@@ -1,28 +1,27 @@
 {
-  "compilerOptions": {
-    "target": "ES5",
-    "module": "ESNext",
-    "allowJs": true,
-    "jsx": "react",
-    "jsxFactory": "h",
-    "noEmit": true,
-    "strict": true,
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": ".",
-    "paths": {
-      "react": [
-        "node_modules/preact/compat/"
-      ],
-      "react-dom": [
-        "node_modules/preact/compat/"
-      ]
-    }
-  },
-  "include": [
-    "src/**/*",
-    "tests/**/*"
-  ]
+	"compilerOptions": {
+		"target": "ES5",
+		"module": "ESNext",
+		"allowJs": true,
+		"jsx": "react",
+		"noEmit": true,
+		"strict": true,
+		"moduleResolution": "node",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": ".",
+		"paths": {
+			"@components/*": [
+				"src/components/*"
+			],
+			"@pages/*": [
+				"src/pages/*"
+			],
+		}
+	},
+	"include": [
+		"src",
+		"webpack.config.js"
+	]
 }

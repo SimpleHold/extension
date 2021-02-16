@@ -1,0 +1,151 @@
+const path = require('path');
+const webpack = require('webpack');
+const FilemanagerPlugin = require('filemanager-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const ExtensionReloader = require('webpack-extension-reloader');
+const WextManifestWebpackPlugin = require('wext-manifest-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+
+const sourcePath = path.join(__dirname, 'src');
+const destPath = path.join(__dirname, 'extension');
+const nodeEnv = process.env.NODE_ENV || 'development';
+const targetBrowser = process.env.TARGET_BROWSER;
+
+const extensionReloaderPlugin =
+  nodeEnv === 'development'
+    ? new ExtensionReloader({
+      port: 9090,
+      reloadPage: true,
+      entries: {
+        contentScript: 'contentScript',
+        background: 'background',
+        extensionPage: ['popup'],
+      },
+    })
+    : () => {
+      this.apply = () => { };
+    };
+
+const getExtensionFileType = (browser) => {
+  if (browser === 'opera') {
+    return 'crx';
+  }
+
+  if (browser === 'firefox') {
+    return 'xpi';
+  }
+
+  return 'zip';
+};
+
+module.exports = {
+  devtool: false,
+  stats: {
+    all: false,
+    builtAt: true,
+    errors: true,
+    hash: true,
+  },
+  mode: nodeEnv,
+  entry: {
+    manifest: path.join(sourcePath, 'manifest.json'),
+    background: path.join(sourcePath, 'utils/background', 'index.ts'),
+    contentScript: path.join(sourcePath, 'utils/contentScript', 'index.ts'),
+    popup: path.join(sourcePath, 'App.tsx'),
+  },
+  output: {
+    path: path.join(destPath, targetBrowser),
+    filename: 'js/[name].bundle.js',
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js', '.json'],
+    alias: {
+      'webextension-polyfill-ts': path.resolve(
+        path.join(__dirname, 'node_modules', 'webextension-polyfill-ts')
+      ),
+    },
+  },
+  module: {
+    rules: [
+      {
+        type: 'javascript/auto',
+        test: /manifest\.json$/,
+        use: {
+          loader: 'wext-manifest-loader',
+          options: {
+            usePackageJSONVersion: true,
+          },
+        },
+        exclude: /node_modules/,
+      },
+      {
+        test: /\.(js|ts)x?$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+      },
+    ],
+  },
+
+  plugins: [
+    new WextManifestWebpackPlugin(),
+    new webpack.SourceMapDevToolPlugin({ filename: false }),
+    new ForkTsCheckerWebpackPlugin(),
+    new webpack.EnvironmentPlugin(['NODE_ENV', 'TARGET_BROWSER']),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [
+        path.join(process.cwd(), `extension/${targetBrowser}`),
+        path.join(
+          process.cwd(),
+          `extension/${targetBrowser}.${getExtensionFileType(targetBrowser)}`
+        ),
+      ],
+      cleanStaleWebpackAssets: false,
+      verbose: true,
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(sourcePath, 'popup.html'),
+      inject: 'body',
+      chunks: ['popup'],
+      hash: true,
+      filename: 'popup.html',
+    }),
+    new CopyWebpackPlugin({
+      patterns: [{ from: 'assets', to: 'assets' }],
+    }),
+    extensionReloaderPlugin,
+  ],
+
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        parallel: true,
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+        },
+        extractComments: false,
+      }),
+      new FilemanagerPlugin({
+        events: {
+          onEnd: {
+            archive: [
+              {
+                format: 'zip',
+                source: path.join(destPath, targetBrowser),
+                destination: `${path.join(destPath, targetBrowser)}.${getExtensionFileType(
+                  targetBrowser
+                )}`,
+                options: { zlib: { level: 6 } },
+              },
+            ],
+          },
+        },
+      }),
+    ],
+  },
+};
