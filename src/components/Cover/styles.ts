@@ -1,10 +1,19 @@
-import styled from 'styled-components'
+import styled from 'styled-components';
 
-export const Container = styled.div`
+import background from '../../assets/backgrounds/main.png';
+
+const Container = styled.div`
   width: 100%;
   height: 340px;
-  background-color: #3FBB7D;
+  background-image: url(${background});
+  background-repeat: no-repeat;
+  background-size: cover;
   position: absolute;
-  top: 0;
   z-index: -1;
-`
+`;
+
+const Styles = {
+  Container,
+};
+
+export default Styles;

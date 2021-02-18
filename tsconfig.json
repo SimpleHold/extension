@@ -1,27 +1,38 @@
 {
+	"extends": "@abhijithvijayan/tsconfig",
 	"compilerOptions": {
-		"target": "ES5",
-		"module": "ESNext",
-		"allowJs": true,
-		"jsx": "react",
-		"noEmit": true,
-		"strict": true,
-		"moduleResolution": "node",
-		"esModuleInterop": true,
+		"target": "es5",
+		"module": "esnext",
+		"lib": [
+			"dom",
+			"dom.iterable",
+			"esnext"
+		],
+		"declaration": false,
+		"isolatedModules": true,
+		"useDefineForClassFields": true,
 		"skipLibCheck": true,
+		"strict": true,
+		"esModuleInterop": true,
+		"moduleResolution": "node",
 		"allowSyntheticDefaultImports": true,
 		"baseUrl": ".",
 		"paths": {
+			"*": ["src/*"],
 			"@components/*": [
 				"src/components/*"
 			],
 			"@pages/*": [
 				"src/pages/*"
 			],
+			"@assets/*": [
+				"assets/pages/*"
+			],
 		}
 	},
 	"include": [
 		"src",
-		"webpack.config.js"
+		"@types",
+		"webpack.config.js",
 	]
 }

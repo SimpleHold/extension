@@ -1,4 +1,4 @@
-import { createGlobalStyle } from 'styled-components';
+import {createGlobalStyle} from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -6,10 +6,11 @@ const GlobalStyle = createGlobalStyle`
   }
   
   body {
-    min-width: 430px;
-    min-height: 680px; 
+    width: 430px;
     padding: 0;
     margin: 0;
+    background-color: #f8f8f8;
+    font-family: 'Roboto', sans-serif;
   }
 `;
 

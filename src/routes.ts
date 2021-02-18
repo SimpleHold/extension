@@ -1,8 +1,20 @@
-import MainPage from '@pages/Main'
+import {RouteProps} from 'react-router-dom';
 
-export default [
+// Pages
+// import WalletsPage from './pages/Wallets';
+import WalletInfoPage from './pages/WalletInfo';
+import SendPage from './pages/Send';
+
+const routers: RouteProps[] = [
   {
     path: '/',
-    component: MainPage,
+    component: SendPage,
+    exact: true,
+  },
+  {
+    path: '/wallet/:address',
+    component: WalletInfoPage,
   },
 ];
+
+export default routers;

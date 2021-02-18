@@ -1,12 +1,20 @@
 import * as React from 'react';
 
 // Styles
-import { Container } from './styles'
+import Styles from './styles';
 
 const Header: React.FC = () => (
-  <Container>
-    <p>Header</p>
-  </Container>
-)
+  <Styles.Container>
+    <Styles.Logo />
+    <Styles.Nav>
+      <Styles.NavItem>
+        <Styles.NavItemIcon />
+      </Styles.NavItem>
+      <Styles.NavItem>
+        <Styles.NavItemIcon />
+      </Styles.NavItem>
+    </Styles.Nav>
+  </Styles.Container>
+);
 
 export default Header;

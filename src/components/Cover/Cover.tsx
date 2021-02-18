@@ -1,10 +1,8 @@
 import * as React from 'react';
 
 // Styles
-import { Container } from './styles'
+import Styles from './styles';
 
-const Cover: React.FC = () => (
-  <Container />
-)
+const Cover: React.FC = () => <Styles.Container />;
 
 export default Cover;

@@ -4,11 +4,14 @@ const FilemanagerPlugin = require('filemanager-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const {CleanWebpackPlugin} = require('clean-webpack-plugin');
 const ExtensionReloader = require('webpack-extension-reloader');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const WextManifestWebpackPlugin = require('wext-manifest-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
+const viewsPath = path.join(__dirname, 'views');
 const sourcePath = path.join(__dirname, 'src');
 const destPath = path.join(__dirname, 'extension');
 const nodeEnv = process.env.NODE_ENV || 'development';
@@ -17,17 +20,17 @@ const targetBrowser = process.env.TARGET_BROWSER;
 const extensionReloaderPlugin =
   nodeEnv === 'development'
     ? new ExtensionReloader({
-      port: 9090,
-      reloadPage: true,
-      entries: {
-        contentScript: 'contentScript',
-        background: 'background',
-        extensionPage: ['popup'],
-      },
-    })
+        port: 9090,
+        reloadPage: true,
+        entries: {
+          contentScript: 'contentScript',
+          background: 'background',
+          extensionPage: ['popup', 'options'],
+        },
+      })
     : () => {
-      this.apply = () => { };
-    };
+        this.apply = () => {};
+      };
 
 const getExtensionFileType = (browser) => {
   if (browser === 'opera') {
@@ -52,9 +55,10 @@ module.exports = {
   mode: nodeEnv,
   entry: {
     manifest: path.join(sourcePath, 'manifest.json'),
-    background: path.join(sourcePath, 'utils/background', 'index.ts'),
-    contentScript: path.join(sourcePath, 'utils/contentScript', 'index.ts'),
-    popup: path.join(sourcePath, 'App.tsx'),
+    background: path.join(sourcePath, 'utils', 'background.ts'),
+    contentScript: path.join(sourcePath, 'utils', 'contentScript.ts'),
+    popup: path.join(sourcePath, 'Popup', 'index.tsx'),
+    options: path.join(sourcePath, 'Options', 'index.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -86,12 +90,54 @@ module.exports = {
         loader: 'babel-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.(sa|sc|c)ss$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+            },
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  [
+                    'autoprefixer',
+                    {
+                      // Options
+                    },
+                  ],
+                ],
+              },
+            },
+          },
+          'resolve-url-loader',
+          'sass-loader',
+        ],
+      },
+      {
+        test: /\.(png|jpg|gif|svg)$/i,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+            },
+          },
+        ],
+      },
     ],
   },
 
   plugins: [
     new WextManifestWebpackPlugin(),
-    new webpack.SourceMapDevToolPlugin({ filename: false }),
+    new webpack.SourceMapDevToolPlugin({filename: false}),
     new ForkTsCheckerWebpackPlugin(),
     new webpack.EnvironmentPlugin(['NODE_ENV', 'TARGET_BROWSER']),
     new CleanWebpackPlugin({
@@ -106,14 +152,22 @@ module.exports = {
       verbose: true,
     }),
     new HtmlWebpackPlugin({
-      template: path.join(sourcePath, 'popup.html'),
+      template: path.join(viewsPath, 'popup.html'),
       inject: 'body',
       chunks: ['popup'],
       hash: true,
       filename: 'popup.html',
     }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'options.html'),
+      inject: 'body',
+      chunks: ['options'],
+      hash: true,
+      filename: 'options.html',
+    }),
+    new MiniCssExtractPlugin({filename: 'css/[name].css'}),
     new CopyWebpackPlugin({
-      patterns: [{ from: 'assets', to: 'assets' }],
+      patterns: [{from: 'src/assets', to: 'assets'}],
     }),
     extensionReloaderPlugin,
   ],
@@ -130,6 +184,11 @@ module.exports = {
         },
         extractComments: false,
       }),
+      new OptimizeCSSAssetsPlugin({
+        cssProcessorPluginOptions: {
+          preset: ['default', {discardComments: {removeAll: true}}],
+        },
+      }),
       new FilemanagerPlugin({
         events: {
           onEnd: {
@@ -137,10 +196,11 @@ module.exports = {
               {
                 format: 'zip',
                 source: path.join(destPath, targetBrowser),
-                destination: `${path.join(destPath, targetBrowser)}.${getExtensionFileType(
+                destination: `${path.join(
+                  destPath,
                   targetBrowser
-                )}`,
-                options: { zlib: { level: 6 } },
+                )}.${getExtensionFileType(targetBrowser)}`,
+                options: {zlib: {level: 6}},
               },
             ],
           },
