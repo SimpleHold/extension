@@ -3,7 +3,7 @@ import styled from 'styled-components'
 const Container = styled.div`
   background-color: #ffffff;
   border-radius: 5px;
-  margin: 10px 0 0 0;
+  margin: 0 0 10px 0;
   padding: 20px;
   display: flex;
   flex-direction: row;
@@ -12,7 +12,7 @@ const Container = styled.div`
 
   &:hover {
     cursor: pointer;
-    margin: 10px -10px 0 10px;
+    margin: 0 -10px 10px 10px;
   }
 `
 

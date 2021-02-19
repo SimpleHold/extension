@@ -26,6 +26,8 @@ const Container = styled.div`
 
 const Logo = styled.div<TLogoProps>`
   background-image: ${({ source }: TLogoProps) => `url(${source})`};
+  background-size: contain;
+  background-repeat: no-repeat;
 `
 
 const Styles = {

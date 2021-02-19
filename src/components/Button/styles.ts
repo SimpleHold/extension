@@ -8,6 +8,11 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #31a76c;
+  }
 `
 
 const Label = styled.p`
@@ -17,6 +22,7 @@ const Label = styled.p`
   line-height: 19px;
   text-align: center;
   color: #ffffff;
+  user-select: none;
 `
 
 const Styles = {

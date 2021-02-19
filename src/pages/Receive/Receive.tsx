@@ -1,7 +1,7 @@
 import * as React from 'react'
-import QRCode from 'qrcode.react'
 
 // Components
+import Cover from '@components/Cover'
 import Header from '@components/Header'
 import Button from '@components/Button'
 import CurrencyLogo from '@components/CurrencyLogo'
@@ -18,32 +18,35 @@ const Receive: React.FC<Props> = (props) => {
 
   return (
     <Styles.Wrapper>
+      <Cover />
       <Header />
       <Styles.Container>
-        <Styles.Wallet>
-          <Styles.Actions>
+        <Styles.Row>
+          <Styles.Heading>
             <Styles.UpdateBalanceBlock>
-              <Styles.UpdateBalanceLabel>
-                Balance {JSON.stringify(params)}
-              </Styles.UpdateBalanceLabel>
-              <Styles.UpdateBalanceIcon />
+              <Styles.BalanceLabel>Balance</Styles.BalanceLabel>
+              <Styles.RefreshIconRow>
+                <Styles.RefreshIcon />
+              </Styles.RefreshIconRow>
             </Styles.UpdateBalanceBlock>
-            <Styles.More>
+            <Styles.MoreButton>
               <Styles.MoreIcon />
-            </Styles.More>
-          </Styles.Actions>
-          <Styles.Currency>
-            <CurrencyLogo width={24} height={24} symbol="btc" />
-            <Styles.CurrenyName>Bitcoin</Styles.CurrenyName>
-          </Styles.Currency>
+            </Styles.MoreButton>
+          </Styles.Heading>
+
+          <Styles.CurrencyBlock>
+            <CurrencyLogo symbol="btc" width={22} height={22} />
+            <Styles.CurrencyName>Bitcoin</Styles.CurrencyName>
+          </Styles.CurrencyBlock>
+
           <Styles.Balance>0.16823857 BTC</Styles.Balance>
           <Styles.USDEstimated>$5,712.75 USD</Styles.USDEstimated>
-        </Styles.Wallet>
-        <Styles.AddressInfo>
-          <QRCode value="adfdsff" width={150} height={150} />
+        </Styles.Row>
+        <Styles.ReceiveBlock>
+          <Styles.QRCode />
           <Styles.Address>bc1q34aq5drpuwy3wgl9lhup9892qp6svr8ldzyy7c</Styles.Address>
           <Button label="Send BTC" />
-        </Styles.AddressInfo>
+        </Styles.ReceiveBlock>
       </Styles.Container>
     </Styles.Wrapper>
   )

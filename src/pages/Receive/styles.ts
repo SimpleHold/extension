@@ -1,38 +1,29 @@
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
-  height: 100%;
+  height: 600px;
 `
 
 const Container = styled.div`
   background-color: #ffffff;
   border-radius: 5px 5px 0 0;
-  height: 100%;
 `
 
-const Wallet = styled.div`
-  padding: 20px 20px 56px 20px;
-`
-
-const AddressInfo = styled.div`
+const ReceiveBlock = styled.div`
   border-top: 1px solid #eaeaea;
+  padding: 20px 30px 30px 30px;
   background-color: #f8f8f8;
   height: 100%;
-  padding: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
 `
 
-const Address = styled.p`
-  margin: 20px 0 30px 0;
-  font-size: 20px;
-  line-height: 25px;
-  text-align: center;
-  color: #7d7e8d;
+const Row = styled.div`
+  padding: 16px 30px 40px 30px;
 `
 
-const Actions = styled.div`
+const Heading = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -45,21 +36,24 @@ const UpdateBalanceBlock = styled.div`
   align-items: center;
 `
 
-const UpdateBalanceLabel = styled.p`
+const BalanceLabel = styled.p`
   margin: 0;
+  font-size: 16px;
   line-height: 19px;
   color: #c3c3c3;
 `
 
-const UpdateBalanceIcon = styled.div`
-  margin: 0 0 0 10px;
+const RefreshIconRow = styled.div`
   width: 24px;
   height: 24px;
   background-color: #c3c3c3;
-  border-radius: 15px;
+  border-radius: 12px;
+  margin: 0 0 0 10px;
 `
 
-const More = styled.div`
+const RefreshIcon = styled.div``
+
+const MoreButton = styled.div`
   width: 30px;
   height: 30px;
   background-color: red;
@@ -69,20 +63,20 @@ const More = styled.div`
 `
 
 const MoreIcon = styled.div`
-  width: 20px;
-  height: 2.22px;
-  background-color: green;
+  width: 16px;
+  height: 2px;
+  background-color: blue;
 `
 
-const Currency = styled.div`
+const CurrencyBlock = styled.div`
   display: flex;
-  align-items: center;
   flex-direction: row;
-  margin: 24px 0 0 0;
+  align-items: center;
+  margin: 21px 0 0 0;
 `
 
-const CurrenyName = styled.p`
-  margin: 0 0 0 7px;
+const CurrencyName = styled.p`
+  margin: 0 0 0 10px;
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
@@ -90,16 +84,31 @@ const CurrenyName = styled.p`
   color: #f7931a;
 `
 
-const Balance = styled.h3`
-  margin: 11px 0 3px 0;
+const QRCode = styled.div`
+  width: 120px;
+  height: 120px;
+  background-color: red;
+`
+
+const Address = styled.p`
+  margin: 10px 0 40px 0;
+  font-size: 20px;
+  line-height: 25px;
+  text-align: center;
+  color: #7d7e8d;
+  word-break: break-all;
+`
+
+const Balance = styled.p`
+  margin: 10px 0 0 0;
   font-weight: 500;
-  font-size: 40px;
-  line-height: 47px;
+  font-size: 36px;
+  line-height: 42px;
   color: #1d1d22;
 `
 
 const USDEstimated = styled.p`
-  margin: 0;
+  margin: 5px 0 0 0;
   font-size: 20px;
   line-height: 23px;
   color: #7d7e8d;
@@ -108,17 +117,19 @@ const USDEstimated = styled.p`
 const Styles = {
   Wrapper,
   Container,
-  Wallet,
-  AddressInfo,
-  Address,
-  Actions,
+  Row,
+  ReceiveBlock,
   UpdateBalanceBlock,
-  UpdateBalanceLabel,
-  UpdateBalanceIcon,
-  More,
+  BalanceLabel,
+  Heading,
+  RefreshIconRow,
+  RefreshIcon,
+  MoreButton,
   MoreIcon,
-  Currency,
-  CurrenyName,
+  CurrencyBlock,
+  CurrencyName,
+  QRCode,
+  Address,
   Balance,
   USDEstimated,
 }

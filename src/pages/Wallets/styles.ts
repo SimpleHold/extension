@@ -1,14 +1,29 @@
 import styled from 'styled-components'
 
-const Wrapper = styled.div``
+import background from '../../assets/backgrounds/main.png'
 
-const Row = styled.div`
-  padding: 0 30px;
-  height: 520px;
+const Wrapper = styled.div`
+  height: 600px;
+`
+
+const Collapsible = styled.div`
+  width: 100%;
+  background-image: url(${background});
+  background-repeat: no-repeat;
+  position: fixed;
+  z-index: 2;
+`
+
+const WalletsList = styled.div`
+  position: relative;
+  top: 300px;
+  padding: 0 30px 20px 30px;
 `
 
 const BalanceBlock = styled.div`
-  margin: 20px 0 0 0;
+  position: absolute;
+  padding-right: 30px;
+  padding-left: 30px;
 `
 
 const TotalBalance = styled.p`
@@ -19,7 +34,7 @@ const TotalBalance = styled.p`
 `
 
 const BalanceAmount = styled.p`
-  margin: 21px 0 5px 0;
+  margin: 21px 0 0 0;
   font-weight: 500;
   font-size: 36px;
   line-height: 42px;
@@ -27,21 +42,19 @@ const BalanceAmount = styled.p`
 `
 
 const USDEstimated = styled.p`
-  margin: 0;
+  margin: 5px 0 0 0;
   font-size: 20px;
   line-height: 23px;
   color: #ffffff;
 `
 
-const WalletsRow = styled.div`
-  margin: 70px 0 0 0;
-`
-
 const WalletsHeading = styled.div`
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: space-between;
+  padding: 0 30px;
+  margin: 70px 0 0 0;
+  align-items: center;
 `
 
 const WalletsLabel = styled.p`
@@ -75,12 +88,12 @@ const AddWalletButton = styled.button`
 
 const Styles = {
   Wrapper,
-  Row,
+  Collapsible,
+  WalletsList,
   BalanceBlock,
   TotalBalance,
   BalanceAmount,
   USDEstimated,
-  WalletsRow,
   WalletsHeading,
   WalletsLabel,
   AddWalletButton,
