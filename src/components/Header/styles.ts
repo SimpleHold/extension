@@ -40,13 +40,11 @@ const NavItem = styled.div`
     cursor: pointer;
     background-color: #ffffffcc;
     border-radius: 15px;
-  }
-`
 
-const NavItemIcon = styled.div`
-  width: 16px;
-  height: 16px;
-  background-color: blue;
+    path {
+      fill: #3fbb7d;
+    }
+  }
 `
 
 const Styles = {
@@ -54,7 +52,6 @@ const Styles = {
   Logo,
   Nav,
   NavItem,
-  NavItemIcon,
 }
 
 export default Styles
