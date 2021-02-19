@@ -1,11 +1,11 @@
-import * as React from 'react';
+import * as React from 'react'
 
 const Options: React.FC = () => {
   return (
     <div>
       <p>options</p>
     </div>
-  );
-};
+  )
+}
 
-export default Options;
+export default Options

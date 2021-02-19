@@ -1,13 +1,13 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
-import logo from '../../assets/logo.svg';
+import logo from '../../assets/logo.svg'
 
 const Container = styled.div`
   padding: 15px 30px;
   display: flex;
   flex-direction: row;
   align-items: center;
-`;
+`
 
 const Logo = styled.div`
   width: 24px;
@@ -15,7 +15,7 @@ const Logo = styled.div`
   background-image: url(${logo});
   background-repeat: no-repeat;
   background-size: contain;
-`;
+`
 
 const Nav = styled.div`
   display: flex;
@@ -23,7 +23,7 @@ const Nav = styled.div`
   align-items: center;
   flex: 1;
   justify-content: flex-end;
-`;
+`
 
 const NavItem = styled.div`
   width: 30px;
@@ -41,13 +41,13 @@ const NavItem = styled.div`
     background-color: #ffffffcc;
     border-radius: 15px;
   }
-`;
+`
 
 const NavItemIcon = styled.div`
   width: 16px;
   height: 16px;
   background-color: blue;
-`;
+`
 
 const Styles = {
   Container,
@@ -55,6 +55,6 @@ const Styles = {
   Nav,
   NavItem,
   NavItemIcon,
-};
+}
 
-export default Styles;
+export default Styles

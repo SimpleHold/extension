@@ -1,12 +1,12 @@
-import * as React from 'react';
-import SVG from 'react-inlinesvg';
+import * as React from 'react'
+import SVG from 'react-inlinesvg'
 
 // Components
-import Header from '@components/Header';
-import WalletCard from '@components/WalletCard';
+import Header from '@components/Header'
+import WalletCard from '@components/WalletCard'
 
 // Styles
-import Styles from './styles';
+import Styles from './styles'
 
 const Wallets: React.FC = () => (
   <Styles.Wrapper>
@@ -21,12 +21,7 @@ const Wallets: React.FC = () => (
         <Styles.WalletsHeading>
           <Styles.WalletsLabel>Wallets</Styles.WalletsLabel>
           <Styles.AddWalletButton>
-            <SVG
-              src="../../assets/icons/plus.svg"
-              width={16}
-              height={16}
-              title="plus"
-            />
+            <SVG src="../../assets/icons/plus.svg" width={16} height={16} title="plus" />
           </Styles.AddWalletButton>
         </Styles.WalletsHeading>
         <WalletCard
@@ -46,6 +41,6 @@ const Wallets: React.FC = () => (
       </Styles.WalletsRow>
     </Styles.Row>
   </Styles.Wrapper>
-);
+)
 
-export default Wallets;
+export default Wallets

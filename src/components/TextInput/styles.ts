@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 const Container = styled.div`
   width: 100%;
@@ -11,14 +11,14 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
-`;
+`
 
 const Label = styled.p`
   margin: 0;
   font-size: 12px;
   line-height: 14px;
   color: #7d7e8d;
-`;
+`
 
 const TextInput = styled.input`
   border: none;
@@ -28,12 +28,12 @@ const TextInput = styled.input`
   font-size: 16px;
   line-height: 19px;
   color: #1d1d22;
-`;
+`
 
 const Styles = {
   Container,
   Label,
   TextInput,
-};
+}
 
-export default Styles;
+export default Styles

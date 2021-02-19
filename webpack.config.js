@@ -1,21 +1,19 @@
-const path = require('path');
-const webpack = require('webpack');
-const FilemanagerPlugin = require('filemanager-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const {CleanWebpackPlugin} = require('clean-webpack-plugin');
-const ExtensionReloader = require('webpack-extension-reloader');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const WextManifestWebpackPlugin = require('wext-manifest-webpack-plugin');
-const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const path = require('path')
+const webpack = require('webpack')
+const FilemanagerPlugin = require('filemanager-webpack-plugin')
+const TerserPlugin = require('terser-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const ExtensionReloader = require('webpack-extension-reloader')
+const WextManifestWebpackPlugin = require('wext-manifest-webpack-plugin')
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 
-const viewsPath = path.join(__dirname, 'views');
-const sourcePath = path.join(__dirname, 'src');
-const destPath = path.join(__dirname, 'extension');
-const nodeEnv = process.env.NODE_ENV || 'development';
-const targetBrowser = process.env.TARGET_BROWSER;
+const viewsPath = path.join(__dirname, 'views')
+const sourcePath = path.join(__dirname, 'src')
+const destPath = path.join(__dirname, 'extension')
+const nodeEnv = process.env.NODE_ENV || 'development'
+const targetBrowser = process.env.TARGET_BROWSER
 
 const extensionReloaderPlugin =
   nodeEnv === 'development'
@@ -29,20 +27,20 @@ const extensionReloaderPlugin =
         },
       })
     : () => {
-        this.apply = () => {};
-      };
+        this.apply = () => {}
+      }
 
 const getExtensionFileType = (browser) => {
   if (browser === 'opera') {
-    return 'crx';
+    return 'crx'
   }
 
   if (browser === 'firefox') {
-    return 'xpi';
+    return 'xpi'
   }
 
-  return 'zip';
-};
+  return 'zip'
+}
 
 module.exports = {
   devtool: false,
@@ -91,37 +89,6 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.(sa|sc|c)ss$/,
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader,
-          },
-          {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true,
-            },
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              postcssOptions: {
-                plugins: [
-                  [
-                    'autoprefixer',
-                    {
-                      // Options
-                    },
-                  ],
-                ],
-              },
-            },
-          },
-          'resolve-url-loader',
-          'sass-loader',
-        ],
-      },
-      {
         test: /\.(png|jpg|gif|svg)$/i,
         use: [
           {
@@ -137,7 +104,7 @@ module.exports = {
 
   plugins: [
     new WextManifestWebpackPlugin(),
-    new webpack.SourceMapDevToolPlugin({filename: false}),
+    new webpack.SourceMapDevToolPlugin({ filename: false }),
     new ForkTsCheckerWebpackPlugin(),
     new webpack.EnvironmentPlugin(['NODE_ENV', 'TARGET_BROWSER']),
     new CleanWebpackPlugin({
@@ -165,9 +132,8 @@ module.exports = {
       hash: true,
       filename: 'options.html',
     }),
-    new MiniCssExtractPlugin({filename: 'css/[name].css'}),
     new CopyWebpackPlugin({
-      patterns: [{from: 'src/assets', to: 'assets'}],
+      patterns: [{ from: 'src/assets', to: 'assets' }],
     }),
     extensionReloaderPlugin,
   ],
@@ -184,11 +150,6 @@ module.exports = {
         },
         extractComments: false,
       }),
-      new OptimizeCSSAssetsPlugin({
-        cssProcessorPluginOptions: {
-          preset: ['default', {discardComments: {removeAll: true}}],
-        },
-      }),
       new FilemanagerPlugin({
         events: {
           onEnd: {
@@ -196,11 +157,10 @@ module.exports = {
               {
                 format: 'zip',
                 source: path.join(destPath, targetBrowser),
-                destination: `${path.join(
-                  destPath,
+                destination: `${path.join(destPath, targetBrowser)}.${getExtensionFileType(
                   targetBrowser
-                )}.${getExtensionFileType(targetBrowser)}`,
-                options: {zlib: {level: 6}},
+                )}`,
+                options: { zlib: { level: 6 } },
               },
             ],
           },
@@ -208,4 +168,4 @@ module.exports = {
       }),
     ],
   },
-};
+}

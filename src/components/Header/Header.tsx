@@ -1,7 +1,7 @@
-import * as React from 'react';
+import * as React from 'react'
 
 // Styles
-import Styles from './styles';
+import Styles from './styles'
 
 const Header: React.FC = () => (
   <Styles.Container>
@@ -15,6 +15,6 @@ const Header: React.FC = () => (
       </Styles.NavItem>
     </Styles.Nav>
   </Styles.Container>
-);
+)
 
-export default Header;
+export default Header

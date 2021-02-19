@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 const Container = styled.div`
   background-color: #ffffff;
@@ -14,7 +14,7 @@ const Container = styled.div`
     cursor: pointer;
     margin: 10px -10px 0 10px;
   }
-`;
+`
 
 const Row = styled.div`
   display: flex;
@@ -23,9 +23,9 @@ const Row = styled.div`
   justify-content: space-between;
   flex: 1;
   margin: 0 0 0 20px;
-`;
+`
 
-const Info = styled.div``;
+const Info = styled.div``
 
 const CurrencyName = styled.p`
   margin: 0;
@@ -33,16 +33,16 @@ const CurrencyName = styled.p`
   line-height: 19px;
   text-transform: capitalize;
   color: #1d1d22;
-`;
+`
 
 const Address = styled.p`
   margin: 6px 0 0 0;
   font-size: 12px;
   line-height: 14px;
   color: #c3c3c3;
-`;
+`
 
-const BalanceInfo = styled.div``;
+const BalanceInfo = styled.div``
 
 const Balance = styled.p`
   margin: 0;
@@ -52,7 +52,7 @@ const Balance = styled.p`
   text-align: right;
   text-transform: capitalize;
   color: #1d1d22;
-`;
+`
 
 const USDEstimated = styled.p`
   margin: 6px 0 0 0;
@@ -60,7 +60,7 @@ const USDEstimated = styled.p`
   line-height: 14px;
   text-align: right;
   color: #7d7e8d;
-`;
+`
 
 const Styles = {
   Container,
@@ -71,6 +71,6 @@ const Styles = {
   BalanceInfo,
   Balance,
   USDEstimated,
-};
+}
 
-export default Styles;
+export default Styles

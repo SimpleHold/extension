@@ -1,3 +1,3 @@
-import WalletCard from './WalletCard';
+import WalletCard from './WalletCard'
 
-export default WalletCard;
+export default WalletCard

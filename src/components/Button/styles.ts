@@ -1,4 +1,4 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 const Container = styled.div`
   width: 100%;
@@ -8,7 +8,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-`;
+`
 
 const Label = styled.p`
   margin: 0;
@@ -17,11 +17,11 @@ const Label = styled.p`
   line-height: 19px;
   text-align: center;
   color: #ffffff;
-`;
+`
 
 const Styles = {
   Container,
   Label,
-};
+}
 
-export default Styles;
+export default Styles

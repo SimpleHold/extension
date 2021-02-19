@@ -1,8 +1,8 @@
-import * as React from 'react';
+import * as React from 'react'
 
 // Styles
-import Styles from './styles';
+import Styles from './styles'
 
-const Cover: React.FC = () => <Styles.Container />;
+const Cover: React.FC = () => <Styles.Container />
 
-export default Cover;
+export default Cover

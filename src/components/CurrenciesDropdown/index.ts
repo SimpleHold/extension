@@ -1,3 +1,3 @@
-import CurrenciesDropdown from './CurrenciesDropdown';
+import CurrenciesDropdown from './CurrenciesDropdown'
 
-export default CurrenciesDropdown;
+export default CurrenciesDropdown

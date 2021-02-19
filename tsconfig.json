@@ -1,38 +1,24 @@
 {
-	"extends": "@abhijithvijayan/tsconfig",
-	"compilerOptions": {
-		"target": "es5",
-		"module": "esnext",
-		"lib": [
-			"dom",
-			"dom.iterable",
-			"esnext"
-		],
-		"declaration": false,
-		"isolatedModules": true,
-		"useDefineForClassFields": true,
-		"skipLibCheck": true,
-		"strict": true,
-		"esModuleInterop": true,
-		"moduleResolution": "node",
-		"allowSyntheticDefaultImports": true,
-		"baseUrl": ".",
-		"paths": {
-			"*": ["src/*"],
-			"@components/*": [
-				"src/components/*"
-			],
-			"@pages/*": [
-				"src/pages/*"
-			],
-			"@assets/*": [
-				"assets/pages/*"
-			],
-		}
-	},
-	"include": [
-		"src",
-		"@types",
-		"webpack.config.js",
-	]
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "react",
+    "declaration": false,
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@pages/*": ["src/pages/*"],
+      "@assets/*": ["assets/pages/*"]
+    }
+  },
+  "include": ["src", "@types", "webpack.config.js"]
 }

@@ -1,28 +1,28 @@
-import * as React from 'react';
-import {useHistory} from 'react-router-dom';
+import * as React from 'react'
+import { useHistory } from 'react-router-dom'
 
 // Components
-import CurrencyLogo from '@components/CurrencyLogo';
+import CurrencyLogo from '@components/CurrencyLogo'
 
 // Styles
-import Styles from './styles';
+import Styles from './styles'
 
 interface Props {
-  currency: string;
-  address: string;
-  balance: number;
-  usdestimtaed: number;
-  symbol: string;
+  currency: string
+  address: string
+  balance: number
+  usdestimtaed: number
+  symbol: string
 }
 
 const WalletCard: React.FC<Props> = (props) => {
-  const {currency, address, balance, usdestimtaed, symbol} = props;
+  const { currency, address, balance, usdestimtaed, symbol } = props
 
-  const history = useHistory();
+  const history = useHistory()
 
   const openWallet = (): void => {
-    history.push('/wallet');
-  };
+    history.push('/receive')
+  }
 
   return (
     <Styles.Container onClick={openWallet}>
@@ -38,7 +38,7 @@ const WalletCard: React.FC<Props> = (props) => {
         </Styles.BalanceInfo>
       </Styles.Row>
     </Styles.Container>
-  );
-};
+  )
+}
 
-export default WalletCard;
+export default WalletCard

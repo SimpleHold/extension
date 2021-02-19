@@ -1,20 +1,23 @@
-import {RouteProps} from 'react-router-dom';
+import { RouteProps } from 'react-router-dom'
 
 // Pages
-// import WalletsPage from './pages/Wallets';
-import WalletInfoPage from './pages/WalletInfo';
-import SendPage from './pages/Send';
+import WalletsPage from './pages/Wallets'
+import ReceivePage from './pages/Receive'
+import SendPage from './pages/Send'
 
 const routers: RouteProps[] = [
   {
-    path: '/',
-    component: SendPage,
-    exact: true,
+    path: '/wallets',
+    component: WalletsPage,
   },
   {
-    path: '/wallet/:address',
-    component: WalletInfoPage,
+    path: '/receive',
+    component: ReceivePage,
   },
-];
+  {
+    path: '/send',
+    component: SendPage,
+  },
+]
 
-export default routers;
+export default routers

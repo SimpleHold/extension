@@ -1,47 +1,48 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div``
 
 const Row = styled.div`
   padding: 0 30px;
-`;
+  height: 520px;
+`
 
 const BalanceBlock = styled.div`
-  margin: 30px 0 0 0;
-`;
+  margin: 20px 0 0 0;
+`
 
 const TotalBalance = styled.p`
   margin: 0;
   font-size: 16px;
   line-height: 19px;
   color: #ffffff;
-`;
+`
 
 const BalanceAmount = styled.p`
-  margin: 21px 0 3px 0;
+  margin: 21px 0 5px 0;
   font-weight: 500;
-  font-size: 40px;
-  line-height: 47px;
+  font-size: 36px;
+  line-height: 42px;
   color: #ffffff;
-`;
+`
 
 const USDEstimated = styled.p`
   margin: 0;
   font-size: 20px;
   line-height: 23px;
   color: #ffffff;
-`;
+`
 
 const WalletsRow = styled.div`
-  margin: 53px 0 0 0;
-`;
+  margin: 70px 0 0 0;
+`
 
 const WalletsHeading = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-`;
+`
 
 const WalletsLabel = styled.p`
   margin: 0;
@@ -49,7 +50,7 @@ const WalletsLabel = styled.p`
   font-size: 16px;
   line-height: 19px;
   color: #ffffff;
-`;
+`
 
 const AddWalletButton = styled.button`
   border: none;
@@ -70,7 +71,7 @@ const AddWalletButton = styled.button`
       stroke: #31a76c;
     }
   }
-`;
+`
 
 const Styles = {
   Wrapper,
@@ -83,6 +84,6 @@ const Styles = {
   WalletsHeading,
   WalletsLabel,
   AddWalletButton,
-};
+}
 
-export default Styles;
+export default Styles

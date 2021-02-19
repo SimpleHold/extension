@@ -1,17 +1,17 @@
-import * as React from 'react';
+import * as React from 'react'
 
 // Components
-import Header from '@components/Header';
-import CurrenciesDropdown from '@components/CurrenciesDropdown';
-import TextInput from '@components/TextInput';
-import Button from '@components/Button';
+import Header from '@components/Header'
+import CurrenciesDropdown from '@components/CurrenciesDropdown'
+import TextInput from '@components/TextInput'
+import Button from '@components/Button'
 
 // Styles
-import Styles from './styles';
+import Styles from './styles'
 
 const Send: React.FC = () => {
-  const [address, setAddress] = React.useState<string>('');
-  const [amount, setAmount] = React.useState<string>('');
+  const [address, setAddress] = React.useState<string>('')
+  const [amount, setAmount] = React.useState<string>('')
 
   return (
     <Styles.Wrapper>
@@ -27,16 +27,12 @@ const Send: React.FC = () => {
           <TextInput
             label="Recipient Address"
             value={address}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-              setAddress(e.target.value)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAddress(e.target.value)}
           />
           <TextInput
             label="Amount (BTC)"
             value={amount}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-              setAmount(e.target.value)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAmount(e.target.value)}
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
@@ -49,7 +45,7 @@ const Send: React.FC = () => {
         </Styles.Form>
       </Styles.Container>
     </Styles.Wrapper>
-  );
-};
+  )
+}
 
-export default Send;
+export default Send

@@ -1,3 +1,3 @@
-import CurrencyLogo from './CurrencyLogo';
+import CurrencyLogo from './CurrencyLogo'
 
-export default CurrencyLogo;
+export default CurrencyLogo

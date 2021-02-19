@@ -1,13 +1,13 @@
-import styled from 'styled-components';
+import styled from 'styled-components'
 
 type TContainerProps = {
-  width: number;
-  height: number;
-};
+  width: number
+  height: number
+}
 
 type TLogoProps = {
-  source: string;
-};
+  source: string
+}
 
 const Container = styled.div`
   width: ${({ width }: TContainerProps) => `${width}px`};
@@ -19,18 +19,18 @@ const Container = styled.div`
   justify-content: center;
 
   div {
-    width: ${({ width }: TContainerProps) => `${width/2}px`};
-    height: ${({ height }: TContainerProps) => `${height/2}px`};
+    width: ${({ width }: TContainerProps) => `${width / 2}px`};
+    height: ${({ height }: TContainerProps) => `${height / 2}px`};
   }
-`;
+`
 
 const Logo = styled.div<TLogoProps>`
   background-image: ${({ source }: TLogoProps) => `url(${source})`};
-`;
+`
 
 const Styles = {
   Container,
   Logo,
-};
+}
 
-export default Styles;
+export default Styles

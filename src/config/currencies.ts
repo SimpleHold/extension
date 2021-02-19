@@ -1,10 +1,10 @@
-import bitcoinLogo from '../assets/currencies/btc.svg';
+import bitcoinLogo from '../assets/currencies/btc.svg'
 
 export interface ICurrency {
-  name: string;
-  symbol: string;
-  logo: string;
-  background: string;
+  name: string
+  symbol: string
+  logo: string
+  background: string
 }
 
 const currencies: ICurrency[] = [
@@ -14,10 +14,10 @@ const currencies: ICurrency[] = [
     logo: bitcoinLogo,
     background: '#f7931a33',
   },
-];
+]
 
 export const getLogo = (symbol: string): ICurrency | undefined => {
-  return currencies.find((currency: ICurrency) => currency.symbol === symbol);
-};
+  return currencies.find((currency: ICurrency) => currency.symbol === symbol)
+}
 
-export default currencies;
+export default currencies

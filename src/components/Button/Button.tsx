@@ -1,20 +1,20 @@
-import * as React from 'react';
+import * as React from 'react'
 
 // Styles
-import Styles from './styles';
+import Styles from './styles'
 
 interface Props {
-  label: string;
+  label: string
 }
 
 const Button: React.FC<Props> = (props) => {
-  const {label} = props;
+  const { label } = props
 
   return (
     <Styles.Container>
       <Styles.Label>{label}</Styles.Label>
     </Styles.Container>
-  );
-};
+  )
+}
 
-export default Button;
+export default Button

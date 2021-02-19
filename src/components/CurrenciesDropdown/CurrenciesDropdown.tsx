@@ -1,17 +1,17 @@
-import * as React from 'react';
+import * as React from 'react'
 
 // Components
-import CurrencyLogo from '@components/CurrencyLogo';
+import CurrencyLogo from '@components/CurrencyLogo'
 
 // Styles
-import Styles from './styles';
+import Styles from './styles'
 
 interface Props {
-  symbol: string;
+  symbol: string
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
-  const {symbol} = props;
+  const { symbol } = props
 
   return (
     <Styles.Container>
@@ -23,7 +23,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
         </Styles.Button>
       </Styles.Row>
     </Styles.Container>
-  );
-};
+  )
+}
 
-export default CurrenciesDropdown;
+export default CurrenciesDropdown
