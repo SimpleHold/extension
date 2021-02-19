@@ -56,7 +56,6 @@ module.exports = {
     background: path.join(sourcePath, 'utils', 'background.ts'),
     contentScript: path.join(sourcePath, 'utils', 'contentScript.ts'),
     popup: path.join(sourcePath, 'Popup', 'index.tsx'),
-    options: path.join(sourcePath, 'Options', 'index.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -124,13 +123,6 @@ module.exports = {
       chunks: ['popup'],
       hash: true,
       filename: 'popup.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'options.html'),
-      inject: 'body',
-      chunks: ['options'],
-      hash: true,
-      filename: 'options.html',
     }),
     new CopyWebpackPlugin({
       patterns: [{ from: 'src/assets', to: 'assets' }],
