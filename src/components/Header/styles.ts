@@ -1,6 +1,8 @@
 import styled from 'styled-components'
 
-import logo from '../../assets/logo.svg'
+type TLogoProps = {
+  color: string
+}
 
 const Container = styled.div`
   padding: 15px 30px;
@@ -17,11 +19,12 @@ const Row = styled.div`
 `
 
 const Logo = styled.div`
-  width: 24px;
-  height: 24px;
-  background-image: url(${logo});
-  background-repeat: no-repeat;
-  background-size: contain;
+  width: 30px;
+  height: 30px;
+
+  path {
+    fill: ${({ color }: TLogoProps) => color};
+  }
 `
 
 const Nav = styled.div`
@@ -77,6 +80,16 @@ const NavigateTitle = styled.p`
   opacity: 0.6;
 `
 
+const LogoRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const Name = styled.div`
+  margin: 0 0 0 10px;
+`
+
 const Styles = {
   Container,
   Row,
@@ -86,6 +99,8 @@ const Styles = {
   Navigate,
   BackIcon,
   NavigateTitle,
+  LogoRow,
+  Name,
 }
 
 export default Styles

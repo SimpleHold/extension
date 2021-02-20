@@ -2,6 +2,8 @@ import * as React from 'react'
 import SVG from 'react-inlinesvg'
 
 // Icons
+import logo from '@assets/logo.svg'
+import nameIcon from '@assets/name.svg'
 import lockIcon from '@assets/icons/lock.svg'
 import settingsIcon from '@assets/icons/settings.svg'
 
@@ -12,14 +14,25 @@ interface Props {
   withBack?: boolean
   backTitle?: string
   noActions?: boolean
+  withName?: boolean
+  logoColor?: string
 }
 
 const Header: React.FC<Props> = (props) => {
-  const { withBack, backTitle, noActions } = props
+  const { withBack, backTitle, noActions, withName, logoColor = '#FFFFFF' } = props
 
   return (
     <Styles.Container>
-      <Styles.Logo />
+      <Styles.LogoRow>
+        <Styles.Logo color={logoColor}>
+          <SVG src={logo} width={30} height={30} title="logo" />
+        </Styles.Logo>
+        {withName ? (
+          <Styles.Name>
+            <SVG src={nameIcon} width={93} height={18} title="name" />
+          </Styles.Name>
+        ) : null}
+      </Styles.LogoRow>
       <Styles.Row>
         {withBack ? (
           <Styles.Navigate>
