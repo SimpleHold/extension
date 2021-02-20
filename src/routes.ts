@@ -7,6 +7,7 @@ import ReceivePage from './pages/Receive'
 import SendPage from './pages/Send'
 import SendConfirmationPage from './pages/SendConfirmation'
 import UsageDataPage from './pages/UsageData'
+import WelcomePage from './pages/Welcome'
 
 const routers: RouteProps[] = [
   {
@@ -28,6 +29,14 @@ const routers: RouteProps[] = [
   {
     path: '/send/confirm',
     component: SendConfirmationPage,
+  },
+  {
+    path: '/usage-data',
+    component: UsageDataPage,
+  },
+  {
+    path: '/welcome',
+    component: WelcomePage,
   },
 ]
 

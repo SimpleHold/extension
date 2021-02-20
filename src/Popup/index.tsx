@@ -24,7 +24,7 @@ const bounceTransition = {
 const App: React.FC = () => (
   <>
     <GlobalStyles />
-    <Router initialEntries={['/main']}>
+    <Router initialEntries={['/welcome']}>
       <AnimatedSwitch {...bounceTransition}>
         {routes.map((route: RouteProps, index: number) => (
           <Route key={index} path={route.path} component={route.component} />
