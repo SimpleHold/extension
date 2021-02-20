@@ -1,5 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
+import { useHistory } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
@@ -13,6 +14,12 @@ import askIcon from '@assets/icons/ask.svg'
 import Styles from './styles'
 
 const Wallets: React.FC = () => {
+  const history = useHistory()
+
+  const openPage = (path: string): void => {
+    history.push(path)
+  }
+
   return (
     <Styles.Wrapper>
       <Header noActions withName logoColor="#3FBB7D" />
@@ -22,13 +29,13 @@ const Wallets: React.FC = () => {
           SimpleHold would like to gather usage data to better understand how our users interact
         </Styles.Description>
         <Styles.WalletActions>
-          <Styles.Action>
+          <Styles.Action onClick={() => openPage('/wallet/create')}>
             <Styles.ActionIcon>
               <SVG src={plusCircleIcon} width={21} height={21} title="plus-circle" />
             </Styles.ActionIcon>
             <Styles.ActionName>Create new wallet</Styles.ActionName>
           </Styles.Action>
-          <Styles.Action>
+          <Styles.Action onClick={() => openPage('/wallet/restore')}>
             <Styles.ActionIcon>
               <SVG src={restoreIcon} width={20} height={20} title="restore" />
             </Styles.ActionIcon>

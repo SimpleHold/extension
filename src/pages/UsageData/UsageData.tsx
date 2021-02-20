@@ -43,8 +43,8 @@ const UsageData: React.FC = () => {
           </Styles.FeaturesList>
         </Styles.FeaturesBlock>
         <Styles.Actions>
-          <Button label="No, thanks" />
-          <Button label="I agree" />
+          <Button label="No, thanks" onClick={() => null} />
+          <Button label="I agree" onClick={() => null} />
         </Styles.Actions>
       </Styles.Container>
     </Styles.Wrapper>

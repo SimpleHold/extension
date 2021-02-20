@@ -8,6 +8,9 @@ import SendPage from './pages/Send'
 import SendConfirmationPage from './pages/SendConfirmation'
 import UsageDataPage from './pages/UsageData'
 import WelcomePage from './pages/Welcome'
+import CreateWalletPage from './pages/CreateWallet'
+import DownloadBackupPage from './pages/DownloadBackup'
+import RestoreWalletPage from './pages/RestoreWallet'
 
 const routers: RouteProps[] = [
   {
@@ -37,6 +40,18 @@ const routers: RouteProps[] = [
   {
     path: '/welcome',
     component: WelcomePage,
+  },
+  {
+    path: '/wallet/create',
+    component: CreateWalletPage,
+  },
+  {
+    path: '/backup/download',
+    component: DownloadBackupPage,
+  },
+  {
+    path: '/wallet/restore',
+    component: RestoreWalletPage,
   },
 ]
 

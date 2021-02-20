@@ -45,7 +45,7 @@ const Receive: React.FC<Props> = (props) => {
         <Styles.ReceiveBlock>
           <Styles.QRCode />
           <Styles.Address>bc1q34aq5drpuwy3wgl9lhup9892qp6svr8ldzyy7c</Styles.Address>
-          <Button label="Send BTC" />
+          <Button label="Send BTC" onClick={() => null} />
         </Styles.ReceiveBlock>
       </Styles.Container>
     </Styles.Wrapper>
