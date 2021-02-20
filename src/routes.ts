@@ -10,9 +10,8 @@ import UsageDataPage from './pages/UsageData'
 
 const routers: RouteProps[] = [
   {
-    path: '/',
-    component: UsageDataPage,
-    exact: true,
+    path: '/main',
+    component: MainPage,
   },
   {
     path: '/wallets',
