@@ -5,11 +5,13 @@ import MainPage from './pages/Main'
 import WalletsPage from './pages/Wallets'
 import ReceivePage from './pages/Receive'
 import SendPage from './pages/Send'
+import SendConfirmationPage from './pages/SendConfirmation'
+import UsageDataPage from './pages/UsageData'
 
 const routers: RouteProps[] = [
   {
     path: '/',
-    component: SendPage,
+    component: UsageDataPage,
     exact: true,
   },
   {
@@ -23,6 +25,10 @@ const routers: RouteProps[] = [
   {
     path: '/send',
     component: SendPage,
+  },
+  {
+    path: '/send/confirm',
+    component: SendConfirmationPage,
   },
 ]
 
