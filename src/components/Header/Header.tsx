@@ -8,18 +8,38 @@ import settingsIcon from '@assets/icons/settings.svg'
 // Styles
 import Styles from './styles'
 
-const Header: React.FC = () => (
-  <Styles.Container>
-    <Styles.Logo />
-    <Styles.Nav>
-      <Styles.NavItem>
-        <SVG src={lockIcon} width={14} height={18} title="lock" />
-      </Styles.NavItem>
-      <Styles.NavItem>
-        <SVG src={settingsIcon} width={16} height={16} title="settings" />
-      </Styles.NavItem>
-    </Styles.Nav>
-  </Styles.Container>
-)
+interface Props {
+  withBack?: boolean
+  backTitle?: string
+  noActions?: boolean
+}
+
+const Header: React.FC<Props> = (props) => {
+  const { withBack, backTitle, noActions } = props
+
+  return (
+    <Styles.Container>
+      <Styles.Logo />
+      <Styles.Row>
+        {withBack ? (
+          <Styles.Navigate>
+            <Styles.BackIcon />
+            <Styles.NavigateTitle>{backTitle}</Styles.NavigateTitle>
+          </Styles.Navigate>
+        ) : null}
+        {!noActions ? (
+          <Styles.Nav>
+            <Styles.NavItem>
+              <SVG src={lockIcon} width={14} height={18} title="lock" />
+            </Styles.NavItem>
+            <Styles.NavItem>
+              <SVG src={settingsIcon} width={16} height={16} title="settings" />
+            </Styles.NavItem>
+          </Styles.Nav>
+        ) : null}
+      </Styles.Row>
+    </Styles.Container>
+  )
+}
 
 export default Header
