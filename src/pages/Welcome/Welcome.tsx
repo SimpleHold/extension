@@ -20,6 +20,12 @@ const Wallets: React.FC = () => {
     history.push(path)
   }
 
+  React.useEffect(() => {
+    if (localStorage.getItem('wallets')) {
+      openPage('/wallets')
+    }
+  }, [])
+
   return (
     <Styles.Wrapper>
       <Header noActions withName logoColor="#3FBB7D" />

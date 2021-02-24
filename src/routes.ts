@@ -11,6 +11,7 @@ import WelcomePage from './pages/Welcome'
 import CreateWalletPage from './pages/CreateWallet'
 import DownloadBackupPage from './pages/DownloadBackup'
 import RestoreWalletPage from './pages/RestoreWallet'
+import SettingsPage from './pages/Settings'
 
 const routers: RouteProps[] = [
   {
@@ -52,6 +53,10 @@ const routers: RouteProps[] = [
   {
     path: '/wallet/restore',
     component: RestoreWalletPage,
+  },
+  {
+    path: '/settings',
+    component: SettingsPage,
   },
 ]
 

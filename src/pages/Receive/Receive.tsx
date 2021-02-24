@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useHistory } from 'react-router-dom'
 
 // Components
 import Cover from '@components/Cover'
@@ -16,10 +17,16 @@ interface Props {
 const Receive: React.FC<Props> = (props) => {
   const { params } = props
 
+  const history = useHistory()
+
+  const onBack = () => {
+    history.push('/wallets')
+  }
+
   return (
     <Styles.Wrapper>
       <Cover />
-      <Header />
+      <Header withBack onBack={onBack} backTitle="Home" />
       <Styles.Container>
         <Styles.Row>
           <Styles.Heading>

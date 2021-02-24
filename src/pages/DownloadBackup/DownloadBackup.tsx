@@ -1,6 +1,7 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
-import CryptoJS from 'crypto-js'
+import { useLocation, useHistory } from 'react-router-dom'
+import get from 'lodash/get'
 
 // Components
 import Header from '@components/Header'
@@ -9,33 +10,36 @@ import Button from '@components/Button'
 // Icons
 import askIcon from '@assets/icons/ask.svg'
 
+// Utils
+import { encrypt } from '@utils/crypto'
+import { generateWallet } from '@utils/bitcoin'
+import { generate } from '@utils/backup'
+
 // Styles
 import Styles from './styles'
 
-const mockData = {
-  wallets: [
-    {
-      symbol: 'btc',
-      balance: '0',
-      address: '16ftSEQ4ctQFDtVZiUBusQUjRrGhM3JYwe',
-      uuid: '88750a2e',
-      privateKey: '123',
-    },
-  ],
-  version: 1,
-  uuid: 'uuid',
-}
-
 const DownloadBackup: React.FC = () => {
+  const { state: locationState } = useLocation()
+  const history = useHistory()
+
   const downloadFile = (): void => {
-    const encryptData = CryptoJS.AES.encrypt(JSON.stringify(mockData), '12345678').toString()
+    const { address, privateKey } = generateWallet()
+    const getPassword = get(locationState, 'password', '')
+    const backup = generate(address, privateKey)
     const element = document.createElement('a')
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(encryptData))
+    element.setAttribute(
+      'href',
+      'data:text/plain;charset=utf-8,' + encodeURIComponent(encrypt(backup, getPassword))
+    )
     element.setAttribute('download', 'backup.dat')
     element.style.display = 'none'
     document.body.appendChild(element)
     element.click()
     document.body.removeChild(element)
+
+    localStorage.setItem('backup', backup)
+    localStorage.setItem('wallets', backup)
+    history.push('/wallets')
   }
 
   return (

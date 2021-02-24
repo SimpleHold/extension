@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+type TContainerProps = {
+  withBorder?: boolean
+}
+
 type TLogoProps = {
   color: string
 }
@@ -9,6 +13,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  border-bottom: ${({ withBorder }: TContainerProps) =>
+    withBorder ? '0.5px solid #EAEAEA' : 'none'};
 `
 
 const Row = styled.div`
@@ -62,6 +68,10 @@ const Navigate = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 const BackIcon = styled.div`

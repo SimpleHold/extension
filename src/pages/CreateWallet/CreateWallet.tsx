@@ -20,8 +20,12 @@ const Wallets: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = React.useState<string>('')
 
   const onConfirm = (): void => {
-    history.push('/backup/download')
+    history.push('/backup/download', {
+      password,
+    })
   }
+
+  const isButtonDisabled = password.length < 7 || password !== confirmPassword
 
   return (
     <Styles.Wrapper>
@@ -57,7 +61,7 @@ const Wallets: React.FC = () => {
             }
             type="password"
           />
-          <Button label="Confirm" onClick={onConfirm} />
+          <Button label="Confirm" onClick={onConfirm} disabled={isButtonDisabled} />
         </Styles.Form>
       </Styles.Container>
     </Styles.Wrapper>

@@ -40,6 +40,8 @@ const Address = styled.p`
   font-size: 12px;
   line-height: 14px;
   color: #c3c3c3;
+  width: 100px; // Fix me
+  overflow: hidden; // Fix me
 `
 
 const BalanceInfo = styled.div``

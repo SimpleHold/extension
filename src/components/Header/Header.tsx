@@ -1,5 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
+import { useHistory } from 'react-router-dom'
 
 // Icons
 import logo from '@assets/logo.svg'
@@ -16,13 +17,29 @@ interface Props {
   noActions?: boolean
   withName?: boolean
   logoColor?: string
+  onBack?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+  withBorder?: boolean
 }
 
 const Header: React.FC<Props> = (props) => {
-  const { withBack, backTitle, noActions, withName, logoColor = '#FFFFFF' } = props
+  const {
+    withBack,
+    backTitle,
+    noActions,
+    withName,
+    logoColor = '#FFFFFF',
+    onBack,
+    withBorder,
+  } = props
+
+  const history = useHistory()
+
+  const openPage = (page: string): void => {
+    history.push(page)
+  }
 
   return (
-    <Styles.Container>
+    <Styles.Container withBorder={withBorder}>
       <Styles.LogoRow>
         <Styles.Logo color={logoColor}>
           <SVG src={logo} width={30} height={30} title="logo" />
@@ -34,8 +51,8 @@ const Header: React.FC<Props> = (props) => {
         ) : null}
       </Styles.LogoRow>
       <Styles.Row>
-        {withBack ? (
-          <Styles.Navigate>
+        {withBack && onBack && backTitle ? (
+          <Styles.Navigate onClick={onBack}>
             <Styles.BackIcon />
             <Styles.NavigateTitle>{backTitle}</Styles.NavigateTitle>
           </Styles.Navigate>
@@ -45,7 +62,7 @@ const Header: React.FC<Props> = (props) => {
             <Styles.NavItem>
               <SVG src={lockIcon} width={14} height={18} title="lock" />
             </Styles.NavItem>
-            <Styles.NavItem>
+            <Styles.NavItem onClick={() => openPage('/settings')}>
               <SVG src={settingsIcon} width={16} height={16} title="settings" />
             </Styles.NavItem>
           </Styles.Nav>

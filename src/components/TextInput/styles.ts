@@ -1,5 +1,11 @@
 import styled from 'styled-components'
 
+type TLabelProps = {
+  isError?: boolean
+}
+
+// EB5757, 100%
+
 const Container = styled.div`
   width: 100%;
   height: 60px;
@@ -17,7 +23,7 @@ const Label = styled.p`
   margin: 0;
   font-size: 12px;
   line-height: 14px;
-  color: #7d7e8d;
+  color: ${({ isError }: TLabelProps) => (isError ? `#EB5757` : '#7d7e8d')};
 `
 
 const TextInput = styled.input`

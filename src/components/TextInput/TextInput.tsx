@@ -10,10 +10,21 @@ interface Props {
   type?: string
   minLength?: number
   maxLength?: number
+  withError?: boolean
+  errorLabel?: string
 }
 
 const TextInput: React.FC<Props> = (props) => {
-  const { label, value, onChange, type = 'text', minLength, maxLength } = props
+  const {
+    label,
+    value,
+    onChange,
+    type = 'text',
+    minLength,
+    maxLength,
+    withError,
+    errorLabel,
+  } = props
 
   const [isFocused, setIsFocused] = React.useState<boolean>(false)
   const textInputRef = React.useRef<HTMLInputElement>(null)
@@ -31,7 +42,9 @@ const TextInput: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container onClick={onClick}>
-      <Styles.Label>{label}</Styles.Label>
+      <Styles.Label isError={!isFocused && withError}>
+        {!isFocused && errorLabel ? errorLabel : label}
+      </Styles.Label>
       {value || isFocused ? (
         <Styles.TextInput
           value={value}
