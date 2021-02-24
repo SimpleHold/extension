@@ -18,7 +18,8 @@
       "@components/*": ["src/components/*"],
       "@pages/*": ["src/pages/*"],
       "@assets/*": ["assets/pages/*"],
-      "@utils/*": ["src/utils/*"]
+      "@utils/*": ["src/utils/*"],
+      "@modals/*": ["src/modals/*"]
     }
   },
   "include": ["src", "@types", "webpack.config.js"]
