@@ -55,7 +55,7 @@ module.exports = {
     manifest: path.join(sourcePath, 'manifest.json'),
     background: path.join(sourcePath, 'utils', 'background.ts'),
     contentScript: path.join(sourcePath, 'utils', 'contentScript.ts'),
-    popup: path.join(sourcePath, 'Popup', 'index.tsx'),
+    popup: path.join(sourcePath, 'app.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),

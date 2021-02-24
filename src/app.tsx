@@ -3,8 +3,8 @@ import { render } from 'react-dom'
 import { Route, RouteProps, MemoryRouter as Router } from 'react-router-dom'
 import { AnimatedSwitch } from 'react-router-transition'
 
-import routes from '../routes'
-import GlobalStyles from '../styles/global'
+import routes from './routes'
+import GlobalStyles from './styles/global'
 
 const bounceTransition = {
   atEnter: {
