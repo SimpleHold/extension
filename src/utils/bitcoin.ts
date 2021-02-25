@@ -9,7 +9,7 @@ export const generateWallet = () => {
   }
 }
 
-export const getBalance = (address: string): Promise<number> | null => {
+export const getBalance = (address: string): Promise<number> | number => {
   try {
     return fetch(`https://blockchain.info/balance?active=${address}`)
       .then((response) => response.json())
@@ -17,14 +17,17 @@ export const getBalance = (address: string): Promise<number> | null => {
         return data[address].final_balance / 100000000
       })
   } catch {
-    return null
+    return 0
   }
 }
 
-export const getEstimated = (amount: number): number | null => {
+export const getEstimated = (amount: number): number => {
   try {
+    if (amount === 0) {
+      return 0
+    }
     return 100 // Fix me
   } catch {
-    return null
+    return 0
   }
 }
