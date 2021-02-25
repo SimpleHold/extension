@@ -1,0 +1,34 @@
+import * as React from 'react'
+import SVG from 'react-inlinesvg'
+import { browser, Tabs } from 'webextension-polyfill-ts'
+
+// Icons
+import askIcon from '@assets/icons/ask.svg'
+
+// Styles
+import Styles from './styles'
+
+interface Props {
+  to: string
+  title: string
+  mt?: number
+}
+
+const Link: React.FC<Props> = (props) => {
+  const { to, title, mt = 0 } = props
+
+  const openWebPage = (): Promise<Tabs.Tab> => {
+    return browser.tabs.create({ url: to })
+  }
+
+  return (
+    <Styles.Container onClick={openWebPage} mt={mt}>
+      <Styles.IconRow>
+        <SVG src={askIcon} width={12} height={12} title="ask" />
+      </Styles.IconRow>
+      <Styles.Title>{title}</Styles.Title>
+    </Styles.Container>
+  )
+}
+
+export default Link
