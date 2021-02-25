@@ -11,7 +11,7 @@ const Container = styled.div`
 
 const ReceiveBlock = styled.div`
   border-top: 1px solid #eaeaea;
-  padding: 20px 30px 30px 30px;
+  padding: 16px 30px 40px 30px;
   background-color: #f8f8f8;
   height: 100%;
   display: flex;
@@ -21,6 +21,7 @@ const ReceiveBlock = styled.div`
 
 const Row = styled.div`
   padding: 16px 30px 40px 30px;
+  position: relative;
 `
 
 const Heading = styled.div`
@@ -56,16 +57,21 @@ const RefreshIcon = styled.div``
 const MoreButton = styled.div`
   width: 30px;
   height: 30px;
-  background-color: red;
   display: flex;
   align-items: center;
   justify-content: center;
-`
 
-const MoreIcon = styled.div`
-  width: 16px;
-  height: 2px;
-  background-color: blue;
+  path {
+    stroke: #c3c3c3;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    path {
+      stroke: #3fbb7d;
+    }
+  }
 `
 
 const CurrencyBlock = styled.div`
@@ -82,12 +88,6 @@ const CurrencyName = styled.p`
   line-height: 19px;
   text-transform: uppercase;
   color: #f7931a;
-`
-
-const QRCode = styled.div`
-  width: 120px;
-  height: 120px;
-  background-color: red;
 `
 
 const Address = styled.p`
@@ -125,10 +125,8 @@ const Styles = {
   RefreshIconRow,
   RefreshIcon,
   MoreButton,
-  MoreIcon,
   CurrencyBlock,
   CurrencyName,
-  QRCode,
   Address,
   Balance,
   USDEstimated,
