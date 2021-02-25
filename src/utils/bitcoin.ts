@@ -21,12 +21,16 @@ export const getBalance = (address: string): Promise<number> | number => {
   }
 }
 
-export const getEstimated = (amount: number): number => {
+export const getEstimated = (amount: number): Promise<number> | number => {
   try {
     if (amount === 0) {
       return 0
     }
-    return 100 // Fix me
+    return fetch('https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD')
+      .then((response) => response.json())
+      .then((data) => {
+        return data['USD'] * amount
+      })
   } catch {
     return 0
   }

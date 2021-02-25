@@ -50,10 +50,10 @@ const WalletCard: React.FC<Props> = (props) => {
     sumBalance(tryGetBalance || 0)
   }
 
-  const loadEstimated = () => {
+  const loadEstimated = async () => {
     if (balance) {
-      const tryGetEstimated = getEstimated(balance)
-      setEstimated(tryGetEstimated || 0)
+      const tryGetEstimated = await getEstimated(balance)
+      setEstimated(tryGetEstimated)
       sumEstimated(tryGetEstimated || 0)
     }
   }
