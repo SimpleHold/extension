@@ -1,11 +1,15 @@
 import styled from 'styled-components'
 
+type TListItemProps = {
+  isButton?: boolean
+}
+
 const Wrapper = styled.div`
   height: 600px;
 `
 
 const Container = styled.div`
-  padding: 40px 30px 30px 30px;
+  padding: 30px;
   background-color: #ffffff;
   border-radius: 5px 5px 0 0;
   height: 540px;
@@ -19,40 +23,66 @@ const Row = styled.div``
 const Title = styled.p`
   margin: 0;
   font-size: 23px;
-  line-height: 25px;
+  line-height: 27px;
   color: #1d1d22;
   font-weight: bold;
 `
 
 const Actions = styled.div``
 
-const List = styled.div`
-  margin: 25px 0 0 0;
-`
+const List = styled.div``
 
 const ListItem = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
+  padding: ${({ isButton }: TListItemProps) => (isButton ? `15px 0` : '20px 0')};
+  height: ${({ isButton }: TListItemProps) => (isButton ? `60px` : 'auto')};
 
   &:not(:last-child) {
-    padding: 0 0 20px 0;
-    margin: 0 0 20px 0;
-    border-bottom: 1px solid #dfdfdf;
+    border-bottom: 1px solid #eaeaea;
+  }
+
+  &:hover {
+    cursor: ${({ isButton }: TListItemProps) => (isButton ? `pointer` : 'default')};
+
+    & > div > div > p {
+      color: ${({ isButton }: TListItemProps) => (isButton ? `#3FBB7D` : '#1d1d22')};
+    }
+
+    path {
+      fill: ${({ isButton }: TListItemProps) => (isButton ? `#3FBB7D` : '#1d1d22')};
+    }
   }
 `
 
-const ListRow = styled.div``
+const ListItemRow = styled.div``
+
+const ListTitleRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`
 
 const ListTitle = styled.p`
   margin: 0;
-  font-weight: 500;
+  font-weight: normal;
   font-size: 16px;
   line-height: 19px;
   color: #1d1d22;
 `
 
-const ListText = styled.p`
+const IconRow = styled.div`
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const Text = styled.p`
   margin: 5px 0 0 0;
   font-size: 14px;
   line-height: 20px;
@@ -67,9 +97,11 @@ const Styles = {
   Actions,
   List,
   ListItem,
-  ListRow,
+  ListItemRow,
+  ListTitleRow,
   ListTitle,
-  ListText,
+  IconRow,
+  Text,
 }
 
 export default Styles
