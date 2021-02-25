@@ -8,6 +8,10 @@ type TLogoProps = {
   color: string
 }
 
+type TNavItemProps = {
+  isActive?: boolean
+}
+
 const Container = styled.div`
   padding: 15px 30px;
   display: flex;
@@ -47,15 +51,20 @@ const NavItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  background-color: ${({ isActive }: TNavItemProps) => (isActive ? '#ffffffcc' : 'none')};
+  border-radius: 15px;
+
+  path {
+    fill: ${({ isActive }: TNavItemProps) => (isActive ? '#3fbb7d' : '#FFFFFF')};
+  }
 
   &:not(:last-child) {
     margin: 0 10px 0 0;
   }
 
   &:hover {
-    cursor: pointer;
+    cursor: ${({ isActive }: TNavItemProps) => (isActive ? 'default' : 'pointer')};
     background-color: #ffffffcc;
-    border-radius: 15px;
 
     path {
       fill: #3fbb7d;
@@ -64,21 +73,33 @@ const NavItem = styled.div`
 `
 
 const Navigate = styled.div`
-  margin: 0 0 0 24px;
+  margin: 0 0 0 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
 
+  path {
+    fill: #ffffff;
+    opacity: 0.6;
+  }
+
   &:hover {
     cursor: pointer;
+
+    p,
+    path {
+      opacity: 1;
+    }
   }
 `
 
-const BackIcon = styled.div`
-  width: 6px;
-  height: 10px;
-  background-color: red;
-  margin: 0 10px 0 0;
+const BackIconRow = styled.div`
+  width: 14px;
+  height: 14px;
+  margin: 0 6px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const NavigateTitle = styled.p`
@@ -107,7 +128,7 @@ const Styles = {
   Nav,
   NavItem,
   Navigate,
-  BackIcon,
+  BackIconRow,
   NavigateTitle,
   LogoRow,
   Name,

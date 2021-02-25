@@ -1,17 +1,19 @@
 import styled from 'styled-components'
 
+type TContainerProps = {
+  isFocused: boolean
+}
+
 type TLabelProps = {
   isError?: boolean
 }
-
-// EB5757, 100%
 
 const Container = styled.div`
   width: 100%;
   height: 60px;
   background-color: #ffffff;
   margin: 0 0 10px 0;
-  border: 1px solid #eaeaea;
+  border: ${({ isFocused }: TContainerProps) => `1px solid ${isFocused ? '#3FBB7D' : '#EAEAEA'}`};
   border-radius: 5px;
   padding: 11px 20px;
   display: flex;

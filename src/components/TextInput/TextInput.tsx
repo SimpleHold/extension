@@ -41,9 +41,9 @@ const TextInput: React.FC<Props> = (props) => {
   }
 
   return (
-    <Styles.Container onClick={onClick}>
+    <Styles.Container onClick={onClick} isFocused={isFocused}>
       <Styles.Label isError={!isFocused && withError}>
-        {!isFocused && errorLabel ? errorLabel : label}
+        {!isFocused && errorLabel && withError ? errorLabel : label}
       </Styles.Label>
       {value || isFocused ? (
         <Styles.TextInput

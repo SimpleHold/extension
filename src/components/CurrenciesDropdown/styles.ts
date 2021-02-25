@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+type TContainerProps = {
+  isDisabled: boolean
+}
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;
@@ -11,8 +15,9 @@ const Container = styled.div`
   border-radius: 5px;
 
   &:hover {
-    cursor: pointer;
-    border: 1px solid #3fbb7d;
+    cursor: ${({ isDisabled }: TContainerProps) => (isDisabled ? 'default' : 'pointer')};
+    border: ${({ isDisabled }: TContainerProps) =>
+      ` 1px solid ${isDisabled ? '#eaeaea' : '#3fbb7d'}`};
   }
 `
 
@@ -21,7 +26,8 @@ const Row = styled.div`
   flex-direction: row;
   align-items: center;
   flex: 1;
-  margin: 0 0 0 15px;
+  margin: 0 0 0 10px;
+  overflow: hidden;
 `
 
 const Address = styled.p`
@@ -29,7 +35,10 @@ const Address = styled.p`
   margin: 0;
   font-size: 16px;
   line-height: 20px;
-  color: #7d7e8d;
+  font-weight: 500;
+  color: #1d1d22;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 const Button = styled.button`

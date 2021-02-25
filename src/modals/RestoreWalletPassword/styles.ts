@@ -13,7 +13,7 @@ const Title = styled.p`
   color: #1d1d22;
 `
 
-const Form = styled.div`
+const Form = styled.form`
   margin: 20px 0 0 0;
 `
 

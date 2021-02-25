@@ -9,11 +9,13 @@ type TContainer = {
   isDanger?: boolean
 }
 
+// TOOD: refactor this shit
+
 const Container = styled.button`
   width: 100%;
   height: ${({ isSmall }: TContainer) => (isSmall ? '50px' : '60px')};
-  background-color: ${({ disabled, isLight }: TContainer) =>
-    disabled ? '#EAEAEA' : isLight ? '#F8F8F8' : '#3fbb7d'};
+  background-color: ${({ disabled, isLight, isDanger }: TContainer) =>
+    disabled ? '#EAEAEA' : isLight ? '#F8F8F8' : isDanger ? '#FFFFFF' : '#3fbb7d'};
   border-radius: 5px;
   display: flex;
   align-items: center;
@@ -22,7 +24,8 @@ const Container = styled.button`
   outline: none;
   margin-left: ${({ ml }: TContainer) => (ml ? `${ml}px` : '0')};
   margin-right: ${({ mr }: TContainer) => (mr ? `${mr}px` : '0')};
-  border: ${({ isLight }: TContainer) => (isLight ? '1px solid #EAEAEA' : 'none')};
+  border: ${({ isLight, isDanger }: TContainer) =>
+    isLight || isDanger ? '1px solid #EAEAEA' : 'none'};
 
   &:hover {
     cursor: ${({ disabled }: TContainer) => (disabled ? 'default' : 'pointer')};
@@ -30,7 +33,8 @@ const Container = styled.button`
   }
 
   p {
-    color: ${({ isLight }: TContainer) => (isLight ? '#3FBB7D' : '#FFFFFF')};
+    color: ${({ isLight, isDanger }: TContainer) =>
+      isLight ? '#3FBB7D' : isDanger ? '#EB5757' : '#FFFFFF'};
   }
 `
 

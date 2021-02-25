@@ -1,7 +1,6 @@
 import { RouteProps } from 'react-router-dom'
 
 // Pages
-import MainPage from './pages/Main'
 import WalletsPage from './pages/Wallets'
 import ReceivePage from './pages/Receive'
 import SendPage from './pages/Send'
@@ -12,15 +11,14 @@ import CreateWalletPage from './pages/CreateWallet'
 import DownloadBackupPage from './pages/DownloadBackup'
 import RestoreWalletPage from './pages/RestoreWallet'
 import SettingsPage from './pages/Settings'
+import NewWalletPage from './pages/NewWallet'
+import ImportPrivateKeyPage from './pages/ImportPrivateKey'
 
 const routers: RouteProps[] = [
   {
-    path: '/main',
-    component: MainPage,
-  },
-  {
     path: '/wallets',
     component: WalletsPage,
+    exact: true,
   },
   {
     path: '/receive',
@@ -29,9 +27,10 @@ const routers: RouteProps[] = [
   {
     path: '/send',
     component: SendPage,
+    exact: true,
   },
   {
-    path: '/send/confirm',
+    path: '/send-confirm',
     component: SendConfirmationPage,
   },
   {
@@ -43,7 +42,7 @@ const routers: RouteProps[] = [
     component: WelcomePage,
   },
   {
-    path: '/wallet/create',
+    path: '/create-wallet',
     component: CreateWalletPage,
   },
   {
@@ -51,12 +50,20 @@ const routers: RouteProps[] = [
     component: DownloadBackupPage,
   },
   {
-    path: '/wallet/restore',
+    path: '/restore-wallet',
     component: RestoreWalletPage,
   },
   {
     path: '/settings',
     component: SettingsPage,
+  },
+  {
+    path: '/new-wallet',
+    component: NewWalletPage,
+  },
+  {
+    path: '/import-private-key',
+    component: ImportPrivateKeyPage,
   },
 ]
 

@@ -63,7 +63,7 @@ const Link = styled.p`
   color: #c3c3c3;
 `
 
-const Form = styled.div`
+const Form = styled.form`
   padding: 30px 30px 0 30px;
   border-top: 1px solid #eaeaea;
 `

@@ -5,8 +5,8 @@ import { useHistory } from 'react-router-dom'
 // Icons
 import logo from '@assets/logo.svg'
 import nameIcon from '@assets/name.svg'
-import lockIcon from '@assets/icons/lock.svg'
 import settingsIcon from '@assets/icons/settings.svg'
+import arrowIcon from '@assets/icons/arrow.svg'
 
 // Styles
 import Styles from './styles'
@@ -19,6 +19,7 @@ interface Props {
   logoColor?: string
   onBack?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   withBorder?: boolean
+  activePage?: string
 }
 
 const Header: React.FC<Props> = (props) => {
@@ -30,6 +31,7 @@ const Header: React.FC<Props> = (props) => {
     logoColor = '#FFFFFF',
     onBack,
     withBorder,
+    activePage,
   } = props
 
   const history = useHistory()
@@ -53,16 +55,18 @@ const Header: React.FC<Props> = (props) => {
       <Styles.Row>
         {withBack && onBack && backTitle ? (
           <Styles.Navigate onClick={onBack}>
-            <Styles.BackIcon />
+            <Styles.BackIconRow>
+              <SVG src={arrowIcon} width={6} height={10} title="arrow" />
+            </Styles.BackIconRow>
             <Styles.NavigateTitle>{backTitle}</Styles.NavigateTitle>
           </Styles.Navigate>
         ) : null}
         {!noActions ? (
           <Styles.Nav>
-            <Styles.NavItem>
-              <SVG src={lockIcon} width={14} height={18} title="lock" />
-            </Styles.NavItem>
-            <Styles.NavItem onClick={() => openPage('/settings')}>
+            <Styles.NavItem
+              onClick={() => (activePage === 'settings' ? null : openPage('/settings'))}
+              isActive={activePage === 'settings'}
+            >
               <SVG src={settingsIcon} width={16} height={16} title="settings" />
             </Styles.NavItem>
           </Styles.Nav>

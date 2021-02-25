@@ -1,5 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
+import { useHistory } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
@@ -11,6 +12,8 @@ import Styles from './styles'
 import { IWallet } from 'utils/backup'
 
 const Wallets: React.FC = () => {
+  const history = useHistory()
+
   const [scrollPosition, setScrollPosition] = React.useState<number>(0)
   const [wallets, setWallets] = React.useState<any | null>(null) // Fix me
   const [totalBalance, setTotalBalance] = React.useState<number | null>(null)
@@ -19,6 +22,10 @@ const Wallets: React.FC = () => {
   React.useEffect(() => {
     getWallets()
   }, [])
+
+  const openPage = (path: string): void => {
+    history.push(path)
+  }
 
   const getWallets = () => {
     const storageWallets = localStorage.getItem('wallets')
@@ -123,7 +130,7 @@ const Wallets: React.FC = () => {
         </Styles.BalanceBlock>
         <Styles.WalletsHeading style={{ marginTop: walletsHeadingMT }}>
           <Styles.WalletsLabel>Wallets</Styles.WalletsLabel>
-          <Styles.AddWalletButton>
+          <Styles.AddWalletButton onClick={() => openPage('/new-wallet')}>
             <SVG src="../../assets/icons/plus.svg" width={16} height={16} title="plus" />
           </Styles.AddWalletButton>
         </Styles.WalletsHeading>

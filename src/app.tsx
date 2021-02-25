@@ -21,17 +21,21 @@ const bounceTransition = {
   },
 }
 
-const App: React.FC = () => (
-  <>
-    <GlobalStyles />
-    <Router initialEntries={['/welcome']}>
-      <AnimatedSwitch {...bounceTransition}>
-        {routes.map((route: RouteProps, index: number) => (
-          <Route key={index} path={route.path} component={route.component} />
-        ))}
-      </AnimatedSwitch>
-    </Router>
-  </>
-)
+const App: React.FC = () => {
+  const isHaveWallets = localStorage.getItem('wallets') !== null
+
+  return (
+    <>
+      <GlobalStyles />
+      <Router initialEntries={[isHaveWallets ? '/wallets' : '/welcome']}>
+        <AnimatedSwitch {...bounceTransition}>
+          {routes.map((route: RouteProps, index: number) => (
+            <Route key={index} path={route.path} component={route.component} />
+          ))}
+        </AnimatedSwitch>
+      </Router>
+    </>
+  )
+}
 
 render(<App />, document.getElementById('popup-root'))

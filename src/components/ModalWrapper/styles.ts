@@ -27,7 +27,7 @@ const Modal = styled.div`
   background-color: #ffffff;
   border-radius: 5px;
   width: 315px;
-  padding: 65px 30px 30px 30px;
+  padding: 55px 30px 30px 30px;
   position: relative;
   display: flex;
   flex-direction: column;

@@ -69,7 +69,7 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
               onClick={onConfirm}
               ml={7.5}
               isSmall
-              // disabled={password.length < 8}
+              disabled={password.length < 8}
             />
           </Styles.Actions>
         </Styles.Form>

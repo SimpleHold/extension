@@ -59,7 +59,11 @@ const WalletCard: React.FC<Props> = (props) => {
   }
 
   const openWallet = (): void => {
-    history.push('/receive')
+    history.push('/receive', {
+      currency,
+      symbol,
+      address,
+    })
   }
 
   return (

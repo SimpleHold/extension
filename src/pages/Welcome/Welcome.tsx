@@ -20,12 +20,6 @@ const Wallets: React.FC = () => {
     history.push(path)
   }
 
-  React.useEffect(() => {
-    if (localStorage.getItem('wallets')) {
-      openPage('/wallets')
-    }
-  }, [])
-
   return (
     <Styles.Wrapper>
       <Header noActions withName logoColor="#3FBB7D" />
@@ -35,13 +29,13 @@ const Wallets: React.FC = () => {
           SimpleHold would like to gather usage data to better understand how our users interact
         </Styles.Description>
         <Styles.WalletActions>
-          <Styles.Action onClick={() => openPage('/wallet/create')}>
+          <Styles.Action onClick={() => openPage('/create-wallet')}>
             <Styles.ActionIcon>
-              <SVG src={plusCircleIcon} width={21} height={21} title="plus-circle" />
+              <SVG src={plusCircleIcon} width={20} height={20} title="plus-circle" />
             </Styles.ActionIcon>
             <Styles.ActionName>Create new wallet</Styles.ActionName>
           </Styles.Action>
-          <Styles.Action onClick={() => openPage('/wallet/restore')}>
+          <Styles.Action onClick={() => openPage('/restore-wallet')}>
             <Styles.ActionIcon>
               <SVG src={restoreIcon} width={20} height={20} title="restore" />
             </Styles.ActionIcon>

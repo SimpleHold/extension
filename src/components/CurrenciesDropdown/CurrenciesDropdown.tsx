@@ -8,19 +8,22 @@ import Styles from './styles'
 
 interface Props {
   symbol: string
+  isDisabled: boolean
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
-  const { symbol } = props
+  const { symbol, isDisabled } = props
 
   return (
-    <Styles.Container>
+    <Styles.Container isDisabled={isDisabled}>
       <CurrencyLogo symbol={symbol} width={40} height={40} />
       <Styles.Row>
-        <Styles.Address>bc1q34aq5duw...gl9lhup92q</Styles.Address>
-        <Styles.Button>
-          <Styles.ArrowIcon />
-        </Styles.Button>
+        <Styles.Address>16RaFNHHYsrX9ryh85HaYeC8sMG3tfA3R7</Styles.Address>
+        {!isDisabled ? (
+          <Styles.Button>
+            <Styles.ArrowIcon />
+          </Styles.Button>
+        ) : null}
       </Styles.Row>
     </Styles.Container>
   )
