@@ -10,6 +10,7 @@ import Header from '@components/Header'
 import Button from '@components/Button'
 import CurrencyLogo from '@components/CurrencyLogo'
 import DropDown from '@components/DropDown'
+import Skeleton from '@components/Skeleton'
 
 // Modals
 import ConfirmShowingPrivateKeyModal from '@modals/ConfirmShowingPrivateKey'
@@ -19,6 +20,7 @@ import useVisible from '@hooks/useVisible'
 
 // Icons
 import moreIcon from '@assets/icons/more.svg'
+import refreshIcon from '@assets/icons/refresh.svg'
 
 // Styles
 import Styles from './styles'
@@ -35,11 +37,32 @@ const Receive: React.FC = () => {
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
+  const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false)
+  const [balance, setBalance] = React.useState<null | number>(null)
+  const [estimated, setEstimated] = React.useState<null | number>(null)
+
+  React.useEffect(() => {
+    loadBalance()
+  }, [])
+
+  React.useEffect(() => {
+    if (balance !== null && estimated !== null && isRefreshing) {
+      setIsRefreshing(false)
+    }
+  }, [balance, estimated, isRefreshing])
 
   const { currency, symbol, address } = locationState
 
   const openPage = (path: string): void => {
     history.push(path)
+  }
+
+  const loadBalance = () => {
+    // Fix me
+    setTimeout(() => {
+      setBalance(0)
+      setEstimated(0)
+    }, 2000)
   }
 
   const openWebPage = (url: string): Promise<Tabs.Tab> => {
@@ -56,6 +79,17 @@ const Receive: React.FC = () => {
     }
   }
 
+  const onRefresh = (): void => {
+    // Fix me
+    if (balance !== null && estimated !== null) {
+      setIsRefreshing(true)
+      setBalance(null)
+      setEstimated(null)
+
+      loadBalance()
+    }
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -66,8 +100,8 @@ const Receive: React.FC = () => {
             <Styles.Heading>
               <Styles.UpdateBalanceBlock>
                 <Styles.BalanceLabel>Balance</Styles.BalanceLabel>
-                <Styles.RefreshIconRow>
-                  <Styles.RefreshIcon />
+                <Styles.RefreshIconRow isRefreshing={isRefreshing} onClick={onRefresh}>
+                  <SVG src={refreshIcon} width={13} height={13} title="refresh" />
                 </Styles.RefreshIconRow>
               </Styles.UpdateBalanceBlock>
               <Styles.MoreButton onClick={() => setIsVisible(!isVisible)}>
@@ -89,9 +123,16 @@ const Receive: React.FC = () => {
               <CurrencyLogo symbol={symbol} width={22} height={22} />
               <Styles.CurrencyName>{currency}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
-
-            <Styles.Balance>0.16823857 BTC</Styles.Balance>
-            <Styles.USDEstimated>$5,712.75 USD</Styles.USDEstimated>
+            {balance !== null ? (
+              <Styles.Balance>{balance} BTC</Styles.Balance>
+            ) : (
+              <Skeleton width={250} height={36} mt={10} type="gray" />
+            )}
+            {estimated !== null ? (
+              <Styles.USDEstimated>{`$${estimated} USD`}</Styles.USDEstimated>
+            ) : (
+              <Skeleton width={130} height={23} mt={11} type="gray" />
+            )}
           </Styles.Row>
           <Styles.ReceiveBlock>
             <QRCode width={120} height={120} value={address} />

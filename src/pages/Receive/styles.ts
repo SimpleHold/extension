@@ -1,4 +1,17 @@
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
+
+const rotating = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`
+
+type TRefreshIconRowProps = {
+  isRefreshing: boolean
+}
 
 const Wrapper = styled.div`
   height: 600px;
@@ -47,12 +60,31 @@ const BalanceLabel = styled.p`
 const RefreshIconRow = styled.div`
   width: 24px;
   height: 24px;
-  background-color: #c3c3c3;
+  background-color: #c3c3c326;
   border-radius: 12px;
   margin: 0 0 0 10px;
-`
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-const RefreshIcon = styled.div``
+  path {
+    fill: ${({ isRefreshing }: TRefreshIconRowProps) => (isRefreshing ? '#3fbb7d' : '#c3c3c3')};
+  }
+
+  svg {
+    animation: ${rotating} 2s infinite linear;
+    animation-duration: ${({ isRefreshing }: TRefreshIconRowProps) =>
+      isRefreshing ? '2s' : 'inherit'};
+  }
+
+  &:hover {
+    cursor: ${({ isRefreshing }: TRefreshIconRowProps) => (isRefreshing ? 'default' : 'pointer')};
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
+`
 
 const MoreButton = styled.div`
   width: 30px;
@@ -123,7 +155,6 @@ const Styles = {
   BalanceLabel,
   Heading,
   RefreshIconRow,
-  RefreshIcon,
   MoreButton,
   CurrencyBlock,
   CurrencyName,
