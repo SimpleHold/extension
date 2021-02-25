@@ -19,7 +19,8 @@
       "@pages/*": ["src/pages/*"],
       "@assets/*": ["assets/pages/*"],
       "@utils/*": ["src/utils/*"],
-      "@modals/*": ["src/modals/*"]
+      "@modals/*": ["src/modals/*"],
+      "@hooks/*": ["src/hooks/*"]
     }
   },
   "include": ["src", "@types", "webpack.config.js"]

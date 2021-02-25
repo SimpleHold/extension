@@ -47,7 +47,8 @@
           "@components": "./src/components",
           "@assets": "./src/assets",
           "@utils": "./src/utils",
-          "@modals": "./src/modals"
+          "@modals": "./src/modals",
+          "@hooks": "./src/hooks"
         }
       }
     ]
