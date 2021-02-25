@@ -35,10 +35,38 @@ const USDEstimated = styled.p`
   color: #7d7e8d;
 `
 
-const Form = styled.div`
+const Form = styled.form`
   padding: 20px 30px 30px 30px;
   background-color: #f8f8f8;
   border-top: 1px solid #eaeaea;
+`
+
+const NetworkFeeBlock = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const NetworkFeeLabel = styled.p`
+  margin: 0;
+  font-size: 14px;
+  line-height: 25px;
+  color: #7d7e8d;
+`
+
+const NetworkFee = styled.p`
+  margin: 0 0 0 5px;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 25px;
+  color: #7d7e8d;
+`
+
+const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 24px 0 0 0;
 `
 
 const Styles = {
@@ -49,6 +77,10 @@ const Styles = {
   Balance,
   USDEstimated,
   Form,
+  NetworkFeeBlock,
+  NetworkFeeLabel,
+  NetworkFee,
+  Actions,
 }
 
 export default Styles
