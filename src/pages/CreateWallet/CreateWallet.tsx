@@ -1,14 +1,12 @@
 import * as React from 'react'
-import SVG from 'react-inlinesvg'
 import { useHistory } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
-
-// Icons
-import askIcon from '@assets/icons/ask.svg'
+import Link from '@components/Link'
+import CheckBox from '@components/CheckBox'
 
 // Styles
 import Styles from './styles'
@@ -18,6 +16,7 @@ const Wallets: React.FC = () => {
 
   const [password, setPassword] = React.useState<string>('')
   const [confirmPassword, setConfirmPassword] = React.useState<string>('')
+  const [isAgreed, setIsagreed] = React.useState<boolean>(false)
 
   const onConfirm = (): void => {
     history.push('/backup/download', {
@@ -25,11 +24,11 @@ const Wallets: React.FC = () => {
     })
   }
 
-  const isButtonDisabled = password.length < 7 || password !== confirmPassword
+  const isButtonDisabled = password.length < 7 || password !== confirmPassword || !isAgreed
 
   return (
     <Styles.Wrapper>
-      <Header noActions withName logoColor="#3FBB7D" />
+      <Header noActions withName logoColor="#3FBB7D" withBorder />
       <Styles.Container>
         <Styles.Row>
           <Styles.Title>Сreate password</Styles.Title>
@@ -37,12 +36,7 @@ const Wallets: React.FC = () => {
             The password needs to encrypt your private keys. We dont have access to your keys, so be
             careful.
           </Styles.Description>
-          <Styles.LinkRow>
-            <Styles.LinkIcon>
-              <SVG src={askIcon} width={12} height={12} title="ask" />
-            </Styles.LinkIcon>
-            <Styles.Link>How it works?</Styles.Link>
-          </Styles.LinkRow>
+          <Link title="How it works?" to="https://simplehold.io" mt={44} />
         </Styles.Row>
         <Styles.Form>
           <TextInput
@@ -61,7 +55,16 @@ const Wallets: React.FC = () => {
             }
             type="password"
           />
-          <Button label="Confirm" onClick={onConfirm} disabled={isButtonDisabled} />
+          <Styles.AgreedBlock>
+            <CheckBox value={isAgreed} onClick={() => setIsagreed(!isAgreed)} />
+            <Styles.AgreedText>
+              I have read and agree to the <Styles.TermsLink>Terms of Use</Styles.TermsLink>
+            </Styles.AgreedText>
+          </Styles.AgreedBlock>
+          <Styles.Actions>
+            <Button label="Back" onClick={history.goBack} isLight mr={7.5} />
+            <Button label="Confirm" onClick={onConfirm} disabled={isButtonDisabled} ml={7.5} />
+          </Styles.Actions>
         </Styles.Form>
       </Styles.Container>
     </Styles.Wrapper>

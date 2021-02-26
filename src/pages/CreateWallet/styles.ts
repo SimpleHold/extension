@@ -9,7 +9,7 @@ const Container = styled.div`
 `
 
 const Row = styled.div`
-  padding: 20px 30px 30px 30px;
+  padding: 30px;
   background-color: #ffffff;
 `
 
@@ -28,44 +28,34 @@ const Description = styled.p`
   color: #7d7e8d;
 `
 
-const LinkRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 54px 0 0 0;
-
-  &:hover {
-    cursor: pointer;
-
-    p {
-      color: #3fbb7d;
-    }
-
-    path {
-      fill: #3fbb7d;
-    }
-  }
-`
-
-const LinkIcon = styled.div`
-  width: 17px;
-  height: 17px;
-  margin: 0 5px 0 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const Link = styled.p`
-  margin: 0;
-  font-size: 14px;
-  line-height: 16px;
-  color: #c3c3c3;
-`
-
 const Form = styled.form`
   padding: 30px 30px 0 30px;
   border-top: 1px solid #eaeaea;
+`
+
+const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 34px 0 0 0;
+`
+
+const AgreedBlock = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 3px 0 0 0;
+`
+
+const AgreedText = styled.p`
+  margin: 0 0 0 11px;
+  font-size: 14px;
+  line-height: 16px;
+  color: #7d7e8d;
+`
+
+const TermsLink = styled.span`
+  color: #3fbb7d;
 `
 
 const Styles = {
@@ -74,10 +64,11 @@ const Styles = {
   Row,
   Title,
   Description,
-  LinkRow,
-  LinkIcon,
-  Link,
   Form,
+  Actions,
+  AgreedBlock,
+  AgreedText,
+  TermsLink,
 }
 
 export default Styles
