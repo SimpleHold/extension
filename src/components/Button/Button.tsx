@@ -5,7 +5,7 @@ import Styles from './styles'
 
 interface Props {
   label: string
-  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onClick: Function
   disabled?: boolean
   isLight?: boolean
   isDanger?: boolean // Fix me
@@ -18,9 +18,14 @@ interface Props {
 const Button: React.FC<Props> = (props) => {
   const { label, onClick, disabled, isLight, isDanger, mr, ml, isSmall, isFullDanger } = props
 
+  const buttonOnClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    event.preventDefault()
+    onClick()
+  }
+
   return (
     <Styles.Container
-      onClick={onClick}
+      onClick={buttonOnClick}
       disabled={disabled}
       mr={mr}
       ml={ml}
