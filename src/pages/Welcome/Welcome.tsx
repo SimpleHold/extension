@@ -4,11 +4,11 @@ import { useHistory } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
+import Link from '@components/Link'
 
 // Icons
 import plusCircleIcon from '@assets/icons/plusCircle.svg'
 import restoreIcon from '@assets/icons/restore.svg'
-import askIcon from '@assets/icons/ask.svg'
 
 // Styles
 import Styles from './styles'
@@ -22,7 +22,7 @@ const Wallets: React.FC = () => {
 
   return (
     <Styles.Wrapper>
-      <Header noActions withName logoColor="#3FBB7D" />
+      <Header noActions withName logoColor="#3FBB7D" withBorder />
       <Styles.Container>
         <Styles.Title>Welcome</Styles.Title>
         <Styles.Description>
@@ -43,20 +43,8 @@ const Wallets: React.FC = () => {
           </Styles.Action>
         </Styles.WalletActions>
 
-        <Styles.Links>
-          <Styles.LinkRow>
-            <Styles.LinkIcon>
-              <SVG src={askIcon} width={12} height={12} title="ask" />
-            </Styles.LinkIcon>
-            <Styles.Link>How it works?</Styles.Link>
-          </Styles.LinkRow>
-          <Styles.LinkRow>
-            <Styles.LinkIcon>
-              <SVG src={askIcon} width={12} height={12} title="ask" />
-            </Styles.LinkIcon>
-            <Styles.Link>Want to migrate from another wallet?</Styles.Link>
-          </Styles.LinkRow>
-        </Styles.Links>
+        <Link to="https://simplehold.io/how-it-works" title="How it works?" mt={41} />
+        <Link to="https://simplehold.io" title="Want to migrate from another wallet?" mt={10} />
       </Styles.Container>
     </Styles.Wrapper>
   )
