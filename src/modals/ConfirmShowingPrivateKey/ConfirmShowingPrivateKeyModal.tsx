@@ -7,6 +7,7 @@ import Button from '@components/Button'
 
 // Utils
 import { decrypt } from '@utils/crypto'
+import { IWallet } from 'utils/backup'
 
 // Styles
 import Styles from './styles'
@@ -14,23 +15,39 @@ import Styles from './styles'
 interface Props {
   isActive: boolean
   onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  address: string
+  onSuccess: (privateKey: string) => void
 }
 
 const ConfirmShowingPrivateKeyModal: React.FC<Props> = (props) => {
-  const { isActive, onClose } = props
+  const { isActive, onClose, address, onSuccess } = props
 
   const [password, setPassword] = React.useState<string>('')
   const [isError, setIsError] = React.useState<boolean>(false)
 
-  const onConfirm = () => {
+  const onConfirm = (): void => {
+    if (isError) {
+      setIsError(false)
+    }
+
     const backup = localStorage.getItem('backup')
 
-    // console.log('backup', backup)
+    if (backup?.length) {
+      const decryptBackup = decrypt(backup, password)
 
-    // if (backup?.length) {
-    //   const decryptBackup = decrypt(backup, password)
-    //   console.log('decryptBackup', decryptBackup)
-    // }
+      if (decryptBackup) {
+        const parseBackup = JSON.parse(decryptBackup)
+        const findWallet = parseBackup?.wallets?.find(
+          (wallet: IWallet) => (wallet.address = address)
+        )
+
+        if (findWallet) {
+          return onSuccess(findWallet.privateKey)
+        }
+      }
+    }
+
+    return setIsError(true)
   }
 
   return (
@@ -50,7 +67,7 @@ const ConfirmShowingPrivateKeyModal: React.FC<Props> = (props) => {
           />
           <Styles.Actions>
             <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
-            <Button label="Ok1" disabled={password.length < 8} onClick={onConfirm} ml={7.5} />
+            <Button label="Ok" disabled={password.length < 8} onClick={onConfirm} ml={7.5} />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Row>

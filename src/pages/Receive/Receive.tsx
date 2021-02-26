@@ -14,6 +14,7 @@ import Skeleton from '@components/Skeleton'
 
 // Modals
 import ConfirmShowingPrivateKeyModal from '@modals/ConfirmShowingPrivateKey'
+import ShowPrivateKeyModal from '@modals/ShowPrivateKey'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
@@ -40,6 +41,7 @@ const Receive: React.FC = () => {
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false)
   const [balance, setBalance] = React.useState<null | number>(null)
   const [estimated, setEstimated] = React.useState<null | number>(null)
+  const [privateKey, setPrivateKey] = React.useState<null | string>(null)
 
   React.useEffect(() => {
     loadBalance()
@@ -88,6 +90,11 @@ const Receive: React.FC = () => {
 
       loadBalance()
     }
+  }
+
+  const onSuccessConfirm = (addressPrivateKey: string) => {
+    setPrivateKey(addressPrivateKey)
+    setActiveModal('showPrivateKey')
   }
 
   return (
@@ -144,6 +151,16 @@ const Receive: React.FC = () => {
       <ConfirmShowingPrivateKeyModal
         isActive={activeModal === 'confirmShowPrivateKey'}
         onClose={() => setActiveModal(null)}
+        address={address}
+        onSuccess={onSuccessConfirm}
+      />
+      <ShowPrivateKeyModal
+        isActive={activeModal === 'showPrivateKey'}
+        onClose={() => {
+          setActiveModal(null)
+          setPrivateKey(null)
+        }}
+        privateKey={privateKey}
       />
     </>
   )

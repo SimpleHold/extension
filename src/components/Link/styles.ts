@@ -11,7 +11,7 @@ const Container = styled.div`
   margin-top: ${({ mt }: TContainerProps) => `${mt ? `${mt}px` : '0'}`};
 
   &:not(:last-child) {
-    margin: 0 0 10px 0;
+    margin-bottom: 10px;
   }
 
   &:hover {

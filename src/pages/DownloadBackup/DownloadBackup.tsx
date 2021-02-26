@@ -1,7 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
 import { useLocation, useHistory } from 'react-router-dom'
-import get from 'lodash/get'
 
 // Components
 import Header from '@components/Header'
@@ -18,18 +17,21 @@ import { generate } from '@utils/backup'
 // Styles
 import Styles from './styles'
 
+interface LocationState {
+  password: string
+}
+
 const DownloadBackup: React.FC = () => {
-  const { state: locationState } = useLocation()
+  const { state: locationState } = useLocation<LocationState>()
   const history = useHistory()
 
   const downloadFile = (): void => {
     const { address, privateKey } = generateWallet()
-    const getPassword = get(locationState, 'password', '')
     const backup = generate(address, privateKey)
     const element = document.createElement('a')
     element.setAttribute(
       'href',
-      'data:text/plain;charset=utf-8,' + encodeURIComponent(encrypt(backup, getPassword))
+      'data:text/plain;charset=utf-8,' + encodeURIComponent(encrypt(backup, locationState.password))
     )
     element.setAttribute('download', 'backup.dat')
     element.style.display = 'none'
@@ -37,7 +39,7 @@ const DownloadBackup: React.FC = () => {
     element.click()
     document.body.removeChild(element)
 
-    localStorage.setItem('backup', backup)
+    localStorage.setItem('backup', encrypt(backup, locationState.password))
     localStorage.setItem('wallets', backup)
     history.push('/wallets')
   }
