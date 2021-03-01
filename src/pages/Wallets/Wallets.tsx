@@ -7,17 +7,20 @@ import Header from '@components/Header'
 import WalletCard from '@components/WalletCard'
 import Skeleton from '@components/Skeleton'
 
+// Hooks
+import useScroll from '@hooks/useScroll'
+
 // Styles
 import Styles from './styles'
 import { IWallet } from 'utils/backup'
 
 const Wallets: React.FC = () => {
   const history = useHistory()
+  const { scrollPosition } = useScroll()
 
-  const [scrollPosition, setScrollPosition] = React.useState<number>(0)
   const [wallets, setWallets] = React.useState<any | null>(null) // Fix me
-  const [totalBalance, setTotalBalance] = React.useState<number | null>(null)
-  const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
+  const [totalBalance, setTotalBalance] = React.useState<number | null>(0)
+  const [totalEstimated, setTotalEstimated] = React.useState<number | null>(0)
 
   React.useEffect(() => {
     getWallets()
@@ -43,7 +46,7 @@ const Wallets: React.FC = () => {
   }
 
   const collapsibleHeight = Math.max(100, 340 - 1.25 * scrollPosition)
-  const walletsHeadingMT = Math.max(0, 200 - scrollPosition)
+  const walletsHeadingMT = Math.max(0, 200 - 1.1 * scrollPosition)
 
   const totalBalanceLabelOpacity = Math.max(0, 1 - 0.1 * scrollPosition)
   const totalBalanceLabelHeight = Math.max(0, 19 - 0.1 * scrollPosition)
@@ -60,19 +63,6 @@ const Wallets: React.FC = () => {
   const balanceBlockLeft = Math.max(0, 0 - scrollPosition)
   const balanceBlockPaddingTop = Math.max(0, 20 - scrollPosition)
   const balanceBlockPaddingHorizontal = Math.max(0, 30 - scrollPosition)
-
-  const handleScroll = () => {
-    const position = window.pageYOffset
-    setScrollPosition(position)
-  }
-
-  React.useEffect(() => {
-    window.addEventListener('scroll', handleScroll)
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
 
   const sumBalance = (amount: number) => {
     setTotalBalance(amount) // Fix me

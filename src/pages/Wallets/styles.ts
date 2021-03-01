@@ -36,15 +36,15 @@ const TotalBalance = styled.p`
 const BalanceAmount = styled.p`
   margin: 21px 0 0 0;
   font-weight: 500;
-  font-size: 36px;
-  line-height: 42px;
+  /* font-size: 36px;
+  line-height: 42px; */
   color: #ffffff;
 `
 
 const USDEstimated = styled.p`
   margin: 5px 0 0 0;
-  font-size: 20px;
-  line-height: 23px;
+  /* font-size: 20px;
+  line-height: 23px; */
   color: #ffffff;
 `
 
