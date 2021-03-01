@@ -1,22 +1,26 @@
 import styled from 'styled-components'
 
-type TContainerProps = {
+type TSelectedAddressBlockProps = {
   isDisabled: boolean
 }
 
 const Container = styled.div`
+  margin: 0 0 10px 0;
+`
+
+const SelectedAddressBlock = styled.div`
+  padding: 9px 10px;
+  background-color: #ffffff;
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: #ffffff;
-  margin: 0 0 10px 0;
-  padding: 10px;
   border: 1px solid #eaeaea;
+  box-sizing: border-box;
   border-radius: 5px;
 
   &:hover {
-    cursor: ${({ isDisabled }: TContainerProps) => (isDisabled ? 'default' : 'pointer')};
-    border: ${({ isDisabled }: TContainerProps) =>
+    cursor: ${({ isDisabled }: TSelectedAddressBlockProps) => (isDisabled ? 'default' : 'pointer')};
+    border: ${({ isDisabled }: TSelectedAddressBlockProps) =>
       ` 1px solid ${isDisabled ? '#eaeaea' : '#3fbb7d'}`};
   }
 `
@@ -41,34 +45,33 @@ const Address = styled.p`
   text-overflow: ellipsis;
 `
 
-const Button = styled.button`
+const ArrowIconRow = styled.div`
   width: 30px;
   height: 30px;
-  border: none;
-  outline: none;
-  background-color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-
-  &:hover {
-    cursor: pointer;
-  }
+  margin: 0 0 0 19px;
 `
 
-const ArrowIcon = styled.div`
-  width: 7.5px;
-  height: 7.5px;
-  border: 2px solid #3fbb7d;
-  transform: rotate(45deg);
+const AddressesList = styled.div`
+  background-color: #ffffff;
+  height: 250px;
+  overflow-y: scroll;
+  border: 1px solid #eaeaea;
+  border-radius: 0 0 5px 5px;
 `
+
+const AddressItem = styled.div``
 
 const Styles = {
   Container,
+  SelectedAddressBlock,
   Row,
   Address,
-  Button,
-  ArrowIcon,
+  ArrowIconRow,
+  AddressesList,
+  AddressItem,
 }
 
 export default Styles
