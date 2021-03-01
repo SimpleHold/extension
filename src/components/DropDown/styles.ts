@@ -38,13 +38,23 @@ const ListItem = styled.div`
     p {
       color: #3fbb7d;
     }
+
+    path {
+      fill: #3fbb7d;
+    }
   }
 `
 
 const IconRow = styled.div`
   width: 24px;
   height: 24px;
-  background-color: #c4c4c4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  path {
+    fill: #c3c3c3;
+  }
 `
 
 const Title = styled.p`

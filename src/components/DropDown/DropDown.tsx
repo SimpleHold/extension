@@ -1,10 +1,15 @@
 import * as React from 'react'
+import SVG from 'react-inlinesvg'
 
 // Styles
 import Styles from './styles'
 
 type List = {
-  icon: string
+  icon: {
+    source: string
+    width: number
+    height: number
+  }
   title: string
 }
 
@@ -25,7 +30,9 @@ const DropDown: React.FC<Props> = (props) => {
 
         return (
           <Styles.ListItem key={title} onClick={() => onClick(index)}>
-            <Styles.IconRow />
+            <Styles.IconRow>
+              <SVG src={icon.source} width={icon.width} height={icon.height} title="icon" />
+            </Styles.IconRow>
             <Styles.Title>{title}</Styles.Title>
           </Styles.ListItem>
         )
