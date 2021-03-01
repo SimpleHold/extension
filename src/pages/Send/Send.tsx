@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 
 // Components
 import Cover from '@components/Cover'
@@ -8,21 +8,48 @@ import CurrenciesDropdown from '@components/CurrenciesDropdown'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
+// Utils
+import { getWallets } from '@utils/backup'
+import { toUpper } from '@utils/format'
+
 // Styles
 import Styles from './styles'
 
+interface LocationState {
+  symbol: string
+  address: string
+}
+
 const Send: React.FC = () => {
   const history = useHistory()
+  const { state: locationState } = useLocation<LocationState>()
 
   const [address, setAddress] = React.useState<string>('')
   const [amount, setAmount] = React.useState<string>('')
+  const [addresses, setAddresses] = React.useState<string[]>([])
+  const [selectedAddress, setSelectedAddress] = React.useState<string>(locationState.address)
+  const [networkFee, setNetworkFee] = React.useState<number>(0.0001)
 
-  const openPage = (path: string, params: any = {}): void => {
-    history.push(path, params)
+  React.useEffect(() => {
+    getWalletsList()
+  }, [])
+
+  const getWalletsList = (): void => {
+    const walletsList = getWallets(locationState.symbol)
+
+    if (walletsList) {
+      setAddresses(walletsList)
+    }
   }
 
-  const next = () => {
-    openPage('/send-confirm')
+  const onSend = (): void => {
+    history.push('/send-confirm', {
+      amount: 0.002,
+      symbol: 'btc',
+      networkFee,
+      addressFrom: selectedAddress,
+      addressTo: address,
+    })
   }
 
   return (
@@ -36,7 +63,15 @@ const Send: React.FC = () => {
           <Styles.USDEstimated>$5,712.75 USD</Styles.USDEstimated>
         </Styles.Row>
         <Styles.Form>
-          <CurrenciesDropdown symbol="btc" isDisabled />
+          {addresses?.length ? (
+            <CurrenciesDropdown
+              symbol={locationState.symbol}
+              isDisabled={addresses?.length < 2}
+              selectedAddress={selectedAddress}
+              addresses={addresses}
+              setAddress={setSelectedAddress}
+            />
+          ) : null}
           <TextInput
             label="Recipient Address"
             value={address}
@@ -49,12 +84,14 @@ const Send: React.FC = () => {
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
-            <Styles.NetworkFee>0.0000000001 BTC</Styles.NetworkFee>
+            <Styles.NetworkFee>
+              {networkFee} {toUpper(locationState.symbol)}
+            </Styles.NetworkFee>
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>
             <Button label="Cancel" isLight onClick={() => null} mr={7.5} />
-            <Button label="Send" onClick={() => openPage('/send-confirm')} ml={7.5} />
+            <Button label="Send" onClick={onSend} ml={7.5} />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Container>
