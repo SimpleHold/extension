@@ -7,18 +7,33 @@ const Wrapper = styled.div`
 const Container = styled.div`
   background-color: #ffffff;
   border-radius: 5px 5px 0 0;
+  padding: 30px;
+  height: 540px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `
 
-const Row = styled.div`
-  padding: 20px 30px 45px 30px;
-`
+const Row = styled.div``
 
 const Title = styled.p`
-  margin: 0 0 26px 0;
-  font-weight: 500;
-  font-size: 20px;
+  margin: 0;
+  font-weight: bold;
+  font-size: 23px;
   line-height: 25px;
   color: #1d1d22;
+`
+
+const Description = styled.p`
+  margin: 5px 0 0 0;
+  font-size: 16px;
+  line-height: 23px;
+  color: #7d7e8d;
+`
+
+const OrderCheck = styled.div`
+  margin: 34px 0 0 0;
 `
 
 const List = styled.div`
@@ -54,10 +69,69 @@ const DashedDividerLine = styled.div`
   border: 1px dashed #c3c3c3;
 `
 
-const Form = styled.form`
-  border-top: 1px solid #eaeaea;
-  background-color: #f8f8f8;
-  padding: 20px 30px;
+const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const DestinationsList = styled.ul`
+  list-style-type: none;
+  padding: 47px 0 0 20px;
+  overflow: hidden;
+`
+
+const Destinate = styled.li`
+  position: relative;
+  margin-bottom: 0;
+  padding-bottom: 20px;
+
+  &:before {
+    content: '';
+    position: absolute;
+    left: -17px;
+    border-left: 1px solid #c3c3c3;
+    height: 100%;
+    width: 1px;
+  }
+
+  &:after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    background-color: #c3c3c3;
+    border-radius: 4px;
+    position: absolute;
+    left: -20px;
+    top: 5px;
+  }
+
+  &:first-child:before {
+    top: 6px;
+  }
+
+  &:last-child:before {
+    height: 6px;
+  }
+`
+
+const DestinateTitle = styled.p`
+  margin: 0;
+  font-size: 14px;
+  line-height: 16px;
+  text-transform: uppercase;
+  color: #7d7e8d;
+`
+
+const DestinateText = styled.p`
+  margin: 5px 0 0 0;
+  font-weight: normal;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `
 
 const Styles = {
@@ -65,12 +139,18 @@ const Styles = {
   Container,
   Row,
   Title,
+  Description,
+  OrderCheck,
   List,
   ListTitle,
   ListText,
   DashedDivider,
   DashedDividerLine,
-  Form,
+  Actions,
+  DestinationsList,
+  Destinate,
+  DestinateTitle,
+  DestinateText,
 }
 
 export default Styles
