@@ -19,9 +19,15 @@ import ShowPrivateKeyModal from '@modals/ShowPrivateKey'
 // Hooks
 import useVisible from '@hooks/useVisible'
 
+// Utils
+import { getBalance, getEstimated } from '@utils/bitcoin'
+import { limitBalance, price } from '@utils/format'
+
 // Icons
 import moreIcon from '@assets/icons/more.svg'
 import refreshIcon from '@assets/icons/refresh.svg'
+import privateKeyIcon from '@assets/icons/privateKey.svg'
+import linkIcon from '@assets/icons/link.svg'
 
 // Styles
 import Styles from './styles'
@@ -34,6 +40,8 @@ interface LocationState {
 
 const Receive: React.FC = () => {
   const { state: locationState } = useLocation<LocationState>()
+  const { currency, symbol, address } = locationState
+
   const history = useHistory()
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
@@ -53,18 +61,23 @@ const Receive: React.FC = () => {
     }
   }, [balance, estimated, isRefreshing])
 
-  const { currency, symbol, address } = locationState
-
-  const openPage = (path: string): void => {
-    history.push(path)
+  const onSend = (): void => {
+    history.push('/send', {
+      symbol,
+      address,
+    })
   }
 
-  const loadBalance = () => {
-    // Fix me
-    setTimeout(() => {
-      setBalance(0)
+  const loadBalance = async (): Promise<void> => {
+    const fetchBalance = await getBalance(address)
+    setBalance(fetchBalance)
+
+    if (fetchBalance !== 0) {
+      const fetchEstimated = await getEstimated(fetchBalance)
+      setEstimated(fetchEstimated)
+    } else {
       setEstimated(0)
-    }, 2000)
+    }
   }
 
   const openWebPage = (url: string): Promise<Tabs.Tab> => {
@@ -101,7 +114,7 @@ const Receive: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={() => openPage('/wallets')} backTitle="Home" />
+        <Header withBack onBack={history.goBack} backTitle="Home" />
         <Styles.Container>
           <Styles.Row>
             <Styles.Heading>
@@ -120,8 +133,11 @@ const Receive: React.FC = () => {
               dropDownRef={ref}
               isVisible={isVisible}
               list={[
-                { icon: '1', title: 'Show Private key' },
-                { icon: '2', title: 'View in Explorer' },
+                {
+                  icon: { source: privateKeyIcon, width: 18, height: 18 },
+                  title: 'Show Private key',
+                },
+                { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
               ]}
               onClick={onClickDropDown}
             />
@@ -131,12 +147,12 @@ const Receive: React.FC = () => {
               <Styles.CurrencyName>{currency}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
             {balance !== null ? (
-              <Styles.Balance>{balance} BTC</Styles.Balance>
+              <Styles.Balance>{limitBalance(balance, 12)} BTC</Styles.Balance>
             ) : (
               <Skeleton width={250} height={36} mt={10} type="gray" />
             )}
             {estimated !== null ? (
-              <Styles.USDEstimated>{`$${estimated} USD`}</Styles.USDEstimated>
+              <Styles.USDEstimated>{`$${price(estimated, 2)} USD`}</Styles.USDEstimated>
             ) : (
               <Skeleton width={130} height={23} mt={11} type="gray" />
             )}
@@ -144,7 +160,7 @@ const Receive: React.FC = () => {
           <Styles.ReceiveBlock>
             <QRCode width={120} height={120} value={address} />
             <Styles.Address>{address}</Styles.Address>
-            <Button label="Send BTC" onClick={() => openPage('/send')} />
+            <Button label="Send BTC" onClick={onSend} />
           </Styles.ReceiveBlock>
         </Styles.Container>
       </Styles.Wrapper>
