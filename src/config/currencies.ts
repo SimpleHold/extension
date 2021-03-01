@@ -16,7 +16,7 @@ const currencies: ICurrency[] = [
   },
 ]
 
-export const getLogo = (symbol: string): ICurrency | undefined => {
+export const getCurrency = (symbol: string): ICurrency | undefined => {
   return currencies.find((currency: ICurrency) => currency.symbol === symbol)
 }
 

@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { getLogo } from '../../config/currencies'
+import { getCurrency } from '../../config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -14,12 +14,12 @@ interface Props {
 const CurrencyLogo: React.FC<Props> = (props) => {
   const { width, height, symbol } = props
 
-  const logo = getLogo(symbol)
+  const currency = getCurrency(symbol)
 
-  if (logo) {
+  if (currency) {
     return (
       <Styles.Container width={width} height={height}>
-        <Styles.Logo source={logo.logo} />
+        <Styles.Logo source={currency.logo} />
       </Styles.Container>
     )
   }

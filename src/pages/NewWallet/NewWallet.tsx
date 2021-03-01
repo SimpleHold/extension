@@ -13,16 +13,32 @@ import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 import importIcon from '@assets/icons/import.svg'
 import plusCircleIcon from '@assets/icons/plusCircle.svg'
 
+// Utils
+import { generateWallet } from '@utils/bitcoin'
+
 // Styles
 import Styles from './styles'
 
 const NewWallet: React.FC = () => {
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
+  const [privateKey, setPrivateKey] = React.useState<null | string>(null)
 
   const history = useHistory()
 
   const openPage = (path: string): void => {
     history.push(path)
+  }
+
+  const onSuccess = (): void => {
+    setActiveModal(null)
+    setPrivateKey(null)
+    history.goBack()
+  }
+
+  const onGenerateAddress = (): void => {
+    const { privateKey: walletPrivateKey } = generateWallet()
+    setPrivateKey(walletPrivateKey)
+    setActiveModal('confirmAddAddress')
   }
 
   return (
@@ -44,7 +60,7 @@ const NewWallet: React.FC = () => {
               </Styles.ActionIcon>
               <Styles.ActionName>Import private key</Styles.ActionName>
             </Styles.Action>
-            <Styles.Action onClick={() => setActiveModal('confirmAddAddress')}>
+            <Styles.Action onClick={onGenerateAddress}>
               <Styles.ActionIcon>
                 <SVG src={plusCircleIcon} width={20} height={20} title="plus-circle" />
               </Styles.ActionIcon>
@@ -56,6 +72,8 @@ const NewWallet: React.FC = () => {
       <ConfirmAddNewAddressModal
         isActive={activeModal === 'confirmAddAddress'}
         onClose={() => setActiveModal(null)}
+        privateKey={privateKey}
+        onSuccess={onSuccess}
       />
     </>
   )

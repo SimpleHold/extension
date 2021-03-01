@@ -6,8 +6,9 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
+import { getCurrency } from '../../config/currencies'
 import { getBalance, getEstimated } from '@utils/bitcoin'
-import { toUpper } from '@utils/format'
+import { toUpper, numberFriendly, limitBalance } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -15,22 +16,21 @@ import Styles from './styles'
 interface Props {
   address: string
   symbol: string
-  sumBalance: Function // Fix me type
-  sumEstimated: Function // Fix me type
+  sumBalance: (balance: number) => void
+  sumEstimated: (estimated: number) => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
   const { address, symbol, sumBalance, sumEstimated } = props
+  const currency = getCurrency(symbol)
 
-  const currency = 'Bitcoin' // Fix me
+  const history = useHistory()
 
   const [balance, setBalance] = React.useState<number | null>(null)
   const [estimated, setEstimated] = React.useState<number | null>(null)
 
-  const history = useHistory()
-
   React.useEffect(() => {
-    loadBalance()
+    fetchBalance()
   }, [])
 
   React.useEffect(() => {
@@ -39,28 +39,28 @@ const WalletCard: React.FC<Props> = (props) => {
         setEstimated(0)
         sumEstimated(0)
       } else {
-        loadEstimated()
+        fetchEstimated()
       }
     }
   }, [balance])
 
-  const loadBalance = async () => {
+  const fetchBalance = async (): Promise<void> => {
     const tryGetBalance = await getBalance(address)
-    setBalance(tryGetBalance || 0)
-    sumBalance(tryGetBalance || 0)
+    setBalance(tryGetBalance)
+    sumBalance(tryGetBalance)
   }
 
-  const loadEstimated = async () => {
-    if (balance) {
+  const fetchEstimated = async (): Promise<void> => {
+    if (balance !== null) {
       const tryGetEstimated = await getEstimated(balance)
       setEstimated(tryGetEstimated)
-      sumEstimated(tryGetEstimated || 0)
+      sumEstimated(tryGetEstimated)
     }
   }
 
   const openWallet = (): void => {
     history.push('/receive', {
-      currency,
+      currency: currency?.name,
       symbol,
       address,
     })
@@ -68,24 +68,25 @@ const WalletCard: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container onClick={openWallet}>
-      <CurrencyLogo width={40} height={40} symbol="btc" />
+      <CurrencyLogo width={40} height={40} symbol={symbol} />
       <Styles.Row>
-        <Styles.Info>
-          <Styles.CurrencyName>{currency}</Styles.CurrencyName>
+        <Styles.AddressInfo>
+          {currency ? <Styles.Currency>{currency.name}</Styles.Currency> : null}
           <Styles.Address>{address}</Styles.Address>
-        </Styles.Info>
-        <Styles.BalanceInfo>
+        </Styles.AddressInfo>
+        <Styles.Balances>
           {balance !== null ? (
-            <Styles.Balance>{`${balance} ${toUpper(symbol)}`}</Styles.Balance>
+            <Styles.Balance>{`${limitBalance(balance, 10)} ${toUpper(symbol)}`}</Styles.Balance>
           ) : (
-            <Skeleton width={110} height={16} type="gray" br={4} />
+            <Skeleton width={106} height={16} type="gray" br={4} />
           )}
+
           {estimated !== null ? (
-            <Styles.USDEstimated>{`$${estimated} USD`}</Styles.USDEstimated>
+            <Styles.Estimated>{`$${numberFriendly(estimated)} USD`}</Styles.Estimated>
           ) : (
-            <Skeleton width={80} height={15} type="gray" mt={9} br={4} />
+            <Skeleton width={80} height={14} type="gray" mt={9} br={4} />
           )}
-        </Styles.BalanceInfo>
+        </Styles.Balances>
       </Styles.Row>
     </Styles.Container>
   )

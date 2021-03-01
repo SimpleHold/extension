@@ -1,5 +1,7 @@
 import bitcore from 'bitcore-lib'
 
+import { validateBitcoinPrivateKey } from '@utils/validate'
+
 export const generateWallet = () => {
   const privateKey = new bitcore.PrivateKey()
 
@@ -33,5 +35,16 @@ export const getEstimated = (amount: number): Promise<number> | number => {
       })
   } catch {
     return 0
+  }
+}
+
+export const importAddress = (privateKey: string) => {
+  try {
+    if (validateBitcoinPrivateKey(privateKey)) {
+      return new bitcore.PrivateKey(privateKey).toAddress().toString()
+    }
+    return null
+  } catch {
+    return null
   }
 }

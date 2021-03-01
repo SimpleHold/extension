@@ -3,11 +3,11 @@ import styled from 'styled-components'
 const Container = styled.div`
   background-color: #ffffff;
   border-radius: 5px;
-  margin: 0 0 10px 0;
   padding: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin: 0 0 10px 0;
   transition: all 0.2s ease-in-out;
 
   &:hover {
@@ -22,57 +22,72 @@ const Row = styled.div`
   align-items: center;
   justify-content: space-between;
   flex: 1;
-  margin: 0 0 0 20px;
+  margin: 0 0 0 10px;
 `
 
-const Info = styled.div``
+const AddressInfo = styled.div`
+  width: 94px;
+  overflow: hidden;
 
-const CurrencyName = styled.p`
+  p {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+`
+
+const Currency = styled.p`
   margin: 0;
-  font-size: 16px;
-  line-height: 19px;
-  text-transform: capitalize;
+  font-size: 14px;
+  line-height: 16px;
   color: #1d1d22;
 `
 
 const Address = styled.p`
-  margin: 6px 0 0 0;
+  margin: 9px 0 0 0;
   font-size: 12px;
   line-height: 14px;
   color: #c3c3c3;
-  width: 100px; // Fix me
-  overflow: hidden; // Fix me
 `
 
-const BalanceInfo = styled.div``
+const Balances = styled.div`
+  width: 106px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
+  p {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+`
 
 const Balance = styled.p`
   margin: 0;
   font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
-  text-align: right;
-  text-transform: capitalize;
+  font-size: 14px;
+  line-height: 16px;
   color: #1d1d22;
 `
 
-const USDEstimated = styled.p`
-  margin: 6px 0 0 0;
+const Estimated = styled.p`
+  margin: 9px 0 0 0;
   font-size: 12px;
   line-height: 14px;
-  text-align: right;
   color: #7d7e8d;
 `
 
 const Styles = {
   Container,
   Row,
-  Info,
-  CurrencyName,
+  AddressInfo,
+  Currency,
   Address,
-  BalanceInfo,
+  Balances,
   Balance,
-  USDEstimated,
+  Estimated,
 }
 
 export default Styles

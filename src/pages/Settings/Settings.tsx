@@ -48,13 +48,13 @@ const Settings: React.FC = () => {
       },
       onClick: () => null,
     },
-    {
-      title: 'Send anonymized usage data',
-      text: 'Help us improve SimpleHold with sending anonymized clicks and pageview events',
-      withSwitch: true,
-      switchValue: false,
-      onToggle: () => null,
-    },
+    // {
+    //   title: 'Send anonymized usage data',
+    //   text: 'Help us improve SimpleHold with sending anonymized clicks and pageview events',
+    //   withSwitch: true,
+    //   switchValue: false,
+    //   onToggle: () => null,
+    // },
     {
       isButton: true,
       title: 'Contact to support',

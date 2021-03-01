@@ -33,3 +33,20 @@ export const generate = (address: string, privateKey: string): string => {
 export const validate = (backup: string): boolean => {
   return true // Fix me
 }
+
+export const getWallets = (symbol: string): string[] | null => {
+  try {
+    const walletsList = localStorage.getItem('wallets')
+
+    if (walletsList) {
+      const parseWallets = JSON.parse(walletsList)
+
+      return parseWallets.wallets
+        .filter((wallet: IWallet) => wallet.symbol === symbol)
+        .map((wallet: IWallet) => wallet.address)
+    }
+    return null
+  } catch {
+    return null
+  }
+}

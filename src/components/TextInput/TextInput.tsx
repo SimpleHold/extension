@@ -11,7 +11,7 @@ interface Props {
   minLength?: number
   maxLength?: number
   withError?: boolean
-  errorLabel?: string
+  errorLabel?: string | null
 }
 
 const TextInput: React.FC<Props> = (props) => {
