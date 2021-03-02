@@ -14,6 +14,7 @@ import SettingsPage from './pages/Settings'
 import NewWalletPage from './pages/NewWallet'
 import ImportPrivateKeyPage from './pages/ImportPrivateKey'
 import OnBoardPage from './pages/OnBoard'
+import LockPage from './pages/Lock'
 
 const routers: RouteProps[] = [
   {
@@ -67,6 +68,10 @@ const routers: RouteProps[] = [
   {
     path: '/onboard',
     component: OnBoardPage,
+  },
+  {
+    path: '/lock',
+    component: LockPage,
   },
 ]
 
