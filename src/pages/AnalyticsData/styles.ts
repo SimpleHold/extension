@@ -2,10 +2,11 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   height: 600px;
+  background-color: #ffffff;
 `
 
 const Container = styled.div`
-  padding: 20px 30px 0 30px;
+  padding: 30px;
 `
 
 const Title = styled.p`
@@ -25,7 +26,7 @@ const Description = styled.p`
 `
 
 const FeaturesBlock = styled.div`
-  margin: 30px 0 0 0;
+  margin: 20px 0 0 0;
 `
 
 const FeaturesTitle = styled.p`

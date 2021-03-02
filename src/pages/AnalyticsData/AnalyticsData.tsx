@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { useHistory } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
@@ -7,15 +8,23 @@ import Button from '@components/Button'
 // Styles
 import Styles from './styles'
 
-const UsageData: React.FC = () => {
+const AnalyticsData: React.FC = () => {
+  const history = useHistory()
+
+  const onNext = (): void => {
+    localStorage.setItem('analyticsAgreed', 'true')
+    history.push('/welcome')
+  }
+
   return (
     <Styles.Wrapper>
-      <Header noActions />
+      <Header noActions logoColor="#3FBB7D" withBorder />
       <Styles.Container>
-        <Styles.Title>Help Us Improve SimpleHold</Styles.Title>
+        <Styles.Title>Analytics data</Styles.Title>
         <Styles.Description>
-          SimpleHold would like to gather usage data to better understand how our users interact
-          with the extension. This data will be used to continually improve the usability.
+          We work hard to provide you best experience with our application. To do it more
+          effectively we would like to gather anonymized usage data. This data will help us better
+          understand how our users interact with our application.
         </Styles.Description>
         <Styles.FeaturesBlock>
           <Styles.FeaturesTitle>SimpleHold will</Styles.FeaturesTitle>
@@ -43,12 +52,11 @@ const UsageData: React.FC = () => {
           </Styles.FeaturesList>
         </Styles.FeaturesBlock>
         <Styles.Actions>
-          <Button label="No, thanks" onClick={() => null} />
-          <Button label="I agree" onClick={() => null} />
+          <Button label="I got it" onClick={onNext} />
         </Styles.Actions>
       </Styles.Container>
     </Styles.Wrapper>
   )
 }
 
-export default UsageData
+export default AnalyticsData
