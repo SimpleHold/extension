@@ -5,7 +5,7 @@ import WalletsPage from './pages/Wallets'
 import ReceivePage from './pages/Receive'
 import SendPage from './pages/Send'
 import SendConfirmationPage from './pages/SendConfirmation'
-import UsageDataPage from './pages/UsageData'
+import AnalyticsDataPage from './pages/AnalyticsData'
 import WelcomePage from './pages/Welcome'
 import CreateWalletPage from './pages/CreateWallet'
 import DownloadBackupPage from './pages/DownloadBackup'
@@ -13,12 +13,12 @@ import RestoreWalletPage from './pages/RestoreWallet'
 import SettingsPage from './pages/Settings'
 import NewWalletPage from './pages/NewWallet'
 import ImportPrivateKeyPage from './pages/ImportPrivateKey'
+import OnBoardPage from './pages/OnBoard'
 
 const routers: RouteProps[] = [
   {
     path: '/wallets',
     component: WalletsPage,
-    exact: true,
   },
   {
     path: '/receive',
@@ -27,15 +27,14 @@ const routers: RouteProps[] = [
   {
     path: '/send',
     component: SendPage,
-    exact: true,
   },
   {
     path: '/send-confirm',
     component: SendConfirmationPage,
   },
   {
-    path: '/usage-data',
-    component: UsageDataPage,
+    path: '/analytics-data',
+    component: AnalyticsDataPage,
   },
   {
     path: '/welcome',
@@ -64,6 +63,10 @@ const routers: RouteProps[] = [
   {
     path: '/import-private-key',
     component: ImportPrivateKeyPage,
+  },
+  {
+    path: '/onboard',
+    component: OnBoardPage,
   },
 ]
 
