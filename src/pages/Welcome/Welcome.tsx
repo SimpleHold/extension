@@ -22,7 +22,7 @@ const Wallets: React.FC = () => {
 
   return (
     <Styles.Wrapper>
-      <Header noActions withName logoColor="#3FBB7D" withBorder />
+      <Header noActions logoColor="#3FBB7D" withBorder />
       <Styles.Container>
         <Styles.Title>Welcome</Styles.Title>
         <Styles.Description>

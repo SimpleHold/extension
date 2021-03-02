@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   height: 600px;
+  background-color: #ffffff;
 `
 
 const Container = styled.div`
@@ -28,9 +29,8 @@ const WalletActions = styled.div`
 `
 
 const Action = styled.div`
-  background: #fafafa;
-  border: 1px dashed #dfdfdf;
-  box-sizing: border-box;
+  background-color: #fafafa;
+  border: 1px solid #eaeaea;
   border-radius: 5px;
   padding: 38px 0;
   display: flex;
