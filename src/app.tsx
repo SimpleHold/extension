@@ -25,6 +25,7 @@ const bounceTransition = {
 
 const App: React.FC = () => {
   const getInitialPage = () => {
+    return '/test'
     if (localStorage.getItem('isLocked')) {
       return '/lock'
     }
