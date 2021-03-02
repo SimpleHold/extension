@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   height: 600px;
+  background-color: #ffffff;
 `
 
 const Container = styled.div`
@@ -10,7 +11,6 @@ const Container = styled.div`
 
 const Row = styled.div`
   padding: 30px;
-  background-color: #ffffff;
 `
 
 const Title = styled.p`
@@ -29,8 +29,9 @@ const Description = styled.p`
 `
 
 const Form = styled.form`
-  padding: 30px 30px 0 30px;
+  padding: 30px;
   border-top: 1px solid #eaeaea;
+  background-color: #f8f8f8;
 `
 
 const Actions = styled.div`
@@ -56,6 +57,10 @@ const AgreedText = styled.p`
 
 const TermsLink = styled.span`
   color: #3fbb7d;
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 const Styles = {
