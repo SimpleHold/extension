@@ -12,6 +12,16 @@ const GlobalStyle = createGlobalStyle`
     background-color: #f8f8f8;
     font-family: 'Roboto', sans-serif;
   }
+
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  
+  input[type=number] {
+    -moz-appearance: textfield;
+  } 
 `
 
 export default GlobalStyle

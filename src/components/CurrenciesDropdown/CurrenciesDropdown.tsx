@@ -22,8 +22,14 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
+  const openDropDown = (): void => {
+    if (!isDisabled) {
+      setIsVisible(!isVisible)
+    }
+  }
+
   return (
-    <Styles.Container ref={ref} onClick={() => setIsVisible(!isVisible)}>
+    <Styles.Container ref={ref} onClick={openDropDown}>
       <Styles.SelectedAddressBlock isDisabled={isDisabled}>
         <CurrencyLogo symbol={symbol} width={40} height={40} />
         <Styles.Row>
@@ -31,7 +37,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
           {!isDisabled ? <Styles.ArrowIconRow /> : null}
         </Styles.Row>
       </Styles.SelectedAddressBlock>
-      {isVisible ? (
+      {isVisible && !isDisabled ? (
         <Styles.AddressesList>
           {addresses.map((address: string) => (
             <Styles.AddressItem key={address} onClick={() => setAddress(address)}>
@@ -45,27 +51,6 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
       ) : null}
     </Styles.Container>
   )
-
-  // return (
-  //   <div ref={ref}>
-  //     <Styles.Container isDisabled={isDisabled} onClick={() => setIsVisible(!isVisible)}>
-  //       <CurrencyLogo symbol={symbol} width={40} height={40} />
-  //       <Styles.Row>
-  //         <Styles.Address>{selectedAddress}</Styles.Address>
-  //         {!isDisabled ? (
-  //           <Styles.Button>
-  //             <Styles.ArrowIcon />
-  //           </Styles.Button>
-  //         ) : null}
-  //       </Styles.Row>
-  //     </Styles.Container>
-  //     {isVisible ? (
-  //       <div>
-  //         <p>123213</p>
-  //       </div>
-  //     ) : null}
-  //   </div>
-  // )
 }
 
 export default CurrenciesDropdown

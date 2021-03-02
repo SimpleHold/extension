@@ -7,6 +7,7 @@ import logo from '@assets/logo.svg'
 import nameIcon from '@assets/name.svg'
 import settingsIcon from '@assets/icons/settings.svg'
 import arrowIcon from '@assets/icons/arrow.svg'
+import lockIcon from '@assets/icons/lock.svg'
 
 // Styles
 import Styles from './styles'
@@ -40,6 +41,11 @@ const Header: React.FC<Props> = (props) => {
     history.push(page)
   }
 
+  const lockWallet = (): void => {
+    localStorage.setItem('isLocked', 'true')
+    return openPage('/lock')
+  }
+
   return (
     <Styles.Container withBorder={withBorder}>
       <Styles.LogoRow>
@@ -63,6 +69,9 @@ const Header: React.FC<Props> = (props) => {
         ) : null}
         {!noActions ? (
           <Styles.Nav>
+            <Styles.NavItem onClick={lockWallet}>
+              <SVG src={lockIcon} width={13} height={16} title="lock" />
+            </Styles.NavItem>
             <Styles.NavItem
               onClick={() => (activePage === 'settings' ? null : openPage('/settings'))}
               isActive={activePage === 'settings'}

@@ -11,6 +11,9 @@ import Switch from '@components/Switch'
 // Modals
 import ConfirmLogoutModal from '@modals/ConfirmLogout'
 
+// Utils
+import { download as downloadBackup } from '@utils/backup'
+
 // Icons
 import cloudIcon from '@assets/icons/cloud.svg'
 import linkIcon from '@assets/icons/link.svg'
@@ -37,6 +40,14 @@ const Settings: React.FC = () => {
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
   const history = useHistory()
 
+  const onDownloadBackup = () => {
+    const backup = localStorage.getItem('backup')
+
+    if (backup) {
+      downloadBackup(backup)
+    }
+  }
+
   const list: List[] = [
     {
       isButton: true,
@@ -46,15 +57,8 @@ const Settings: React.FC = () => {
         width: 22,
         height: 14,
       },
-      onClick: () => null,
+      onClick: onDownloadBackup,
     },
-    // {
-    //   title: 'Send anonymized usage data',
-    //   text: 'Help us improve SimpleHold with sending anonymized clicks and pageview events',
-    //   withSwitch: true,
-    //   switchValue: false,
-    //   onToggle: () => null,
-    // },
     {
       isButton: true,
       title: 'Contact to support',

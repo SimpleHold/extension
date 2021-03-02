@@ -22,3 +22,13 @@ export const generate = (address: string, privateKey: string): string => {
     uuid: v4(),
   })
 }
+
+export const download = (backup: string): void => {
+  const element = document.createElement('a')
+  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(backup))
+  element.setAttribute('download', 'backup.dat')
+  element.style.display = 'none'
+  document.body.appendChild(element)
+  element.click()
+  document.body.removeChild(element)
+}

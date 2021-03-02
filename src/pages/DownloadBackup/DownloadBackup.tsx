@@ -12,7 +12,7 @@ import downloadBackupIllustrate from '@assets/illustrate/downloadbackup.svg'
 // Utils
 import { encrypt } from '@utils/crypto'
 import { generateWallet } from '@utils/bitcoin'
-import { generate } from '@utils/backup'
+import { generate, download as downloadBackup } from '@utils/backup'
 import { getWalletsFromBackup } from '@utils/wallet'
 
 // Styles
@@ -29,16 +29,7 @@ const DownloadBackup: React.FC = () => {
   const downloadFile = (): void => {
     const { address, privateKey } = generateWallet()
     const backup = generate(address, privateKey)
-    const element = document.createElement('a')
-    element.setAttribute(
-      'href',
-      'data:text/plain;charset=utf-8,' + encodeURIComponent(encrypt(backup, locationState.password))
-    )
-    element.setAttribute('download', 'backup.dat')
-    element.style.display = 'none'
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
+    downloadBackup(encrypt(backup, locationState.password))
 
     localStorage.setItem('backup', encrypt(backup, locationState.password))
     localStorage.setItem('wallets', JSON.stringify(getWalletsFromBackup(backup)))

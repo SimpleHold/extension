@@ -13,7 +13,7 @@ export const getWallets = (symbol: string): string[] | null => {
     if (walletsList) {
       const parseWallets = JSON.parse(walletsList)
 
-      return parseWallets.wallets
+      return parseWallets
         .filter((wallet: IWallet) => wallet.symbol === symbol)
         .map((wallet: IWallet) => wallet.address)
     }
