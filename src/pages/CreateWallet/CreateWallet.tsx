@@ -19,7 +19,7 @@ const Wallets: React.FC = () => {
   const [isAgreed, setIsagreed] = React.useState<boolean>(false)
 
   const onConfirm = (): void => {
-    history.push('/backup/download', {
+    history.push('/download-backup', {
       password,
     })
   }

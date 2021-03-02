@@ -46,7 +46,7 @@ const OnBoard: React.FC = () => {
     if (currentStep !== 2) {
       setCurrentStep(currentStep + 1)
     } else {
-      localStorage.setItem('onBoardPassed', 'true')
+      localStorage.setItem('onBoard', 'passed')
       history.push('/analytics-data')
     }
   }

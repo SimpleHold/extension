@@ -6,6 +6,8 @@ import { AnimatedSwitch } from 'react-router-transition'
 import routes from './routes'
 import GlobalStyles from './styles/global'
 
+import { validate } from '@utils/wallet'
+
 const bounceTransition = {
   atEnter: {
     opacity: 1,
@@ -22,12 +24,23 @@ const bounceTransition = {
 }
 
 const App: React.FC = () => {
-  const isHaveWallets = localStorage.getItem('wallets') !== null
+  const getInitialPage = () => {
+    if (localStorage.getItem('onBoard') !== 'passed') {
+      return '/onboard'
+    }
+
+    if (localStorage.getItem('analytics') !== 'agreed') {
+      return '/analytics-data'
+    }
+
+    const validateWallets = validate(localStorage.getItem('wallets'))
+    return validateWallets ? '/wallets' : '/welcome'
+  }
 
   return (
     <>
       <GlobalStyles />
-      <Router initialEntries={[isHaveWallets ? '/wallets' : '/welcome']}>
+      <Router initialEntries={[getInitialPage()]}>
         <AnimatedSwitch {...bounceTransition}>
           {routes.map((route: RouteProps, index: number) => (
             <Route key={index} path={route.path} component={route.component} />

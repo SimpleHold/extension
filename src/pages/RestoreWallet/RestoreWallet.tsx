@@ -58,7 +58,7 @@ const RestoreWallet: React.FC<Props> = (props) => {
   return (
     <>
       <Styles.Wrapper>
-        <Header noActions withName logoColor="#3FBB7D" withBorder />
+        <Header noActions logoColor="#3FBB7D" withBorder />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Restore</Styles.Title>

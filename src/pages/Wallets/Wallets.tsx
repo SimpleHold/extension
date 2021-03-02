@@ -12,7 +12,6 @@ import useScroll from '@hooks/useScroll'
 
 // Styles
 import Styles from './styles'
-import { IWallet } from 'utils/backup'
 
 const Wallets: React.FC = () => {
   const history = useHistory()
@@ -35,13 +34,7 @@ const Wallets: React.FC = () => {
 
     if (storageWallets) {
       const parseWallets = JSON.parse(storageWallets)
-      const mapWallets = parseWallets.wallets.map((wallet: IWallet) => {
-        return {
-          symbol: wallet.symbol,
-          address: wallet.address,
-        }
-      })
-      setWallets(mapWallets)
+      setWallets(parseWallets)
     }
   }
 

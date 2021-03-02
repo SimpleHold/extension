@@ -9,7 +9,7 @@ import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
 // Utils
-import { getWallets } from '@utils/backup'
+import { getWallets } from '@utils/wallet'
 import { toUpper } from '@utils/format'
 
 // Styles

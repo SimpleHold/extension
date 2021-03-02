@@ -45,7 +45,7 @@ const routers: RouteProps[] = [
     component: CreateWalletPage,
   },
   {
-    path: '/backup/download',
+    path: '/download-backup',
     component: DownloadBackupPage,
   },
   {

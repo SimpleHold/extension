@@ -12,7 +12,7 @@ const AnalyticsData: React.FC = () => {
   const history = useHistory()
 
   const onNext = (): void => {
-    localStorage.setItem('analyticsAgreed', 'true')
+    localStorage.setItem('analytics', 'agreed')
     history.push('/welcome')
   }
 

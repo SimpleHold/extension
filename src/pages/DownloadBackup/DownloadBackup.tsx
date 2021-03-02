@@ -1,18 +1,19 @@
 import * as React from 'react'
-import SVG from 'react-inlinesvg'
 import { useLocation, useHistory } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
+import Link from '@components/Link'
 import Button from '@components/Button'
 
-// Icons
-import askIcon from '@assets/icons/ask.svg'
+// Illustrate
+import downloadBackupIllustrate from '@assets/illustrate/downloadbackup.svg'
 
 // Utils
 import { encrypt } from '@utils/crypto'
 import { generateWallet } from '@utils/bitcoin'
 import { generate } from '@utils/backup'
+import { getWalletsFromBackup } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -40,34 +41,25 @@ const DownloadBackup: React.FC = () => {
     document.body.removeChild(element)
 
     localStorage.setItem('backup', encrypt(backup, locationState.password))
-    localStorage.setItem('wallets', backup)
+    localStorage.setItem('wallets', JSON.stringify(getWalletsFromBackup(backup)))
     history.push('/wallets')
   }
 
   return (
     <Styles.Wrapper>
-      <Header noActions withName logoColor="#3FBB7D" />
-      <Styles.Wrapper>
-        <Styles.CircleRow>
-          <Styles.Circle />
-        </Styles.CircleRow>
+      <Header noActions logoColor="#3FBB7D" withBorder />
+      <Styles.Container>
         <Styles.Row>
+          <Styles.Image src={downloadBackupIllustrate} alt="image" />
           <Styles.Title>Download backup</Styles.Title>
           <Styles.Description>
             Please save your backup file and keep it properly as well as password. It ensures access
             to your funds.
           </Styles.Description>
-          <Styles.LinkRow>
-            <Styles.LinkIcon>
-              <SVG src={askIcon} width={12} height={12} title="ask" />
-            </Styles.LinkIcon>
-            <Styles.Link>Read more about how it works.</Styles.Link>
-          </Styles.LinkRow>
-          <Styles.Actions>
-            <Button label="Download backup file" onClick={downloadFile} />
-          </Styles.Actions>
+          <Link title="Read more about how it works." to="https://simplehold.io" mt={17} />
         </Styles.Row>
-      </Styles.Wrapper>
+        <Button label="Download backup file" onClick={downloadFile} />
+      </Styles.Container>
     </Styles.Wrapper>
   )
 }

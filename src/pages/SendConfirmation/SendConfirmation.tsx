@@ -100,7 +100,9 @@ const SendConfirmation: React.FC = () => {
         inputType="password"
         inputValue={password}
         inputErrorLabel={null}
-        onChangeInput={setPassword}
+        onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
+          setPassword(e.target.value)
+        }
         isDisabledConfirmButton
         onConfirm={onConfirmModal}
       />

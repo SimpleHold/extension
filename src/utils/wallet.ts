@@ -23,7 +23,10 @@ export const getWallets = (symbol: string): string[] | null => {
   }
 }
 
-export const validate = (walletы: string): boolean => {
+export const validate = (wallet: string | null): boolean => {
+  if (!wallet) {
+    return false
+  }
   return true // Fix me
 }
 
@@ -35,7 +38,7 @@ export const getWalletsFromBackup = (backup: string): string | null => {
   const parsebackup = JSON.parse(backup)
 
   if (parsebackup) {
-    const validateWallets = validate(parsebackup.wallets)
+    const validateWallets = validate(backup)
 
     if (validateWallets) {
       return parsebackup.wallets.map((wallet: IWallet) => {
