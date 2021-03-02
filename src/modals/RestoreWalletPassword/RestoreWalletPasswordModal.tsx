@@ -7,7 +7,10 @@ import Button from '@components/Button'
 
 // Utils
 import { decrypt } from '@utils/crypto'
-import { validate } from '@utils/backup'
+import { validate } from '@utils/wallet'
+
+// Icons
+import modalIcon from '@assets/modalIcons/confirm.svg'
 
 // Styles
 import Styles from './styles'
@@ -50,7 +53,7 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
   }
 
   return (
-    <ModalWrapper isActive={isActive} onClose={onClose}>
+    <ModalWrapper isActive={isActive} onClose={onClose} icon={modalIcon}>
       <Styles.Row>
         <Styles.Title>Confirm adding new address</Styles.Title>
         <Styles.Form>

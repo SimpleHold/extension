@@ -7,10 +7,11 @@ interface Props {
   children: React.ReactNode
   isActive: boolean
   onClose: Function
+  icon: string
 }
 
 const ModalWrapper: React.FC<Props> = (props) => {
-  const { children, isActive, onClose } = props
+  const { children, isActive, onClose, icon } = props
 
   const modalRef = React.useRef<HTMLDivElement>(null)
 
@@ -25,7 +26,7 @@ const ModalWrapper: React.FC<Props> = (props) => {
       <Styles.Background onClick={onClick}>
         <Styles.Modal ref={modalRef}>
           <Styles.Circle>
-            <Styles.IconRow />
+            <Styles.Icon src={icon} alt="icon" />
           </Styles.Circle>
           {children}
         </Styles.Modal>

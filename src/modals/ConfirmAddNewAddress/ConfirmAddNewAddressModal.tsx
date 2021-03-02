@@ -10,6 +10,9 @@ import { validatePassword } from '@utils/validate'
 import { decrypt, addNewWallet, encrypt } from '@utils/crypto'
 import { importAddress } from '@utils/bitcoin'
 
+// Icons
+import modalIcon from '@assets/modalIcons/confirm.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -53,7 +56,7 @@ const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
   }
 
   return (
-    <ModalWrapper isActive={isActive} onClose={onClose}>
+    <ModalWrapper isActive={isActive} onClose={onClose} icon={modalIcon}>
       <Styles.Row>
         <Styles.Title>Confirm adding new address</Styles.Title>
 

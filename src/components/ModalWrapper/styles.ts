@@ -35,24 +35,23 @@ const Modal = styled.div`
 `
 
 const Circle = styled.div`
-  background-color: #c4c4c4;
-  border: 8px solid #ffffff;
-  box-sizing: border-box;
   width: 90px;
   height: 90px;
-  border-radius: 45px;
   position: absolute;
   top: -45px;
 `
 
-const IconRow = styled.div``
+const Icon = styled.img`
+  width: 90px;
+  height: 90px;
+`
 
 const Styles = {
   Container,
   Background,
   Modal,
   Circle,
-  IconRow,
+  Icon,
 }
 
 export default Styles

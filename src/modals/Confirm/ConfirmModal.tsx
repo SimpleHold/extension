@@ -5,6 +5,9 @@ import ModalWrapper from '@components/ModalWrapper'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
+// Icons
+import modalIcon from '@assets/modalIcons/confirm.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -17,7 +20,7 @@ interface Props {
   inputType: string
   inputValue: string
   inputErrorLabel: null | string
-  onChangeInput: any
+  onChangeInput: (event: React.ChangeEvent<HTMLInputElement>) => void
   isDisabledConfirmButton: boolean
 }
 
@@ -36,7 +39,7 @@ const ConfirmModal: React.FC<Props> = (props) => {
   } = props
 
   return (
-    <ModalWrapper isActive={isActive} onClose={onClose}>
+    <ModalWrapper isActive={isActive} onClose={onClose} icon={modalIcon}>
       <Styles.Row>
         <Styles.Title>{title}</Styles.Title>
 
