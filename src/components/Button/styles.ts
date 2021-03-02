@@ -1,40 +1,108 @@
 import styled from 'styled-components'
 
-type TContainer = {
+type TContainerProps = {
   disabled?: boolean
+  isLight?: boolean
   ml?: number
   mr?: number
   isSmall?: boolean
-  isLight?: boolean
   isDanger?: boolean
 }
 
-// TOOD: refactor this shit
+const getBackgroundColor = (props: TContainerProps) => {
+  const { disabled, isLight, isDanger } = props
+
+  if (isDanger) {
+    return '#FFFFFF'
+  }
+
+  if (disabled) {
+    return '#EAEAEA'
+  }
+
+  if (isLight) {
+    return 'inherit'
+  }
+
+  return '#3FBB7D'
+}
+
+const getHoverBackgroundColor = (props: TContainerProps) => {
+  const { disabled, isDanger, isLight } = props
+
+  if (isLight || isDanger || disabled) {
+    return getBackgroundColor(props)
+  }
+
+  return '#31A76C'
+}
+
+const getBorderColor = (props: TContainerProps) => {
+  const { isLight, disabled, isDanger } = props
+
+  if (isLight || disabled || isDanger) {
+    return '#EAEAEA'
+  }
+
+  return '#3FBB7D'
+}
+
+const getHoverBorderColor = (props: TContainerProps) => {
+  const { isLight, disabled, isDanger } = props
+
+  if (isDanger) {
+    return '#EB5757'
+  }
+
+  if (isLight) {
+    return '#31A76C'
+  }
+
+  if (disabled) {
+    return '#EAEAEA'
+  }
+
+  return '#3FBB7D'
+}
+
+const getLabelColor = (props: TContainerProps) => {
+  const { disabled, isLight, isDanger } = props
+
+  if (isDanger) {
+    return '#EB5757'
+  }
+
+  if (isLight) {
+    return '#3FBB7D'
+  }
+
+  if (disabled) {
+    return '#7D7E8D'
+  }
+
+  return '#FFFFFF'
+}
 
 const Container = styled.button`
   width: 100%;
-  height: ${({ isSmall }: TContainer) => (isSmall ? '50px' : '60px')};
-  background-color: ${({ disabled, isLight, isDanger }: TContainer) =>
-    disabled ? '#EAEAEA' : isLight ? '#F8F8F8' : isDanger ? '#FFFFFF' : '#3fbb7d'};
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   border: none;
   outline: none;
-  margin-left: ${({ ml }: TContainer) => (ml ? `${ml}px` : '0')};
-  margin-right: ${({ mr }: TContainer) => (mr ? `${mr}px` : '0')};
-  border: ${({ isLight, isDanger }: TContainer) =>
-    isLight || isDanger ? '1px solid #EAEAEA' : 'none'};
+  background-color: ${(props: TContainerProps) => getBackgroundColor(props)};
+  border: ${(props: TContainerProps) => `1px solid ${getBorderColor(props)}`};
+  height: ${({ isSmall }: TContainerProps) => (isSmall ? '50px' : '60px')};
+  border-radius: 5px;
+  transition: all 0.3s;
+  margin-left: ${({ ml }: TContainerProps) => (ml ? `${ml}px` : '0')};
+  margin-right: ${({ mr }: TContainerProps) => (mr ? `${mr}px` : '0')};
 
   &:hover {
-    cursor: ${({ disabled }: TContainer) => (disabled ? 'default' : 'pointer')};
-    background-color: #31a76c;
+    cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
+    background-color: ${(props: TContainerProps) => getHoverBackgroundColor(props)};
+    border: ${(props: TContainerProps) => `1px solid ${getHoverBorderColor(props)}`};
   }
 
   p {
-    color: ${({ isLight, isDanger }: TContainer) =>
-      isLight ? '#3FBB7D' : isDanger ? '#EB5757' : '#FFFFFF'};
+    color: ${(props: TContainerProps) => getLabelColor(props)};
   }
 `
 
@@ -43,8 +111,6 @@ const Label = styled.p`
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
-  text-align: center;
-  user-select: none;
 `
 
 const Styles = {

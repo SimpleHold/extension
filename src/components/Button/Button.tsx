@@ -8,15 +8,14 @@ interface Props {
   onClick: Function
   disabled?: boolean
   isLight?: boolean
-  isDanger?: boolean // Fix me
   mr?: number
   ml?: number
   isSmall?: boolean
-  isFullDanger?: boolean // Fix me
+  isDanger?: boolean
 }
 
 const Button: React.FC<Props> = (props) => {
-  const { label, onClick, disabled, isLight, isDanger, mr, ml, isSmall, isFullDanger } = props
+  const { label, disabled, isLight, mr, ml, isSmall, isDanger, onClick } = props
 
   const buttonOnClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     event.preventDefault()
@@ -25,13 +24,13 @@ const Button: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container
-      onClick={buttonOnClick}
       disabled={disabled}
+      isLight={isLight}
       mr={mr}
       ml={ml}
       isSmall={isSmall}
-      isLight={isLight}
       isDanger={isDanger}
+      onClick={buttonOnClick}
     >
       <Styles.Label>{label}</Styles.Label>
     </Styles.Container>
