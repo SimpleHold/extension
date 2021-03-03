@@ -22,6 +22,8 @@
   "dependencies": {
     "@babel/runtime": "^7.12.5",
     "advanced-css-reset": "^1.2.2",
+    "axios": "^0.21.1",
+    "bignumber.js": "^9.0.1",
     "bitcore-lib": "^8.25.0",
     "crypto-js": "^4.0.0",
     "emoji-log": "^1.0.2",
