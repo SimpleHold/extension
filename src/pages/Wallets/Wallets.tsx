@@ -10,6 +10,9 @@ import Skeleton from '@components/Skeleton'
 // Hooks
 import useScroll from '@hooks/useScroll'
 
+// Utils
+import { price } from '@utils/format'
+
 // Styles
 import Styles from './styles'
 
@@ -55,14 +58,13 @@ const Wallets: React.FC = () => {
   const balanceBlockTop = Math.max(13, 80 - scrollPosition)
   const balanceBlockLeft = Math.max(0, 0 - scrollPosition)
   const balanceBlockPaddingTop = Math.max(0, 20 - scrollPosition)
-  const balanceBlockPaddingHorizontal = Math.max(0, 30 - scrollPosition)
 
   const sumBalance = (amount: number) => {
-    setTotalBalance(amount) // Fix me
+    setTotalBalance((amount += totalBalance || 0))
   }
 
   const sumEstimated = (amount: number) => {
-    setTotalEstimated(amount) // Fix me
+    setTotalEstimated((amount += totalEstimated || 0))
   }
 
   return (
@@ -107,7 +109,7 @@ const Wallets: React.FC = () => {
                 marginTop: estimatedMarginTop,
               }}
             >
-              {`$${totalEstimated} USD`}
+              {`$${price(totalEstimated)} USD`}
             </Styles.USDEstimated>
           )}
         </Styles.BalanceBlock>
