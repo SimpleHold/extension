@@ -43,6 +43,7 @@ const Address = styled.p`
   color: #1d1d22;
   overflow: hidden;
   text-overflow: ellipsis;
+  user-select: none;
 `
 
 const ArrowIconRow = styled.div`
@@ -52,17 +53,37 @@ const ArrowIconRow = styled.div`
   align-items: center;
   justify-content: center;
   margin: 0 0 0 19px;
+
+  svg {
+    transform: rotate(270deg);
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
 `
 
 const AddressesList = styled.div`
   background-color: #ffffff;
-  height: 250px;
+  max-height: 250px;
   overflow-y: scroll;
   border: 1px solid #eaeaea;
   border-radius: 0 0 5px 5px;
+  position: absolute;
+  width: calc(100% - 60px);
 `
 
-const AddressItem = styled.div``
+const AddressItem = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #f8f8f8;
+  }
+`
 
 const Styles = {
   Container,

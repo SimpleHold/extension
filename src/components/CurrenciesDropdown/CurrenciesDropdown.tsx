@@ -1,10 +1,14 @@
 import * as React from 'react'
+import SVG from 'react-inlinesvg'
 
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
+
+// Icons
+import arrowIcon from '@assets/icons/arrow.svg'
 
 // Styles
 import Styles from './styles'
@@ -34,19 +38,25 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
         <CurrencyLogo symbol={symbol} width={40} height={40} />
         <Styles.Row>
           <Styles.Address>{selectedAddress}</Styles.Address>
-          {!isDisabled ? <Styles.ArrowIconRow /> : null}
+          {!isDisabled ? (
+            <Styles.ArrowIconRow>
+              <SVG src={arrowIcon} width={8} height={14} title="arrow" />
+            </Styles.ArrowIconRow>
+          ) : null}
         </Styles.Row>
       </Styles.SelectedAddressBlock>
       {isVisible && !isDisabled ? (
         <Styles.AddressesList>
-          {addresses.map((address: string) => (
-            <Styles.AddressItem key={address} onClick={() => setAddress(address)}>
-              <CurrencyLogo symbol={symbol} width={40} height={40} />
-              <Styles.Row>
-                <Styles.Address>{address}</Styles.Address>
-              </Styles.Row>
-            </Styles.AddressItem>
-          ))}
+          {addresses
+            .filter((i: string) => i !== selectedAddress)
+            .map((address: string) => (
+              <Styles.AddressItem key={address} onClick={() => setAddress(address)}>
+                <CurrencyLogo symbol={symbol} width={40} height={40} />
+                <Styles.Row>
+                  <Styles.Address>{address}</Styles.Address>
+                </Styles.Row>
+              </Styles.AddressItem>
+            ))}
         </Styles.AddressesList>
       ) : null}
     </Styles.Container>
