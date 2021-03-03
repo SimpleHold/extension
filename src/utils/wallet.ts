@@ -6,7 +6,7 @@ export interface IWallet {
   privateKey: string
 }
 
-export const getWallets = (symbol: string): string[] | null => {
+export const getWallets = (): IWallet[] | null => {
   try {
     const walletsList = localStorage.getItem('wallets')
 
@@ -14,8 +14,6 @@ export const getWallets = (symbol: string): string[] | null => {
       const parseWallets = JSON.parse(walletsList)
 
       return parseWallets
-        .filter((wallet: IWallet) => wallet.symbol === symbol)
-        .map((wallet: IWallet) => wallet.address)
     }
     return null
   } catch {
@@ -32,7 +30,14 @@ export const validate = (wallet: string | null): boolean => {
 
 export const setBalance = (address: string): void => {}
 
-export const checkExistWallet = (address: string) => {}
+export const checkExistWallet = (address: string): boolean => {
+  const wallets = getWallets()
+
+  if (wallets?.length) {
+    return wallets.find((wallet: IWallet) => wallet.address === address) !== undefined
+  }
+  return false
+}
 
 export const getWalletsFromBackup = (backup: string): string | null => {
   const parsebackup = JSON.parse(backup)

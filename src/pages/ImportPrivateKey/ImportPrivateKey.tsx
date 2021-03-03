@@ -13,6 +13,7 @@ import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 
 // Utils
 import { importAddress } from '@utils/bitcoin'
+import { checkExistWallet } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -32,6 +33,11 @@ const ImportPrivateKey: React.FC = () => {
     const getAddress = importAddress(privateKey)
 
     if (getAddress) {
+      const checkExist = checkExistWallet(getAddress)
+
+      if (checkExist) {
+        return setErrorLabel('This address has already been added')
+      }
       return setActiveModal('confirmAddAddress')
     }
 

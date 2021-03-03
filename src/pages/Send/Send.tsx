@@ -10,7 +10,7 @@ import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { getWallets } from '@utils/wallet'
+import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
 import {
   getBalance,
@@ -100,10 +100,13 @@ const Send: React.FC = () => {
   }
 
   const getWalletsList = (): void => {
-    const walletsList = getWallets(symbol)
+    const walletsList = getWallets()
 
     if (walletsList) {
-      setAddresses(walletsList)
+      const filterWallets = walletsList
+        .filter((wallet: IWallet) => wallet.symbol === symbol)
+        .map((wallet: IWallet) => wallet.address)
+      setAddresses(filterWallets)
     }
   }
 
