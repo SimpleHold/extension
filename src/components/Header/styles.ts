@@ -117,10 +117,6 @@ const LogoRow = styled.div`
   align-items: center;
 `
 
-const Name = styled.div`
-  margin: 0 0 0 10px;
-`
-
 const Styles = {
   Container,
   Row,
@@ -131,7 +127,6 @@ const Styles = {
   BackIconRow,
   NavigateTitle,
   LogoRow,
-  Name,
 }
 
 export default Styles
