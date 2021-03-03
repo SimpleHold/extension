@@ -23,7 +23,9 @@ export const numberFriendly = (amount: number): number | string => {
   let base = Math.floor(Math.log(Math.abs(amount)) / Math.log(1000))
   const suffix = abbrev[Math.min(2, base - 1)]
   base = abbrev.indexOf(suffix) + 1
-  return suffix ? round(amount / Math.pow(1000, base), 2) + suffix : '' + amount
+  return suffix
+    ? round(amount / Math.pow(1000, base), 2).toFixed(2) + suffix
+    : '' + amount.toFixed(2)
 }
 
 export const limitBalance = (amount: number, max: number): string | number => {

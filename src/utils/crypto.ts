@@ -39,7 +39,7 @@ export const addNewWallet = (privateKey: string, address: string, symbol: string
     const validate = validateWallet(parseWallets)
 
     if (validate) {
-      parseWallets.wallets.push({
+      parseWallets.push({
         symbol,
         address,
         uuid: v4(),
