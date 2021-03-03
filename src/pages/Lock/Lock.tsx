@@ -13,6 +13,7 @@ import ConfirmLogoutModal from '@modals/ConfirmLogout'
 // Utils
 import { decrypt } from '@utils/crypto'
 import { download as downloadBackup } from '@utils/backup'
+import { validatePassword } from '@utils/validate'
 
 // Illustrate
 import lockIllustrate from '@assets/illustrate/lock.svg'
@@ -25,18 +26,27 @@ const Lock: React.FC = () => {
 
   const [password, setPassword] = React.useState<string>('')
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
+  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
   const onUnlock = (): void => {
-    const backup = localStorage.getItem('backup')
+    if (errorLabel) {
+      setErrorLabel(null)
+    }
 
-    if (backup) {
-      const decryptWallet = decrypt(backup, password)
+    if (validatePassword(password)) {
+      const backup = localStorage.getItem('backup')
 
-      if (decryptWallet) {
-        localStorage.removeItem('isLocked')
-        history.push('/wallets')
+      if (backup) {
+        const decryptWallet = decrypt(backup, password)
+
+        if (decryptWallet) {
+          localStorage.removeItem('isLocked')
+          return history.push('/wallets')
+        }
       }
     }
+
+    return setErrorLabel('Password is not valid')
   }
 
   const openWebPage = (url: string): Promise<Tabs.Tab> => {
@@ -77,9 +87,10 @@ const Lock: React.FC = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
                 setPassword(e.target.value)
               }
+              errorLabel={errorLabel}
             />
             <Styles.Actions>
-              <Button label="Unlock" onClick={onUnlock} disabled={password.length < 8} />
+              <Button label="Unlock" onClick={onUnlock} disabled={!validatePassword(password)} />
             </Styles.Actions>
           </Styles.Form>
 
