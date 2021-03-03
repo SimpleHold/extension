@@ -1,23 +1,38 @@
 import styled from 'styled-components'
 
+import eyeIcon from '@assets/icons/eye.svg'
+import eyeVisibleIcon from '@assets/icons/eyeVisible.svg'
+
 type TContainerProps = {
   isFocused: boolean
+  isError: boolean
 }
 
 type TRowProps = {
   isActive: boolean
 }
 
+type TEyeIconPRops = {
+  isVisible: boolean
+}
+
 const Container = styled.div`
   height: 60px;
   background: #ffffff;
-  border: ${({ isFocused }: TContainerProps) => `1px solid ${isFocused ? '#3FBB7D' : '#eaeaea'}`};
+  border: ${({ isFocused, isError }: TContainerProps) =>
+    isFocused || isError ? `1px solid ${isFocused ? '#3FBB7D' : '#EB5757'}` : '1px solid #eaeaea'};
   border-radius: 5px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  margin: 0 0 10px 0;
   padding: 0 19px;
+
+  label {
+    color: ${({ isFocused, isError }: TContainerProps) =>
+      isError && !isFocused ? '#EB5757' : '#7D7E8D'};
+  }
 
   &:hover {
     cursor: pointer;
@@ -44,12 +59,11 @@ const Row = styled.div`
 `
 
 const Label = styled.label`
-  color: #7d7e8d;
   transition: all 0.3s ease-out;
 `
 
 const Input = styled.input`
-  margin: 0;
+  margin: 5px 0 0 0;
   padding: 0;
   border: none;
   height: 0;
@@ -63,8 +77,18 @@ const Input = styled.input`
 const VisibleInput = styled.div`
   width: 30px;
   height: 30px;
-  background-color: red;
   margin: 0 0 0 10px;
+
+  &:hover {
+    cursor: pointer;
+  }
+`
+
+const EyeIcon = styled.div`
+  width: 30px;
+  height: 30px;
+  background-image: ${({ isVisible }: TEyeIconPRops) =>
+    `url(${isVisible ? eyeVisibleIcon : eyeIcon})`};
 `
 
 const Styles = {
@@ -73,52 +97,7 @@ const Styles = {
   Label,
   Input,
   VisibleInput,
+  EyeIcon,
 }
 
 export default Styles
-
-// type TContainerProps = {
-//   isFocused: boolean
-// }
-
-// type TLabelProps = {
-//   isError?: boolean
-// }
-
-// const Container = styled.div`
-//   width: 100%;
-//   height: 60px;
-//   background-color: #ffffff;
-//   margin: 0 0 10px 0;
-//   border: ${({ isFocused }: TContainerProps) => `1px solid ${isFocused ? '#3FBB7D' : '#EAEAEA'}`};
-//   border-radius: 5px;
-//   padding: 11px 20px;
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-// `
-
-// const Label = styled.p`
-//   margin: 0;
-//   font-size: 12px;
-//   line-height: 14px;
-//   color: ${({ isError }: TLabelProps) => (isError ? `#EB5757` : '#7d7e8d')};
-// `
-
-// const TextInput = styled.input`
-//   border: none;
-//   outline: none;
-//   margin: 5px 0 0 0;
-//   font-weight: 500;
-//   font-size: 16px;
-//   line-height: 19px;
-//   color: #1d1d22;
-// `
-
-// const Styles = {
-//   Container,
-//   Label,
-//   TextInput,
-// }
-
-// export default Styles

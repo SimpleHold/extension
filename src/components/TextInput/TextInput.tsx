@@ -8,16 +8,27 @@ interface Props {
   value: string
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
   type?: string
+  errorLabel?: string | null
+  withPasswordVisible?: boolean
+  onBlurInput?: Function
 }
 
 const TextInput: React.FC<Props> = (props) => {
-  const { label, value, onChange, type } = props
+  const { label, value, onChange, type, errorLabel, withPasswordVisible, onBlurInput } = props
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
-  const [isFocused, setIsFocused] = React.useState<boolean>(false)
+  const visibleBlockRef = React.useRef<HTMLDivElement>(null)
 
-  const onClick = (): void => {
-    textInputRef.current?.focus()
+  const [isFocused, setIsFocused] = React.useState<boolean>(false)
+  const [isPasswordVisible, setPasswordVisible] = React.useState<boolean>(false)
+
+  const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
+    if (
+      (visibleBlockRef.current && !visibleBlockRef.current.contains(event.target as Node)) ||
+      !withPasswordVisible
+    ) {
+      textInputRef.current?.focus()
+    }
   }
 
   const onFocus = (): void => {
@@ -26,83 +37,40 @@ const TextInput: React.FC<Props> = (props) => {
 
   const onBlur = (): void => {
     setIsFocused(false)
+    if (onBlurInput) {
+      onBlurInput()
+    }
   }
 
   return (
-    <Styles.Container onClick={onClick} isFocused={isFocused}>
+    <Styles.Container
+      onClick={onClick}
+      isFocused={isFocused}
+      isError={errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0}
+    >
       <Styles.Row isActive={isFocused || value?.length > 0}>
-        <Styles.Label>{label}</Styles.Label>
+        <Styles.Label>
+          {errorLabel && !isFocused && value.length > 0 ? errorLabel : label}
+        </Styles.Label>
         <Styles.Input
           ref={textInputRef}
           onFocus={onFocus}
           onBlur={onBlur}
           value={value}
           onChange={onChange}
-          type={type}
+          type={type === 'password' && isPasswordVisible ? 'text' : type}
         />
       </Styles.Row>
-      <Styles.VisibleInput />
+      {withPasswordVisible ? (
+        <Styles.VisibleInput
+          ref={visibleBlockRef}
+          onClick={() => setPasswordVisible(!isPasswordVisible)}
+        >
+          <Styles.EyeIcon isVisible={isPasswordVisible} />
+        </Styles.VisibleInput>
+      ) : null}
     </Styles.Container>
   )
 }
 
 export default TextInput
-
-// interface Props {
-//   label: string
-//   value: string
-//   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
-//   type?: string
-//   minLength?: number
-//   maxLength?: number
-//   withError?: boolean
-//   errorLabel?: string | null
-// }
-
-// const TextInput: React.FC<Props> = (props) => {
-//   const {
-//     label,
-//     value,
-//     onChange,
-//     type = 'text',
-//     minLength,
-//     maxLength,
-//     withError,
-//     errorLabel,
-//   } = props
-
-//   const [isFocused, setIsFocused] = React.useState<boolean>(false)
-//   const textInputRef = React.useRef<HTMLInputElement>(null)
-
-//   const onClick = (): void => {
-//     setIsFocused(true)
-//     setTimeout(() => {
-//       textInputRef.current?.focus()
-//     }, 100)
-//   }
-
-//   const onBlur = (): void => {
-//     setIsFocused(false)
-//   }
-
-//   return (
-//     <Styles.Container onClick={onClick} isFocused={isFocused}>
-//       <Styles.Label isError={!isFocused && withError}>
-//         {!isFocused && errorLabel && withError ? errorLabel : label}
-//       </Styles.Label>
-//       {value || isFocused ? (
-//         <Styles.TextInput
-//           value={value}
-//           onChange={onChange}
-//           ref={textInputRef}
-//           onBlur={onBlur}
-//           type={type}
-//           minLength={minLength}
-//           maxLength={maxLength}
-//         />
-//       ) : null}
-//     </Styles.Container>
-//   )
-// }
-
-// export default TextInput
