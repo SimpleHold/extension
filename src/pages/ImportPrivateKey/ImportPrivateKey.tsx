@@ -19,14 +19,14 @@ import Styles from './styles'
 
 const ImportPrivateKey: React.FC = () => {
   const [privateKey, setPrivateKey] = React.useState<string>('')
-  const [isError, setIsError] = React.useState<boolean>(false)
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
+  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
   const history = useHistory()
 
   const onConfirm = (): void => {
-    if (isError) {
-      setIsError(false)
+    if (errorLabel) {
+      setErrorLabel(null)
     }
 
     const getAddress = importAddress(privateKey)
@@ -35,7 +35,7 @@ const ImportPrivateKey: React.FC = () => {
       return setActiveModal('confirmAddAddress')
     }
 
-    return setIsError(true)
+    return setErrorLabel('Invalid private key')
   }
 
   const onSuccess = (): void => {
@@ -64,8 +64,7 @@ const ImportPrivateKey: React.FC = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
                 setPrivateKey(e.target.value)
               }
-              withError={isError}
-              errorLabel="Invalid private key"
+              errorLabel={errorLabel}
             />
             <Styles.Actions>
               <Button label="Back" isLight onClick={history.goBack} mr={7.5} />

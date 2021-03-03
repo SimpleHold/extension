@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
+import { browser, Tabs } from 'webextension-polyfill-ts'
 
 // Components
 import Header from '@components/Header'
@@ -48,6 +49,10 @@ const Settings: React.FC = () => {
     }
   }
 
+  const openWebPage = (url: string): Promise<Tabs.Tab> => {
+    return browser.tabs.create({ url })
+  }
+
   const list: List[] = [
     {
       isButton: true,
@@ -67,7 +72,7 @@ const Settings: React.FC = () => {
         width: 16,
         height: 16,
       },
-      onClick: () => null,
+      onClick: () => openWebPage('https://simplehold.io/support'),
     },
   ]
 

@@ -52,7 +52,7 @@ const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
         }
       }
     }
-    return setErrorLabel('Invalid password')
+    return setErrorLabel('Password is not valid')
   }
 
   return (
@@ -66,7 +66,6 @@ const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
             type="password"
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setPassword(e.target.value)}
-            withError={errorLabel !== null}
             errorLabel={errorLabel}
           />
           <Styles.Actions>

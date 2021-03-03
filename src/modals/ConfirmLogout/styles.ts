@@ -18,7 +18,7 @@ const Text = styled.p`
   text-align: center;
   font-size: 16px;
   line-height: 23px;
-  color: #3fbb7d;
+  color: #7d7e8d;
 `
 
 const Actions = styled.div`

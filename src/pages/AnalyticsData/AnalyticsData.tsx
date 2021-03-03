@@ -22,19 +22,24 @@ const AnalyticsData: React.FC = () => {
       <Styles.Container>
         <Styles.Title>Analytics data</Styles.Title>
         <Styles.Description>
-          We work hard to provide you best experience with our application. To do it more
-          effectively we would like to gather anonymized usage data. This data will help us better
-          understand how our users interact with our application.
+          We work hard to provide you with the best experience when using our extension. To do it
+          more effectively we would like to gather anonymized usage data. This data will help us
+          better understand how our customers interact with our wallet.
         </Styles.Description>
         <Styles.FeaturesBlock>
-          <Styles.FeaturesTitle>SimpleHold will</Styles.FeaturesTitle>
+          <Styles.FeaturesTitle>Please, keep in mind that</Styles.FeaturesTitle>
           <Styles.FeaturesList>
             <Styles.Feature>
               <Styles.FeatureLine />
               <Styles.FeatureIcon />
               <Styles.Features>
-                <Styles.FeatureText>Always allow you to opt-out via Settings</Styles.FeatureText>
-                <Styles.FeatureText>Send anonymized click & pageview events</Styles.FeatureText>
+                <Styles.FeatureText>We will track your clicks and pageviews</Styles.FeatureText>
+                <Styles.FeatureText>
+                  You can reject the data collection at any time via Settings
+                </Styles.FeatureText>
+                <Styles.FeatureText>
+                  We guarantee that your data is not for selling
+                </Styles.FeatureText>
               </Styles.Features>
             </Styles.Feature>
             <Styles.Feature>
@@ -42,17 +47,16 @@ const AnalyticsData: React.FC = () => {
               <Styles.FeatureIcon />
               <Styles.Features>
                 <Styles.FeatureText>
-                  Never collect keys, addresses, transactions, balances, hashes, or any personal
-                  information
+                  SimpleHold will never collect any personal information such as keys, addresses,
+                  transactions, balances or hashes
                 </Styles.FeatureText>
-                <Styles.FeatureText>Never collect your full IP address</Styles.FeatureText>
-                <Styles.FeatureText>Never sell data for profit. Ever!</Styles.FeatureText>
+                <Styles.FeatureText>We won’t collect your full IP address</Styles.FeatureText>
               </Styles.Features>
             </Styles.Feature>
           </Styles.FeaturesList>
         </Styles.FeaturesBlock>
         <Styles.Actions>
-          <Button label="I got it" onClick={onNext} />
+          <Button label="I got it" onClick={onNext} isLight />
         </Styles.Actions>
       </Styles.Container>
     </Styles.Wrapper>

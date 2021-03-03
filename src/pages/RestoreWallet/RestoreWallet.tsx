@@ -41,7 +41,6 @@ const RestoreWallet: React.FC<Props> = (props) => {
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
-  const isButtonDisabled = !backupData?.length || !fileName?.length
 
   const onCancel = (): void => {
     history.push('/welcome')
@@ -74,15 +73,26 @@ const RestoreWallet: React.FC<Props> = (props) => {
                   <Styles.DNDText type="success">{fileName} uploaded successfully</Styles.DNDText>
                 ) : null}
                 {!backupData && !fileName && !isInvalidFile ? (
-                  <Styles.DNDText>Drag and drop here or click</Styles.DNDText>
+                  <Styles.DNDText>
+                    Drag and drop or choose backup file to restore your wallet
+                  </Styles.DNDText>
                 ) : null}
-                {isInvalidFile ? <Styles.DNDText type="error">Invalid file</Styles.DNDText> : null}
+                {isInvalidFile ? (
+                  <Styles.DNDText type="error">
+                    File you chose is invalid or broken, please pick another one
+                  </Styles.DNDText>
+                ) : null}
               </Styles.DNDArea>
             </Styles.DNDBlock>
           </Styles.Row>
           <Styles.Actions>
             <Button label="Cancel" onClick={onCancel} isLight mr={7.5} />
-            <Button label="Confirm" onClick={onConfirm} ml={7.5} disabled={isButtonDisabled} />
+            <Button
+              label="Confirm"
+              onClick={onConfirm}
+              ml={7.5}
+              disabled={!backupData?.length || !fileName?.length}
+            />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>

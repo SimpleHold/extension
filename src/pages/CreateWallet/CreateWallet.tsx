@@ -44,8 +44,7 @@ const Wallets: React.FC = () => {
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setPassword(e.target.value)}
             type="password"
-            minLength={8}
-            maxLength={16}
+            withPasswordVisible
           />
           <TextInput
             label="Confirm password"
@@ -54,6 +53,7 @@ const Wallets: React.FC = () => {
               setConfirmPassword(e.target.value)
             }
             type="password"
+            withPasswordVisible
           />
           <Styles.AgreedBlock>
             <CheckBox value={isAgreed} onClick={() => setIsagreed(!isAgreed)} />

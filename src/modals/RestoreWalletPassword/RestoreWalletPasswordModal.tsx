@@ -25,19 +25,19 @@ interface Props {
 const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
   const { backupData, isActive, onClose, onSuccess } = props
 
-  const [isError, setIsError] = React.useState<boolean>(false)
   const [password, setPassword] = React.useState<string>('')
+  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
   const onConfirm = (): void => {
-    if (isError) {
-      setIsError(false)
+    if (errorLabel) {
+      setErrorLabel(null)
     }
 
     if (backupData) {
       const decryptBackup = decrypt(backupData, password)
 
       if (decryptBackup === null) {
-        setIsError(true)
+        setErrorLabel('Password is not valid')
       } else {
         const validateFile = validate(decryptBackup)
 
@@ -62,8 +62,7 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
             type="password"
             value={password}
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setPassword(e.target.value)}
-            withError={isError}
-            errorLabel="Invalid password"
+            errorLabel={errorLabel}
           />
           <Styles.Actions>
             <Button label="Cancel" onClick={onClose} isLight mr={7.5} isSmall />

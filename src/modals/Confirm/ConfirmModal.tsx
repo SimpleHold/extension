@@ -49,7 +49,6 @@ const ConfirmModal: React.FC<Props> = (props) => {
             type={inputType}
             value={inputValue}
             onChange={onChangeInput}
-            withError={inputErrorLabel !== null}
             errorLabel={inputErrorLabel}
           />
           <Styles.Actions>

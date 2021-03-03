@@ -23,7 +23,10 @@ const ConfirmLogoutModal: React.FC<Props> = (props) => {
     <ModalWrapper isActive={isActive} onClose={onClose} icon={modalIcon}>
       <Styles.Row>
         <Styles.Title>Confirm log out</Styles.Title>
-        <Styles.Text>Are you sure you want to log out and clear the cache?</Styles.Text>
+        <Styles.Text>
+          Are you sure that you want to clear cache and log out? Note: backup file will downloaded
+          after you confirm this action
+        </Styles.Text>
         <Styles.Actions>
           <Button label="Cancel" isLight onClick={onClose} mr={7.5} isSmall />
           <Button label="Log out" onClick={onConfirm} ml={7.5} isSmall />
