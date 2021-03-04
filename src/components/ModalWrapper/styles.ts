@@ -1,8 +1,16 @@
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 
-type TContainerProps = {
-  isActive: boolean
-}
+const scaleUp = keyframes`
+  0% {
+    transform: scale(.8) translateY(1000px);
+    opacity: 0;
+  }
+  
+  100% {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+  }
+`
 
 const Container = styled.div`
   position: fixed;
@@ -10,7 +18,11 @@ const Container = styled.div`
   height: 100%;
   top: 0;
   left: 0;
-  display: ${({ isActive }: TContainerProps) => (isActive ? 'block' : 'none')};
+  transform: scale(0);
+
+  &.active {
+    transform: scale(1);
+  }
 `
 
 const Background = styled.div`
@@ -21,6 +33,7 @@ const Background = styled.div`
   align-items: center;
   justify-content: center;
   display: flex;
+  backdrop-filter: blur(4px);
 `
 
 const Modal = styled.div`
@@ -32,6 +45,12 @@ const Modal = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  transform: scale(0);
+
+  &.active {
+    transform: scale(1);
+    animation: ${scaleUp} 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+  }
 `
 
 const Circle = styled.div`

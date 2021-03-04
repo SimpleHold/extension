@@ -22,9 +22,9 @@ const ModalWrapper: React.FC<Props> = (props) => {
   }
 
   return (
-    <Styles.Container isActive={isActive}>
+    <Styles.Container className={isActive ? 'active' : ''}>
       <Styles.Background onClick={onClick}>
-        <Styles.Modal ref={modalRef}>
+        <Styles.Modal ref={modalRef} className={isActive ? 'active' : ''}>
           <Styles.Circle>
             <Styles.Icon src={icon} alt="icon" />
           </Styles.Circle>
