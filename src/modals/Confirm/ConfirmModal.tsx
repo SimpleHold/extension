@@ -52,8 +52,14 @@ const ConfirmModal: React.FC<Props> = (props) => {
             errorLabel={inputErrorLabel}
           />
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
-            <Button label="Ok" disabled={isDisabledConfirmButton} onClick={onConfirm} mr={7.5} />
+            <Button label="Cancel" isLight onClick={onClose} mr={7.5} isSmall />
+            <Button
+              label="Ok"
+              disabled={isDisabledConfirmButton}
+              onClick={onConfirm}
+              mr={7.5}
+              isSmall
+            />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Row>

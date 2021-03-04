@@ -3,10 +3,10 @@ import { v4 } from 'uuid'
 
 export interface IWallet {
   symbol: string
-  balance: string
+  balance?: number
   address: string
   uuid: string
-  privateKey: string
+  privateKey?: string
 }
 
 export const getWallets = (): IWallet[] | null => {
@@ -25,6 +25,20 @@ export const getWallets = (): IWallet[] | null => {
 }
 
 export const setBalance = (address: string): void => {}
+
+export const getLatestBalance = (address: string): number => {
+  const wallets = getWallets()
+
+  if (wallets) {
+    const findWallet = wallets.find((wallet: IWallet) => wallet.address === address)
+
+    if (findWallet) {
+      return findWallet.balance || 0
+    }
+  }
+
+  return 0
+}
 
 export const checkExistWallet = (address: string): boolean => {
   const wallets = getWallets()

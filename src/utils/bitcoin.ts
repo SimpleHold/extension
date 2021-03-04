@@ -1,5 +1,5 @@
-import bitcore from 'bitcore-lib'
-import axios, { AxiosResponse } from 'axios'
+import bitcore, { Unit } from 'bitcore-lib'
+import axios from 'axios'
 
 import { validateBitcoinPrivateKey } from '@utils/validate'
 
@@ -61,9 +61,7 @@ export const importAddress = (privateKey: string) => {
   }
 }
 
-export const getUnspentOutputs = async (
-  address: string
-): Promise<AxiosResponse<IUnspentOutput[]> | []> => {
+export const getUnspentOutputs = async (address: string): Promise<IUnspentOutput[]> => {
   try {
     const { data } = await axios.get(`https://blockchain.info/unspent?active=${address}`)
 
@@ -77,18 +75,29 @@ export const createTransaction = (
   outputs: bitcore.Transaction.UnspentOutput[],
   to: string,
   amount: number,
-  privateKey: string,
-  changeAddress: string
+  fee: number,
+  changeAddress: string,
+  privateKey: string
 ) => {
-  return new bitcore.Transaction()
-    .from(outputs)
-    .to(to, amount)
-    .change(changeAddress)
-    .sign(privateKey)
-    .serialize()
+  try {
+    const transaction = new bitcore.Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .fee(fee)
+      .change(changeAddress)
+      .sign(privateKey)
+
+    return {
+      raw: transaction.serialize(),
+      hash: transaction.hash,
+    }
+  } catch (err) {
+    console.log('err', err)
+    return null
+  }
 }
 
-export const getTransactionFeeBytes = (outputs: bitcore.Transaction.UnspentOutput[]): number => {
+export const getTransactionOutputsSize = (outputs: bitcore.Transaction.UnspentOutput[]): number => {
   try {
     return new bitcore.Transaction().from(outputs).toString().length
   } catch {
@@ -96,14 +105,40 @@ export const getTransactionFeeBytes = (outputs: bitcore.Transaction.UnspentOutpu
   }
 }
 
-export const sendTransaction = (transaction: string) => {}
+export const sendRawTransaction = async (transaction: string): Promise<string | null> => {
+  try {
+    const { data } = await axios.post(
+      'https://btc.getblock.io',
+      {
+        jsonrpc: '2.0',
+        id: +new Date(),
+        method: 'sendrawtransaction',
+        params: [transaction],
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': '51cbe972-73ce-4b49-a602-651ee065dd3f',
+        },
+      }
+    )
 
-export const getFees = async (): Promise<AxiosResponse<number> | number> => {
+    return data?.result || null
+  } catch {
+    return null
+  }
+}
+
+export const getFees = async (): Promise<number> => {
   try {
     const { data } = await axios.get('https://api.blockchain.info/mempool/fees')
 
-    return data.regular
+    return data.regular || 0
   } catch {
     return 0
   }
+}
+
+export const btcToSat = (amount: number): number => {
+  return Unit.fromBTC(amount).toSatoshis()
 }

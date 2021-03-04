@@ -37,7 +37,6 @@ const WalletCard: React.FC<Props> = (props) => {
     if (balance !== null) {
       if (balance === 0) {
         setEstimated(0)
-        sumEstimated(0)
       } else {
         fetchEstimated()
       }

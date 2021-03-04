@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import bitcore from 'bitcore-lib'
 
 // Components
 import Cover from '@components/Cover'
@@ -17,8 +18,9 @@ import {
   getEstimated,
   getUnspentOutputs,
   IUnspentOutput,
-  getTransactionFeeBytes,
+  getTransactionOutputsSize,
   getFees,
+  btcToSat,
 } from '@utils/bitcoin'
 import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
 
@@ -49,6 +51,7 @@ const Send: React.FC = () => {
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<IUnspentOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<bitcore.Transaction.UnspentOutput[]>([])
 
   const debounced = useDebounce(amount, 1000)
 
@@ -73,18 +76,23 @@ const Send: React.FC = () => {
   }
 
   const getNetworkFee = async (): Promise<void> => {
-    if (outputs && amount != null && Number(amount) > 0) {
-      const utxos = []
+    if (outputs && Number(amount) > 0) {
+      const fee = await getFees()
+      setUtxosList([])
 
-      for (const output of outputs) {
+      const sortOutputs = outputs.sort((a, b) => a.value - b.value)
+      const utxos: bitcore.Transaction.UnspentOutput[] = []
+
+      for (const output of sortOutputs) {
         const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
+        const transactionFeeBytes = getTransactionOutputsSize(utxos) * fee
 
-        if (getUtxosValue >= Number(amount) * 100000000) {
+        if (getUtxosValue >= btcToSat(Number(amount)) + transactionFeeBytes) {
           break
         }
 
         utxos.push({
-          txId: output.tx_hash,
+          txId: output.tx_hash_big_endian,
           outputIndex: output.tx_output_n,
           script: output.script,
           satoshis: output.value,
@@ -92,9 +100,9 @@ const Send: React.FC = () => {
         })
       }
 
-      const fee = await getFees()
+      setUtxosList(utxos)
 
-      const transactionFeeBytes = getTransactionFeeBytes(utxos)
+      const transactionFeeBytes = getTransactionOutputsSize(utxos)
       setNetworkFee((transactionFeeBytes * fee) / 100000000)
     }
   }
@@ -132,6 +140,7 @@ const Send: React.FC = () => {
       networkFee,
       addressFrom: selectedAddress,
       addressTo: address,
+      outputs: utxosList,
     })
   }
 

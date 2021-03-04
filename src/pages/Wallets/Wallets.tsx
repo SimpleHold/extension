@@ -61,11 +61,11 @@ const Wallets: React.FC = () => {
   const balanceBlockPaddingTop = Math.max(0, 20 - scrollPosition)
 
   const sumBalance = (amount: number) => {
-    setTotalBalance((amount += totalBalance || 0))
+    setTotalBalance((prevBalance: number | null) => Number(prevBalance) + amount)
   }
 
   const sumEstimated = (amount: number) => {
-    setTotalEstimated((amount += totalEstimated || 0))
+    setTotalEstimated((prevEstimated: number | null) => Number(prevEstimated) + amount)
   }
 
   return (
@@ -97,7 +97,7 @@ const Wallets: React.FC = () => {
                 lineHeight: `${balanceLineHeight}px`,
               }}
             >
-              {totalBalance} BTC
+              {totalBalance.toFixed(8)} BTC
             </Styles.BalanceAmount>
           )}
           {totalEstimated === null ? (

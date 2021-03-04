@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import { Transaction } from 'bitcore-lib'
 
 // Components
 import Cover from '@components/Cover'
@@ -22,12 +23,13 @@ interface LocationState {
   networkFee: number
   addressFrom: string
   addressTo: string
+  outputs: Transaction.UnspentOutput[]
 }
 
 const SendConfirmation: React.FC = () => {
   const history = useHistory()
   const {
-    state: { amount, symbol, networkFee, addressFrom, addressTo },
+    state: { amount, symbol, networkFee, addressFrom, addressTo, outputs },
   } = useLocation<LocationState>()
 
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
