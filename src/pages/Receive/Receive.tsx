@@ -2,7 +2,6 @@ import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
 import { browser, Tabs } from 'webextension-polyfill-ts'
-import QRCode from 'qrcode.react'
 
 // Components
 import Cover from '@components/Cover'
@@ -11,6 +10,8 @@ import Button from '@components/Button'
 import CurrencyLogo from '@components/CurrencyLogo'
 import DropDown from '@components/DropDown'
 import Skeleton from '@components/Skeleton'
+import QRCode from '@components/QRCode'
+import CopyToClipboard from '@components/CopyToClipboard'
 
 // Modals
 import ConfirmShowingPrivateKeyModal from '@modals/ConfirmShowingPrivateKey'
@@ -121,11 +122,11 @@ const Receive: React.FC = () => {
               <Styles.UpdateBalanceBlock>
                 <Styles.BalanceLabel>Balance</Styles.BalanceLabel>
                 <Styles.RefreshIconRow isRefreshing={isRefreshing} onClick={onRefresh}>
-                  <SVG src={refreshIcon} width={13} height={13} title="refresh" />
+                  <SVG src={refreshIcon} width={13} height={13} title="Refresh balance" />
                 </Styles.RefreshIconRow>
               </Styles.UpdateBalanceBlock>
               <Styles.MoreButton onClick={() => setIsVisible(!isVisible)}>
-                <SVG src={moreIcon} width={18} height={3.78} title="more" />
+                <SVG src={moreIcon} width={18} height={3.78} title="More" />
               </Styles.MoreButton>
             </Styles.Heading>
 
@@ -158,8 +159,10 @@ const Receive: React.FC = () => {
             )}
           </Styles.Row>
           <Styles.ReceiveBlock>
-            <QRCode width={120} height={120} value={address} />
-            <Styles.Address>{address}</Styles.Address>
+            <QRCode size={120} value={address} />
+            <CopyToClipboard value={address} mb={40}>
+              <Styles.Address>{address}</Styles.Address>
+            </CopyToClipboard>
             <Button label="Send BTC" onClick={onSend} />
           </Styles.ReceiveBlock>
         </Styles.Container>

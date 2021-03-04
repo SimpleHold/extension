@@ -6,34 +6,31 @@ import { useHistory } from 'react-router-dom'
 // Components
 import Header from '@components/Header'
 import Button from '@components/Button'
+import AgreeTerms from '@components/AgreeTerms'
 
 // Modals
 import RestoreWalletPasswordModal from '@modals/RestoreWalletPassword'
 
 // Icons
 import fileIcon from '@assets/icons/file.svg'
+import invalidFileIcon from '@assets/icons/invalidFile.svg'
 
 // Styles
 import Styles from './styles'
 
-interface Props {
-  params: string
-}
-
-const RestoreWallet: React.FC<Props> = (props) => {
-  const { params } = props
-
+const RestoreWallet: React.FC = () => {
   const history = useHistory()
 
-  const [isInvalidFile, setInvalibFile] = React.useState<boolean>(false)
+  const [isInvalidFile, setInvalidFile] = React.useState<boolean>(false)
   const [fileName, setFileName] = React.useState<null | string>(null)
   const [backupData, setBackupData] = React.useState<null | string>(null)
-  const [activeWallet, setActiveWallet] = React.useState<null | 'enterPassword' | 'confirm'>(null)
+  const [activeWallet, setActiveWallet] = React.useState<null | 'enterPassword'>(null)
+  const [isAgreed, setIsAgreed] = React.useState<boolean>(false)
 
   const onDrop = React.useCallback(async (acceptedFiles) => {
     const text = await acceptedFiles[0]?.text()
     if (!text?.length) {
-      setInvalibFile(true)
+      setInvalidFile(true)
     } else {
       setFileName(acceptedFiles[0]?.name)
       setBackupData(text)
@@ -41,10 +38,6 @@ const RestoreWallet: React.FC<Props> = (props) => {
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
-
-  const onCancel = (): void => {
-    history.push('/welcome')
-  }
 
   const onConfirm = (): void => {
     setActiveWallet('enterPassword')
@@ -66,11 +59,18 @@ const RestoreWallet: React.FC<Props> = (props) => {
             <Styles.DNDBlock {...getRootProps()}>
               <Styles.DNDArea isDragActive={isDragActive}>
                 <input {...getInputProps()} />
-                <Styles.DNDIconRow isDragActive={isDragActive}>
-                  <SVG src={fileIcon} width={16.5} height={21.5} title="file" />
+                <Styles.DNDIconRow
+                  isDragActive={isDragActive || (backupData !== null && fileName !== null)}
+                  isInvalidFile={isInvalidFile}
+                >
+                  {isInvalidFile ? (
+                    <SVG src={invalidFileIcon} width={21.85} height={21.85} title="file" />
+                  ) : (
+                    <SVG src={fileIcon} width={16.85} height={21.5} title="file" />
+                  )}
                 </Styles.DNDIconRow>
                 {backupData && fileName ? (
-                  <Styles.DNDText type="success">{fileName} uploaded successfully</Styles.DNDText>
+                  <Styles.DNDText>{fileName} uploaded successfully</Styles.DNDText>
                 ) : null}
                 {!backupData && !fileName && !isInvalidFile ? (
                   <Styles.DNDText>
@@ -78,20 +78,21 @@ const RestoreWallet: React.FC<Props> = (props) => {
                   </Styles.DNDText>
                 ) : null}
                 {isInvalidFile ? (
-                  <Styles.DNDText type="error">
+                  <Styles.DNDText>
                     File you chose is invalid or broken, please pick another one
                   </Styles.DNDText>
                 ) : null}
               </Styles.DNDArea>
             </Styles.DNDBlock>
+            <AgreeTerms isAgreed={isAgreed} setIsAgreed={() => setIsAgreed(!isAgreed)} mt={24} />
           </Styles.Row>
           <Styles.Actions>
-            <Button label="Cancel" onClick={onCancel} isLight mr={7.5} />
+            <Button label="Cancel" onClick={history.goBack} isLight mr={7.5} />
             <Button
               label="Confirm"
               onClick={onConfirm}
               ml={7.5}
-              disabled={!backupData?.length || !fileName?.length}
+              disabled={!backupData?.length || !fileName?.length || !isAgreed}
             />
           </Styles.Actions>
         </Styles.Container>

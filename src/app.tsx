@@ -6,7 +6,7 @@ import { AnimatedSwitch } from 'react-router-transition'
 import routes from './routes'
 import GlobalStyles from './styles/global'
 
-import { validate } from '@utils/wallet'
+import { validateWallet } from '@utils/validate'
 
 const bounceTransition = {
   atEnter: {
@@ -36,7 +36,7 @@ const App: React.FC = () => {
       return '/analytics-data'
     }
 
-    const validateWallets = validate(localStorage.getItem('wallets'))
+    const validateWallets = validateWallet(localStorage.getItem('wallets'))
     return validateWallets ? '/wallets' : '/welcome'
   }
 

@@ -7,6 +7,9 @@ export const validatePassword = (password: string) => {
 }
 
 export const validateWallet = (wallet: any) => {
+  if (!wallet) {
+    return false
+  }
   return true // Fix me
 }
 

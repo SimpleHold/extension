@@ -19,13 +19,18 @@ const PrivateKey = styled.p`
   margin: 7px 0 0 0;
   font-size: 16px;
   line-height: 23px;
-  color: #40ba7d;
+  color: #7d7e8d;
+`
+
+const Actions = styled.div`
+  margin: 40px 52.5px 0 52.5px;
 `
 
 const Styles = {
   Row,
   Title,
   PrivateKey,
+  Actions,
 }
 
 export default Styles

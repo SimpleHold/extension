@@ -12,6 +12,7 @@ import useScroll from '@hooks/useScroll'
 
 // Utils
 import { price } from '@utils/format'
+import { IWallet } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -20,9 +21,9 @@ const Wallets: React.FC = () => {
   const history = useHistory()
   const { scrollPosition } = useScroll()
 
-  const [wallets, setWallets] = React.useState<any | null>(null) // Fix me
-  const [totalBalance, setTotalBalance] = React.useState<number | null>(0)
-  const [totalEstimated, setTotalEstimated] = React.useState<number | null>(0)
+  const [wallets, setWallets] = React.useState<null | IWallet[]>(null)
+  const [totalBalance, setTotalBalance] = React.useState<number | null>(null)
+  const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
 
   React.useEffect(() => {
     getWallets()
@@ -116,13 +117,13 @@ const Wallets: React.FC = () => {
         <Styles.WalletsHeading style={{ marginTop: walletsHeadingMT }}>
           <Styles.WalletsLabel>Wallets</Styles.WalletsLabel>
           <Styles.AddWalletButton onClick={() => openPage('/new-wallet')}>
-            <SVG src="../../assets/icons/plus.svg" width={16} height={16} title="plus" />
+            <SVG src="../../assets/icons/plus.svg" width={16} height={16} title="Add new wallet" />
           </Styles.AddWalletButton>
         </Styles.WalletsHeading>
       </Styles.Collapsible>
       {wallets?.length ? (
         <Styles.WalletsList style={{ zIndex: scrollPosition > 200 ? 1 : 3 }}>
-          {wallets.map((wallet: any) => {
+          {wallets.map((wallet: IWallet) => {
             const { address, symbol } = wallet
 
             return (

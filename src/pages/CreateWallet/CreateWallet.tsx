@@ -6,7 +6,10 @@ import Header from '@components/Header'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Link from '@components/Link'
-import CheckBox from '@components/CheckBox'
+import AgreeTerms from '@components/AgreeTerms'
+
+// Utils
+import { validatePassword } from '@utils/validate'
 
 // Styles
 import Styles from './styles'
@@ -16,7 +19,13 @@ const Wallets: React.FC = () => {
 
   const [password, setPassword] = React.useState<string>('')
   const [confirmPassword, setConfirmPassword] = React.useState<string>('')
-  const [isAgreed, setIsagreed] = React.useState<boolean>(false)
+  const [isAgreed, setIsAgreed] = React.useState<boolean>(false)
+  const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
+  const [confirmPasswordErrorLabel, setConfirmPasswordErrorLabel] = React.useState<null | string>(
+    null
+  )
+
+  const isButtonDisabled = password.length < 7 || password !== confirmPassword || !isAgreed
 
   const onConfirm = (): void => {
     history.push('/download-backup', {
@@ -24,7 +33,25 @@ const Wallets: React.FC = () => {
     })
   }
 
-  const isButtonDisabled = password.length < 7 || password !== confirmPassword || !isAgreed
+  const onBlurPassword = (): void => {
+    if (passwordErrorLabel) {
+      setPasswordErrorLabel(null)
+    }
+
+    if (!validatePassword(password)) {
+      setPasswordErrorLabel('Password should have at least 8 symbols')
+    }
+  }
+
+  const onBlurConfirmPassword = (): void => {
+    if (confirmPasswordErrorLabel) {
+      setConfirmPasswordErrorLabel(null)
+    }
+
+    if (confirmPassword.length && confirmPassword !== password) {
+      setConfirmPasswordErrorLabel("Passwords doesn't match")
+    }
+  }
 
   return (
     <Styles.Wrapper>
@@ -45,6 +72,8 @@ const Wallets: React.FC = () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setPassword(e.target.value)}
             type="password"
             withPasswordVisible
+            errorLabel={passwordErrorLabel}
+            onBlurInput={onBlurPassword}
           />
           <TextInput
             label="Confirm password"
@@ -54,13 +83,10 @@ const Wallets: React.FC = () => {
             }
             type="password"
             withPasswordVisible
+            errorLabel={confirmPasswordErrorLabel}
+            onBlurInput={onBlurConfirmPassword}
           />
-          <Styles.AgreedBlock>
-            <CheckBox value={isAgreed} onClick={() => setIsagreed(!isAgreed)} />
-            <Styles.AgreedText>
-              I have read and agree to the <Styles.TermsLink>Terms of Use</Styles.TermsLink>
-            </Styles.AgreedText>
-          </Styles.AgreedBlock>
+          <AgreeTerms isAgreed={isAgreed} setIsAgreed={() => setIsAgreed(!isAgreed)} mt={4} />
           <Styles.Actions>
             <Button label="Back" onClick={history.goBack} isLight mr={7.5} />
             <Button label="Confirm" onClick={onConfirm} disabled={isButtonDisabled} ml={7.5} />

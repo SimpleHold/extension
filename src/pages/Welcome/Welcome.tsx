@@ -31,13 +31,13 @@ const Wallets: React.FC = () => {
         <Styles.WalletActions>
           <Styles.Action onClick={() => openPage('/create-wallet')}>
             <Styles.ActionIcon>
-              <SVG src={plusCircleIcon} width={20} height={20} title="plus-circle" />
+              <SVG src={plusCircleIcon} width={20} height={20} title="Create new wallet" />
             </Styles.ActionIcon>
             <Styles.ActionName>Create new wallet</Styles.ActionName>
           </Styles.Action>
           <Styles.Action onClick={() => openPage('/restore-wallet')}>
             <Styles.ActionIcon>
-              <SVG src={restoreIcon} width={20} height={20} title="restore" />
+              <SVG src={restoreIcon} width={20} height={20} title="Restore wallet" />
             </Styles.ActionIcon>
             <Styles.ActionName>Restore wallet</Styles.ActionName>
           </Styles.Action>

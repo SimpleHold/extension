@@ -47,14 +47,14 @@ const Header: React.FC<Props> = (props) => {
     <Styles.Container withBorder={withBorder}>
       <Styles.LogoRow>
         <Styles.Logo color={logoColor}>
-          <SVG src={logo} width={30} height={30} title="logo" />
+          <SVG src={logo} width={30} height={30} title="SimleHold" />
         </Styles.Logo>
       </Styles.LogoRow>
       <Styles.Row>
         {withBack && onBack && backTitle ? (
           <Styles.Navigate onClick={onBack}>
             <Styles.BackIconRow>
-              <SVG src={arrowIcon} width={6} height={10} title="arrow" />
+              <SVG src={arrowIcon} width={6} height={10} title="Back" />
             </Styles.BackIconRow>
             <Styles.NavigateTitle>{backTitle}</Styles.NavigateTitle>
           </Styles.Navigate>
@@ -62,13 +62,13 @@ const Header: React.FC<Props> = (props) => {
         {!noActions ? (
           <Styles.Nav>
             <Styles.NavItem onClick={lockWallet}>
-              <SVG src={lockIcon} width={13} height={16} title="lock" />
+              <SVG src={lockIcon} width={13} height={16} title="Lock wallet" />
             </Styles.NavItem>
             <Styles.NavItem
               onClick={() => (activePage === 'settings' ? null : openPage('/settings'))}
               isActive={activePage === 'settings'}
             >
-              <SVG src={settingsIcon} width={16} height={16} title="settings" />
+              <SVG src={settingsIcon} width={16} height={16} title="Settings" />
             </Styles.NavItem>
           </Styles.Nav>
         ) : null}

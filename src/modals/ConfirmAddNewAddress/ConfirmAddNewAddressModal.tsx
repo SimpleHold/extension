@@ -7,8 +7,9 @@ import Button from '@components/Button'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { decrypt, addNewWallet, encrypt } from '@utils/crypto'
+import { decrypt, encrypt } from '@utils/crypto'
 import { importAddress } from '@utils/bitcoin'
+import { addNew as addNewWallet } from '@utils/wallet'
 
 // Icons
 import modalIcon from '@assets/modalIcons/confirm.svg'
@@ -70,7 +71,12 @@ const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
           />
           <Styles.Actions>
             <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
-            <Button label="Ok" disabled={password.length < 8} onClick={onConfirm} mr={7.5} />
+            <Button
+              label="Ok"
+              disabled={!validatePassword(password)}
+              onClick={onConfirm}
+              mr={7.5}
+            />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Row>

@@ -11,6 +11,7 @@ import ConfirmModal from '@modals/Confirm'
 
 // Utils
 import { toUpper } from '@utils/format'
+import { validatePassword } from '@utils/validate'
 
 // Styles
 import Styles from './styles'
@@ -103,7 +104,7 @@ const SendConfirmation: React.FC = () => {
         onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
           setPassword(e.target.value)
         }
-        isDisabledConfirmButton
+        isDisabledConfirmButton={!validatePassword(password)}
         onConfirm={onConfirmModal}
       />
     </>

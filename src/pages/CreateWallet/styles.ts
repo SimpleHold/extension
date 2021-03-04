@@ -41,28 +41,6 @@ const Actions = styled.div`
   margin: 34px 0 0 0;
 `
 
-const AgreedBlock = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  margin: 3px 0 0 0;
-`
-
-const AgreedText = styled.p`
-  margin: 0 0 0 11px;
-  font-size: 14px;
-  line-height: 16px;
-  color: #7d7e8d;
-`
-
-const TermsLink = styled.span`
-  color: #3fbb7d;
-
-  &:hover {
-    cursor: pointer;
-  }
-`
-
 const Styles = {
   Wrapper,
   Container,
@@ -71,9 +49,6 @@ const Styles = {
   Description,
   Form,
   Actions,
-  AgreedBlock,
-  AgreedText,
-  TermsLink,
 }
 
 export default Styles

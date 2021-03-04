@@ -5,7 +5,7 @@ const linearAnimation = keyframes`
     background-position: 0px 0px;
   }
   100% {
-    background-position: 230px 0px;
+    background-position: 250px 0px;
   }
 `
 
@@ -30,7 +30,7 @@ const Container = styled.div`
   margin-top: ${({ mt }: TContainerProps) => (mt ? `${mt}px` : 0)};
   background: ${({ type }: TContainerProps) => `linear-gradient(${getBackground(type)})`};
   border-radius: ${({ br }: TContainerProps) => `${br}px`};
-  animation: ${linearAnimation} 2s infinite linear;
+  animation: ${linearAnimation} 1s infinite linear;
 `
 
 const Styles = {

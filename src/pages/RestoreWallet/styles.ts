@@ -4,10 +4,7 @@ type TDrag = {
   isDragActive: boolean
   isSuccess?: boolean
   isError?: boolean
-}
-
-type TDNDText = {
-  type?: 'success' | 'error'
+  isInvalidFile?: boolean
 }
 
 const Wrapper = styled.div`
@@ -57,17 +54,17 @@ const DNDBlock = styled.div`
 
 const DNDArea = styled.div`
   border: ${({ isDragActive }: TDrag) =>
-    isDragActive ? `1px dashed #3FBB7D` : '1px dashed #dfdfdf'};
+    isDragActive ? `1px dashed #3fbb7d` : '1px dashed #dfdfdf'};
   border-radius: 5px;
   height: 200px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 0 20px;
 
   & span {
-    color: ${({ isDragActive }: TDrag) =>
-      isDragActive ? '#3FBB7D!important' : '#C3C3C3!important'};
+    color: ${({ isDragActive }: TDrag) => (isDragActive ? '#3fbb7d' : '#C3C3C3')};
   }
 
   &:hover {
@@ -92,7 +89,8 @@ const DNDIconRow = styled.div`
   justify-content: center;
 
   path {
-    fill: ${({ isDragActive }: TDrag) => (isDragActive ? '#3FBB7D' : '#C3C3C3')};
+    fill: ${({ isDragActive, isInvalidFile }: TDrag) =>
+      isDragActive ? '#3FBB7D' : isInvalidFile ? '#EB5757' : '#C3C3C3'};
   }
 `
 
@@ -100,8 +98,7 @@ const DNDText = styled.span`
   margin: 10px 0 0 0;
   font-size: 14px;
   line-height: 16px;
-  color: ${({ type }: TDNDText) =>
-    type ? (type === 'success' ? '#3FBB7D' : '#EB5757') : '#C3C3C3'};
+  text-align: center;
 `
 
 const Styles = {

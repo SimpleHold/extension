@@ -56,13 +56,13 @@ const NewWallet: React.FC = () => {
           <Styles.Actions>
             <Styles.Action onClick={() => openPage('/import-private-key')}>
               <Styles.ActionIcon>
-                <SVG src={importIcon} width={18} height={18} title="import" />
+                <SVG src={importIcon} width={18} height={18} title="Import private key" />
               </Styles.ActionIcon>
               <Styles.ActionName>Import private key</Styles.ActionName>
             </Styles.Action>
             <Styles.Action onClick={onGenerateAddress}>
               <Styles.ActionIcon>
-                <SVG src={plusCircleIcon} width={20} height={20} title="plus-circle" />
+                <SVG src={plusCircleIcon} width={20} height={20} title="Generate new address" />
               </Styles.ActionIcon>
               <Styles.ActionName>Generate new address</Styles.ActionName>
             </Styles.Action>

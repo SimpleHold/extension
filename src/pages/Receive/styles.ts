@@ -125,7 +125,7 @@ const CurrencyName = styled.p`
 `
 
 const Address = styled.p`
-  margin: 10px 0 40px 0;
+  margin: 10px 0 0 0;
   font-size: 20px;
   line-height: 25px;
   text-align: center;

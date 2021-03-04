@@ -7,7 +7,7 @@ import Button from '@components/Button'
 
 // Utils
 import { decrypt } from '@utils/crypto'
-import { validate } from '@utils/wallet'
+import { validateWallet, validatePassword } from '@utils/validate'
 
 // Icons
 import modalIcon from '@assets/modalIcons/confirm.svg'
@@ -33,13 +33,17 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
       setErrorLabel(null)
     }
 
+    if (!validatePassword(password)) {
+      return setErrorLabel('Password is not valid')
+    }
+
     if (backupData) {
       const decryptBackup = decrypt(backupData, password)
 
       if (decryptBackup === null) {
         setErrorLabel('Password is not valid')
       } else {
-        const validateFile = validate(decryptBackup)
+        const validateFile = validateWallet(decryptBackup)
 
         if (validateFile) {
           localStorage.setItem('backup', backupData)
@@ -71,7 +75,7 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
               onClick={onConfirm}
               ml={7.5}
               isSmall
-              disabled={password.length < 8}
+              disabled={!validatePassword(password)}
             />
           </Styles.Actions>
         </Styles.Form>
