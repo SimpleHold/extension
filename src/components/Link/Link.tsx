@@ -24,7 +24,7 @@ const Link: React.FC<Props> = (props) => {
   return (
     <Styles.Container onClick={openWebPage} mt={mt}>
       <Styles.IconRow>
-        <SVG src={askIcon} width={12} height={12} title="ask" />
+        <SVG src={askIcon} width={15} height={15} title="ask" />
       </Styles.IconRow>
       <Styles.Title>{title}</Styles.Title>
     </Styles.Container>

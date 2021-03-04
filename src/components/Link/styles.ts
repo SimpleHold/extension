@@ -30,7 +30,7 @@ const Container = styled.div`
 const IconRow = styled.div`
   width: 17px;
   height: 17px;
-  margin: 0 5px 0 0;
+  margin: 0 6px 0 0;
   display: flex;
   align-items: center;
   justify-content: center;
