@@ -12,7 +12,7 @@ import Button from '@components/Button'
 import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 
 // Utils
-import { importAddress } from '@utils/bitcoin'
+import { validateBitcoinPrivateKey } from '@utils/validate'
 import { checkExistWallet } from '@utils/wallet'
 
 // Styles
@@ -30,15 +30,19 @@ const ImportPrivateKey: React.FC = () => {
       setErrorLabel(null)
     }
 
-    const getAddress = importAddress(privateKey)
+    const validate = validateBitcoinPrivateKey(privateKey)
 
-    if (getAddress) {
-      const checkExist = checkExistWallet(getAddress)
+    if (validate) {
+      const getAddress = window.importAddress(privateKey)
 
-      if (checkExist) {
-        return setErrorLabel('This address has already been added')
+      if (getAddress) {
+        const checkExist = checkExistWallet(getAddress)
+
+        if (checkExist) {
+          return setErrorLabel('This address has already been added')
+        }
+        return setActiveModal('confirmAddAddress')
       }
-      return setActiveModal('confirmAddAddress')
     }
 
     return setErrorLabel('Invalid private key')

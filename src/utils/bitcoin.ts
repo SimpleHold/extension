@@ -1,7 +1,4 @@
-import bitcore, { Unit } from 'bitcore-lib'
 import axios from 'axios'
-
-import { validateBitcoinPrivateKey } from '@utils/validate'
 
 export interface IUnspentOutput {
   tx_hash_big_endian: string
@@ -12,15 +9,6 @@ export interface IUnspentOutput {
   value_hex: string
   confirmations: number
   tx_index: number
-}
-
-export const generateWallet = () => {
-  const privateKey = new bitcore.PrivateKey()
-
-  return {
-    address: privateKey.toAddress().toString(),
-    privateKey: privateKey.toWIF(),
-  }
 }
 
 export const getBalance = (address: string): Promise<number> | number => {
@@ -50,17 +38,6 @@ export const getEstimated = (amount: number): Promise<number> | number => {
   }
 }
 
-export const importAddress = (privateKey: string) => {
-  try {
-    if (validateBitcoinPrivateKey(privateKey)) {
-      return new bitcore.PrivateKey(privateKey).toAddress().toString()
-    }
-    return null
-  } catch {
-    return null
-  }
-}
-
 export const getUnspentOutputs = async (address: string): Promise<IUnspentOutput[]> => {
   try {
     const { data } = await axios.get(`https://blockchain.info/unspent?active=${address}`)
@@ -72,7 +49,7 @@ export const getUnspentOutputs = async (address: string): Promise<IUnspentOutput
 }
 
 export const createTransaction = (
-  outputs: bitcore.Transaction.UnspentOutput[],
+  outputs: any[],
   to: string,
   amount: number,
   fee: number,
@@ -80,26 +57,27 @@ export const createTransaction = (
   privateKey: string
 ) => {
   try {
-    const transaction = new bitcore.Transaction()
-      .from(outputs)
-      .to(to, amount)
-      .fee(fee)
-      .change(changeAddress)
-      .sign(privateKey)
+    // const transaction = new bitcore.Transaction()
+    //   .from(outputs)
+    //   .to(to, amount)
+    //   .fee(fee)
+    //   .change(changeAddress)
+    //   .sign(privateKey)
 
-    return {
-      raw: transaction.serialize(),
-      hash: transaction.hash,
-    }
+    // return {
+    //   raw: transaction.serialize(),
+    //   hash: transaction.hash,
+    // }
+    return null
   } catch (err) {
     console.log('err', err)
     return null
   }
 }
 
-export const getTransactionOutputsSize = (outputs: bitcore.Transaction.UnspentOutput[]): number => {
+export const getTransactionOutputsSize = (): number => {
   try {
-    return new bitcore.Transaction().from(outputs).toString().length
+    return 0 //new bitcore.Transaction().from(outputs).toString().length
   } catch {
     return 0
   }
@@ -140,5 +118,5 @@ export const getFees = async (): Promise<number> => {
 }
 
 export const btcToSat = (amount: number): number => {
-  return Unit.fromBTC(amount).toSatoshis()
+  return 0 //Unit.fromBTC(amount).toSatoshis()
 }

@@ -13,15 +13,7 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
-import {
-  getBalance,
-  getEstimated,
-  getUnspentOutputs,
-  IUnspentOutput,
-  getTransactionOutputsSize,
-  getFees,
-  btcToSat,
-} from '@utils/bitcoin'
+import { getBalance, getEstimated, getUnspentOutputs, getFees } from '@utils/bitcoin'
 import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
 
 // Hooks
@@ -50,7 +42,7 @@ const Send: React.FC = () => {
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
-  const [outputs, setOutputs] = React.useState<IUnspentOutput[]>([])
+  const [outputs, setOutputs] = React.useState<any[]>([])
   const [utxosList, setUtxosList] = React.useState<bitcore.Transaction.UnspentOutput[]>([])
 
   const debounced = useDebounce(amount, 1000)
@@ -85,9 +77,9 @@ const Send: React.FC = () => {
 
       for (const output of sortOutputs) {
         const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-        const transactionFeeBytes = getTransactionOutputsSize(utxos) * fee
+        const transactionFeeBytes = window.getTransactionSize(utxos) * fee
 
-        if (getUtxosValue >= btcToSat(Number(amount)) + transactionFeeBytes) {
+        if (getUtxosValue >= window.btcToSat(Number(amount)) + transactionFeeBytes) {
           break
         }
 
@@ -102,7 +94,7 @@ const Send: React.FC = () => {
 
       setUtxosList(utxos)
 
-      const transactionFeeBytes = getTransactionOutputsSize(utxos)
+      const transactionFeeBytes = window.getTransactionSize(utxos)
       setNetworkFee((transactionFeeBytes * fee) / 100000000)
     }
   }

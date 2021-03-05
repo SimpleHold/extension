@@ -125,7 +125,10 @@ module.exports = {
       filename: 'popup.html',
     }),
     new CopyWebpackPlugin({
-      patterns: [{ from: 'src/assets', to: 'assets' }],
+      patterns: [
+        { from: 'src/assets', to: 'assets' },
+        { from: 'src/scripts', to: 'js' },
+      ],
     }),
     extensionReloaderPlugin,
   ],

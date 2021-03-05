@@ -1,4 +1,4 @@
-import bitcoinLogo from '../assets/currencies/btc.svg'
+import bitcoinLogo from '@assets/currencies/btc.svg'
 
 export interface ICurrency {
   name: string

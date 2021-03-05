@@ -34,12 +34,22 @@ const SendConfirmation: React.FC = () => {
 
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
   const [password, setPassword] = React.useState<string>('')
+  const [privateKey, setPrivateKey] = React.useState<null | string>(null)
 
   const onConfirm = (): void => {
     setActiveModal('confirmSending')
   }
 
-  const onConfirmModal = (): void => {}
+  const onConfirmModal = (): void => {
+    const transaction = window.createTransaction(
+      outputs,
+      addressTo,
+      window.btcToSat(amount),
+      window.btcToSat(networkFee),
+      addressFrom,
+      privateKey
+    )
+  }
 
   return (
     <>

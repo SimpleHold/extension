@@ -6,9 +6,8 @@ import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
 // Utils
-import { validatePassword } from '@utils/validate'
+import { validatePassword, validateBitcoinPrivateKey } from '@utils/validate'
 import { decrypt, encrypt } from '@utils/crypto'
-import { importAddress } from '@utils/bitcoin'
 import { addNew as addNewWallet } from '@utils/wallet'
 
 // Icons
@@ -37,8 +36,8 @@ const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
       if (backup && privateKey) {
         const encryptBackup = decrypt(backup, password)
 
-        if (encryptBackup) {
-          const address = importAddress(privateKey)
+        if (encryptBackup && validateBitcoinPrivateKey(privateKey)) {
+          const address = window.importAddress(privateKey)
 
           if (address) {
             const newWalletsList = addNewWallet(privateKey, address, 'btc')

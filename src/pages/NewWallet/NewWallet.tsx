@@ -13,9 +13,6 @@ import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 import importIcon from '@assets/icons/import.svg'
 import plusCircleIcon from '@assets/icons/plusCircle.svg'
 
-// Utils
-import { generateWallet } from '@utils/bitcoin'
-
 // Styles
 import Styles from './styles'
 
@@ -36,7 +33,7 @@ const NewWallet: React.FC = () => {
   }
 
   const onGenerateAddress = (): void => {
-    const { privateKey: walletPrivateKey } = generateWallet()
+    const { privateKey: walletPrivateKey } = window.generateWallet()
     setPrivateKey(walletPrivateKey)
     setActiveModal('confirmAddAddress')
   }

@@ -11,7 +11,6 @@ import downloadBackupIllustrate from '@assets/illustrate/downloadbackup.svg'
 
 // Utils
 import { encrypt } from '@utils/crypto'
-import { generateWallet } from '@utils/bitcoin'
 import { generate, download as downloadBackup } from '@utils/backup'
 import { getWalletsFromBackup } from '@utils/wallet'
 
@@ -27,7 +26,7 @@ const DownloadBackup: React.FC = () => {
   const history = useHistory()
 
   const downloadFile = (): void => {
-    const { address, privateKey } = generateWallet()
+    const { address, privateKey } = window.generateWallet()
     const backup = generate(address, privateKey)
     downloadBackup(encrypt(backup, locationState.password))
 
