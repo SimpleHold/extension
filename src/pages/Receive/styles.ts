@@ -137,11 +137,11 @@ const Balance = styled.p`
   margin: 10px 0 0 0;
   font-weight: 500;
   font-size: 36px;
-  line-height: 42px;
+  line-height: 36px;
   color: #1d1d22;
 `
 
-const USDEstimated = styled.p`
+const Estimated = styled.p`
   margin: 5px 0 0 0;
   font-size: 20px;
   line-height: 23px;
@@ -162,7 +162,7 @@ const Styles = {
   CurrencyName,
   Address,
   Balance,
-  USDEstimated,
+  Estimated,
 }
 
 export default Styles

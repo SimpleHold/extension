@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Transaction } from 'bitcore-lib'
 
 // Components
 import Cover from '@components/Cover'
@@ -9,10 +8,14 @@ import Button from '@components/Button'
 
 // Modals
 import ConfirmModal from '@modals/Confirm'
+import SuccessSendModal from '@modals/SuccessSend'
 
 // Utils
 import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
+import { decrypt } from '@utils/crypto'
+import { IWallet } from '@utils/wallet'
+import { IRawTransaction, IBitcoreUnspentOutput, sendRawTransaction } from '@utils/bitcoin'
 
 // Styles
 import Styles from './styles'
@@ -23,7 +26,7 @@ interface LocationState {
   networkFee: number
   addressFrom: string
   addressTo: string
-  outputs: Transaction.UnspentOutput[]
+  outputs: IBitcoreUnspentOutput[]
 }
 
 const SendConfirmation: React.FC = () => {
@@ -32,23 +35,51 @@ const SendConfirmation: React.FC = () => {
     state: { amount, symbol, networkFee, addressFrom, addressTo, outputs },
   } = useLocation<LocationState>()
 
-  const [activeModal, setActiveModal] = React.useState<null | string>(null)
+  const [activeModal, setActiveModal] = React.useState<null | 'confirmSending' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
-  const [privateKey, setPrivateKey] = React.useState<null | string>(null)
+  const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
+  const [rawTransaction, setRawTransaction] = React.useState<null | IRawTransaction>(null)
 
-  const onConfirm = (): void => {
-    setActiveModal('confirmSending')
-  }
+  const onConfirmModal = async (): Promise<void> => {
+    if (inputErrorLabel) {
+      setInputErrorLabel(null)
+    }
 
-  const onConfirmModal = (): void => {
-    const transaction = window.createTransaction(
-      outputs,
-      addressTo,
-      window.btcToSat(amount),
-      window.btcToSat(networkFee),
-      addressFrom,
-      privateKey
-    )
+    const backup = localStorage.getItem('backup')
+
+    if (backup) {
+      const decryptBackup = decrypt(backup, password)
+
+      if (decryptBackup) {
+        const findWallet: IWallet | null = JSON.parse(decryptBackup).find(
+          (wallet: IWallet) => wallet.address === addressFrom
+        )
+
+        if (findWallet) {
+          const transaction: IRawTransaction | null = window.createTransaction(
+            outputs,
+            addressTo,
+            window.btcToSat(amount),
+            window.btcToSat(networkFee),
+            addressFrom,
+            findWallet.privateKey
+          )
+
+          if (transaction?.hash && transaction?.raw) {
+            const sendTransaction = await sendRawTransaction(transaction.raw)
+
+            if (sendTransaction === transaction.hash) {
+              setRawTransaction(transaction)
+              return setActiveModal('success')
+            }
+          }
+
+          return setInputErrorLabel('Transaction creation error')
+        }
+      }
+    }
+
+    return setInputErrorLabel('Password is not valid')
   }
 
   return (
@@ -100,7 +131,7 @@ const SendConfirmation: React.FC = () => {
           </Styles.Row>
           <Styles.Actions>
             <Button label="Cancel" isLight onClick={history.goBack} mr={7.5} />
-            <Button label="Confirm" onClick={onConfirm} ml={7.5} />
+            <Button label="Confirm" onClick={() => setActiveModal('confirmSending')} ml={7.5} />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>
@@ -112,12 +143,18 @@ const SendConfirmation: React.FC = () => {
         inputLabel="Enter password"
         inputType="password"
         inputValue={password}
-        inputErrorLabel={null}
+        inputErrorLabel={inputErrorLabel}
         onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
           setPassword(e.target.value)
         }
         isDisabledConfirmButton={!validatePassword(password)}
         onConfirm={onConfirmModal}
+      />
+
+      <SuccessSendModal
+        isActive={activeModal === 'success'}
+        onClose={() => setActiveModal(null)}
+        transactionHash={rawTransaction?.hash}
       />
     </>
   )

@@ -1,22 +1,14 @@
 declare module '*.png'
 declare module '*.svg'
 
-interface MyWindow extends Window {
-  createTransaction(): void
+interface Window {
+  createTransaction: any
+  btcToSat: (amount: number) => number
+  importAddress: (privateKey: string) => string | null
+  getTransactionSize: (outputs: any[]) => number
+  satToBtc: (amount: number) => number
+  generateWallet: () => {
+    address: string
+    privateKey: string
+  }
 }
-
-declare var window: MyWindow
-
-// declare Window {
-//   createTransaction: Function
-// }
-
-// declare global {
-//   interface Window {
-//     createTransaction: Function
-//     generateWallet: Function
-//     importAddress: Function
-//     getTransactionSize: Function
-//     btcToSat: Function
-//   }
-// }

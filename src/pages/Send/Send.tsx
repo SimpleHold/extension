@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import bitcore from 'bitcore-lib'
 
 // Components
 import Cover from '@components/Cover'
@@ -13,7 +12,13 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
-import { getBalance, getEstimated, getUnspentOutputs, getFees } from '@utils/bitcoin'
+import {
+  getBalance,
+  getEstimated,
+  getUnspentOutputs,
+  getFees,
+  IBitcoreUnspentOutput,
+} from '@utils/bitcoin'
 import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
 
 // Hooks
@@ -43,7 +48,7 @@ const Send: React.FC = () => {
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<any[]>([])
-  const [utxosList, setUtxosList] = React.useState<bitcore.Transaction.UnspentOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<IBitcoreUnspentOutput[]>([])
 
   const debounced = useDebounce(amount, 1000)
 
@@ -73,7 +78,7 @@ const Send: React.FC = () => {
       setUtxosList([])
 
       const sortOutputs = outputs.sort((a, b) => a.value - b.value)
-      const utxos: bitcore.Transaction.UnspentOutput[] = []
+      const utxos: IBitcoreUnspentOutput[] = []
 
       for (const output of sortOutputs) {
         const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)

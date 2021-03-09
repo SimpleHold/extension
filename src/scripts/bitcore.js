@@ -48,3 +48,7 @@ function getTransactionSize(outputs) {
 function btcToSat(value) {
   return Unit.fromBTC(value).toSatoshis()
 }
+
+function satToBtc(value) {
+  return Unit.fromSatoshis(value).toBTC()
+}

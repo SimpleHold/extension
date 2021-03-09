@@ -11,6 +11,19 @@ export interface IUnspentOutput {
   tx_index: number
 }
 
+export interface IRawTransaction {
+  hash: string
+  raw: string
+}
+
+export interface IBitcoreUnspentOutput {
+  address: string
+  txId: string
+  outputIndex: string
+  script: string
+  satoshis: number
+}
+
 export const getBalance = (address: string): Promise<number> | number => {
   try {
     return fetch(`https://blockchain.info/balance?active=${address}`)
@@ -48,41 +61,6 @@ export const getUnspentOutputs = async (address: string): Promise<IUnspentOutput
   }
 }
 
-export const createTransaction = (
-  outputs: any[],
-  to: string,
-  amount: number,
-  fee: number,
-  changeAddress: string,
-  privateKey: string
-) => {
-  try {
-    // const transaction = new bitcore.Transaction()
-    //   .from(outputs)
-    //   .to(to, amount)
-    //   .fee(fee)
-    //   .change(changeAddress)
-    //   .sign(privateKey)
-
-    // return {
-    //   raw: transaction.serialize(),
-    //   hash: transaction.hash,
-    // }
-    return null
-  } catch (err) {
-    console.log('err', err)
-    return null
-  }
-}
-
-export const getTransactionOutputsSize = (): number => {
-  try {
-    return 0 //new bitcore.Transaction().from(outputs).toString().length
-  } catch {
-    return 0
-  }
-}
-
 export const sendRawTransaction = async (transaction: string): Promise<string | null> => {
   try {
     const { data } = await axios.post(
@@ -115,8 +93,4 @@ export const getFees = async (): Promise<number> => {
   } catch {
     return 0
   }
-}
-
-export const btcToSat = (amount: number): number => {
-  return 0 //Unit.fromBTC(amount).toSatoshis()
 }

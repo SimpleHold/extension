@@ -96,7 +96,6 @@ const Receive: React.FC = () => {
   }
 
   const onRefresh = (): void => {
-    // Fix me
     if (balance !== null && estimated !== null) {
       setIsRefreshing(true)
       setBalance(null)
@@ -153,7 +152,7 @@ const Receive: React.FC = () => {
               <Skeleton width={250} height={36} mt={10} type="gray" />
             )}
             {estimated !== null ? (
-              <Styles.USDEstimated>{`$${price(estimated, 2)} USD`}</Styles.USDEstimated>
+              <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
             ) : (
               <Skeleton width={130} height={23} mt={11} type="gray" />
             )}

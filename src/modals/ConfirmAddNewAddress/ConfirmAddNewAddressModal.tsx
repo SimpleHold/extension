@@ -34,9 +34,9 @@ const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
       const backup = localStorage.getItem('backup')
 
       if (backup && privateKey) {
-        const encryptBackup = decrypt(backup, password)
+        const decryptBackup = decrypt(backup, password)
 
-        if (encryptBackup && validateBitcoinPrivateKey(privateKey)) {
+        if (decryptBackup && validateBitcoinPrivateKey(privateKey)) {
           const address = window.importAddress(privateKey)
 
           if (address) {
