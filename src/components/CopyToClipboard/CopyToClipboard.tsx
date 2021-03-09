@@ -8,14 +8,19 @@ interface Props {
   children: React.ReactNode
   value: string
   mb?: number
+  onCopy?: () => void
 }
 
 const CopyToClipboard: React.FC<Props> = (props) => {
-  const { children, value, mb } = props
+  const { children, value, mb, onCopy: onCopySuccess } = props
 
   const [isCopied, setIsCopied] = React.useState<boolean>(false)
 
   const onCopy = (): void => {
+    if (onCopySuccess) {
+      onCopySuccess()
+    }
+
     copy(value)
     setIsCopied(true)
   }

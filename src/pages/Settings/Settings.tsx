@@ -14,6 +14,10 @@ import ConfirmLogoutModal from '@modals/ConfirmLogout'
 
 // Utils
 import { download as downloadBackup } from '@utils/backup'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { BACKUP_SETTINGS } from '@config/events'
 
 // Icons
 import cloudIcon from '@assets/icons/cloud.svg'
@@ -45,6 +49,9 @@ const Settings: React.FC = () => {
     const backup = localStorage.getItem('backup')
 
     if (backup) {
+      logEvent({
+        name: BACKUP_SETTINGS,
+      })
       downloadBackup(backup)
     }
   }

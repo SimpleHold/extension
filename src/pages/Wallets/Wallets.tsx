@@ -13,6 +13,10 @@ import useScroll from '@hooks/useScroll'
 // Utils
 import { price } from '@utils/format'
 import { IWallet } from '@utils/wallet'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { ADD_ADDRESS } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -29,10 +33,6 @@ const Wallets: React.FC = () => {
     getWallets()
   }, [])
 
-  const openPage = (path: string): void => {
-    history.push(path)
-  }
-
   const getWallets = () => {
     const storageWallets = localStorage.getItem('wallets')
 
@@ -40,6 +40,22 @@ const Wallets: React.FC = () => {
       const parseWallets = JSON.parse(storageWallets)
       setWallets(parseWallets)
     }
+  }
+
+  const onAddNewAddress = (): void => {
+    logEvent({
+      name: ADD_ADDRESS,
+    })
+
+    history.push('/new-wallet')
+  }
+
+  const sumBalance = (amount: number) => {
+    setTotalBalance((prevBalance: number | null) => Number(prevBalance) + amount)
+  }
+
+  const sumEstimated = (amount: number) => {
+    setTotalEstimated((prevEstimated: number | null) => Number(prevEstimated) + amount)
   }
 
   const collapsibleHeight = Math.max(100, 340 - 1.25 * scrollPosition)
@@ -59,14 +75,6 @@ const Wallets: React.FC = () => {
   const balanceBlockTop = Math.max(13, 80 - scrollPosition)
   const balanceBlockLeft = Math.max(0, 0 - scrollPosition)
   const balanceBlockPaddingTop = Math.max(0, 20 - scrollPosition)
-
-  const sumBalance = (amount: number) => {
-    setTotalBalance((prevBalance: number | null) => Number(prevBalance) + amount)
-  }
-
-  const sumEstimated = (amount: number) => {
-    setTotalEstimated((prevEstimated: number | null) => Number(prevEstimated) + amount)
-  }
 
   return (
     <Styles.Wrapper>
@@ -116,7 +124,7 @@ const Wallets: React.FC = () => {
         </Styles.BalanceBlock>
         <Styles.WalletsHeading style={{ marginTop: walletsHeadingMT }}>
           <Styles.WalletsLabel>Wallets</Styles.WalletsLabel>
-          <Styles.AddWalletButton onClick={() => openPage('/new-wallet')}>
+          <Styles.AddWalletButton onClick={onAddNewAddress}>
             <SVG src="../../assets/icons/plus.svg" width={16} height={16} title="Add new wallet" />
           </Styles.AddWalletButton>
         </Styles.WalletsHeading>

@@ -10,14 +10,38 @@ import Link from '@components/Link'
 import plusCircleIcon from '@assets/icons/plusCircle.svg'
 import restoreIcon from '@assets/icons/restore.svg'
 
+// Utils
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { WELCOME, START_CREATE, START_RESTORE } from '@config/events'
+
 // Styles
 import Styles from './styles'
 
 const Wallets: React.FC = () => {
   const history = useHistory()
 
-  const openPage = (path: string): void => {
-    history.push(path)
+  React.useEffect(() => {
+    logEvent({
+      name: WELCOME,
+    })
+  }, [])
+
+  const onCreateWallet = (): void => {
+    logEvent({
+      name: START_CREATE,
+    })
+
+    history.push('/create-wallet')
+  }
+
+  const onRestoreWallet = (): void => {
+    logEvent({
+      name: START_RESTORE,
+    })
+
+    history.push('/restore-wallet')
   }
 
   return (
@@ -29,13 +53,13 @@ const Wallets: React.FC = () => {
           SimpleHold would like to gather usage data to better understand how our users interact
         </Styles.Description>
         <Styles.WalletActions>
-          <Styles.Action onClick={() => openPage('/create-wallet')}>
+          <Styles.Action onClick={onCreateWallet}>
             <Styles.ActionIcon>
               <SVG src={plusCircleIcon} width={20} height={20} title="Create new wallet" />
             </Styles.ActionIcon>
             <Styles.ActionName>Create new wallet</Styles.ActionName>
           </Styles.Action>
-          <Styles.Action onClick={() => openPage('/restore-wallet')}>
+          <Styles.Action onClick={onRestoreWallet}>
             <Styles.ActionIcon>
               <SVG src={restoreIcon} width={20} height={20} title="Restore wallet" />
             </Styles.ActionIcon>

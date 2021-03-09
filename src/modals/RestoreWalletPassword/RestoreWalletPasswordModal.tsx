@@ -8,6 +8,10 @@ import Button from '@components/Button'
 // Utils
 import { decrypt } from '@utils/crypto'
 import { validateWallet, validatePassword } from '@utils/validate'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { START_RESTORE_PASSWORD } from '@config/events'
 
 // Icons
 import modalIcon from '@assets/modalIcons/confirm.svg'
@@ -29,6 +33,10 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
   const onConfirm = (): void => {
+    logEvent({
+      name: START_RESTORE_PASSWORD,
+    })
+
     if (errorLabel) {
       setErrorLabel(null)
     }

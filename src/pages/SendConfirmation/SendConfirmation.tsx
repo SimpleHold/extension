@@ -16,6 +16,15 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { IRawTransaction, IBitcoreUnspentOutput, sendRawTransaction } from '@utils/bitcoin'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import {
+  ADDRESS_SEND_CONFIRM,
+  ADDRESS_SEND_CONFIRM_CANCEL,
+  ADDRESS_SEND_PASSWORD,
+  ADDRESS_SEND_PASSWORD_CANCEL,
+} from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -41,6 +50,10 @@ const SendConfirmation: React.FC = () => {
   const [rawTransaction, setRawTransaction] = React.useState<null | IRawTransaction>(null)
 
   const onConfirmModal = async (): Promise<void> => {
+    logEvent({
+      name: ADDRESS_SEND_PASSWORD,
+    })
+
     if (inputErrorLabel) {
       setInputErrorLabel(null)
     }
@@ -80,6 +93,30 @@ const SendConfirmation: React.FC = () => {
     }
 
     return setInputErrorLabel('Password is not valid')
+  }
+
+  const onCancel = (): void => {
+    logEvent({
+      name: ADDRESS_SEND_CONFIRM_CANCEL,
+    })
+
+    history.goBack()
+  }
+
+  const onConfirm = (): void => {
+    logEvent({
+      name: ADDRESS_SEND_CONFIRM,
+    })
+
+    setActiveModal('confirmSending')
+  }
+
+  const onCloseConfirmModal = (): void => {
+    logEvent({
+      name: ADDRESS_SEND_PASSWORD_CANCEL,
+    })
+
+    setActiveModal(null)
   }
 
   return (
@@ -130,15 +167,15 @@ const SendConfirmation: React.FC = () => {
             </Styles.DestinationsList>
           </Styles.Row>
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={history.goBack} mr={7.5} />
-            <Button label="Confirm" onClick={() => setActiveModal('confirmSending')} ml={7.5} />
+            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
+            <Button label="Confirm" onClick={onConfirm} ml={7.5} />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>
 
       <ConfirmModal
         isActive={activeModal === 'confirmSending'}
-        onClose={() => setActiveModal(null)}
+        onClose={onCloseConfirmModal}
         title="Confirm sending"
         inputLabel="Enter password"
         inputType="password"

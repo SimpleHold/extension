@@ -10,6 +10,10 @@ import AgreeTerms from '@components/AgreeTerms'
 
 // Utils
 import { validatePassword } from '@utils/validate'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { START_PASSWORD } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -28,6 +32,10 @@ const Wallets: React.FC = () => {
   const isButtonDisabled = password.length < 7 || password !== confirmPassword || !isAgreed
 
   const onConfirm = (): void => {
+    logEvent({
+      name: START_PASSWORD,
+    })
+
     history.push('/download-backup', {
       password,
     })

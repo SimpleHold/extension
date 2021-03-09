@@ -5,6 +5,12 @@ import { useHistory } from 'react-router-dom'
 import Header from '@components/Header'
 import Button from '@components/Button'
 
+// Utils
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { ANALYTICS_OK } from '@config/events'
+
 // Styles
 import Styles from './styles'
 
@@ -13,6 +19,11 @@ const AnalyticsData: React.FC = () => {
 
   const onNext = (): void => {
     localStorage.setItem('analytics', 'agreed')
+
+    logEvent({
+      name: ANALYTICS_OK,
+    })
+
     history.push('/welcome')
   }
 

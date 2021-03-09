@@ -20,6 +20,10 @@ import {
   IBitcoreUnspentOutput,
 } from '@utils/bitcoin'
 import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -131,6 +135,10 @@ const Send: React.FC = () => {
   }
 
   const onSend = (): void => {
+    logEvent({
+      name: ADDRESS_SEND,
+    })
+
     history.push('/send-confirm', {
       amount: Number(amount),
       symbol,
@@ -174,7 +182,15 @@ const Send: React.FC = () => {
   }
 
   const isButtonDisabled = (): boolean => {
-    return false
+    return false // Fix me
+  }
+
+  const onCancel = (): void => {
+    logEvent({
+      name: ADDRESS_SEND_CANCEL,
+    })
+
+    history.goBack()
   }
 
   return (
@@ -229,7 +245,7 @@ const Send: React.FC = () => {
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={history.goBack} mr={7.5} />
+            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
             <Button label="Send" onClick={onSend} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
         </Styles.Form>

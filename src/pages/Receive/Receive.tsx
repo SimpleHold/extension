@@ -22,7 +22,11 @@ import useVisible from '@hooks/useVisible'
 
 // Utils
 import { getBalance, getEstimated } from '@utils/bitcoin'
-import { limitBalance, price } from '@utils/format'
+import { limitBalance, price, toUpper } from '@utils/format'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
 
 // Icons
 import moreIcon from '@assets/icons/more.svg'
@@ -53,6 +57,10 @@ const Receive: React.FC = () => {
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
 
   React.useEffect(() => {
+    logEvent({
+      name: ADDRESS_RECEIVE,
+    })
+
     loadBalance()
   }, [])
 
@@ -63,6 +71,10 @@ const Receive: React.FC = () => {
   }, [balance, estimated, isRefreshing])
 
   const onSend = (): void => {
+    logEvent({
+      name: ADDRESS_RECEIVE_SEND,
+    })
+
     history.push('/send', {
       symbol,
       address,
@@ -110,6 +122,12 @@ const Receive: React.FC = () => {
     setActiveModal('showPrivateKey')
   }
 
+  const onCopyAddress = (): void => {
+    logEvent({
+      name: ADDRESS_COPY,
+    })
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -147,7 +165,9 @@ const Receive: React.FC = () => {
               <Styles.CurrencyName>{currency}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
             {balance !== null ? (
-              <Styles.Balance>{limitBalance(balance, 12)} BTC</Styles.Balance>
+              <Styles.Balance>
+                {limitBalance(balance, 12)} {toUpper(symbol)}
+              </Styles.Balance>
             ) : (
               <Skeleton width={250} height={36} mt={10} type="gray" />
             )}
@@ -159,10 +179,10 @@ const Receive: React.FC = () => {
           </Styles.Row>
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />
-            <CopyToClipboard value={address} mb={40}>
+            <CopyToClipboard value={address} mb={40} onCopy={onCopyAddress}>
               <Styles.Address>{address}</Styles.Address>
             </CopyToClipboard>
-            <Button label="Send BTC" onClick={onSend} />
+            <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} />
           </Styles.ReceiveBlock>
         </Styles.Container>
       </Styles.Wrapper>

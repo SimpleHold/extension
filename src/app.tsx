@@ -6,7 +6,11 @@ import { AnimatedSwitch } from 'react-router-transition'
 import routes from './routes'
 import GlobalStyles from './styles/global'
 
+import config from '@config/index'
+import { FIRST_ENTER, SESSION_START } from '@config/events'
+
 import { validateWallet } from '@utils/validate'
+import { init, logEvent } from '@utils/amplitude'
 
 const bounceTransition = {
   atEnter: {
@@ -24,7 +28,25 @@ const bounceTransition = {
 }
 
 const App: React.FC = () => {
-  const getInitialPage = () => {
+  React.useEffect(() => {
+    initAmplitude()
+  }, [])
+
+  const initAmplitude = (): void => {
+    init(config.apiKey.amplitude)
+
+    if (!localStorage.getItem('clientId')) {
+      logEvent({
+        name: FIRST_ENTER,
+      })
+    }
+
+    logEvent({
+      name: SESSION_START,
+    })
+  }
+
+  const getInitialPage = (): string => {
     if (localStorage.getItem('isLocked')) {
       return '/lock'
     }

@@ -22,6 +22,7 @@
   "dependencies": {
     "@babel/runtime": "^7.12.5",
     "advanced-css-reset": "^1.2.2",
+    "amplitude-js": "^7.4.4",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
     "copy-to-clipboard": "^3.3.1",
@@ -49,6 +50,7 @@
     "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.12.5",
     "@babel/preset-typescript": "^7.12.1",
+    "@types/amplitude-js": "^7.0.1",
     "@types/bitcore-lib": "^0.15.2",
     "@types/crypto-js": "^4.0.1",
     "@types/qrcode.react": "^1.0.1",

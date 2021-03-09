@@ -15,6 +15,12 @@ import RestoreWalletPasswordModal from '@modals/RestoreWalletPassword'
 import fileIcon from '@assets/icons/file.svg'
 import invalidFileIcon from '@assets/icons/invalidFile.svg'
 
+// Utils
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { START_RESTORE_CONFIRM } from '@config/events'
+
 // Styles
 import Styles from './styles'
 
@@ -40,6 +46,10 @@ const RestoreWallet: React.FC = () => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   const onConfirm = (): void => {
+    logEvent({
+      name: START_RESTORE_CONFIRM,
+    })
+
     setActiveWallet('enterPassword')
   }
 

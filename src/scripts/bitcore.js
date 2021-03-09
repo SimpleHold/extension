@@ -1,3 +1,4 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable no-unused-vars */
 const { Transaction, Unit, PrivateKey } = require('bitcore-lib')

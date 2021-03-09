@@ -6,13 +6,17 @@ import Header from '@components/Header'
 import Link from '@components/Link'
 import Button from '@components/Button'
 
-// Illustrate
+// Assets
 import downloadBackupIllustrate from '@assets/illustrate/downloadbackup.svg'
 
 // Utils
 import { encrypt } from '@utils/crypto'
 import { generate, download as downloadBackup } from '@utils/backup'
 import { getWalletsFromBackup } from '@utils/wallet'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { START_BACKUP } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -26,6 +30,10 @@ const DownloadBackup: React.FC = () => {
   const history = useHistory()
 
   const downloadFile = (): void => {
+    logEvent({
+      name: START_BACKUP,
+    })
+
     const { address, privateKey } = window.generateWallet()
     const backup = generate(address, privateKey)
     downloadBackup(encrypt(backup, locationState.password))

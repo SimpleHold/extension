@@ -9,9 +9,15 @@ import Header from '@components/Header'
 // Modals
 import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 
-// Icons
+// Assets
 import importIcon from '@assets/icons/import.svg'
 import plusCircleIcon from '@assets/icons/plusCircle.svg'
+
+// Utils
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -22,27 +28,39 @@ const NewWallet: React.FC = () => {
 
   const history = useHistory()
 
-  const openPage = (path: string): void => {
-    history.push(path)
-  }
-
   const onSuccess = (): void => {
+    logEvent({
+      name: ADD_ADDRESS_CONFIRM,
+    })
+
     setActiveModal(null)
     setPrivateKey(null)
     history.goBack()
   }
 
   const onGenerateAddress = (): void => {
+    logEvent({
+      name: ADD_ADDRESS_GENERATE,
+    })
+
     const { privateKey: walletPrivateKey } = window.generateWallet()
     setPrivateKey(walletPrivateKey)
     setActiveModal('confirmAddAddress')
+  }
+
+  const onImportPrivateKey = (): void => {
+    logEvent({
+      name: ADD_ADDRESS_IMPORT,
+    })
+
+    history.push('/import-private-key')
   }
 
   return (
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={() => openPage('/wallets')} backTitle="Wallets" />
+        <Header withBack onBack={history.goBack} backTitle="Wallets" />
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
@@ -51,7 +69,7 @@ const NewWallet: React.FC = () => {
           </Styles.Description>
 
           <Styles.Actions>
-            <Styles.Action onClick={() => openPage('/import-private-key')}>
+            <Styles.Action onClick={onImportPrivateKey}>
               <Styles.ActionIcon>
                 <SVG src={importIcon} width={18} height={18} title="Import private key" />
               </Styles.ActionIcon>

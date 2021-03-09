@@ -8,6 +8,12 @@ import settingsIcon from '@assets/icons/settings.svg'
 import arrowIcon from '@assets/icons/arrow.svg'
 import lockIcon from '@assets/icons/lock.svg'
 
+// Utils
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { LOCK } from '@config/events'
+
 // Styles
 import Styles from './styles'
 
@@ -40,6 +46,11 @@ const Header: React.FC<Props> = (props) => {
 
   const lockWallet = (): void => {
     localStorage.setItem('isLocked', 'true')
+
+    logEvent({
+      name: LOCK,
+    })
+
     return openPage('/lock')
   }
 

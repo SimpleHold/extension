@@ -5,13 +5,14 @@ import { useHistory } from 'react-router-dom'
 // Components
 import Header from '@components/Header'
 
-// Illustrate
+// Assets
 import illustrate1 from '@assets/illustrate/onboard1.svg'
 import illustrate2 from '@assets/illustrate/onboard2.svg'
 import illustrate3 from '@assets/illustrate/onboard3.svg'
-
-// Icons
 import arrowIcon from '@assets/icons/arrow.svg'
+
+// Utils
+import { logEvent } from '@utils/amplitude'
 
 // Styles
 import Styles from './styles'
@@ -20,6 +21,12 @@ const OnBoard: React.FC = () => {
   const history = useHistory()
 
   const [currentStep, setCurrentStep] = React.useState<number>(0)
+
+  React.useEffect(() => {
+    logEvent({
+      name: `ONBOARDING_${currentStep + 1}`,
+    })
+  }, [currentStep])
 
   const steps = [
     {

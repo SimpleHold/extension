@@ -14,6 +14,10 @@ import ConfirmLogoutModal from '@modals/ConfirmLogout'
 import { decrypt } from '@utils/crypto'
 import { download as downloadBackup } from '@utils/backup'
 import { validatePassword } from '@utils/validate'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { LOG_OUT_CACHE, PASSWORD_AFTER_LOG_OUT, SUCCESS_ENTER } from '@config/events'
 
 // Illustrate
 import lockIllustrate from '@assets/illustrate/lock.svg'
@@ -23,6 +27,12 @@ import Styles from './styles'
 
 const Lock: React.FC = () => {
   const history = useHistory()
+
+  React.useEffect(() => {
+    logEvent({
+      name: PASSWORD_AFTER_LOG_OUT,
+    })
+  }, [])
 
   const [password, setPassword] = React.useState<string>('')
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
@@ -40,6 +50,10 @@ const Lock: React.FC = () => {
         const decryptWallet = decrypt(backup, password)
 
         if (decryptWallet) {
+          logEvent({
+            name: SUCCESS_ENTER,
+          })
+
           localStorage.removeItem('isLocked')
           return history.push('/wallets')
         }
@@ -63,6 +77,10 @@ const Lock: React.FC = () => {
 
     if (backup) {
       downloadBackup(backup)
+
+      logEvent({
+        name: LOG_OUT_CACHE,
+      })
 
       localStorage.removeItem('backup')
       localStorage.removeItem('wallets')
