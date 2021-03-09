@@ -87,7 +87,7 @@ const SendConfirmation: React.FC = () => {
             }
           }
 
-          return setInputErrorLabel('Transaction creation error')
+          return setInputErrorLabel('Error while creating transaction')
         }
       }
     }

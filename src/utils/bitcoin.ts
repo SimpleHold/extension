@@ -19,7 +19,7 @@ export interface IRawTransaction {
 export interface IBitcoreUnspentOutput {
   address: string
   txId: string
-  outputIndex: string
+  outputIndex: number
   script: string
   satoshis: number
 }

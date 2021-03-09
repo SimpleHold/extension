@@ -8,6 +8,7 @@ import CurrenciesDropdown from '@components/CurrenciesDropdown'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
+import Spinner from '@components/Spinner'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
@@ -18,6 +19,7 @@ import {
   getUnspentOutputs,
   getFees,
   IBitcoreUnspentOutput,
+  IUnspentOutput,
 } from '@utils/bitcoin'
 import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
@@ -51,8 +53,9 @@ const Send: React.FC = () => {
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
-  const [outputs, setOutputs] = React.useState<any[]>([])
+  const [outputs, setOutputs] = React.useState<IUnspentOutput[]>([])
   const [utxosList, setUtxosList] = React.useState<IBitcoreUnspentOutput[]>([])
+  const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
 
   const debounced = useDebounce(amount, 1000)
 
@@ -66,7 +69,8 @@ const Send: React.FC = () => {
   }, [selectedAddress])
 
   React.useEffect(() => {
-    if (amount.length && balance !== null && balance > 0) {
+    if (amount.length && Number(balance) > 0 && outputs.length) {
+      setNetworkFeeLoading(true)
       getNetworkFee()
     }
   }, [debounced])
@@ -77,35 +81,34 @@ const Send: React.FC = () => {
   }
 
   const getNetworkFee = async (): Promise<void> => {
-    if (outputs && Number(amount) > 0) {
-      const fee = await getFees()
-      setUtxosList([])
+    const fee = await getFees()
+    setUtxosList([])
 
-      const sortOutputs = outputs.sort((a, b) => a.value - b.value)
-      const utxos: IBitcoreUnspentOutput[] = []
+    const sortOutputs = outputs.sort((a, b) => a.value - b.value)
+    const utxos: IBitcoreUnspentOutput[] = []
 
-      for (const output of sortOutputs) {
-        const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-        const transactionFeeBytes = window.getTransactionSize(utxos) * fee
+    for (const output of sortOutputs) {
+      const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
+      const transactionFeeBytes = window.getTransactionSize(utxos) * fee
 
-        if (getUtxosValue >= window.btcToSat(Number(amount)) + transactionFeeBytes) {
-          break
-        }
-
-        utxos.push({
-          txId: output.tx_hash_big_endian,
-          outputIndex: output.tx_output_n,
-          script: output.script,
-          satoshis: output.value,
-          address: selectedAddress,
-        })
+      if (getUtxosValue >= window.btcToSat(Number(amount)) + transactionFeeBytes) {
+        break
       }
 
-      setUtxosList(utxos)
-
-      const transactionFeeBytes = window.getTransactionSize(utxos)
-      setNetworkFee((transactionFeeBytes * fee) / 100000000)
+      utxos.push({
+        txId: output.tx_hash_big_endian,
+        outputIndex: output.tx_output_n,
+        script: output.script,
+        satoshis: output.value,
+        address: selectedAddress,
+      })
     }
+
+    setUtxosList(utxos)
+
+    const transactionFeeBytes = window.getTransactionSize(utxos)
+    setNetworkFee((transactionFeeBytes * fee) / 100000000)
+    setNetworkFeeLoading(false)
   }
 
   const getWalletsList = (): void => {
@@ -157,6 +160,10 @@ const Send: React.FC = () => {
     if (address.length && !validateBitcoinAddress(address)) {
       setAddressErrorLabel('Address is not valid')
     }
+
+    if (address === selectedAddress) {
+      setAddressErrorLabel('Address same as sender')
+    }
   }
 
   const onBlurAmountInput = (): void => {
@@ -182,7 +189,17 @@ const Send: React.FC = () => {
   }
 
   const isButtonDisabled = (): boolean => {
-    return false // Fix me
+    return (
+      !validateBitcoinAddress(address) ||
+      !amount.length ||
+      Number(amount) <= 0 ||
+      !outputs.length ||
+      addressErrorLabel !== null ||
+      amountErrorLabel !== null ||
+      Number(balance) <= 0 ||
+      networkFee === 0 ||
+      isNetworkFeeLoading
+    )
   }
 
   const onCancel = (): void => {
@@ -239,9 +256,13 @@ const Send: React.FC = () => {
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
-            <Styles.NetworkFee>
-              {networkFee} {toUpper(symbol)}
-            </Styles.NetworkFee>
+            {isNetworkFeeLoading ? (
+              <Spinner ml={10} />
+            ) : (
+              <Styles.NetworkFee>
+                {networkFee} {toUpper(symbol)}
+              </Styles.NetworkFee>
+            )}
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>
