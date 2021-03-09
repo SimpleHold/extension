@@ -13,30 +13,44 @@ import { getWalletsFromBackup } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 
 // Config
-import { START_BACKUP } from '@config/events'
+import {
+  START_BACKUP,
+  ADD_ADDRESS_GENERATE_BACKUP,
+  ADD_ADDRESS_IMPORT_BACKUP,
+} from '@config/events'
 
 // Styles
 import Styles from './styles'
 
 interface LocationState {
   password: string
+  from: null | 'privateKey' | 'newAddress'
 }
 
 const DownloadBackup: React.FC = () => {
-  const { state: locationState } = useLocation<LocationState>()
+  const {
+    state: { password, from },
+  } = useLocation<LocationState>()
   const history = useHistory()
 
   const downloadFile = (): void => {
-    logEvent({
-      name: START_BACKUP,
-    })
-
     const { address, privateKey } = window.generateWallet()
     const backup = generate(address, privateKey)
-    downloadBackup(encrypt(backup, locationState.password))
+    downloadBackup(encrypt(backup, password))
 
-    localStorage.setItem('backup', encrypt(backup, locationState.password))
+    localStorage.setItem('backup', encrypt(backup, password))
     localStorage.setItem('wallets', JSON.stringify(getWalletsFromBackup(backup)))
+
+    if (from === 'privateKey' || from === 'newAddress') {
+      logEvent({
+        name: from === 'privateKey' ? ADD_ADDRESS_IMPORT_BACKUP : ADD_ADDRESS_GENERATE_BACKUP,
+      })
+    } else {
+      logEvent({
+        name: START_BACKUP,
+      })
+    }
+
     history.push('/wallets')
   }
 

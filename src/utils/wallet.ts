@@ -80,21 +80,19 @@ export const getWalletsFromBackup = (backup: string): string | null => {
 
 export const addNew = (privateKey: string, address: string, symbol: string) => {
   const walletsList = localStorage.getItem('wallets')
+  const validateWallets = validateWallet(walletsList)
 
-  if (walletsList) {
+  if (validateWallets && walletsList) {
     const parseWallets = JSON.parse(walletsList)
-    const validate = validateWallet(parseWallets)
 
-    if (validate) {
-      parseWallets.push({
-        symbol,
-        address,
-        uuid: v4(),
-        privateKey,
-      })
+    parseWallets.push({
+      symbol,
+      address,
+      uuid: v4(),
+      privateKey,
+    })
 
-      return JSON.stringify(parseWallets)
-    }
+    return JSON.stringify(parseWallets)
   }
   return null
 }

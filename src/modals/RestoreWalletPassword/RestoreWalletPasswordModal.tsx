@@ -20,11 +20,12 @@ interface Props {
   backupData: null | string
   isActive: boolean
   onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
-  onSuccess: Function
+  onSuccess: () => void
+  onError: () => void
 }
 
 const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
-  const { backupData, isActive, onClose, onSuccess } = props
+  const { backupData, isActive, onClose, onSuccess, onError } = props
 
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
@@ -55,7 +56,7 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
           localStorage.setItem('wallets', decryptBackup)
           onSuccess()
         } else {
-          alert('error file') // Fix me add modal
+          onError()
         }
       }
     }

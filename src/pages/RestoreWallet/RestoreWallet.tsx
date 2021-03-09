@@ -10,6 +10,7 @@ import AgreeTerms from '@components/AgreeTerms'
 
 // Modals
 import RestoreWalletPasswordModal from '@modals/RestoreWalletPassword'
+import FailModal from '@modals/Fail'
 
 // Utils
 import { logEvent } from '@utils/amplitude'
@@ -26,7 +27,7 @@ const RestoreWallet: React.FC = () => {
   const [isInvalidFile, setInvalidFile] = React.useState<boolean>(false)
   const [fileName, setFileName] = React.useState<null | string>(null)
   const [backupData, setBackupData] = React.useState<null | string>(null)
-  const [activeWallet, setActiveWallet] = React.useState<null | 'enterPassword'>(null)
+  const [activeWallet, setActiveWallet] = React.useState<null | 'enterPassword' | 'error'>(null)
   const [isAgreed, setIsAgreed] = React.useState<boolean>(false)
 
   const onDrop = React.useCallback(async (acceptedFiles) => {
@@ -51,6 +52,10 @@ const RestoreWallet: React.FC = () => {
 
   const onSuccessRestore = (): void => {
     history.push('/wallets')
+  }
+
+  const onErrorRestore = (): void => {
+    setActiveWallet('error')
   }
 
   return (
@@ -118,6 +123,12 @@ const RestoreWallet: React.FC = () => {
         onClose={() => setActiveWallet(null)}
         backupData={backupData}
         onSuccess={onSuccessRestore}
+        onError={onErrorRestore}
+      />
+      <FailModal
+        isActive={activeWallet === 'error'}
+        onClose={() => setActiveWallet(null)}
+        text="Backup file is broken. We cannot restore your wallet. Check your backup file and try again."
       />
     </>
   )

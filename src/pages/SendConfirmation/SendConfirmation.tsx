@@ -68,7 +68,7 @@ const SendConfirmation: React.FC = () => {
           (wallet: IWallet) => wallet.address === addressFrom
         )
 
-        if (findWallet) {
+        if (findWallet?.privateKey) {
           const transaction: IRawTransaction | null = window.createTransaction(
             outputs,
             addressTo,
