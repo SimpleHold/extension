@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+type TListProps = {
+  color: string
+}
+
 const Wrapper = styled.div`
   height: 600px;
   background-color: #ffffff;
@@ -7,6 +11,7 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   padding: 30px;
+  height: 540px;
 `
 
 const Title = styled.p`
@@ -14,7 +19,6 @@ const Title = styled.p`
   font-weight: bold;
   font-size: 23px;
   line-height: 27px;
-  text-transform: capitalize;
   color: #1d1d22;
 `
 
@@ -25,79 +29,88 @@ const Description = styled.p`
   color: #7d7e8d;
 `
 
-const FeaturesBlock = styled.div`
-  margin: 20px 0 0 0;
-`
-
-const FeaturesTitle = styled.p`
-  margin: 0;
+const ListTitle = styled.p`
+  margin: 10px 0;
   font-weight: bold;
   font-size: 16px;
   line-height: 19px;
   color: #1d1d22;
 `
 
-const FeaturesList = styled.div`
-  margin: 20px 0 0 0;
-`
-
-const Feature = styled.div`
-  position: relative;
+const ListRow = styled.div`
+  margin: 0 0 15px 0;
   display: flex;
   flex-direction: row;
   align-items: center;
+  position: relative;
 
-  &:not(:last-child) {
-    margin: 0 0 30px 0;
+  &:before {
+    content: '';
+    width: 1px;
+    height: 100%;
+    position: absolute;
+    background-color: ${({ color }: TListProps) => color};
+    top: 0;
+    left: 10px;
   }
 `
 
-const FeatureLine = styled.div`
-  width: 1px;
+const ListDivider = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   height: 100%;
-  background-color: #3fbb7d;
-  position: absolute;
-  left: 10px;
 `
 
-const FeatureIcon = styled.div`
+const ListIconRow = styled.div`
   width: 21px;
   height: 21px;
-  background-color: #3fbb7d;
-  border-radius: 12px;
-  position: absolute;
+  border-radius: 11px;
+  background-color: ${({ color }: TListProps) => color};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    z-index: 2;
+
+    path {
+      fill: #ffffff;
+    }
+  }
 `
 
-const Features = styled.div`
-  margin: 0 0 0 30px;
+const List = styled.ul`
+  padding: 0;
+  margin: 0 0 0 9px;
+  list-style: none;
 `
 
-const FeatureText = styled.p`
-  margin: 0;
+const ListItem = styled.li`
   font-size: 14px;
   line-height: 20px;
   color: #1d1d22;
 
   &:not(:last-child) {
-    margin: 0 0 10px 0;
+    margin: 0 0 5px 0;
   }
 `
 
-const Actions = styled.div``
+const Actions = styled.div`
+  margin: 21px 0 0 0;
+`
 
 const Styles = {
   Wrapper,
   Container,
   Title,
   Description,
-  FeaturesBlock,
-  FeaturesTitle,
-  FeaturesList,
-  Feature,
-  FeatureLine,
-  FeatureIcon,
-  Features,
-  FeatureText,
+  ListTitle,
+  ListRow,
+  ListDivider,
+  ListIconRow,
+  List,
+  ListItem,
   Actions,
 }
 
