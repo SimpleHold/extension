@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import background from '../../assets/backgrounds/main.png'
+import background from '@assets/backgrounds/main.png'
 
 const Wrapper = styled.div`
   height: 600px;

@@ -24,13 +24,12 @@ import useVisible from '@hooks/useVisible'
 import { getBalance, getEstimated } from '@utils/bitcoin'
 import { limitBalance, price, toUpper } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
+import { getLatestBalance, updateBalance } from '@utils/wallet'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
 
 // Icons
-import moreIcon from '@assets/icons/more.svg'
-import refreshIcon from '@assets/icons/refresh.svg'
 import privateKeyIcon from '@assets/icons/privateKey.svg'
 import linkIcon from '@assets/icons/link.svg'
 
@@ -44,8 +43,9 @@ interface LocationState {
 }
 
 const Receive: React.FC = () => {
-  const { state: locationState } = useLocation<LocationState>()
-  const { currency, symbol, address } = locationState
+  const {
+    state: { currency, symbol, address },
+  } = useLocation<LocationState>()
 
   const history = useHistory()
 
@@ -85,11 +85,23 @@ const Receive: React.FC = () => {
     const fetchBalance = await getBalance(address)
     setBalance(fetchBalance)
 
-    if (fetchBalance !== 0) {
-      const fetchEstimated = await getEstimated(fetchBalance)
-      setEstimated(fetchEstimated)
+    if (fetchBalance === null) {
+      const latestbalance = getLatestBalance(address)
+
+      if (latestbalance !== 0) {
+        const fetchEstimated = await getEstimated(latestbalance)
+        setEstimated(fetchEstimated)
+      } else {
+        setEstimated(0)
+      }
     } else {
-      setEstimated(0)
+      updateBalance(address, fetchBalance)
+      if (fetchBalance !== 0) {
+        const fetchEstimated = await getEstimated(fetchBalance)
+        setEstimated(fetchEstimated)
+      } else {
+        setEstimated(0)
+      }
     }
   }
 
@@ -139,11 +151,16 @@ const Receive: React.FC = () => {
               <Styles.UpdateBalanceBlock>
                 <Styles.BalanceLabel>Balance</Styles.BalanceLabel>
                 <Styles.RefreshIconRow isRefreshing={isRefreshing} onClick={onRefresh}>
-                  <SVG src={refreshIcon} width={13} height={13} title="Refresh balance" />
+                  <SVG
+                    src="../../assets/icons/refresh.svg"
+                    width={13}
+                    height={13}
+                    title="Refresh balance"
+                  />
                 </Styles.RefreshIconRow>
               </Styles.UpdateBalanceBlock>
               <Styles.MoreButton onClick={() => setIsVisible(!isVisible)}>
-                <SVG src={moreIcon} width={18} height={3.78} title="More" />
+                <SVG src="../../assets/icons/more.svg" width={18} height={3.78} title="More" />
               </Styles.MoreButton>
             </Styles.Heading>
 

@@ -9,10 +9,6 @@ import Header from '@components/Header'
 // Modals
 import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 
-// Assets
-import importIcon from '@assets/icons/import.svg'
-import plusCircleIcon from '@assets/icons/plusCircle.svg'
-
 // Utils
 import { logEvent } from '@utils/amplitude'
 
@@ -71,13 +67,23 @@ const NewWallet: React.FC = () => {
           <Styles.Actions>
             <Styles.Action onClick={onImportPrivateKey}>
               <Styles.ActionIcon>
-                <SVG src={importIcon} width={18} height={18} title="Import private key" />
+                <SVG
+                  src="../../assets/icons/import.svg"
+                  width={18}
+                  height={18}
+                  title="Import private key"
+                />
               </Styles.ActionIcon>
               <Styles.ActionName>Import private key</Styles.ActionName>
             </Styles.Action>
             <Styles.Action onClick={onGenerateAddress}>
               <Styles.ActionIcon>
-                <SVG src={plusCircleIcon} width={20} height={20} title="Generate new address" />
+                <SVG
+                  src="../../assets/icons/plusCircle.svg"
+                  width={20}
+                  height={20}
+                  title="Generate new address"
+                />
               </Styles.ActionIcon>
               <Styles.ActionName>Generate new address</Styles.ActionName>
             </Styles.Action>

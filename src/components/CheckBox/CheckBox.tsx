@@ -1,9 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
 
-// Icons
-import checkIcon from '@assets/icons/check.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -17,7 +14,9 @@ const CheckBox: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container onClick={onClick}>
-      {value ? <SVG src={checkIcon} width={9.5} height={7.5} title="check" /> : null}
+      {value ? (
+        <SVG src="../../assets/icons/check.svg" width={9.5} height={7.5} title="check" />
+      ) : null}
     </Styles.Container>
   )
 }

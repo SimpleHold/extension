@@ -4,9 +4,6 @@ import * as React from 'react'
 import ModalWrapper from '@components/ModalWrapper'
 import Button from '@components/Button'
 
-// Icons
-import modalIcon from '@assets/modalIcons/logout.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -20,7 +17,7 @@ const ConfirmLogoutModal: React.FC<Props> = (props) => {
   const { isActive, onClose, onConfirm } = props
 
   return (
-    <ModalWrapper isActive={isActive} onClose={onClose} icon={modalIcon}>
+    <ModalWrapper isActive={isActive} onClose={onClose} icon="../../assets/modalIcons/logout.svg">
       <Styles.Row>
         <Styles.Title>Confirm log out</Styles.Title>
         <Styles.Text>

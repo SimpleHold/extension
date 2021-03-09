@@ -6,9 +6,6 @@ import Header from '@components/Header'
 import Link from '@components/Link'
 import Button from '@components/Button'
 
-// Assets
-import downloadBackupIllustrate from '@assets/illustrate/downloadbackup.svg'
-
 // Utils
 import { encrypt } from '@utils/crypto'
 import { generate, download as downloadBackup } from '@utils/backup'
@@ -48,7 +45,7 @@ const DownloadBackup: React.FC = () => {
       <Header noActions logoColor="#3FBB7D" withBorder />
       <Styles.Container>
         <Styles.Row>
-          <Styles.Image src={downloadBackupIllustrate} alt="image" />
+          <Styles.Image src="../../assets/illustrate/downloadbackup.svg" alt="image" />
           <Styles.Title>Download backup</Styles.Title>
           <Styles.Description>
             Please save your backup file and keep it properly as well as password. It ensures access

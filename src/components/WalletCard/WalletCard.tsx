@@ -6,9 +6,10 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { getCurrency } from '../../config/currencies'
+import { getCurrency } from '@config/currencies'
 import { getBalance, getEstimated } from '@utils/bitcoin'
 import { toUpper, numberFriendly, limitBalance } from '@utils/format'
+import { updateBalance, getLatestBalance } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -46,8 +47,16 @@ const WalletCard: React.FC<Props> = (props) => {
 
   const fetchBalance = async (): Promise<void> => {
     const tryGetBalance = await getBalance(address)
-    setBalance(tryGetBalance)
-    sumBalance(tryGetBalance)
+
+    if (tryGetBalance === null) {
+      const latestbalance = getLatestBalance(address)
+      setBalance(latestbalance)
+      sumBalance(latestbalance)
+    } else {
+      setBalance(tryGetBalance)
+      sumBalance(tryGetBalance)
+      updateBalance(address, tryGetBalance)
+    }
   }
 
   const fetchEstimated = async (): Promise<void> => {

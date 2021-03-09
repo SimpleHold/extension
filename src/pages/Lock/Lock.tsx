@@ -19,9 +19,6 @@ import { logEvent } from '@utils/amplitude'
 // Config
 import { LOG_OUT_CACHE, PASSWORD_AFTER_LOG_OUT, SUCCESS_ENTER } from '@config/events'
 
-// Illustrate
-import lockIllustrate from '@assets/illustrate/lock.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -95,7 +92,7 @@ const Lock: React.FC = () => {
       <Styles.Wrapper>
         <Header noActions logoColor="#3FBB7D" withBorder />
         <Styles.Container>
-          <Styles.Image src={lockIllustrate} alt="lock" />
+          <Styles.Image src="../../assets/illustrate/lock.svg" alt="lock" />
           <Styles.Title>Welcome back!</Styles.Title>
           <Styles.Form>
             <TextInput

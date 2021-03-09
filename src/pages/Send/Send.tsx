@@ -23,6 +23,7 @@ import {
 } from '@utils/bitcoin'
 import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
+import { getLatestBalance, updateBalance } from '@utils/wallet'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -127,13 +128,27 @@ const Send: React.FC = () => {
     setEstimated(null)
 
     const fetchBalance = await getBalance(selectedAddress)
-    setBalance(fetchBalance)
 
-    if (fetchBalance !== 0) {
-      const fetchEstimated = await getEstimated(fetchBalance)
-      setEstimated(fetchEstimated)
+    if (fetchBalance === null) {
+      const latestbalance = getLatestBalance(address)
+      setBalance(latestbalance)
+
+      if (latestbalance !== 0) {
+        const fetchEstimated = await getEstimated(latestbalance)
+        setEstimated(fetchEstimated)
+      } else {
+        setEstimated(0)
+      }
     } else {
-      setEstimated(0)
+      setBalance(fetchBalance)
+      updateBalance(selectedAddress, fetchBalance)
+
+      if (fetchBalance !== 0) {
+        const fetchEstimated = await getEstimated(fetchBalance)
+        setEstimated(fetchEstimated)
+      } else {
+        setEstimated(0)
+      }
     }
   }
 

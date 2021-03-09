@@ -6,10 +6,6 @@ import { useHistory } from 'react-router-dom'
 import Header from '@components/Header'
 import Link from '@components/Link'
 
-// Icons
-import plusCircleIcon from '@assets/icons/plusCircle.svg'
-import restoreIcon from '@assets/icons/restore.svg'
-
 // Utils
 import { logEvent } from '@utils/amplitude'
 
@@ -55,13 +51,23 @@ const Wallets: React.FC = () => {
         <Styles.WalletActions>
           <Styles.Action onClick={onCreateWallet}>
             <Styles.ActionIcon>
-              <SVG src={plusCircleIcon} width={20} height={20} title="Create new wallet" />
+              <SVG
+                src="../../assets/icons/plusCircle.svg"
+                width={20}
+                height={20}
+                title="Create new wallet"
+              />
             </Styles.ActionIcon>
             <Styles.ActionName>Create new wallet</Styles.ActionName>
           </Styles.Action>
           <Styles.Action onClick={onRestoreWallet}>
             <Styles.ActionIcon>
-              <SVG src={restoreIcon} width={20} height={20} title="Restore wallet" />
+              <SVG
+                src="../../assets/icons/restore.svg"
+                width={20}
+                height={20}
+                title="Restore wallet"
+              />
             </Styles.ActionIcon>
             <Styles.ActionName>Restore wallet</Styles.ActionName>
           </Styles.Action>

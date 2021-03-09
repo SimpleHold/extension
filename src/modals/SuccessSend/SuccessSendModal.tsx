@@ -4,9 +4,6 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 // Components
 import ModalWrapper from '@components/ModalWrapper'
 
-// Icons
-import modalIcon from '@assets/modalIcons/success.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -28,7 +25,7 @@ const SuccessSendModal: React.FC<Props> = (props) => {
   }
 
   return (
-    <ModalWrapper isActive={isActive} onClose={onClose} icon={modalIcon}>
+    <ModalWrapper isActive={isActive} onClose={onClose} icon="../../assets/modalIcons/success.svg">
       <Styles.Row>
         <Styles.Title>Success!</Styles.Title>
         <Styles.Text>Your transaction has successfully sent. You can check it here:</Styles.Text>

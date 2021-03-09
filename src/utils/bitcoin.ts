@@ -24,7 +24,7 @@ export interface IBitcoreUnspentOutput {
   satoshis: number
 }
 
-export const getBalance = (address: string): Promise<number> | number => {
+export const getBalance = (address: string): Promise<number> | number | null => {
   try {
     return fetch(`https://blockchain.info/balance?active=${address}`)
       .then((response) => response.json())
@@ -32,7 +32,7 @@ export const getBalance = (address: string): Promise<number> | number => {
         return data[address].final_balance / 100000000
       })
   } catch {
-    return 0
+    return null
   }
 }
 

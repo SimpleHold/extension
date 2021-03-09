@@ -1,9 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
 
-// Assets
-import spinnerIcon from '@assets/icons/spinner.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -16,7 +13,7 @@ const Spinner: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container ml={ml}>
-      <SVG src={spinnerIcon} width={16} height={16} title="Spinner" />
+      <SVG src="../../assets/icons/spinner.svg" width={16} height={16} title="Spinner" />
     </Styles.Container>
   )
 }

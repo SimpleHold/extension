@@ -24,7 +24,15 @@ export const getWallets = (): IWallet[] | null => {
   }
 }
 
-export const setBalance = (address: string): void => {}
+export const updateBalance = (address: string, amount: number): void => {
+  const wallets = getWallets()
+  const findWallet = wallets?.find((wallet: IWallet) => wallet.address === address)
+
+  if (findWallet) {
+    findWallet.balance = amount
+    localStorage.setItem('wallets', JSON.stringify(wallets))
+  }
+}
 
 export const getLatestBalance = (address: string): number => {
   const wallets = getWallets()

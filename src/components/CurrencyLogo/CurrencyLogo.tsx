@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { getCurrency } from '../../config/currencies'
+import { getCurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'

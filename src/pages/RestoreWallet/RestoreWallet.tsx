@@ -11,10 +11,6 @@ import AgreeTerms from '@components/AgreeTerms'
 // Modals
 import RestoreWalletPasswordModal from '@modals/RestoreWalletPassword'
 
-// Icons
-import fileIcon from '@assets/icons/file.svg'
-import invalidFileIcon from '@assets/icons/invalidFile.svg'
-
 // Utils
 import { logEvent } from '@utils/amplitude'
 
@@ -74,9 +70,19 @@ const RestoreWallet: React.FC = () => {
                   isInvalidFile={isInvalidFile}
                 >
                   {isInvalidFile ? (
-                    <SVG src={invalidFileIcon} width={21.85} height={21.85} title="file" />
+                    <SVG
+                      src="../../assets/icons/invalidFile.svg"
+                      width={21.85}
+                      height={21.85}
+                      title="file"
+                    />
                   ) : (
-                    <SVG src={fileIcon} width={16.85} height={21.5} title="file" />
+                    <SVG
+                      src="../../assets/icons/file.svg"
+                      width={16.85}
+                      height={21.5}
+                      title="file"
+                    />
                   )}
                 </Styles.DNDIconRow>
                 {backupData && fileName ? (

@@ -13,9 +13,6 @@ import { logEvent } from '@utils/amplitude'
 // Config
 import { START_RESTORE_PASSWORD } from '@config/events'
 
-// Icons
-import modalIcon from '@assets/modalIcons/confirm.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -65,7 +62,7 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
   }
 
   return (
-    <ModalWrapper isActive={isActive} onClose={onClose} icon={modalIcon}>
+    <ModalWrapper isActive={isActive} onClose={onClose} icon="../../assets/modalIcons/confirm.svg">
       <Styles.Row>
         <Styles.Title>Confirm adding new address</Styles.Title>
         <Styles.Form>

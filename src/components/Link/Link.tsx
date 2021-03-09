@@ -2,9 +2,6 @@ import * as React from 'react'
 import SVG from 'react-inlinesvg'
 import { browser, Tabs } from 'webextension-polyfill-ts'
 
-// Icons
-import askIcon from '@assets/icons/ask.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -24,7 +21,7 @@ const Link: React.FC<Props> = (props) => {
   return (
     <Styles.Container onClick={openWebPage} mt={mt}>
       <Styles.IconRow>
-        <SVG src={askIcon} width={15} height={15} title="ask" />
+        <SVG src="../../assets/icons/ask.svg" width={15} height={15} title="ask" />
       </Styles.IconRow>
       <Styles.Title>{title}</Styles.Title>
     </Styles.Container>

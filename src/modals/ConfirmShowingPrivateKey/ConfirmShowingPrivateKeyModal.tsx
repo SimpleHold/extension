@@ -10,9 +10,6 @@ import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { validatePassword } from '@utils/validate'
 
-// Icons
-import modalIcon from '@assets/modalIcons/key.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -63,7 +60,7 @@ const ConfirmShowingPrivateKeyModal: React.FC<Props> = (props) => {
   }
 
   return (
-    <ModalWrapper isActive={isActive} onClose={onClose} icon={modalIcon}>
+    <ModalWrapper isActive={isActive} onClose={onClose} icon="../../assets/modalIcons/key.svg">
       <Styles.Row>
         <Styles.Title>Confirm showing private key</Styles.Title>
 

@@ -7,9 +7,6 @@ import CurrencyLogo from '@components/CurrencyLogo'
 // Hooks
 import useVisible from '@hooks/useVisible'
 
-// Icons
-import arrowIcon from '@assets/icons/arrow.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -40,7 +37,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
           <Styles.Address>{selectedAddress}</Styles.Address>
           {!isDisabled ? (
             <Styles.ArrowIconRow>
-              <SVG src={arrowIcon} width={8} height={14} title="arrow" />
+              <SVG src="../../assets/icons/arrow.svg" width={8} height={14} title="arrow" />
             </Styles.ArrowIconRow>
           ) : null}
         </Styles.Row>

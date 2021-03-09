@@ -5,9 +5,6 @@ import ModalWrapper from '@components/ModalWrapper'
 import CopyToClipboard from '@components/CopyToClipboard'
 import Button from '@components/Button'
 
-// Icons
-import modalIcon from '@assets/modalIcons/key.svg'
-
 // Styles
 import Styles from './styles'
 
@@ -21,7 +18,7 @@ const ShowPrivateKeyModal: React.FC<Props> = (props) => {
   const { isActive, onClose, privateKey } = props
 
   return (
-    <ModalWrapper isActive={isActive} onClose={onClose} icon={modalIcon}>
+    <ModalWrapper isActive={isActive} onClose={onClose} icon="../../assets/modalIcons/key.svg">
       <Styles.Row>
         <Styles.Title>Show private key</Styles.Title>
         {privateKey ? (
