@@ -6,6 +6,7 @@ type TListItemProps = {
 
 const Wrapper = styled.div`
   height: 600px;
+  overflow: hidden;
 `
 
 const Container = styled.div`

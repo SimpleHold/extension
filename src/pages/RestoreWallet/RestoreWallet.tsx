@@ -28,7 +28,7 @@ const RestoreWallet: React.FC = () => {
   const [fileName, setFileName] = React.useState<null | string>(null)
   const [backupData, setBackupData] = React.useState<null | string>(null)
   const [activeWallet, setActiveWallet] = React.useState<null | 'enterPassword' | 'error'>(null)
-  const [isAgreed, setIsAgreed] = React.useState<boolean>(false)
+  const [isAgreed, setIsAgreed] = React.useState<boolean>(true)
 
   const onDrop = React.useCallback(async (acceptedFiles) => {
     const text = await acceptedFiles[0]?.text()

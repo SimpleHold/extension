@@ -1,5 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
+import numeral from 'numeral'
 
 // Components
 import Header from '@components/Header'
@@ -67,7 +68,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
               lineHeight: `${balanceLineHeight}px`,
             }}
           >
-            {totalBalance.toFixed(8)} BTC
+            {numeral(totalBalance).format('0.[00000000]')} BTC
           </Styles.BalanceAmount>
         )}
         {totalEstimated === null ? (

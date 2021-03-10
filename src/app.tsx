@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-dom'
-import { Route, RouteProps, MemoryRouter as Router } from 'react-router-dom'
-import { AnimatedSwitch } from 'react-router-transition'
+import { Route, RouteProps, MemoryRouter as Router, Switch } from 'react-router-dom'
 
 import routes from './routes'
 import GlobalStyles from './styles/global'
@@ -11,21 +10,6 @@ import { FIRST_ENTER, SESSION_START } from '@config/events'
 
 import { validateWallet } from '@utils/validate'
 import { init, logEvent } from '@utils/amplitude'
-
-const bounceTransition = {
-  atEnter: {
-    opacity: 1,
-    scale: 1,
-  },
-  atLeave: {
-    opacity: 1,
-    scale: 1,
-  },
-  atActive: {
-    opacity: 1,
-    scale: 1,
-  },
-}
 
 const App: React.FC = () => {
   React.useEffect(() => {
@@ -66,11 +50,11 @@ const App: React.FC = () => {
     <>
       <GlobalStyles />
       <Router initialEntries={[getInitialPage()]}>
-        <AnimatedSwitch {...bounceTransition}>
+        <Switch>
           {routes.map((route: RouteProps, index: number) => (
             <Route key={index} path={route.path} component={route.component} />
           ))}
-        </AnimatedSwitch>
+        </Switch>
       </Router>
     </>
   )

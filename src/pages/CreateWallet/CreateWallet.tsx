@@ -23,7 +23,7 @@ const Wallets: React.FC = () => {
 
   const [password, setPassword] = React.useState<string>('')
   const [confirmPassword, setConfirmPassword] = React.useState<string>('')
-  const [isAgreed, setIsAgreed] = React.useState<boolean>(false)
+  const [isAgreed, setIsAgreed] = React.useState<boolean>(true)
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
   const [confirmPasswordErrorLabel, setConfirmPasswordErrorLabel] = React.useState<null | string>(
     null

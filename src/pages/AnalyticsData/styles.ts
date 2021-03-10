@@ -7,12 +7,18 @@ type TListProps = {
 const Wrapper = styled.div`
   height: 600px;
   background-color: #ffffff;
+  overflow: hidden;
 `
 
 const Container = styled.div`
   padding: 30px;
   height: 540px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `
+
+const Row = styled.div``
 
 const Title = styled.p`
   margin: 0;
@@ -103,6 +109,7 @@ const Actions = styled.div`
 const Styles = {
   Wrapper,
   Container,
+  Row,
   Title,
   Description,
   ListTitle,

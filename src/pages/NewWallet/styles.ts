@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   height: 600px;
+  overflow: hidden;
 `
 
 const Container = styled.div`
