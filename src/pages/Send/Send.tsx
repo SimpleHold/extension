@@ -274,9 +274,15 @@ const Send: React.FC = () => {
             {isNetworkFeeLoading ? (
               <Spinner ml={10} />
             ) : (
-              <Styles.NetworkFee>
-                {networkFee} {toUpper(symbol)}
-              </Styles.NetworkFee>
+              <>
+                {networkFee === 0 ? (
+                  <Styles.NetworkFee>-</Styles.NetworkFee>
+                ) : (
+                  <Styles.NetworkFee>
+                    {networkFee} {toUpper(symbol)}
+                  </Styles.NetworkFee>
+                )}
+              </>
             )}
           </Styles.NetworkFeeBlock>
 

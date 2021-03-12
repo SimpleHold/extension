@@ -191,7 +191,7 @@ const Receive: React.FC = () => {
             {estimated !== null ? (
               <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
             ) : (
-              <Skeleton width={130} height={23} mt={11} type="gray" />
+              <Skeleton width={130} height={23} mt={5} type="gray" />
             )}
           </Styles.Row>
           <Styles.ReceiveBlock>

@@ -52,14 +52,24 @@ const TextInput: React.FC<Props> = (props) => {
         <Styles.Label>
           {errorLabel && !isFocused && value.length > 0 ? errorLabel : label}
         </Styles.Label>
-        <Styles.Input
-          ref={textInputRef}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          value={value}
-          onChange={onChange}
-          type={type === 'password' && isPasswordVisible ? 'text' : type}
-        />
+        {type === 'number ' ? (
+          <Styles.NumberInput
+            ref={textInputRef}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            value={value}
+            onChange={onChange}
+          />
+        ) : (
+          <Styles.Input
+            ref={textInputRef}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            value={value}
+            onChange={onChange}
+            type={type === 'password' && isPasswordVisible ? 'text' : type}
+          />
+        )}
       </Styles.Row>
       {withPasswordVisible ? (
         <Styles.VisibleInput

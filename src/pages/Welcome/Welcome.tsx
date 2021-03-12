@@ -73,8 +73,11 @@ const Wallets: React.FC = () => {
           </Styles.Action>
         </Styles.WalletActions>
 
-        <Link to="https://simplehold.io/how-it-works" title="How it works?" mt={41} />
-        <Link to="https://simplehold.io" title="Want to migrate from another wallet?" mt={10} />
+        <Link
+          to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
+          title="How it works?"
+          mt={41}
+        />
       </Styles.Container>
     </Styles.Wrapper>
   )

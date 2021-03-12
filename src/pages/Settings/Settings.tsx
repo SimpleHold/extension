@@ -79,7 +79,7 @@ const Settings: React.FC = () => {
         width: 16,
         height: 16,
       },
-      onClick: () => openWebPage('https://simplehold.io/support'),
+      onClick: () => openWebPage('https://simplehold.io/about'),
     },
   ]
 

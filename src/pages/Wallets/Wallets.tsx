@@ -1,16 +1,17 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
+import SVG from 'react-inlinesvg'
+import numeral from 'numeral'
 
 // Components
-import CollapsibleHeader from '@components/CollapsibleHeader'
+import Header from '@components/Header'
 import WalletCard from '@components/WalletCard'
-
-// Hooks
-import useScroll from '@hooks/useScroll'
+import Skeleton from '@components/Skeleton'
 
 // Utils
 import { IWallet, getWallets } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
+import { price } from '@utils/format'
 
 // Config
 import { ADD_ADDRESS, BALANCE_CHANGED } from '@config/events'
@@ -20,8 +21,6 @@ import Styles from './styles'
 
 const Wallets: React.FC = () => {
   const history = useHistory()
-  const { scrollPosition } = useScroll()
-
   const [wallets, setWallets] = React.useState<null | IWallet[]>(null)
   const [totalBalance, setTotalBalance] = React.useState<number | null>(null)
   const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
@@ -66,6 +65,9 @@ const Wallets: React.FC = () => {
 
     if (walletsList) {
       setWallets(walletsList)
+    } else {
+      localStorage.clear()
+      history.push('/welcome')
     }
   }
 
@@ -87,29 +89,56 @@ const Wallets: React.FC = () => {
 
   return (
     <Styles.Wrapper>
-      <CollapsibleHeader
-        scrollPosition={scrollPosition}
-        totalBalance={totalBalance}
-        totalEstimated={totalEstimated}
-        onAddNewAddress={onAddNewAddress}
-      />
-      {wallets?.length ? (
-        <Styles.WalletsList style={{ zIndex: scrollPosition > 200 ? 1 : 3 }}>
-          {wallets.map((wallet: IWallet) => {
-            const { address, symbol } = wallet
+      <Styles.Row>
+        <Styles.Cover>
+          <Header />
 
-            return (
-              <WalletCard
-                key={address}
-                address={address}
-                symbol={symbol.toLowerCase()}
-                sumBalance={sumBalance}
-                sumEstimated={sumEstimated}
+          <Styles.Balances>
+            <Styles.TotalBalanceLabel>Total Balance</Styles.TotalBalanceLabel>
+            {totalBalance === null ? (
+              <Skeleton width={250} height={36} type="light" mt={21} />
+            ) : (
+              <Styles.TotalBalance>
+                {numeral(totalBalance).format('0.[00000000]')} BTC
+              </Styles.TotalBalance>
+            )}
+            {totalEstimated === null ? (
+              <Skeleton width={130} height={23} type="light" mt={11} />
+            ) : (
+              <Styles.TotalEstimated>{`$${price(totalEstimated)} USD`}</Styles.TotalEstimated>
+            )}
+          </Styles.Balances>
+
+          <Styles.AddWalletBlock>
+            <Styles.WalletsLabel>Wallets</Styles.WalletsLabel>
+            <Styles.AddWalletButton onClick={onAddNewAddress}>
+              <SVG
+                src="../../assets/icons/plus.svg"
+                width={16}
+                height={16}
+                title="Add new wallet"
               />
-            )
-          })}
-        </Styles.WalletsList>
-      ) : null}
+            </Styles.AddWalletButton>
+          </Styles.AddWalletBlock>
+        </Styles.Cover>
+        {wallets?.length ? (
+          <Styles.WalletsList>
+            {wallets.map((wallet: IWallet) => {
+              const { address, symbol } = wallet
+
+              return (
+                <WalletCard
+                  key={address}
+                  address={address}
+                  symbol={symbol.toLowerCase()}
+                  sumBalance={sumBalance}
+                  sumEstimated={sumEstimated}
+                />
+              )
+            })}
+          </Styles.WalletsList>
+        ) : null}
+      </Styles.Row>
     </Styles.Wrapper>
   )
 }

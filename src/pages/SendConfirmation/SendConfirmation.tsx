@@ -64,7 +64,7 @@ const SendConfirmation: React.FC = () => {
       const decryptBackup = decrypt(backup, password)
 
       if (decryptBackup) {
-        const findWallet: IWallet | null = JSON.parse(decryptBackup).find(
+        const findWallet: IWallet | null = JSON.parse(decryptBackup).wallets.find(
           (wallet: IWallet) => wallet.address === addressFrom
         )
 
@@ -117,6 +117,15 @@ const SendConfirmation: React.FC = () => {
     })
 
     setActiveModal(null)
+  }
+
+  const clearModalStats = (): void => {
+    if (inputErrorLabel) {
+      setInputErrorLabel(null)
+    }
+    if (password) {
+      setPassword('')
+    }
   }
 
   return (
@@ -186,6 +195,7 @@ const SendConfirmation: React.FC = () => {
         }
         isDisabledConfirmButton={!validatePassword(password)}
         onConfirm={onConfirmModal}
+        clearState={clearModalStats}
       />
 
       <SuccessSendModal

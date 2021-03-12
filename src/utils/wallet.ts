@@ -1,5 +1,4 @@
 import { validateWallet } from '@utils/validate'
-import { v4 } from 'uuid'
 
 export interface IWallet {
   symbol: string
@@ -57,28 +56,7 @@ export const checkExistWallet = (address: string): boolean => {
   return false
 }
 
-export const getWalletsFromBackup = (backup: string): string | null => {
-  const parsebackup = JSON.parse(backup)
-
-  if (parsebackup) {
-    const validateWallets = validateWallet(backup)
-
-    if (validateWallets) {
-      return parsebackup.wallets.map((wallet: IWallet) => {
-        const { symbol, balance = 0, address } = wallet
-        return {
-          symbol,
-          balance,
-          address,
-        }
-      })
-    }
-  }
-
-  return null
-}
-
-export const addNew = (privateKey: string, address: string, symbol: string) => {
+export const addNew = (address: string, symbol: string, uuid: string): string | null => {
   const walletsList = localStorage.getItem('wallets')
   const validateWallets = validateWallet(walletsList)
 
@@ -88,8 +66,7 @@ export const addNew = (privateKey: string, address: string, symbol: string) => {
     parseWallets.push({
       symbol,
       address,
-      uuid: v4(),
-      privateKey,
+      uuid,
     })
 
     return JSON.stringify(parseWallets)

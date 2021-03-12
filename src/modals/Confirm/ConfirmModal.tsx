@@ -5,6 +5,9 @@ import ModalWrapper from '@components/ModalWrapper'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
+// Hooks
+import usePrevious from '@hooks/usePrevious'
+
 // Styles
 import Styles from './styles'
 
@@ -19,6 +22,7 @@ interface Props {
   inputErrorLabel: null | string
   onChangeInput: (event: React.ChangeEvent<HTMLInputElement>) => void
   isDisabledConfirmButton: boolean
+  clearState: () => void
 }
 
 const ConfirmModal: React.FC<Props> = (props) => {
@@ -33,7 +37,16 @@ const ConfirmModal: React.FC<Props> = (props) => {
     inputErrorLabel,
     onChangeInput,
     isDisabledConfirmButton,
+    clearState,
   } = props
+
+  const prevModalState = usePrevious(isActive)
+
+  React.useEffect(() => {
+    if (isActive && !prevModalState && clearState) {
+      clearState()
+    }
+  }, [isActive, prevModalState])
 
   return (
     <ModalWrapper isActive={isActive} onClose={onClose} icon="../../assets/modalIcons/confirm.svg">

@@ -11,6 +11,8 @@ import AgreeTerms from '@components/AgreeTerms'
 // Utils
 import { validatePassword } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
+import { generate } from '@utils/backup'
+import { encrypt } from '@utils/crypto'
 
 // Config
 import { START_PASSWORD } from '@config/events'
@@ -36,9 +38,14 @@ const Wallets: React.FC = () => {
       name: START_PASSWORD,
     })
 
-    history.push('/download-backup', {
-      password,
-    })
+    const { address, privateKey } = window.generateWallet()
+    const { backup, wallets } = generate(address, privateKey)
+    console.log('backup', backup)
+    console.log('wallets', wallets)
+    localStorage.setItem('backup', encrypt(backup, password))
+    localStorage.setItem('wallets', wallets)
+
+    history.push('/download-backup')
   }
 
   const onBlurPassword = (): void => {
@@ -66,12 +73,16 @@ const Wallets: React.FC = () => {
       <Header noActions logoColor="#3FBB7D" withBorder />
       <Styles.Container>
         <Styles.Row>
-          <Styles.Title>Сreate password</Styles.Title>
+          <Styles.Title>Create password</Styles.Title>
           <Styles.Description>
             The password needs to encrypt your private keys. We dont have access to your keys, so be
             careful.
           </Styles.Description>
-          <Link title="How it works?" to="https://simplehold.io" mt={44} />
+          <Link
+            title="How it works?"
+            to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
+            mt={44}
+          />
         </Styles.Row>
         <Styles.Form>
           <TextInput

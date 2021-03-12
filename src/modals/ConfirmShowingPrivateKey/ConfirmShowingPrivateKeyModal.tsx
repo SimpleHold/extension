@@ -10,6 +10,9 @@ import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { validatePassword } from '@utils/validate'
 
+// Hooks
+import usePrevious from '@hooks/usePrevious'
+
 // Styles
 import Styles from './styles'
 
@@ -25,6 +28,23 @@ const ConfirmShowingPrivateKeyModal: React.FC<Props> = (props) => {
 
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+
+  const prevModalState = usePrevious(isActive)
+
+  React.useEffect(() => {
+    if (isActive && !prevModalState) {
+      clearState()
+    }
+  }, [isActive, prevModalState])
+
+  const clearState = (): void => {
+    if (password?.length) {
+      setPassword('')
+    }
+    if (errorLabel) {
+      setErrorLabel(null)
+    }
+  }
 
   const onConfirm = (): void => {
     if (errorLabel) {

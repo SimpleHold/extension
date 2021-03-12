@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import NumberFormat from 'react-number-format'
 
 import eyeIcon from '@assets/icons/eye.svg'
 import eyeVisibleIcon from '@assets/icons/eyeVisible.svg'
@@ -91,6 +92,18 @@ const EyeIcon = styled.div`
     `url(${isVisible ? eyeVisibleIcon : eyeIcon})`};
 `
 
+const NumberInput = styled(NumberFormat)`
+  margin: 5px 0 0 0;
+  padding: 0;
+  border: none;
+  height: 0;
+  outline: none;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
+`
+
 const Styles = {
   Container,
   Row,
@@ -98,6 +111,7 @@ const Styles = {
   Input,
   VisibleInput,
   EyeIcon,
+  NumberInput,
 }
 
 export default Styles

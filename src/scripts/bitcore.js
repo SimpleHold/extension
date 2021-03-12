@@ -16,7 +16,7 @@ function createTransaction(outputs, to, amount, fee, changeAddress, privateKey) 
       raw: transaction.serialize(),
       hash: transaction.hash,
     }
-  } catch (err) {
+  } catch {
     return null
   }
 }

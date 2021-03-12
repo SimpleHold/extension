@@ -24,14 +24,17 @@ const NewWallet: React.FC = () => {
 
   const history = useHistory()
 
-  const onSuccess = (): void => {
+  const onSuccess = (password: string): void => {
     logEvent({
       name: ADD_ADDRESS_CONFIRM,
     })
 
     setActiveModal(null)
     setPrivateKey(null)
-    history.goBack()
+    history.push('/download-backup', {
+      password,
+      from: 'newWallet',
+    })
   }
 
   const onGenerateAddress = (): void => {

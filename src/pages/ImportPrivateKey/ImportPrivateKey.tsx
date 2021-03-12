@@ -48,9 +48,13 @@ const ImportPrivateKey: React.FC = () => {
     return setErrorLabel('Invalid private key')
   }
 
-  const onSuccess = (): void => {
+  const onSuccess = (password: string): void => {
     setActiveModal(null)
-    history.goBack()
+
+    history.push('/download-backup', {
+      password,
+      from: 'privateKey',
+    })
   }
 
   return (
@@ -65,7 +69,11 @@ const ImportPrivateKey: React.FC = () => {
               The password needs to encrypt your private keys. We dont have access to your keys, so
               be careful.
             </Styles.Description>
-            <Link to="https://simplehold.io/how-it-works" title="How it works?" mt={30} />
+            <Link
+              to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
+              title="How it works?"
+              mt={30}
+            />
           </Styles.Heading>
           <Styles.Form>
             <TextInput

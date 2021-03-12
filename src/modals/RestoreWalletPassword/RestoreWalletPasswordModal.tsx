@@ -7,11 +7,15 @@ import Button from '@components/Button'
 
 // Utils
 import { decrypt } from '@utils/crypto'
-import { validateWallet, validatePassword } from '@utils/validate'
+import { validatePassword } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
+import { validate as validateBackup } from '@utils/backup'
 
 // Config
 import { START_RESTORE_PASSWORD } from '@config/events'
+
+// Hooks
+import usePrevious from '@hooks/usePrevious'
 
 // Styles
 import Styles from './styles'
@@ -29,6 +33,23 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
 
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+
+  const prevModalState = usePrevious(isActive)
+
+  React.useEffect(() => {
+    if (isActive && !prevModalState) {
+      clearState()
+    }
+  }, [isActive, prevModalState])
+
+  const clearState = (): void => {
+    if (password?.length) {
+      setPassword('')
+    }
+    if (errorLabel) {
+      setErrorLabel(null)
+    }
+  }
 
   const onConfirm = (): void => {
     logEvent({
@@ -49,11 +70,11 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
       if (decryptBackup === null) {
         setErrorLabel('Password is not valid')
       } else {
-        const validateFile = validateWallet(decryptBackup)
+        const getWalletsList = validateBackup(decryptBackup)
 
-        if (validateFile) {
+        if (getWalletsList) {
           localStorage.setItem('backup', backupData)
-          localStorage.setItem('wallets', decryptBackup)
+          localStorage.setItem('wallets', getWalletsList)
           onSuccess()
         } else {
           onError()
@@ -65,7 +86,7 @@ const RestoreWalletPasswordModal: React.FC<Props> = (props) => {
   return (
     <ModalWrapper isActive={isActive} onClose={onClose} icon="../../assets/modalIcons/confirm.svg">
       <Styles.Row>
-        <Styles.Title>Confirm adding new address</Styles.Title>
+        <Styles.Title>Enter your password to restore wallet</Styles.Title>
         <Styles.Form>
           <TextInput
             label="Enter password"
