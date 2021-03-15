@@ -60,6 +60,10 @@ const Settings: React.FC = () => {
     return browser.tabs.create({ url })
   }
 
+  const togglePasscode = (): void => {
+    history.push('/set-passcode')
+  }
+
   const list: List[] = [
     {
       isButton: true,
@@ -70,6 +74,13 @@ const Settings: React.FC = () => {
         height: 14,
       },
       onClick: onDownloadBackup,
+    },
+    {
+      title: 'Use passcode',
+      text: 'Use passcode instead of password to easily hide extension data from other people',
+      withSwitch: true,
+      switchValue: true,
+      onToggle: togglePasscode,
     },
     {
       isButton: true,

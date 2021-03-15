@@ -1,4 +1,4 @@
-import { AES, enc } from 'crypto-js'
+import { AES, enc, SHA256 } from 'crypto-js'
 
 export const encrypt = (message: string, key: string): string => {
   return AES.encrypt(message, key).toString()
@@ -11,4 +11,8 @@ export const decrypt = (message: string, key: string): string | null => {
   } catch {
     return null
   }
+}
+
+export const sha256hash = (message: string): string => {
+  return SHA256(message).toString()
 }

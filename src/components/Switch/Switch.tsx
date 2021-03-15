@@ -5,13 +5,13 @@ import Styles from './styles'
 
 interface Props {
   value: boolean
-  onToggle: Function
+  onToggle: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
 }
 
 const Switch: React.FC<Props> = (props) => {
   const { value, onToggle } = props
 
-  return <Styles.Container />
+  return <Styles.Container onClick={onToggle} />
 }
 
 export default Switch
