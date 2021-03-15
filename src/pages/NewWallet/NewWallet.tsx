@@ -31,6 +31,7 @@ const NewWallet: React.FC = () => {
 
     setActiveModal(null)
     setPrivateKey(null)
+    localStorage.setItem('backupStatus', 'notDownloaded')
     history.push('/download-backup', {
       password,
       from: 'newWallet',

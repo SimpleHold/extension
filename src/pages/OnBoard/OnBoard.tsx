@@ -31,7 +31,7 @@ const OnBoard: React.FC = () => {
   const steps = [
     {
       image: illustrate1,
-      title: 'Hello',
+      title: 'Hello!',
       description:
         'Welcome to new crypto wallet from SimpleSwap! Take a little tour before you can start',
     },

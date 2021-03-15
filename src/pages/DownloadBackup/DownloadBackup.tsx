@@ -42,6 +42,7 @@ const DownloadBackup: React.FC = () => {
     const backup = localStorage.getItem('backup')
     if (backup) {
       downloadBackup(backup)
+      localStorage.removeItem('backupStatus')
       history.push('/wallets')
     }
   }

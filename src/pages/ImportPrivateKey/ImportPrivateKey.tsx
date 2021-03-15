@@ -50,6 +50,7 @@ const ImportPrivateKey: React.FC = () => {
 
   const onSuccess = (password: string): void => {
     setActiveModal(null)
+    localStorage.setItem('backupStatus', 'notDownloaded')
 
     history.push('/download-backup', {
       password,

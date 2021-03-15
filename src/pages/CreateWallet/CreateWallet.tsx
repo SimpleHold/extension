@@ -44,6 +44,7 @@ const Wallets: React.FC = () => {
     console.log('wallets', wallets)
     localStorage.setItem('backup', encrypt(backup, password))
     localStorage.setItem('wallets', wallets)
+    localStorage.setItem('backupStatus', 'notDownloaded')
 
     history.push('/download-backup')
   }

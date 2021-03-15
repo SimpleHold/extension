@@ -42,6 +42,10 @@ const App: React.FC = () => {
       return '/analytics-data'
     }
 
+    if (localStorage.getItem('backupStatus') === 'notDownloaded') {
+      return '/download-backup'
+    }
+
     const validateWallets = validateWallet(localStorage.getItem('wallets'))
     return validateWallets ? '/wallets' : '/welcome'
   }

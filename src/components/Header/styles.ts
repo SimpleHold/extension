@@ -105,8 +105,8 @@ const BackIconRow = styled.div`
 const NavigateTitle = styled.p`
   margin: 0;
   font-weight: 500;
-  font-size: 12px;
-  line-height: 14px;
+  font-size: 14px;
+  line-height: 16px;
   color: #ffffff;
   opacity: 0.6;
 `
