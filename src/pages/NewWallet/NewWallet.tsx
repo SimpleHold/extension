@@ -64,8 +64,8 @@ const NewWallet: React.FC = () => {
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
-            The password needs to encrypt your private keys. We dont have access to your keys, so be
-            careful.
+            You can generate new address or import private key to add address you already use. Enter
+            your password to keep your backup up-to-date and encrypted.
           </Styles.Description>
 
           <Styles.Actions>
