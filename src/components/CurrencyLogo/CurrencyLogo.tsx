@@ -9,16 +9,17 @@ interface Props {
   width: number
   height: number
   symbol: string
+  br?: number
 }
 
 const CurrencyLogo: React.FC<Props> = (props) => {
-  const { width, height, symbol } = props
+  const { width, height, symbol, br } = props
 
   const currency = getCurrency(symbol)
 
   if (currency) {
     return (
-      <Styles.Container width={width} height={height}>
+      <Styles.Container width={width} height={height} background={currency.background} br={br}>
         <Styles.Logo source={currency.logo} />
       </Styles.Container>
     )

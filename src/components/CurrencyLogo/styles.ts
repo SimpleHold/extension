@@ -3,6 +3,8 @@ import styled from 'styled-components'
 type TContainerProps = {
   width: number
   height: number
+  background: string
+  br?: number
 }
 
 type TLogoProps = {
@@ -12,8 +14,8 @@ type TLogoProps = {
 const Container = styled.div`
   width: ${({ width }: TContainerProps) => `${width}px`};
   height: ${({ height }: TContainerProps) => `${height}px`};
-  background: #f7931a33;
-  border-radius: 5px;
+  background-color: ${({ background }: TContainerProps) => background};
+  border-radius: ${({ br }: TContainerProps) => (br ? `${br}px` : '5px')};
   display: flex;
   align-items: center;
   justify-content: center;
