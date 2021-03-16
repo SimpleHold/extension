@@ -16,6 +16,7 @@ import ImportPrivateKeyPage from './pages/ImportPrivateKey'
 import OnBoardPage from './pages/OnBoard'
 import LockPage from './pages/Lock'
 import SetPasscodePage from './pages/SetPasscode'
+import SelectCurrency from './pages/SelectCurrency'
 
 const routers: RouteProps[] = [
   {
@@ -77,6 +78,10 @@ const routers: RouteProps[] = [
   {
     path: '/set-passcode',
     component: SetPasscodePage,
+  },
+  {
+    path: '/select-currency',
+    component: SelectCurrency,
   },
 ]
 

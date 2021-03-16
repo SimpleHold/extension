@@ -19,6 +19,7 @@ const Container = styled.div`
   top: 0;
   left: 0;
   transform: scale(0);
+  z-index: 3;
 
   &.active {
     transform: scale(1);

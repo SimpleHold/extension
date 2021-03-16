@@ -46,16 +46,18 @@ const WalletCard: React.FC<Props> = (props) => {
   }, [balance])
 
   const fetchBalance = async (): Promise<void> => {
-    const tryGetBalance = await getBalance(address)
+    if (currency) {
+      const tryGetBalance = await getBalance(address, currency?.chain)
 
-    if (tryGetBalance === null) {
-      const latestbalance = getLatestBalance(address)
-      setBalance(latestbalance)
-      sumBalance(latestbalance)
-    } else {
-      setBalance(tryGetBalance)
-      sumBalance(tryGetBalance)
-      updateBalance(address, tryGetBalance)
+      if (tryGetBalance === null) {
+        const latestbalance = getLatestBalance(address)
+        setBalance(latestbalance)
+        sumBalance(latestbalance)
+      } else {
+        setBalance(tryGetBalance)
+        sumBalance(tryGetBalance)
+        updateBalance(address, tryGetBalance)
+      }
     }
   }
 
@@ -84,17 +86,12 @@ const WalletCard: React.FC<Props> = (props) => {
           <Styles.Address>{address}</Styles.Address>
         </Styles.AddressInfo>
         <Styles.Balances>
-          {balance !== null ? (
+          <Skeleton width={106} height={16} type="gray" br={4} isLoading={balance === null}>
             <Styles.Balance>{`${limitBalance(balance, 10)} ${toUpper(symbol)}`}</Styles.Balance>
-          ) : (
-            <Skeleton width={106} height={16} type="gray" br={4} />
-          )}
-
-          {estimated !== null ? (
+          </Skeleton>
+          <Skeleton width={80} height={14} type="gray" mt={9} br={4} isLoading={estimated === null}>
             <Styles.Estimated>{`$${numberFriendly(estimated)} USD`}</Styles.Estimated>
-          ) : (
-            <Skeleton width={80} height={14} type="gray" mt={9} br={4} />
-          )}
+          </Skeleton>
         </Styles.Balances>
       </Styles.Row>
     </Styles.Container>

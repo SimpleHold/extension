@@ -14,6 +14,9 @@ import { addNew as addNewWallet } from '@utils/wallet'
 // Hooks
 import usePrevious from '@hooks/usePrevious'
 
+// Utils
+import { importAddress } from '@utils/bitcoin'
+
 // Styles
 import Styles from './styles'
 
@@ -22,10 +25,12 @@ interface Props {
   onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   privateKey: string | null
   onSuccess: (password: string) => void
+  symbol: string
+  provider: any
 }
 
 const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
-  const { isActive, onClose, privateKey, onSuccess } = props
+  const { isActive, onClose, privateKey, onSuccess, symbol, provider } = props
 
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
@@ -54,17 +59,21 @@ const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
       if (backup && privateKey) {
         const decryptBackup = decrypt(backup, password)
 
-        if (decryptBackup && validateBitcoinPrivateKey(privateKey)) {
+        // && validateBitcoinPrivateKey(privateKey)
+        if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
 
-          const address = window.importAddress(privateKey)
+          const address = importAddress(provider, privateKey)
+
+          console.log('address', address)
+          console.log('symbol', symbol)
 
           if (address) {
             const uuid = v4()
-            const newWalletsList = addNewWallet(address, 'btc', uuid)
+            const newWalletsList = addNewWallet(address, symbol, uuid)
 
             parseBackup.wallets.push({
-              symbol: 'btc',
+              symbol,
               address,
               uuid,
               privateKey,

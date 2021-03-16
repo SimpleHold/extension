@@ -1,5 +1,9 @@
 declare module '*.png'
 declare module '*.svg'
+declare module 'litecore-lib'
+declare module '@dashevo/dashcore-lib'
+declare module 'bitcore-lib-doge'
+declare module 'bitcore-lib-cash'
 
 interface Window {
   createTransaction: any
@@ -11,4 +15,5 @@ interface Window {
     address: string
     privateKey: string
   }
+  dashcore: any
 }

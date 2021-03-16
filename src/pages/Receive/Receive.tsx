@@ -82,7 +82,7 @@ const Receive: React.FC = () => {
   }
 
   const loadBalance = async (): Promise<void> => {
-    const fetchBalance = await getBalance(address)
+    const fetchBalance = await getBalance(address, 'bitcoin') // Fix me
     setBalance(fetchBalance)
 
     if (fetchBalance === null) {
@@ -181,18 +181,16 @@ const Receive: React.FC = () => {
               <CurrencyLogo symbol={symbol} width={22} height={22} />
               <Styles.CurrencyName>{currency}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
-            {balance !== null ? (
+
+            <Skeleton width={250} height={36} mt={10} type="gray" isLoading={balance === null}>
               <Styles.Balance>
                 {limitBalance(balance, 12)} {toUpper(symbol)}
               </Styles.Balance>
-            ) : (
-              <Skeleton width={250} height={36} mt={10} type="gray" />
-            )}
-            {estimated !== null ? (
+            </Skeleton>
+
+            <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
               <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
-            ) : (
-              <Skeleton width={130} height={23} mt={5} type="gray" />
-            )}
+            </Skeleton>
           </Styles.Row>
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />

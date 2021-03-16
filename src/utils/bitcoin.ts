@@ -24,12 +24,12 @@ export interface IBitcoreUnspentOutput {
   satoshis: number
 }
 
-export const getBalance = (address: string): Promise<number> | number | null => {
+export const getBalance = (address: string, chain: string): Promise<number> | number | null => {
   try {
-    return fetch(`https://blockchain.info/balance?active=${address}`)
+    return fetch(`http://localhost:8080/wallet/balance/${chain}/${address}`)
       .then((response) => response.json())
       .then((data) => {
-        return data[address].final_balance / 100000000
+        return data?.data?.balance || 0
       })
   } catch {
     return null
@@ -94,3 +94,56 @@ export const getFees = async (): Promise<number> => {
     return 0
   }
 }
+
+export const generateWallet = (provider: any) => {
+  const privateKey = new provider.PrivateKey()
+
+  return {
+    address: privateKey.toAddress().toString(),
+    privateKey: privateKey.toWIF(),
+  }
+}
+
+export const importAddress = (provider: any, privateKey: string) => {
+  try {
+    return new provider.PrivateKey(privateKey).toAddress().toString()
+  } catch {
+    return null
+  }
+}
+
+// const { Transaction, Unit, PrivateKey } = require('bitcore-lib')
+
+// function createTransaction(outputs, to, amount, fee, changeAddress, privateKey) {
+//   try {
+//     const transaction = new Transaction()
+//       .from(outputs)
+//       .to(to, amount)
+//       .fee(fee)
+//       .change(changeAddress)
+//       .sign(privateKey)
+
+//     return {
+//       raw: transaction.serialize(),
+//       hash: transaction.hash,
+//     }
+//   } catch {
+//     return null
+//   }
+// }
+
+// function getTransactionSize(outputs) {
+//   try {
+//     return new Transaction().from(outputs).toString().length
+//   } catch (err) {
+//     return 0
+//   }
+// }
+
+// function btcToSat(value) {
+//   return Unit.fromBTC(value).toSatoshis()
+// }
+
+// function satToBtc(value) {
+//   return Unit.fromSatoshis(value).toBTC()
+// }

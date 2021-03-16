@@ -9,12 +9,18 @@ interface Props {
   height: number
   mt?: number
   br?: number
+  isLoading: boolean
+  children: React.ReactElement<any, any> | null
 }
 
 const Skeleton: React.FC<Props> = (props) => {
-  const { type, width, height, mt, br = 5 } = props
+  const { type, width, height, mt, br = 5, isLoading, children } = props
 
-  return <Styles.Container type={type} width={width} height={height} mt={mt} br={br} />
+  if (isLoading) {
+    return <Styles.Container type={type} width={width} height={height} mt={mt} br={br} />
+  }
+
+  return children
 }
 
 export default Skeleton

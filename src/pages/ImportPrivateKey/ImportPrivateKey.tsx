@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 
 // Components
 import Cover from '@components/Cover'
@@ -18,12 +18,20 @@ import { checkExistWallet } from '@utils/wallet'
 // Styles
 import Styles from './styles'
 
+interface LocationState {
+  symbol: string
+  provider: any
+}
+
 const ImportPrivateKey: React.FC = () => {
   const [privateKey, setPrivateKey] = React.useState<string>('')
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
   const history = useHistory()
+  const {
+    state: { symbol, provider },
+  } = useLocation<LocationState>()
 
   const onConfirm = (): void => {
     if (errorLabel) {
@@ -33,7 +41,7 @@ const ImportPrivateKey: React.FC = () => {
     const validate = validateBitcoinPrivateKey(privateKey)
 
     if (validate) {
-      const getAddress = window.importAddress(privateKey)
+      const getAddress = window.importAddress(privateKey) // Fix me
 
       if (getAddress) {
         const checkExist = checkExistWallet(getAddress)
@@ -97,6 +105,8 @@ const ImportPrivateKey: React.FC = () => {
         onClose={() => setActiveModal(null)}
         privateKey={privateKey}
         onSuccess={onSuccess}
+        symbol={symbol}
+        provider={provider}
       />
     </>
   )

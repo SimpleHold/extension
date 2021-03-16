@@ -76,7 +76,7 @@ const Wallets: React.FC = () => {
       name: ADD_ADDRESS,
     })
 
-    history.push('/new-wallet')
+    history.push('/select-currency')
   }
 
   const sumBalance = (amount: number) => {
@@ -95,18 +95,26 @@ const Wallets: React.FC = () => {
 
           <Styles.Balances>
             <Styles.TotalBalanceLabel>Total Balance</Styles.TotalBalanceLabel>
-            {totalBalance === null ? (
-              <Skeleton width={250} height={36} type="light" mt={21} />
-            ) : (
+            <Skeleton
+              width={250}
+              height={36}
+              type="light"
+              mt={21}
+              isLoading={totalBalance === null}
+            >
               <Styles.TotalBalance>
                 {numeral(totalBalance).format('0.[00000000]')} BTC
               </Styles.TotalBalance>
-            )}
-            {totalEstimated === null ? (
-              <Skeleton width={130} height={23} type="light" mt={11} />
-            ) : (
+            </Skeleton>
+            <Skeleton
+              width={130}
+              height={23}
+              type="light"
+              mt={11}
+              isLoading={totalEstimated === null}
+            >
               <Styles.TotalEstimated>{`$${price(totalEstimated)} USD`}</Styles.TotalEstimated>
-            )}
+            </Skeleton>
           </Styles.Balances>
 
           <Styles.AddWalletBlock>

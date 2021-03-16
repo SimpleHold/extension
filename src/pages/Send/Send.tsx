@@ -127,7 +127,7 @@ const Send: React.FC = () => {
     setBalance(null)
     setEstimated(null)
 
-    const fetchBalance = await getBalance(selectedAddress)
+    const fetchBalance = await getBalance(selectedAddress, 'bitcoin') // Fix me
 
     if (fetchBalance === null) {
       const latestbalance = getLatestBalance(address)
@@ -232,17 +232,12 @@ const Send: React.FC = () => {
       <Styles.Container>
         <Styles.Row>
           <Styles.PageTitle>Send</Styles.PageTitle>
-          {balance !== null ? (
+          <Skeleton width={250} height={42} type="gray" mt={21} isLoading={balance === null}>
             <Styles.Balance>{`${balance} ${toUpper(symbol)}`}</Styles.Balance>
-          ) : (
-            <Skeleton width={250} height={42} type="gray" mt={21} />
-          )}
-
-          {estimated !== null ? (
+          </Skeleton>
+          <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
             <Styles.USDEstimated>{`$${price(estimated, 2)} USD`}</Styles.USDEstimated>
-          ) : (
-            <Skeleton width={130} height={23} mt={5} type="gray" />
-          )}
+          </Skeleton>
         </Styles.Row>
         <Styles.Form>
           {addresses?.length ? (

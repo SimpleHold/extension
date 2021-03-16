@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
 
 // Components
@@ -11,6 +11,7 @@ import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 
 // Utils
 import { logEvent } from '@utils/amplitude'
+import { generateWallet } from '@utils/bitcoin'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
@@ -18,11 +19,19 @@ import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@
 // Styles
 import Styles from './styles'
 
+interface LocationState {
+  symbol: string
+  provider: any
+}
+
 const NewWallet: React.FC = () => {
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
 
   const history = useHistory()
+  const {
+    state: { symbol, provider },
+  } = useLocation<LocationState>()
 
   const onSuccess = (password: string): void => {
     logEvent({
@@ -43,7 +52,8 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const { privateKey: walletPrivateKey } = window.generateWallet()
+    const { privateKey: walletPrivateKey } = generateWallet(provider)
+
     setPrivateKey(walletPrivateKey)
     setActiveModal('confirmAddAddress')
   }
@@ -53,7 +63,10 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_IMPORT,
     })
 
-    history.push('/import-private-key')
+    history.push('/import-private-key', {
+      symbol,
+      provider,
+    })
   }
 
   return (
@@ -99,6 +112,8 @@ const NewWallet: React.FC = () => {
         onClose={() => setActiveModal(null)}
         privateKey={privateKey}
         onSuccess={onSuccess}
+        symbol={symbol}
+        provider={provider}
       />
     </>
   )
