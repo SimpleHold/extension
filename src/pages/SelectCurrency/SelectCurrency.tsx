@@ -19,11 +19,17 @@ import Styles from './styles'
 const Receive: React.FC = () => {
   const history = useHistory()
 
-  const onAddAddress = (symbol: string, provider: any): void => {
-    history.push('/new-wallet', {
-      symbol,
-      provider,
-    })
+  const [selectedCurrency, setSelectedCurrency] = React.useState<null | ICurrency>(null)
+
+  const onAddAddress = (): void => {
+    if (selectedCurrency) {
+      const { symbol, provider } = selectedCurrency
+
+      history.push('/new-wallet', {
+        symbol,
+        provider,
+      })
+    }
   }
 
   return (
@@ -35,10 +41,15 @@ const Receive: React.FC = () => {
           <Styles.Title>Select currency</Styles.Title>
           <Styles.CurrenciesList>
             {currencies.map((currency: ICurrency) => {
-              const { name, symbol, provider } = currency
+              const { name, symbol } = currency
+              const isActive = selectedCurrency?.symbol === symbol
 
               return (
-                <Styles.CurrencyBlock key={symbol} onClick={() => onAddAddress(symbol, provider)}>
+                <Styles.CurrencyBlock
+                  key={symbol}
+                  onClick={() => setSelectedCurrency(currency)}
+                  isActive={isActive}
+                >
                   <CurrencyLogo symbol={symbol} width={40} height={40} br={10} />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>
                   <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
@@ -48,7 +59,7 @@ const Receive: React.FC = () => {
           </Styles.CurrenciesList>
         </Styles.Row>
         <Styles.Actions>
-          <Button label="Add address" disabled onClick={onAddAddress} />
+          <Button label="Add address" disabled={!selectedCurrency} onClick={onAddAddress} />
         </Styles.Actions>
       </Styles.Container>
     </Styles.Wrapper>
