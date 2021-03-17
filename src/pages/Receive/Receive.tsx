@@ -21,10 +21,9 @@ import ShowPrivateKeyModal from '@modals/ShowPrivateKey'
 import useVisible from '@hooks/useVisible'
 
 // Utils
-import { getBalance, getEstimated } from '@utils/bitcoin'
+import { getBalance } from '@utils/bitcoin'
 import { limitBalance, price, toUpper } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
-import { getLatestBalance, updateBalance } from '@utils/wallet'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
@@ -40,11 +39,12 @@ interface LocationState {
   currency: string
   symbol: string
   address: string
+  chain: string
 }
 
 const Receive: React.FC = () => {
   const {
-    state: { currency, symbol, address },
+    state: { currency, symbol, address, chain },
   } = useLocation<LocationState>()
 
   const history = useHistory()
@@ -82,26 +82,19 @@ const Receive: React.FC = () => {
   }
 
   const loadBalance = async (): Promise<void> => {
-    const fetchBalance = await getBalance(address, 'bitcoin') // Fix me
-    setBalance(fetchBalance)
+    const fetchBalance = await getBalance(address, chain)
 
-    if (fetchBalance === null) {
-      const latestbalance = getLatestBalance(address)
-
-      if (latestbalance !== 0) {
-        const fetchEstimated = await getEstimated(latestbalance)
-        setEstimated(fetchEstimated)
-      } else {
-        setEstimated(0)
-      }
+    if (fetchBalance) {
+      setBalance(fetchBalance.balance)
+      setEstimated(fetchBalance.usd)
     } else {
-      updateBalance(address, fetchBalance)
-      if (fetchBalance !== 0) {
-        const fetchEstimated = await getEstimated(fetchBalance)
-        setEstimated(fetchEstimated)
-      } else {
-        setEstimated(0)
-      }
+      // const latestbalance = getLatestBalance(address)
+      // if (latestbalance !== 0) {
+      //   const fetchEstimated = await getEstimated(latestbalance)
+      //   setEstimated(fetchEstimated)
+      // } else {
+      //   setEstimated(0)
+      // }
     }
   }
 
@@ -115,7 +108,7 @@ const Receive: React.FC = () => {
     if (index === 0) {
       setActiveModal('confirmShowPrivateKey')
     } else if (index === 1) {
-      openWebPage(`https://blockchair.com/bitcoin/address/${address}`)
+      openWebPage(`https://blockchair.com/${chain}/address/${address}`)
     }
   }
 

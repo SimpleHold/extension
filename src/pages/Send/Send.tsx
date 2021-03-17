@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import { Transaction } from 'bitcore-lib'
 
 // Components
 import Cover from '@components/Cover'
@@ -15,18 +16,19 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
 import {
   getBalance,
-  getEstimated,
+  getTransactionSize,
   getUnspentOutputs,
   getFees,
-  IBitcoreUnspentOutput,
   IUnspentOutput,
+  btcToSat,
+  satToBtc,
 } from '@utils/bitcoin'
 import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
-import { getLatestBalance, updateBalance } from '@utils/wallet'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
+import { getCurrency } from '@config/currencies'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -45,6 +47,8 @@ const Send: React.FC = () => {
     state: { symbol, address: locationAddress },
   } = useLocation<LocationState>()
 
+  const currency = getCurrency(symbol)
+
   const [address, setAddress] = React.useState<string>('')
   const [amount, setAmount] = React.useState<string>('')
   const [addresses, setAddresses] = React.useState<string[]>([])
@@ -55,7 +59,7 @@ const Send: React.FC = () => {
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<IUnspentOutput[]>([])
-  const [utxosList, setUtxosList] = React.useState<IBitcoreUnspentOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<Transaction.UnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
 
   const debounced = useDebounce(amount, 1000)
@@ -86,23 +90,25 @@ const Send: React.FC = () => {
     setUtxosList([])
 
     const sortOutputs = outputs.sort((a, b) => a.value - b.value)
-    const utxos: IBitcoreUnspentOutput[] = []
+    const utxos: Transaction.UnspentOutput[] = []
 
     for (const output of sortOutputs) {
       const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-      const transactionFeeBytes = window.getTransactionSize(utxos) * fee
+      const transactionFeeBytes = getTransactionSize(utxos) * fee
 
-      if (getUtxosValue >= window.btcToSat(Number(amount)) + transactionFeeBytes) {
+      if (getUtxosValue >= btcToSat(Number(amount)) + transactionFeeBytes) {
         break
       }
 
-      utxos.push({
+      const newOutput = new Transaction.UnspentOutput({
         txId: output.tx_hash_big_endian,
-        outputIndex: output.tx_output_n,
-        script: output.script,
-        satoshis: output.value,
+        vout: output.tx_output_n,
         address: selectedAddress,
+        scriptPubKey: output.script,
+        amount: satToBtc(output.value),
       })
+
+      utxos.push(newOutput)
     }
 
     setUtxosList(utxos)
@@ -127,27 +133,21 @@ const Send: React.FC = () => {
     setBalance(null)
     setEstimated(null)
 
-    const fetchBalance = await getBalance(selectedAddress, 'bitcoin') // Fix me
+    if (currency) {
+      const fetchBalance = await getBalance(selectedAddress, currency?.chain)
 
-    if (fetchBalance === null) {
-      const latestbalance = getLatestBalance(address)
-      setBalance(latestbalance)
-
-      if (latestbalance !== 0) {
-        const fetchEstimated = await getEstimated(latestbalance)
-        setEstimated(fetchEstimated)
+      if (fetchBalance) {
+        setBalance(fetchBalance.balance)
+        setEstimated(fetchBalance.usd)
       } else {
-        setEstimated(0)
-      }
-    } else {
-      setBalance(fetchBalance)
-      updateBalance(selectedAddress, fetchBalance)
-
-      if (fetchBalance !== 0) {
-        const fetchEstimated = await getEstimated(fetchBalance)
-        setEstimated(fetchEstimated)
-      } else {
-        setEstimated(0)
+        //   const latestbalance = getLatestBalance(address)
+        // setBalance(latestbalance)
+        // if (latestbalance !== 0) {
+        //   const fetchEstimated = await getEstimated(latestbalance)
+        //   setEstimated(fetchEstimated)
+        // } else {
+        //   setEstimated(0)
+        // }
       }
     }
   }

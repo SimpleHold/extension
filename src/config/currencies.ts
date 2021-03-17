@@ -62,7 +62,7 @@ const currencies: ICurrency[] = [
   {
     name: 'Zcash',
     symbol: 'zec',
-    logo: bitcoinLogo,
+    logo: zcashLogo,
     background: '#FDF1D4',
     chain: 'zcash',
   },

@@ -38,7 +38,7 @@ const Wallets: React.FC = () => {
       name: START_PASSWORD,
     })
 
-    const { address, privateKey } = window.generateWallet()
+    const { address, privateKey } = window.generateWallet() // Fix me
     const { backup, wallets } = generate(address, privateKey)
     console.log('backup', backup)
     console.log('wallets', wallets)

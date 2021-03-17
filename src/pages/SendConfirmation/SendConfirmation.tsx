@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import { Transaction } from 'bitcore-lib'
 
 // Components
 import Cover from '@components/Cover'
@@ -15,7 +16,7 @@ import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { IRawTransaction, IBitcoreUnspentOutput, sendRawTransaction } from '@utils/bitcoin'
+import { IRawTransaction, sendRawTransaction } from '@utils/bitcoin'
 import { logEvent } from '@utils/amplitude'
 
 // Config
@@ -35,7 +36,7 @@ interface LocationState {
   networkFee: number
   addressFrom: string
   addressTo: string
-  outputs: IBitcoreUnspentOutput[]
+  outputs: Transaction.UnspentOutput[]
 }
 
 const SendConfirmation: React.FC = () => {

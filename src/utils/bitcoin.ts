@@ -1,4 +1,5 @@
-import axios from 'axios'
+import { Transaction, Unit } from 'bitcore-lib'
+import axios, { AxiosResponse } from 'axios'
 
 export interface IUnspentOutput {
   tx_hash_big_endian: string
@@ -16,38 +17,27 @@ export interface IRawTransaction {
   raw: string
 }
 
-export interface IBitcoreUnspentOutput {
-  address: string
-  txId: string
-  outputIndex: number
-  script: string
-  satoshis: number
+interface IGetBalance {
+  balance: number
+  usd: number
 }
 
-export const getBalance = (address: string, chain: string): Promise<number> | number | null => {
+export const getBalance = async (address: string, chain: string): Promise<IGetBalance> => {
   try {
-    return fetch(`http://localhost:8080/wallet/balance/${chain}/${address}`)
-      .then((response) => response.json())
-      .then((data) => {
-        return data?.data?.balance || 0
-      })
-  } catch {
-    return null
-  }
-}
+    const { data }: AxiosResponse = await axios(
+      `http://localhost:8080/wallet/balance/${chain}/${address}`
+    )
+    const { balance, usd } = data.data
 
-export const getEstimated = (amount: number): Promise<number> | number => {
-  try {
-    if (amount === 0) {
-      return 0
+    return {
+      balance,
+      usd,
     }
-    return fetch('https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD')
-      .then((response) => response.json())
-      .then((data) => {
-        return data['USD'] * amount
-      })
   } catch {
-    return 0
+    return {
+      balance: 0,
+      usd: 0,
+    }
   }
 }
 
@@ -95,55 +85,43 @@ export const getFees = async (): Promise<number> => {
   }
 }
 
-export const generateWallet = (provider: any) => {
-  const privateKey = new provider.PrivateKey()
-
-  return {
-    address: privateKey.toAddress().toString(),
-    privateKey: privateKey.toWIF(),
-  }
-}
-
-export const importAddress = (provider: any, privateKey: string) => {
+export const createTransaction = (
+  outputs: Transaction.UnspentOutput[],
+  to: string,
+  amount: number,
+  fee: number,
+  changeAddress: string,
+  privateKey: string
+) => {
   try {
-    return new provider.PrivateKey(privateKey).toAddress().toString()
+    const transaction = new Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .fee(fee)
+      .change(changeAddress)
+      .sign(privateKey)
+
+    return {
+      raw: transaction.serialize(),
+      hash: transaction.hash,
+    }
   } catch {
     return null
   }
 }
 
-// const { Transaction, Unit, PrivateKey } = require('bitcore-lib')
+export const getTransactionSize = (outputs: Transaction.UnspentOutput[]) => {
+  try {
+    return new Transaction().from(outputs).toString().length
+  } catch {
+    return 0
+  }
+}
 
-// function createTransaction(outputs, to, amount, fee, changeAddress, privateKey) {
-//   try {
-//     const transaction = new Transaction()
-//       .from(outputs)
-//       .to(to, amount)
-//       .fee(fee)
-//       .change(changeAddress)
-//       .sign(privateKey)
+export const btcToSat = (value: number) => {
+  return Unit.fromBTC(value).toSatoshis()
+}
 
-//     return {
-//       raw: transaction.serialize(),
-//       hash: transaction.hash,
-//     }
-//   } catch {
-//     return null
-//   }
-// }
-
-// function getTransactionSize(outputs) {
-//   try {
-//     return new Transaction().from(outputs).toString().length
-//   } catch (err) {
-//     return 0
-//   }
-// }
-
-// function btcToSat(value) {
-//   return Unit.fromBTC(value).toSatoshis()
-// }
-
-// function satToBtc(value) {
-//   return Unit.fromSatoshis(value).toBTC()
-// }
+export const satToBtc = (value: number) => {
+  return Unit.fromSatoshis(value).toBTC()
+}

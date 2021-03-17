@@ -14,7 +14,7 @@ import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 // Utils
 import { validateBitcoinPrivateKey } from '@utils/validate'
 import { checkExistWallet } from '@utils/wallet'
-import { TSymbols } from '@utils/address'
+import address, { TSymbols } from '@utils/address'
 
 // Styles
 import Styles from './styles'
@@ -41,7 +41,7 @@ const ImportPrivateKey: React.FC = () => {
     const validate = validateBitcoinPrivateKey(privateKey)
 
     if (validate) {
-      const getAddress = window.importAddress(privateKey) // Fix me
+      const getAddress = new address(symbol).import(privateKey)
 
       if (getAddress) {
         const checkExist = checkExistWallet(getAddress)
