@@ -142,13 +142,13 @@ const SendConfirmation: React.FC = () => {
               <Styles.List>
                 <Styles.ListTitle>Amount:</Styles.ListTitle>
                 <Styles.ListText>
-                  {amount} {toUpper(symbol)}
+                  {Number(amount).toFixed(8)} {toUpper(symbol)}
                 </Styles.ListText>
               </Styles.List>
               <Styles.List>
                 <Styles.ListTitle>Network fee:</Styles.ListTitle>
                 <Styles.ListText>
-                  {networkFee} {toUpper(symbol)}
+                  {Number(networkFee).toFixed(8)} {toUpper(symbol)}
                 </Styles.ListText>
               </Styles.List>
 
@@ -159,7 +159,7 @@ const SendConfirmation: React.FC = () => {
               <Styles.List>
                 <Styles.ListTitle>Total:</Styles.ListTitle>
                 <Styles.ListText>
-                  {amount + networkFee} {toUpper(symbol)}
+                  {Number(amount + networkFee).toFixed(8)} {toUpper(symbol)}
                 </Styles.ListText>
               </Styles.List>
             </Styles.OrderCheck>
