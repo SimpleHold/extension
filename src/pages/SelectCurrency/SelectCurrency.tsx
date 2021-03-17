@@ -23,11 +23,10 @@ const Receive: React.FC = () => {
 
   const onAddAddress = (): void => {
     if (selectedCurrency) {
-      const { symbol, provider } = selectedCurrency
+      const { symbol } = selectedCurrency
 
       history.push('/new-wallet', {
         symbol,
-        provider,
       })
     }
   }

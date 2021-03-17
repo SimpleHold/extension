@@ -1,9 +1,3 @@
-// Networks
-import bitcore from 'bitcore-lib'
-import litecore from 'litecore-lib'
-import dogecore from 'bitcore-lib-doge'
-import bitcoreCash from 'bitcore-lib-cash'
-
 // Currencies logo
 import bitcoinLogo from '@assets/currencies/btc.svg'
 import bitcoinCashLogo from '@assets/currencies/bch.svg'
@@ -19,18 +13,8 @@ export interface ICurrency {
   symbol: string
   logo: string
   background: string
-  provider: any // Fix me
   chain: string
 }
-
-bitcore.Networks.add({
-  name: 'bitcoinsv',
-  alias: 'bsv',
-  pubkeyhash: 0x00,
-  privatekey: 0x80,
-  scripthash: 0x05,
-  dnsSeeds: ['seed.bitcoinsv.io', 'btccash-seeder.bitcoinunlimited.info'],
-})
 
 const currencies: ICurrency[] = [
   {
@@ -38,7 +22,6 @@ const currencies: ICurrency[] = [
     symbol: 'btc',
     logo: bitcoinLogo,
     background: '#FDE9D1',
-    provider: bitcore,
     chain: 'bitcoin',
   },
   {
@@ -46,7 +29,6 @@ const currencies: ICurrency[] = [
     symbol: 'bch',
     logo: bitcoinCashLogo,
     background: '#DDF2E9',
-    provider: bitcoreCash,
     chain: 'bitcoin-cash',
   },
   {
@@ -54,7 +36,6 @@ const currencies: ICurrency[] = [
     symbol: 'bsv',
     logo: bitcoinSVLogo,
     background: '#FBF0CC',
-    provider: bitcore,
     chain: 'bitcoin-sv',
   },
   {
@@ -62,7 +43,6 @@ const currencies: ICurrency[] = [
     symbol: 'ltc',
     logo: litecoinLogo,
     background: '#DFEEFB',
-    provider: litecore,
     chain: 'litecoin',
   },
   {
@@ -70,7 +50,6 @@ const currencies: ICurrency[] = [
     symbol: 'doge',
     logo: dogecoinLogo,
     background: '#F3EDD6',
-    provider: dogecore,
     chain: 'dogecoin',
   },
   {
@@ -78,7 +57,6 @@ const currencies: ICurrency[] = [
     symbol: 'dash',
     logo: dashLogo,
     background: '#CCE8FA',
-    provider: window.dashcore,
     chain: 'dash',
   },
   {
@@ -86,7 +64,6 @@ const currencies: ICurrency[] = [
     symbol: 'zec',
     logo: bitcoinLogo,
     background: '#FDF1D4',
-    provider: zcashLogo,
     chain: 'zcash',
   },
   {
@@ -94,7 +71,6 @@ const currencies: ICurrency[] = [
     symbol: 'grs',
     logo: groestlcoinLogo,
     background: '#D5E7F9',
-    provider: bitcore,
     chain: 'groestlcoin',
   },
 ]

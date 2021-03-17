@@ -11,7 +11,7 @@ import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 
 // Utils
 import { logEvent } from '@utils/amplitude'
-import { generateWallet } from '@utils/bitcoin'
+import generateAddress, { TSymbols } from '@utils/address'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
@@ -20,8 +20,7 @@ import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@
 import Styles from './styles'
 
 interface LocationState {
-  symbol: string
-  provider: any
+  symbol: TSymbols
 }
 
 const NewWallet: React.FC = () => {
@@ -30,7 +29,7 @@ const NewWallet: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol, provider },
+    state: { symbol },
   } = useLocation<LocationState>()
 
   const onSuccess = (password: string): void => {
@@ -40,7 +39,9 @@ const NewWallet: React.FC = () => {
 
     setActiveModal(null)
     setPrivateKey(null)
+
     localStorage.setItem('backupStatus', 'notDownloaded')
+
     history.push('/download-backup', {
       password,
       from: 'newWallet',
@@ -52,10 +53,14 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const { privateKey: walletPrivateKey } = generateWallet(provider)
+    const generate = new generateAddress(symbol).generate()
 
-    setPrivateKey(walletPrivateKey)
-    setActiveModal('confirmAddAddress')
+    if (generate) {
+      const { privateKey: walletPrivateKey } = generate
+
+      setPrivateKey(walletPrivateKey)
+      setActiveModal('confirmAddAddress')
+    }
   }
 
   const onImportPrivateKey = (): void => {
@@ -65,7 +70,6 @@ const NewWallet: React.FC = () => {
 
     history.push('/import-private-key', {
       symbol,
-      provider,
     })
   }
 
@@ -113,7 +117,6 @@ const NewWallet: React.FC = () => {
         privateKey={privateKey}
         onSuccess={onSuccess}
         symbol={symbol}
-        provider={provider}
       />
     </>
   )

@@ -14,13 +14,13 @@ import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
 // Utils
 import { validateBitcoinPrivateKey } from '@utils/validate'
 import { checkExistWallet } from '@utils/wallet'
+import { TSymbols } from '@utils/address'
 
 // Styles
 import Styles from './styles'
 
 interface LocationState {
-  symbol: string
-  provider: any
+  symbol: TSymbols
 }
 
 const ImportPrivateKey: React.FC = () => {
@@ -30,7 +30,7 @@ const ImportPrivateKey: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol, provider },
+    state: { symbol },
   } = useLocation<LocationState>()
 
   const onConfirm = (): void => {
@@ -106,7 +106,6 @@ const ImportPrivateKey: React.FC = () => {
         privateKey={privateKey}
         onSuccess={onSuccess}
         symbol={symbol}
-        provider={provider}
       />
     </>
   )

@@ -7,7 +7,7 @@ import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
 // Utils
-import { validatePassword, validateBitcoinPrivateKey } from '@utils/validate'
+import { validatePassword } from '@utils/validate'
 import { decrypt, encrypt } from '@utils/crypto'
 import { addNew as addNewWallet } from '@utils/wallet'
 
@@ -15,7 +15,7 @@ import { addNew as addNewWallet } from '@utils/wallet'
 import usePrevious from '@hooks/usePrevious'
 
 // Utils
-import { importAddress } from '@utils/bitcoin'
+import addressUtil, { TSymbols } from '@utils/address'
 
 // Styles
 import Styles from './styles'
@@ -25,12 +25,11 @@ interface Props {
   onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   privateKey: string | null
   onSuccess: (password: string) => void
-  symbol: string
-  provider: any
+  symbol: TSymbols
 }
 
 const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
-  const { isActive, onClose, privateKey, onSuccess, symbol, provider } = props
+  const { isActive, onClose, privateKey, onSuccess, symbol } = props
 
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
@@ -59,14 +58,10 @@ const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
       if (backup && privateKey) {
         const decryptBackup = decrypt(backup, password)
 
-        // && validateBitcoinPrivateKey(privateKey)
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
 
-          const address = importAddress(provider, privateKey)
-
-          console.log('address', address)
-          console.log('symbol', symbol)
+          const address = new addressUtil(symbol).import(privateKey)
 
           if (address) {
             const uuid = v4()
@@ -82,6 +77,7 @@ const ConfirmAddNewAddressModal: React.FC<Props> = (props) => {
             if (newWalletsList) {
               localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
               localStorage.setItem('wallets', newWalletsList)
+
               return onSuccess(password)
             }
           }
