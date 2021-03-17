@@ -7,6 +7,7 @@ import numeral from 'numeral'
 import Header from '@components/Header'
 import WalletCard from '@components/WalletCard'
 import Skeleton from '@components/Skeleton'
+import UnconfirmedBalance from '@components/UnconfirmedBalance'
 
 // Utils
 import { IWallet, getWallets } from '@utils/wallet'
@@ -26,9 +27,12 @@ const Wallets: React.FC = () => {
   const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
   const [walletsBalance, setWalletsBalance] = React.useState<number[]>([])
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
+  const [unconfirmedBalance, setUnconfirmedBalance] = React.useState<null | number>(0.168) // Fix me
+  const [coverHeight, setCoverHeight] = React.useState<number>(0)
 
   React.useEffect(() => {
     getWalletsList()
+    getCoverHeight()
   }, [])
 
   React.useEffect(() => {
@@ -60,6 +64,14 @@ const Wallets: React.FC = () => {
     }
   }, [totalBalance])
 
+  const getCoverHeight = (): void => {
+    const cover = document.querySelector<HTMLDivElement>('.walletsCover')
+
+    if (cover !== null) {
+      setCoverHeight(cover?.offsetHeight)
+    }
+  }
+
   const getWalletsList = () => {
     const walletsList = getWallets()
 
@@ -90,7 +102,7 @@ const Wallets: React.FC = () => {
   return (
     <Styles.Wrapper>
       <Styles.Row>
-        <Styles.Cover>
+        <Styles.Cover className="walletsCover">
           <Header />
 
           <Styles.Balances>
@@ -115,6 +127,9 @@ const Wallets: React.FC = () => {
             >
               <Styles.TotalEstimated>{`$${price(totalEstimated)} USD`}</Styles.TotalEstimated>
             </Skeleton>
+            {unconfirmedBalance !== null && unconfirmedBalance > 0 ? (
+              <UnconfirmedBalance value={unconfirmedBalance} />
+            ) : null}
           </Styles.Balances>
 
           <Styles.AddWalletBlock>
@@ -130,7 +145,7 @@ const Wallets: React.FC = () => {
           </Styles.AddWalletBlock>
         </Styles.Cover>
         {wallets?.length ? (
-          <Styles.WalletsList>
+          <Styles.WalletsList style={{ top: `${coverHeight}px` }}>
             {wallets.map((wallet: IWallet) => {
               const { address, symbol } = wallet
 

@@ -11,7 +11,7 @@ const Row = styled.div``
 
 const Cover = styled.div`
   width: 100%;
-  height: 260px;
+  padding: 0 0 10px 0;
   background-image: url(${background});
   background-repeat: no-repeat;
   background-position: bottom;
@@ -21,7 +21,6 @@ const Cover = styled.div`
 
 const WalletsList = styled.div`
   position: relative;
-  top: 260px;
   padding: 20px 30px;
 `
 
