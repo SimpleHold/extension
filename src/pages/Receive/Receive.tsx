@@ -13,8 +13,10 @@ import Skeleton from '@components/Skeleton'
 import QRCode from '@components/QRCode'
 import CopyToClipboard from '@components/CopyToClipboard'
 
+// Drawers
+import ConfirmDrawer from '../../drawers/Confirm'
+
 // Modals
-import ConfirmShowingPrivateKeyModal from '@modals/ConfirmShowingPrivateKey'
 import ShowPrivateKeyModal from '@modals/ShowPrivateKey'
 
 // Hooks
@@ -55,6 +57,7 @@ const Receive: React.FC = () => {
   const [balance, setBalance] = React.useState<null | number>(null)
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'privateKey'>(null)
 
   React.useEffect(() => {
     logEvent({
@@ -106,7 +109,7 @@ const Receive: React.FC = () => {
     setIsVisible(false)
 
     if (index === 0) {
-      setActiveModal('confirmShowPrivateKey')
+      setActiveDrawer('confirm')
     } else if (index === 1) {
       openWebPage(`https://blockchair.com/${chain}/address/${address}`)
     }
@@ -194,12 +197,22 @@ const Receive: React.FC = () => {
           </Styles.ReceiveBlock>
         </Styles.Container>
       </Styles.Wrapper>
-      <ConfirmShowingPrivateKeyModal
+      <ConfirmDrawer
+        isActive={activeDrawer === 'confirm'}
+        onClose={() => setActiveDrawer(null)}
+        title="Confirm showing private key"
+        isButtonDisabled
+        onConfirm={() => null}
+        textInputValue=""
+        onChangeInput={() => null}
+        inputLabel="Enter password"
+      />
+      {/* <ConfirmShowingPrivateKeyModal
         isActive={activeModal === 'confirmShowPrivateKey'}
         onClose={() => setActiveModal(null)}
         address={address}
         onSuccess={onSuccessConfirm}
-      />
+      /> */}
       <ShowPrivateKeyModal
         isActive={activeModal === 'showPrivateKey'}
         onClose={() => {

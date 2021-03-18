@@ -12,6 +12,9 @@ import Switch from '@components/Switch'
 // Modals
 import ConfirmLogoutModal from '@modals/ConfirmLogout'
 
+// Drawers
+import PasscodeDrawer from '../../drawers/Passcode'
+
 // Utils
 import { download as downloadBackup } from '@utils/backup'
 import { logEvent } from '@utils/amplitude'
@@ -45,6 +48,8 @@ const Settings: React.FC = () => {
   const [activeModal, setActiveModal] = React.useState<null | string>(null)
   const history = useHistory()
 
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'passcode'>(null)
+
   const onDownloadBackup = () => {
     const backup = localStorage.getItem('backup')
 
@@ -61,7 +66,8 @@ const Settings: React.FC = () => {
   }
 
   const togglePasscode = (): void => {
-    history.push('/set-passcode')
+    setActiveDrawer('passcode')
+    // history.push('/set-passcode')
   }
 
   const list: List[] = [
@@ -76,13 +82,6 @@ const Settings: React.FC = () => {
       onClick: onDownloadBackup,
     },
     {
-      title: 'Use passcode',
-      text: 'Use passcode instead of password to easily hide extension data from other people',
-      withSwitch: true,
-      switchValue: true,
-      onToggle: togglePasscode,
-    },
-    {
       isButton: true,
       title: 'Contact to support',
       icon: {
@@ -91,6 +90,13 @@ const Settings: React.FC = () => {
         height: 16,
       },
       onClick: () => openWebPage('https://simplehold.io/about'),
+    },
+    {
+      title: 'Use passcode',
+      text: 'Use passcode instead of password to easily hide extension data from other people',
+      withSwitch: true,
+      switchValue: true,
+      onToggle: togglePasscode,
     },
   ]
 
@@ -161,6 +167,10 @@ const Settings: React.FC = () => {
         isActive={activeModal === 'confirmLogout'}
         onClose={() => setActiveModal(null)}
         onConfirm={onConfirmLogout}
+      />
+      <PasscodeDrawer
+        isActive={activeDrawer === 'passcode'}
+        onClose={() => setActiveDrawer(null)}
       />
     </>
   )

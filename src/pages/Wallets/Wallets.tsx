@@ -27,7 +27,7 @@ const Wallets: React.FC = () => {
   const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
   const [walletsBalance, setWalletsBalance] = React.useState<number[]>([])
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
-  const [unconfirmedBalance, setUnconfirmedBalance] = React.useState<null | number>(0.168) // Fix me
+  const [unconfirmedBalance, setUnconfirmedBalance] = React.useState<null | number>(null)
   const [coverHeight, setCoverHeight] = React.useState<number>(0)
 
   React.useEffect(() => {
@@ -122,13 +122,14 @@ const Wallets: React.FC = () => {
               width={130}
               height={23}
               type="light"
-              mt={11}
+              mt={5}
               isLoading={totalEstimated === null}
+              mb={10}
             >
               <Styles.TotalEstimated>{`$${price(totalEstimated)} USD`}</Styles.TotalEstimated>
             </Skeleton>
             {unconfirmedBalance !== null && unconfirmedBalance > 0 ? (
-              <UnconfirmedBalance value={unconfirmedBalance} />
+              <UnconfirmedBalance btcValue={unconfirmedBalance} type="light" />
             ) : null}
           </Styles.Balances>
 

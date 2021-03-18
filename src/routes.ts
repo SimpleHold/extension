@@ -17,6 +17,7 @@ import OnBoardPage from './pages/OnBoard'
 import LockPage from './pages/Lock'
 import SetPasscodePage from './pages/SetPasscode'
 import SelectCurrency from './pages/SelectCurrency'
+import EnterPasscode from './pages/EnterPasscode'
 
 const routers: RouteProps[] = [
   {
@@ -82,6 +83,10 @@ const routers: RouteProps[] = [
   {
     path: '/select-currency',
     component: SelectCurrency,
+  },
+  {
+    path: '/enter-passcode',
+    component: EnterPasscode,
   },
 ]
 
