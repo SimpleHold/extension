@@ -11,7 +11,11 @@ interface Props {
 const Switch: React.FC<Props> = (props) => {
   const { value, onToggle } = props
 
-  return <Styles.Container onClick={onToggle} />
+  return (
+    <Styles.Container onClick={onToggle} isActive={value}>
+      <Styles.Dot />
+    </Styles.Container>
+  )
 }
 
 export default Switch
