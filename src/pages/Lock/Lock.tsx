@@ -7,8 +7,8 @@ import Header from '@components/Header'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
-// Modals
-import ConfirmLogoutModal from '@modals/ConfirmLogout'
+// Drawers
+import LogoutDrawer from '@drawers/Logout'
 
 // Utils
 import { decrypt } from '@utils/crypto'
@@ -32,7 +32,7 @@ const Lock: React.FC = () => {
   }, [])
 
   const [password, setPassword] = React.useState<string>('')
-  const [activeModal, setActiveModal] = React.useState<null | string>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'logout'>(null)
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
   const onUnlock = (): void => {
@@ -51,6 +51,7 @@ const Lock: React.FC = () => {
             name: SUCCESS_ENTER,
           })
 
+          localStorage.removeItem('passcode')
           localStorage.removeItem('isLocked')
           return history.push('/wallets')
         }
@@ -65,11 +66,11 @@ const Lock: React.FC = () => {
   }
 
   const onLogout = (): void => {
-    setActiveModal('logout')
+    setActiveDrawer('logout')
   }
 
   const onConfirmLogout = () => {
-    setActiveModal(null)
+    setActiveDrawer(null)
     const backup = localStorage.getItem('backup')
 
     if (backup) {
@@ -110,16 +111,16 @@ const Lock: React.FC = () => {
           </Styles.Form>
 
           <Styles.Links>
+            <Styles.Link onClick={onLogout}>Download backup and log out</Styles.Link>
             <Styles.Link onClick={() => openWebPage('https://simplehold.io/about')}>
               Contact to support
             </Styles.Link>
-            <Styles.Link onClick={onLogout}>Download backup and log out</Styles.Link>
           </Styles.Links>
         </Styles.Container>
       </Styles.Wrapper>
-      <ConfirmLogoutModal
-        isActive={activeModal === 'logout'}
-        onClose={() => setActiveModal(null)}
+      <LogoutDrawer
+        isActive={activeDrawer === 'logout'}
+        onClose={() => setActiveDrawer(null)}
         onConfirm={onConfirmLogout}
       />
     </>
