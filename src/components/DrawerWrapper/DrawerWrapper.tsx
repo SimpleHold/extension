@@ -8,10 +8,11 @@ interface Props {
   children: React.ReactNode
   isActive: boolean
   onClose: Function
+  icon?: string
 }
 
 const DrawerWrapper: React.FC<Props> = (props) => {
-  const { title, children, isActive, onClose } = props
+  const { title, children, isActive, onClose, icon } = props
 
   const drawerRef = React.useRef<HTMLDivElement>(null)
 
@@ -24,7 +25,16 @@ const DrawerWrapper: React.FC<Props> = (props) => {
   return (
     <Styles.Wrapper className={isActive ? 'active' : ''}>
       <Styles.Background onClick={onClick}>
-        <Styles.Drawer ref={drawerRef} className={isActive ? 'active' : ''}>
+        <Styles.Drawer
+          ref={drawerRef}
+          className={isActive ? 'active' : ''}
+          withIcon={icon !== undefined}
+        >
+          {icon ? (
+            <Styles.IconRow>
+              <Styles.Icon src={icon} alt="icon" />
+            </Styles.IconRow>
+          ) : null}
           <Styles.Title>{title}</Styles.Title>
           {children}
         </Styles.Drawer>

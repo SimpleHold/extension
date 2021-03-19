@@ -1,16 +1,8 @@
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 
-const scaleUp = keyframes`
-  0% {
-    transform: scale(.8) translateY(100%);
-    opacity: 0;
-  }
-  
-  100% {
-    transform: scale(1) translateY(0px);
-    opacity: 1;
-  }
-`
+type TDrawerProps = {
+  withIcon: boolean
+}
 
 const Wrapper = styled.div`
   position: fixed;
@@ -38,12 +30,13 @@ const Background = styled.div`
 const Drawer = styled.div`
   background-color: #ffffff;
   border-radius: 5px 5px 0 0;
-  padding: 40px 30px 30px 30px;
-  transform: scale(0);
+  padding: ${({ withIcon }: TDrawerProps) =>
+    withIcon ? '20px 30px 30px 30px' : '40px 30px 30px 30px'};
+  transition: all 0.5s ease;
+  transform: translateY(100%);
 
   &.active {
-    transform: scale(1);
-    animation: ${scaleUp} 0.5s linear forwards;
+    transform: translateY(0px);
   }
 `
 
@@ -57,11 +50,24 @@ const Title = styled.p`
   color: #1d1d22;
 `
 
+const IconRow = styled.div`
+  margin: 0 0 20px 0;
+  display: flex;
+  justify-content: center;
+`
+
+const Icon = styled.img`
+  width: 60px;
+  height: 60px;
+`
+
 const Styles = {
   Wrapper,
   Background,
   Drawer,
   Title,
+  IconRow,
+  Icon,
 }
 
 export default Styles
