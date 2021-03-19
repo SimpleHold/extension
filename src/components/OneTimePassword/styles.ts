@@ -1,7 +1,7 @@
 import styled from 'styled-components'
 
 type TContainerProps = {
-  isError: boolean
+  isError?: boolean
 }
 
 const Container = styled.div`
