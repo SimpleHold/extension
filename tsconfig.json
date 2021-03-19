@@ -19,7 +19,6 @@
       "@pages/*": ["src/pages/*"],
       "@assets/*": ["assets/pages/*"],
       "@utils/*": ["src/utils/*"],
-      "@modals/*": ["src/modals/*"],
       "@hooks/*": ["src/hooks/*"],
       "@config/*": ["src/config/*"],
       "@drawers/*": ["src/drawers/*"]
