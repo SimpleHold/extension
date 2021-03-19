@@ -1,9 +1,12 @@
 import * as React from 'react'
-import OtpInput from 'react-otp-input'
 
 // Components
 import DrawerWrapper from '@components/DrawerWrapper'
+import OneTimePassword from '@components/OneTimePassword'
 import Button from '@components/Button'
+
+// Utils
+import { sha256hash } from '@utils/crypto'
 
 // Styles
 import Styles from './styles'
@@ -18,13 +21,16 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
 
   const [passcode, setPasscode] = React.useState<string>('')
 
-  const onConfirm = (): void => {}
+  const onConfirm = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
+    localStorage.setItem('passcode', sha256hash(passcode))
+    onClose(e)
+  }
 
   return (
     <DrawerWrapper title="Enter your passcode" isActive={isActive} onClose={onClose}>
       <Styles.Row>
         <Styles.Form>
-          <OtpInput value={passcode} onChange={setPasscode} numInputs={6} isInputNum />
+          <OneTimePassword value={passcode} onChange={setPasscode} />
         </Styles.Form>
 
         <Styles.Actions>
