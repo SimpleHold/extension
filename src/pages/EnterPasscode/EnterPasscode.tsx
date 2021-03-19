@@ -6,7 +6,7 @@ import Header from '@components/Header'
 import OneTimePassword from '@components/OneTimePassword'
 
 // Drawers
-import ForgotPasscodeDrawer from '../../drawers/ForgotPasscode'
+import ForgotPasscodeDrawer from '@drawers/ForgotPasscode'
 
 // Utils
 import { sha256hash } from '@utils/crypto'
@@ -38,7 +38,9 @@ const EnterPasscode: React.FC = () => {
     }
   }
 
-  const onConfirmReset = (): void => {}
+  const onConfirmReset = (): void => {
+    history.push('/lock')
+  }
 
   return (
     <>

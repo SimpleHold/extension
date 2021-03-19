@@ -40,12 +40,13 @@ const Header: React.FC<Props> = (props) => {
 
   const lockWallet = (): void => {
     localStorage.setItem('isLocked', 'true')
+    const isPasscodeEnabled = localStorage.getItem('passcode') !== null
 
     logEvent({
       name: LOCK,
     })
 
-    return openPage('/lock')
+    return openPage(isPasscodeEnabled ? '/enter-passcode' : '/lock')
   }
 
   return (

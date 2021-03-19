@@ -1,17 +1,21 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
+import { v4 } from 'uuid'
 
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 
-// Modals
-import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
+// Drawers
+import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
 import { logEvent } from '@utils/amplitude'
-import generateAddress, { TSymbols } from '@utils/address'
+import addressUtil, { TSymbols } from '@utils/address'
+import { validatePassword } from '@utils/validate'
+import { decrypt, encrypt } from '@utils/crypto'
+import { addNew as addNewWallet } from '@utils/wallet'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
@@ -24,8 +28,10 @@ interface LocationState {
 }
 
 const NewWallet: React.FC = () => {
-  const [activeModal, setActiveModal] = React.useState<null | string>(null)
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
+  const [password, setPassword] = React.useState<string>('')
+  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
   const history = useHistory()
   const {
@@ -37,7 +43,6 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_CONFIRM,
     })
 
-    setActiveModal(null)
     setPrivateKey(null)
 
     localStorage.setItem('backupStatus', 'notDownloaded')
@@ -53,13 +58,13 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const generate = new generateAddress(symbol).generate()
+    const generate = new addressUtil(symbol).generate()
 
     if (generate) {
       const { privateKey: walletPrivateKey } = generate
 
       setPrivateKey(walletPrivateKey)
-      setActiveModal('confirmAddAddress')
+      setActiveDrawer('confirm')
     }
   }
 
@@ -71,6 +76,42 @@ const NewWallet: React.FC = () => {
     history.push('/import-private-key', {
       symbol,
     })
+  }
+
+  const onConfirm = (): void => {
+    if (validatePassword(password)) {
+      const backup = localStorage.getItem('backup')
+
+      if (backup && privateKey) {
+        const decryptBackup = decrypt(backup, password)
+
+        if (decryptBackup) {
+          const parseBackup = JSON.parse(decryptBackup)
+
+          const address = new addressUtil(symbol).import(privateKey)
+
+          if (address) {
+            const uuid = v4()
+            const newWalletsList = addNewWallet(address, symbol, uuid)
+
+            parseBackup.wallets.push({
+              symbol,
+              address,
+              uuid,
+              privateKey,
+            })
+
+            if (newWalletsList) {
+              localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+              localStorage.setItem('wallets', newWalletsList)
+
+              return onSuccess(password)
+            }
+          }
+        }
+      }
+    }
+    return setErrorLabel('Password is not valid')
   }
 
   return (
@@ -111,12 +152,19 @@ const NewWallet: React.FC = () => {
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>
-      <ConfirmAddNewAddressModal
-        isActive={activeModal === 'confirmAddAddress'}
-        onClose={() => setActiveModal(null)}
-        privateKey={privateKey}
-        onSuccess={onSuccess}
-        symbol={symbol}
+      <ConfirmDrawer
+        isActive={activeDrawer === 'confirm'}
+        onClose={() => setActiveDrawer(null)}
+        title="Confirm adding new address"
+        inputLabel="Enter password"
+        textInputValue={password}
+        isButtonDisabled={!validatePassword(password)}
+        onConfirm={onConfirm}
+        onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
+          setPassword(e.target.value)
+        }
+        textInputType="password"
+        inputErrorLabel={errorLabel}
       />
     </>
   )

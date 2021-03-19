@@ -32,7 +32,7 @@ const App: React.FC = () => {
 
   const getInitialPage = (): string => {
     if (localStorage.getItem('isLocked')) {
-      return '/lock'
+      return localStorage.getItem('passcode') !== null ? '/enter-passcode' : '/lock'
     }
     if (localStorage.getItem('onBoard') !== 'passed') {
       return '/onboard'

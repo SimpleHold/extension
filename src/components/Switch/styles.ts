@@ -17,6 +17,7 @@ const Container = styled.div`
     background-color: ${({ isActive }: TContainerProps) =>
       `1.5px solid ${isActive ? '#3FBB7D' : '#C3C3C3'}`};
     transform: ${({ isActive }: TContainerProps) => `translateX(${isActive ? '10px' : '0'})`};
+    background-color: ${({ isActive }: TContainerProps) => (isActive ? '#3FBB7D' : '#C3C3C3')};
   }
 `
 
@@ -25,7 +26,6 @@ const Dot = styled.div`
   width: 4px;
   height: 4px;
   border-radius: 2px;
-  background-color: #c3c3c3;
 `
 
 const Styles = {

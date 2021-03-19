@@ -17,6 +17,8 @@ interface Props {
   textInputValue: string
   onChangeInput: (event: React.ChangeEvent<HTMLInputElement>) => void
   inputLabel: string
+  textInputType?: string
+  inputErrorLabel?: string | null
 }
 
 const ConfirmDrawer: React.FC<Props> = (props) => {
@@ -29,13 +31,21 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
     textInputValue,
     onChangeInput,
     inputLabel,
+    textInputType,
+    inputErrorLabel,
   } = props
 
   return (
     <DrawerWrapper title={title} isActive={isActive} onClose={onClose}>
       <Styles.Row>
         <Styles.Form>
-          <TextInput label={inputLabel} value={textInputValue} onChange={onChangeInput} />
+          <TextInput
+            label={inputLabel}
+            value={textInputValue}
+            onChange={onChangeInput}
+            type={textInputType}
+            errorLabel={inputErrorLabel}
+          />
         </Styles.Form>
         <Styles.Actions>
           <Button label="Cancel" isLight isSmall mr={7.5} onClick={onClose} />

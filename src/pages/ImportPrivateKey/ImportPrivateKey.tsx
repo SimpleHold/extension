@@ -8,11 +8,11 @@ import Link from '@components/Link'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
-// Modals
-import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
+// Drawers
+import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
-import { validateBitcoinPrivateKey } from '@utils/validate'
+import { validateBitcoinPrivateKey, validatePassword } from '@utils/validate'
 import { checkExistWallet } from '@utils/wallet'
 import address, { TSymbols } from '@utils/address'
 
@@ -25,8 +25,9 @@ interface LocationState {
 
 const ImportPrivateKey: React.FC = () => {
   const [privateKey, setPrivateKey] = React.useState<string>('')
-  const [activeModal, setActiveModal] = React.useState<null | string>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+  const [password, setPassword] = React.useState<string>('')
 
   const history = useHistory()
   const {
@@ -49,7 +50,7 @@ const ImportPrivateKey: React.FC = () => {
         if (checkExist) {
           return setErrorLabel('This address has already been added')
         }
-        return setActiveModal('confirmAddAddress')
+        return setActiveDrawer('confirm')
       }
     }
 
@@ -57,13 +58,41 @@ const ImportPrivateKey: React.FC = () => {
   }
 
   const onSuccess = (password: string): void => {
-    setActiveModal(null)
     localStorage.setItem('backupStatus', 'notDownloaded')
 
     history.push('/download-backup', {
       password,
       from: 'privateKey',
     })
+  }
+
+  const onConfirmDrawer = (): void => {
+    // if (validatePassword(password)) {
+    //   const backup = localStorage.getItem('backup')
+    //   if (backup && privateKey) {
+    //     const decryptBackup = decrypt(backup, password)
+    //     if (decryptBackup) {
+    //       const parseBackup = JSON.parse(decryptBackup)
+    //       const address = new addressUtil(symbol).import(privateKey)
+    //       if (address) {
+    //         const uuid = v4()
+    //         const newWalletsList = addNewWallet(address, symbol, uuid)
+    //         parseBackup.wallets.push({
+    //           symbol,
+    //           address,
+    //           uuid,
+    //           privateKey,
+    //         })
+    //         if (newWalletsList) {
+    //           localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+    //           localStorage.setItem('wallets', newWalletsList)
+    //           return onSuccess(password)
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
+    // return setErrorLabel('Password is not valid')
   }
 
   return (
@@ -100,12 +129,19 @@ const ImportPrivateKey: React.FC = () => {
           </Styles.Form>
         </Styles.Container>
       </Styles.Wrapper>
-      <ConfirmAddNewAddressModal
-        isActive={activeModal === 'confirmAddAddress'}
-        onClose={() => setActiveModal(null)}
-        privateKey={privateKey}
-        onSuccess={onSuccess}
-        symbol={symbol}
+      <ConfirmDrawer
+        isActive={activeDrawer === 'confirm'}
+        onClose={() => setActiveDrawer(null)}
+        title="Confirm adding new address"
+        inputLabel="Enter password"
+        textInputValue={password}
+        isButtonDisabled={!validatePassword(password)}
+        onConfirm={onConfirmDrawer}
+        onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
+          setPassword(e.target.value)
+        }
+        textInputType="password"
+        inputErrorLabel={errorLabel}
       />
     </>
   )

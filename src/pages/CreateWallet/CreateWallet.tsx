@@ -13,6 +13,7 @@ import { validatePassword } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
 import { generate } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
+import address from '@utils/address'
 
 // Config
 import { START_PASSWORD } from '@config/events'
@@ -38,15 +39,18 @@ const Wallets: React.FC = () => {
       name: START_PASSWORD,
     })
 
-    const { address, privateKey } = window.generateWallet() // Fix me
-    const { backup, wallets } = generate(address, privateKey)
-    console.log('backup', backup)
-    console.log('wallets', wallets)
-    localStorage.setItem('backup', encrypt(backup, password))
-    localStorage.setItem('wallets', wallets)
-    localStorage.setItem('backupStatus', 'notDownloaded')
+    const geneateAddress = new address('btc').generate()
 
-    history.push('/download-backup')
+    if (geneateAddress) {
+      const { address, privateKey } = geneateAddress
+      const { backup, wallets } = generate(address, privateKey)
+
+      localStorage.setItem('backup', encrypt(backup, password))
+      localStorage.setItem('wallets', wallets)
+      localStorage.setItem('backupStatus', 'notDownloaded')
+
+      history.push('/download-backup')
+    }
   }
 
   const onBlurPassword = (): void => {

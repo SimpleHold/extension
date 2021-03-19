@@ -14,10 +14,8 @@ import QRCode from '@components/QRCode'
 import CopyToClipboard from '@components/CopyToClipboard'
 
 // Drawers
-import ConfirmDrawer from '../../drawers/Confirm'
-
-// Modals
-import ShowPrivateKeyModal from '@modals/ShowPrivateKey'
+import ConfirmDrawer from '@drawers/Confirm'
+import ShowPrivateKeyDrawer from '@drawers/ShowPrivateKey'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
@@ -26,6 +24,9 @@ import useVisible from '@hooks/useVisible'
 import { getBalance } from '@utils/bitcoin'
 import { limitBalance, price, toUpper } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
+import { validatePassword } from '@utils/validate'
+import { decrypt } from '@utils/crypto'
+import { IWallet } from '@utils/wallet'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
@@ -52,12 +53,13 @@ const Receive: React.FC = () => {
   const history = useHistory()
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
-  const [activeModal, setActiveModal] = React.useState<null | string>(null)
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false)
   const [balance, setBalance] = React.useState<null | number>(null)
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'privateKey'>(null)
+  const [password, setPassword] = React.useState<string>('')
+  const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
 
   React.useEffect(() => {
     logEvent({
@@ -125,15 +127,38 @@ const Receive: React.FC = () => {
     }
   }
 
-  const onSuccessConfirm = (addressPrivateKey: string) => {
-    setPrivateKey(addressPrivateKey)
-    setActiveModal('showPrivateKey')
-  }
-
   const onCopyAddress = (): void => {
     logEvent({
       name: ADDRESS_COPY,
     })
+  }
+
+  const onConfirmModal = (): void => {
+    if (passwordErrorLabel) {
+      setPasswordErrorLabel(null)
+    }
+
+    if (validatePassword(password)) {
+      const backup = localStorage.getItem('backup')
+
+      if (backup?.length) {
+        const decryptBackup = decrypt(backup, password)
+
+        if (decryptBackup) {
+          const parseBackup = JSON.parse(decryptBackup)
+          const findWallet = parseBackup?.wallets?.find(
+            (wallet: IWallet) => (wallet.address = address)
+          )
+
+          if (findWallet) {
+            setPrivateKey(findWallet.privateKey)
+            return setActiveDrawer('privateKey')
+          }
+        }
+      }
+    }
+
+    return setPasswordErrorLabel('Password is not valid')
   }
 
   return (
@@ -201,22 +226,20 @@ const Receive: React.FC = () => {
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
         title="Confirm showing private key"
-        isButtonDisabled
-        onConfirm={() => null}
-        textInputValue=""
-        onChangeInput={() => null}
+        isButtonDisabled={!validatePassword(password)}
+        onConfirm={onConfirmModal}
+        textInputValue={password}
+        onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
+          setPassword(e.target.value)
+        }
         inputLabel="Enter password"
+        textInputType="password"
+        inputErrorLabel={passwordErrorLabel}
       />
-      {/* <ConfirmShowingPrivateKeyModal
-        isActive={activeModal === 'confirmShowPrivateKey'}
-        onClose={() => setActiveModal(null)}
-        address={address}
-        onSuccess={onSuccessConfirm}
-      /> */}
-      <ShowPrivateKeyModal
-        isActive={activeModal === 'showPrivateKey'}
+      <ShowPrivateKeyDrawer
+        isActive={activeDrawer === 'privateKey'}
         onClose={() => {
-          setActiveModal(null)
+          setActiveDrawer(null)
           setPrivateKey(null)
         }}
         privateKey={privateKey}

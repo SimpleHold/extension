@@ -9,11 +9,9 @@ import Cover from '@components/Cover'
 import Button from '@components/Button'
 import Switch from '@components/Switch'
 
-// Modals
-import ConfirmLogoutModal from '@modals/ConfirmLogout'
-
 // Drawers
-import PasscodeDrawer from '../../drawers/Passcode'
+import PasscodeDrawer from '@drawers/Passcode'
+import LogoutDrawer from '@drawers/Logout'
 
 // Utils
 import { download as downloadBackup } from '@utils/backup'
@@ -45,10 +43,9 @@ interface List {
 }
 
 const Settings: React.FC = () => {
-  const [activeModal, setActiveModal] = React.useState<null | string>(null)
   const history = useHistory()
 
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'passcode'>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'passcode' | 'logout'>(null)
 
   const onDownloadBackup = () => {
     const backup = localStorage.getItem('backup')
@@ -67,7 +64,6 @@ const Settings: React.FC = () => {
 
   const togglePasscode = (): void => {
     setActiveDrawer('passcode')
-    // history.push('/set-passcode')
   }
 
   const list: List[] = [
@@ -95,13 +91,13 @@ const Settings: React.FC = () => {
       title: 'Use passcode',
       text: 'Use passcode instead of password to easily hide extension data from other people',
       withSwitch: true,
-      switchValue: true,
+      switchValue: localStorage.getItem('passcode') !== null,
       onToggle: togglePasscode,
     },
   ]
 
   const onLogout = (): void => {
-    setActiveModal('confirmLogout')
+    setActiveDrawer('logout')
   }
 
   const onConfirmLogout = (): void => {
@@ -163,9 +159,9 @@ const Settings: React.FC = () => {
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>
-      <ConfirmLogoutModal
-        isActive={activeModal === 'confirmLogout'}
-        onClose={() => setActiveModal(null)}
+      <LogoutDrawer
+        isActive={activeDrawer === 'logout'}
+        onClose={() => setActiveDrawer(null)}
         onConfirm={onConfirmLogout}
       />
       <PasscodeDrawer
