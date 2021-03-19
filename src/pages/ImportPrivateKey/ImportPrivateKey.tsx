@@ -12,7 +12,7 @@ import Button from '@components/Button'
 import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
-import { validateBitcoinPrivateKey, validatePassword } from '@utils/validate'
+import { validatePassword } from '@utils/validate'
 import { checkExistWallet } from '@utils/wallet'
 import address, { TSymbols } from '@utils/address'
 
@@ -39,19 +39,15 @@ const ImportPrivateKey: React.FC = () => {
       setErrorLabel(null)
     }
 
-    const validate = validateBitcoinPrivateKey(privateKey)
+    const getAddress = new address(symbol).import(privateKey)
 
-    if (validate) {
-      const getAddress = new address(symbol).import(privateKey)
+    if (getAddress) {
+      const checkExist = checkExistWallet(getAddress)
 
-      if (getAddress) {
-        const checkExist = checkExistWallet(getAddress)
-
-        if (checkExist) {
-          return setErrorLabel('This address has already been added')
-        }
-        return setActiveDrawer('confirm')
+      if (checkExist) {
+        return setErrorLabel('This address has already been added')
       }
+      return setActiveDrawer('confirm')
     }
 
     return setErrorLabel('Invalid private key')

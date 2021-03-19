@@ -23,8 +23,8 @@ import {
   btcToSat,
   satToBtc,
 } from '@utils/bitcoin'
-import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
+import addressLib, { TSymbols } from '@utils/address'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -37,7 +37,7 @@ import useDebounce from '@hooks/useDebounce'
 import Styles from './styles'
 
 interface LocationState {
-  symbol: string
+  symbol: TSymbols
   address: string
 }
 
@@ -172,7 +172,7 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (address.length && !validateBitcoinAddress(address)) {
+    if (address.length && !new addressLib(symbol).validate(address)) {
       setAddressErrorLabel('Address is not valid')
     }
 
@@ -195,17 +195,9 @@ const Send: React.FC = () => {
     }
   }
 
-  const onChangeAmount = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { value } = e.target
-
-    if (validateNumbersDot(value)) {
-      setAmount(value)
-    }
-  }
-
   const isButtonDisabled = (): boolean => {
     return (
-      !validateBitcoinAddress(address) ||
+      !new addressLib(symbol).validate(address) ||
       !amount.length ||
       Number(amount) <= 0 ||
       !outputs.length ||
@@ -259,7 +251,7 @@ const Send: React.FC = () => {
           <TextInput
             label={`Amount (${toUpper(symbol)})`}
             value={amount}
-            onChange={onChangeAmount}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAmount(e.target.value)}
             type="number"
             errorLabel={amountErrorLabel}
             onBlurInput={onBlurAmountInput}

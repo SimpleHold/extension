@@ -9,6 +9,7 @@ const PrivateKey = styled.p`
   line-height: 23px;
   text-align: center;
   color: #7d7e8d;
+  margin: 0;
 `
 
 const Actions = styled.div`

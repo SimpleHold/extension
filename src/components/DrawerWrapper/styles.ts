@@ -34,6 +34,7 @@ const Drawer = styled.div`
     withIcon ? '20px 30px 30px 30px' : '40px 30px 30px 30px'};
   transition: all 0.5s ease;
   transform: translateY(100%);
+  word-break: break-all;
 
   &.active {
     transform: translateY(0px);

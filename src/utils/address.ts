@@ -4,6 +4,9 @@ import dogecore from 'bitcore-lib-doge'
 import bitcoreCash from 'bitcore-lib-cash'
 import bitGoUTXO from 'bitgo-utxo-lib'
 
+// Validate address
+import addressValidate from '@config/addressValidate'
+
 bitcore.Networks.add({
   name: 'bitcoinsv',
   alias: 'bsv',
@@ -167,6 +170,12 @@ class GenerateAddress {
     }
 
     return null
+  }
+
+  validate = (address: string): boolean => {
+    const { symbol } = this
+
+    return new RegExp(addressValidate[symbol]).test(address)
   }
 }
 
