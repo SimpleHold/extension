@@ -32,8 +32,11 @@ const Wallets: React.FC = () => {
 
   React.useEffect(() => {
     getWalletsList()
-    getCoverHeight()
   }, [])
+
+  React.useEffect(() => {
+    getCoverHeight()
+  }, [unconfirmedBalance])
 
   React.useEffect(() => {
     if (walletsBalance.length === wallets?.length && totalBalance === null) {
@@ -65,7 +68,7 @@ const Wallets: React.FC = () => {
   }, [totalBalance])
 
   const getCoverHeight = (): void => {
-    const cover = document.querySelector<HTMLDivElement>('.walletsCover')
+    const cover = document.querySelector<HTMLDivElement>('.wallets-cover')
 
     if (cover !== null) {
       setCoverHeight(cover?.offsetHeight)
@@ -102,14 +105,14 @@ const Wallets: React.FC = () => {
   return (
     <Styles.Wrapper>
       <Styles.Row>
-        <Styles.Cover className="walletsCover">
+        <Styles.Cover className="wallets-cover">
           <Header />
 
           <Styles.Balances>
             <Styles.TotalBalanceLabel>Total Balance</Styles.TotalBalanceLabel>
             <Skeleton
               width={250}
-              height={36}
+              height={42}
               type="light"
               mt={21}
               isLoading={totalBalance === null}

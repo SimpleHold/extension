@@ -39,12 +39,12 @@ const TotalBalance = styled.p`
   margin: 21px 0 0 0;
   font-weight: 500;
   font-size: 36px;
-  line-height: 36px;
+  line-height: 42px;
   color: #ffffff;
 `
 
 const TotalEstimated = styled.p`
-  margin: 11px 0 0 0;
+  margin: 5px 0 10px 0;
   font-size: 20px;
   line-height: 23px;
   color: #ffffff;
@@ -54,8 +54,7 @@ const AddWalletBlock = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 0 30px;
-  margin: 30px 0 0 0;
+  padding: 20px 30px 0 30px;
   align-items: center;
 `
 
