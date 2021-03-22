@@ -19,6 +19,10 @@ const Container = styled.div`
     transform: ${({ isActive }: TContainerProps) => `translateX(${isActive ? '10px' : '0'})`};
     background-color: ${({ isActive }: TContainerProps) => (isActive ? '#3FBB7D' : '#C3C3C3')};
   }
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 const Dot = styled.div`

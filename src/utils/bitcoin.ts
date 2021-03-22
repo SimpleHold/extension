@@ -1,16 +1,8 @@
 import { Transaction, Unit } from 'bitcore-lib'
 import axios, { AxiosResponse } from 'axios'
 
-export interface IUnspentOutput {
-  tx_hash_big_endian: string
-  tx_hash: string
-  tx_output_n: number
-  script: string
-  value: number
-  value_hex: string
-  confirmations: number
-  tx_index: number
-}
+// Config
+import config from '@config/index'
 
 export interface IRawTransaction {
   hash: string
@@ -25,7 +17,7 @@ interface IGetBalance {
 export const getBalance = async (address: string, chain: string): Promise<IGetBalance> => {
   try {
     const { data }: AxiosResponse = await axios(
-      `http://localhost:8080/wallet/balance/${chain}/${address}`
+      `${config.serverUrl}/wallet/balance/${chain}/${address}`
     )
     const { balance, usd } = data.data
 
@@ -41,11 +33,14 @@ export const getBalance = async (address: string, chain: string): Promise<IGetBa
   }
 }
 
-export const getUnspentOutputs = async (address: string): Promise<IUnspentOutput[]> => {
+export const getUnspentOutputs = async (
+  address: string,
+  chain: string
+): Promise<Transaction.UnspentOutput[]> => {
   try {
-    const { data } = await axios.get(`https://blockchain.info/unspent?active=${address}`)
+    const { data } = await axios.get(`${config.serverUrl}/wallet/unspent/${chain}/${address}`)
 
-    return data?.unspent_outputs
+    return data?.data
   } catch {
     return []
   }

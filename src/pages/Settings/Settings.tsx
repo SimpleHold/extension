@@ -16,6 +16,7 @@ import LogoutDrawer from '@drawers/Logout'
 // Utils
 import { download as downloadBackup } from '@utils/backup'
 import { logEvent } from '@utils/amplitude'
+import { sha256hash } from '@utils/crypto'
 
 // Config
 import { BACKUP_SETTINGS } from '@config/events'
@@ -36,7 +37,7 @@ interface List {
     width: number
     height: number
   }
-  onClick?: () => void | null
+  onClick?: () => void
   withSwitch?: boolean
   switchValue?: boolean
   onToggle?: () => void
@@ -46,6 +47,7 @@ const Settings: React.FC = () => {
   const history = useHistory()
 
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'passcode' | 'logout'>(null)
+  const [passcodeDrawerType, setPasscodeDrawerType] = React.useState<'create' | 'remove'>('create')
 
   const onDownloadBackup = () => {
     const backup = localStorage.getItem('backup')
@@ -63,6 +65,9 @@ const Settings: React.FC = () => {
   }
 
   const togglePasscode = (): void => {
+    const getPasscode = localStorage.getItem('passcode')
+    setPasscodeDrawerType(getPasscode !== null ? 'remove' : 'create')
+
     setActiveDrawer('passcode')
   }
 
@@ -104,6 +109,16 @@ const Settings: React.FC = () => {
     localStorage.removeItem('wallets')
     localStorage.removeItem('backup')
     history.push('/welcome')
+  }
+
+  const onConfirmPasscode = (passcode: string) => {
+    setActiveDrawer(null)
+
+    if (passcodeDrawerType === 'remove') {
+      localStorage.removeItem('passcode')
+    } else {
+      localStorage.setItem('passcode', sha256hash(passcode))
+    }
   }
 
   return (
@@ -167,6 +182,8 @@ const Settings: React.FC = () => {
       <PasscodeDrawer
         isActive={activeDrawer === 'passcode'}
         onClose={() => setActiveDrawer(null)}
+        onConfirm={onConfirmPasscode}
+        type={passcodeDrawerType}
       />
     </>
   )

@@ -85,6 +85,7 @@ const Receive: React.FC = () => {
     history.push('/send', {
       symbol,
       address,
+      chain,
     })
   }
 

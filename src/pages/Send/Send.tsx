@@ -19,7 +19,6 @@ import {
   getTransactionSize,
   getUnspentOutputs,
   getFees,
-  IUnspentOutput,
   btcToSat,
   satToBtc,
 } from '@utils/bitcoin'
@@ -39,12 +38,13 @@ import Styles from './styles'
 interface LocationState {
   symbol: TSymbols
   address: string
+  chain: string
 }
 
 const Send: React.FC = () => {
   const history = useHistory()
   const {
-    state: { symbol, address: locationAddress },
+    state: { symbol, address: locationAddress, chain },
   } = useLocation<LocationState>()
 
   const currency = getCurrency(symbol)
@@ -58,7 +58,7 @@ const Send: React.FC = () => {
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
-  const [outputs, setOutputs] = React.useState<IUnspentOutput[]>([])
+  const [outputs, setOutputs] = React.useState<Transaction.UnspentOutput[]>([])
   const [utxosList, setUtxosList] = React.useState<Transaction.UnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
 
@@ -81,7 +81,7 @@ const Send: React.FC = () => {
   }, [debounced])
 
   const getOutputs = async (): Promise<void> => {
-    const unspentOutputs = await getUnspentOutputs(selectedAddress)
+    const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
     setOutputs(unspentOutputs)
   }
 
@@ -89,7 +89,7 @@ const Send: React.FC = () => {
     const fee = await getFees()
     setUtxosList([])
 
-    const sortOutputs = outputs.sort((a, b) => a.value - b.value)
+    const sortOutputs = outputs.sort((a, b) => a.satoshis - b.satoshis)
     const utxos: Transaction.UnspentOutput[] = []
 
     for (const output of sortOutputs) {
@@ -101,11 +101,11 @@ const Send: React.FC = () => {
       }
 
       const newOutput = new Transaction.UnspentOutput({
-        txId: output.tx_hash_big_endian,
-        vout: output.tx_output_n,
-        address: selectedAddress,
+        txId: output.txId,
+        vout: output.outputIndex,
+        address: output.address,
         scriptPubKey: output.script,
-        amount: satToBtc(output.value),
+        amount: satToBtc(output.satoshis),
       })
 
       utxos.push(newOutput)
@@ -114,7 +114,7 @@ const Send: React.FC = () => {
     setUtxosList(utxos)
 
     const transactionFeeBytes = window.getTransactionSize(utxos)
-    setNetworkFee((transactionFeeBytes * fee) / 100000000)
+    setNetworkFee(satToBtc(transactionFeeBytes * fee))
     setNetworkFeeLoading(false)
   }
 
