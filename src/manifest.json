@@ -8,7 +8,7 @@
     "48": "assets/logo/favicon-48.png",
     "128": "assets/logo/favicon-128.png"
   },
-  "description": "SimpleHold Wallet",
+  "description": "Light wallet for Bitcoin and other cryptocurrencies.",
   "homepage_url": "https://simplehold.io",
   "short_name": "SimpleHold",
   "permissions": ["storage"],
@@ -30,15 +30,5 @@
     "default_title": "SimpleHold",
     "__chrome|opera__chrome_style": false,
     "__firefox__browser_style": false
-  },
-  "background": {
-    "scripts": ["js/background.bundle.js"],
-    "__chrome|opera__persistent": false
-  },
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["js/contentScript.bundle.js"]
-    }
-  ]
+  }
 }
