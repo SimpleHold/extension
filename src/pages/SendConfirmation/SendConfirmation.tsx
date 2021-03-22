@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { Transaction } from 'bitcore-lib'
+import numeral from 'numeral'
 
 // Components
 import Cover from '@components/Cover'
@@ -80,7 +81,7 @@ const SendConfirmation: React.FC = () => {
           )
 
           if (transaction?.hash && transaction?.raw) {
-            const sendTransaction = await sendRawTransaction(transaction.raw)
+            const sendTransaction = await sendRawTransaction(transaction.raw, symbol)
 
             if (sendTransaction === transaction.hash) {
               setRawTransaction(transaction)
@@ -133,15 +134,17 @@ const SendConfirmation: React.FC = () => {
             <Styles.OrderCheck>
               <Styles.List>
                 <Styles.ListTitle>Amount:</Styles.ListTitle>
-                <Styles.ListText>
-                  {amount} {toUpper(symbol)}
-                </Styles.ListText>
+                <Styles.ListRow>
+                  <Styles.Amount>{numeral(amount).format('0.[00000000]')}</Styles.Amount>
+                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                </Styles.ListRow>
               </Styles.List>
               <Styles.List>
                 <Styles.ListTitle>Network fee:</Styles.ListTitle>
-                <Styles.ListText>
-                  {networkFee} {toUpper(symbol)}
-                </Styles.ListText>
+                <Styles.ListRow>
+                  <Styles.Amount>{numeral(networkFee).format('0.[00000000]')}</Styles.Amount>
+                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                </Styles.ListRow>
               </Styles.List>
 
               <Styles.DashedDivider>
@@ -150,9 +153,12 @@ const SendConfirmation: React.FC = () => {
 
               <Styles.List>
                 <Styles.ListTitle>Total:</Styles.ListTitle>
-                <Styles.ListText>
-                  {amount + networkFee} {toUpper(symbol)}
-                </Styles.ListText>
+                <Styles.ListRow>
+                  <Styles.Amount>
+                    {numeral(amount + networkFee).format('0.[00000000]')}
+                  </Styles.Amount>
+                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                </Styles.ListRow>
               </Styles.List>
             </Styles.OrderCheck>
 

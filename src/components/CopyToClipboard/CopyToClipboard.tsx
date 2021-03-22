@@ -5,7 +5,7 @@ import copy from 'copy-to-clipboard'
 import Styles from './styles'
 
 interface Props {
-  children: React.ReactNode
+  children: React.ReactElement<any, any> | null
   value: string
   mb?: number
   onCopy?: () => void

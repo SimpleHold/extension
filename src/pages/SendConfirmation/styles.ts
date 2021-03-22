@@ -134,6 +134,10 @@ const DestinateText = styled.p`
   white-space: nowrap;
 `
 
+const ListRow = styled.div``
+
+const Amount = styled.p``
+
 const Styles = {
   Wrapper,
   Container,
@@ -151,6 +155,8 @@ const Styles = {
   Destinate,
   DestinateTitle,
   DestinateText,
+  ListRow,
+  Amount,
 }
 
 export default Styles

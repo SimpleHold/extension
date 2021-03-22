@@ -20,27 +20,29 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
 
   const [passcode, setPasscode] = React.useState<string>('')
 
-  if (isActive) {
-    return (
-      <DrawerWrapper
-        title={type === 'create' ? 'Create your passcode' : 'Enter your passcode'}
-        isActive={isActive}
-        onClose={onClose}
-      >
-        <Styles.Row>
-          <Styles.Form>
-            <OneTimePassword value={passcode} onChange={setPasscode} />
-          </Styles.Form>
+  return (
+    <DrawerWrapper
+      title={type === 'create' ? 'Create your passcode' : 'Enter your passcode'}
+      isActive={isActive}
+      onClose={onClose}
+    >
+      <Styles.Row>
+        <Styles.Form>
+          <OneTimePassword value={passcode} onChange={setPasscode} />
+        </Styles.Form>
 
-          <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onClose} mr={7.5} isSmall />
-            <Button label="Ok" disabled={passcode.length !== 6} onClick={onConfirm} isSmall />
-          </Styles.Actions>
-        </Styles.Row>
-      </DrawerWrapper>
-    )
-  }
-  return null
+        <Styles.Actions>
+          <Button label="Cancel" isLight onClick={onClose} mr={7.5} isSmall />
+          <Button
+            label="Ok"
+            disabled={passcode.length !== 6}
+            onClick={() => onConfirm(passcode)}
+            isSmall
+          />
+        </Styles.Actions>
+      </Styles.Row>
+    </DrawerWrapper>
+  )
 }
 
 export default PasscodeDrawer

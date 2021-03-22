@@ -86,7 +86,7 @@ const Send: React.FC = () => {
   }
 
   const getNetworkFee = async (): Promise<void> => {
-    const fee = await getFees()
+    const fee = await getFees(chain)
     setUtxosList([])
 
     const sortOutputs = outputs.sort((a, b) => a.satoshis - b.satoshis)

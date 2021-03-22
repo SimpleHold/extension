@@ -8,6 +8,7 @@ const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const ExtensionReloader = require('webpack-extension-reloader')
 const WextManifestWebpackPlugin = require('wext-manifest-webpack-plugin')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
+const Dotenv = require('dotenv-webpack')
 
 const viewsPath = path.join(__dirname, 'views')
 const sourcePath = path.join(__dirname, 'src')
@@ -100,8 +101,8 @@ module.exports = {
       },
     ],
   },
-
   plugins: [
+    new Dotenv(),
     new WextManifestWebpackPlugin(),
     new webpack.SourceMapDevToolPlugin({ filename: false }),
     new ForkTsCheckerWebpackPlugin(),
@@ -132,7 +133,6 @@ module.exports = {
     }),
     extensionReloaderPlugin,
   ],
-
   optimization: {
     minimize: true,
     minimizer: [
