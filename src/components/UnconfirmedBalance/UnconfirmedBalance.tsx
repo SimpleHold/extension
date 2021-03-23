@@ -1,4 +1,5 @@
 import * as React from 'react'
+import SVG from 'react-inlinesvg'
 
 // Components
 import Skeleton from '@components/Skeleton'
@@ -24,16 +25,14 @@ const UnconfirmedBalance: React.FC<Props> = (props) => {
   }, [btcValue])
 
   return (
-    <Styles.Container type={type}>
-      <Styles.Title type={type}>Unconfirmed balance:</Styles.Title>
-      <Styles.Values>
-        <Styles.BTCValue type={type}>{btcValue} BTC</Styles.BTCValue>
-        <Skeleton width={80} height={14} isLoading={USDValue === null} type={type}>
-          {USDValue ? (
-            <Styles.USDValue type={type}>{`$${price(USDValue)} USD`}</Styles.USDValue>
-          ) : null}
-        </Skeleton>
-      </Styles.Values>
+    <Styles.Container>
+      <Styles.IconRow>
+        <SVG src="../../assets/icons/clock.svg" width={16} height={16} />
+      </Styles.IconRow>
+      <Styles.Row>
+        <Styles.BTCValue>+ 0.16823857 BTC</Styles.BTCValue>
+        <Styles.USDValue>$ 8,964.91</Styles.USDValue>
+      </Styles.Row>
     </Styles.Container>
   )
 }
