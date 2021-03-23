@@ -7,13 +7,14 @@ type TProps = {
 const Container = styled.div`
   background: rgba(255, 255, 255, 0.2);
   border-radius: 5px;
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
   align-items: center;
 `
 
 const IconRow = styled.div`
   padding: 7px 10px;
+  height: 30px;
 `
 
 const Row = styled.div`

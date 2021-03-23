@@ -11,21 +11,22 @@ const Row = styled.div``
 
 const Cover = styled.div`
   width: 100%;
-  padding: 0 0 10px 0;
   background-image: url(${background});
   background-repeat: no-repeat;
   background-position: bottom;
   position: fixed;
   z-index: 2;
+  height: 290px;
 `
 
 const WalletsList = styled.div`
   position: relative;
   padding: 20px 30px;
+  top: 290px;
 `
 
 const Balances = styled.div`
-  padding: 20px 30px 0 30px;
+  padding: 10px 30px 0 30px;
 `
 
 const TotalBalanceLabel = styled.p`
@@ -54,7 +55,7 @@ const AddWalletBlock = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  padding: 20px 30px 0 30px;
+  padding: 0 30px;
   align-items: center;
 `
 

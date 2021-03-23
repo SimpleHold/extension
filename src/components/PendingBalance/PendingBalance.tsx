@@ -1,5 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
+import numeral from 'numeral'
 
 // Components
 import Skeleton from '@components/Skeleton'
@@ -15,7 +16,7 @@ interface Props {
   type: 'light' | 'gray'
 }
 
-const UnconfirmedBalance: React.FC<Props> = (props) => {
+const PendingBalance: React.FC<Props> = (props) => {
   const { btcValue, type } = props
 
   const [USDValue, setUSDValue] = React.useState<number | null>(null)
@@ -30,11 +31,13 @@ const UnconfirmedBalance: React.FC<Props> = (props) => {
         <SVG src="../../assets/icons/clock.svg" width={16} height={16} />
       </Styles.IconRow>
       <Styles.Row>
-        <Styles.BTCValue>+ 0.16823857 BTC</Styles.BTCValue>
-        <Styles.USDValue>$ 8,964.91</Styles.USDValue>
+        <Styles.BTCValue>{numeral(btcValue).format('0.[00000000]')} BTC</Styles.BTCValue>
+        <Skeleton width={56} height={14} isLoading={USDValue === null} type={type}>
+          {USDValue ? <Styles.USDValue>{`$ ${price(USDValue)}`}</Styles.USDValue> : null}
+        </Skeleton>
       </Styles.Row>
     </Styles.Container>
   )
 }
 
-export default UnconfirmedBalance
+export default PendingBalance

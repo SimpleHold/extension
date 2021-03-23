@@ -12,7 +12,7 @@ import DropDown from '@components/DropDown'
 import Skeleton from '@components/Skeleton'
 import QRCode from '@components/QRCode'
 import CopyToClipboard from '@components/CopyToClipboard'
-import UnconfirmedBalance from '@components/UnconfirmedBalance'
+import PendingBalance from '@components/PendingBalance'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -224,7 +224,7 @@ const Receive: React.FC = () => {
             </Skeleton>
 
             {unconfirmedBalance !== null && Number(unconfirmedBalance) > 0 ? (
-              <UnconfirmedBalance btcValue={unconfirmedBalance} type="gray" />
+              <PendingBalance btcValue={unconfirmedBalance} type="gray" />
             ) : null}
           </Styles.Row>
           <Styles.ReceiveBlock>

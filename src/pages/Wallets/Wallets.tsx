@@ -7,7 +7,7 @@ import numeral from 'numeral'
 import Header from '@components/Header'
 import WalletCard from '@components/WalletCard'
 import Skeleton from '@components/Skeleton'
-import UnconfirmedBalance from '@components/UnconfirmedBalance'
+import PendingBalance from '@components/PendingBalance'
 
 // Utils
 import { IWallet, getWallets } from '@utils/wallet'
@@ -27,16 +27,11 @@ const Wallets: React.FC = () => {
   const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
   const [walletsBalance, setWalletsBalance] = React.useState<number[]>([])
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
-  const [unconfirmedBalance, setUnconfirmedBalance] = React.useState<null | number>(null)
-  const [coverHeight, setCoverHeight] = React.useState<number>(0)
+  const [unconfirmedBalance, setUnconfirmedBalance] = React.useState<null | number>(1)
 
   React.useEffect(() => {
     getWalletsList()
   }, [])
-
-  React.useEffect(() => {
-    getCoverHeight()
-  }, [unconfirmedBalance])
 
   React.useEffect(() => {
     if (walletsBalance.length === wallets?.length && totalBalance === null) {
@@ -66,14 +61,6 @@ const Wallets: React.FC = () => {
       }
     }
   }, [totalBalance])
-
-  const getCoverHeight = (): void => {
-    const cover = document.querySelector<HTMLDivElement>('.wallets-cover')
-
-    if (cover !== null) {
-      setCoverHeight(cover?.offsetHeight)
-    }
-  }
 
   const getWalletsList = () => {
     const walletsList = getWallets()
@@ -105,7 +92,7 @@ const Wallets: React.FC = () => {
   return (
     <Styles.Wrapper>
       <Styles.Row>
-        <Styles.Cover className="wallets-cover">
+        <Styles.Cover>
           <Header />
 
           <Styles.Balances>
@@ -132,7 +119,7 @@ const Wallets: React.FC = () => {
               <Styles.TotalEstimated>{`$${price(totalEstimated)} USD`}</Styles.TotalEstimated>
             </Skeleton>
             {unconfirmedBalance !== null && unconfirmedBalance > 0 ? (
-              <UnconfirmedBalance btcValue={unconfirmedBalance} type="light" />
+              <PendingBalance btcValue={unconfirmedBalance} type="light" />
             ) : null}
           </Styles.Balances>
 
@@ -149,7 +136,7 @@ const Wallets: React.FC = () => {
           </Styles.AddWalletBlock>
         </Styles.Cover>
         {wallets?.length ? (
-          <Styles.WalletsList style={{ top: `${coverHeight}px` }}>
+          <Styles.WalletsList>
             {wallets.map((wallet: IWallet) => {
               const { address, symbol } = wallet
 
