@@ -12,7 +12,6 @@
   "homepage_url": "https://simplehold.io",
   "short_name": "SimpleHold",
   "permissions": [
-    "activeTab",
     "storage",
     "https://blockchain.info/*",
     "https://min-api.cryptocompare.com/*",
