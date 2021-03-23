@@ -1,4 +1,4 @@
-import bitcore from 'bitcore-lib'
+import bitcore, { Transaction } from 'bitcore-lib'
 import litecore from 'litecore-lib'
 import dogecore from 'bitcore-lib-doge'
 import bitcoreCash from 'bitcore-lib-cash'
@@ -172,10 +172,126 @@ class GenerateAddress {
     return null
   }
 
+  getTransactionSize = (outputs: Transaction.UnspentOutput[]): number => {
+    const { symbol } = this
+
+    if (symbol === 'btc') {
+      return new Transaction().from(outputs).toString().length
+    }
+
+    if (symbol === 'bch') {
+      return 0 // Fix me
+    }
+
+    if (symbol === 'bsv') {
+      return 0 // Fix me
+    }
+
+    if (symbol === 'dash') {
+      return new window.dashcore.Transaction().from(outputs).toString().length
+    }
+
+    if (symbol === 'doge') {
+      return new dogecore.Transaction().from(outputs).toString().length
+    }
+
+    if (symbol === 'grs') {
+      return 0 // Fix me
+    }
+
+    if (symbol === 'ltc') {
+      return 0 // Fix me
+    }
+
+    if (symbol === 'zec') {
+      return 0 // Fix me
+    }
+
+    return 0
+  }
+
+  toSat = (value: number): number => {
+    return bitcore.Unit.fromBTC(value).toSatoshis()
+  }
+
+  fromSat = (value: number): number => {
+    return bitcore.Unit.fromSatoshis(value).toBTC()
+  }
+
+  getNetworkFee = (
+    unspentOutputs: Transaction.UnspentOutput[],
+    feePerByteSat: number,
+    amount: string
+  ) => {
+    const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
+    const utxos = []
+
+    for (const output of sortOutputs) {
+      const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
+      const transactionFeeBytes = this.getTransactionSize(utxos) * feePerByteSat
+
+      if (getUtxosValue >= this.toSat(Number(amount)) + transactionFeeBytes) {
+        break
+      }
+
+      utxos.push(output)
+    }
+
+    return {
+      networkFee: this.fromSat(this.getTransactionSize(utxos) * feePerByteSat),
+      utxos,
+    }
+  }
+
   validate = (address: string): boolean => {
     const { symbol } = this
 
-    return new RegExp(addressValidate[symbol]).test(address)
+    return new RegExp(addressValidate[symbol])?.test(address)
+  }
+
+  createTransaction = (
+    outputs: Transaction.UnspentOutput[],
+    to: string,
+    amount: number,
+    fee: number,
+    changeAddress: string,
+    privateKey: string
+  ) => {
+    try {
+      const { symbol } = this
+
+      if (symbol === 'btc') {
+        const transaction = new Transaction()
+          .from(outputs)
+          .to(to, amount)
+          .fee(fee)
+          .change(changeAddress)
+          .sign(privateKey)
+
+        return {
+          raw: transaction.serialize(),
+          hash: transaction.hash,
+        }
+      }
+
+      if (symbol === 'doge') {
+        const transaction = new dogecore.Transaction()
+          .from(outputs)
+          .to(to, amount)
+          .fee(fee)
+          .change(changeAddress)
+          .sign(privateKey)
+
+        return {
+          raw: transaction.serialize(),
+          hash: transaction.hash,
+        }
+      }
+
+      return null
+    } catch {
+      return null
+    }
   }
 }
 

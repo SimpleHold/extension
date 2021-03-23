@@ -134,9 +134,20 @@ const DestinateText = styled.p`
   white-space: nowrap;
 `
 
-const ListRow = styled.div``
+const ListRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
 
-const Amount = styled.p``
+const Amount = styled.p`
+  margin: 0;
+  width: 88px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
+`
 
 const Styles = {
   Wrapper,

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
+import numeral from 'numeral'
 
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
@@ -8,7 +9,7 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getCurrency } from '@config/currencies'
 import { getBalance } from '@utils/bitcoin'
-import { toUpper, numberFriendly, limitBalance } from '@utils/format'
+import { toUpper, numberFriendly } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -72,7 +73,9 @@ const WalletCard: React.FC<Props> = (props) => {
         </Styles.AddressInfo>
         <Styles.Balances>
           <Skeleton width={106} height={16} type="gray" br={4} isLoading={balance === null}>
-            <Styles.Balance>{`${limitBalance(balance, 10)} ${toUpper(symbol)}`}</Styles.Balance>
+            <Styles.Balance>{`${numeral(balance).format('0.[00000000]')} ${toUpper(
+              symbol
+            )}`}</Styles.Balance>
           </Skeleton>
           <Skeleton width={80} height={14} type="gray" mt={9} br={4} isLoading={estimated === null}>
             <Styles.Estimated>{`$${numberFriendly(estimated)} USD`}</Styles.Estimated>

@@ -13,6 +13,7 @@ type TLogoProps = {
 
 const Container = styled.div`
   width: ${({ width }: TContainerProps) => `${width}px`};
+  min-width: ${({ width }: TContainerProps) => `${width}px`};
   height: ${({ height }: TContainerProps) => `${height}px`};
   background-color: ${({ background }: TContainerProps) => background};
   border-radius: ${({ br }: TContainerProps) => (br ? `${br}px` : '5px')};

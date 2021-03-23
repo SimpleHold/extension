@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import { v4 } from 'uuid'
 
 // Components
 import Cover from '@components/Cover'
@@ -13,8 +14,9 @@ import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { checkExistWallet } from '@utils/wallet'
-import address, { TSymbols } from '@utils/address'
+import { checkExistWallet, addNew as addNewWallet } from '@utils/wallet'
+import addressUtil, { TSymbols } from '@utils/address'
+import { decrypt, encrypt } from '@utils/crypto'
 
 // Styles
 import Styles from './styles'
@@ -39,7 +41,7 @@ const ImportPrivateKey: React.FC = () => {
       setErrorLabel(null)
     }
 
-    const getAddress = new address(symbol).import(privateKey)
+    const getAddress = new addressUtil(symbol).import(privateKey)
 
     if (getAddress) {
       const checkExist = checkExistWallet(getAddress)
@@ -53,42 +55,37 @@ const ImportPrivateKey: React.FC = () => {
     return setErrorLabel('Invalid private key')
   }
 
-  const onSuccess = (password: string): void => {
-    localStorage.setItem('backupStatus', 'notDownloaded')
-
-    history.push('/download-backup', {
-      password,
-      from: 'privateKey',
-    })
-  }
-
   const onConfirmDrawer = (): void => {
-    // if (validatePassword(password)) {
-    //   const backup = localStorage.getItem('backup')
-    //   if (backup && privateKey) {
-    //     const decryptBackup = decrypt(backup, password)
-    //     if (decryptBackup) {
-    //       const parseBackup = JSON.parse(decryptBackup)
-    //       const address = new addressUtil(symbol).import(privateKey)
-    //       if (address) {
-    //         const uuid = v4()
-    //         const newWalletsList = addNewWallet(address, symbol, uuid)
-    //         parseBackup.wallets.push({
-    //           symbol,
-    //           address,
-    //           uuid,
-    //           privateKey,
-    //         })
-    //         if (newWalletsList) {
-    //           localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
-    //           localStorage.setItem('wallets', newWalletsList)
-    //           return onSuccess(password)
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-    // return setErrorLabel('Password is not valid')
+    const backup = localStorage.getItem('backup')
+
+    if (backup && privateKey) {
+      const decryptBackup = decrypt(backup, password)
+      if (decryptBackup) {
+        const parseBackup = JSON.parse(decryptBackup)
+        const address = new addressUtil(symbol).import(privateKey)
+        if (address) {
+          const uuid = v4()
+          const newWalletsList = addNewWallet(address, symbol, uuid)
+          parseBackup.wallets.push({
+            symbol,
+            address,
+            uuid,
+            privateKey,
+          })
+          if (newWalletsList) {
+            localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+            localStorage.setItem('wallets', newWalletsList)
+            localStorage.setItem('backupStatus', 'notDownloaded')
+
+            return history.push('/download-backup', {
+              password,
+              from: 'privateKey',
+            })
+          }
+        }
+      }
+    }
+    return setErrorLabel('Password is not valid')
   }
 
   return (

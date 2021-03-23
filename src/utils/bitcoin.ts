@@ -105,14 +105,6 @@ export const createTransaction = (
   }
 }
 
-export const getTransactionSize = (outputs: Transaction.UnspentOutput[]) => {
-  try {
-    return new Transaction().from(outputs).toString().length
-  } catch {
-    return 0
-  }
-}
-
 export const btcToSat = (value: number) => {
   return Unit.fromBTC(value).toSatoshis()
 }

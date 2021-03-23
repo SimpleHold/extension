@@ -17,8 +17,9 @@ import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { IRawTransaction, sendRawTransaction } from '@utils/bitcoin'
+import { IRawTransaction, sendRawTransaction, createTransaction, btcToSat } from '@utils/bitcoin'
 import { logEvent } from '@utils/amplitude'
+import address, { TSymbols } from '@utils/address'
 
 // Config
 import {
@@ -33,7 +34,7 @@ import Styles from './styles'
 
 interface LocationState {
   amount: number
-  symbol: string
+  symbol: TSymbols
   networkFee: number
   addressFrom: string
   addressTo: string
@@ -71,11 +72,11 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
-          const transaction: IRawTransaction | null = window.createTransaction(
+          const transaction: IRawTransaction | null = new address(symbol).createTransaction(
             outputs,
             addressTo,
-            window.btcToSat(amount),
-            window.btcToSat(networkFee),
+            btcToSat(amount),
+            btcToSat(networkFee),
             addressFrom,
             findWallet.privateKey
           )

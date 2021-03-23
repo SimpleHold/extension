@@ -14,14 +14,7 @@ import Spinner from '@components/Spinner'
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
-import {
-  getBalance,
-  getTransactionSize,
-  getUnspentOutputs,
-  getFees,
-  btcToSat,
-  satToBtc,
-} from '@utils/bitcoin'
+import { getBalance, getUnspentOutputs, getFees } from '@utils/bitcoin'
 import { logEvent } from '@utils/amplitude'
 import addressLib, { TSymbols } from '@utils/address'
 
@@ -82,6 +75,7 @@ const Send: React.FC = () => {
 
   const getOutputs = async (): Promise<void> => {
     const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
+    console.log('unspentOutputs', unspentOutputs)
     setOutputs(unspentOutputs)
   }
 
@@ -89,32 +83,10 @@ const Send: React.FC = () => {
     const fee = await getFees(chain)
     setUtxosList([])
 
-    const sortOutputs = outputs.sort((a, b) => a.satoshis - b.satoshis)
-    const utxos: Transaction.UnspentOutput[] = []
-
-    for (const output of sortOutputs) {
-      const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-      const transactionFeeBytes = getTransactionSize(utxos) * fee
-
-      if (getUtxosValue >= btcToSat(Number(amount)) + transactionFeeBytes) {
-        break
-      }
-
-      const newOutput = new Transaction.UnspentOutput({
-        txId: output.txId,
-        vout: output.outputIndex,
-        address: output.address,
-        scriptPubKey: output.script,
-        amount: satToBtc(output.satoshis),
-      })
-
-      utxos.push(newOutput)
-    }
+    const { networkFee, utxos } = new addressLib(symbol).getNetworkFee(outputs, fee, amount)
 
     setUtxosList(utxos)
-
-    const transactionFeeBytes = window.getTransactionSize(utxos)
-    setNetworkFee(satToBtc(transactionFeeBytes * fee))
+    setNetworkFee(networkFee)
     setNetworkFeeLoading(false)
   }
 
