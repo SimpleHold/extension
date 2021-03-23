@@ -40,8 +40,6 @@ const Wallets: React.FC = () => {
 
     const { address, privateKey } = window.generateWallet()
     const { backup, wallets } = generate(address, privateKey)
-    console.log('backup', backup)
-    console.log('wallets', wallets)
     localStorage.setItem('backup', encrypt(backup, password))
     localStorage.setItem('wallets', wallets)
     localStorage.setItem('backupStatus', 'notDownloaded')
