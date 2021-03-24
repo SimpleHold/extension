@@ -110,7 +110,7 @@ const Send: React.FC = () => {
 
       if (fetchBalance) {
         setBalance(fetchBalance.balance)
-        setEstimated(fetchBalance.usd)
+        setEstimated(fetchBalance.balance_usd)
       } else {
         //   const latestbalance = getLatestBalance(address)
         // setBalance(latestbalance)

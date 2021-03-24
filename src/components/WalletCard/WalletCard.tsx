@@ -39,13 +39,13 @@ const WalletCard: React.FC<Props> = (props) => {
       const tryGetBalance = await getBalance(address, currency?.chain)
 
       if (tryGetBalance) {
-        const { balance, usd } = tryGetBalance
+        const { balance, balance_usd } = tryGetBalance
 
         setBalance(balance)
         sumBalance(balance)
 
-        setEstimated(usd)
-        sumEstimated(usd)
+        setEstimated(balance_usd)
+        sumEstimated(balance_usd)
       } else {
         // const latestbalance = getLatestBalance(address)
         // setBalance(latestbalance)

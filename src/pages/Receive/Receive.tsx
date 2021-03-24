@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
 import { browser, Tabs } from 'webextension-polyfill-ts'
+import numeral from 'numeral'
 
 // Components
 import Cover from '@components/Cover'
@@ -23,7 +24,7 @@ import useVisible from '@hooks/useVisible'
 
 // Utils
 import { getBalance } from '@utils/bitcoin'
-import { limitBalance, price, toUpper } from '@utils/format'
+import { price, toUpper } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
@@ -61,7 +62,7 @@ const Receive: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'privateKey'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
-  const [unconfirmedBalance, setUnconfirmedBalance] = React.useState<null | number>(null)
+  const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
 
   React.useEffect(() => {
     logEvent({
@@ -94,7 +95,8 @@ const Receive: React.FC = () => {
 
     if (fetchBalance) {
       setBalance(fetchBalance.balance)
-      setEstimated(fetchBalance.usd)
+      setEstimated(fetchBalance.balance_usd)
+      setPendingBalance(100) //fetchBalance.pending
     } else {
       // const latestbalance = getLatestBalance(address)
       // if (latestbalance !== 0) {
@@ -208,7 +210,7 @@ const Receive: React.FC = () => {
 
             <Skeleton width={250} height={36} mt={10} type="gray" isLoading={balance === null}>
               <Styles.Balance>
-                {limitBalance(balance, 12)} {toUpper(symbol)}
+                {numeral(balance).format('0.[00000000]')} {toUpper(symbol)}
               </Styles.Balance>
             </Skeleton>
 
@@ -220,16 +222,18 @@ const Receive: React.FC = () => {
               type="gray"
               isLoading={estimated === null}
             >
-              <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
+              {estimated !== null ? (
+                <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
+              ) : null}
             </Skeleton>
 
-            {unconfirmedBalance !== null && Number(unconfirmedBalance) > 0 ? (
-              <PendingBalance btcValue={unconfirmedBalance} type="gray" />
+            {pendingBalance !== null && Number(pendingBalance) > 0 ? (
+              <PendingBalance btcValue={pendingBalance} type="gray" />
             ) : null}
           </Styles.Row>
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />
-            <CopyToClipboard value={address} mb={40} onCopy={onCopyAddress}>
+            <CopyToClipboard value={address} mb={20} onCopy={onCopyAddress}>
               <Styles.Address>{address}</Styles.Address>
             </CopyToClipboard>
             <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} />

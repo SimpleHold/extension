@@ -27,7 +27,7 @@ const Container = styled.div`
 
 const ReceiveBlock = styled.div`
   border-top: 1px solid #eaeaea;
-  padding: 16px 30px 40px 30px;
+  padding: 20px 30px 30px 30px;
   background-color: #f8f8f8;
   height: 100%;
   display: flex;
@@ -36,8 +36,9 @@ const ReceiveBlock = styled.div`
 `
 
 const Row = styled.div`
-  padding: 16px 30px 20px 30px;
+  padding: 16px 30px 30px 30px;
   position: relative;
+  height: 230px;
 `
 
 const Heading = styled.div`

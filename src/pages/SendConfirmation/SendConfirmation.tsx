@@ -17,7 +17,7 @@ import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { IRawTransaction, sendRawTransaction, createTransaction, btcToSat } from '@utils/bitcoin'
+import { IRawTransaction, sendRawTransaction, btcToSat, satToBtc } from '@utils/bitcoin'
 import { logEvent } from '@utils/amplitude'
 import address, { TSymbols } from '@utils/address'
 
@@ -45,6 +45,7 @@ const SendConfirmation: React.FC = () => {
   const history = useHistory()
   const {
     state: { amount, symbol, networkFee, addressFrom, addressTo, outputs },
+    state,
   } = useLocation<LocationState>()
 
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
@@ -76,7 +77,7 @@ const SendConfirmation: React.FC = () => {
             outputs,
             addressTo,
             btcToSat(amount),
-            btcToSat(networkFee),
+            satToBtc(networkFee),
             addressFrom,
             findWallet.privateKey
           )

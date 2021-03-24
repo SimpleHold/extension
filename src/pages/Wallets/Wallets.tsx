@@ -1,13 +1,12 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
-import SVG from 'react-inlinesvg'
-import numeral from 'numeral'
 
 // Components
-import Header from '@components/Header'
 import WalletCard from '@components/WalletCard'
-import Skeleton from '@components/Skeleton'
-import PendingBalance from '@components/PendingBalance'
+import CollapsibleHeader from '@components/CollapsibleHeader'
+
+// Hooks
+import useScroll from '@hooks/useScroll'
 
 // Utils
 import { IWallet, getWallets } from '@utils/wallet'
@@ -27,7 +26,9 @@ const Wallets: React.FC = () => {
   const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
   const [walletsBalance, setWalletsBalance] = React.useState<number[]>([])
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
-  const [unconfirmedBalance, setUnconfirmedBalance] = React.useState<null | number>(1)
+  const [pendingBalance, setPendingBalance] = React.useState<null | number>(1)
+
+  const { scrollPosition } = useScroll()
 
   React.useEffect(() => {
     getWalletsList()
@@ -91,68 +92,29 @@ const Wallets: React.FC = () => {
 
   return (
     <Styles.Wrapper>
-      <Styles.Row>
-        <Styles.Cover>
-          <Header />
+      <CollapsibleHeader
+        onAddNewAddress={onAddNewAddress}
+        scrollPosition={scrollPosition}
+        balance={0.23410354}
+        estimated={8964.91}
+      />
+      {wallets?.length ? (
+        <Styles.WalletsList>
+          {wallets.map((wallet: IWallet) => {
+            const { address, symbol } = wallet
 
-          <Styles.Balances>
-            <Styles.TotalBalanceLabel>Total Balance</Styles.TotalBalanceLabel>
-            <Skeleton
-              width={250}
-              height={42}
-              type="light"
-              mt={21}
-              isLoading={totalBalance === null}
-            >
-              <Styles.TotalBalance>
-                {numeral(totalBalance).format('0.[00000000]')} BTC
-              </Styles.TotalBalance>
-            </Skeleton>
-            <Skeleton
-              width={130}
-              height={23}
-              type="light"
-              mt={5}
-              isLoading={totalEstimated === null}
-              mb={10}
-            >
-              <Styles.TotalEstimated>{`$${price(totalEstimated)} USD`}</Styles.TotalEstimated>
-            </Skeleton>
-            {unconfirmedBalance !== null && unconfirmedBalance > 0 ? (
-              <PendingBalance btcValue={unconfirmedBalance} type="light" />
-            ) : null}
-          </Styles.Balances>
-
-          <Styles.AddWalletBlock>
-            <Styles.WalletsLabel>Wallets</Styles.WalletsLabel>
-            <Styles.AddWalletButton onClick={onAddNewAddress}>
-              <SVG
-                src="../../assets/icons/plus.svg"
-                width={16}
-                height={16}
-                title="Add new wallet"
+            return (
+              <WalletCard
+                key={address}
+                address={address}
+                symbol={symbol.toLowerCase()}
+                sumBalance={sumBalance}
+                sumEstimated={sumEstimated}
               />
-            </Styles.AddWalletButton>
-          </Styles.AddWalletBlock>
-        </Styles.Cover>
-        {wallets?.length ? (
-          <Styles.WalletsList>
-            {wallets.map((wallet: IWallet) => {
-              const { address, symbol } = wallet
-
-              return (
-                <WalletCard
-                  key={address}
-                  address={address}
-                  symbol={symbol.toLowerCase()}
-                  sumBalance={sumBalance}
-                  sumEstimated={sumEstimated}
-                />
-              )
-            })}
-          </Styles.WalletsList>
-        ) : null}
-      </Styles.Row>
+            )
+          })}
+        </Styles.WalletsList>
+      ) : null}
     </Styles.Wrapper>
   )
 }

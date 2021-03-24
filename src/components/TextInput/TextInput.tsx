@@ -18,6 +18,7 @@ const TextInput: React.FC<Props> = (props) => {
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
   const visibleBlockRef = React.useRef<HTMLDivElement>(null)
+  let numberInputRef: HTMLInputElement
 
   const [isFocused, setIsFocused] = React.useState<boolean>(false)
   const [isPasswordVisible, setPasswordVisible] = React.useState<boolean>(false)
@@ -27,7 +28,11 @@ const TextInput: React.FC<Props> = (props) => {
       (visibleBlockRef.current && !visibleBlockRef.current.contains(event.target as Node)) ||
       !withPasswordVisible
     ) {
-      textInputRef.current?.focus()
+      if (type === 'number') {
+        numberInputRef.focus()
+      } else {
+        textInputRef.current?.focus()
+      }
     }
   }
 
@@ -42,6 +47,31 @@ const TextInput: React.FC<Props> = (props) => {
     }
   }
 
+  const renderInput = () => {
+    if (type === 'number') {
+      return (
+        <Styles.NumberInput
+          getInputRef={(el: HTMLInputElement) => (numberInputRef = el)}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          value={value}
+          onChange={onChange}
+          decimalScale={8}
+        />
+      )
+    }
+    return (
+      <Styles.Input
+        ref={textInputRef}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        value={value}
+        onChange={onChange}
+        type={type === 'password' && isPasswordVisible ? 'text' : type}
+      />
+    )
+  }
+
   return (
     <Styles.Container
       onClick={onClick}
@@ -52,24 +82,7 @@ const TextInput: React.FC<Props> = (props) => {
         <Styles.Label>
           {errorLabel && !isFocused && value.length > 0 ? errorLabel : label}
         </Styles.Label>
-        {type === 'number ' ? (
-          <Styles.NumberInput
-            ref={textInputRef}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            value={value}
-            onChange={onChange}
-          />
-        ) : (
-          <Styles.Input
-            ref={textInputRef}
-            onFocus={onFocus}
-            onBlur={onBlur}
-            value={value}
-            onChange={onChange}
-            type={type === 'password' && isPasswordVisible ? 'text' : type}
-          />
-        )}
+        {renderInput()}
       </Styles.Row>
       {withPasswordVisible ? (
         <Styles.VisibleInput

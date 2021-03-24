@@ -142,7 +142,7 @@ const ListRow = styled.div`
 
 const Amount = styled.p`
   margin: 0;
-  width: 88px;
+  width: 90px;
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;

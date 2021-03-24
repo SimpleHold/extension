@@ -11,7 +11,10 @@ export interface IRawTransaction {
 
 interface IGetBalance {
   balance: number
-  usd: number
+  balance_usd: number
+  balance_btc: number
+  pending: number
+  pending_btc: number
 }
 
 export const getBalance = async (address: string, chain: string): Promise<IGetBalance> => {
@@ -19,16 +22,14 @@ export const getBalance = async (address: string, chain: string): Promise<IGetBa
     const { data }: AxiosResponse = await axios(
       `${config.serverUrl}/wallet/balance/${chain}/${address}`
     )
-    const { balance, balance_usd } = data.data
-
-    return {
-      balance,
-      usd: balance_usd,
-    }
+    return data.data
   } catch {
     return {
       balance: 0,
-      usd: 0,
+      balance_usd: 0,
+      balance_btc: 0,
+      pending: 0,
+      pending_btc: 0,
     }
   }
 }
@@ -77,31 +78,6 @@ export const getFees = async (chain: string): Promise<number> => {
     return data.data || 0
   } catch {
     return 0
-  }
-}
-
-export const createTransaction = (
-  outputs: Transaction.UnspentOutput[],
-  to: string,
-  amount: number,
-  fee: number,
-  changeAddress: string,
-  privateKey: string
-) => {
-  try {
-    const transaction = new Transaction()
-      .from(outputs)
-      .to(to, amount)
-      .fee(fee)
-      .change(changeAddress)
-      .sign(privateKey)
-
-    return {
-      raw: transaction.serialize(),
-      hash: transaction.hash,
-    }
-  } catch {
-    return null
   }
 }
 

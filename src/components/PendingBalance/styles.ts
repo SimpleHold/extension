@@ -1,15 +1,31 @@
 import styled from 'styled-components'
 
-type TProps = {
+type TContainerProps = {
   type: 'light' | 'gray'
 }
 
 const Container = styled.div`
-  background: rgba(255, 255, 255, 0.2);
+  background-color: ${({ type }: TContainerProps) =>
+    type === 'light' ? 'rgba(255, 255, 255, 0.2)' : '#F8F8F8'};
   border-radius: 5px;
   display: inline-flex;
   flex-direction: row;
   align-items: center;
+
+  p {
+    color: ${({ type }: TContainerProps) => (type === 'light' ? '#ffffff' : '#7D7E8D')};
+  }
+
+  div:last-child {
+    border-left: ${({ type }: TContainerProps) =>
+      `1px solid ${type === 'light' ? '#38b175' : '#EAEAEA'}`};
+  }
+
+  svg {
+    path {
+      fill: ${({ type }: TContainerProps) => (type === 'light' ? '#ffffff' : '#C3C3C3')};
+    }
+  }
 `
 
 const IconRow = styled.div`
@@ -18,7 +34,6 @@ const IconRow = styled.div`
 `
 
 const Row = styled.div`
-  border-left: 1px solid #38b175;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -30,7 +45,6 @@ const BTCValue = styled.p`
   font-weight: 500;
   font-size: 12px;
   line-height: 14px;
-  color: #ffffff;
 `
 
 const USDValue = styled.p`
@@ -38,7 +52,6 @@ const USDValue = styled.p`
   font-weight: normal;
   font-size: 12px;
   line-height: 14px;
-  color: #ffffff;
 `
 
 const Styles = {
