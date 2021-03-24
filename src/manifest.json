@@ -1,21 +1,41 @@
 {
-  "name": "extension",
-  "short_name": "extension",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#fff",
-  "theme_color": "#673ab8",
-  "icons": [
-    {
-      "src": "/assets/icons/android-chrome-192x192.png",
-      "type": "image/png",
-      "sizes": "192x192"
+  "manifest_version": 2,
+  "name": "SimpleHold",
+  "version": "1.0.1",
+  "icons": {
+    "16": "assets/logo/favicon-16.png",
+    "32": "assets/logo/favicon-32.png",
+    "48": "assets/logo/favicon-48.png",
+    "128": "assets/logo/favicon-128.png"
+  },
+  "description": "Light wallet for Bitcoin and other cryptocurrencies.",
+  "homepage_url": "https://simplehold.io",
+  "short_name": "SimpleHold",
+  "permissions": [
+    "storage",
+    "https://blockchain.info/*",
+    "https://min-api.cryptocompare.com/*",
+    "https://btc.getblock.io/*",
+    "https://fonts.googleapis.com/*",
+    "https://cdn.amplitude.com/*"
+  ],
+  "content_security_policy": "script-src 'self'; object-src 'self'",
+  "__chrome|firefox__author": "SimpleHold",
+  "__opera__developer": {
+    "name": "SimpleHold"
+  },
+  "__chrome__minimum_chrome_version": "49",
+  "__opera__minimum_opera_version": "36",
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "assets/logo/favicon-16.png",
+      "32": "assets/logo/favicon-32.png",
+      "48": "assets/logo/favicon-48.png",
+      "128": "assets/logo/favicon-128.png"
     },
-    {
-      "src": "/assets/icons/android-chrome-512x512.png",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
-  ]
+    "default_title": "SimpleHold",
+    "__chrome|opera__chrome_style": false,
+    "__firefox__browser_style": false
+  }
 }

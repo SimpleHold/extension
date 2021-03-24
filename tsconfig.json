@@ -1,21 +1,28 @@
 {
-    "compilerOptions": {
-        "target": "ES5",
-        "module": "ESNext",
-        "allowJs": true,
-        "jsx": "react",
-        "jsxFactory": "h",
-        "noEmit": true,
-        "strict": true,
-        "moduleResolution": "node",
-        "esModuleInterop": true,  
-        "skipLibCheck": true,
-        "allowSyntheticDefaultImports": true,
-        "baseUrl": ".",
-        "paths": {
-            "react": ["node_modules/preact/compat/"],
-            "react-dom": ["node_modules/preact/compat/"]
-        }
-    },
-    "include": ["src/**/*", "tests/**/*"]
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "react",
+    "declaration": false,
+    "isolatedModules": true,
+    "useDefineForClassFields": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@pages/*": ["src/pages/*"],
+      "@assets/*": ["assets/pages/*"],
+      "@utils/*": ["src/utils/*"],
+      "@modals/*": ["src/modals/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@config/*": ["src/config/*"]
+    }
+  },
+  "include": ["src", "@types", "webpack.config.js"]
 }

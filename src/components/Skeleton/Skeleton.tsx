@@ -1,0 +1,20 @@
+import * as React from 'react'
+
+// Styles
+import Styles from './styles'
+
+interface Props {
+  type: 'light' | 'gray'
+  width: number
+  height: number
+  mt?: number
+  br?: number
+}
+
+const Skeleton: React.FC<Props> = (props) => {
+  const { type, width, height, mt, br = 5 } = props
+
+  return <Styles.Container type={type} width={width} height={height} mt={mt} br={br} />
+}
+
+export default Skeleton
