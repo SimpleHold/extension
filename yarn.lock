@@ -1017,13 +1017,6 @@
   resolved "https://registry.yarnpkg.com/@types/anymatch/-/anymatch-1.3.1.tgz#336badc1beecb9dacc38bea2cf32adf627a8421a"
   integrity sha512-/+CRPXpBDpo2RK9C68N3b2cOvO0Cf5B9aPijHsoDQTHivnGSObdOF2BRQOYjojWTDy6nQvMjmqRXIxH55VjxxA==
 
-"@types/bitcore-lib@^0.15.2":
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/@types/bitcore-lib/-/bitcore-lib-0.15.2.tgz#148d5a83995e4520c125fa57d06e8c8749e6dc52"
-  integrity sha512-4EGo5FunshASa0xq2Ta2zfi5CANZ7SB6NfHXJKHk5QUort8ywL1Z7tE9Mr5ft7mHjXQVBngqTguQ8Y5So37hiA==
-  dependencies:
-    "@types/node" "*"
-
 "@types/crypto-js@^4.0.1":
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/@types/crypto-js/-/crypto-js-4.0.1.tgz#3a4bd24518b0e6c5940da4e2659eeb2ef0806963"
@@ -1935,11 +1928,6 @@ bech32@0.0.3:
   resolved "https://registry.yarnpkg.com/bech32/-/bech32-0.0.3.tgz#736747c4a6531c5d8937d0400498de30e93b2f9c"
   integrity sha512-O+K1w8P/aAOLcYwwQ4sbiPYZ51ZIW95lnS4/6nE8Aib/z+OOddQIIPdu2qi94qGDp4HhYy/wJotttXKkak1lXg==
 
-bech32@=1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/bech32/-/bech32-1.1.3.tgz#bd47a8986bbb3eec34a56a097a84b8d3e9a2dfcd"
-  integrity sha512-yuVFUvrNcoJi0sv5phmqc6P+Fl1HjRDRNOOkHY2X/3LBy2bIGNSFx4fZ95HMaXHupuS7cZR15AsvtmCIF4UEyg==
-
 big.js@^5.2.2:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/big.js/-/big.js-5.2.2.tgz#65f0af382f578bcdc742bd9c281e9cb2d7768328"
@@ -1983,46 +1971,6 @@ bitcoin-ops@^1.3.0:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/bitcoin-ops/-/bitcoin-ops-1.4.1.tgz#e45de620398e22fd4ca6023de43974ff42240278"
   integrity sha512-pef6gxZFztEhaE9RY9HmWVmiIHqCb2OyS4HPKkpc6CIiiOa3Qmuoylxc5P2EkU3w+5eTSifI9SEZC88idAIGow==
-
-bitcore-lib-cash@^8.25.7:
-  version "8.25.7"
-  resolved "https://registry.yarnpkg.com/bitcore-lib-cash/-/bitcore-lib-cash-8.25.7.tgz#23cba368f23a614781efd845463ef2d6da602143"
-  integrity sha512-aVlY35PBLWhCwmChaBXM0QXoceT/ZonwWIh8mR1z56UCtSrp1wlvq6ipiWbnQrKMGEShrt4kz5up6W33nvHINQ==
-  dependencies:
-    bitcore-lib "^8.25.7"
-    bn.js "=4.11.8"
-    bs58 "^4.0.1"
-    buffer-compare "=1.1.1"
-    elliptic "^6.5.3"
-    inherits "=2.0.1"
-    lodash "^4.17.20"
-
-bitcore-lib-doge@^8.25.7:
-  version "8.25.7"
-  resolved "https://registry.yarnpkg.com/bitcore-lib-doge/-/bitcore-lib-doge-8.25.7.tgz#2d134fabd5e27c105778333c93b0db8acb7046cc"
-  integrity sha512-11R2/RSMeCvlnMXpqoRbff1D8Ivvw3poAZf3SOjlH8clkfw7nqGKPU1USowpezPWxQ+29l4lEsmN3ZbxLWDJbg==
-  dependencies:
-    bech32 "=1.1.3"
-    bn.js "=4.11.8"
-    bs58 "^4.0.1"
-    buffer-compare "=1.1.1"
-    elliptic "^6.5.3"
-    inherits "=2.0.1"
-    lodash "^4.17.20"
-    scryptsy "2.1.0"
-
-bitcore-lib@^8.25.7:
-  version "8.25.7"
-  resolved "https://registry.yarnpkg.com/bitcore-lib/-/bitcore-lib-8.25.7.tgz#11a2f55d888fc8efddb5de96f53d7548fa656bb2"
-  integrity sha512-eECXfaXkc6LSK3ZjOAsEvKXMMpbmWFJh+SaFFgWkyOs1py6LtXoUbjopDAuTyU4d1uIyGpUkZ+HHji+5QcXn/A==
-  dependencies:
-    bech32 "=1.1.3"
-    bn.js "=4.11.8"
-    bs58 "^4.0.1"
-    buffer-compare "=1.1.1"
-    elliptic "^6.5.3"
-    inherits "=2.0.1"
-    lodash "^4.17.20"
 
 bitgo-utxo-lib@^1.8.0:
   version "1.8.0"
@@ -2087,21 +2035,6 @@ blueimp-md5@^2.10.0:
   version "2.18.0"
   resolved "https://registry.yarnpkg.com/blueimp-md5/-/blueimp-md5-2.18.0.tgz#1152be1335f0c6b3911ed9e36db54f3e6ac52935"
   integrity sha512-vE52okJvzsVWhcgUHOv+69OG3Mdg151xyn41aVQN/5W5S+S43qZhxECtYLAEHMSFWX6Mv5IZrzj3T5+JqXfj5Q==
-
-bn.js@=2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-2.0.4.tgz#220a7cd677f7f1bfa93627ff4193776fe7819480"
-  integrity sha1-Igp81nf38b+pNif/QZN3b+eBlIA=
-
-bn.js@=4.11.8:
-  version "4.11.8"
-  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.8.tgz#2cde09eb5ee341f484746bb0309b3253b1b1442f"
-  integrity sha512-ItfYfPLkWHUjckQCk8xC+LwxgK8NYcXywGigJgSwOP8Y2iyWT4f2vsZnoOXTTbo+o5yXmIUJ4gn5538SO5S3gA==
-
-bn.js@^2.0.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-2.2.0.tgz#12162bc2ae71fc40a5626c33438f3a875cd37625"
-  integrity sha1-EhYrwq5x/EClYmwzQ486h1zTdiU=
 
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.11.9:
   version "4.11.9"
@@ -2231,12 +2164,7 @@ browserslist@^4.14.5, browserslist@^4.16.1, browserslist@^4.16.3:
     escalade "^3.1.1"
     node-releases "^1.1.70"
 
-bs58@=2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/bs58/-/bs58-2.0.0.tgz#72b713bed223a0ac518bbda0e3ce3f4817f39eb5"
-  integrity sha1-crcTvtIjoKxRi72g484/SBfznrU=
-
-bs58@^4.0.0, bs58@^4.0.1:
+bs58@^4.0.0:
   version "4.0.1"
   resolved "https://registry.yarnpkg.com/bs58/-/bs58-4.0.1.tgz#be161e76c354f6f788ae4071f63f34e8c4f0a42a"
   integrity sha1-vhYedsNU9veIrkBx9j806MTwpCo=
@@ -2251,16 +2179,6 @@ bs58check@<3.0.0, bs58check@^2.0.0:
     bs58 "^4.0.0"
     create-hash "^1.1.0"
     safe-buffer "^5.1.2"
-
-buffer-compare@=1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/buffer-compare/-/buffer-compare-1.0.0.tgz#acaa7a966e98eee9fae14b31c39a5f158fb3c4a2"
-  integrity sha1-rKp6lm6Y7un64Usxw5pfFY+zxKI=
-
-buffer-compare@=1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/buffer-compare/-/buffer-compare-1.1.1.tgz#5be7be853af89198d1f4ddc090d1d66a48aef596"
-  integrity sha1-W+e+hTr4kZjR9N3AkNHWakiu9ZY=
 
 buffer-crc32@^0.2.1, buffer-crc32@^0.2.13:
   version "0.2.13"
@@ -3205,16 +3123,6 @@ electron-to-chromium@^1.3.649:
   version "1.3.669"
   resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.669.tgz#ef9b63187b3f9821e2a064e04f616ea092282b41"
   integrity sha512-VNj10fmGC6SbE7s4tKG7y2OopVXYoTIfjE1MetflPd77KmeRuHtkl+HYsfF00BGg5hyaorTUn6lTToEHaciOSw==
-
-elliptic@=3.0.3:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/elliptic/-/elliptic-3.0.3.tgz#865c9b420bfbe55006b9f969f97a0d2c44966595"
-  integrity sha1-hlybQgv75VAGuflp+XoNLESWZZU=
-  dependencies:
-    bn.js "^2.0.0"
-    brorand "^1.0.1"
-    hash.js "^1.0.0"
-    inherits "^2.0.1"
 
 elliptic@^6.5.2, elliptic@^6.5.3:
   version "6.5.4"
@@ -4464,7 +4372,7 @@ inherits@2, inherits@^2.0.1, inherits@^2.0.3, inherits@^2.0.4, inherits@~2.0.0, 
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.4.tgz#0fa2c64f932917c3433a0ded55363aae37416b7c"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
 
-inherits@2.0.1, inherits@=2.0.1:
+inherits@2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.1.tgz#b17d08d326b4423e568eff719f91b0b1cbdf69f1"
   integrity sha1-sX0I0ya0Qj5Wjv9xn5GwscvfafE=
@@ -4937,19 +4845,6 @@ lines-and-columns@^1.1.6:
   resolved "https://registry.yarnpkg.com/lines-and-columns/-/lines-and-columns-1.1.6.tgz#1c00c743b433cd0a4e80758f7b64a57440d9ff00"
   integrity sha1-HADHQ7QzzQpOgHWPe2SldEDZ/wA=
 
-litecore-lib@^0.13.22:
-  version "0.13.22"
-  resolved "https://registry.yarnpkg.com/litecore-lib/-/litecore-lib-0.13.22.tgz#7d7406be67582ee5fdf2ac0004ea6ad1d1d0d3f0"
-  integrity sha1-fXQGvmdYLuX98qwABOpq0dHQ0/A=
-  dependencies:
-    bn.js "=2.0.4"
-    bs58 "=2.0.0"
-    buffer-compare "=1.0.0"
-    elliptic "=3.0.3"
-    inherits "=2.0.1"
-    lodash "=3.10.1"
-    scryptsy "=2.0.0"
-
 load-json-file@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/load-json-file/-/load-json-file-1.1.0.tgz#956905708d58b4bab4c2261b04f59f31c99374c0"
@@ -5046,11 +4941,6 @@ lodash.union@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/lodash.union/-/lodash.union-4.6.0.tgz#48bb5088409f16f1821666641c44dd1aaae3cd88"
   integrity sha1-SLtQiECfFvGCFmZkHETdGqrjzYg=
-
-lodash@=3.10.1:
-  version "3.10.1"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-3.10.1.tgz#5bf45e8e49ba4189e17d482789dfd15bd140b7b6"
-  integrity sha1-W/Rejkm6QYnhfUgnid/RW9FAt7Y=
 
 lodash@^4.0.0, lodash@^4.17.11, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@~4.17.10:
   version "4.17.20"
@@ -6769,16 +6659,6 @@ schema-utils@^3.0.0:
     "@types/json-schema" "^7.0.6"
     ajv "^6.12.5"
     ajv-keywords "^3.5.2"
-
-scryptsy@2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/scryptsy/-/scryptsy-2.1.0.tgz#8d1e8d0c025b58fdd25b6fa9a0dc905ee8faa790"
-  integrity sha512-1CdSqHQowJBnMAFyPEBRfqag/YP9OF394FV+4YREIJX4ljD7OxvQRDayyoyyCk+senRjSkP6VnUNQmVQqB6g7w==
-
-scryptsy@=2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/scryptsy/-/scryptsy-2.0.0.tgz#262c36f0231cfa7654e2363fa394cd2dec66f378"
-  integrity sha1-Jiw28CMc+nZU4jY/o5TNLexm83g=
 
 scss-tokenizer@^0.2.3:
   version "0.2.3"

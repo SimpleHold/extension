@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Transaction } from 'bitcore-lib'
+// import { Transaction } from 'bitcore-lib'
 
 // Components
 import Cover from '@components/Cover'
@@ -51,8 +51,8 @@ const Send: React.FC = () => {
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
-  const [outputs, setOutputs] = React.useState<Transaction.UnspentOutput[]>([])
-  const [utxosList, setUtxosList] = React.useState<Transaction.UnspentOutput[]>([])
+  const [outputs, setOutputs] = React.useState<any[]>([]) //Transaction.UnspentOutput[]
+  const [utxosList, setUtxosList] = React.useState<any[]>([]) //Transaction.UnspentOutput[]
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
 
   const debounced = useDebounce(amount, 1000)

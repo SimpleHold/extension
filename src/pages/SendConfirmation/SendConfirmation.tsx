@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import { Transaction } from 'bitcore-lib'
+// import { Transaction } from 'bitcore-lib'
 import numeral from 'numeral'
 
 // Components
@@ -38,7 +38,7 @@ interface LocationState {
   networkFee: number
   addressFrom: string
   addressTo: string
-  outputs: Transaction.UnspentOutput[]
+  outputs: any[] //Transaction.UnspentOutput[]
 }
 
 const SendConfirmation: React.FC = () => {
@@ -82,14 +82,14 @@ const SendConfirmation: React.FC = () => {
             findWallet.privateKey
           )
 
-          if (transaction?.hash && transaction?.raw) {
-            const sendTransaction = await sendRawTransaction(transaction.raw, symbol)
+          // if (transaction?.hash && transaction?.raw) {
+          //   const sendTransaction = await sendRawTransaction(transaction.raw, symbol)
 
-            if (sendTransaction === transaction.hash) {
-              setRawTransaction(transaction)
-              return setActiveDrawer('success')
-            }
-          }
+          //   if (sendTransaction === transaction.hash) {
+          //     setRawTransaction(transaction)
+          //     return setActiveDrawer('success')
+          //   }
+          // }
 
           return setInputErrorLabel('Error while creating transaction')
         }

@@ -1,20 +1,7 @@
-import bitcore, { Transaction } from 'bitcore-lib'
-import litecore from 'litecore-lib'
-import dogecore from 'bitcore-lib-doge'
-import bitcoreCash from 'bitcore-lib-cash'
 import bitGoUTXO from 'bitgo-utxo-lib'
 
 // Validate address
 import addressValidate from '@config/addressValidate'
-
-bitcore.Networks.add({
-  name: 'bitcoinsv',
-  alias: 'bsv',
-  pubkeyhash: 0x00,
-  privatekey: 0x80,
-  scripthash: 0x05,
-  dnsSeeds: ['seed.bitcoinsv.io', 'btccash-seeder.bitcoinunlimited.info'],
-})
 
 const ZEC = {
   messagePrefix: '\x19Zcash Signed Message:\n',
@@ -57,33 +44,33 @@ class GenerateAddress {
   generate = (): INewAddress | null => {
     const { symbol } = this
 
-    if (symbol === 'btc') {
-      const privateKey = new bitcore.PrivateKey()
+    // if (symbol === 'btc') {
+    //   const privateKey = new bitcore.PrivateKey()
 
-      return {
-        address: privateKey.toAddress().toString(),
-        privateKey: privateKey.toWIF(),
-      }
-    }
+    //   return {
+    //     address: privateKey.toAddress().toString(),
+    //     privateKey: privateKey.toWIF(),
+    //   }
+    // }
 
-    if (symbol === 'bch') {
-      const privateKey = new bitcoreCash.PrivateKey()
+    // if (symbol === 'bch') {
+    //   const privateKey = new bitcoreCash.PrivateKey()
 
-      return {
-        address: privateKey.toAddress().toString(),
-        privateKey: privateKey.toWIF(),
-      }
-    }
+    //   return {
+    //     address: privateKey.toAddress().toString(),
+    //     privateKey: privateKey.toWIF(),
+    //   }
+    // }
 
-    if (symbol === 'bsv') {
-      const network = bitcore.Networks.get('bitcoinsv', '')
-      const privateKey = new bitcore.PrivateKey('', network)
+    // if (symbol === 'bsv') {
+    //   const network = bitcore.Networks.get('bitcoinsv', '')
+    //   const privateKey = new bitcore.PrivateKey('', network)
 
-      return {
-        address: privateKey.toAddress().toString(),
-        privateKey: privateKey.toWIF(),
-      }
-    }
+    //   return {
+    //     address: privateKey.toAddress().toString(),
+    //     privateKey: privateKey.toWIF(),
+    //   }
+    // }
 
     if (symbol === 'dash') {
       const privateKey = new window.dashcore.PrivateKey()
@@ -94,14 +81,14 @@ class GenerateAddress {
       }
     }
 
-    if (symbol === 'doge') {
-      const privateKey = new dogecore.PrivateKey()
+    // if (symbol === 'doge') {
+    //   const privateKey = new dogecore.PrivateKey()
 
-      return {
-        address: privateKey.toAddress().toString(),
-        privateKey: privateKey.toWIF(),
-      }
-    }
+    //   return {
+    //     address: privateKey.toAddress().toString(),
+    //     privateKey: privateKey.toWIF(),
+    //   }
+    // }
 
     if (symbol === 'grs') {
       const keyPair = bitGoUTXO.ECPair.makeRandom({ network: GRS })
@@ -112,14 +99,14 @@ class GenerateAddress {
       }
     }
 
-    if (symbol === 'ltc') {
-      const privateKey = new litecore.PrivateKey()
+    // if (symbol === 'ltc') {
+    //   const privateKey = new litecore.PrivateKey()
 
-      return {
-        address: privateKey.toAddress().toString(),
-        privateKey: privateKey.toWIF(),
-      }
-    }
+    //   return {
+    //     address: privateKey.toAddress().toString(),
+    //     privateKey: privateKey.toWIF(),
+    //   }
+    // }
 
     if (symbol === 'zec') {
       const keyPair = bitGoUTXO.ECPair.makeRandom({ network: ZEC })
@@ -136,34 +123,34 @@ class GenerateAddress {
   import = (privateKey: string): string | null => {
     const { symbol } = this
 
-    if (symbol === 'btc') {
-      return new bitcore.PrivateKey(privateKey).toAddress().toString()
-    }
+    // if (symbol === 'btc') {
+    //   return new bitcore.PrivateKey(privateKey).toAddress().toString()
+    // }
 
-    if (symbol === 'bch') {
-      return new bitcoreCash.PrivateKey(privateKey).toAddress().toString()
-    }
+    // if (symbol === 'bch') {
+    //   return new bitcoreCash.PrivateKey(privateKey).toAddress().toString()
+    // }
 
-    if (symbol === 'bsv') {
-      const network = bitcore.Networks.get('bitcoinsv', '')
-      return new bitcoreCash.PrivateKey(privateKey, network).toAddress().toString()
-    }
+    // if (symbol === 'bsv') {
+    //   const network = bitcore.Networks.get('bitcoinsv', '')
+    //   return new bitcoreCash.PrivateKey(privateKey, network).toAddress().toString()
+    // }
 
     if (symbol === 'dash') {
       return new window.dashcore.PrivateKey(privateKey).toAddress().toString()
     }
 
-    if (symbol === 'doge') {
-      return new dogecore.PrivateKey(privateKey).toAddress().toString()
-    }
+    // if (symbol === 'doge') {
+    //   return new dogecore.PrivateKey(privateKey).toAddress().toString()
+    // }
 
     if (symbol === 'grs') {
       return bitGoUTXO.ECPair.fromWIF(privateKey, GRS).getAddress()
     }
 
-    if (symbol === 'ltc') {
-      return new litecore.PrivateKey(privateKey).toAddress().toString()
-    }
+    // if (symbol === 'ltc') {
+    //   return new litecore.PrivateKey(privateKey).toAddress().toString()
+    // }
 
     if (symbol === 'zec') {
       return bitGoUTXO.ECPair.fromWIF(privateKey, ZEC).getAddress()
@@ -172,36 +159,36 @@ class GenerateAddress {
     return null
   }
 
-  getTransactionSize = (outputs: Transaction.UnspentOutput[]): number => {
+  getTransactionSize = (outputs: any[]): number => {
     const { symbol } = this
 
-    if (symbol === 'btc') {
-      return new Transaction().from(outputs).toString().length
-    }
+    // if (symbol === 'btc') {
+    //   return new Transaction().from(outputs).toString().length
+    // }
 
-    if (symbol === 'bch') {
-      return 0 // Fix me
-    }
+    // if (symbol === 'bch') {
+    //   return 0 // Fix me
+    // }
 
-    if (symbol === 'bsv') {
-      return 0 // Fix me
-    }
+    // if (symbol === 'bsv') {
+    //   return 0 // Fix me
+    // }
 
     if (symbol === 'dash') {
       return new window.dashcore.Transaction().from(outputs).toString().length
     }
 
-    if (symbol === 'doge') {
-      return new dogecore.Transaction().from(outputs).toString().length
-    }
+    // if (symbol === 'doge') {
+    //   return new dogecore.Transaction().from(outputs).toString().length
+    // }
 
     if (symbol === 'grs') {
       return 0 // Fix me
     }
 
-    if (symbol === 'ltc') {
-      return 0 // Fix me
-    }
+    // if (symbol === 'ltc') {
+    //   return 0 // Fix me
+    // }
 
     if (symbol === 'zec') {
       return 0 // Fix me
@@ -211,35 +198,31 @@ class GenerateAddress {
   }
 
   toSat = (value: number): number => {
-    return bitcore.Unit.fromBTC(value).toSatoshis()
+    return 0 //bitcore.Unit.fromBTC(value).toSatoshis()
   }
 
   fromSat = (value: number): number => {
-    return bitcore.Unit.fromSatoshis(value).toBTC()
+    return 0 // bitcore.Unit.fromSatoshis(value).toBTC()
   }
 
-  getNetworkFee = (
-    unspentOutputs: Transaction.UnspentOutput[],
-    feePerByteSat: number,
-    amount: string
-  ) => {
-    const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
-    const utxos = []
+  getNetworkFee = (unspentOutputs: any[], feePerByteSat: number, amount: string) => {
+    // const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
+    // const utxos = []
 
-    for (const output of sortOutputs) {
-      const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-      const transactionFeeBytes = this.getTransactionSize(utxos) * feePerByteSat
+    // for (const output of sortOutputs) {
+    //   const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
+    //   const transactionFeeBytes = this.getTransactionSize(utxos) * feePerByteSat
 
-      if (getUtxosValue >= this.toSat(Number(amount)) + transactionFeeBytes) {
-        break
-      }
+    //   if (getUtxosValue >= this.toSat(Number(amount)) + transactionFeeBytes) {
+    //     break
+    //   }
 
-      utxos.push(output)
-    }
+    //   utxos.push(output)
+    // }
 
     return {
-      networkFee: this.fromSat(this.getTransactionSize(utxos) * feePerByteSat),
-      utxos,
+      networkFee: 0, //this.fromSat(this.getTransactionSize(utxos) * feePerByteSat),
+      utxos: [],
     }
   }
 
@@ -250,48 +233,14 @@ class GenerateAddress {
   }
 
   createTransaction = (
-    outputs: Transaction.UnspentOutput[],
+    outputs: any[],
     to: string,
     amount: number,
     fee: number,
     changeAddress: string,
     privateKey: string
   ) => {
-    try {
-      const { symbol } = this
-
-      if (symbol === 'btc') {
-        const transaction = new Transaction()
-          .from(outputs)
-          .to(to, amount)
-          .fee(fee)
-          .change(changeAddress)
-          .sign(privateKey)
-
-        return {
-          raw: transaction.serialize(),
-          hash: transaction.hash,
-        }
-      }
-
-      if (symbol === 'doge') {
-        const transaction = new dogecore.Transaction()
-          .from(outputs)
-          .to(to, amount)
-          .fee(fee)
-          .change(changeAddress)
-          .sign(privateKey)
-
-        return {
-          raw: transaction.serialize(),
-          hash: transaction.hash,
-        }
-      }
-
-      return null
-    } catch {
-      return null
-    }
+    return null
   }
 }
 

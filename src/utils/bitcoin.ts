@@ -1,4 +1,4 @@
-import { Transaction, Unit } from 'bitcore-lib'
+// import { Transaction, Unit } from 'bitcore-lib'
 import axios, { AxiosResponse } from 'axios'
 
 // Config
@@ -34,10 +34,7 @@ export const getBalance = async (address: string, chain: string): Promise<IGetBa
   }
 }
 
-export const getUnspentOutputs = async (
-  address: string,
-  chain: string
-): Promise<Transaction.UnspentOutput[]> => {
+export const getUnspentOutputs = async (address: string, chain: string): Promise<any[]> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/wallet/unspent/${chain}/${address}`)
 
@@ -82,9 +79,9 @@ export const getFees = async (chain: string): Promise<number> => {
 }
 
 export const btcToSat = (value: number) => {
-  return Unit.fromBTC(value).toSatoshis()
+  return 0 //Unit.fromBTC(value).toSatoshis()
 }
 
 export const satToBtc = (value: number) => {
-  return Unit.fromSatoshis(value).toBTC()
+  return 0 // Unit.fromSatoshis(value).toBTC()
 }
