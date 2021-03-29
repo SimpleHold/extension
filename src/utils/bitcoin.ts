@@ -1,15 +1,6 @@
 import axios from 'axios'
 
-export interface IUnspentOutput {
-  tx_hash_big_endian: string
-  tx_hash: string
-  tx_output_n: number
-  script: string
-  value: number
-  value_hex: string
-  confirmations: number
-  tx_index: number
-}
+import config from '@config/index'
 
 export interface IRawTransaction {
   hash: string
@@ -24,38 +15,26 @@ export interface IBitcoreUnspentOutput {
   satoshis: number
 }
 
-export const getBalance = (address: string): Promise<number> | number | null => {
+export type TGetBalanceResponse = {
+  balance: number
+  balance_usd: number
+}
+
+export const getBalance = async (address: string): Promise<TGetBalanceResponse | null> => {
   try {
-    return fetch(`https://blockchain.info/balance?active=${address}`)
-      .then((response) => response.json())
-      .then((data) => {
-        return data[address].final_balance / 100000000
-      })
+    const { data } = await axios(`${config.api}/wallet/balance/bitcoin/${address}`)
+
+    return data.data
   } catch {
     return null
   }
 }
 
-export const getEstimated = (amount: number): Promise<number> | number => {
+export const getUnspentOutputs = async (address: string): Promise<IBitcoreUnspentOutput[]> => {
   try {
-    if (amount === 0) {
-      return 0
-    }
-    return fetch('https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD')
-      .then((response) => response.json())
-      .then((data) => {
-        return data['USD'] * amount
-      })
-  } catch {
-    return 0
-  }
-}
+    const { data } = await axios(`${config.api}/wallet/unspent/bitcoin/${address}`)
 
-export const getUnspentOutputs = async (address: string): Promise<IUnspentOutput[]> => {
-  try {
-    const { data } = await axios.get(`https://blockchain.info/unspent?active=${address}`)
-
-    return data?.unspent_outputs
+    return data.data
   } catch {
     return []
   }
@@ -63,23 +42,19 @@ export const getUnspentOutputs = async (address: string): Promise<IUnspentOutput
 
 export const sendRawTransaction = async (transaction: string): Promise<string | null> => {
   try {
-    const { data } = await axios.post(
-      'https://btc.getblock.io',
-      {
-        jsonrpc: '2.0',
-        id: +new Date(),
-        method: 'sendrawtransaction',
-        params: [transaction],
+    const { data } = await axios({
+      method: 'POST',
+      url: `${config.api}/transaction/send`,
+      data: {
+        currency: 'btc',
+        transaction,
       },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': '51cbe972-73ce-4b49-a602-651ee065dd3f',
-        },
-      }
-    )
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
 
-    return data?.result || null
+    return data.data
   } catch {
     return null
   }
@@ -87,9 +62,9 @@ export const sendRawTransaction = async (transaction: string): Promise<string | 
 
 export const getFees = async (): Promise<number> => {
   try {
-    const { data } = await axios.get('https://api.blockchain.info/mempool/fees')
+    const { data } = await axios.get(`${config.api}/wallet/fee/bitcoin`)
 
-    return data.regular || 0
+    return data.data || 0
   } catch {
     return 0
   }

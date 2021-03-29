@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "SimpleHold",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "icons": {
     "16": "assets/logo/favicon-16.png",
     "32": "assets/logo/favicon-32.png",
@@ -11,13 +11,7 @@
   "description": "Light wallet for Bitcoin and other cryptocurrencies.",
   "homepage_url": "https://simplehold.io",
   "short_name": "SimpleHold",
-  "permissions": [
-    "https://blockchain.info/*",
-    "https://min-api.cryptocompare.com/*",
-    "https://btc.getblock.io/*",
-    "https://fonts.googleapis.com/*",
-    "https://cdn.amplitude.com/*"
-  ],
+  "permissions": [],
   "content_security_policy": "script-src 'self'; object-src 'self'",
   "__chrome|firefox__author": "SimpleHold",
   "__opera__developer": {

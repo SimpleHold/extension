@@ -12,7 +12,10 @@ const getClientId = (): string => {
   if (getClientId) {
     return getClientId
   }
-  return v4()
+
+  const newClientId = v4()
+  localStorage.setItem('clientId', newClientId)
+  return newClientId
 }
 
 export const init = (apiKey: string) => {

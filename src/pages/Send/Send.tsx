@@ -13,14 +13,7 @@ import Spinner from '@components/Spinner'
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
-import {
-  getBalance,
-  getEstimated,
-  getUnspentOutputs,
-  getFees,
-  IBitcoreUnspentOutput,
-  IUnspentOutput,
-} from '@utils/bitcoin'
+import { getBalance, getUnspentOutputs, getFees, IBitcoreUnspentOutput } from '@utils/bitcoin'
 import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
 import { getLatestBalance, updateBalance } from '@utils/wallet'
@@ -54,7 +47,7 @@ const Send: React.FC = () => {
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
-  const [outputs, setOutputs] = React.useState<IUnspentOutput[]>([])
+  const [outputs, setOutputs] = React.useState<IBitcoreUnspentOutput[]>([])
   const [utxosList, setUtxosList] = React.useState<IBitcoreUnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
 
@@ -85,7 +78,7 @@ const Send: React.FC = () => {
     const fee = await getFees()
     setUtxosList([])
 
-    const sortOutputs = outputs.sort((a, b) => a.value - b.value)
+    const sortOutputs = outputs.sort((a, b) => a.satoshis - b.satoshis)
     const utxos: IBitcoreUnspentOutput[] = []
 
     for (const output of sortOutputs) {
@@ -96,13 +89,7 @@ const Send: React.FC = () => {
         break
       }
 
-      utxos.push({
-        txId: output.tx_hash_big_endian,
-        outputIndex: output.tx_output_n,
-        script: output.script,
-        satoshis: output.value,
-        address: selectedAddress,
-      })
+      utxos.push(output)
     }
 
     setUtxosList(utxos)
@@ -129,26 +116,13 @@ const Send: React.FC = () => {
 
     const fetchBalance = await getBalance(selectedAddress)
 
-    if (fetchBalance === null) {
+    if (fetchBalance !== null) {
+      setBalance(fetchBalance.balance)
+      setEstimated(fetchBalance.balance_usd)
+      updateBalance(selectedAddress, fetchBalance.balance)
+    } else {
       const latestbalance = getLatestBalance(address)
       setBalance(latestbalance)
-
-      if (latestbalance !== 0) {
-        const fetchEstimated = await getEstimated(latestbalance)
-        setEstimated(fetchEstimated)
-      } else {
-        setEstimated(0)
-      }
-    } else {
-      setBalance(fetchBalance)
-      updateBalance(selectedAddress, fetchBalance)
-
-      if (fetchBalance !== 0) {
-        const fetchEstimated = await getEstimated(fetchBalance)
-        setEstimated(fetchEstimated)
-      } else {
-        setEstimated(0)
-      }
     }
   }
 
