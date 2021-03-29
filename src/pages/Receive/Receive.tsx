@@ -21,7 +21,7 @@ import ShowPrivateKeyModal from '@modals/ShowPrivateKey'
 import useVisible from '@hooks/useVisible'
 
 // Utils
-import { getBalance, getEstimated } from '@utils/bitcoin'
+import { getBalance } from '@utils/bitcoin'
 import { limitBalance, price, toUpper } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { getLatestBalance, updateBalance } from '@utils/wallet'
@@ -83,25 +83,14 @@ const Receive: React.FC = () => {
 
   const loadBalance = async (): Promise<void> => {
     const fetchBalance = await getBalance(address)
-    setBalance(fetchBalance)
 
-    if (fetchBalance === null) {
-      const latestbalance = getLatestBalance(address)
-
-      if (latestbalance !== 0) {
-        const fetchEstimated = await getEstimated(latestbalance)
-        setEstimated(fetchEstimated)
-      } else {
-        setEstimated(0)
-      }
+    if (fetchBalance !== null) {
+      setBalance(fetchBalance.balance)
+      setEstimated(fetchBalance.balance_usd)
+      updateBalance(address, fetchBalance.balance)
     } else {
-      updateBalance(address, fetchBalance)
-      if (fetchBalance !== 0) {
-        const fetchEstimated = await getEstimated(fetchBalance)
-        setEstimated(fetchEstimated)
-      } else {
-        setEstimated(0)
-      }
+      const latestbalance = getLatestBalance(address)
+      setBalance(latestbalance)
     }
   }
 

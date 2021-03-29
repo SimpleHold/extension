@@ -7,7 +7,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { getCurrency } from '@config/currencies'
-import { getBalance, getEstimated } from '@utils/bitcoin'
+import { getBalance } from '@utils/bitcoin'
 import { toUpper, numberFriendly, limitBalance } from '@utils/format'
 import { updateBalance, getLatestBalance } from '@utils/wallet'
 
@@ -34,17 +34,6 @@ const WalletCard: React.FC<Props> = (props) => {
     fetchBalance()
   }, [])
 
-  React.useEffect(() => {
-    if (balance !== null) {
-      if (balance === 0) {
-        setEstimated(0)
-        sumEstimated(0)
-      } else {
-        fetchEstimated()
-      }
-    }
-  }, [balance])
-
   const fetchBalance = async (): Promise<void> => {
     const tryGetBalance = await getBalance(address)
 
@@ -53,17 +42,12 @@ const WalletCard: React.FC<Props> = (props) => {
       setBalance(latestbalance)
       sumBalance(latestbalance)
     } else {
-      setBalance(tryGetBalance)
-      sumBalance(tryGetBalance)
-      updateBalance(address, tryGetBalance)
-    }
-  }
+      setBalance(tryGetBalance.balance)
+      sumBalance(tryGetBalance.balance)
+      updateBalance(address, tryGetBalance.balance)
 
-  const fetchEstimated = async (): Promise<void> => {
-    if (balance !== null) {
-      const tryGetEstimated = await getEstimated(balance)
-      setEstimated(tryGetEstimated)
-      sumEstimated(tryGetEstimated)
+      setEstimated(tryGetBalance.balance_usd)
+      sumEstimated(tryGetBalance.balance_usd)
     }
   }
 
