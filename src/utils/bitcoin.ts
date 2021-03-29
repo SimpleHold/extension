@@ -1,4 +1,3 @@
-// import { Transaction, Unit } from 'bitcore-lib'
 import axios, { AxiosResponse } from 'axios'
 
 // Config

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-// import { Transaction } from 'bitcore-lib'
 import numeral from 'numeral'
 
 // Components
@@ -38,7 +37,7 @@ interface LocationState {
   networkFee: number
   addressFrom: string
   addressTo: string
-  outputs: any[] //Transaction.UnspentOutput[]
+  outputs: UnspentOutput[]
 }
 
 const SendConfirmation: React.FC = () => {
@@ -73,7 +72,7 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
-          const transaction: IRawTransaction | null = new address(symbol).createTransaction(
+          const transaction: TCreatedTransaction | null = new address(symbol).createTransaction(
             outputs,
             addressTo,
             btcToSat(amount),
@@ -81,6 +80,8 @@ const SendConfirmation: React.FC = () => {
             addressFrom,
             findWallet.privateKey
           )
+
+          console.log('transaction', transaction)
 
           // if (transaction?.hash && transaction?.raw) {
           //   const sendTransaction = await sendRawTransaction(transaction.raw, symbol)
