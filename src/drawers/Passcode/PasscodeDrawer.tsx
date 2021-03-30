@@ -9,7 +9,7 @@ import Button from '@components/Button'
 import Styles from './styles'
 
 interface Props {
-  onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onClose: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   isActive: boolean
   onConfirm: (passcode: string) => void
   type: 'create' | 'remove'
@@ -19,6 +19,16 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive, onConfirm, type } = props
 
   const [passcode, setPasscode] = React.useState<string>('')
+
+  React.useEffect(() => {
+    if (isActive) {
+      document.querySelector<HTMLInputElement>('[aria-label="Digit 1"]')?.focus()
+
+      if (passcode.length) {
+        setPasscode('')
+      }
+    }
+  }, [isActive])
 
   return (
     <DrawerWrapper

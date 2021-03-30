@@ -9,13 +9,13 @@ import Button from '@components/Button'
 import Styles from './styles'
 
 interface Props {
-  onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onClose: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   isActive: boolean
   title: string
   isButtonDisabled?: boolean
   onConfirm: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   textInputValue: string
-  onChangeInput: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChangeText: (data: string) => void
   inputLabel: string
   textInputType?: string
   inputErrorLabel?: string | null
@@ -29,11 +29,29 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
     isButtonDisabled,
     onConfirm,
     textInputValue,
-    onChangeInput,
+    onChangeText,
     inputLabel,
     textInputType,
     inputErrorLabel,
   } = props
+
+  const textInputRef = React.useRef<HTMLInputElement>(null)
+
+  React.useEffect(() => {
+    if (isActive) {
+      if (textInputValue.length) {
+        onChangeText('')
+      }
+
+      setTimeout(() => {
+        textInputRef.current?.focus()
+      }, 20)
+    }
+  }, [isActive])
+
+  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    onChangeText(e.target.value)
+  }
 
   return (
     <DrawerWrapper title={title} isActive={isActive} onClose={onClose}>
@@ -45,6 +63,7 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
             onChange={onChangeInput}
             type={textInputType}
             errorLabel={inputErrorLabel}
+            inputRef={textInputRef}
           />
         </Styles.Form>
         <Styles.Actions>

@@ -8,7 +8,7 @@ import Button from '@components/Button'
 import Styles from './styles'
 
 interface Props {
-  onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onClose: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   isActive: boolean
   onConfirm: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
 }

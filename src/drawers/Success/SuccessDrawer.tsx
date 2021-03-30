@@ -10,7 +10,7 @@ import Styles from './styles'
 
 interface Props {
   isActive: boolean
-  onClose: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onClose: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   text?: string
   link?: string
 }
