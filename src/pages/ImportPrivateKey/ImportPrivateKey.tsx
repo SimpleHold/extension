@@ -130,9 +130,7 @@ const ImportPrivateKey: React.FC = () => {
         textInputValue={password}
         isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirmDrawer}
-        onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
-          setPassword(e.target.value)
-        }
+        onChangeText={setPassword}
         textInputType="password"
         inputErrorLabel={errorLabel}
       />

@@ -22,10 +22,22 @@ const EnterPasscode: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'forgotPasscode'>(null)
 
   React.useEffect(() => {
+    addFormEventsListener()
+  }, [])
+
+  React.useEffect(() => {
     if (passcode.length === 6) {
       checkPasscode()
     }
   }, [passcode])
+
+  const addFormEventsListener = (): void => {
+    for (let i = 0; i < document.querySelectorAll('input').length; i++) {
+      document.querySelectorAll('input')[i].addEventListener('focus', () => {
+        setIsError(false)
+      })
+    }
+  }
 
   const checkPasscode = (): void => {
     const getPasscodeHash = localStorage.getItem('passcode')

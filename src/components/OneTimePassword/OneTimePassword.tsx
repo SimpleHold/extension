@@ -13,8 +13,6 @@ interface Props {
 const OneTimePassword: React.FC<Props> = (props) => {
   const { value, onChange, isError } = props
 
-  const otpInputRef = React.useRef<OtpInput>(null)
-
   React.useEffect(() => {
     if (isError) {
       document.querySelector<HTMLInputElement>('[aria-label="Digit 6"]')?.blur()
@@ -29,7 +27,7 @@ const OneTimePassword: React.FC<Props> = (props) => {
         numInputs={6}
         isInputNum
         shouldAutoFocus
-        ref={otpInputRef}
+        isInputSecure
       />
     </Styles.Container>
   )

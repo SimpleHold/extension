@@ -231,8 +231,9 @@ const Receive: React.FC = () => {
               <PendingBalance btcValue={pendingBalance} type="gray" />
             ) : null}
           </Styles.Row>
+
           <Styles.ReceiveBlock>
-            <QRCode size={120} value={address} />
+            <QRCode size={100} value={address} />
             <CopyToClipboard value={address} mb={20} onCopy={onCopyAddress}>
               <Styles.Address>{address}</Styles.Address>
             </CopyToClipboard>
@@ -247,9 +248,7 @@ const Receive: React.FC = () => {
         isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirmModal}
         textInputValue={password}
-        onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
-          setPassword(e.target.value)
-        }
+        onChangeText={setPassword}
         inputLabel="Enter password"
         textInputType="password"
         inputErrorLabel={passwordErrorLabel}

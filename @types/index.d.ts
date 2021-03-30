@@ -66,14 +66,16 @@ declare const dogecoin: {
     fee: number,
     changeAddress: string,
     privateKey: string
-  ) => TCreatedTransaction
+  ) => TCreatedTransaction | null
 }
 
 declare const bitgo: {
   zcash: {
     generateWallet: () => TGenerateAddress
+    importPrivateKey: (privateKey: string) => string
   }
   groestl: {
     generateWallet: () => TGenerateAddress
+    importPrivateKey: (privateKey: string) => string
   }
 }

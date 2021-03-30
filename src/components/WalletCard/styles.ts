@@ -65,6 +65,16 @@ const Estimated = styled.p`
   color: #7d7e8d;
 `
 
+const BalanceRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+`
+
+const PendingIcon = styled.div`
+  margin: 0 5px 0 0;
+`
+
 const Styles = {
   Container,
   Row,
@@ -74,6 +84,8 @@ const Styles = {
   Balances,
   Balance,
   Estimated,
+  BalanceRow,
+  PendingIcon,
 }
 
 export default Styles

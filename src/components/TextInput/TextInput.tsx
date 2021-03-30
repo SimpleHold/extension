@@ -11,12 +11,22 @@ interface Props {
   errorLabel?: string | null
   withPasswordVisible?: boolean
   onBlurInput?: Function
+  inputRef?: React.RefObject<HTMLInputElement>
 }
 
 const TextInput: React.FC<Props> = (props) => {
-  const { label, value, onChange, type, errorLabel, withPasswordVisible, onBlurInput } = props
+  const {
+    label,
+    value,
+    onChange,
+    type,
+    errorLabel,
+    withPasswordVisible,
+    onBlurInput,
+    inputRef,
+  } = props
 
-  const textInputRef = React.useRef<HTMLInputElement>(null)
+  const textInputRef = inputRef || React.useRef<HTMLInputElement>(null)
   const visibleBlockRef = React.useRef<HTMLDivElement>(null)
   let numberInputRef: HTMLInputElement
 

@@ -11,7 +11,6 @@ import useScroll from '@hooks/useScroll'
 // Utils
 import { IWallet, getWallets } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
-import { price } from '@utils/format'
 
 // Config
 import { ADD_ADDRESS, BALANCE_CHANGED } from '@config/events'
@@ -26,7 +25,7 @@ const Wallets: React.FC = () => {
   const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
   const [walletsBalance, setWalletsBalance] = React.useState<number[]>([])
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
-  const [pendingBalance, setPendingBalance] = React.useState<null | number>(1)
+  const [pendingBalance, setPendingBalance] = React.useState<null | number>(0)
 
   const { scrollPosition } = useScroll()
 
@@ -95,8 +94,9 @@ const Wallets: React.FC = () => {
       <CollapsibleHeader
         onAddNewAddress={onAddNewAddress}
         scrollPosition={scrollPosition}
-        balance={0.23410354}
-        estimated={8964.91}
+        balance={totalBalance}
+        estimated={totalEstimated}
+        pendingBalance={pendingBalance}
       />
       {wallets?.length ? (
         <Styles.WalletsList>

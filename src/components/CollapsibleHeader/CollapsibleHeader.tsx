@@ -18,10 +18,11 @@ interface Props {
   scrollPosition: number
   balance: null | number
   estimated: null | number
+  pendingBalance: null | number
 }
 
 const CollapsibleHeader: React.FC<Props> = (props) => {
-  const { onAddNewAddress, scrollPosition, balance, estimated } = props
+  const { onAddNewAddress, scrollPosition, balance, estimated, pendingBalance } = props
 
   const сontainerHeight = Math.max(110, 290 - 1.25 * scrollPosition)
 
@@ -78,7 +79,9 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
           ) : null}
         </Skeleton>
 
-        <PendingBalance btcValue={0.1} type="light" />
+        {pendingBalance !== null && Number(pendingBalance) > 0 ? (
+          <PendingBalance btcValue={pendingBalance} type="light" />
+        ) : null}
       </Styles.Row>
 
       <Styles.AddWalletBlock>

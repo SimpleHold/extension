@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import numeral from 'numeral'
+import SVG from 'react-inlinesvg'
 
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
@@ -73,9 +74,14 @@ const WalletCard: React.FC<Props> = (props) => {
         </Styles.AddressInfo>
         <Styles.Balances>
           <Skeleton width={106} height={16} type="gray" br={4} isLoading={balance === null}>
-            <Styles.Balance>{`${numeral(balance).format('0.[00000000]')} ${toUpper(
-              symbol
-            )}`}</Styles.Balance>
+            <Styles.BalanceRow>
+              <Styles.PendingIcon>
+                <SVG src="../../assets/icons/clock.svg" width={12} height={12} />
+              </Styles.PendingIcon>
+              <Styles.Balance>{`${numeral(balance).format('0.[00000000]')} ${toUpper(
+                symbol
+              )}`}</Styles.Balance>
+            </Styles.BalanceRow>
           </Skeleton>
           <Skeleton width={80} height={14} type="gray" mt={9} br={4} isLoading={estimated === null}>
             <Styles.Estimated>{`$${numberFriendly(estimated)} USD`}</Styles.Estimated>

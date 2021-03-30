@@ -152,9 +152,7 @@ const RestoreWallet: React.FC = () => {
         onClose={() => setActiveDrawer(null)}
         title="Enter your password to restore wallet"
         textInputValue={password}
-        onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
-          setPassword(e.target.value)
-        }
+        onChangeText={setPassword}
         onConfirm={onConfirmRestore}
         textInputType="password"
         inputLabel="Enter password"

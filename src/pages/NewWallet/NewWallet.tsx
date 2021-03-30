@@ -120,7 +120,7 @@ const NewWallet: React.FC = () => {
         <Cover />
         <Header withBack onBack={history.goBack} backTitle="Wallets" />
         <Styles.Container>
-          <Styles.Title>Add address</Styles.Title>
+          <Styles.Title>Select currency</Styles.Title>
           <Styles.Description>
             The password needs to encrypt your private keys. We dont have access to your keys, so be
             careful.
@@ -160,9 +160,7 @@ const NewWallet: React.FC = () => {
         textInputValue={password}
         isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirm}
-        onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
-          setPassword(e.target.value)
-        }
+        onChangeText={setPassword}
         textInputType="password"
         inputErrorLabel={errorLabel}
       />
