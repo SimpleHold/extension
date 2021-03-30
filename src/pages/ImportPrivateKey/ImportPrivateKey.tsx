@@ -97,8 +97,8 @@ const ImportPrivateKey: React.FC = () => {
           <Styles.Heading>
             <Styles.Title>Import private key</Styles.Title>
             <Styles.Description>
-              The password needs to encrypt your private keys. We dont have access to your keys, so
-              be careful.
+              Enter private key of existing address to import it in SimpleHold and use for receive
+              and send crypto.
             </Styles.Description>
             <Link
               to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"

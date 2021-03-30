@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import { Route, RouteProps, MemoryRouter as Router, Switch } from 'react-router-dom'
+import { v4 } from 'uuid'
 
 import routes from './routes'
 import GlobalStyles from './styles/global'
@@ -17,9 +18,13 @@ const App: React.FC = () => {
   }, [])
 
   const initAmplitude = (): void => {
-    init(config.apiKey.amplitude)
+    const clientId = localStorage.getItem('clientId') || v4()
+
+    init(config.apiKey.amplitude, clientId)
 
     if (!localStorage.getItem('clientId')) {
+      localStorage.setItem('clientId', clientId)
+
       logEvent({
         name: FIRST_ENTER,
       })

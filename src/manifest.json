@@ -1,17 +1,17 @@
 {
   "manifest_version": 2,
   "name": "SimpleHold",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "icons": {
     "16": "assets/logo/favicon-16.png",
     "32": "assets/logo/favicon-32.png",
     "48": "assets/logo/favicon-48.png",
     "128": "assets/logo/favicon-128.png"
   },
-  "description": "SimpleHold Wallet",
+  "description": "Light wallet for Bitcoin and other cryptocurrencies.",
   "homepage_url": "https://simplehold.io",
   "short_name": "SimpleHold",
-  "permissions": ["activeTab", "storage", "http://*/*", "https://*/*"],
+  "permissions": [],
   "content_security_policy": "script-src 'self'; object-src 'self'",
   "__chrome|firefox__author": "SimpleHold",
   "__opera__developer": {
@@ -30,15 +30,5 @@
     "default_title": "SimpleHold",
     "__chrome|opera__chrome_style": false,
     "__firefox__browser_style": false
-  },
-  "background": {
-    "scripts": ["js/background.bundle.js"],
-    "__chrome|opera__persistent": false
-  },
-  "content_scripts": [
-    {
-      "matches": ["http://*/*", "https://*/*"],
-      "js": ["js/contentScript.bundle.js"]
-    }
-  ]
+  }
 }
