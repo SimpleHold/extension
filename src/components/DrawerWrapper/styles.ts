@@ -4,27 +4,17 @@ type TDrawerProps = {
   withIcon: boolean
 }
 
-const Wrapper = styled.div`
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
-  left: 0;
-  transform: scale(0);
-
-  &.active {
-    transform: scale(1);
-  }
-`
+const Wrapper = styled.div``
 
 const Background = styled.div`
-  background: rgba(29, 29, 34, 0.2);
-  backdrop-filter: blur(4px);
+  position: fixed;
+  z-index: 10;
+  background-color: rgba(29, 29, 34, 0.2);
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  transition: opacity 250ms;
 `
 
 const Drawer = styled.div`
@@ -32,8 +22,13 @@ const Drawer = styled.div`
   border-radius: 5px 5px 0 0;
   padding: ${({ withIcon }: TDrawerProps) =>
     withIcon ? '20px 30px 30px 30px' : '40px 30px 30px 30px'};
-  transition: all 0.5s ease;
   word-break: break-all;
+  position: fixed;
+  z-index: 11;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  transition: transform 250ms;
 `
 
 const Title = styled.p`
