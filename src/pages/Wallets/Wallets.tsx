@@ -25,7 +25,8 @@ const Wallets: React.FC = () => {
   const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
   const [walletsBalance, setWalletsBalance] = React.useState<number[]>([])
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
-  const [pendingBalance, setPendingBalance] = React.useState<null | number>(0)
+  const [walletsPending, setWalletsPending] = React.useState<number[]>([])
+  const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
 
   const { scrollPosition } = useScroll()
 
@@ -44,6 +45,12 @@ const Wallets: React.FC = () => {
       setTotalEstimated(walletsEstimated.reduce((a, b) => a + b, 0))
     }
   }, [walletsEstimated, totalEstimated])
+
+  React.useEffect(() => {
+    if (walletsPending.length === wallets?.length && pendingBalance === null) {
+      setPendingBalance(walletsPending.reduce((a, b) => a + b, 0))
+    }
+  }, [walletsPending, pendingBalance])
 
   React.useEffect(() => {
     if (totalBalance !== null && totalEstimated !== null) {
@@ -89,6 +96,10 @@ const Wallets: React.FC = () => {
     setWalletsEstimated((prevArray: number[]) => [...prevArray, amount])
   }
 
+  const sumPending = (amount: number) => {
+    setWalletsPending((prevArray: number[]) => [...prevArray, amount])
+  }
+
   return (
     <Styles.Wrapper>
       <CollapsibleHeader
@@ -110,6 +121,7 @@ const Wallets: React.FC = () => {
                 symbol={symbol.toLowerCase()}
                 sumBalance={sumBalance}
                 sumEstimated={sumEstimated}
+                sumPending={sumPending}
               />
             )
           })}
