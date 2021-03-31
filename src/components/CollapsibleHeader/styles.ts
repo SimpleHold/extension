@@ -15,13 +15,6 @@ const Row = styled.div`
   padding-right: 30px;
 `
 
-const TotalBalanceLabel = styled.p`
-  margin: 0px;
-  font-size: 16px;
-  line-height: 19px;
-  color: #ffffff;
-`
-
 const BalanceRow = styled.div`
   display: flex;
   flex-direction: row;
@@ -34,28 +27,30 @@ const Balance = styled.p`
   color: #ffffff;
 `
 
-const ClockIconRow = styled.div`
-  margin: 0 0 0 5px;
+const ClockIcon = styled.div`
+  width: 12px;
+  height: 12px;
+  background-color: red;
+  margin: 0 0 0 6px;
 `
 
 const Estimated = styled.p`
+  margin: 0;
   color: rgba(255, 255, 255, 0.8);
 `
 
-const AddWalletBlock = styled.div`
-  padding: 16px 30px 0 30px;
+const AddWallet = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  position: absolute;
+  width: calc(100% - 60px);
+  bottom: 10px;
 `
 
 const AddWalletLabel = styled.p`
   margin: 0;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
-  color: #ffffff;
 `
 
 const AddWalletButton = styled.button`
@@ -79,17 +74,28 @@ const AddWalletButton = styled.button`
   }
 `
 
+const TotalBalanceLabel = styled.p`
+  margin: 0;
+  font-size: 16px;
+  line-height: 19px;
+  color: #ffffff;
+  position: absolute;
+`
+
+const PendingBalanceRow = styled.div``
+
 const Styles = {
   Container,
   Row,
-  TotalBalanceLabel,
   BalanceRow,
   Balance,
-  ClockIconRow,
+  ClockIcon,
   Estimated,
-  AddWalletBlock,
+  AddWallet,
   AddWalletLabel,
   AddWalletButton,
+  TotalBalanceLabel,
+  PendingBalanceRow,
 }
 
 export default Styles

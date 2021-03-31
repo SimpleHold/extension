@@ -26,42 +26,47 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
 
   const сontainerHeight = Math.max(110, 290 - 1.25 * scrollPosition)
 
-  const totalBalanceLabelOpacity = Math.max(0, 1 - 0.1 * scrollPosition)
-  const totalBalanceLabelHeight = Math.max(0, 19 - 0.1 * scrollPosition)
-
+  const balanceRowMarginTop = Math.max(3, 50 - scrollPosition)
   const balanceFontSize = Math.max(16, 36 - 0.2 * scrollPosition)
-  const balanceLineHeight = Math.max(19, 36 - 0.2 * scrollPosition)
+  const balanceLineHeight = Math.max(19, 36 - 0.1 * scrollPosition)
 
-  const estimatedFontSize = Math.max(14, 20 - 0.4 * scrollPosition)
-  const estimatedLineHeight = Math.max(16, 23 - 0.4 * scrollPosition)
+  const estimatedFontSize = Math.max(14, 20 - 0.2 * scrollPosition)
+  const estimatedLineHeight = Math.max(16, 23 - 0.1 * scrollPosition)
+  const estimatedMarginTop = Math.max(2, 11 - scrollPosition)
+
+  const totalBalanceOpacity = Math.max(0, 1 - 0.1 * scrollPosition)
+  const totalBalanceTop = Math.max(0, 70 - scrollPosition)
+
+  const pendingBalanceRowHeight = Math.max(0, 30 - 0.05 * scrollPosition)
+  const pendingBalanceRowOpacity = Math.max(0, 1 - 0.05 * scrollPosition)
+  const pendingBalanceRowMarginTop = Math.max(0, 10 - 0.05 * scrollPosition)
 
   return (
     <Styles.Container style={{ height: сontainerHeight }}>
       <Header />
 
-      <Styles.Row style={{ paddingTop: 10 }}>
-        <Styles.TotalBalanceLabel
-          style={{ opacity: totalBalanceLabelOpacity, height: totalBalanceLabelHeight }}
-        >
+      <Styles.Row>
+        <Styles.TotalBalanceLabel style={{ opacity: totalBalanceOpacity, top: totalBalanceTop }}>
           Total balance
         </Styles.TotalBalanceLabel>
 
-        <Styles.BalanceRow style={{ marginTop: 21 }}>
-          <Skeleton width={350} height={36} isLoading={balance === null} type="light">
+        <Skeleton width={250} height={balanceFontSize} isLoading={balance === null} type="light">
+          <Styles.BalanceRow style={{ marginTop: balanceRowMarginTop }}>
             <Styles.Balance
-              style={{ fontSize: balanceFontSize, lineHeight: `${balanceLineHeight}px` }}
+              style={{
+                fontSize: balanceFontSize,
+                lineHeight: `${balanceLineHeight}px`,
+              }}
             >
               {numeral(balance).format('0.[00000000]')} BTC
             </Styles.Balance>
-          </Skeleton>
-          <Styles.ClockIconRow style={{ height: 0, opacity: 0 }}>
-            <SVG src="../../assets/icons/clock.svg" width={14} height={14} />
-          </Styles.ClockIconRow>
-        </Styles.BalanceRow>
+            <Styles.ClockIcon />
+          </Styles.BalanceRow>
+        </Skeleton>
 
         <Skeleton
           width={120}
-          height={23}
+          height={estimatedLineHeight}
           isLoading={estimated === null}
           mt={11}
           type="light"
@@ -70,26 +75,36 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
           {estimated !== null ? (
             <Styles.Estimated
               style={{
-                marginTop: 11,
+                marginTop: estimatedMarginTop,
                 fontSize: estimatedFontSize,
                 lineHeight: `${estimatedLineHeight}px`,
-                marginBottom: 10,
               }}
-            >{`$ ${price(estimated)}`}</Styles.Estimated>
+            >
+              {`$ ${price(estimated)}`}
+            </Styles.Estimated>
           ) : null}
         </Skeleton>
 
         {pendingBalance !== null && Number(pendingBalance) > 0 ? (
-          <PendingBalance btcValue={pendingBalance} type="light" />
+          <Styles.PendingBalanceRow
+            style={{
+              height: pendingBalanceRowHeight,
+              opacity: pendingBalanceRowOpacity,
+              marginTop: pendingBalanceRowMarginTop,
+            }}
+          >
+            <PendingBalance btcValue={pendingBalance} type="light" />
+          </Styles.PendingBalanceRow>
         ) : null}
-      </Styles.Row>
 
-      <Styles.AddWalletBlock>
-        <Styles.AddWalletLabel>Wallets</Styles.AddWalletLabel>
-        <Styles.AddWalletButton onClick={onAddNewAddress}>
-          <SVG src="../../assets/icons/plus.svg" width={16} height={16} title="Add new wallet" />
-        </Styles.AddWalletButton>
-      </Styles.AddWalletBlock>
+        <Styles.AddWallet>
+          <Styles.AddWalletLabel style={{ opacity: 0, height: 0 }}>Wallets</Styles.AddWalletLabel>
+
+          <Styles.AddWalletButton onClick={onAddNewAddress}>
+            <SVG src="../../assets/icons/plus.svg" width={16} height={16} title="Add new wallet" />
+          </Styles.AddWalletButton>
+        </Styles.AddWallet>
+      </Styles.Row>
     </Styles.Container>
   )
 }
