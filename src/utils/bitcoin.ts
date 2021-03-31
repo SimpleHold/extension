@@ -33,6 +33,28 @@ export const getBalance = async (address: string, chain: string): Promise<IGetBa
   }
 }
 
+export const getEstimated = async (
+  value: number,
+  currencyFrom: string,
+  currencyTo: string
+): Promise<number> => {
+  try {
+    const { data }: AxiosResponse = await axios({
+      method: 'GET',
+      url: `${config.serverUrl}/wallet/estimated`,
+      params: {
+        value,
+        currencyFrom,
+        currencyTo,
+      },
+    })
+
+    return data.data
+  } catch {
+    return 0
+  }
+}
+
 export const getUnspentOutputs = async (address: string, chain: string): Promise<any[]> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/wallet/unspent/${chain}/${address}`)
