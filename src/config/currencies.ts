@@ -6,7 +6,6 @@ import litecoinLogo from '@assets/currencies/ltc.svg'
 import dogecoinLogo from '@assets/currencies/doge.svg'
 import dashLogo from '@assets/currencies/dash.svg'
 import zcashLogo from '@assets/currencies/zec.svg'
-import groestlcoinLogo from '@assets/currencies/grs.svg'
 
 export interface ICurrency {
   name: string
@@ -65,13 +64,6 @@ const currencies: ICurrency[] = [
     logo: zcashLogo,
     background: '#FDF1D4',
     chain: 'zcash',
-  },
-  {
-    name: 'Groestlcoin',
-    symbol: 'grs',
-    logo: groestlcoinLogo,
-    background: '#D5E7F9',
-    chain: 'groestlcoin',
   },
 ]
 

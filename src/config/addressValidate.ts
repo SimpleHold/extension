@@ -7,5 +7,4 @@ export default {
   doge: '^(D|A|9)[a-km-zA-HJ-NP-Z1-9]{33,34}$',
   dash: '^[X|7][0-9A-Za-z]{33}$',
   zec: '^(t)[A-Za-z0-9]{34}$',
-  grs: '^(F|3)[0-9A-za-z]{33}$',
 }

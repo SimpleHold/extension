@@ -1,7 +1,7 @@
 // Validate address
 import addressValidate from '@config/addressValidate'
 
-export type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash' | 'zec' | 'grs'
+export type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash' | 'zec'
 
 class GenerateAddress {
   symbol: TSymbols
@@ -33,10 +33,6 @@ class GenerateAddress {
       return litecoin.generateWallet()
     }
 
-    if (symbol === 'grs') {
-      return bitgo.groestl.generateWallet()
-    }
-
     if (symbol === 'zec') {
       return bitgo.zcash.generateWallet()
     }
@@ -65,10 +61,6 @@ class GenerateAddress {
 
     if (symbol === 'ltc') {
       return litecoin.importPrivateKey(privateKey)
-    }
-
-    if (symbol === 'grs') {
-      return bitgo.groestl.importPrivateKey(privateKey)
     }
 
     if (symbol === 'zec') {
