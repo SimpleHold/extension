@@ -7,6 +7,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { price } from '@utils/format'
+import { getEstimated } from '@utils/bitcoin'
 
 // Styles
 import Styles from './styles'
@@ -22,8 +23,13 @@ const PendingBalance: React.FC<Props> = (props) => {
   const [USDValue, setUSDValue] = React.useState<number | null>(null)
 
   React.useEffect(() => {
-    setUSDValue(btcValue * 1000) // Fix me
+    getUSDEstimated()
   }, [btcValue])
+
+  const getUSDEstimated = async (): Promise<void> => {
+    const data = await getEstimated(btcValue, 'BTC', 'USD')
+    setUSDValue(data)
+  }
 
   return (
     <Styles.Container type={type}>
