@@ -17,8 +17,28 @@ class GenerateAddress {
       return bitcoin.generateWallet()
     }
 
+    if (symbol === 'bch' || symbol === 'bsv') {
+      return bitcoincash.generateWallet()
+    }
+
+    if (symbol === 'dash') {
+      return dash.generateWallet()
+    }
+
     if (symbol === 'doge') {
       return dogecoin.generateWallet()
+    }
+
+    if (symbol === 'ltc') {
+      return litecoin.generateWallet()
+    }
+
+    if (symbol === 'grs') {
+      return bitgo.groestl.generateWallet()
+    }
+
+    if (symbol === 'zec') {
+      return bitgo.zcash.generateWallet()
     }
 
     return null
@@ -31,8 +51,28 @@ class GenerateAddress {
       return bitcoin.importPrivateKey(privateKey)
     }
 
+    if (symbol === 'bch' || symbol === 'bsv') {
+      return bitcoincash.importPrivateKey(privateKey)
+    }
+
+    if (symbol === 'dash') {
+      return dash.importPrivateKey(privateKey)
+    }
+
     if (symbol === 'doge') {
       return dogecoin.importPrivateKey(privateKey)
+    }
+
+    if (symbol === 'ltc') {
+      return litecoin.importPrivateKey(privateKey)
+    }
+
+    if (symbol === 'grs') {
+      return bitgo.groestl.importPrivateKey(privateKey)
+    }
+
+    if (symbol === 'zec') {
+      return bitgo.zcash.importPrivateKey(privateKey)
     }
 
     return null
