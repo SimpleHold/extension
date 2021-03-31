@@ -44,7 +44,6 @@ const SendConfirmation: React.FC = () => {
   const history = useHistory()
   const {
     state: { amount, symbol, networkFee, addressFrom, addressTo, outputs },
-    state,
   } = useLocation<LocationState>()
 
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)

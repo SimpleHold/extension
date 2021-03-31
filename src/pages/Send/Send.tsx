@@ -75,7 +75,6 @@ const Send: React.FC = () => {
 
   const getOutputs = async (): Promise<void> => {
     const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
-    console.log('unspentOutputs', unspentOutputs)
     setOutputs(unspentOutputs)
   }
 
@@ -106,21 +105,10 @@ const Send: React.FC = () => {
     setEstimated(null)
 
     if (currency) {
-      const fetchBalance = await getBalance(selectedAddress, currency?.chain)
+      const { balance, balance_usd } = await getBalance(selectedAddress, currency?.chain)
 
-      if (fetchBalance) {
-        setBalance(fetchBalance.balance)
-        setEstimated(fetchBalance.balance_usd)
-      } else {
-        //   const latestbalance = getLatestBalance(address)
-        // setBalance(latestbalance)
-        // if (latestbalance !== 0) {
-        //   const fetchEstimated = await getEstimated(latestbalance)
-        //   setEstimated(fetchEstimated)
-        // } else {
-        //   setEstimated(0)
-        // }
-      }
+      setBalance(balance)
+      setEstimated(balance_usd)
     }
   }
 

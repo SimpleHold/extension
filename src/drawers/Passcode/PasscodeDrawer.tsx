@@ -22,7 +22,9 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
 
   React.useEffect(() => {
     if (isActive) {
-      document.querySelector<HTMLInputElement>('[aria-label="Digit 1"]')?.focus()
+      setTimeout(() => {
+        document.querySelector<HTMLInputElement>('[aria-label="Digit 1"]')?.focus()
+      }, 300)
 
       if (passcode.length) {
         setPasscode('')

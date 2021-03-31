@@ -38,8 +38,8 @@ const bitcoin = (function () {
       .sign(privateKey)
 
     return {
-      raw: transaction.serialize(),
-      hash: transaction.hash,
+      raw: transaction.toString(),
+      hash: transaction.toObject().hash,
     }
   }
 

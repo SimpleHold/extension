@@ -17,8 +17,28 @@ const dogecoin = (function () {
     return new dogecore.PrivateKey(privateKey).toAddress().toString()
   }
 
+  const getTransactionSize = (outputs) => {
+    return new dogecore.Transaction().from(outputs).toString().length
+  }
+
+  const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {
+    const transaction = new dogecore.Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .fee(fee)
+      .change(changeAddress)
+      .sign(privateKey)
+
+    return {
+      raw: transaction.toString(),
+      hash: transaction.toObject().hash,
+    }
+  }
+
   return {
     generateWallet,
     importPrivateKey,
+    getTransactionSize,
+    createTransaction,
   }
 })()

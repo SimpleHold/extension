@@ -11,63 +11,71 @@ class GenerateAddress {
   }
 
   generate = (): TGenerateAddress | null => {
-    const { symbol } = this
+    try {
+      const { symbol } = this
 
-    if (symbol === 'btc') {
-      return bitcoin.generateWallet()
+      if (symbol === 'btc') {
+        return bitcoin.generateWallet()
+      }
+
+      if (symbol === 'bch' || symbol === 'bsv') {
+        return bitcoincash.generateWallet()
+      }
+
+      if (symbol === 'dash') {
+        return dash.generateWallet()
+      }
+
+      if (symbol === 'doge') {
+        return dogecoin.generateWallet()
+      }
+
+      if (symbol === 'ltc') {
+        return litecoin.generateWallet()
+      }
+
+      if (symbol === 'zec') {
+        return bitgo.zcash.generateWallet()
+      }
+
+      return null
+    } catch {
+      return null
     }
-
-    if (symbol === 'bch' || symbol === 'bsv') {
-      return bitcoincash.generateWallet()
-    }
-
-    if (symbol === 'dash') {
-      return dash.generateWallet()
-    }
-
-    if (symbol === 'doge') {
-      return dogecoin.generateWallet()
-    }
-
-    if (symbol === 'ltc') {
-      return litecoin.generateWallet()
-    }
-
-    if (symbol === 'zec') {
-      return bitgo.zcash.generateWallet()
-    }
-
-    return null
   }
 
   import = (privateKey: string): string | null => {
-    const { symbol } = this
+    try {
+      const { symbol } = this
 
-    if (symbol === 'btc') {
-      return bitcoin.importPrivateKey(privateKey)
+      if (symbol === 'btc') {
+        return bitcoin.importPrivateKey(privateKey)
+      }
+
+      if (symbol === 'bch' || symbol === 'bsv') {
+        return bitcoincash.importPrivateKey(privateKey)
+      }
+
+      if (symbol === 'dash') {
+        return dash.importPrivateKey(privateKey)
+      }
+
+      if (symbol === 'doge') {
+        return dogecoin.importPrivateKey(privateKey)
+      }
+
+      if (symbol === 'ltc') {
+        return litecoin.importPrivateKey(privateKey)
+      }
+
+      if (symbol === 'zec') {
+        return bitgo.zcash.importPrivateKey(privateKey)
+      }
+
+      return null
+    } catch {
+      return null
     }
-
-    if (symbol === 'bch' || symbol === 'bsv') {
-      return bitcoincash.importPrivateKey(privateKey)
-    }
-
-    if (symbol === 'dash') {
-      return dash.importPrivateKey(privateKey)
-    }
-
-    if (symbol === 'doge') {
-      return dogecoin.importPrivateKey(privateKey)
-    }
-
-    if (symbol === 'ltc') {
-      return litecoin.importPrivateKey(privateKey)
-    }
-
-    if (symbol === 'zec') {
-      return bitgo.zcash.importPrivateKey(privateKey)
-    }
-
-    return null
   }
 
   getTransactionSize = (outputs: UnspentOutput[]): number => {
@@ -85,29 +93,19 @@ class GenerateAddress {
   }
 
   toSat = (value: number): number => {
-    const { symbol } = this
-
-    if (symbol === 'btc') {
-      return bitcoin.toSat(value)
+    try {
+      return bitcoin.fromSat(value)
+    } catch {
+      return 0
     }
-
-    if (symbol === 'doge') {
-      return dogecoin.toSat(value)
-    }
-    return 0
   }
 
   fromSat = (value: number): number => {
-    const { symbol } = this
-
-    if (symbol === 'btc') {
+    try {
       return bitcoin.fromSat(value)
+    } catch {
+      return 0
     }
-
-    if (symbol === 'doge') {
-      return dogecoin.fromSat(value)
-    }
-    return 0
   }
 
   getNetworkFee = (unspentOutputs: UnspentOutput[], feePerByteSat: number, amount: string) => {
@@ -145,16 +143,20 @@ class GenerateAddress {
     changeAddress: string,
     privateKey: string
   ): TCreatedTransaction | null => {
-    const { symbol } = this
+    try {
+      const { symbol } = this
 
-    if (symbol === 'btc') {
-      return bitcoin.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
-    }
+      if (symbol === 'btc') {
+        return bitcoin.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
+      }
 
-    if (symbol === 'doge') {
-      return dogecoin.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
+      if (symbol === 'doge') {
+        return dogecoin.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
+      }
+      return null
+    } catch {
+      return null
     }
-    return null
   }
 }
 
