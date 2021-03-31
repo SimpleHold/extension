@@ -91,21 +91,11 @@ const Receive: React.FC = () => {
   }
 
   const loadBalance = async (): Promise<void> => {
-    const fetchBalance = await getBalance(address, chain)
+    const { balance, balance_usd, pending } = await getBalance(address, chain)
 
-    if (fetchBalance) {
-      setBalance(fetchBalance.balance)
-      setEstimated(fetchBalance.balance_usd)
-      setPendingBalance(100) //fetchBalance.pending
-    } else {
-      // const latestbalance = getLatestBalance(address)
-      // if (latestbalance !== 0) {
-      //   const fetchEstimated = await getEstimated(latestbalance)
-      //   setEstimated(fetchEstimated)
-      // } else {
-      //   setEstimated(0)
-      // }
-    }
+    setBalance(balance)
+    setEstimated(balance_usd)
+    setPendingBalance(pending)
   }
 
   const openWebPage = (url: string): Promise<Tabs.Tab> => {
