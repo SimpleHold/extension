@@ -43,14 +43,28 @@ declare const bitcoin: {
 
 declare const bitcoincash: {
   generateWallet: () => TGenerateAddress
+  importPrivateKey: (privateKey: string) => string
 }
 
-declare const bitcoinsv: {
+declare const dash: {
   generateWallet: () => TGenerateAddress
+  importPrivateKey: (privateKey: string) => string
 }
 
 declare const litecoin: {
   generateWallet: () => TGenerateAddress
+  importPrivateKey: (privateKey: string) => string
+}
+
+declare const bitgo: {
+  zcash: {
+    generateWallet: () => TGenerateAddress
+    importPrivateKey: (privateKey: string) => string
+  }
+  groestl: {
+    generateWallet: () => TGenerateAddress
+    importPrivateKey: (privateKey: string) => string
+  }
 }
 
 declare const dogecoin: {
