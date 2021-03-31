@@ -20,16 +20,18 @@ interface Props {
   symbol: string
   sumBalance: (balance: number) => void
   sumEstimated: (estimated: number) => void
+  sumPending: (pending: number) => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
-  const { address, symbol, sumBalance, sumEstimated } = props
+  const { address, symbol, sumBalance, sumEstimated, sumPending } = props
   const currency = getCurrency(symbol)
 
   const history = useHistory()
 
   const [balance, setBalance] = React.useState<number | null>(null)
   const [estimated, setEstimated] = React.useState<number | null>(null)
+  const [pendingBalance, setPendingBalance] = React.useState<number>(0)
 
   React.useEffect(() => {
     fetchBalance()
@@ -39,19 +41,16 @@ const WalletCard: React.FC<Props> = (props) => {
     if (currency) {
       const tryGetBalance = await getBalance(address, currency?.chain)
 
-      if (tryGetBalance) {
-        const { balance, balance_usd } = tryGetBalance
+      const { balance, balance_usd, balance_btc, pending, pending_btc } = tryGetBalance
 
-        setBalance(balance)
-        sumBalance(balance)
+      setBalance(balance)
+      sumBalance(balance_btc)
 
-        setEstimated(balance_usd)
-        sumEstimated(balance_usd)
-      } else {
-        // const latestbalance = getLatestBalance(address)
-        // setBalance(latestbalance)
-        // sumBalance(latestbalance)
-      }
+      sumPending(pending_btc)
+      setPendingBalance(pending)
+
+      setEstimated(balance_usd)
+      sumEstimated(balance_usd)
     }
   }
 
@@ -75,9 +74,12 @@ const WalletCard: React.FC<Props> = (props) => {
         <Styles.Balances>
           <Skeleton width={106} height={16} type="gray" br={4} isLoading={balance === null}>
             <Styles.BalanceRow>
-              <Styles.PendingIcon>
-                <SVG src="../../assets/icons/clock.svg" width={12} height={12} />
-              </Styles.PendingIcon>
+              {pendingBalance > 0 ? (
+                <Styles.PendingIcon>
+                  <SVG src="../../assets/icons/clock.svg" width={12} height={12} />
+                </Styles.PendingIcon>
+              ) : null}
+
               <Styles.Balance>{`${numeral(balance).format('0.[00000000]')} ${toUpper(
                 symbol
               )}`}</Styles.Balance>

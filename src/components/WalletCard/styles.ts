@@ -73,6 +73,12 @@ const BalanceRow = styled.div`
 
 const PendingIcon = styled.div`
   margin: 0 5px 0 0;
+
+  svg {
+    path {
+      fill: rgba(195, 195, 195, 0.6);
+    }
+  }
 `
 
 const Styles = {
