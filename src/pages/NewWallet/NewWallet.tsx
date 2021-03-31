@@ -120,7 +120,7 @@ const NewWallet: React.FC = () => {
         <Cover />
         <Header withBack onBack={history.goBack} backTitle="Wallets" />
         <Styles.Container>
-          <Styles.Title>Select currency</Styles.Title>
+          <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
             You can generate new address or import private key to add address you already use. Enter
             your password to keep your backup up-to-date and encrypted.
