@@ -1,11 +1,11 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable func-names */
 /* eslint-disable no-unused-vars */
-const dogecore = require('bitcore-lib-doge')
+const litecore = require('bitcore-lib-ltc')
 
-const dogecoin = (function () {
+const litecoin = (function () {
   const generateWallet = () => {
-    const privateKey = new dogecore.PrivateKey()
+    const privateKey = new litecore.PrivateKey()
 
     return {
       address: privateKey.toAddress().toString(),
@@ -14,7 +14,7 @@ const dogecoin = (function () {
   }
 
   const importPrivateKey = (privateKey) => {
-    return new dogecore.PrivateKey(privateKey).toAddress().toString()
+    return new litecore.PrivateKey(privateKey).toAddress().toString()
   }
 
   return {

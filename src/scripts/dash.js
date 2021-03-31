@@ -1,11 +1,9 @@
 /* eslint-disable import/no-unresolved */
 /* eslint-disable func-names */
 /* eslint-disable no-unused-vars */
-const dogecore = require('bitcore-lib-doge')
-
-const dogecoin = (function () {
+const dash = (function () {
   const generateWallet = () => {
-    const privateKey = new dogecore.PrivateKey()
+    const privateKey = new window.dashcore.PrivateKey()
 
     return {
       address: privateKey.toAddress().toString(),
@@ -14,7 +12,7 @@ const dogecoin = (function () {
   }
 
   const importPrivateKey = (privateKey) => {
-    return new dogecore.PrivateKey(privateKey).toAddress().toString()
+    return new window.dashcore.PrivateKey(privateKey).toAddress().toString()
   }
 
   return {
