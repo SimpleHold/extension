@@ -44,16 +44,43 @@ declare const bitcoin: {
 declare const bitcoincash: {
   generateWallet: () => TGenerateAddress
   importPrivateKey: (privateKey: string) => string
+  getTransactionSize: (outputs: UnspentOutput[]) => number
+  createTransaction: (
+    outputs: UnspentOutput[],
+    to: string,
+    amount: number,
+    fee: number,
+    changeAddress: string,
+    privateKey: string
+  ) => TCreatedTransaction | null
 }
 
 declare const dash: {
   generateWallet: () => TGenerateAddress
   importPrivateKey: (privateKey: string) => string
+  getTransactionSize: (outputs: UnspentOutput[]) => number
+  createTransaction: (
+    outputs: UnspentOutput[],
+    to: string,
+    amount: number,
+    fee: number,
+    changeAddress: string,
+    privateKey: string
+  ) => TCreatedTransaction
 }
 
 declare const litecoin: {
   generateWallet: () => TGenerateAddress
   importPrivateKey: (privateKey: string) => string
+  getTransactionSize: (outputs: UnspentOutput[]) => number
+  createTransaction: (
+    outputs: UnspentOutput[],
+    to: string,
+    amount: number,
+    fee: number,
+    changeAddress: string,
+    privateKey: string
+  ) => TCreatedTransaction | null
 }
 
 declare const bitgo: {
@@ -71,8 +98,6 @@ declare const dogecoin: {
   generateWallet: () => TGenerateAddress
   importPrivateKey: (privateKey: string) => string
   getTransactionSize: (outputs: UnspentOutput[]) => number
-  toSat: (value: number) => number
-  fromSat: (value: number) => number
   createTransaction: (
     outputs: UnspentOutput[],
     to: string,
