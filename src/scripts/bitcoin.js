@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable func-names */
 /* eslint-disable no-unused-vars */
@@ -18,7 +19,7 @@ const bitcoin = (function () {
   }
 
   const getTransactionSize = (outputs) => {
-    return new bitcore.Transaction().from(outputs).toString().length
+    return new bitcore.Transaction().from(outputs)._estimateFee()
   }
 
   const toSat = (value) => {

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable func-names */
 /* eslint-disable no-unused-vars */
@@ -17,8 +18,28 @@ const litecoin = (function () {
     return new litecore.PrivateKey(privateKey).toAddress().toString()
   }
 
+  const getTransactionSize = (outputs) => {
+    return new litecore.Transaction().from(outputs)._estimateFee()
+  }
+
+  const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {
+    const transaction = new litecore.Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .fee(fee)
+      .change(changeAddress)
+      .sign(privateKey)
+
+    return {
+      raw: transaction.toString(),
+      hash: transaction.toObject().hash,
+    }
+  }
+
   return {
     generateWallet,
     importPrivateKey,
+    getTransactionSize,
+    createTransaction,
   }
 })()
