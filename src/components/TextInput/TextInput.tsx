@@ -12,6 +12,7 @@ interface Props {
   withPasswordVisible?: boolean
   onBlurInput?: Function
   inputRef?: React.RefObject<HTMLInputElement>
+  disabled?: boolean
 }
 
 const TextInput: React.FC<Props> = (props) => {
@@ -24,6 +25,7 @@ const TextInput: React.FC<Props> = (props) => {
     withPasswordVisible,
     onBlurInput,
     inputRef,
+    disabled,
   } = props
 
   const textInputRef = inputRef || React.useRef<HTMLInputElement>(null)
@@ -35,7 +37,9 @@ const TextInput: React.FC<Props> = (props) => {
 
   const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     if (
-      (visibleBlockRef.current && !visibleBlockRef.current.contains(event.target as Node)) ||
+      (!disabled &&
+        visibleBlockRef.current &&
+        !visibleBlockRef.current.contains(event.target as Node)) ||
       !withPasswordVisible
     ) {
       if (type === 'number') {
@@ -67,6 +71,7 @@ const TextInput: React.FC<Props> = (props) => {
           value={value}
           onChange={onChange}
           decimalScale={8}
+          disabled={disabled}
         />
       )
     }
@@ -78,6 +83,7 @@ const TextInput: React.FC<Props> = (props) => {
         value={value}
         onChange={onChange}
         type={type === 'password' && isPasswordVisible ? 'text' : type}
+        disabled={disabled}
       />
     )
   }
@@ -87,6 +93,7 @@ const TextInput: React.FC<Props> = (props) => {
       onClick={onClick}
       isFocused={isFocused}
       isError={errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0}
+      disabled={disabled}
     >
       <Styles.Row isActive={isFocused || value?.length > 0}>
         <Styles.Label>

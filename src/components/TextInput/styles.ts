@@ -7,6 +7,7 @@ import eyeVisibleIcon from '@assets/icons/eyeVisible.svg'
 type TContainerProps = {
   isFocused: boolean
   isError: boolean
+  disabled?: boolean
 }
 
 type TRowProps = {
@@ -36,7 +37,7 @@ const Container = styled.div`
   }
 
   &:hover {
-    cursor: pointer;
+    cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
   }
 `
 
