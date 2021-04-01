@@ -10,10 +10,10 @@ import AgreeTerms from '@components/AgreeTerms'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { logEvent } from '@utils/amplitude'
+import { logEvent, setUserProperties } from '@utils/amplitude'
 import { generate } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
-import address from '@utils/address'
+import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import { START_PASSWORD } from '@config/events'
@@ -39,7 +39,7 @@ const Wallets: React.FC = () => {
       name: START_PASSWORD,
     })
 
-    const geneateAddress = new address('btc').generate()
+    const geneateAddress = new bitcoinLike('btc').generate()
 
     if (geneateAddress) {
       const { address, privateKey } = geneateAddress
@@ -48,6 +48,10 @@ const Wallets: React.FC = () => {
       localStorage.setItem('backup', encrypt(backup, password))
       localStorage.setItem('wallets', wallets)
       localStorage.setItem('backupStatus', 'notDownloaded')
+
+      setUserProperties({
+        NUMBER_WALLET_BTC: '1',
+      })
 
       history.push('/download-backup')
     }

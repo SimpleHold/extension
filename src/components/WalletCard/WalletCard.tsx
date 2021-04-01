@@ -9,7 +9,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { getCurrency } from '@config/currencies'
-import { getBalance } from '@utils/bitcoin'
+import { getBalance } from '@utils/api'
 import { toUpper, numberFriendly } from '@utils/format'
 
 // Styles

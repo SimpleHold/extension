@@ -11,11 +11,12 @@ import Header from '@components/Header'
 import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
-import { logEvent } from '@utils/amplitude'
-import addressUtil, { TSymbols } from '@utils/address'
+import { logEvent, setUserProperties } from '@utils/amplitude'
+import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
 import { validatePassword } from '@utils/validate'
 import { decrypt, encrypt } from '@utils/crypto'
-import { addNew as addNewWallet } from '@utils/wallet'
+import { addNew as addNewWallet, IWallet } from '@utils/wallet'
+import { toUpper } from '@utils/format'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
@@ -58,7 +59,7 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const generate = new addressUtil(symbol).generate()
+    const generate = new bitcoinLike(symbol).generate()
 
     if (generate) {
       const { privateKey: walletPrivateKey } = generate
@@ -88,7 +89,7 @@ const NewWallet: React.FC = () => {
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
 
-          const address = new addressUtil(symbol).import(privateKey)
+          const address = new bitcoinLike(symbol).import(privateKey)
 
           if (address) {
             const uuid = v4()
@@ -104,6 +105,11 @@ const NewWallet: React.FC = () => {
             if (newWalletsList) {
               localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
               localStorage.setItem('wallets', newWalletsList)
+
+              const walletAmount = JSON.parse(newWalletsList).filter(
+                (wallet: IWallet) => wallet.symbol === symbol
+              ).length
+              setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
               return onSuccess(password)
             }

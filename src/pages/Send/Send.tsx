@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-// import { Transaction } from 'bitcore-lib'
+import numeral from 'numeral'
 
 // Components
 import Cover from '@components/Cover'
@@ -14,9 +14,9 @@ import Spinner from '@components/Spinner'
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
-import { getBalance, getUnspentOutputs, getFees } from '@utils/bitcoin'
+import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import addressLib, { TSymbols } from '@utils/address'
+import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -51,8 +51,8 @@ const Send: React.FC = () => {
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
-  const [outputs, setOutputs] = React.useState<any[]>([]) //Transaction.UnspentOutput[]
-  const [utxosList, setUtxosList] = React.useState<any[]>([]) //Transaction.UnspentOutput[]
+  const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
 
   const debounced = useDebounce(amount, 1000)
@@ -82,7 +82,7 @@ const Send: React.FC = () => {
     const fee = await getFees(chain)
     setUtxosList([])
 
-    const { networkFee, utxos } = new addressLib(symbol).getNetworkFee(outputs, fee, amount)
+    const { networkFee, utxos } = new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
 
     setUtxosList(utxos)
     setNetworkFee(networkFee)
@@ -132,7 +132,7 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (address.length && !new addressLib(symbol).validate(address)) {
+    if (address.length && !new bitcoinLike(symbol).validate(address)) {
       setAddressErrorLabel('Address is not valid')
     }
 
@@ -157,7 +157,7 @@ const Send: React.FC = () => {
 
   const isButtonDisabled = (): boolean => {
     return (
-      !new addressLib(symbol).validate(address) ||
+      !new bitcoinLike(symbol).validate(address) ||
       !amount.length ||
       Number(amount) <= 0 ||
       !outputs.length ||
@@ -185,7 +185,9 @@ const Send: React.FC = () => {
         <Styles.Row>
           <Styles.PageTitle>Send</Styles.PageTitle>
           <Skeleton width={250} height={42} type="gray" mt={21} isLoading={balance === null}>
-            <Styles.Balance>{`${balance} ${toUpper(symbol)}`}</Styles.Balance>
+            <Styles.Balance>
+              {numeral(balance).format('0.[00000000]')} {toUpper(symbol)}
+            </Styles.Balance>
           </Skeleton>
           <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
             <Styles.USDEstimated>{`$${price(estimated, 2)} USD`}</Styles.USDEstimated>
@@ -207,6 +209,7 @@ const Send: React.FC = () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAddress(e.target.value)}
             errorLabel={addressErrorLabel}
             onBlurInput={onBlurAddressInput}
+            disabled={balance === null || Number(balance) <= 0}
           />
           <TextInput
             label={`Amount (${toUpper(symbol)})`}
@@ -215,6 +218,7 @@ const Send: React.FC = () => {
             type="number"
             errorLabel={amountErrorLabel}
             onBlurInput={onBlurAmountInput}
+            disabled={balance === null || Number(balance) <= 0}
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>

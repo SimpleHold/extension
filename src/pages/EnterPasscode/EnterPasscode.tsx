@@ -10,6 +10,10 @@ import ForgotPasscodeDrawer from '@drawers/ForgotPasscode'
 
 // Utils
 import { sha256hash } from '@utils/crypto'
+import { logEvent } from '@utils/amplitude'
+
+// Config
+import { PASSCODE_LOCKED_INVALID, PASSCODE_LOCKED_FORGOT } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -47,11 +51,19 @@ const EnterPasscode: React.FC = () => {
       history.push('/wallets')
     } else {
       setIsError(true)
+
+      logEvent({
+        name: PASSCODE_LOCKED_INVALID,
+      })
     }
   }
 
   const onConfirmReset = (): void => {
     history.push('/lock')
+
+    logEvent({
+      name: PASSCODE_LOCKED_FORGOT,
+    })
   }
 
   return (

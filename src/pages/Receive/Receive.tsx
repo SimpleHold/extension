@@ -23,7 +23,7 @@ import ShowPrivateKeyDrawer from '@drawers/ShowPrivateKey'
 import useVisible from '@hooks/useVisible'
 
 // Utils
-import { getBalance } from '@utils/bitcoin'
+import { getBalance } from '@utils/api'
 import { price, toUpper } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
@@ -217,13 +217,13 @@ const Receive: React.FC = () => {
               ) : null}
             </Skeleton>
 
-            {pendingBalance !== null && Number(pendingBalance) > 0 ? (
-              <PendingBalance btcValue={pendingBalance} type="gray" />
+            {pendingBalance !== null && Number(pendingBalance) !== 0 ? (
+              <PendingBalance btcValue={pendingBalance} type="gray" symbol={symbol} />
             ) : null}
           </Styles.Row>
 
           <Styles.ReceiveBlock>
-            <QRCode size={100} value={address} />
+            <QRCode size={120} value={address} />
             <CopyToClipboard value={address} mb={20} onCopy={onCopyAddress}>
               <Styles.Address>{address}</Styles.Address>
             </CopyToClipboard>

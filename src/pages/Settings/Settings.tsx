@@ -19,7 +19,7 @@ import { logEvent } from '@utils/amplitude'
 import { sha256hash } from '@utils/crypto'
 
 // Config
-import { BACKUP_SETTINGS } from '@config/events'
+import { BACKUP_SETTINGS, PASSCODE_ENABLED, PASSCODE_DISABLED } from '@config/events'
 
 // Icons
 import cloudIcon from '@assets/icons/cloud.svg'
@@ -48,6 +48,7 @@ const Settings: React.FC = () => {
 
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'passcode' | 'logout'>(null)
   const [passcodeDrawerType, setPasscodeDrawerType] = React.useState<'create' | 'remove'>('create')
+  const [isPasscodeError, setIsPasscodeError] = React.useState<boolean>(false)
 
   const onDownloadBackup = () => {
     const backup = localStorage.getItem('backup')
@@ -112,12 +113,28 @@ const Settings: React.FC = () => {
   }
 
   const onConfirmPasscode = (passcode: string) => {
-    setActiveDrawer(null)
-
     if (passcodeDrawerType === 'remove') {
-      localStorage.removeItem('passcode')
+      if (sha256hash(passcode) === localStorage.getItem('passcode')) {
+        localStorage.removeItem('passcode')
+
+        setActiveDrawer(null)
+        setPasscodeDrawerType('create')
+
+        logEvent({
+          name: PASSCODE_DISABLED,
+        })
+      } else {
+        setIsPasscodeError(true)
+      }
     } else {
       localStorage.setItem('passcode', sha256hash(passcode))
+
+      setActiveDrawer(null)
+      setPasscodeDrawerType('remove')
+
+      logEvent({
+        name: PASSCODE_ENABLED,
+      })
     }
   }
 
@@ -184,6 +201,8 @@ const Settings: React.FC = () => {
         onClose={() => setActiveDrawer(null)}
         onConfirm={onConfirmPasscode}
         type={passcodeDrawerType}
+        isError={isPasscodeError}
+        setIsError={setIsPasscodeError}
       />
     </>
   )

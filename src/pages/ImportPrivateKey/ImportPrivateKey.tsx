@@ -14,9 +14,11 @@ import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { checkExistWallet, addNew as addNewWallet } from '@utils/wallet'
-import addressUtil, { TSymbols } from '@utils/address'
+import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
+import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
 import { decrypt, encrypt } from '@utils/crypto'
+import { setUserProperties } from '@utils/amplitude'
+import { toUpper } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -41,7 +43,7 @@ const ImportPrivateKey: React.FC = () => {
       setErrorLabel(null)
     }
 
-    const getAddress = new addressUtil(symbol).import(privateKey)
+    const getAddress = new bitcoinLike(symbol).import(privateKey)
 
     if (getAddress) {
       const checkExist = checkExistWallet(getAddress)
@@ -62,7 +64,8 @@ const ImportPrivateKey: React.FC = () => {
       const decryptBackup = decrypt(backup, password)
       if (decryptBackup) {
         const parseBackup = JSON.parse(decryptBackup)
-        const address = new addressUtil(symbol).import(privateKey)
+        const address = new bitcoinLike(symbol).import(privateKey)
+
         if (address) {
           const uuid = v4()
           const newWalletsList = addNewWallet(address, symbol, uuid)
@@ -76,6 +79,11 @@ const ImportPrivateKey: React.FC = () => {
             localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
             localStorage.setItem('wallets', newWalletsList)
             localStorage.setItem('backupStatus', 'notDownloaded')
+
+            const walletAmount = JSON.parse(newWalletsList).filter(
+              (wallet: IWallet) => wallet.symbol === symbol
+            ).length
+            setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
             return history.push('/download-backup', {
               password,

@@ -13,10 +13,12 @@ interface Props {
   isActive: boolean
   onConfirm: (passcode: string) => void
   type: 'create' | 'remove'
+  isError: boolean
+  setIsError: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const PasscodeDrawer: React.FC<Props> = (props) => {
-  const { onClose, isActive, onConfirm, type } = props
+  const { onClose, isActive, onConfirm, type, isError, setIsError } = props
 
   const [passcode, setPasscode] = React.useState<string>('')
 
@@ -32,6 +34,12 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
     }
   }, [isActive])
 
+  React.useEffect(() => {
+    if (isError) {
+      setIsError(false)
+    }
+  }, [passcode])
+
   return (
     <DrawerWrapper
       title={type === 'create' ? 'Create your passcode' : 'Enter your passcode'}
@@ -40,7 +48,7 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
     >
       <Styles.Row>
         <Styles.Form>
-          <OneTimePassword value={passcode} onChange={setPasscode} />
+          <OneTimePassword value={passcode} onChange={setPasscode} isError={isError} />
         </Styles.Form>
 
         <Styles.Actions>
