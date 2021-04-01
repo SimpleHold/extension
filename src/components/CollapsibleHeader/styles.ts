@@ -27,12 +27,7 @@ const Balance = styled.p`
   color: #ffffff;
 `
 
-const ClockIcon = styled.div`
-  width: 12px;
-  height: 12px;
-  background-color: red;
-  margin: 0 0 0 6px;
-`
+const ClockIcon = styled.div``
 
 const Estimated = styled.p`
   margin: 0;

@@ -36,21 +36,35 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
 
   const totalBalanceOpacity = Math.max(0, 1 - 0.1 * scrollPosition)
   const totalBalanceTop = Math.max(0, 70 - scrollPosition)
+  const totalBalanceHeight = Math.max(0, 19 - scrollPosition)
 
   const pendingBalanceRowHeight = Math.max(0, 30 - 0.05 * scrollPosition)
   const pendingBalanceRowOpacity = Math.max(0, 1 - 0.05 * scrollPosition)
   const pendingBalanceRowMarginTop = Math.max(0, 10 - 0.05 * scrollPosition)
+
+  const balanceSkeletonWidth = Math.max(150, 250 - scrollPosition)
+
+  const clockIconSize = Math.max(12, 23 - 0.1 * scrollPosition)
+  const clockIconMarginLeft = Math.max(6, 10 - scrollPosition)
 
   return (
     <Styles.Container style={{ height: сontainerHeight }}>
       <Header />
 
       <Styles.Row>
-        <Styles.TotalBalanceLabel style={{ opacity: totalBalanceOpacity, top: totalBalanceTop }}>
+        <Styles.TotalBalanceLabel
+          style={{ opacity: totalBalanceOpacity, top: totalBalanceTop, height: totalBalanceHeight }}
+        >
           Total balance
         </Styles.TotalBalanceLabel>
 
-        <Skeleton width={250} height={balanceFontSize} isLoading={balance === null} type="light">
+        <Skeleton
+          width={balanceSkeletonWidth}
+          height={balanceFontSize}
+          isLoading={balance === null}
+          type="light"
+          mt={balanceRowMarginTop}
+        >
           <Styles.BalanceRow style={{ marginTop: balanceRowMarginTop }}>
             <Styles.Balance
               style={{
@@ -60,7 +74,21 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
             >
               {numeral(balance).format('0.[00000000]')} BTC
             </Styles.Balance>
-            <Styles.ClockIcon />
+            {scrollPosition > 80 && pendingBalance !== null && Number(pendingBalance) > 0 ? (
+              <Styles.ClockIcon
+                style={{
+                  width: clockIconSize,
+                  height: clockIconSize,
+                  marginLeft: clockIconMarginLeft,
+                }}
+              >
+                <SVG
+                  src="../../assets/icons/clock.svg"
+                  width={clockIconSize}
+                  height={clockIconSize}
+                />
+              </Styles.ClockIcon>
+            ) : null}
           </Styles.BalanceRow>
         </Skeleton>
 
@@ -68,7 +96,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
           width={120}
           height={estimatedLineHeight}
           isLoading={estimated === null}
-          mt={11}
+          mt={estimatedMarginTop}
           type="light"
           mb={10}
         >
