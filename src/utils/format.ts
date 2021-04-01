@@ -32,21 +32,6 @@ export const numberFriendly = (amount: number | null): number | string => {
     : '' + amount.toFixed(2)
 }
 
-export const limitBalance = (amount: number | null, max: number): string | number => {
-  if (amount === null) {
-    return 0
-  }
-
-  const stringAmount = amount.toString()
-  if (stringAmount.length > max) {
-    const toFixed = stringAmount.split('.')[0].length + 1
-
-    return Number(amount).toFixed(10 - toFixed)
-  }
-
-  return amount
-}
-
 export const price = (price: number | null, toFixed = 2): string => {
   if (price === null) {
     return Number(0).toFixed(toFixed)
