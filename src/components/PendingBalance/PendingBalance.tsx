@@ -6,8 +6,8 @@ import numeral from 'numeral'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { price } from '@utils/format'
-import { getEstimated } from '@utils/bitcoin'
+import { price, toUpper } from '@utils/format'
+import { getEstimated } from '@utils/api'
 
 // Styles
 import Styles from './styles'
@@ -15,10 +15,11 @@ import Styles from './styles'
 interface Props {
   btcValue: number
   type: 'light' | 'gray'
+  symbol: string
 }
 
 const PendingBalance: React.FC<Props> = (props) => {
-  const { btcValue, type } = props
+  const { btcValue, type, symbol } = props
 
   const [USDValue, setUSDValue] = React.useState<number | null>(null)
 
@@ -37,9 +38,14 @@ const PendingBalance: React.FC<Props> = (props) => {
         <SVG src="../../assets/icons/clock.svg" width={16} height={16} />
       </Styles.IconRow>
       <Styles.Row>
-        <Styles.BTCValue>{numeral(btcValue).format('0.[00000000]')} BTC</Styles.BTCValue>
+        <Styles.BTCValue>
+          {`${btcValue > 0 ? '+' : ''}${numeral(btcValue).format('0.[00000000]')}`}{' '}
+          {toUpper(symbol)}
+        </Styles.BTCValue>
         <Skeleton width={56} height={14} isLoading={USDValue === null} type={type}>
-          {USDValue ? <Styles.USDValue>{`$ ${price(USDValue)}`}</Styles.USDValue> : null}
+          {USDValue ? (
+            <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${price(USDValue)}`}</Styles.USDValue>
+          ) : null}
         </Skeleton>
       </Styles.Row>
     </Styles.Container>
