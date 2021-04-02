@@ -153,6 +153,15 @@ const Send: React.FC = () => {
     ) {
       setAmountErrorLabel('Insufficient funds')
     }
+
+    if (currency) {
+      const parseAmount = new bitcoinLike(symbol).toSat(Number(amount))
+      const parseMinAmount = new bitcoinLike(symbol).fromSat(currency.minSendAmount)
+
+      if (parseAmount < currency.minSendAmount) {
+        setAmountErrorLabel(`Min. amount: ${parseMinAmount} ${toUpper(symbol)}`)
+      }
+    }
   }
 
   const isButtonDisabled = (): boolean => {
