@@ -200,7 +200,7 @@ const Receive: React.FC = () => {
 
             <Skeleton width={250} height={36} mt={10} type="gray" isLoading={balance === null}>
               <Styles.Balance>
-                {numeral(balance).format('0.[00000000]')} {toUpper(symbol)}
+                {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
               </Styles.Balance>
             </Skeleton>
 

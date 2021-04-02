@@ -39,8 +39,7 @@ const PendingBalance: React.FC<Props> = (props) => {
       </Styles.IconRow>
       <Styles.Row>
         <Styles.BTCValue>
-          {`${btcValue > 0 ? '+' : ''}${numeral(btcValue).format('0.[00000000]')}`}{' '}
-          {toUpper(symbol)}
+          {`${btcValue > 0 ? '+' : ''}${numeral(btcValue).format('0.[000000]')}`} {toUpper(symbol)}
         </Styles.BTCValue>
         <Skeleton width={56} height={14} isLoading={USDValue === null} type={type}>
           {USDValue ? (

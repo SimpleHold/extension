@@ -72,7 +72,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
                 lineHeight: `${balanceLineHeight}px`,
               }}
             >
-              {numeral(balance).format('0.[00000000]')} BTC
+              {numeral(balance).format('0.[000000]')} BTC
             </Styles.Balance>
             {scrollPosition > 80 && pendingBalance !== null && Number(pendingBalance) > 0 ? (
               <Styles.ClockIcon

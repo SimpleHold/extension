@@ -80,7 +80,7 @@ const WalletCard: React.FC<Props> = (props) => {
                 </Styles.PendingIcon>
               ) : null}
 
-              <Styles.Balance>{`${numeral(balance).format('0.[00000000]')} ${toUpper(
+              <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
                 symbol
               )}`}</Styles.Balance>
             </Styles.BalanceRow>

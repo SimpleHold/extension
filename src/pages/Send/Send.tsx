@@ -195,7 +195,7 @@ const Send: React.FC = () => {
           <Styles.PageTitle>Send</Styles.PageTitle>
           <Skeleton width={250} height={42} type="gray" mt={21} isLoading={balance === null}>
             <Styles.Balance>
-              {numeral(balance).format('0.[00000000]')} {toUpper(symbol)}
+              {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
             </Styles.Balance>
           </Skeleton>
           <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
