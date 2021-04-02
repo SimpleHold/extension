@@ -83,17 +83,6 @@ declare const litecoin: {
   ) => TCreatedTransaction | null
 }
 
-declare const bitgo: {
-  zcash: {
-    generateWallet: () => TGenerateAddress
-    importPrivateKey: (privateKey: string) => string
-  }
-  groestl: {
-    generateWallet: () => TGenerateAddress
-    importPrivateKey: (privateKey: string) => string
-  }
-}
-
 declare const dogecoin: {
   generateWallet: () => TGenerateAddress
   importPrivateKey: (privateKey: string) => string
@@ -106,15 +95,4 @@ declare const dogecoin: {
     changeAddress: string,
     privateKey: string
   ) => TCreatedTransaction | null
-}
-
-declare const bitgo: {
-  zcash: {
-    generateWallet: () => TGenerateAddress
-    importPrivateKey: (privateKey: string) => string
-  }
-  groestl: {
-    generateWallet: () => TGenerateAddress
-    importPrivateKey: (privateKey: string) => string
-  }
 }
