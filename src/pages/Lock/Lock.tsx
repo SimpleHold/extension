@@ -25,15 +25,19 @@ import Styles from './styles'
 const Lock: React.FC = () => {
   const history = useHistory()
 
+  const [password, setPassword] = React.useState<string>('')
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'logout'>(null)
+  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+
+  const textInputRef = React.useRef<HTMLInputElement>(null)
+
   React.useEffect(() => {
     logEvent({
       name: PASSWORD_AFTER_LOG_OUT,
     })
-  }, [])
 
-  const [password, setPassword] = React.useState<string>('')
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'logout'>(null)
-  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+    textInputRef.current?.focus()
+  }, [])
 
   const onUnlock = (): void => {
     if (errorLabel) {
@@ -104,6 +108,7 @@ const Lock: React.FC = () => {
                 setPassword(e.target.value)
               }
               errorLabel={errorLabel}
+              inputRef={textInputRef}
             />
             <Styles.Actions>
               <Button label="Unlock" onClick={onUnlock} disabled={!validatePassword(password)} />

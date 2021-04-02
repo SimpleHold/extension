@@ -38,6 +38,12 @@ const ImportPrivateKey: React.FC = () => {
     state: { symbol },
   } = useLocation<LocationState>()
 
+  const textInputRef = React.useRef<HTMLInputElement>(null)
+
+  React.useEffect(() => {
+    textInputRef.current?.focus()
+  }, [])
+
   const onConfirm = (): void => {
     if (errorLabel) {
       setErrorLabel(null)
@@ -122,6 +128,7 @@ const ImportPrivateKey: React.FC = () => {
                 setPrivateKey(e.target.value)
               }
               errorLabel={errorLabel}
+              inputRef={textInputRef}
             />
             <Styles.Actions>
               <Button label="Back" isLight onClick={history.goBack} mr={7.5} />

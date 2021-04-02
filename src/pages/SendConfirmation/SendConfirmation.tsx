@@ -16,9 +16,9 @@ import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { IRawTransaction, sendRawTransaction, btcToSat, satToBtc } from '@utils/bitcoin'
+import { IRawTransaction, sendRawTransaction } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import address, { TSymbols } from '@utils/address'
+import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
 
 // Config
 import {
@@ -71,25 +71,26 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
-          const transaction: TCreatedTransaction | null = new address(symbol).createTransaction(
+          const parseAmount = new bitcoinLike(symbol).toSat(amount)
+          const parseNetworkFee = new bitcoinLike(symbol).fromSat(networkFee)
+
+          const transaction: TCreatedTransaction | null = new bitcoinLike(symbol).createTransaction(
             outputs,
             addressTo,
-            btcToSat(amount),
-            satToBtc(networkFee),
+            parseAmount,
+            parseNetworkFee,
             addressFrom,
             findWallet.privateKey
           )
 
-          console.log('transaction', transaction)
+          if (transaction?.hash && transaction?.raw) {
+            const sendTransaction = await sendRawTransaction(transaction.raw, symbol)
 
-          // if (transaction?.hash && transaction?.raw) {
-          //   const sendTransaction = await sendRawTransaction(transaction.raw, symbol)
-
-          //   if (sendTransaction === transaction.hash) {
-          //     setRawTransaction(transaction)
-          //     return setActiveDrawer('success')
-          //   }
-          // }
+            if (sendTransaction === transaction.hash) {
+              setRawTransaction(transaction)
+              return setActiveDrawer('success')
+            }
+          }
 
           return setInputErrorLabel('Error while creating transaction')
         }
