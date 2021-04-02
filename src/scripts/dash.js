@@ -18,7 +18,7 @@ const dash = (function () {
   }
 
   const getTransactionSize = (outputs) => {
-    return new window.dashcore.Transaction().from(outputs)._estimateFee()
+    return new window.dashcore.Transaction().from(outputs).toString().length
   }
 
   const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {

@@ -19,7 +19,7 @@ const dogecoin = (function () {
   }
 
   const getTransactionSize = (outputs) => {
-    return new dogecore.Transaction().from(outputs)._estimateFee()
+    return new dogecore.Transaction().from(outputs).toString().length
   }
 
   const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {

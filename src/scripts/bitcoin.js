@@ -19,7 +19,7 @@ const bitcoin = (function () {
   }
 
   const getTransactionSize = (outputs) => {
-    return new bitcore.Transaction().from(outputs)._estimateFee()
+    return new bitcore.Transaction().from(outputs).toString().length
   }
 
   const toSat = (value) => {

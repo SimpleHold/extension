@@ -19,7 +19,7 @@ const bitcoincash = (function () {
   }
 
   const getTransactionSize = (outputs) => {
-    return new bitcorecash.Transaction().from(outputs)._estimateFee()
+    return new bitcorecash.Transaction().from(outputs).toString().length
   }
 
   const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {

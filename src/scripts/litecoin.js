@@ -19,7 +19,7 @@ const litecoin = (function () {
   }
 
   const getTransactionSize = (outputs) => {
-    return new litecore.Transaction().from(outputs)._estimateFee()
+    return new litecore.Transaction().from(outputs).toString().length
   }
 
   const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {
