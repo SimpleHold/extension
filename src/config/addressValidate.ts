@@ -6,5 +6,4 @@ export default {
   ltc: '^(L|M|3)[A-Za-z0-9]{33}$|^(ltc1)[0-9A-Za-z]{39}$',
   doge: '^(D|A|9)[a-km-zA-HJ-NP-Z1-9]{33,34}$',
   dash: '^[X|7][0-9A-Za-z]{33}$',
-  zec: '^(t)[A-Za-z0-9]{34}$',
 }

@@ -5,7 +5,6 @@ import bitcoinSVLogo from '@assets/currencies/bsv.svg'
 import litecoinLogo from '@assets/currencies/ltc.svg'
 import dogecoinLogo from '@assets/currencies/doge.svg'
 import dashLogo from '@assets/currencies/dash.svg'
-import zcashLogo from '@assets/currencies/zec.svg'
 
 export interface ICurrency {
   name: string
@@ -13,6 +12,7 @@ export interface ICurrency {
   logo: string
   background: string
   chain: string
+  minSendAmount: number
 }
 
 const currencies: ICurrency[] = [
@@ -22,6 +22,7 @@ const currencies: ICurrency[] = [
     logo: bitcoinLogo,
     background: '#FDE9D1',
     chain: 'bitcoin',
+    minSendAmount: 1000,
   },
   {
     name: 'Bitcoin Cash',
@@ -29,6 +30,7 @@ const currencies: ICurrency[] = [
     logo: bitcoinCashLogo,
     background: '#DDF2E9',
     chain: 'bitcoin-cash',
+    minSendAmount: 87000,
   },
   {
     name: 'Bitcoin SV',
@@ -36,6 +38,7 @@ const currencies: ICurrency[] = [
     logo: bitcoinSVLogo,
     background: '#FBF0CC',
     chain: 'bitcoin-sv',
+    minSendAmount: 200000,
   },
   {
     name: 'Litecoin',
@@ -43,6 +46,7 @@ const currencies: ICurrency[] = [
     logo: litecoinLogo,
     background: '#DFEEFB',
     chain: 'litecoin',
+    minSendAmount: 245000,
   },
   {
     name: 'Dogecoin',
@@ -50,6 +54,7 @@ const currencies: ICurrency[] = [
     logo: dogecoinLogo,
     background: '#F3EDD6',
     chain: 'dogecoin',
+    minSendAmount: 100000000,
   },
   {
     name: 'Dash',
@@ -57,13 +62,7 @@ const currencies: ICurrency[] = [
     logo: dashLogo,
     background: '#CCE8FA',
     chain: 'dash',
-  },
-  {
-    name: 'Zcash',
-    symbol: 'zec',
-    logo: zcashLogo,
-    background: '#FDF1D4',
-    chain: 'zcash',
+    minSendAmount: 200000,
   },
 ]
 

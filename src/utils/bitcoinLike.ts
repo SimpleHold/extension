@@ -1,7 +1,7 @@
 // Validate address
 import addressValidate from '@config/addressValidate'
 
-export type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash' | 'zec'
+export type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash'
 
 class GenerateAddress {
   symbol: TSymbols
@@ -14,11 +14,11 @@ class GenerateAddress {
     try {
       const { symbol } = this
 
-      if (symbol === 'btc') {
+      if (symbol === 'btc' || symbol === 'bsv') {
         return bitcoin.generateWallet()
       }
 
-      if (symbol === 'bch' || symbol === 'bsv') {
+      if (symbol === 'bch') {
         return bitcoincash.generateWallet()
       }
 
@@ -34,10 +34,6 @@ class GenerateAddress {
         return litecoin.generateWallet()
       }
 
-      if (symbol === 'zec') {
-        return bitgo.zcash.generateWallet()
-      }
-
       return null
     } catch {
       return null
@@ -48,11 +44,11 @@ class GenerateAddress {
     try {
       const { symbol } = this
 
-      if (symbol === 'btc') {
+      if (symbol === 'btc' || symbol === 'bsv') {
         return bitcoin.importPrivateKey(privateKey)
       }
 
-      if (symbol === 'bch' || symbol === 'bsv') {
+      if (symbol === 'bch') {
         return bitcoincash.importPrivateKey(privateKey)
       }
 
@@ -68,10 +64,6 @@ class GenerateAddress {
         return litecoin.importPrivateKey(privateKey)
       }
 
-      if (symbol === 'zec') {
-        return bitgo.zcash.importPrivateKey(privateKey)
-      }
-
       return null
     } catch {
       return null
@@ -81,11 +73,11 @@ class GenerateAddress {
   getTransactionSize = (outputs: UnspentOutput[]): number => {
     const { symbol } = this
 
-    if (symbol === 'btc') {
+    if (symbol === 'btc' || symbol === 'bsv') {
       return bitcoin.getTransactionSize(outputs)
     }
 
-    if (symbol === 'bch' || symbol === 'bsv') {
+    if (symbol === 'bch') {
       return bitcoincash.getTransactionSize(outputs)
     }
 
@@ -124,6 +116,12 @@ class GenerateAddress {
     const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
     const utxos: UnspentOutput[] = []
 
+    console.log({
+      unspentOutputs,
+      feePerByteSat,
+      amount,
+    })
+
     for (const output of sortOutputs) {
       const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
       const transactionFeeBytes = this.getTransactionSize(utxos) * feePerByteSat
@@ -158,11 +156,11 @@ class GenerateAddress {
     try {
       const { symbol } = this
 
-      if (symbol === 'btc') {
+      if (symbol === 'btc' || symbol === 'bsv') {
         return bitcoin.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
       }
 
-      if (symbol === 'bch' || symbol === 'bsv') {
+      if (symbol === 'bch') {
         return bitcoincash.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
       }
 
@@ -179,7 +177,8 @@ class GenerateAddress {
       }
 
       return null
-    } catch {
+    } catch (err) {
+      console.log('err', err)
       return null
     }
   }
