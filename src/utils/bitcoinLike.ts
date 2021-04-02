@@ -98,7 +98,7 @@ class GenerateAddress {
 
   toSat = (value: number): number => {
     try {
-      return bitcoin.fromSat(value)
+      return bitcoin.toSat(value)
     } catch {
       return 0
     }
@@ -115,12 +115,6 @@ class GenerateAddress {
   getNetworkFee = (unspentOutputs: UnspentOutput[], feePerByteSat: number, amount: string) => {
     const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
     const utxos: UnspentOutput[] = []
-
-    console.log({
-      unspentOutputs,
-      feePerByteSat,
-      amount,
-    })
 
     for (const output of sortOutputs) {
       const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)

@@ -27,6 +27,7 @@ import {
   ADDRESS_SEND_PASSWORD,
   ADDRESS_SEND_PASSWORD_CANCEL,
 } from '@config/events'
+import { getCurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -45,6 +46,8 @@ const SendConfirmation: React.FC = () => {
   const {
     state: { amount, symbol, networkFee, addressFrom, addressTo, outputs },
   } = useLocation<LocationState>()
+
+  const currency = getCurrency(symbol)
 
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
@@ -200,7 +203,7 @@ const SendConfirmation: React.FC = () => {
         isActive={activeDrawer === 'success'}
         onClose={() => setActiveDrawer(null)}
         text="Your transaction has successfully sent. You can check it here:"
-        link={`https://blockchair.com/bitcoin/transaction/${rawTransaction?.hash}`}
+        link={`https://blockchair.com/${currency?.chain}/transaction/${rawTransaction?.hash}`}
       />
     </>
   )
