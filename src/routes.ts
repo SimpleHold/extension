@@ -17,6 +17,7 @@ import OnBoardPage from './pages/OnBoard'
 import LockPage from './pages/Lock'
 import SelectCurrency from './pages/SelectCurrency'
 import EnterPasscode from './pages/EnterPasscode'
+import AddCustomToken from './pages/AddCustomToken'
 
 const routers: RouteProps[] = [
   {
@@ -82,6 +83,10 @@ const routers: RouteProps[] = [
   {
     path: '/enter-passcode',
     component: EnterPasscode,
+  },
+  {
+    path: '/add-custom-token',
+    component: AddCustomToken,
   },
 ]
 
