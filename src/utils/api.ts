@@ -16,6 +16,12 @@ interface IGetBalance {
   pending_btc: number
 }
 
+interface IGetContractInfo {
+  decimals: number
+  name: string
+  symbol: string
+}
+
 export const getBalance = async (address: string, chain: string): Promise<IGetBalance> => {
   try {
     const { data }: AxiosResponse = await axios(
@@ -96,5 +102,18 @@ export const getFees = async (chain: string): Promise<number> => {
     return data.data || 0
   } catch {
     return 0
+  }
+}
+
+export const getContractInfo = async (
+  address: string,
+  platform: string
+): Promise<IGetContractInfo | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/contract/${platform}/${address}`)
+
+    return data.data
+  } catch {
+    return null
   }
 }

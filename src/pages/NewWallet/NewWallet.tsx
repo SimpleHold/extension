@@ -124,7 +124,7 @@ const NewWallet: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Wallets" />
+        <Header withBack onBack={history.goBack} backTitle="Select currency" />
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
