@@ -1,10 +1,11 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
+import SVG from 'react-inlinesvg'
 
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
-import Button from '@components/Button'
+import TextInput from '@components/TextInput'
 import CurrencyLogo from '@components/CurrencyLogo'
 
 // Utils
@@ -12,23 +13,34 @@ import { toUpper } from '@utils/format'
 
 // Config
 import currencies, { ICurrency } from '@config/currencies'
+import tokens, { IToken } from '@config/tokens'
 
 // Styles
 import Styles from './styles'
 
-const Receive: React.FC = () => {
+const SelectCurrency: React.FC = () => {
   const history = useHistory()
 
-  const [selectedCurrency, setSelectedCurrency] = React.useState<null | ICurrency>(null)
+  const [searchValue, setSearchValue] = React.useState<string>('')
 
-  const onAddAddress = (): void => {
-    if (selectedCurrency) {
-      const { symbol } = selectedCurrency
+  const filterCurrenciesList = [...currencies, ...tokens].filter((currency: ICurrency | IToken) => {
+    if (searchValue.length) {
+      const findByName = currency.name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
+      const findBySymbol = currency.symbol.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
 
-      history.push('/new-wallet', {
-        symbol,
-      })
+      return findByName || findBySymbol
     }
+    return currency
+  })
+
+  const onAddAddress = (symbol: string): void => {
+    history.push('/new-wallet', {
+      symbol,
+    })
+  }
+
+  const onAddCustomToken = (): void => {
+    history.push('/add-custom-token')
   }
 
   return (
@@ -38,31 +50,62 @@ const Receive: React.FC = () => {
       <Styles.Container>
         <Styles.Row>
           <Styles.Title>Select currency</Styles.Title>
+
+          <TextInput
+            value={searchValue}
+            label="Type a currency or ticker"
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
+              setSearchValue(e.target.value)
+            }
+          />
+
           <Styles.CurrenciesList>
             {currencies.map((currency: ICurrency) => {
               const { name, symbol } = currency
-              const isActive = selectedCurrency?.symbol === symbol
 
               return (
-                <Styles.CurrencyBlock
-                  key={symbol}
-                  onClick={() => setSelectedCurrency(currency)}
-                  isActive={isActive}
-                >
+                <Styles.CurrencyBlock key={symbol} onClick={() => onAddAddress(symbol)}>
                   <CurrencyLogo symbol={symbol} width={40} height={40} br={10} />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>
                   <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
                 </Styles.CurrencyBlock>
               )
             })}
+
+            {tokens.map((currency: IToken) => {
+              const { name, symbol, platform } = currency
+
+              return (
+                <Styles.CurrencyBlock key={symbol} onClick={() => onAddAddress(symbol)}>
+                  <CurrencyLogo
+                    symbol={symbol}
+                    width={40}
+                    height={40}
+                    br={10}
+                    platform={platform}
+                  />
+                  <Styles.CurrencyName>{name}</Styles.CurrencyName>
+                  <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
+                </Styles.CurrencyBlock>
+              )
+            })}
+
+            <Styles.CurrencyBlock onClick={onAddCustomToken}>
+              <Styles.CustomTokenLogo>
+                <SVG
+                  src="../../assets/icons/plusCircle.svg"
+                  width={20}
+                  height={20}
+                  title="Create new wallet"
+                />
+              </Styles.CustomTokenLogo>
+              <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
+            </Styles.CurrencyBlock>
           </Styles.CurrenciesList>
         </Styles.Row>
-        <Styles.Actions>
-          <Button label="Add address" disabled={!selectedCurrency} onClick={onAddAddress} />
-        </Styles.Actions>
       </Styles.Container>
     </Styles.Wrapper>
   )
 }
 
-export default Receive
+export default SelectCurrency
