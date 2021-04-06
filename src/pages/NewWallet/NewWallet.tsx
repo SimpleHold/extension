@@ -12,11 +12,11 @@ import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
 import { logEvent, setUserProperties } from '@utils/amplitude'
-import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
 import { validatePassword } from '@utils/validate'
 import { decrypt, encrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
+import { generate, importPrivateKey } from '@utils/address'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
@@ -59,10 +59,10 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const generate = new bitcoinLike(symbol).generate()
+    const generateAddress = generate(symbol)
 
-    if (generate) {
-      const { privateKey: walletPrivateKey } = generate
+    if (generateAddress) {
+      const { privateKey: walletPrivateKey } = generateAddress
 
       setPrivateKey(walletPrivateKey)
       setActiveDrawer('confirm')
@@ -89,7 +89,7 @@ const NewWallet: React.FC = () => {
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
 
-          const address = new bitcoinLike(symbol).import(privateKey)
+          const address = importPrivateKey(symbol, privateKey)
 
           if (address) {
             const uuid = v4()

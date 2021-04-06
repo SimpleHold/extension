@@ -1,8 +1,6 @@
 // Validate address
 import addressValidate from '@config/addressValidate'
 
-export type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash'
-
 class GenerateAddress {
   symbol: TSymbols
 

@@ -96,3 +96,5 @@ declare const dogecoin: {
     privateKey: string
   ) => TCreatedTransaction | null
 }
+
+type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash' | 'eth' | 'etc' | 'bsc'

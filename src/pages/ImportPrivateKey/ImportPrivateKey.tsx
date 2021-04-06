@@ -15,7 +15,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 // Utils
 import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
-import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
+import bitcoinLike from '@utils/bitcoinLike'
 import { decrypt, encrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toUpper } from '@utils/format'

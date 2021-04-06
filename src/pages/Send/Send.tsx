@@ -16,7 +16,7 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
 import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
+import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'

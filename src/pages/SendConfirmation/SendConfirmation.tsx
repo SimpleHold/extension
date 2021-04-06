@@ -18,7 +18,7 @@ import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { IRawTransaction, sendRawTransaction } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
+import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import {
