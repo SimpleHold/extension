@@ -58,8 +58,8 @@ const TokenTicker = styled.p`
   color: #7d7e8d;
 `
 
-const TokenDecimal = styled.p`
-  margin: 17px 0 0 0;
+const TokenDecimalLabel = styled.p`
+  margin: 0 3px 0 0;
   font-size: 12px;
   line-height: 14px;
   color: #c3c3c3;
@@ -75,6 +75,17 @@ const ButtonRow = styled.div`
   margin: 60px 0 0 0;
 `
 
+const DecimalRow = styled.div`
+  margin: 17px 0 0 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const TokenDecimal = styled(TokenDecimalLabel)`
+  margin: 0;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -84,9 +95,11 @@ const Styles = {
   TokenCardRow,
   TokenName,
   TokenTicker,
-  TokenDecimal,
+  TokenDecimalLabel,
   Form,
   ButtonRow,
+  DecimalRow,
+  TokenDecimal,
 }
 
 export default Styles

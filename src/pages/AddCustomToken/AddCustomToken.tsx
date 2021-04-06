@@ -7,6 +7,7 @@ import Header from '@components/Header'
 import CurrencyLogo from '@components/CurrencyLogo'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
+import Skeleton from '@components/Skeleton'
 
 // Config
 import platforms, { getPlatform } from '@config/platforms'
@@ -40,6 +41,8 @@ const AddCustomToken: React.FC = () => {
       !errorLabel &&
       validateContractAddress(contractAddress, platform)
     ) {
+      setIsLoading(true)
+
       getContractAddressInfo()
     }
   }, [debounced])
@@ -59,6 +62,8 @@ const AddCustomToken: React.FC = () => {
   const getContractAddressInfo = async (): Promise<any> => {
     const data = await getContractInfo(contractAddress, platform)
 
+    setIsLoading(false)
+
     if (data) {
       const { name, symbol, decimals } = data
 
@@ -77,13 +82,22 @@ const AddCustomToken: React.FC = () => {
           <Styles.Title>Add custom token</Styles.Title>
 
           <Styles.TokenCard>
-            <CurrencyLogo symbol={platform} width={40} height={40} platform={platform} />
+            <CurrencyLogo symbol={platform} width={40} height={40} platform={platform} hideLogo />
             <Styles.TokenCardRow>
-              <Styles.TokenName>{tokenName || 'Token name'}</Styles.TokenName>
-              <Styles.TokenTicker>TICKER - {tokenTicker}</Styles.TokenTicker>
-              <Styles.TokenDecimal>
-                Decimals of precion: - {tokenDecimals || null}
-              </Styles.TokenDecimal>
+              <Skeleton width={90} height={19} mt={6} isLoading={isLoading} type="gray">
+                <Styles.TokenName>{tokenName || 'Token name'}</Styles.TokenName>
+              </Skeleton>
+              <Skeleton width={40} height={15} mt={4} isLoading={isLoading} type="gray">
+                <Styles.TokenTicker>TICKER - {tokenTicker}</Styles.TokenTicker>
+              </Skeleton>
+              <Styles.DecimalRow>
+                <Styles.TokenDecimalLabel>Decimals of precion:</Styles.TokenDecimalLabel>
+                <Skeleton width={20} height={14} mt={0} isLoading={isLoading} type="gray">
+                  {tokenDecimals > 0 ? (
+                    <Styles.TokenDecimal>{tokenDecimals}</Styles.TokenDecimal>
+                  ) : null}
+                </Skeleton>
+              </Styles.DecimalRow>
             </Styles.TokenCardRow>
           </Styles.TokenCard>
         </Styles.Row>
