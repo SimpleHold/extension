@@ -12,42 +12,36 @@ interface Props {
   symbol: string
   br?: number
   platform?: 'eth' | 'bsc'
+  letter?: string
+  hideLogo?: boolean
 }
 
 const CurrencyLogo: React.FC<Props> = (props) => {
-  const { width, height, symbol, br, platform } = props
+  const { width, height, symbol, br, platform, letter, hideLogo } = props
 
-  if (platform) {
-    const token = getToken(symbol, platform)
-    const platformLogo = getCurrency(platform)
-
-    if (token) {
-      return (
-        <Styles.Container width={width} height={height} background={token.background} br={br}>
-          <Styles.LogoRow>
-            <Styles.Logo source={token.logo} width={width} height={height} />
-            {platformLogo ? (
-              <Styles.PlatformLogoRow>
-                <Styles.PlatformLogo source={platformLogo.logo} />
-              </Styles.PlatformLogoRow>
-            ) : null}
-          </Styles.LogoRow>
-        </Styles.Container>
-      )
-    }
-  }
-
+  const getPlatformLogo = platform ? getCurrency(platform) : null
   const currency = getCurrency(symbol)
 
-  if (currency) {
-    return (
-      <Styles.Container width={width} height={height} background={currency.background} br={br}>
-        <Styles.Logo source={currency.logo} width={width} height={height} />
-      </Styles.Container>
-    )
-  }
+  const containerWidth = typeof platform !== 'undefined' ? width + 5 : width
+  const containerHeight = typeof platform !== 'undefined' ? height + 5 : height
 
-  return null
+  return (
+    <Styles.Container width={containerWidth} height={containerHeight}>
+      {currency ? (
+        <Styles.LogoRow width={width} height={height} background={currency.background} br={br}>
+          {letter ? <Styles.LetterLogo>{letter}</Styles.LetterLogo> : null}
+          {!letter && !hideLogo ? (
+            <Styles.Logo src={currency.logo} width={width / 2} height={height / 2} />
+          ) : null}
+        </Styles.LogoRow>
+      ) : null}
+      {getPlatformLogo ? (
+        <Styles.TokenRow>
+          <Styles.TokenLogo src={getPlatformLogo.logo} />
+        </Styles.TokenRow>
+      ) : null}
+    </Styles.Container>
+  )
 }
 
 export default CurrencyLogo
