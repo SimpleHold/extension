@@ -23,7 +23,7 @@ const SelectCurrency: React.FC = () => {
 
   const [searchValue, setSearchValue] = React.useState<string>('')
 
-  const filterCurrenciesList = [...currencies, ...tokens].filter((currency: ICurrency | IToken) => {
+  const filterCurrenciesList = currencies.filter((currency: ICurrency) => {
     if (searchValue.length) {
       const findByName = currency.name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
       const findBySymbol = currency.symbol.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
@@ -31,6 +31,16 @@ const SelectCurrency: React.FC = () => {
       return findByName || findBySymbol
     }
     return currency
+  })
+
+  const filterTokensList = tokens.filter((token: IToken) => {
+    if (searchValue.length) {
+      const findByName = token.name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
+      const findBySymbol = token.symbol.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
+
+      return findByName || findBySymbol
+    }
+    return token
   })
 
   const onAddAddress = (symbol: string): void => {
@@ -59,8 +69,14 @@ const SelectCurrency: React.FC = () => {
             }
           />
 
+          {!filterCurrenciesList.length && !filterTokensList.length ? (
+            <Styles.NotFoundMessage>
+              Currency was not found but you can add custom token
+            </Styles.NotFoundMessage>
+          ) : null}
+
           <Styles.CurrenciesList>
-            {currencies.map((currency: ICurrency) => {
+            {filterCurrenciesList.map((currency: ICurrency) => {
               const { name, symbol } = currency
 
               return (
@@ -72,8 +88,8 @@ const SelectCurrency: React.FC = () => {
               )
             })}
 
-            {tokens.map((currency: IToken) => {
-              const { name, symbol, platform } = currency
+            {filterTokensList.map((token: IToken) => {
+              const { name, symbol, platform } = token
 
               return (
                 <Styles.CurrencyBlock key={symbol} onClick={() => onAddAddress(symbol)}>
@@ -83,6 +99,7 @@ const SelectCurrency: React.FC = () => {
                     height={40}
                     br={10}
                     platform={platform}
+                    isToken
                   />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>
                   <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>

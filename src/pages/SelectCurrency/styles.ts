@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   height: 600px;
+  overflow: hidden;
 `
 
 const Container = styled.div`
@@ -11,7 +12,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow-y: scroll;
 `
 
 const Row = styled.div`
@@ -27,10 +27,12 @@ const Title = styled.p`
 `
 
 const CurrenciesList = styled.div`
-  margin: 20px 0 0 0;
+  margin: 20px 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 8px;
+  max-height: 365px;
+  overflow-y: scroll;
 `
 
 const CurrencyBlock = styled.div`
@@ -97,6 +99,13 @@ const CustomTokenLabel = styled.p`
   color: #3fbb7d;
 `
 
+const NotFoundMessage = styled.p`
+  margin: 10px 0 0 0px;
+  font-size: 16px;
+  line-height: 23px;
+  color: #7d7e8d;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -108,6 +117,7 @@ const Styles = {
   CurrencySymbol,
   CustomTokenLogo,
   CustomTokenLabel,
+  NotFoundMessage,
 }
 
 export default Styles
