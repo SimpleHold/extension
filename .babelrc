@@ -49,7 +49,8 @@
           "@utils": "./src/utils",
           "@hooks": "./src/hooks",
           "@config": "./src/config",
-          "@drawers": "./src/drawers"
+          "@drawers": "./src/drawers",
+          "@contexts": "./src/contexts"
         }
       }
     ]
