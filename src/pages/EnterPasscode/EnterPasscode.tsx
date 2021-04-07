@@ -51,6 +51,7 @@ const EnterPasscode: React.FC = () => {
       history.push('/wallets')
     } else {
       setIsError(true)
+      setPasscode('')
 
       logEvent({
         name: PASSCODE_LOCKED_INVALID,

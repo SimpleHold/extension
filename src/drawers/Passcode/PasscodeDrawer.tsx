@@ -23,22 +23,24 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
   const [passcode, setPasscode] = React.useState<string>('')
 
   React.useEffect(() => {
-    if (isActive) {
-      setTimeout(() => {
-        document.querySelector<HTMLInputElement>('[aria-label="Digit 1"]')?.focus()
-      }, 300)
-
-      if (passcode.length) {
-        setPasscode('')
-      }
+    if (isActive && type === 'remove') {
+      addFormEventsListener()
     }
   }, [isActive])
 
   React.useEffect(() => {
     if (isError) {
-      setIsError(false)
+      setPasscode('')
     }
-  }, [passcode])
+  }, [isError])
+
+  const addFormEventsListener = (): void => {
+    for (let i = 0; i < document.querySelectorAll('input').length; i++) {
+      document.querySelectorAll('input')[i].addEventListener('focus', () => {
+        setIsError(false)
+      })
+    }
+  }
 
   return (
     <DrawerWrapper

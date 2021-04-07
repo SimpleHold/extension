@@ -67,11 +67,21 @@ const Send: React.FC = () => {
   }, [selectedAddress])
 
   React.useEffect(() => {
-    if (amount.length && Number(balance) > 0 && outputs.length) {
+    if (amount.length && Number(balance) > 0 && outputs.length && !amountErrorLabel) {
       setNetworkFeeLoading(true)
       getNetworkFee()
     }
   }, [debounced])
+
+  React.useEffect(() => {
+    if (Number(amount) >= Number(balance)) {
+      setAmountErrorLabel('Insufficient funds')
+    } else {
+      if (amountErrorLabel) {
+        setAmountErrorLabel(null)
+      }
+    }
+  }, [amount])
 
   const getOutputs = async (): Promise<void> => {
     const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
