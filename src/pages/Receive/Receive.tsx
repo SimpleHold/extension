@@ -36,6 +36,7 @@ import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/eve
 // Icons
 import privateKeyIcon from '@assets/icons/privateKey.svg'
 import linkIcon from '@assets/icons/link.svg'
+import plusCircleIcon from '@assets/icons/plusCircle.svg'
 
 // Styles
 import Styles from './styles'
@@ -63,6 +64,7 @@ const Receive: React.FC = () => {
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
   const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
+  const [dropDownList, setDropDownList] = React.useState<any[]>([])
 
   React.useEffect(() => {
     logEvent({
@@ -70,6 +72,7 @@ const Receive: React.FC = () => {
     })
 
     loadBalance()
+    getDropDownList()
   }, [])
 
   React.useEffect(() => {
@@ -77,6 +80,26 @@ const Receive: React.FC = () => {
       setIsRefreshing(false)
     }
   }, [balance, estimated, isRefreshing])
+
+  const getDropDownList = (): void => {
+    const list = [
+      {
+        icon: { source: privateKeyIcon, width: 18, height: 18 },
+        title: 'Show Private key',
+      },
+      { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
+    ]
+
+    if (['eth', 'etc', 'bsc'].indexOf(symbol) !== -1) {
+      // Fix me
+      list.push({
+        icon: { source: plusCircleIcon, width: 18, height: 18 },
+        title: 'Add token',
+      })
+    }
+
+    setDropDownList(list)
+  }
 
   const onSend = (): void => {
     logEvent({
@@ -183,13 +206,7 @@ const Receive: React.FC = () => {
             <DropDown
               dropDownRef={ref}
               isVisible={isVisible}
-              list={[
-                {
-                  icon: { source: privateKeyIcon, width: 18, height: 18 },
-                  title: 'Show Private key',
-                },
-                { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
-              ]}
+              list={dropDownList}
               onClick={onClickDropDown}
             />
 

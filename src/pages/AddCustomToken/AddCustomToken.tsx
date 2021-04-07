@@ -10,7 +10,6 @@ import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
 
 // Config
-import platforms, { getPlatform } from '@config/platforms'
 import { validateContractAddress } from '@config/tokens'
 
 // Utils
