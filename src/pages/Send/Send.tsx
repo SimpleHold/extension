@@ -218,7 +218,7 @@ const Send: React.FC = () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAddress(e.target.value)}
             errorLabel={addressErrorLabel}
             onBlurInput={onBlurAddressInput}
-            disabled={balance === null || Number(balance) <= 0}
+            disabled={balance === null}
           />
           <TextInput
             label={`Amount (${toUpper(symbol)})`}
@@ -227,7 +227,7 @@ const Send: React.FC = () => {
             type="number"
             errorLabel={amountErrorLabel}
             onBlurInput={onBlurAmountInput}
-            disabled={balance === null || Number(balance) <= 0}
+            disabled={balance === null}
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>

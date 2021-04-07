@@ -59,7 +59,9 @@ const EnterPasscode: React.FC = () => {
   }
 
   const onConfirmReset = (): void => {
-    history.push('/lock')
+    history.push('/lock', {
+      status: 'passcodeTurnedOff',
+    })
 
     logEvent({
       name: PASSCODE_LOCKED_FORGOT,
