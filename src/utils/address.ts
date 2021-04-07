@@ -1,7 +1,7 @@
 import * as web3 from '@utils/web3'
 import bitcoinLike from '@utils/bitcoinLike'
 
-const web3Symbols = ['eth', 'etc', 'bsc']
+const web3Symbols = ['eth', 'etc', 'bnb']
 
 export const generate = (symbol: TSymbols): TGenerateAddress | null => {
   if (web3Symbols.indexOf(symbol) !== -1) {

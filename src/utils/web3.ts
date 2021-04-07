@@ -2,7 +2,7 @@ import Web3 from 'web3'
 
 const web3 = new Web3()
 
-export type TWeb3Symbols = 'eth' | 'etc' | 'bsc'
+export type TWeb3Symbols = 'eth' | 'etc' | 'bnb'
 
 export const generateAddress = (): TGenerateAddress | null => {
   try {

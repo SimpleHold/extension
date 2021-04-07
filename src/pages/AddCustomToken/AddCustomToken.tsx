@@ -8,6 +8,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
+import SelectNetwork from '@components/SelectNetwork'
 
 // Config
 import { validateContractAddress } from '@config/tokens'
@@ -72,6 +73,16 @@ const AddCustomToken: React.FC = () => {
     }
   }
 
+  const onConfirm = (): void => {}
+
+  const isButtonDisabled =
+    !tokenName.length ||
+    !tokenTicker.length ||
+    tokenDecimals <= 0 ||
+    !contractAddress.length ||
+    isLoading ||
+    errorLabel !== null
+
   return (
     <Styles.Wrapper>
       <Cover />
@@ -101,6 +112,7 @@ const AddCustomToken: React.FC = () => {
           </Styles.TokenCard>
         </Styles.Row>
         <Styles.Form>
+          <SelectNetwork platform={platform} list={['eth', 'bsc']} onSelect={setPlatform} />
           <TextInput
             value={contractAddress}
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
@@ -111,7 +123,7 @@ const AddCustomToken: React.FC = () => {
             errorLabel={errorLabel}
           />
           <Styles.ButtonRow>
-            <Button label="Confirm" onClick={() => null} />
+            <Button label="Confirm" onClick={onConfirm} disabled={isButtonDisabled} />
           </Styles.ButtonRow>
         </Styles.Form>
       </Styles.Container>

@@ -18,6 +18,8 @@ import LockPage from './pages/Lock'
 import SelectCurrency from './pages/SelectCurrency'
 import EnterPasscode from './pages/EnterPasscode'
 import AddCustomToken from './pages/AddCustomToken'
+import AddTokenToAddress from './pages/AddTokenToAddress'
+import FoundTokens from './pages/FoundTokens'
 
 const routers: RouteProps[] = [
   {
@@ -87,6 +89,14 @@ const routers: RouteProps[] = [
   {
     path: '/add-custom-token',
     component: AddCustomToken,
+  },
+  {
+    path: '/add-token-to-address',
+    component: AddTokenToAddress,
+  },
+  {
+    path: '/found-tokens',
+    component: FoundTokens,
   },
 ]
 

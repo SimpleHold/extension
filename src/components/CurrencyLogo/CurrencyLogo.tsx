@@ -1,5 +1,6 @@
 import * as React from 'react'
 
+// Config
 import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
@@ -14,13 +15,15 @@ interface Props {
   platform?: 'eth' | 'bsc'
   letter?: string
   hideLogo?: boolean
+  isToken?: boolean
+  background?: string
 }
 
 const CurrencyLogo: React.FC<Props> = (props) => {
-  const { width, height, symbol, br, platform, letter, hideLogo } = props
+  const { width, height, symbol, br, platform, letter, hideLogo, isToken, background } = props
 
   const getPlatformLogo = platform ? getCurrency(platform) : null
-  const currency = getCurrency(symbol)
+  const currency = isToken && platform ? getToken(symbol, platform) : getCurrency(symbol)
 
   const containerWidth = typeof platform !== 'undefined' ? width + 5 : width
   const containerHeight = typeof platform !== 'undefined' ? height + 5 : height
@@ -28,7 +31,12 @@ const CurrencyLogo: React.FC<Props> = (props) => {
   return (
     <Styles.Container width={containerWidth} height={containerHeight}>
       {currency ? (
-        <Styles.LogoRow width={width} height={height} background={currency.background} br={br}>
+        <Styles.LogoRow
+          width={width}
+          height={height}
+          background={background || currency.background}
+          br={br}
+        >
           {letter ? <Styles.LetterLogo>{letter}</Styles.LetterLogo> : null}
           {!letter && !hideLogo ? (
             <Styles.Logo src={currency.logo} width={width / 2} height={height / 2} />

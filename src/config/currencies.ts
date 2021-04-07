@@ -88,7 +88,7 @@ const currencies: ICurrency[] = [
     symbol: 'bnb',
     logo: binanceLogo,
     background: '#EBBB4E',
-    chain: 'bnb',
+    chain: 'bsc',
     minSendAmount: 1, // Fix me
   },
 ]

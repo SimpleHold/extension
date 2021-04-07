@@ -26,6 +26,7 @@ import Styles from './styles'
 
 interface LocationState {
   symbol: TSymbols
+  warning?: string
 }
 
 const NewWallet: React.FC = () => {
@@ -36,7 +37,7 @@ const NewWallet: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol },
+    state: { symbol, warning = null },
   } = useLocation<LocationState>()
 
   const onSuccess = (password: string): void => {
@@ -131,6 +132,8 @@ const NewWallet: React.FC = () => {
             You can generate new address or import private key to add address you already use. Enter
             your password to keep your backup up-to-date and encrypted.
           </Styles.Description>
+
+          {warning ? <p>{warning}</p> : null}
 
           <Styles.Actions>
             <Styles.Action onClick={onImportPrivateKey}>
