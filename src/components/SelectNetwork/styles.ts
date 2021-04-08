@@ -4,6 +4,11 @@ type TVisibleProps = {
   isVisible: boolean
 }
 
+type TContainerProps = {
+  disabled: boolean
+  isVisible: boolean
+}
+
 const Wrapper = styled.div`
   margin: 0 0 10px 0;
   position: relative;
@@ -14,15 +19,15 @@ const Wrapper = styled.div`
 const Container = styled.div`
   padding: 10px;
   background-color: #ffffff;
-  border: ${({ isVisible }: TVisibleProps) => `1px solid ${isVisible ? '#3fbb7d' : '#eaeaea'}`};
-  border-radius: ${({ isVisible }: TVisibleProps) => (isVisible ? '5px 5px 0px 0px' : '5px')};
+  border: ${({ isVisible }: TContainerProps) => `1px solid ${isVisible ? '#3fbb7d' : '#eaeaea'}`};
+  border-radius: ${({ isVisible }: TContainerProps) => (isVisible ? '5px 5px 0px 0px' : '5px')};
   display: flex;
   flex-direction: row;
   align-items: center;
 
   &:hover {
-    cursor: pointer;
-    border: 1px solid #3fbb7d;
+    border: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
+    cursor: ${({ disabled }: TContainerProps) => `1px solid ${disabled ? '#eaeaea' : '#3fbb7d'}`};
   }
 `
 
@@ -32,10 +37,12 @@ const Row = styled.div`
   flex-direction: row;
   align-items: center;
   flex: 1;
+  overflow: hidden;
 `
 
 const Info = styled.div`
   flex: 1;
+  overflow: hidden;
 `
 
 const Label = styled.p`
@@ -45,12 +52,14 @@ const Label = styled.p`
   color: #7d7e8d;
 `
 
-const CurrencyName = styled.p`
+const Value = styled.p`
   margin: 2px 0 0 0;
   font-weight: 500;
   font-size: 16px;
   line-height: 20px;
   color: #1d1d22;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `
 
 const ArrowIconRow = styled.div`
@@ -85,9 +94,23 @@ const NetworksList = styled.div`
   top: 62px;
 `
 
-const ListItem = styled.div``
+const ListItem = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  overflow: hidden;
+`
 
-const ListItemLabel = styled.p``
+const ListItemLabel = styled.p`
+  margin: 0 0 0 10px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 23px;
+  color: #1d1d22;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
 
 const Styles = {
   Wrapper,
@@ -95,7 +118,7 @@ const Styles = {
   Row,
   Info,
   Label,
-  CurrencyName,
+  Value,
   ArrowIconRow,
   NetworksList,
   ListItem,
