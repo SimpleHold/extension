@@ -72,24 +72,24 @@ const currencies: ICurrency[] = [
     symbol: 'eth',
     logo: ethereumLogo,
     background: '#132BD8',
-    chain: 'eth',
-    minSendAmount: 1, // Fix me
+    chain: 'ethereum',
+    minSendAmount: 2400000000000000,
   },
   {
     name: 'Ethereum Classic',
     symbol: 'etc',
     logo: ethereumClassicLogo,
     background: '#49803D',
-    chain: 'etc',
-    minSendAmount: 1, // Fix me
+    chain: 'ethereum-classic',
+    minSendAmount: 52850000000000000,
   },
   {
     name: 'Binance Coin',
     symbol: 'bnb',
     logo: binanceLogo,
     background: '#EBBB4E',
-    chain: 'bsc',
-    minSendAmount: 1, // Fix me
+    chain: 'binance',
+    minSendAmount: 14770000000000000,
   },
 ]
 

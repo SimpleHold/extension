@@ -6,6 +6,7 @@ export interface IWallet {
   address: string
   uuid: string
   privateKey?: string
+  platform?: string
 }
 
 export const getWallets = (): IWallet[] | null => {
@@ -56,7 +57,12 @@ export const checkExistWallet = (address: string): boolean => {
   return false
 }
 
-export const addNew = (address: string, symbol: string, uuid: string): string | null => {
+export const addNew = (
+  address: string,
+  symbol: string,
+  uuid: string,
+  platform?: string
+): string | null => {
   const walletsList = localStorage.getItem('wallets')
   const validateWallets = validateWallet(walletsList)
 
@@ -67,6 +73,7 @@ export const addNew = (address: string, symbol: string, uuid: string): string | 
       symbol,
       address,
       uuid,
+      platform,
     })
 
     return JSON.stringify(parseWallets)

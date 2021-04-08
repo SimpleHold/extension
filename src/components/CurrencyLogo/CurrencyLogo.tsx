@@ -12,7 +12,7 @@ interface Props {
   height: number
   symbol: string
   br?: number
-  platform?: 'eth' | 'bsc'
+  platform?: string
   letter?: string
   hideLogo?: boolean
   isToken?: boolean

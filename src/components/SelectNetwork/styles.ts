@@ -5,7 +5,7 @@ type TVisibleProps = {
 }
 
 type TContainerProps = {
-  disabled: boolean
+  disabled?: boolean
   isVisible: boolean
 }
 

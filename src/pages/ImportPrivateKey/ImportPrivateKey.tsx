@@ -15,16 +15,17 @@ import ConfirmDrawer from '@drawers/Confirm'
 // Utils
 import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
-import bitcoinLike from '@utils/bitcoinLike'
 import { decrypt, encrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toUpper } from '@utils/format'
+import { importPrivateKey } from '@utils/address'
 
 // Styles
 import Styles from './styles'
 
 interface LocationState {
   symbol: TSymbols
+  platform?: string
 }
 
 const ImportPrivateKey: React.FC = () => {
@@ -35,7 +36,7 @@ const ImportPrivateKey: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol },
+    state: { symbol, platform = undefined },
   } = useLocation<LocationState>()
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
@@ -49,7 +50,7 @@ const ImportPrivateKey: React.FC = () => {
       setErrorLabel(null)
     }
 
-    const getAddress = new bitcoinLike(symbol).import(privateKey)
+    const getAddress = importPrivateKey(symbol, privateKey, platform)
 
     if (getAddress) {
       const checkExist = checkExistWallet(getAddress)
@@ -70,7 +71,7 @@ const ImportPrivateKey: React.FC = () => {
       const decryptBackup = decrypt(backup, password)
       if (decryptBackup) {
         const parseBackup = JSON.parse(decryptBackup)
-        const address = new bitcoinLike(symbol).import(privateKey)
+        const address = importPrivateKey(symbol, privateKey, platform)
 
         if (address) {
           const uuid = v4()

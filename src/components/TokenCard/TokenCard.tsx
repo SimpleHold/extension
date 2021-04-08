@@ -4,31 +4,43 @@ import * as React from 'react'
 import CurrencyLogo from '@components/CurrencyLogo'
 import RadioButton from '@components/RadioButton'
 
+// Config
+import { getToken } from '@config/tokens'
+
 // Styles
 import Styles from './styles'
 
 interface Props {
-  name: string
   symbol: string
-  platform: 'eth' | 'bsc'
-  isActive: boolean
+  platform: string
+  isActive?: boolean
+  hideSelect?: boolean
+  onToggle?: () => void
 }
 
 const TokenCard: React.FC<Props> = (props) => {
-  const { name, symbol, platform, isActive } = props
+  const { symbol, platform, isActive, hideSelect, onToggle } = props
 
-  return (
-    <Styles.Container>
-      <CurrencyLogo width={40} height={40} symbol={symbol} platform={platform} isToken />
-      <Styles.Row>
-        <Styles.Info>
-          <Styles.TokenName>{name}</Styles.TokenName>
-          <Styles.TokenSymbol>{symbol}</Styles.TokenSymbol>
-        </Styles.Info>
-        <RadioButton isActive={isActive} />
-      </Styles.Row>
-    </Styles.Container>
-  )
+  const tokenInfo = getToken(symbol, platform)
+
+  if (tokenInfo) {
+    return (
+      <Styles.Container>
+        <CurrencyLogo width={40} height={40} symbol={symbol} platform={platform} isToken />
+        <Styles.Row>
+          <Styles.Info>
+            <Styles.TokenName>{tokenInfo.name}</Styles.TokenName>
+            <Styles.TokenSymbol>{symbol}</Styles.TokenSymbol>
+          </Styles.Info>
+          {!hideSelect && typeof isActive !== 'undefined' && onToggle ? (
+            <RadioButton isActive={isActive} onToggle={onToggle} />
+          ) : null}
+        </Styles.Row>
+      </Styles.Container>
+    )
+  }
+
+  return null
 }
 
 export default TokenCard

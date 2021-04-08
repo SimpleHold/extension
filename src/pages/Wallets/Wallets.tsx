@@ -111,13 +111,14 @@ const Wallets: React.FC = () => {
       />
       {wallets?.length ? (
         <Styles.WalletsList>
-          {wallets.map((wallet: IWallet) => {
-            const { address, symbol } = wallet
+          {wallets.map((wallet: IWallet, index: number) => {
+            const { address, symbol, platform } = wallet
 
             return (
               <WalletCard
-                key={address}
+                key={`${address}/${index}`}
                 address={address}
+                platform={platform}
                 symbol={symbol.toLowerCase()}
                 sumBalance={sumBalance}
                 sumEstimated={sumEstimated}

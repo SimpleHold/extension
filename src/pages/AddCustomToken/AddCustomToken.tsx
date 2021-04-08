@@ -112,7 +112,24 @@ const AddCustomToken: React.FC = () => {
           </Styles.TokenCard>
         </Styles.Row>
         <Styles.Form>
-          <SelectNetwork platform={platform} list={['eth', 'bsc']} onSelect={setPlatform} />
+          <SelectNetwork
+            currencySymbol={platform}
+            list={[
+              {
+                logo: {
+                  symbol: 'bnb',
+                  width: 40,
+                  height: 40,
+                  br: 20,
+                  background: '#1D1D22',
+                },
+                value: 'Binance',
+              },
+            ]}
+            onSelect={setPlatform}
+            value="Ethereum"
+            label="Select network"
+          />
           <TextInput
             value={contractAddress}
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>

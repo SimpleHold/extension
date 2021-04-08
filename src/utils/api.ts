@@ -22,7 +22,11 @@ interface IGetContractInfo {
   symbol: string
 }
 
-export const getBalance = async (address: string, chain: string): Promise<IGetBalance> => {
+export const getBalance = async (
+  address: string,
+  chain: string,
+  platform?: string
+): Promise<IGetBalance> => {
   try {
     const { data }: AxiosResponse = await axios(
       `${config.serverUrl}/wallet/balance/${chain}/${address}`

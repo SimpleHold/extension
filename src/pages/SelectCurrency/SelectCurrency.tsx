@@ -9,7 +9,8 @@ import TextInput from '@components/TextInput'
 import CurrencyLogo from '@components/CurrencyLogo'
 
 // Utils
-import { toUpper } from '@utils/format'
+import { toUpper, toLower } from '@utils/format'
+import { getWallets, IWallet } from '@utils/wallet'
 
 // Config
 import currencies, { ICurrency } from '@config/currencies'
@@ -47,6 +48,28 @@ const SelectCurrency: React.FC = () => {
     history.push('/new-wallet', {
       symbol,
     })
+  }
+
+  const onAddToken = (symbol: string, platform: string): void => {
+    const walletsList = getWallets()
+
+    if (walletsList) {
+      const findCurrenciesForToken = walletsList.find(
+        (wallet: IWallet) => toLower(wallet.symbol) === toLower(platform)
+      )
+
+      if (findCurrenciesForToken) {
+        return history.push('/add-token-to-address', {
+          symbol,
+          platform,
+        })
+      }
+
+      return history.push('/new-wallet', {
+        symbol,
+        platform,
+      })
+    }
   }
 
   const onAddCustomToken = (): void => {
@@ -92,7 +115,7 @@ const SelectCurrency: React.FC = () => {
               const { name, symbol, platform } = token
 
               return (
-                <Styles.CurrencyBlock key={symbol} onClick={() => onAddAddress(symbol)}>
+                <Styles.CurrencyBlock key={symbol} onClick={() => onAddToken(symbol, platform)}>
                   <CurrencyLogo
                     symbol={symbol}
                     width={40}

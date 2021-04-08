@@ -14,6 +14,7 @@ const Container = styled.div`
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
   width: calc(100% - 60px);
   top: 56px;
+  z-index: 2;
 `
 
 const ListItem = styled.div`

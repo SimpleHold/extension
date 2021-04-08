@@ -15,7 +15,7 @@ const Container = styled.div`
 `
 
 const Row = styled.div`
-  padding: 30px;
+  padding: 30px 30px 0 30px;
 `
 
 const Title = styled.p`
@@ -27,11 +27,11 @@ const Title = styled.p`
 `
 
 const CurrenciesList = styled.div`
-  margin: 20px 0;
+  margin: 20px 0 0 0;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 8px;
-  max-height: 365px;
+  max-height: 385px;
   overflow-y: scroll;
 `
 

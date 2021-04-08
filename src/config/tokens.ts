@@ -2,16 +2,15 @@
 import tetherLogo from '@assets/currencies/usdt.svg'
 import usdCoinLogo from '@assets/currencies/usdc.svg'
 
-type TTokenPlatforms = 'eth' | 'bsc'
-
 export interface IToken {
   address: string
   name: string
   symbol: string
   decimals: number
-  platform: TTokenPlatforms
+  platform: string
   logo: string
   background: string
+  chain: string
 }
 
 const tokens: IToken[] = [
@@ -23,6 +22,7 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: tetherLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
   {
     address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
@@ -32,6 +32,7 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: usdCoinLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
   {
     address: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -41,6 +42,7 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: usdCoinLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
   {
     address: '0x8e870d67f660d95d5be530380d0ec0bd388289e1',
@@ -50,6 +52,7 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: usdCoinLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
   {
     address: '0xa47c8bf37f92aBed4A126BDA807A7b7498661acD',
@@ -59,6 +62,7 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: usdCoinLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
   {
     address: '0xf629cbd94d3791c9250152bd8dfbdf380e2a3b9c',
@@ -68,6 +72,7 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: usdCoinLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
   {
     address: '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
@@ -77,6 +82,7 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: usdCoinLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
   {
     address: '0xb59490ab09a0f526cc7305822ac65f2ab12f9723',
@@ -86,6 +92,7 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: usdCoinLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
   {
     address: '0x6468e79A80C0eaB0F9A2B574c8d5bC374Af59414',
@@ -95,6 +102,7 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: usdCoinLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
   {
     address: '0x5580ab97F226C324c671746a1787524AEF42E415',
@@ -104,14 +112,15 @@ const tokens: IToken[] = [
     platform: 'eth',
     logo: usdCoinLogo,
     background: '#132BD8',
+    chain: 'eth',
   },
 ]
 
-export const getToken = (symbol: String, platform: TTokenPlatforms) => {
+export const getToken = (symbol: String, platform: string) => {
   return tokens.find((token: IToken) => token.symbol === symbol && token.platform === platform)
 }
 
-export const validateContractAddress = (address: string, platform: TTokenPlatforms): boolean => {
+export const validateContractAddress = (address: string, platform: string): boolean => {
   if (platform === 'eth' || platform === 'bsc') {
     return new RegExp('^(0x)[0-9A-Fa-f]{40}$').test(address)
   }

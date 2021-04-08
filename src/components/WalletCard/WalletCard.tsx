@@ -11,6 +11,7 @@ import Skeleton from '@components/Skeleton'
 import { getCurrency } from '@config/currencies'
 import { getBalance } from '@utils/api'
 import { toUpper, numberFriendly } from '@utils/format'
+import { getToken } from '@config/tokens'
 
 // Styles
 import Styles from './styles'
@@ -18,14 +19,15 @@ import Styles from './styles'
 interface Props {
   address: string
   symbol: string
+  platform?: string
   sumBalance: (balance: number) => void
   sumEstimated: (estimated: number) => void
   sumPending: (pending: number) => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
-  const { address, symbol, sumBalance, sumEstimated, sumPending } = props
-  const currency = getCurrency(symbol)
+  const { address, symbol, sumBalance, sumEstimated, sumPending, platform } = props
+  const currency = platform ? getToken(symbol, platform) : getCurrency(symbol)
 
   const history = useHistory()
 
@@ -39,7 +41,7 @@ const WalletCard: React.FC<Props> = (props) => {
 
   const fetchBalance = async (): Promise<void> => {
     if (currency) {
-      const tryGetBalance = await getBalance(address, currency?.chain)
+      const tryGetBalance = await getBalance(address, currency?.chain, platform)
 
       const { balance, balance_usd, balance_btc, pending, pending_btc } = tryGetBalance
 
@@ -65,7 +67,13 @@ const WalletCard: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container onClick={openWallet}>
-      <CurrencyLogo width={40} height={40} symbol={symbol} />
+      <CurrencyLogo
+        width={40}
+        height={40}
+        symbol={symbol}
+        isToken={platform !== undefined}
+        platform={platform}
+      />
       <Styles.Row>
         <Styles.AddressInfo>
           {currency ? <Styles.Currency>{currency.name}</Styles.Currency> : null}

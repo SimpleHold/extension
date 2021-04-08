@@ -27,7 +27,7 @@ interface Props {
   onSelect: Function
   label: string
   value: string
-  disabled: boolean
+  disabled?: boolean
 }
 
 const SelectNetwork: React.FC<Props> = (props) => {
