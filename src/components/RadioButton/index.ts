@@ -1,3 +1,3 @@
-import TokenCard from './TokenCard'
+import RadioButton from './RadioButton'
 
-export default TokenCard
+export default RadioButton
