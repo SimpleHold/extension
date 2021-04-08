@@ -6,6 +6,7 @@ import { v4 } from 'uuid'
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
+import Warning from '@components/Warning'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -27,6 +28,8 @@ import Styles from './styles'
 interface LocationState {
   symbol: TSymbols
   warning?: string
+  backTitle?: string
+  platform?: string
 }
 
 const NewWallet: React.FC = () => {
@@ -37,7 +40,7 @@ const NewWallet: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol, warning = null },
+    state: { symbol, warning = undefined, backTitle = undefined, platform = undefined },
   } = useLocation<LocationState>()
 
   const onSuccess = (password: string): void => {
@@ -60,7 +63,7 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const generateAddress = generate(symbol)
+    const generateAddress = generate(symbol, platform)
 
     if (generateAddress) {
       const { privateKey: walletPrivateKey } = generateAddress
@@ -77,6 +80,7 @@ const NewWallet: React.FC = () => {
 
     history.push('/import-private-key', {
       symbol,
+      platform,
     })
   }
 
@@ -90,17 +94,18 @@ const NewWallet: React.FC = () => {
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
 
-          const address = importPrivateKey(symbol, privateKey)
+          const address = importPrivateKey(symbol, privateKey, platform)
 
           if (address) {
             const uuid = v4()
-            const newWalletsList = addNewWallet(address, symbol, uuid)
+            const newWalletsList = addNewWallet(address, symbol, uuid, platform)
 
             parseBackup.wallets.push({
               symbol,
               address,
               uuid,
               privateKey,
+              platform,
             })
 
             if (newWalletsList) {
@@ -125,7 +130,7 @@ const NewWallet: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Select currency" />
+        <Header withBack onBack={history.goBack} backTitle={backTitle || 'Select currency'} />
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
@@ -133,10 +138,10 @@ const NewWallet: React.FC = () => {
             your password to keep your backup up-to-date and encrypted.
           </Styles.Description>
 
-          {warning ? <p>{warning}</p> : null}
+          {warning ? <Warning text={warning} /> : null}
 
-          <Styles.Actions>
-            <Styles.Action onClick={onImportPrivateKey}>
+          <Styles.Actions mt={warning ? 26 : 32}>
+            <Styles.Action onClick={onImportPrivateKey} size={warning ? 'small' : 'big'}>
               <Styles.ActionIcon>
                 <SVG
                   src="../../assets/icons/import.svg"
@@ -147,7 +152,7 @@ const NewWallet: React.FC = () => {
               </Styles.ActionIcon>
               <Styles.ActionName>Import private key</Styles.ActionName>
             </Styles.Action>
-            <Styles.Action onClick={onGenerateAddress}>
+            <Styles.Action onClick={onGenerateAddress} size={warning ? 'small' : 'big'}>
               <Styles.ActionIcon>
                 <SVG
                   src="../../assets/icons/plusCircle.svg"

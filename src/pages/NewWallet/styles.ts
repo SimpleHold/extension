@@ -1,5 +1,13 @@
 import styled from 'styled-components'
 
+type TActionsProps = {
+  mt: number
+}
+
+type TActionProps = {
+  size: 'small' | 'big'
+}
+
 const Wrapper = styled.div`
   height: 600px;
   overflow: hidden;
@@ -28,7 +36,7 @@ const Description = styled.p`
 `
 
 const Actions = styled.div`
-  margin: 32px 0 0 0;
+  margin-top: ${({ mt }: TActionsProps) => `${mt}px`};
 `
 
 const Action = styled.div`
@@ -36,13 +44,13 @@ const Action = styled.div`
   border: 1px solid #dfdfdf;
   box-sizing: border-box;
   border-radius: 5px;
-  padding: 38px 0;
+  padding: ${({ size }: TActionProps) => (size === 'big' ? '38px 0' : '29px 0')};
   display: flex;
   flex-direction: column;
   align-items: center;
 
   &:not(:last-child) {
-    margin: 0 0 20px 0;
+    margin-bottom: ${({ size }: TActionProps) => (size === 'big' ? '20px' : '15px')};
   }
 
   &:hover {
