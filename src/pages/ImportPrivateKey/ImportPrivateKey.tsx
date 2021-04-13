@@ -19,6 +19,10 @@ import { decrypt, encrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toUpper } from '@utils/format'
 import { importPrivateKey } from '@utils/address'
+import { getTokensBalance, ITokensBalance } from '@utils/api'
+
+// Config
+import tokens, { IToken } from '@config/tokens'
 
 // Styles
 import Styles from './styles'
@@ -33,6 +37,7 @@ const ImportPrivateKey: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
   const [password, setPassword] = React.useState<string>('')
+  const [isImportButtonLoading, setImportButtonLoading] = React.useState<boolean>(false)
 
   const history = useHistory()
   const {
@@ -45,7 +50,7 @@ const ImportPrivateKey: React.FC = () => {
     textInputRef.current?.focus()
   }, [])
 
-  const onConfirm = (): void => {
+  const onConfirm = async (isSkipFindTokens?: boolean): Promise<void> => {
     if (errorLabel) {
       setErrorLabel(null)
     }
@@ -58,10 +63,41 @@ const ImportPrivateKey: React.FC = () => {
       if (checkExist) {
         return setErrorLabel('This address has already been added')
       }
+
+      if (platform && !isSkipFindTokens) {
+        return await findAddressTokens(getAddress, privateKey)
+      }
       return setActiveDrawer('confirm')
     }
 
     return setErrorLabel('Invalid private key')
+  }
+
+  const findAddressTokens = async (address: string, privateKey: string): Promise<void> => {
+    if (platform) {
+      setImportButtonLoading(true)
+
+      const data = await getTokensBalance(address, platform)
+
+      setImportButtonLoading(false)
+
+      if (data?.length) {
+        const mapTokens = data.map((token: ITokensBalance) => token.address)
+        const mapExistTokens = tokens.map((token: IToken) => token.address)
+        const filterByExistTokens = mapTokens.map((token: string) => mapExistTokens.includes(token))
+
+        if (filterByExistTokens.length) {
+          return history.push('/found-tokens', {
+            platform,
+            symbol,
+            privateKey,
+            tokens: filterByExistTokens,
+          })
+        }
+      }
+
+      return onConfirm(true)
+    }
   }
 
   const onConfirmDrawer = (): void => {
@@ -133,7 +169,13 @@ const ImportPrivateKey: React.FC = () => {
             />
             <Styles.Actions>
               <Button label="Back" isLight onClick={history.goBack} mr={7.5} />
-              <Button label="Import" disabled={!privateKey.length} onClick={onConfirm} ml={7.5} />
+              <Button
+                label="Import"
+                disabled={!privateKey.length}
+                onClick={onConfirm}
+                ml={7.5}
+                isLoading={isImportButtonLoading}
+              />
             </Styles.Actions>
           </Styles.Form>
         </Styles.Container>
