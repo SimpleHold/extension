@@ -1,5 +1,8 @@
 import * as React from 'react'
 
+// Components
+import Spinner from '@components/Spinner'
+
 // Styles
 import Styles from './styles'
 
@@ -12,10 +15,11 @@ interface Props {
   ml?: number
   isSmall?: boolean
   isDanger?: boolean
+  isLoading?: boolean
 }
 
 const Button: React.FC<Props> = (props) => {
-  const { label, disabled, isLight, mr, ml, isSmall, isDanger, onClick } = props
+  const { label, disabled, isLight, mr, ml, isSmall, isDanger, onClick, isLoading } = props
 
   const buttonOnClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     event.preventDefault()
@@ -24,7 +28,7 @@ const Button: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container
-      disabled={disabled}
+      disabled={disabled || isLoading}
       isLight={isLight}
       mr={mr}
       ml={ml}
@@ -32,7 +36,7 @@ const Button: React.FC<Props> = (props) => {
       isDanger={isDanger}
       onClick={buttonOnClick}
     >
-      <Styles.Label>{label}</Styles.Label>
+      {isLoading ? <Spinner size={24} /> : <Styles.Label>{label}</Styles.Label>}
     </Styles.Container>
   )
 }

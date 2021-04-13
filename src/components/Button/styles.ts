@@ -94,6 +94,9 @@ const Container = styled.button`
   transition: all 0.3s;
   margin-left: ${({ ml }: TContainerProps) => (ml ? `${ml}px` : '0')};
   margin-right: ${({ mr }: TContainerProps) => (mr ? `${mr}px` : '0')};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
