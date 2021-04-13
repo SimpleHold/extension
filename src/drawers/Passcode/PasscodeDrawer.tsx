@@ -26,6 +26,10 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
     if (isActive && type === 'remove') {
       addFormEventsListener()
     }
+
+    if (passcode.length) {
+      setPasscode('')
+    }
   }, [isActive])
 
   React.useEffect(() => {
