@@ -53,23 +53,25 @@ const SelectCurrency: React.FC = () => {
   const onAddToken = (symbol: string, platform: string): void => {
     const walletsList = getWallets()
 
-    if (walletsList) {
-      const findCurrenciesForToken = walletsList.find(
-        (wallet: IWallet) => toLower(wallet.symbol) === toLower(platform)
-      )
+    const checkExistWallet = walletsList?.filter(
+      (wallet: IWallet) =>
+        toLower(wallet.platform) === toLower(platform) && toLower(wallet.symbol) === toLower(symbol)
+    )
+    const getAllWalletsByPlatform = walletsList?.filter(
+      (wallet: IWallet) => toLower(wallet.platform) === toLower(platform)
+    )
 
-      if (findCurrenciesForToken) {
-        return history.push('/add-token-to-address', {
-          symbol,
-          platform,
-        })
-      }
-
+    if (checkExistWallet?.length && getAllWalletsByPlatform?.length === 1) {
       return history.push('/new-wallet', {
         symbol,
         platform,
       })
     }
+
+    return history.push('/add-token-to-address', {
+      symbol,
+      platform,
+    })
   }
 
   const onAddCustomToken = (): void => {
@@ -121,7 +123,7 @@ const SelectCurrency: React.FC = () => {
                     width={40}
                     height={40}
                     br={10}
-                    platform={platform}
+                    chain={platform}
                     isToken
                   />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>

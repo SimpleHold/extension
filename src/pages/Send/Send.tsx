@@ -202,6 +202,10 @@ const Send: React.FC = () => {
       }
     })
 
+  const onSelectDropDown = (index: number) => {
+    setSelectedAddress(mapDropDownList[index].value)
+  }
+
   return (
     <Styles.Wrapper>
       <Cover />
@@ -227,7 +231,7 @@ const Send: React.FC = () => {
               currencyBr={10}
               background={currency?.background}
               list={mapDropDownList}
-              onSelect={setSelectedAddress}
+              onSelect={onSelectDropDown}
               disabled={addresses.length < 2}
             />
           ) : null}
@@ -251,7 +255,7 @@ const Send: React.FC = () => {
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
             {isNetworkFeeLoading ? (
-              <Spinner ml={10} />
+              <Spinner ml={10} size={16} />
             ) : (
               <>
                 {networkFee === 0 ? (
