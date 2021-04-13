@@ -41,7 +41,7 @@ const WalletCard: React.FC<Props> = (props) => {
 
   const fetchBalance = async (): Promise<void> => {
     if (currency) {
-      const tryGetBalance = await getBalance(address, currency?.chain, platform)
+      const tryGetBalance = await getBalance(address, currency?.chain, symbol)
 
       const { balance, balance_usd, balance_btc, pending, pending_btc } = tryGetBalance
 
@@ -72,7 +72,7 @@ const WalletCard: React.FC<Props> = (props) => {
         height={40}
         symbol={symbol}
         isToken={platform !== undefined}
-        platform={platform}
+        chain={platform}
       />
       <Styles.Row>
         <Styles.AddressInfo>

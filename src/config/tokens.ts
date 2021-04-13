@@ -178,12 +178,13 @@ const tokens: IToken[] = [
     chain: 'ethereum',
   },
 ]
+
 export const getToken = (symbol: String, platform: string) => {
   return tokens.find((token: IToken) => token.symbol === symbol && token.platform === platform)
 }
 
-export const validateContractAddress = (address: string, platform: string): boolean => {
-  if (platform === 'eth' || platform === 'bsc') {
+export const validateContractAddress = (address: string, chain: string): boolean => {
+  if (chain === 'eth' || chain === 'bsc') {
     return new RegExp('^(0x)[0-9A-Fa-f]{40}$').test(address)
   }
   return false
