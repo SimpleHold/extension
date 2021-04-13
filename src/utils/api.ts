@@ -22,14 +22,24 @@ interface IGetContractInfo {
   symbol: string
 }
 
+export interface ITokensBalance {
+  address: string
+  symbol: string
+}
+
 export const getBalance = async (
   address: string,
   chain: string,
-  platform?: string
+  tokenSymbol?: string
 ): Promise<IGetBalance> => {
   try {
     const { data }: AxiosResponse = await axios(
-      `${config.serverUrl}/wallet/balance/${chain}/${address}`
+      `${config.serverUrl}/wallet/balance/${chain}/${address}`,
+      {
+        params: {
+          tokenSymbol,
+        },
+      }
     )
     return data.data
   } catch {
@@ -111,10 +121,31 @@ export const getFees = async (chain: string): Promise<number> => {
 
 export const getContractInfo = async (
   address: string,
-  platform: string
+  chain: string
 ): Promise<IGetContractInfo | null> => {
   try {
-    const { data } = await axios.get(`${config.serverUrl}/contract/${platform}/${address}`)
+    const { data } = await axios.get(`${config.serverUrl}/contract/${chain}/${address}`)
+
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const getTokensBalance = async (
+  address: string,
+  platform: string
+): Promise<ITokensBalance[] | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/contract/balances`, {
+      params: {
+        address,
+        platform,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
 
     return data.data
   } catch {
