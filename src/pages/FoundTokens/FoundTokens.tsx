@@ -20,21 +20,21 @@ import Styles from './styles'
 interface LocationState {
   platform: string
   symbol: string
-  address: string
+  privateKey: string
   tokens: string[]
 }
 
 const FoundTokens: React.FC = () => {
   const history = useHistory()
   const {
-    state: { platform, symbol, address, tokens },
+    state: { platform, symbol, privateKey, tokens },
   } = useLocation<LocationState>()
 
   const [selectedTokens, setSelectedTokens] = React.useState<string[]>(tokens)
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
-  const [isIncludeTokens, setIncludeTokens] = React.useState<boolean>(false)
+  const [includeTokens, setIncludeTokens] = React.useState<boolean>(false)
 
   const onToggle = (tokenSymbol: string, isActive: boolean): void => {
     if (isActive) {
@@ -61,6 +61,7 @@ const FoundTokens: React.FC = () => {
         const decryptBackup = decrypt(backup, password)
 
         if (decryptBackup) {
+          // TODO
         }
       }
     }
