@@ -12,7 +12,7 @@ interface Props {
   height: number
   symbol: string
   br?: number
-  platform?: string
+  chain?: string
   letter?: string
   hideLogo?: boolean
   isToken?: boolean
@@ -20,13 +20,13 @@ interface Props {
 }
 
 const CurrencyLogo: React.FC<Props> = (props) => {
-  const { width, height, symbol, br, platform, letter, hideLogo, isToken, background } = props
+  const { width, height, symbol, br, chain, letter, hideLogo, isToken, background } = props
 
-  const getPlatformLogo = platform ? getCurrency(platform) : null
-  const currency = isToken && platform ? getToken(symbol, platform) : getCurrency(symbol)
+  const getChainogo = chain ? getCurrency(chain) : null
+  const currency = isToken && chain ? getToken(symbol, chain) : getCurrency(symbol)
 
-  const containerWidth = typeof platform !== 'undefined' ? width + 5 : width
-  const containerHeight = typeof platform !== 'undefined' ? height + 5 : height
+  const containerWidth = typeof chain !== 'undefined' ? width + 5 : width
+  const containerHeight = typeof chain !== 'undefined' ? height + 5 : height
 
   return (
     <Styles.Container width={containerWidth} height={containerHeight}>
@@ -43,9 +43,9 @@ const CurrencyLogo: React.FC<Props> = (props) => {
           ) : null}
         </Styles.LogoRow>
       ) : null}
-      {getPlatformLogo ? (
+      {getChainogo ? (
         <Styles.TokenRow>
-          <Styles.TokenLogo src={getPlatformLogo.logo} />
+          <Styles.TokenLogo src={getChainogo.logo} />
         </Styles.TokenRow>
       ) : null}
     </Styles.Container>
