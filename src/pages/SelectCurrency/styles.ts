@@ -31,7 +31,7 @@ const CurrenciesList = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-gap: 8px;
-  max-height: 385px;
+  max-height: 355px;
   overflow-y: scroll;
 `
 

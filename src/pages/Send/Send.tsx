@@ -5,11 +5,11 @@ import numeral from 'numeral'
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
-import CurrenciesDropdown from '@components/CurrenciesDropdown'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
 import Spinner from '@components/Spinner'
+import CurrenciesDropdown from '@components/CurrenciesDropdown'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
@@ -186,6 +186,22 @@ const Send: React.FC = () => {
     history.goBack()
   }
 
+  const mapDropDownList = addresses
+    .filter((address: string) => address !== selectedAddress)
+    .map((address: string) => {
+      return {
+        logo: {
+          symbol: symbol,
+          width: 40,
+          height: 40,
+          br: 10,
+          background: currency?.background,
+        },
+        label: currency?.name,
+        value: address,
+      }
+    })
+
   return (
     <Styles.Wrapper>
       <Cover />
@@ -205,11 +221,14 @@ const Send: React.FC = () => {
         <Styles.Form>
           {addresses?.length ? (
             <CurrenciesDropdown
-              symbol={symbol}
-              isDisabled={addresses.length < 2}
-              selectedAddress={selectedAddress}
-              addresses={addresses}
-              setAddress={setSelectedAddress}
+              label={currency?.name}
+              value={selectedAddress}
+              currencySymbol={symbol}
+              currencyBr={10}
+              background={currency?.background}
+              list={mapDropDownList}
+              onSelect={setSelectedAddress}
+              disabled={addresses.length < 2}
             />
           ) : null}
           <TextInput

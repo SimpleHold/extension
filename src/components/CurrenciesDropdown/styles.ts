@@ -1,49 +1,65 @@
 import styled from 'styled-components'
 
-type TSelectedAddressBlockProps = {
-  isDisabled: boolean
+type TVisibleProps = {
+  isVisible: boolean
 }
 
-const Container = styled.div`
+type TContainerProps = {
+  disabled?: boolean
+  isVisible: boolean
+}
+
+const Wrapper = styled.div`
   margin: 0 0 10px 0;
+  position: relative;
+  filter: ${({ isVisible }: TVisibleProps) =>
+    isVisible ? 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.3))' : 'none'};
 `
 
-const SelectedAddressBlock = styled.div`
-  padding: 9px 10px;
+const Container = styled.div`
+  padding: 10px;
   background-color: #ffffff;
+  border: ${({ isVisible }: TContainerProps) => `1px solid ${isVisible ? '#3fbb7d' : '#eaeaea'}`};
+  border-radius: ${({ isVisible }: TContainerProps) => (isVisible ? '5px 5px 0px 0px' : '5px')};
   display: flex;
   flex-direction: row;
   align-items: center;
-  border: 1px solid #eaeaea;
-  box-sizing: border-box;
-  border-radius: 5px;
 
   &:hover {
-    cursor: ${({ isDisabled }: TSelectedAddressBlockProps) => (isDisabled ? 'default' : 'pointer')};
-    border: ${({ isDisabled }: TSelectedAddressBlockProps) =>
-      ` 1px solid ${isDisabled ? '#eaeaea' : '#3fbb7d'}`};
+    cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
+    border: ${({ disabled }: TContainerProps) => `1px solid ${disabled ? '#eaeaea' : '#3fbb7d'}`};
   }
 `
 
 const Row = styled.div`
+  margin: 0 0 0 10px;
   display: flex;
   flex-direction: row;
   align-items: center;
   flex: 1;
-  margin: 0 0 0 10px;
   overflow: hidden;
 `
 
-const Address = styled.p`
+const Info = styled.div`
   flex: 1;
+  overflow: hidden;
+`
+
+const Label = styled.p`
   margin: 0;
+  font-size: 12px;
+  line-height: 14px;
+  color: #7d7e8d;
+`
+
+const Value = styled.p`
+  margin: 2px 0 0 0;
+  font-weight: 500;
   font-size: 16px;
   line-height: 20px;
-  font-weight: 500;
   color: #1d1d22;
   overflow: hidden;
   text-overflow: ellipsis;
-  user-select: none;
 `
 
 const ArrowIconRow = styled.div`
@@ -63,36 +79,73 @@ const ArrowIconRow = styled.div`
   }
 `
 
-const AddressesList = styled.div`
-  background-color: #ffffff;
-  max-height: 250px;
-  overflow-y: scroll;
+const NetworksList = styled.div`
   border: 1px solid #eaeaea;
+  border-top: none;
+  background-color: #ffffff;
+  width: 100%;
   border-radius: 0 0 5px 5px;
   position: absolute;
-  width: calc(100% - 60px);
+  opacity: ${({ isVisible }: TVisibleProps) => (isVisible ? '1' : '0')};
+  visibility: ${({ isVisible }: TVisibleProps) => (isVisible ? 'visible' : 'hidden')};
+  transform: ${({ isVisible }: TVisibleProps) => `translateY(${isVisible ? '0' : '-20px'})`};
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+  width: 100%;
+  top: 62px;
 `
 
-const AddressItem = styled.div`
+const ListItem = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 10px;
+  overflow: hidden;
 
   &:hover {
     cursor: pointer;
     background-color: #f8f8f8;
+
+    p:last-child {
+      color: #3fbb7d;
+    }
   }
 `
 
+const ListItemValue = styled.p`
+  margin: 0;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 23px;
+  color: #1d1d22;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
+
+const ListItemRow = styled.div`
+  margin: 0 0 0 10px;
+  overflow: hidden;
+`
+
+const ListItemLabel = styled.p`
+  margin: 0 0 2px 0;
+  font-size: 12px;
+  line-height: 14px;
+  color: #7d7e8d;
+`
+
 const Styles = {
+  Wrapper,
   Container,
-  SelectedAddressBlock,
   Row,
-  Address,
+  Info,
+  Label,
+  Value,
   ArrowIconRow,
-  AddressesList,
-  AddressItem,
+  NetworksList,
+  ListItem,
+  ListItemRow,
+  ListItemValue,
+  ListItemLabel,
 }
 
 export default Styles

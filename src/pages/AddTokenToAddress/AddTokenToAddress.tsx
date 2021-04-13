@@ -6,7 +6,7 @@ import { v4 } from 'uuid'
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 import Button from '@components/Button'
-import SelectNetwork from '@components/SelectNetwork'
+import CurrenciesDropdown from 'components/CurrenciesDropdown'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -125,11 +125,12 @@ const AddTokenToAddress: React.FC = () => {
               Ethereum address with Tether? Press Skip if you want to add new address
             </Styles.Description>
 
-            <SelectNetwork
+            <CurrenciesDropdown
               currencySymbol={platform}
               list={[
                 {
                   logo: {
+                    // Fix me
                     symbol: 'eth',
                     width: 40,
                     height: 40,

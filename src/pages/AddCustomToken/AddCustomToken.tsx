@@ -8,7 +8,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
-import SelectNetwork from '@components/SelectNetwork'
+import CurrenciesDropdown from 'components/CurrenciesDropdown'
 
 // Config
 import { validateContractAddress } from '@config/tokens'
@@ -112,7 +112,7 @@ const AddCustomToken: React.FC = () => {
           </Styles.TokenCard>
         </Styles.Row>
         <Styles.Form>
-          <SelectNetwork
+          <CurrenciesDropdown
             currencySymbol={platform}
             list={[
               {
