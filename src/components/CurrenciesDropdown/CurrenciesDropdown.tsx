@@ -38,8 +38,8 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
-  const onSelectItem = (itemValue: string): void => {
-    onSelect(itemValue)
+  const onSelectItem = (index: number): void => {
+    onSelect(index)
     setIsVisible(false)
   }
 
@@ -77,11 +77,11 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
 
       {!disabled ? (
         <Styles.NetworksList isVisible={isVisible}>
-          {list.map((item: TList) => {
+          {list.map((item: TList, index: number) => {
             const { logo, value, label } = item
 
             return (
-              <Styles.ListItem key={value} onClick={() => onSelectItem(value)}>
+              <Styles.ListItem key={value} onClick={() => onSelectItem(index)}>
                 <CurrencyLogo
                   symbol={logo.symbol}
                   width={logo.width}
