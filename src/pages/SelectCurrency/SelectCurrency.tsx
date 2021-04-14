@@ -26,8 +26,8 @@ const SelectCurrency: React.FC = () => {
 
   const filterCurrenciesList = currencies.filter((currency: ICurrency) => {
     if (searchValue.length) {
-      const findByName = currency.name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
-      const findBySymbol = currency.symbol.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
+      const findByName = toLower(currency.name)?.indexOf(toLower(searchValue) || '') !== -1
+      const findBySymbol = toLower(currency.symbol)?.indexOf(toLower(searchValue) || '') !== -1
 
       return findByName || findBySymbol
     }
@@ -36,8 +36,8 @@ const SelectCurrency: React.FC = () => {
 
   const filterTokensList = tokens.filter((token: IToken) => {
     if (searchValue.length) {
-      const findByName = token.name.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
-      const findBySymbol = token.symbol.toLowerCase().indexOf(searchValue.toLowerCase()) !== -1
+      const findByName = toLower(token.name)?.indexOf(toLower(searchValue) || '') !== -1
+      const findBySymbol = toLower(token.symbol)?.indexOf(toLower(searchValue) || '') !== -1
 
       return findByName || findBySymbol
     }
@@ -50,27 +50,27 @@ const SelectCurrency: React.FC = () => {
     })
   }
 
-  const onAddToken = (symbol: string, platform: string): void => {
+  const onAddToken = (symbol: string, chain: string): void => {
     const walletsList = getWallets()
 
     const checkExistWallet = walletsList?.filter(
       (wallet: IWallet) =>
-        toLower(wallet.platform) === toLower(platform) && toLower(wallet.symbol) === toLower(symbol)
+        toLower(wallet.chain) === toLower(chain) && toLower(wallet.symbol) === toLower(symbol)
     )
-    const getAllWalletsByPlatform = walletsList?.filter(
-      (wallet: IWallet) => toLower(wallet.platform) === toLower(platform)
+    const getAllWalletsByChain = walletsList?.filter(
+      (wallet: IWallet) => toLower(wallet.symbol) === toLower(chain)
     )
 
-    if (checkExistWallet?.length && getAllWalletsByPlatform?.length === 1) {
+    if (checkExistWallet?.length && getAllWalletsByChain?.length === 1) {
       return history.push('/new-wallet', {
         symbol,
-        platform,
+        chain,
       })
     }
 
     return history.push('/add-token-to-address', {
       symbol,
-      platform,
+      chain,
     })
   }
 
@@ -114,16 +114,16 @@ const SelectCurrency: React.FC = () => {
             })}
 
             {filterTokensList.map((token: IToken) => {
-              const { name, symbol, platform } = token
+              const { name, symbol, chain } = token
 
               return (
-                <Styles.CurrencyBlock key={symbol} onClick={() => onAddToken(symbol, platform)}>
+                <Styles.CurrencyBlock key={symbol} onClick={() => onAddToken(symbol, chain)}>
                   <CurrencyLogo
                     symbol={symbol}
                     width={40}
                     height={40}
                     br={10}
-                    chain={platform}
+                    chain={chain}
                     isToken
                   />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>
