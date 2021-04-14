@@ -29,7 +29,7 @@ interface Props {
   label?: string
   value: string
   disabled?: boolean
-  currencyBr?: number
+  currencyBr: number
   background?: string
 }
 
@@ -54,7 +54,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
           symbol={currencySymbol}
           width={40}
           height={40}
-          br={currencyBr || 20}
+          br={currencyBr}
           background={background || '#1D1D22'}
         />
         <Styles.Row>
