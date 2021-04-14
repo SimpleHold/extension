@@ -17,6 +17,7 @@ import { toUpper, price } from '@utils/format'
 import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
 import bitcoinLike from '@utils/bitcoinLike'
+import { validateAddress } from '@utils/address'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -132,7 +133,7 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (address.length && !new bitcoinLike(symbol).validate(address)) {
+    if (address.length && !validateAddress(symbol, address)) {
       setAddressErrorLabel('Address is not valid')
     }
 
@@ -166,7 +167,7 @@ const Send: React.FC = () => {
 
   const isButtonDisabled = (): boolean => {
     return (
-      !new bitcoinLike(symbol).validate(address) ||
+      !validateAddress(symbol, address) ||
       !amount.length ||
       Number(amount) <= 0 ||
       !outputs.length ||

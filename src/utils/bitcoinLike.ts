@@ -1,6 +1,3 @@
-// Validate address
-import addressValidate from '@config/addressValidate'
-
 class GenerateAddress {
   symbol: TSymbols
 
@@ -131,12 +128,6 @@ class GenerateAddress {
     }
   }
 
-  validate = (address: string): boolean => {
-    const { symbol } = this
-
-    return new RegExp(addressValidate[symbol])?.test(address)
-  }
-
   createTransaction = (
     outputs: UnspentOutput[],
     to: string,
@@ -169,8 +160,7 @@ class GenerateAddress {
       }
 
       return null
-    } catch (err) {
-      console.log('err', err)
+    } catch {
       return null
     }
   }
