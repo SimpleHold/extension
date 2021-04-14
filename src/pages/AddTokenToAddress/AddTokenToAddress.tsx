@@ -22,40 +22,40 @@ import Styles from './styles'
 
 interface LocationState {
   symbol: string
-  platform: string
+  chain: string
 }
 
 const AddTokenToAddress: React.FC = () => {
   const history = useHistory()
   const {
-    state: { symbol, platform },
+    state: { symbol, chain },
   } = useLocation<LocationState>()
 
-  const [platformAddresses, setPlatformAddresses] = React.useState<string[]>([])
+  const [chainAddresses, setChainAddresses] = React.useState<string[]>([])
   const [selectedAddress, setSelectedAddress] = React.useState<string>('')
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
   React.useEffect(() => {
-    getPlatformAddresses()
+    getChainAddresses()
   }, [])
 
   React.useEffect(() => {
-    if (platformAddresses.length && !selectedAddress.length) {
-      setSelectedAddress(platformAddresses[0])
+    if (chainAddresses.length && !selectedAddress.length) {
+      setSelectedAddress(chainAddresses[0])
     }
-  }, [platformAddresses, selectedAddress])
+  }, [chainAddresses, selectedAddress])
 
-  const getPlatformAddresses = (): void => {
+  const getChainAddresses = (): void => {
     const walletsList = getWallets()
 
     if (walletsList) {
       const filterWallets = walletsList
-        .filter((wallet: IWallet) => toLower(wallet.symbol) === toLower(platform))
+        .filter((wallet: IWallet) => toLower(wallet.symbol) === toLower(chain))
         .map((wallet: IWallet) => wallet.address)
 
-      setPlatformAddresses(filterWallets)
+      setChainAddresses(filterWallets)
     }
   }
 
@@ -64,8 +64,8 @@ const AddTokenToAddress: React.FC = () => {
       symbol,
       warning:
         'You are trying to add new ERC20 token address. Corresponding Ethereum address will also be added to your wallet',
-      backTitle: `Add to ${toUpper(platform)} address`,
-      platform,
+      backTitle: `Add to ${toUpper(chain)} address`,
+      chain,
     })
   }
 
@@ -87,7 +87,7 @@ const AddTokenToAddress: React.FC = () => {
           )
 
           const uuid = v4()
-          const newWalletsList = addNewWallet(selectedAddress, symbol, uuid, platform)
+          const newWalletsList = addNewWallet(selectedAddress, symbol, uuid, chain)
 
           parseBackup.wallets.push({
             symbol,
@@ -119,14 +119,14 @@ const AddTokenToAddress: React.FC = () => {
         <Header withBack onBack={history.goBack} backTitle="Select currency" />
         <Styles.Container>
           <Styles.Row>
-            <Styles.Title>Add to {toUpper(platform)} address</Styles.Title>
+            <Styles.Title>Add to {toUpper(chain)} address</Styles.Title>
             <Styles.Description>
               You are trying to add new ERC20 token address. Do you want to associate one of your
               Ethereum address with Tether? Press Skip if you want to add new address
             </Styles.Description>
 
             <CurrenciesDropdown
-              currencySymbol={platform}
+              currencySymbol={chain}
               list={[
                 {
                   logo: {
@@ -143,7 +143,8 @@ const AddTokenToAddress: React.FC = () => {
               onSelect={setSelectedAddress}
               label="Select address"
               value={selectedAddress}
-              disabled={platformAddresses.length < 2}
+              disabled={chainAddresses.length < 2}
+              currencyBr={20}
             />
           </Styles.Row>
 

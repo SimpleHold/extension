@@ -29,7 +29,7 @@ interface LocationState {
   symbol: TSymbols
   warning?: string
   backTitle?: string
-  platform?: string
+  chain?: string
 }
 
 const NewWallet: React.FC = () => {
@@ -40,7 +40,7 @@ const NewWallet: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol, warning = undefined, backTitle = undefined, platform = undefined },
+    state: { symbol, warning = undefined, backTitle = undefined, chain = undefined },
   } = useLocation<LocationState>()
 
   const onSuccess = (password: string): void => {
@@ -63,7 +63,7 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const generateAddress = generate(symbol, platform)
+    const generateAddress = generate(symbol, chain)
 
     if (generateAddress) {
       const { privateKey: walletPrivateKey } = generateAddress
@@ -80,7 +80,7 @@ const NewWallet: React.FC = () => {
 
     history.push('/import-private-key', {
       symbol,
-      platform,
+      chain,
     })
   }
 
@@ -94,18 +94,18 @@ const NewWallet: React.FC = () => {
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
 
-          const address = importPrivateKey(symbol, privateKey, platform)
+          const address = importPrivateKey(symbol, privateKey, chain)
 
           if (address) {
             const uuid = v4()
-            const newWalletsList = addNewWallet(address, symbol, uuid, platform)
+            const newWalletsList = addNewWallet(address, symbol, uuid, chain)
 
             parseBackup.wallets.push({
               symbol,
               address,
               uuid,
               privateKey,
-              platform,
+              chain,
             })
 
             if (newWalletsList) {

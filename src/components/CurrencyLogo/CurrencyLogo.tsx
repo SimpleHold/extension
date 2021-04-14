@@ -14,13 +14,12 @@ interface Props {
   br?: number
   chain?: string
   letter?: string
-  hideLogo?: boolean
   isToken?: boolean
   background?: string
 }
 
 const CurrencyLogo: React.FC<Props> = (props) => {
-  const { width, height, symbol, br, chain, letter, hideLogo, isToken, background } = props
+  const { width, height, symbol, br, chain, letter, isToken, background } = props
 
   const getChainogo = chain ? getCurrency(chain) : null
   const currency = isToken && chain ? getToken(symbol, chain) : getCurrency(symbol)
@@ -37,10 +36,11 @@ const CurrencyLogo: React.FC<Props> = (props) => {
           background={background || currency.background}
           br={br}
         >
-          {letter ? <Styles.LetterLogo>{letter}</Styles.LetterLogo> : null}
-          {!letter && !hideLogo ? (
+          {letter?.length ? (
+            <Styles.LetterLogo>{letter}</Styles.LetterLogo>
+          ) : (
             <Styles.Logo src={currency.logo} width={width / 2} height={height / 2} />
-          ) : null}
+          )}
         </Styles.LogoRow>
       ) : null}
       {getChainogo ? (

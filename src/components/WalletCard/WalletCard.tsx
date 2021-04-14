@@ -19,15 +19,15 @@ import Styles from './styles'
 interface Props {
   address: string
   symbol: string
-  platform?: string
+  chain?: string
   sumBalance: (balance: number) => void
   sumEstimated: (estimated: number) => void
   sumPending: (pending: number) => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
-  const { address, symbol, sumBalance, sumEstimated, sumPending, platform } = props
-  const currency = platform ? getToken(symbol, platform) : getCurrency(symbol)
+  const { address, symbol, sumBalance, sumEstimated, sumPending, chain } = props
+  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
   const history = useHistory()
 
@@ -41,7 +41,11 @@ const WalletCard: React.FC<Props> = (props) => {
 
   const fetchBalance = async (): Promise<void> => {
     if (currency) {
-      const tryGetBalance = await getBalance(address, currency?.chain, symbol)
+      const tryGetBalance = await getBalance(
+        address,
+        currency?.chain,
+        chain ? currency.symbol : undefined
+      )
 
       const { balance, balance_usd, balance_btc, pending, pending_btc } = tryGetBalance
 
@@ -71,8 +75,8 @@ const WalletCard: React.FC<Props> = (props) => {
         width={40}
         height={40}
         symbol={symbol}
-        isToken={platform !== undefined}
-        chain={platform}
+        isToken={chain !== undefined}
+        chain={chain}
       />
       <Styles.Row>
         <Styles.AddressInfo>

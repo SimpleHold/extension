@@ -12,21 +12,21 @@ import Styles from './styles'
 
 interface Props {
   symbol: string
-  platform: string
+  chain: string
   isActive?: boolean
   hideSelect?: boolean
   onToggle?: () => void
 }
 
 const TokenCard: React.FC<Props> = (props) => {
-  const { symbol, platform, isActive, hideSelect, onToggle } = props
+  const { symbol, chain, isActive, hideSelect, onToggle } = props
 
-  const tokenInfo = getToken(symbol, platform)
+  const tokenInfo = getToken(symbol, chain)
 
   if (tokenInfo) {
     return (
       <Styles.Container>
-        <CurrencyLogo width={40} height={40} symbol={symbol} chain={platform} isToken />
+        <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} isToken />
         <Styles.Row>
           <Styles.Info>
             <Styles.TokenName>{tokenInfo.name}</Styles.TokenName>

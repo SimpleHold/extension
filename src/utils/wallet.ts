@@ -1,4 +1,5 @@
 import { validateWallet } from '@utils/validate'
+import { toLower } from '@utils/format'
 
 export interface IWallet {
   symbol: string
@@ -6,7 +7,7 @@ export interface IWallet {
   address: string
   uuid: string
   privateKey?: string
-  platform?: string
+  chain?: string
 }
 
 export const getWallets = (): IWallet[] | null => {
@@ -48,11 +49,16 @@ export const getLatestBalance = (address: string): number => {
   return 0
 }
 
-export const checkExistWallet = (address: string): boolean => {
+export const checkExistWallet = (address: string, chain?: string): boolean => {
   const wallets = getWallets()
 
   if (wallets?.length) {
-    return wallets.find((wallet: IWallet) => wallet.address === address) !== undefined
+    return (
+      wallets.find(
+        (wallet: IWallet) =>
+          toLower(wallet.address) === toLower(address) && toLower(wallet.chain) === toLower(chain)
+      ) !== undefined
+    )
   }
   return false
 }
@@ -61,7 +67,7 @@ export const addNew = (
   address: string,
   symbol: string,
   uuid: string,
-  platform?: string
+  chain?: string
 ): string | null => {
   const walletsList = localStorage.getItem('wallets')
   const validateWallets = validateWallet(walletsList)
@@ -73,7 +79,7 @@ export const addNew = (
       symbol,
       address,
       uuid,
-      platform,
+      chain,
     })
 
     return JSON.stringify(parseWallets)

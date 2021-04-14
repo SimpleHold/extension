@@ -134,13 +134,13 @@ export const getContractInfo = async (
 
 export const getTokensBalance = async (
   address: string,
-  platform: string
+  chain: string
 ): Promise<ITokensBalance[] | null> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/contract/balances`, {
       params: {
         address,
-        platform,
+        chain,
       },
       headers: {
         'Content-Type': 'application/json',

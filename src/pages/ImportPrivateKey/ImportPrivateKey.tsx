@@ -17,7 +17,7 @@ import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { decrypt, encrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
-import { toUpper } from '@utils/format'
+import { toLower, toUpper } from '@utils/format'
 import { importPrivateKey } from '@utils/address'
 import { getTokensBalance, ITokensBalance } from '@utils/api'
 
@@ -29,7 +29,7 @@ import Styles from './styles'
 
 interface LocationState {
   symbol: TSymbols
-  platform?: string
+  chain?: string
 }
 
 const ImportPrivateKey: React.FC = () => {
@@ -41,7 +41,7 @@ const ImportPrivateKey: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol, platform = undefined },
+    state: { symbol, chain = undefined },
   } = useLocation<LocationState>()
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
@@ -55,16 +55,16 @@ const ImportPrivateKey: React.FC = () => {
       setErrorLabel(null)
     }
 
-    const getAddress = importPrivateKey(symbol, privateKey, platform)
+    const getAddress = importPrivateKey(symbol, privateKey, chain)
 
     if (getAddress) {
-      const checkExist = checkExistWallet(getAddress)
+      const checkExist = checkExistWallet(getAddress, chain)
 
       if (checkExist) {
         return setErrorLabel('This address has already been added')
       }
 
-      if (platform && !isSkipFindTokens) {
+      if (chain && !isSkipFindTokens) {
         return await findAddressTokens(getAddress, privateKey)
       }
       return setActiveDrawer('confirm')
@@ -74,21 +74,24 @@ const ImportPrivateKey: React.FC = () => {
   }
 
   const findAddressTokens = async (address: string, privateKey: string): Promise<void> => {
-    if (platform) {
+    if (chain) {
       setImportButtonLoading(true)
 
-      const data = await getTokensBalance(address, platform)
+      const data = await getTokensBalance(address, chain)
+      const filterData = data?.filter((item) => toLower(item.symbol) !== toLower(symbol))
 
       setImportButtonLoading(false)
 
-      if (data?.length) {
-        const mapTokens = data.map((token: ITokensBalance) => token.address)
-        const mapExistTokens = tokens.map((token: IToken) => token.address)
-        const filterByExistTokens = mapTokens.map((token: string) => mapExistTokens.includes(token))
+      if (filterData?.length) {
+        const mapTokens = filterData.map((token: ITokensBalance) => token.symbol)
+        const mapExistTokens = tokens.map((token: IToken) => token.symbol)
+        const filterByExistTokens = mapTokens.filter((token: string) =>
+          mapExistTokens.includes(token)
+        )
 
         if (filterByExistTokens.length) {
           return history.push('/found-tokens', {
-            platform,
+            chain,
             symbol,
             privateKey,
             tokens: filterByExistTokens,
@@ -107,7 +110,7 @@ const ImportPrivateKey: React.FC = () => {
       const decryptBackup = decrypt(backup, password)
       if (decryptBackup) {
         const parseBackup = JSON.parse(decryptBackup)
-        const address = importPrivateKey(symbol, privateKey, platform)
+        const address = importPrivateKey(symbol, privateKey, chain)
 
         if (address) {
           const uuid = v4()
