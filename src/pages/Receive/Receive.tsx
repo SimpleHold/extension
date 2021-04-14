@@ -132,6 +132,11 @@ const Receive: React.FC = () => {
       setActiveDrawer('confirm')
     } else if (index === 1) {
       openWebPage(`https://blockchair.com/${chain}/address/${address}`)
+    } else if (index === 2) {
+      history.push('/select-token', {
+        currencyFrom: currency,
+        chain,
+      })
     }
   }
 
@@ -211,7 +216,7 @@ const Receive: React.FC = () => {
             />
 
             <Styles.CurrencyBlock>
-              <CurrencyLogo symbol={symbol} width={22} height={22} />
+              <CurrencyLogo symbol={symbol} width={22} height={22} br={5} />
               <Styles.CurrencyName>{currency}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
 
