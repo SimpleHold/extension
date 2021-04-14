@@ -20,6 +20,7 @@ import EnterPasscode from './pages/EnterPasscode'
 import AddCustomToken from './pages/AddCustomToken'
 import AddTokenToAddress from './pages/AddTokenToAddress'
 import FoundTokens from './pages/FoundTokens'
+import SelectToken from './pages/SelectToken'
 
 const routers: RouteProps[] = [
   {
@@ -97,6 +98,10 @@ const routers: RouteProps[] = [
   {
     path: '/found-tokens',
     component: FoundTokens,
+  },
+  {
+    path: '/select-token',
+    component: SelectToken,
   },
 ]
 
