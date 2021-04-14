@@ -5,10 +5,10 @@ import { useHistory } from 'react-router-dom'
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 import CurrencyLogo from '@components/CurrencyLogo'
+import CurrenciesDropdown from '@components/CurrenciesDropdown'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
-import CurrenciesDropdown from 'components/CurrenciesDropdown'
 
 // Config
 import { validateContractAddress } from '@config/tokens'
@@ -24,75 +24,64 @@ import useDebounce from '@hooks/useDebounce'
 // Styles
 import Styles from './styles'
 
-interface IPlatform {
-  symbol: string
+interface INetwork {
   name: string
-  chain: 'eth' | 'bsc'
+  symbol: string
+  chain: string
 }
+
+const networks: INetwork[] = [
+  {
+    name: 'Ethereum',
+    symbol: 'eth',
+    chain: 'eth',
+  },
+  {
+    name: 'Binance',
+    symbol: 'bnb',
+    chain: 'bsc',
+  },
+]
 
 const AddCustomToken: React.FC = () => {
   const history = useHistory()
 
-  const [selectedChain, setChain] = React.useState<'eth' | 'bsc'>('eth')
-  const [tokenName, setTokenName] = React.useState<string>('')
-  const [tokenTicker, setTokenTicker] = React.useState<string>('')
-  const [tokenDecimals, setTokenDecimals] = React.useState<number>(0)
   const [contractAddress, setContractAddress] = React.useState<string>('')
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [selectedNetwork, setSelectedNetwork] = React.useState<INetwork>(networks[0])
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+  const [isLoading, setIsLoading] = React.useState<boolean>(false)
+  const [tokenName, setTokenName] = React.useState<string>('')
+  const [tokenSymbol, setTokenSymbol] = React.useState<string>('')
+  const [tokenDecimals, setTokenDecimals] = React.useState<number>(0)
 
   const debounced = useDebounce(contractAddress, 1000)
-
-  const platforms: IPlatform[] = [
-    { symbol: 'eth', name: 'Ethereum', chain: 'eth' },
-    { symbol: 'bnb', name: 'Binance', chain: 'bsc' },
-  ]
-
-  const mapPlatforms = platforms.map((platformItem) => {
-    const { symbol, name, chain } = platformItem
-
-    return {
-      logo: {
-        symbol,
-        width: 40,
-        height: 40,
-        br: 20,
-        background: '#1D1D22',
-      },
-      value: name,
-      chain,
-    }
-  })
-
-  const filterPlatforms = mapPlatforms.filter((item) => item.chain !== selectedChain)
-  const getActivePlatform = platforms.find((item) => item.chain === selectedChain)
 
   React.useEffect(() => {
     if (
       contractAddress.length &&
       !errorLabel &&
-      validateContractAddress(contractAddress, selectedChain)
+      validateContractAddress(contractAddress, selectedNetwork.chain)
     ) {
-      setIsLoading(true)
-
       getContractAddressInfo()
     }
   }, [debounced])
 
-  const onBlurInput = (): void => {
-    if (validateContractAddress(contractAddress, selectedChain)) {
-      if (errorLabel) {
-        setErrorLabel(null)
-      }
-    } else {
-      if (!errorLabel) {
-        setErrorLabel('Token Contract Address is not valid')
-      }
-    }
-  }
+  const getContractAddressInfo = async (): Promise<void> => {
+    setIsLoading(true)
 
-  const getContractAddressInfo = async (): Promise<any> => {
-    const data = await getContractInfo(contractAddress, selectedChain)
+    if (tokenName.length) {
+      setTokenName('')
+    }
+
+    if (tokenSymbol.length) {
+      setTokenSymbol('')
+    }
+
+    if (tokenDecimals > 0) {
+      setTokenDecimals(0)
+    }
+
+    const data = await getContractInfo(contractAddress, selectedNetwork.chain)
 
     setIsLoading(false)
 
@@ -100,43 +89,78 @@ const AddCustomToken: React.FC = () => {
       const { name, symbol, decimals } = data
 
       setTokenName(name)
-      setTokenTicker(symbol)
+      setTokenSymbol(symbol)
       setTokenDecimals(decimals)
+    } else {
+      // Fix me: handle not found
     }
   }
 
   const onConfirm = (): void => {
     const walletsList = getWallets()
+    const { symbol, chain } = selectedNetwork
 
     const checkExistWallet = walletsList?.filter(
       (wallet: IWallet) =>
-        toLower(wallet.platform) === toLower(selectedChain) &&
-        toLower(wallet.symbol) === toLower(tokenTicker)
+        toLower(wallet.chain) === toLower(chain) && toLower(wallet.symbol) === toLower(symbol)
     )
-    const getAllWalletsByPlatform = walletsList?.filter(
-      (wallet: IWallet) => toLower(wallet.platform) === toLower(selectedChain)
+    const getAllWalletsByChain = walletsList?.filter(
+      (wallet: IWallet) => toLower(wallet.symbol) === toLower(chain)
     )
 
-    if (checkExistWallet?.length && getAllWalletsByPlatform?.length === 1) {
+    if (checkExistWallet?.length && getAllWalletsByChain?.length === 1) {
       return history.push('/new-wallet', {
-        symbol: tokenTicker,
-        platform: selectedChain,
+        symbol: chain,
       })
     }
 
     return history.push('/add-token-to-address', {
-      symbol: tokenTicker,
-      platform: selectedChain,
+      symbol,
+      chain,
     })
   }
 
-  const onSelectDropDown = (index: number): void => {
-    setChain(filterPlatforms[index].chain)
+  const onSelectDropdown = (index: number): void => {
+    const getNetwork = mapList[index]
+    const getNetworkInfo = networks.find(
+      (network: INetwork) => network.symbol === getNetwork.logo.symbol
+    )
+
+    if (getNetworkInfo) {
+      setSelectedNetwork(getNetworkInfo)
+    }
   }
+
+  const onBlurInput = (): void => {
+    if (!validateContractAddress(contractAddress, selectedNetwork.chain)) {
+      setErrorLabel('Token Contract Address is not valid')
+    } else {
+      if (errorLabel) {
+        setErrorLabel(null)
+      }
+    }
+  }
+
+  const dropDownList = networks.filter(
+    (network: INetwork) => network.symbol !== selectedNetwork.symbol
+  )
+
+  const mapList = dropDownList.map((network: INetwork) => {
+    return {
+      logo: {
+        symbol: network.symbol,
+        width: 40,
+        height: 40,
+        br: 20,
+        background: '#1D1D22',
+      },
+      value: network.name,
+    }
+  })
 
   const isButtonDisabled =
     !tokenName.length ||
-    !tokenTicker.length ||
+    !tokenSymbol.length ||
     tokenDecimals <= 0 ||
     !contractAddress.length ||
     isLoading ||
@@ -152,18 +176,18 @@ const AddCustomToken: React.FC = () => {
 
           <Styles.TokenCard>
             <CurrencyLogo
-              symbol={selectedChain}
               width={40}
               height={40}
-              chain={selectedChain}
-              hideLogo
+              symbol={tokenSymbol}
+              chain={selectedNetwork.chain}
+              letter={tokenName[0]}
             />
             <Styles.TokenCardRow>
               <Skeleton width={90} height={19} mt={6} isLoading={isLoading} type="gray">
                 <Styles.TokenName>{tokenName || 'Token name'}</Styles.TokenName>
               </Skeleton>
               <Skeleton width={40} height={15} mt={4} isLoading={isLoading} type="gray">
-                <Styles.TokenTicker>TICKER - {tokenTicker}</Styles.TokenTicker>
+                <Styles.TokenSymbol>{tokenSymbol || 'Ticker'}</Styles.TokenSymbol>
               </Skeleton>
               <Styles.DecimalRow>
                 <Styles.TokenDecimalLabel>Decimals of precion:</Styles.TokenDecimalLabel>
@@ -176,27 +200,27 @@ const AddCustomToken: React.FC = () => {
             </Styles.TokenCardRow>
           </Styles.TokenCard>
         </Styles.Row>
+
         <Styles.Form>
-          {getActivePlatform ? (
-            <CurrenciesDropdown
-              currencySymbol={selectedChain}
-              list={filterPlatforms}
-              onSelect={onSelectDropDown}
-              value={getActivePlatform.name}
-              label="Select network"
-            />
-          ) : null}
+          <CurrenciesDropdown
+            label="Select network"
+            value={selectedNetwork.name}
+            currencySymbol={selectedNetwork.symbol}
+            list={mapList}
+            onSelect={onSelectDropdown}
+            currencyBr={20}
+          />
           <TextInput
+            label="Token Contract Address"
             value={contractAddress}
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
               setContractAddress(e.target.value)
             }
-            label="Token Contract Address"
             onBlurInput={onBlurInput}
             errorLabel={errorLabel}
           />
           <Styles.ButtonRow>
-            <Button label="Confirm" onClick={onConfirm} disabled={isButtonDisabled} />
+            <Button label="Confirm" disabled={isButtonDisabled} onClick={onConfirm} />
           </Styles.ButtonRow>
         </Styles.Form>
       </Styles.Container>
