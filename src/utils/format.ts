@@ -1,11 +1,11 @@
-export const toUpper = (text: string | null | undefined) => {
+export const toUpper = (text?: string): string | undefined => {
   if (text?.length) {
     return text.toUpperCase()
   }
   return text
 }
 
-export const toLower = (text: string | null | undefined) => {
+export const toLower = (text?: string): string | undefined => {
   if (text?.length) {
     return text.toLowerCase()
   }
