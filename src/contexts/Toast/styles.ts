@@ -14,6 +14,7 @@ const Toast = styled.div`
   display: flex;
   flex-direction: row;
   align-items: flex-start;
+  position: relative;
 `
 
 const ToastText = styled.p`
@@ -24,6 +25,10 @@ const ToastText = styled.p`
 `
 
 const CloseIconRow = styled.div`
+  position: absolute;
+  top: 15px;
+  right: 15px;
+
   &:hover {
     cursor: pointer;
   }

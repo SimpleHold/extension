@@ -25,7 +25,7 @@ export const ToastContextProvider: React.FC<Props> = (props) => {
   }, [toast])
 
   const addToast = React.useCallback(
-    function (toast: string) {
+    (toast: string) => {
       setToast(toast)
     },
     [setToast]
