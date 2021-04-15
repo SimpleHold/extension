@@ -164,9 +164,7 @@ const ImportPrivateKey: React.FC = () => {
             <TextInput
               label="Enter private key"
               value={privateKey}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-                setPrivateKey(e.target.value)
-              }
+              onChange={setPrivateKey}
               errorLabel={errorLabel}
               inputRef={textInputRef}
             />

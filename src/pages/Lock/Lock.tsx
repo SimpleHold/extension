@@ -111,9 +111,7 @@ const Lock: React.FC = () => {
               label="Password"
               type="password"
               value={password}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-                setPassword(e.target.value)
-              }
+              onChange={setPassword}
               errorLabel={errorLabel}
               inputRef={textInputRef}
             />

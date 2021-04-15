@@ -85,9 +85,7 @@ const SelectCurrency: React.FC = () => {
           <TextInput
             value={searchValue}
             label="Type a currency or ticker"
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-              setSearchValue(e.target.value)
-            }
+            onChange={setSearchValue}
           />
 
           {!filterCurrenciesList.length && !filterTokensList.length ? (

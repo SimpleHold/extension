@@ -6,7 +6,7 @@ import Styles from './styles'
 interface Props {
   label: string
   value: string
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange: (value: string) => void
   type?: string
   errorLabel?: string | null
   withPasswordVisible?: boolean
@@ -61,6 +61,10 @@ const TextInput: React.FC<Props> = (props) => {
     }
   }
 
+  const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value)
+  }
+
   const renderInput = () => {
     if (type === 'number') {
       return (
@@ -69,7 +73,7 @@ const TextInput: React.FC<Props> = (props) => {
           onFocus={onFocus}
           onBlur={onBlur}
           value={value}
-          onChange={onChange}
+          onChange={onChangeInput}
           decimalScale={8}
           disabled={disabled}
         />
@@ -81,7 +85,7 @@ const TextInput: React.FC<Props> = (props) => {
         onFocus={onFocus}
         onBlur={onBlur}
         value={value}
-        onChange={onChange}
+        onChange={onChangeInput}
         type={type === 'password' && isPasswordVisible ? 'text' : type}
         disabled={disabled}
       />

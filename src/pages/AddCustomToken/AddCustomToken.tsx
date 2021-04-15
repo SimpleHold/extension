@@ -146,9 +146,7 @@ const AddCustomToken: React.FC = () => {
     }
   }
 
-  const onChangeAddress = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const { value } = event.target
-
+  const onChangeAddress = (value: string): void => {
     if (!isLoading) {
       setContractAddress(value)
     }

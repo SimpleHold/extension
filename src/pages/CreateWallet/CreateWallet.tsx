@@ -97,7 +97,7 @@ const Wallets: React.FC = () => {
           <TextInput
             label="Enter password"
             value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setPassword(e.target.value)}
+            onChange={setPassword}
             type="password"
             withPasswordVisible
             errorLabel={passwordErrorLabel}
@@ -106,9 +106,7 @@ const Wallets: React.FC = () => {
           <TextInput
             label="Confirm password"
             value={confirmPassword}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-              setConfirmPassword(e.target.value)
-            }
+            onChange={setConfirmPassword}
             type="password"
             withPasswordVisible
             errorLabel={confirmPasswordErrorLabel}

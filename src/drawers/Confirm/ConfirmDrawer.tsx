@@ -49,10 +49,6 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
     }
   }, [isActive])
 
-  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    onChangeText(e.target.value)
-  }
-
   return (
     <DrawerWrapper title={title} isActive={isActive} onClose={onClose}>
       <Styles.Row>
@@ -60,7 +56,7 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
           <TextInput
             label={inputLabel}
             value={textInputValue}
-            onChange={onChangeInput}
+            onChange={onChangeText}
             type={textInputType}
             errorLabel={inputErrorLabel}
             inputRef={textInputRef}
