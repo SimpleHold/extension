@@ -24,7 +24,7 @@ import useVisible from '@hooks/useVisible'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { price, toUpper } from '@utils/format'
+import { price, toUpper, toLower } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
@@ -142,7 +142,7 @@ const Receive: React.FC = () => {
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
           const findWallet = parseBackup?.wallets?.find(
-            (wallet: IWallet) => (wallet.address = address)
+            (wallet: IWallet) => toLower(wallet.address) === toLower(address)
           )
 
           if (findWallet) {
