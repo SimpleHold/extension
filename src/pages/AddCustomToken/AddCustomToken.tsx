@@ -11,15 +11,15 @@ import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
 
 // Config
-import { validateContractAddress } from '@config/tokens'
+import { validateContractAddress, checkExistWallet } from '@config/tokens'
 
 // Utils
 import { getContractInfo } from '@utils/api'
-import { getWallets, IWallet } from '@utils/wallet'
-import { toLower } from '@utils/format'
+import { getWallets } from '@utils/wallet'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
+import useToastContext from '@hooks/useToastContext'
 
 // Styles
 import Styles from './styles'
@@ -28,6 +28,12 @@ interface INetwork {
   name: string
   symbol: string
   chain: string
+}
+
+interface IToken {
+  name: string
+  symbol: string
+  decimals: number
 }
 
 const networks: INetwork[] = [
@@ -50,11 +56,14 @@ const AddCustomToken: React.FC = () => {
   const [selectedNetwork, setSelectedNetwork] = React.useState<INetwork>(networks[0])
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [tokenName, setTokenName] = React.useState<string>('')
-  const [tokenSymbol, setTokenSymbol] = React.useState<string>('')
-  const [tokenDecimals, setTokenDecimals] = React.useState<number>(0)
+  const [tokenInfo, setTokenInfo] = React.useState<IToken>({
+    name: '',
+    symbol: '',
+    decimals: 0,
+  })
 
   const debounced = useDebounce(contractAddress, 1000)
+  const useToast = useToastContext()
 
   React.useEffect(() => {
     if (
@@ -69,16 +78,12 @@ const AddCustomToken: React.FC = () => {
   const getContractAddressInfo = async (): Promise<void> => {
     setIsLoading(true)
 
-    if (tokenName.length) {
-      setTokenName('')
-    }
-
-    if (tokenSymbol.length) {
-      setTokenSymbol('')
-    }
-
-    if (tokenDecimals > 0) {
-      setTokenDecimals(0)
+    if (tokenInfo.name.length || tokenInfo.symbol.length || tokenInfo.decimals > 0) {
+      setTokenInfo({
+        name: '',
+        symbol: '',
+        decimals: 0,
+      })
     }
 
     const data = await getContractInfo(contractAddress, selectedNetwork.chain)
@@ -88,36 +93,36 @@ const AddCustomToken: React.FC = () => {
     if (data) {
       const { name, symbol, decimals } = data
 
-      setTokenName(name)
-      setTokenSymbol(symbol)
-      setTokenDecimals(decimals)
+      setTokenInfo({
+        name,
+        symbol,
+        decimals,
+      })
     } else {
-      // Fix me: handle not found
+      useToast('Token Contract Address is not found')
     }
   }
 
   const onConfirm = (): void => {
     const walletsList = getWallets()
-    const { symbol, chain } = selectedNetwork
 
-    const checkExistWallet = walletsList?.filter(
-      (wallet: IWallet) =>
-        toLower(wallet.chain) === toLower(chain) && toLower(wallet.symbol) === toLower(symbol)
-    )
-    const getAllWalletsByChain = walletsList?.filter(
-      (wallet: IWallet) => toLower(wallet.symbol) === toLower(chain)
-    )
+    if (walletsList) {
+      const { symbol, chain } = selectedNetwork
 
-    if (checkExistWallet?.length && getAllWalletsByChain?.length === 1) {
+      const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
+
+      if (checkTokenWallets) {
+        return history.push('/add-token-to-address', {
+          symbol,
+          chain,
+        })
+      }
+
       return history.push('/new-wallet', {
-        symbol: chain,
+        symbol,
+        chain,
       })
     }
-
-    return history.push('/add-token-to-address', {
-      symbol,
-      chain,
-    })
   }
 
   const onSelectDropdown = (index: number): void => {
@@ -141,6 +146,14 @@ const AddCustomToken: React.FC = () => {
     }
   }
 
+  const onChangeAddress = (event: React.ChangeEvent<HTMLInputElement>): void => {
+    const { value } = event.target
+
+    if (!isLoading) {
+      setContractAddress(value)
+    }
+  }
+
   const dropDownList = networks.filter(
     (network: INetwork) => network.symbol !== selectedNetwork.symbol
   )
@@ -159,9 +172,9 @@ const AddCustomToken: React.FC = () => {
   })
 
   const isButtonDisabled =
-    !tokenName.length ||
-    !tokenSymbol.length ||
-    tokenDecimals <= 0 ||
+    !tokenInfo.name.length ||
+    !tokenInfo.symbol.length ||
+    tokenInfo.decimals <= 0 ||
     !contractAddress.length ||
     isLoading ||
     errorLabel !== null
@@ -178,22 +191,23 @@ const AddCustomToken: React.FC = () => {
             <CurrencyLogo
               width={40}
               height={40}
-              symbol={tokenSymbol}
+              symbol={selectedNetwork.symbol}
               chain={selectedNetwork.chain}
-              letter={tokenName[0]}
+              letter={tokenInfo.name[0] || 'T'}
+              background="#132BD8"
             />
             <Styles.TokenCardRow>
               <Skeleton width={90} height={19} mt={6} isLoading={isLoading} type="gray">
-                <Styles.TokenName>{tokenName || 'Token name'}</Styles.TokenName>
+                <Styles.TokenName>{tokenInfo.name || 'Token name'}</Styles.TokenName>
               </Skeleton>
               <Skeleton width={40} height={15} mt={4} isLoading={isLoading} type="gray">
-                <Styles.TokenSymbol>{tokenSymbol || 'Ticker'}</Styles.TokenSymbol>
+                <Styles.TokenSymbol>{tokenInfo.symbol || 'Ticker'}</Styles.TokenSymbol>
               </Skeleton>
               <Styles.DecimalRow>
                 <Styles.TokenDecimalLabel>Decimals of precion:</Styles.TokenDecimalLabel>
                 <Skeleton width={20} height={14} mt={0} isLoading={isLoading} type="gray">
-                  {tokenDecimals > 0 ? (
-                    <Styles.TokenDecimal>{tokenDecimals}</Styles.TokenDecimal>
+                  {tokenInfo.decimals > 0 ? (
+                    <Styles.TokenDecimal>{tokenInfo.decimals}</Styles.TokenDecimal>
                   ) : null}
                 </Skeleton>
               </Styles.DecimalRow>
@@ -213,9 +227,7 @@ const AddCustomToken: React.FC = () => {
           <TextInput
             label="Token Contract Address"
             value={contractAddress}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-              setContractAddress(e.target.value)
-            }
+            onChange={onChangeAddress}
             onBlurInput={onBlurInput}
             errorLabel={errorLabel}
           />

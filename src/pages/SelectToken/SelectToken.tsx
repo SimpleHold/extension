@@ -9,11 +9,11 @@ import TextInput from '@components/TextInput'
 import CurrencyLogo from '@components/CurrencyLogo'
 
 // Config
-import tokens, { IToken } from '@config/tokens'
+import tokens, { IToken, checkExistWallet } from '@config/tokens'
 
 // Utils
 import { toUpper, toLower } from '@utils/format'
-import { getWallets, IWallet } from '@utils/wallet'
+import { getWallets } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -50,25 +50,21 @@ const SelectToken: React.FC = () => {
   const onAddToken = (symbol: string, chain: string): void => {
     const walletsList = getWallets()
 
-    const checkExistWallet = walletsList?.filter(
-      (wallet: IWallet) =>
-        toLower(wallet.chain) === toLower(chain) && toLower(wallet.symbol) === toLower(symbol)
-    )
-    const getAllWalletsByChain = walletsList?.filter(
-      (wallet: IWallet) => toLower(wallet.symbol) === toLower(chain)
-    )
+    if (walletsList) {
+      const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
 
-    if (checkExistWallet?.length && getAllWalletsByChain?.length === 1) {
+      if (checkTokenWallets) {
+        return history.push('/add-token-to-address', {
+          symbol,
+          chain,
+        })
+      }
+
       return history.push('/new-wallet', {
         symbol,
         chain,
       })
     }
-
-    return history.push('/add-token-to-address', {
-      symbol,
-      chain,
-    })
   }
 
   return (
