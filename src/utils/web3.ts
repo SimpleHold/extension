@@ -54,6 +54,10 @@ export const importPrivateKey = (privateKey: string): string | null => {
   }
 }
 
+export const fromWei = (value: string, unit: Unit): number => {
+  return +web3.utils.fromWei(value, unit)
+}
+
 export const toWei = (value: string, unit: Unit): number => {
   return +web3.utils.toWei(value, unit)
 }

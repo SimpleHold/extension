@@ -16,8 +16,7 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
 import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import bitcoinLike from '@utils/bitcoinLike'
-import { validateAddress } from '@utils/address'
+import { validateAddress, getAddressNetworkFee, formatUnit } from '@utils/address'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -91,7 +90,7 @@ const Send: React.FC = () => {
     const fee = await getFees(chain)
     setUtxosList([])
 
-    const { networkFee, utxos } = new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
+    const { networkFee, utxos } = getAddressNetworkFee(symbol, outputs, fee, amount, chain)
 
     setUtxosList(utxos)
     setNetworkFee(networkFee)
@@ -133,6 +132,7 @@ const Send: React.FC = () => {
       addressFrom: selectedAddress,
       addressTo: address,
       outputs: utxosList,
+      chain,
     })
   }
 
@@ -160,8 +160,8 @@ const Send: React.FC = () => {
     }
 
     if (currency) {
-      const parseAmount = new bitcoinLike(symbol).toSat(Number(amount))
-      const parseMinAmount = new bitcoinLike(symbol).fromSat(currency.minSendAmount)
+      const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+      const parseMinAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
 
       if (parseAmount < currency.minSendAmount) {
         return setAmountErrorLabel(`Min. amount: ${parseMinAmount} ${toUpper(symbol)}`)

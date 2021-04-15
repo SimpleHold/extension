@@ -64,3 +64,37 @@ export const createTransaction = async (
 
   return null
 }
+
+export const getAddressNetworkFee = (
+  symbol: TSymbols,
+  outputs: UnspentOutput[],
+  fee: number,
+  amount: string,
+  chain?: string
+) => {
+  if (isEthereumLike(symbol, chain)) {
+    return {
+      networkFee: 21000, // Fix me
+      utxos: [],
+    }
+  }
+  return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
+}
+
+export const formatUnit = (
+  symbol: TSymbols,
+  value: string | number,
+  type: 'from' | 'to',
+  chain?: string,
+  unit?: web3.Unit
+): number => {
+  if (isEthereumLike(symbol, chain)) {
+    if (unit) {
+      return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
+    }
+    return Number(value)
+  }
+  return type === 'from'
+    ? new bitcoinLike(symbol).fromSat(Number(value))
+    : new bitcoinLike(symbol).toSat(Number(value))
+}

@@ -13,7 +13,7 @@ import { validatePassword } from '@utils/validate'
 import { logEvent, setUserProperties } from '@utils/amplitude'
 import { generate } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
-import bitcoinLike from '@utils/bitcoinLike'
+import { generate as generateAddress } from '@utils/address'
 
 // Config
 import { START_PASSWORD } from '@config/events'
@@ -39,7 +39,7 @@ const Wallets: React.FC = () => {
       name: START_PASSWORD,
     })
 
-    const geneateAddress = new bitcoinLike('btc').generate()
+    const geneateAddress = generateAddress('btc')
 
     if (geneateAddress) {
       const { address, privateKey } = geneateAddress

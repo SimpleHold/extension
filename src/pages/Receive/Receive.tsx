@@ -90,8 +90,7 @@ const Receive: React.FC = () => {
       { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
     ]
 
-    if (['eth', 'etc', 'bsc'].indexOf(symbol) !== -1) {
-      // Fix me
+    if (['eth', 'bsc'].indexOf(symbol) !== -1) {
       list.push({
         icon: { source: plusCircleIcon, width: 18, height: 18 },
         title: 'Add token',
@@ -216,7 +215,14 @@ const Receive: React.FC = () => {
             />
 
             <Styles.CurrencyBlock>
-              <CurrencyLogo symbol={symbol} width={22} height={22} br={5} />
+              <CurrencyLogo
+                symbol={symbol}
+                width={22}
+                height={22}
+                br={5}
+                chain={chain}
+                isToken={chain !== undefined}
+              />
               <Styles.CurrencyName>{currency}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
 

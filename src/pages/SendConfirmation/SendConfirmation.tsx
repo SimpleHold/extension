@@ -18,7 +18,7 @@ import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { IRawTransaction, sendRawTransaction } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import bitcoinLike from '@utils/bitcoinLike'
+import { formatUnit, createTransaction } from '@utils/address'
 
 // Config
 import {
@@ -39,12 +39,13 @@ interface LocationState {
   addressFrom: string
   addressTo: string
   outputs: UnspentOutput[]
+  chain?: string
 }
 
 const SendConfirmation: React.FC = () => {
   const history = useHistory()
   const {
-    state: { amount, symbol, networkFee, addressFrom, addressTo, outputs },
+    state: { amount, symbol, networkFee, addressFrom, addressTo, outputs, chain },
   } = useLocation<LocationState>()
 
   const currency = getCurrency(symbol)
@@ -74,16 +75,18 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
-          const parseAmount = new bitcoinLike(symbol).toSat(amount)
-          const parseNetworkFee = new bitcoinLike(symbol).toSat(networkFee)
+          const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+          const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
-          const transaction: TCreatedTransaction | null = new bitcoinLike(symbol).createTransaction(
-            outputs,
+          const transaction = await createTransaction(
+            addressFrom,
             addressTo,
             parseAmount,
-            parseNetworkFee,
-            addressFrom,
-            findWallet.privateKey
+            findWallet.privateKey,
+            symbol,
+            chain,
+            outputs,
+            parseNetworkFee
           )
 
           if (transaction?.hash && transaction?.raw) {
