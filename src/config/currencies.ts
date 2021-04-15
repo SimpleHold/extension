@@ -97,4 +97,8 @@ export const getCurrency = (symbol: string): ICurrency | undefined => {
   return currencies.find((currency: ICurrency) => currency.symbol === symbol)
 }
 
+export const getCurrencyByChain = (chain: string): ICurrency | undefined => {
+  return currencies.find((currency: ICurrency) => currency.chain === chain)
+}
+
 export default currencies

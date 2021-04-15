@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 // Config
-import { getCurrency } from '@config/currencies'
+import { getCurrency, getCurrencyByChain } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
 // Styles
@@ -21,7 +21,7 @@ interface Props {
 const CurrencyLogo: React.FC<Props> = (props) => {
   const { width, height, symbol, br, chain, letter, isToken, background } = props
 
-  const getChainogo = chain ? getCurrency(chain) : null
+  const getChainogo = chain ? getCurrencyByChain(chain) : null
   const currency = isToken && chain ? getToken(symbol, chain) : getCurrency(symbol)
 
   const containerWidth = typeof chain !== 'undefined' ? width + 5 : width
