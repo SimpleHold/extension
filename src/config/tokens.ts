@@ -15,6 +15,10 @@ import markLogo from '@assets/tokens/mark.svg'
 import astaLogo from '@assets/tokens/asta.svg'
 import bnbLogo from '@assets/tokens/bnb.svg'
 
+// Utils
+import { IWallet } from '@utils/wallet'
+import { toLower } from '@utils/format'
+
 export interface IToken {
   address: string
   name: string
@@ -163,6 +167,8 @@ const tokens: IToken[] = [
   },
 ]
 
+export default tokens
+
 export const getToken = (symbol: String, chain: string) => {
   return tokens.find((token: IToken) => token.symbol === symbol && token.chain === chain)
 }
@@ -174,4 +180,23 @@ export const validateContractAddress = (address: string, chain: string): boolean
   return false
 }
 
-export default tokens
+export const checkExistWallet = (
+  walletsList: IWallet[],
+  symbol: string,
+  chain: string
+): boolean => {
+  const getWalletsByChain = walletsList.filter(
+    (wallet: IWallet) => toLower(wallet.symbol) === toLower(chain)
+  )
+
+  if (getWalletsByChain.length) {
+    const getExistWallets = walletsList.filter(
+      (wallet: IWallet) =>
+        toLower(wallet.symbol) === toLower(symbol) && toLower(wallet.chain) === toLower(chain)
+    )
+
+    return getExistWallets.length !== getWalletsByChain.length
+  }
+
+  return false
+}
