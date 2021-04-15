@@ -25,8 +25,24 @@ const EnterPasscode: React.FC = () => {
   const [isError, setIsError] = React.useState<boolean>(false)
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'forgotPasscode'>(null)
 
+  const handleInputFocus = (index: number) => {
+    if (index !== 0) {
+      setIsError(false)
+    }
+  }
+
   React.useEffect(() => {
-    addFormEventsListener()
+    for (let i = 0; i < document.querySelectorAll('input').length; i++) {
+      document.querySelectorAll('input')[i].addEventListener('focus', () => handleInputFocus(i))
+    }
+
+    return () => {
+      for (let i = 0; i < document.querySelectorAll('input').length; i++) {
+        document
+          .querySelectorAll('input')
+          [i].removeEventListener('focus', () => handleInputFocus(i))
+      }
+    }
   }, [])
 
   React.useEffect(() => {
@@ -34,14 +50,6 @@ const EnterPasscode: React.FC = () => {
       checkPasscode()
     }
   }, [passcode])
-
-  const addFormEventsListener = (): void => {
-    for (let i = 0; i < document.querySelectorAll('input').length; i++) {
-      document.querySelectorAll('input')[i].addEventListener('focus', () => {
-        setIsError(false)
-      })
-    }
-  }
 
   const checkPasscode = (): void => {
     const getPasscodeHash = localStorage.getItem('passcode')
@@ -51,6 +59,7 @@ const EnterPasscode: React.FC = () => {
       history.push('/wallets')
     } else {
       setIsError(true)
+      setPasscode('')
 
       logEvent({
         name: PASSCODE_LOCKED_INVALID,
@@ -59,7 +68,9 @@ const EnterPasscode: React.FC = () => {
   }
 
   const onConfirmReset = (): void => {
-    history.push('/lock')
+    history.push('/lock', {
+      status: 'passcodeTurnedOff',
+    })
 
     logEvent({
       name: PASSCODE_LOCKED_FORGOT,

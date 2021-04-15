@@ -68,11 +68,19 @@ const Send: React.FC = () => {
   }, [selectedAddress])
 
   React.useEffect(() => {
-    if (amount.length && Number(balance) > 0 && outputs.length) {
+    if (amount.length && Number(balance) > 0 && outputs.length && !amountErrorLabel) {
       setNetworkFeeLoading(true)
       getNetworkFee()
     }
   }, [debounced])
+
+  React.useEffect(() => {
+    if (networkFee > 0 && !amountErrorLabel) {
+      if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
+        setAmountErrorLabel('Insufficient funds')
+      }
+    }
+  }, [networkFee])
 
   const getOutputs = async (): Promise<void> => {
     const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
@@ -147,12 +155,8 @@ const Send: React.FC = () => {
       setAmountErrorLabel(null)
     }
 
-    if (
-      `${amount}`.length &&
-      balance !== null &&
-      Number(amount) + Number(networkFee) > Number(balance)
-    ) {
-      setAmountErrorLabel('Insufficient funds')
+    if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
+      return setAmountErrorLabel('Insufficient funds')
     }
 
     if (currency) {
@@ -160,7 +164,7 @@ const Send: React.FC = () => {
       const parseMinAmount = new bitcoinLike(symbol).fromSat(currency.minSendAmount)
 
       if (parseAmount < currency.minSendAmount) {
-        setAmountErrorLabel(`Min. amount: ${parseMinAmount} ${toUpper(symbol)}`)
+        return setAmountErrorLabel(`Min. amount: ${parseMinAmount} ${toUpper(symbol)}`)
       }
     }
   }
@@ -242,7 +246,7 @@ const Send: React.FC = () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAddress(e.target.value)}
             errorLabel={addressErrorLabel}
             onBlurInput={onBlurAddressInput}
-            disabled={balance === null || Number(balance) <= 0}
+            disabled={balance === null}
           />
           <TextInput
             label={`Amount (${toUpper(symbol)})`}
@@ -251,7 +255,7 @@ const Send: React.FC = () => {
             type="number"
             errorLabel={amountErrorLabel}
             onBlurInput={onBlurAmountInput}
-            disabled={balance === null || Number(balance) <= 0}
+            disabled={balance === null}
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>

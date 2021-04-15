@@ -12,6 +12,8 @@ import { FIRST_ENTER, SESSION_START } from '@config/events'
 import { validateWallet } from '@utils/validate'
 import { init, logEvent } from '@utils/amplitude'
 
+import { ToastContextProvider } from '@contexts/Toast/Toast'
+
 const App: React.FC = () => {
   React.useEffect(() => {
     initAmplitude()
@@ -58,13 +60,15 @@ const App: React.FC = () => {
   return (
     <>
       <GlobalStyles />
-      <Router initialEntries={[getInitialPage()]}>
-        <Switch>
-          {routes.map((route: RouteProps, index: number) => (
-            <Route key={index} path={route.path} component={route.component} />
-          ))}
-        </Switch>
-      </Router>
+      <ToastContextProvider>
+        <Router initialEntries={[getInitialPage()]}>
+          <Switch>
+            {routes.map((route: RouteProps, index: number) => (
+              <Route key={index} path={route.path} component={route.component} />
+            ))}
+          </Switch>
+        </Router>
+      </ToastContextProvider>
     </>
   )
 }

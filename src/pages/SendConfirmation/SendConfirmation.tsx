@@ -75,7 +75,7 @@ const SendConfirmation: React.FC = () => {
 
         if (findWallet?.privateKey) {
           const parseAmount = new bitcoinLike(symbol).toSat(amount)
-          const parseNetworkFee = new bitcoinLike(symbol).fromSat(networkFee)
+          const parseNetworkFee = new bitcoinLike(symbol).toSat(networkFee)
 
           const transaction: TCreatedTransaction | null = new bitcoinLike(symbol).createTransaction(
             outputs,

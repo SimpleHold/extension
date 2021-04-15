@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { browser, Tabs } from 'webextension-polyfill-ts'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
@@ -22,8 +22,13 @@ import { LOG_OUT_CACHE, PASSWORD_AFTER_LOG_OUT, SUCCESS_ENTER } from '@config/ev
 // Styles
 import Styles from './styles'
 
+interface LocationState {
+  status?: string
+}
+
 const Lock: React.FC = () => {
   const history = useHistory()
+  const { state } = useLocation<LocationState>()
 
   const [password, setPassword] = React.useState<string>('')
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'logout'>(null)
@@ -57,7 +62,9 @@ const Lock: React.FC = () => {
 
           localStorage.removeItem('passcode')
           localStorage.removeItem('isLocked')
-          return history.push('/wallets')
+          return history.push('/wallets', {
+            status: state?.status,
+          })
         }
       }
     }

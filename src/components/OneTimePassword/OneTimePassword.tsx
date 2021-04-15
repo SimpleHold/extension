@@ -15,7 +15,9 @@ const OneTimePassword: React.FC<Props> = (props) => {
 
   React.useEffect(() => {
     if (isError) {
-      document.querySelector<HTMLInputElement>('[aria-label="Digit 6"]')?.blur()
+      document
+        .querySelector<HTMLInputElement>('[aria-label="Please enter verification code. Digit 1"]')
+        ?.focus()
     }
   }, [isError])
 

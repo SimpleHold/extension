@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 
 // Components
 import WalletCard from '@components/WalletCard'
@@ -7,6 +7,7 @@ import CollapsibleHeader from '@components/CollapsibleHeader'
 
 // Hooks
 import useScroll from '@hooks/useScroll'
+import useToastContext from '@hooks/useToastContext'
 
 // Utils
 import { IWallet, getWallets } from '@utils/wallet'
@@ -18,8 +19,14 @@ import { ADD_ADDRESS, BALANCE_CHANGED } from '@config/events'
 // Styles
 import Styles from './styles'
 
+interface LocationState {
+  status?: string
+}
+
 const Wallets: React.FC = () => {
   const history = useHistory()
+  const { state } = useLocation<LocationState>()
+
   const [wallets, setWallets] = React.useState<null | IWallet[]>(null)
   const [totalBalance, setTotalBalance] = React.useState<number | null>(null)
   const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
@@ -29,10 +36,17 @@ const Wallets: React.FC = () => {
   const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
 
   const { scrollPosition } = useScroll()
+  const addToast = useToastContext()
 
   React.useEffect(() => {
     getWalletsList()
   }, [])
+
+  React.useEffect(() => {
+    if (state?.status === 'passcodeTurnedOff') {
+      addToast('Your passcode is disabled now. You can turn it on in settings.')
+    }
+  }, [state])
 
   React.useEffect(() => {
     if (walletsBalance.length === wallets?.length && totalBalance === null) {
