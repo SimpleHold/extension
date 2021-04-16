@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
 import { browser, Tabs } from 'webextension-polyfill-ts'
+import numeral from 'numeral'
 
 // Components
 import Cover from '@components/Cover'
@@ -12,19 +13,22 @@ import DropDown from '@components/DropDown'
 import Skeleton from '@components/Skeleton'
 import QRCode from '@components/QRCode'
 import CopyToClipboard from '@components/CopyToClipboard'
+import PendingBalance from '@components/PendingBalance'
 
-// Modals
-import ConfirmShowingPrivateKeyModal from '@modals/ConfirmShowingPrivateKey'
-import ShowPrivateKeyModal from '@modals/ShowPrivateKey'
+// Drawers
+import ConfirmDrawer from '@drawers/Confirm'
+import ShowPrivateKeyDrawer from '@drawers/ShowPrivateKey'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
 
 // Utils
-import { getBalance } from '@utils/bitcoin'
-import { limitBalance, price, toUpper } from '@utils/format'
+import { getBalance } from '@utils/api'
+import { price, toUpper, toLower } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
-import { getLatestBalance, updateBalance } from '@utils/wallet'
+import { validatePassword } from '@utils/validate'
+import { decrypt } from '@utils/crypto'
+import { IWallet } from '@utils/wallet'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
@@ -40,21 +44,25 @@ interface LocationState {
   currency: string
   symbol: string
   address: string
+  chain: string
 }
 
 const Receive: React.FC = () => {
   const {
-    state: { currency, symbol, address },
+    state: { currency, symbol, address, chain },
   } = useLocation<LocationState>()
 
   const history = useHistory()
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
-  const [activeModal, setActiveModal] = React.useState<null | string>(null)
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false)
   const [balance, setBalance] = React.useState<null | number>(null)
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'privateKey'>(null)
+  const [password, setPassword] = React.useState<string>('')
+  const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
+  const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
 
   React.useEffect(() => {
     logEvent({
@@ -78,20 +86,16 @@ const Receive: React.FC = () => {
     history.push('/send', {
       symbol,
       address,
+      chain,
     })
   }
 
   const loadBalance = async (): Promise<void> => {
-    const fetchBalance = await getBalance(address)
+    const { balance, balance_usd, pending } = await getBalance(address, chain)
 
-    if (fetchBalance !== null) {
-      setBalance(fetchBalance.balance)
-      setEstimated(fetchBalance.balance_usd)
-      updateBalance(address, fetchBalance.balance)
-    } else {
-      const latestbalance = getLatestBalance(address)
-      setBalance(latestbalance)
-    }
+    setBalance(balance)
+    setEstimated(balance_usd)
+    setPendingBalance(pending)
   }
 
   const openWebPage = (url: string): Promise<Tabs.Tab> => {
@@ -102,9 +106,9 @@ const Receive: React.FC = () => {
     setIsVisible(false)
 
     if (index === 0) {
-      setActiveModal('confirmShowPrivateKey')
+      setActiveDrawer('confirm')
     } else if (index === 1) {
-      openWebPage(`https://blockchair.com/bitcoin/address/${address}`)
+      openWebPage(`https://blockchair.com/${chain}/address/${address}`)
     }
   }
 
@@ -118,15 +122,38 @@ const Receive: React.FC = () => {
     }
   }
 
-  const onSuccessConfirm = (addressPrivateKey: string) => {
-    setPrivateKey(addressPrivateKey)
-    setActiveModal('showPrivateKey')
-  }
-
   const onCopyAddress = (): void => {
     logEvent({
       name: ADDRESS_COPY,
     })
+  }
+
+  const onConfirmModal = (): void => {
+    if (passwordErrorLabel) {
+      setPasswordErrorLabel(null)
+    }
+
+    if (validatePassword(password)) {
+      const backup = localStorage.getItem('backup')
+
+      if (backup?.length) {
+        const decryptBackup = decrypt(backup, password)
+
+        if (decryptBackup) {
+          const parseBackup = JSON.parse(decryptBackup)
+          const findWallet = parseBackup?.wallets?.find(
+            (wallet: IWallet) => toLower(wallet.address) === toLower(address)
+          )
+
+          if (findWallet) {
+            setPrivateKey(findWallet.privateKey)
+            return setActiveDrawer('privateKey')
+          }
+        }
+      }
+    }
+
+    return setPasswordErrorLabel('Password is not valid')
   }
 
   return (
@@ -170,38 +197,56 @@ const Receive: React.FC = () => {
               <CurrencyLogo symbol={symbol} width={22} height={22} />
               <Styles.CurrencyName>{currency}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
-            {balance !== null ? (
+
+            <Skeleton width={250} height={36} mt={10} type="gray" isLoading={balance === null}>
               <Styles.Balance>
-                {limitBalance(balance, 12)} {toUpper(symbol)}
+                {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
               </Styles.Balance>
-            ) : (
-              <Skeleton width={250} height={36} mt={10} type="gray" />
-            )}
-            {estimated !== null ? (
-              <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
-            ) : (
-              <Skeleton width={130} height={23} mt={5} type="gray" />
-            )}
+            </Skeleton>
+
+            <Skeleton
+              width={130}
+              height={23}
+              mt={5}
+              mb={10}
+              type="gray"
+              isLoading={estimated === null}
+            >
+              {estimated !== null ? (
+                <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
+              ) : null}
+            </Skeleton>
+
+            {pendingBalance !== null && Number(pendingBalance) !== 0 ? (
+              <PendingBalance btcValue={pendingBalance} type="gray" symbol={symbol} />
+            ) : null}
           </Styles.Row>
+
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />
-            <CopyToClipboard value={address} mb={40} onCopy={onCopyAddress}>
+            <CopyToClipboard value={address} mb={20} onCopy={onCopyAddress}>
               <Styles.Address>{address}</Styles.Address>
             </CopyToClipboard>
             <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} />
           </Styles.ReceiveBlock>
         </Styles.Container>
       </Styles.Wrapper>
-      <ConfirmShowingPrivateKeyModal
-        isActive={activeModal === 'confirmShowPrivateKey'}
-        onClose={() => setActiveModal(null)}
-        address={address}
-        onSuccess={onSuccessConfirm}
+      <ConfirmDrawer
+        isActive={activeDrawer === 'confirm'}
+        onClose={() => setActiveDrawer(null)}
+        title="Confirm showing private key"
+        isButtonDisabled={!validatePassword(password)}
+        onConfirm={onConfirmModal}
+        textInputValue={password}
+        onChangeText={setPassword}
+        inputLabel="Enter password"
+        textInputType="password"
+        inputErrorLabel={passwordErrorLabel}
       />
-      <ShowPrivateKeyModal
-        isActive={activeModal === 'showPrivateKey'}
+      <ShowPrivateKeyDrawer
+        isActive={activeDrawer === 'privateKey'}
         onClose={() => {
-          setActiveModal(null)
+          setActiveDrawer(null)
           setPrivateKey(null)
         }}
         privateKey={privateKey}

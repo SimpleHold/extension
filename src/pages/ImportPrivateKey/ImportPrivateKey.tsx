@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
+import { v4 } from 'uuid'
 
 // Components
 import Cover from '@components/Cover'
@@ -8,54 +9,97 @@ import Link from '@components/Link'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
-// Modals
-import ConfirmAddNewAddressModal from '@modals/ConfirmAddNewAddress'
+// Drawers
+import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
-import { validateBitcoinPrivateKey } from '@utils/validate'
-import { checkExistWallet } from '@utils/wallet'
+import { validatePassword } from '@utils/validate'
+import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
+import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
+import { decrypt, encrypt } from '@utils/crypto'
+import { setUserProperties } from '@utils/amplitude'
+import { toUpper } from '@utils/format'
 
 // Styles
 import Styles from './styles'
 
+interface LocationState {
+  symbol: TSymbols
+}
+
 const ImportPrivateKey: React.FC = () => {
   const [privateKey, setPrivateKey] = React.useState<string>('')
-  const [activeModal, setActiveModal] = React.useState<null | string>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+  const [password, setPassword] = React.useState<string>('')
 
   const history = useHistory()
+  const {
+    state: { symbol },
+  } = useLocation<LocationState>()
+
+  const textInputRef = React.useRef<HTMLInputElement>(null)
+
+  React.useEffect(() => {
+    textInputRef.current?.focus()
+  }, [])
 
   const onConfirm = (): void => {
     if (errorLabel) {
       setErrorLabel(null)
     }
 
-    const validate = validateBitcoinPrivateKey(privateKey)
+    const getAddress = new bitcoinLike(symbol).import(privateKey)
 
-    if (validate) {
-      const getAddress = window.importAddress(privateKey)
+    if (getAddress) {
+      const checkExist = checkExistWallet(getAddress)
 
-      if (getAddress) {
-        const checkExist = checkExistWallet(getAddress)
-
-        if (checkExist) {
-          return setErrorLabel('This address has already been added')
-        }
-        return setActiveModal('confirmAddAddress')
+      if (checkExist) {
+        return setErrorLabel('This address has already been added')
       }
+      return setActiveDrawer('confirm')
     }
 
     return setErrorLabel('Invalid private key')
   }
 
-  const onSuccess = (password: string): void => {
-    setActiveModal(null)
-    localStorage.setItem('backupStatus', 'notDownloaded')
+  const onConfirmDrawer = (): void => {
+    const backup = localStorage.getItem('backup')
 
-    history.push('/download-backup', {
-      password,
-      from: 'privateKey',
-    })
+    if (backup && privateKey) {
+      const decryptBackup = decrypt(backup, password)
+      if (decryptBackup) {
+        const parseBackup = JSON.parse(decryptBackup)
+        const address = new bitcoinLike(symbol).import(privateKey)
+
+        if (address) {
+          const uuid = v4()
+          const newWalletsList = addNewWallet(address, symbol, uuid)
+          parseBackup.wallets.push({
+            symbol,
+            address,
+            uuid,
+            privateKey,
+          })
+          if (newWalletsList) {
+            localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+            localStorage.setItem('wallets', newWalletsList)
+            localStorage.setItem('backupStatus', 'notDownloaded')
+
+            const walletAmount = JSON.parse(newWalletsList).filter(
+              (wallet: IWallet) => wallet.symbol === symbol
+            ).length
+            setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
+
+            return history.push('/download-backup', {
+              password,
+              from: 'privateKey',
+            })
+          }
+        }
+      }
+    }
+    return setErrorLabel('Password is not valid')
   }
 
   return (
@@ -84,6 +128,7 @@ const ImportPrivateKey: React.FC = () => {
                 setPrivateKey(e.target.value)
               }
               errorLabel={errorLabel}
+              inputRef={textInputRef}
             />
             <Styles.Actions>
               <Button label="Back" isLight onClick={history.goBack} mr={7.5} />
@@ -92,11 +137,17 @@ const ImportPrivateKey: React.FC = () => {
           </Styles.Form>
         </Styles.Container>
       </Styles.Wrapper>
-      <ConfirmAddNewAddressModal
-        isActive={activeModal === 'confirmAddAddress'}
-        onClose={() => setActiveModal(null)}
-        privateKey={privateKey}
-        onSuccess={onSuccess}
+      <ConfirmDrawer
+        isActive={activeDrawer === 'confirm'}
+        onClose={() => setActiveDrawer(null)}
+        title="Confirm adding new address"
+        inputLabel="Enter password"
+        textInputValue={password}
+        isButtonDisabled={!validatePassword(password)}
+        onConfirm={onConfirmDrawer}
+        onChangeText={setPassword}
+        textInputType="password"
+        inputErrorLabel={errorLabel}
       />
     </>
   )

@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import numeral from 'numeral'
 
 // Components
 import Cover from '@components/Cover'
@@ -13,13 +14,13 @@ import Spinner from '@components/Spinner'
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
-import { getBalance, getUnspentOutputs, getFees, IBitcoreUnspentOutput } from '@utils/bitcoin'
-import { validateBitcoinAddress, validateNumbersDot } from '@utils/validate'
+import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import { getLatestBalance, updateBalance } from '@utils/wallet'
+import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
+import { getCurrency } from '@config/currencies'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -28,15 +29,18 @@ import useDebounce from '@hooks/useDebounce'
 import Styles from './styles'
 
 interface LocationState {
-  symbol: string
+  symbol: TSymbols
   address: string
+  chain: string
 }
 
 const Send: React.FC = () => {
   const history = useHistory()
   const {
-    state: { symbol, address: locationAddress },
+    state: { symbol, address: locationAddress, chain },
   } = useLocation<LocationState>()
+
+  const currency = getCurrency(symbol)
 
   const [address, setAddress] = React.useState<string>('')
   const [amount, setAmount] = React.useState<string>('')
@@ -47,8 +51,8 @@ const Send: React.FC = () => {
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
-  const [outputs, setOutputs] = React.useState<IBitcoreUnspentOutput[]>([])
-  const [utxosList, setUtxosList] = React.useState<IBitcoreUnspentOutput[]>([])
+  const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
 
   const debounced = useDebounce(amount, 1000)
@@ -63,39 +67,33 @@ const Send: React.FC = () => {
   }, [selectedAddress])
 
   React.useEffect(() => {
-    if (amount.length && Number(balance) > 0 && outputs.length) {
+    if (amount.length && Number(balance) > 0 && outputs.length && !amountErrorLabel) {
       setNetworkFeeLoading(true)
       getNetworkFee()
     }
   }, [debounced])
 
+  React.useEffect(() => {
+    if (networkFee > 0 && !amountErrorLabel) {
+      if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
+        setAmountErrorLabel('Insufficient funds')
+      }
+    }
+  }, [networkFee])
+
   const getOutputs = async (): Promise<void> => {
-    const unspentOutputs = await getUnspentOutputs(selectedAddress)
+    const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
     setOutputs(unspentOutputs)
   }
 
   const getNetworkFee = async (): Promise<void> => {
-    const fee = await getFees()
+    const fee = await getFees(chain)
     setUtxosList([])
 
-    const sortOutputs = outputs.sort((a, b) => a.satoshis - b.satoshis)
-    const utxos: IBitcoreUnspentOutput[] = []
-
-    for (const output of sortOutputs) {
-      const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-      const transactionFeeBytes = window.getTransactionSize(utxos) * fee
-
-      if (getUtxosValue >= window.btcToSat(Number(amount)) + transactionFeeBytes) {
-        break
-      }
-
-      utxos.push(output)
-    }
+    const { networkFee, utxos } = new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
 
     setUtxosList(utxos)
-
-    const transactionFeeBytes = window.getTransactionSize(utxos)
-    setNetworkFee((transactionFeeBytes * fee) / 100000000)
+    setNetworkFee(networkFee)
     setNetworkFeeLoading(false)
   }
 
@@ -114,15 +112,11 @@ const Send: React.FC = () => {
     setBalance(null)
     setEstimated(null)
 
-    const fetchBalance = await getBalance(selectedAddress)
+    if (currency) {
+      const { balance, balance_usd } = await getBalance(selectedAddress, currency?.chain)
 
-    if (fetchBalance !== null) {
-      setBalance(fetchBalance.balance)
-      setEstimated(fetchBalance.balance_usd)
-      updateBalance(selectedAddress, fetchBalance.balance)
-    } else {
-      const latestbalance = getLatestBalance(address)
-      setBalance(latestbalance)
+      setBalance(balance)
+      setEstimated(balance_usd)
     }
   }
 
@@ -146,7 +140,7 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (address.length && !validateBitcoinAddress(address)) {
+    if (address.length && !new bitcoinLike(symbol).validate(address)) {
       setAddressErrorLabel('Address is not valid')
     }
 
@@ -160,26 +154,23 @@ const Send: React.FC = () => {
       setAmountErrorLabel(null)
     }
 
-    if (
-      `${amount}`.length &&
-      balance !== null &&
-      Number(amount) + Number(networkFee) > Number(balance)
-    ) {
-      setAmountErrorLabel('Insufficient funds')
+    if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
+      return setAmountErrorLabel('Insufficient funds')
     }
-  }
 
-  const onChangeAmount = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { value } = e.target
+    if (currency) {
+      const parseAmount = new bitcoinLike(symbol).toSat(Number(amount))
+      const parseMinAmount = new bitcoinLike(symbol).fromSat(currency.minSendAmount)
 
-    if (validateNumbersDot(value)) {
-      setAmount(value)
+      if (parseAmount < currency.minSendAmount) {
+        return setAmountErrorLabel(`Min. amount: ${parseMinAmount} ${toUpper(symbol)}`)
+      }
     }
   }
 
   const isButtonDisabled = (): boolean => {
     return (
-      !validateBitcoinAddress(address) ||
+      !new bitcoinLike(symbol).validate(address) ||
       !amount.length ||
       Number(amount) <= 0 ||
       !outputs.length ||
@@ -206,17 +197,14 @@ const Send: React.FC = () => {
       <Styles.Container>
         <Styles.Row>
           <Styles.PageTitle>Send</Styles.PageTitle>
-          {balance !== null ? (
-            <Styles.Balance>{`${balance} ${toUpper(symbol)}`}</Styles.Balance>
-          ) : (
-            <Skeleton width={250} height={42} type="gray" mt={21} />
-          )}
-
-          {estimated !== null ? (
+          <Skeleton width={250} height={42} type="gray" mt={21} isLoading={balance === null}>
+            <Styles.Balance>
+              {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
+            </Styles.Balance>
+          </Skeleton>
+          <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
             <Styles.USDEstimated>{`$${price(estimated, 2)} USD`}</Styles.USDEstimated>
-          ) : (
-            <Skeleton width={130} height={23} mt={5} type="gray" />
-          )}
+          </Skeleton>
         </Styles.Row>
         <Styles.Form>
           {addresses?.length ? (
@@ -234,14 +222,16 @@ const Send: React.FC = () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAddress(e.target.value)}
             errorLabel={addressErrorLabel}
             onBlurInput={onBlurAddressInput}
+            disabled={balance === null}
           />
           <TextInput
             label={`Amount (${toUpper(symbol)})`}
             value={amount}
-            onChange={onChangeAmount}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAmount(e.target.value)}
             type="number"
             errorLabel={amountErrorLabel}
             onBlurInput={onBlurAmountInput}
+            disabled={balance === null}
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>

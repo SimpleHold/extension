@@ -22,6 +22,7 @@ const Title = styled.p`
   font-size: 23px;
   line-height: 27px;
   color: #1d1d22;
+  text-align: center;
 `
 
 const Form = styled.form`
@@ -40,6 +41,7 @@ const Link = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: #3fbb7d;
+  text-align: center;
 
   &:hover {
     cursor: pointer;

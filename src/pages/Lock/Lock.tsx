@@ -1,14 +1,14 @@
 import * as React from 'react'
 import { browser, Tabs } from 'webextension-polyfill-ts'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 
-// Modals
-import ConfirmLogoutModal from '@modals/ConfirmLogout'
+// Drawers
+import LogoutDrawer from '@drawers/Logout'
 
 // Utils
 import { decrypt } from '@utils/crypto'
@@ -22,18 +22,27 @@ import { LOG_OUT_CACHE, PASSWORD_AFTER_LOG_OUT, SUCCESS_ENTER } from '@config/ev
 // Styles
 import Styles from './styles'
 
+interface LocationState {
+  status?: string
+}
+
 const Lock: React.FC = () => {
   const history = useHistory()
+  const { state } = useLocation<LocationState>()
+
+  const [password, setPassword] = React.useState<string>('')
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'logout'>(null)
+  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+
+  const textInputRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
     logEvent({
       name: PASSWORD_AFTER_LOG_OUT,
     })
-  }, [])
 
-  const [password, setPassword] = React.useState<string>('')
-  const [activeModal, setActiveModal] = React.useState<null | string>(null)
-  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+    textInputRef.current?.focus()
+  }, [])
 
   const onUnlock = (): void => {
     if (errorLabel) {
@@ -51,8 +60,11 @@ const Lock: React.FC = () => {
             name: SUCCESS_ENTER,
           })
 
+          localStorage.removeItem('passcode')
           localStorage.removeItem('isLocked')
-          return history.push('/wallets')
+          return history.push('/wallets', {
+            status: state?.status,
+          })
         }
       }
     }
@@ -65,11 +77,11 @@ const Lock: React.FC = () => {
   }
 
   const onLogout = (): void => {
-    setActiveModal('logout')
+    setActiveDrawer('logout')
   }
 
   const onConfirmLogout = () => {
-    setActiveModal(null)
+    setActiveDrawer(null)
     const backup = localStorage.getItem('backup')
 
     if (backup) {
@@ -103,6 +115,7 @@ const Lock: React.FC = () => {
                 setPassword(e.target.value)
               }
               errorLabel={errorLabel}
+              inputRef={textInputRef}
             />
             <Styles.Actions>
               <Button label="Unlock" onClick={onUnlock} disabled={!validatePassword(password)} />
@@ -110,16 +123,16 @@ const Lock: React.FC = () => {
           </Styles.Form>
 
           <Styles.Links>
+            <Styles.Link onClick={onLogout}>Download backup and log out</Styles.Link>
             <Styles.Link onClick={() => openWebPage('https://simplehold.io/about')}>
               Contact to support
             </Styles.Link>
-            <Styles.Link onClick={onLogout}>Download backup and log out</Styles.Link>
           </Styles.Links>
         </Styles.Container>
       </Styles.Wrapper>
-      <ConfirmLogoutModal
-        isActive={activeModal === 'logout'}
-        onClose={() => setActiveModal(null)}
+      <LogoutDrawer
+        isActive={activeDrawer === 'logout'}
+        onClose={() => setActiveDrawer(null)}
         onConfirm={onConfirmLogout}
       />
     </>

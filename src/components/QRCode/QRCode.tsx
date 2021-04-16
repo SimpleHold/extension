@@ -18,6 +18,7 @@ const QRCode: React.FC<Props> = (props) => {
       bgColor="#F8F8F8"
       qrStyle="dots"
       value={value}
+      quietZone={0}
     />
   )
 }

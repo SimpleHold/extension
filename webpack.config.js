@@ -101,7 +101,6 @@ module.exports = {
       },
     ],
   },
-
   plugins: [
     new Dotenv(),
     new WextManifestWebpackPlugin(),
@@ -134,7 +133,6 @@ module.exports = {
     }),
     extensionReloaderPlugin,
   ],
-
   optimization: {
     minimize: true,
     minimizer: [

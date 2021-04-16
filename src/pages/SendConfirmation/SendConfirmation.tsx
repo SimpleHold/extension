@@ -1,22 +1,24 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import numeral from 'numeral'
 
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 import Button from '@components/Button'
 
-// Modals
-import ConfirmModal from '@modals/Confirm'
-import SuccessSendModal from '@modals/SuccessSend'
+// Drawers
+import ConfirmDrawer from '@drawers/Confirm'
+import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { IRawTransaction, IBitcoreUnspentOutput, sendRawTransaction } from '@utils/bitcoin'
+import { IRawTransaction, sendRawTransaction } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
+import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
 
 // Config
 import {
@@ -25,17 +27,18 @@ import {
   ADDRESS_SEND_PASSWORD,
   ADDRESS_SEND_PASSWORD_CANCEL,
 } from '@config/events'
+import { getCurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
 
 interface LocationState {
   amount: number
-  symbol: string
+  symbol: TSymbols
   networkFee: number
   addressFrom: string
   addressTo: string
-  outputs: IBitcoreUnspentOutput[]
+  outputs: UnspentOutput[]
 }
 
 const SendConfirmation: React.FC = () => {
@@ -44,7 +47,9 @@ const SendConfirmation: React.FC = () => {
     state: { amount, symbol, networkFee, addressFrom, addressTo, outputs },
   } = useLocation<LocationState>()
 
-  const [activeModal, setActiveModal] = React.useState<null | 'confirmSending' | 'success'>(null)
+  const currency = getCurrency(symbol)
+
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
   const [rawTransaction, setRawTransaction] = React.useState<null | IRawTransaction>(null)
@@ -69,21 +74,24 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
-          const transaction: IRawTransaction | null = window.createTransaction(
+          const parseAmount = new bitcoinLike(symbol).toSat(amount)
+          const parseNetworkFee = new bitcoinLike(symbol).toSat(networkFee)
+
+          const transaction: TCreatedTransaction | null = new bitcoinLike(symbol).createTransaction(
             outputs,
             addressTo,
-            window.btcToSat(amount),
-            window.btcToSat(networkFee),
+            parseAmount,
+            parseNetworkFee,
             addressFrom,
             findWallet.privateKey
           )
 
           if (transaction?.hash && transaction?.raw) {
-            const sendTransaction = await sendRawTransaction(transaction.raw)
+            const sendTransaction = await sendRawTransaction(transaction.raw, symbol)
 
             if (sendTransaction === transaction.hash) {
               setRawTransaction(transaction)
-              return setActiveModal('success')
+              return setActiveDrawer('success')
             }
           }
 
@@ -108,7 +116,7 @@ const SendConfirmation: React.FC = () => {
       name: ADDRESS_SEND_CONFIRM,
     })
 
-    setActiveModal('confirmSending')
+    setActiveDrawer('confirm')
   }
 
   const onCloseConfirmModal = (): void => {
@@ -116,16 +124,7 @@ const SendConfirmation: React.FC = () => {
       name: ADDRESS_SEND_PASSWORD_CANCEL,
     })
 
-    setActiveModal(null)
-  }
-
-  const clearModalStats = (): void => {
-    if (inputErrorLabel) {
-      setInputErrorLabel(null)
-    }
-    if (password) {
-      setPassword('')
-    }
+    setActiveDrawer(null)
   }
 
   return (
@@ -141,15 +140,17 @@ const SendConfirmation: React.FC = () => {
             <Styles.OrderCheck>
               <Styles.List>
                 <Styles.ListTitle>Amount:</Styles.ListTitle>
-                <Styles.ListText>
-                  {Number(amount).toFixed(8)} {toUpper(symbol)}
-                </Styles.ListText>
+                <Styles.ListRow>
+                  <Styles.Amount>{numeral(amount).format('0.[00000000]')}</Styles.Amount>
+                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                </Styles.ListRow>
               </Styles.List>
               <Styles.List>
                 <Styles.ListTitle>Network fee:</Styles.ListTitle>
-                <Styles.ListText>
-                  {Number(networkFee).toFixed(8)} {toUpper(symbol)}
-                </Styles.ListText>
+                <Styles.ListRow>
+                  <Styles.Amount>{numeral(networkFee).format('0.[00000000]')}</Styles.Amount>
+                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                </Styles.ListRow>
               </Styles.List>
 
               <Styles.DashedDivider>
@@ -158,9 +159,12 @@ const SendConfirmation: React.FC = () => {
 
               <Styles.List>
                 <Styles.ListTitle>Total:</Styles.ListTitle>
-                <Styles.ListText>
-                  {Number(amount + networkFee).toFixed(8)} {toUpper(symbol)}
-                </Styles.ListText>
+                <Styles.ListRow>
+                  <Styles.Amount>
+                    {numeral(amount + networkFee).format('0.[00000000]')}
+                  </Styles.Amount>
+                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                </Styles.ListRow>
               </Styles.List>
             </Styles.OrderCheck>
 
@@ -182,26 +186,24 @@ const SendConfirmation: React.FC = () => {
         </Styles.Container>
       </Styles.Wrapper>
 
-      <ConfirmModal
-        isActive={activeModal === 'confirmSending'}
+      <ConfirmDrawer
+        isActive={activeDrawer === 'confirm'}
         onClose={onCloseConfirmModal}
         title="Confirm sending"
         inputLabel="Enter password"
-        inputType="password"
-        inputValue={password}
+        textInputType="password"
+        textInputValue={password}
         inputErrorLabel={inputErrorLabel}
-        onChangeInput={(e: React.ChangeEvent<HTMLInputElement>): void =>
-          setPassword(e.target.value)
-        }
-        isDisabledConfirmButton={!validatePassword(password)}
+        onChangeText={setPassword}
+        isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirmModal}
-        clearState={clearModalStats}
       />
 
-      <SuccessSendModal
-        isActive={activeModal === 'success'}
-        onClose={() => setActiveModal(null)}
-        transactionHash={rawTransaction?.hash}
+      <SuccessDrawer
+        isActive={activeDrawer === 'success'}
+        onClose={() => setActiveDrawer(null)}
+        text="Your transaction has successfully sent. You can check it here:"
+        link={`https://blockchair.com/${currency?.chain}/transaction/${rawTransaction?.hash}`}
       />
     </>
   )

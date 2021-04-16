@@ -47,9 +47,10 @@
           "@components": "./src/components",
           "@assets": "./src/assets",
           "@utils": "./src/utils",
-          "@modals": "./src/modals",
           "@hooks": "./src/hooks",
-          "@config": "./src/config"
+          "@config": "./src/config",
+          "@drawers": "./src/drawers",
+          "@contexts": "./src/contexts"
         }
       }
     ]

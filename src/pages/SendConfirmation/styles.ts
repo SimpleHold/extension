@@ -134,6 +134,21 @@ const DestinateText = styled.p`
   white-space: nowrap;
 `
 
+const ListRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const Amount = styled.p`
+  margin: 0;
+  width: 90px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -151,6 +166,8 @@ const Styles = {
   Destinate,
   DestinateTitle,
   DestinateText,
+  ListRow,
+  Amount,
 }
 
 export default Styles

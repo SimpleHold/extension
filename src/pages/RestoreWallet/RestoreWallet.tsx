@@ -8,15 +8,18 @@ import Header from '@components/Header'
 import Button from '@components/Button'
 import AgreeTerms from '@components/AgreeTerms'
 
-// Modals
-import RestoreWalletPasswordModal from '@modals/RestoreWalletPassword'
-import FailModal from '@modals/Fail'
+// Drawers
+import ConfirmDrawer from '@drawers/Confirm'
+import FailDrawer from '@drawers/Fail'
 
 // Utils
 import { logEvent } from '@utils/amplitude'
+import { validatePassword } from '@utils/validate'
+import { decrypt } from '@utils/crypto'
+import { validate as validateBackup } from '@utils/backup'
 
 // Config
-import { START_RESTORE_CONFIRM } from '@config/events'
+import { START_RESTORE_CONFIRM, START_RESTORE_PASSWORD } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -27,8 +30,10 @@ const RestoreWallet: React.FC = () => {
   const [isInvalidFile, setInvalidFile] = React.useState<boolean>(false)
   const [fileName, setFileName] = React.useState<null | string>(null)
   const [backupData, setBackupData] = React.useState<null | string>(null)
-  const [activeWallet, setActiveWallet] = React.useState<null | 'enterPassword' | 'error'>(null)
   const [isAgreed, setIsAgreed] = React.useState<boolean>(true)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'fail'>(null)
+  const [password, setPassword] = React.useState<string>('')
+  const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
 
   const onDrop = React.useCallback(async (acceptedFiles) => {
     const text = await acceptedFiles[0]?.text()
@@ -47,15 +52,39 @@ const RestoreWallet: React.FC = () => {
       name: START_RESTORE_CONFIRM,
     })
 
-    setActiveWallet('enterPassword')
+    setActiveDrawer('confirm')
   }
 
-  const onSuccessRestore = (): void => {
-    history.push('/wallets')
-  }
+  const onConfirmRestore = (): void => {
+    logEvent({
+      name: START_RESTORE_PASSWORD,
+    })
 
-  const onErrorRestore = (): void => {
-    setActiveWallet('error')
+    if (passwordErrorLabel) {
+      setPasswordErrorLabel(null)
+    }
+
+    if (!validatePassword(password)) {
+      return setPasswordErrorLabel('Password is not valid')
+    }
+
+    if (backupData) {
+      const decryptBackup = decrypt(backupData, password)
+
+      if (decryptBackup === null) {
+        setPasswordErrorLabel('Password is not valid')
+      } else {
+        const getWalletsList = validateBackup(decryptBackup)
+
+        if (getWalletsList) {
+          localStorage.setItem('backup', backupData)
+          localStorage.setItem('wallets', getWalletsList)
+          history.push('/wallets')
+        } else {
+          setActiveDrawer('fail')
+        }
+      }
+    }
   }
 
   return (
@@ -118,16 +147,21 @@ const RestoreWallet: React.FC = () => {
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>
-      <RestoreWalletPasswordModal
-        isActive={activeWallet === 'enterPassword'}
-        onClose={() => setActiveWallet(null)}
-        backupData={backupData}
-        onSuccess={onSuccessRestore}
-        onError={onErrorRestore}
+      <ConfirmDrawer
+        isActive={activeDrawer === 'confirm'}
+        onClose={() => setActiveDrawer(null)}
+        title="Enter your password to restore wallet"
+        textInputValue={password}
+        onChangeText={setPassword}
+        onConfirm={onConfirmRestore}
+        textInputType="password"
+        inputLabel="Enter password"
+        isButtonDisabled={!validatePassword(password)}
+        inputErrorLabel={passwordErrorLabel}
       />
-      <FailModal
-        isActive={activeWallet === 'error'}
-        onClose={() => setActiveWallet(null)}
+      <FailDrawer
+        isActive={activeDrawer === 'fail'}
+        onClose={() => setActiveDrawer(null)}
         text="Backup file is broken. We cannot restore your wallet. Check your backup file and try again."
       />
     </>

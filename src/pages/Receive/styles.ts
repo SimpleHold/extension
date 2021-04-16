@@ -27,7 +27,7 @@ const Container = styled.div`
 
 const ReceiveBlock = styled.div`
   border-top: 1px solid #eaeaea;
-  padding: 16px 30px 40px 30px;
+  padding: 20px 30px 30px 30px;
   background-color: #f8f8f8;
   height: 100%;
   display: flex;
@@ -36,8 +36,9 @@ const ReceiveBlock = styled.div`
 `
 
 const Row = styled.div`
-  padding: 16px 30px 40px 30px;
+  padding: 16px 30px 30px 30px;
   position: relative;
+  height: 230px;
 `
 
 const Heading = styled.div`
@@ -118,11 +119,9 @@ const CurrencyBlock = styled.div`
 
 const CurrencyName = styled.p`
   margin: 0 0 0 10px;
-  font-weight: 500;
   font-size: 16px;
   line-height: 19px;
-  text-transform: uppercase;
-  color: #f7931a;
+  color: #1d1d22;
 `
 
 const Address = styled.p`
@@ -143,7 +142,7 @@ const Balance = styled.p`
 `
 
 const Estimated = styled.p`
-  margin: 5px 0 0 0;
+  margin: 5px 0 10px 0;
   font-size: 20px;
   line-height: 23px;
   color: #7d7e8d;

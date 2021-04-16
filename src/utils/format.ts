@@ -12,7 +12,11 @@ export const toLower = (text: string | null | undefined) => {
   return text
 }
 
-export const numberFriendly = (amount: number): number | string => {
+export const numberFriendly = (amount: number | null): number | string => {
+  if (amount === null) {
+    return '0'
+  }
+
   const abbrev = 'KMB'
 
   const round = (n: number, precision: number) => {
@@ -28,18 +32,11 @@ export const numberFriendly = (amount: number): number | string => {
     : '' + amount.toFixed(2)
 }
 
-export const limitBalance = (amount: number, max: number): string | number => {
-  const stringAmount = amount.toString()
-  if (stringAmount.length > max) {
-    const toFixed = stringAmount.split('.')[0].length + 1
-
-    return Number(amount).toFixed(10 - toFixed)
+export const price = (price: number | null, toFixed = 2): string => {
+  if (price === null) {
+    return Number(0).toFixed(toFixed)
   }
 
-  return amount
-}
-
-export const price = (price: number, toFixed = 2): string => {
   return Number(price)
     .toFixed(toFixed)
     .toString()

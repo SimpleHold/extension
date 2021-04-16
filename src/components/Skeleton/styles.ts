@@ -15,6 +15,7 @@ type TContainerProps = {
   height: number
   mt?: number
   br: number
+  mb?: number
 }
 
 const getBackground = (type: 'light' | 'gray'): string => {
@@ -27,7 +28,8 @@ const getBackground = (type: 'light' | 'gray'): string => {
 const Container = styled.div`
   width: ${({ width }: TContainerProps) => `${width}px`};
   height: ${({ height }: TContainerProps) => `${height}px`};
-  margin-top: ${({ mt }: TContainerProps) => (mt ? `${mt}px` : 0)};
+  margin-top: ${({ mt }: TContainerProps) => (mt ? `${mt}px` : '0')};
+  margin-bottom: ${({ mb }: TContainerProps) => (mb ? `${mb}px` : '0')};
   background: ${({ type }: TContainerProps) => `linear-gradient(${getBackground(type)})`};
   border-radius: ${({ br }: TContainerProps) => `${br}px`};
   animation: ${linearAnimation} 1s infinite linear;

@@ -17,23 +17,14 @@ const Container = styled.div`
 `
 
 const Row = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
   margin: 0 0 0 10px;
 `
 
 const AddressInfo = styled.div`
-  width: 94px;
   overflow: hidden;
-
-  p {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
 `
 
 const Currency = styled.p`
@@ -44,6 +35,8 @@ const Currency = styled.p`
 `
 
 const Address = styled.p`
+  text-overflow: ellipsis;
+  overflow: hidden;
   margin: 9px 0 0 0;
   font-size: 12px;
   line-height: 14px;
@@ -51,20 +44,13 @@ const Address = styled.p`
 `
 
 const Balances = styled.div`
-  width: 106px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-
   p {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
+    text-align: right;
   }
 `
 
 const Balance = styled.p`
+  white-space: pre;
   margin: 0;
   font-weight: 500;
   font-size: 14px;
@@ -79,6 +65,22 @@ const Estimated = styled.p`
   color: #7d7e8d;
 `
 
+const BalanceRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+`
+
+const PendingIcon = styled.div`
+  margin: 0 5px 0 0;
+
+  svg {
+    path {
+      fill: rgba(195, 195, 195, 0.6);
+    }
+  }
+`
+
 const Styles = {
   Container,
   Row,
@@ -88,6 +90,8 @@ const Styles = {
   Balances,
   Balance,
   Estimated,
+  BalanceRow,
+  PendingIcon,
 }
 
 export default Styles

@@ -10,9 +10,10 @@ import AgreeTerms from '@components/AgreeTerms'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { logEvent } from '@utils/amplitude'
+import { logEvent, setUserProperties } from '@utils/amplitude'
 import { generate } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
+import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import { START_PASSWORD } from '@config/events'
@@ -38,13 +39,22 @@ const Wallets: React.FC = () => {
       name: START_PASSWORD,
     })
 
-    const { address, privateKey } = window.generateWallet()
-    const { backup, wallets } = generate(address, privateKey)
-    localStorage.setItem('backup', encrypt(backup, password))
-    localStorage.setItem('wallets', wallets)
-    localStorage.setItem('backupStatus', 'notDownloaded')
+    const geneateAddress = new bitcoinLike('btc').generate()
 
-    history.push('/download-backup')
+    if (geneateAddress) {
+      const { address, privateKey } = geneateAddress
+      const { backup, wallets } = generate(address, privateKey)
+
+      localStorage.setItem('backup', encrypt(backup, password))
+      localStorage.setItem('wallets', wallets)
+      localStorage.setItem('backupStatus', 'notDownloaded')
+
+      setUserProperties({
+        NUMBER_WALLET_BTC: '1',
+      })
+
+      history.push('/download-backup')
+    }
   }
 
   const onBlurPassword = (): void => {
