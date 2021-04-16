@@ -50,16 +50,19 @@ const SelectCurrency: React.FC = () => {
     })
   }
 
-  const onAddToken = (symbol: string, chain: string): void => {
+  const onAddToken = (symbol: string, chain: string, tokenName: string): void => {
     const walletsList = getWallets()
 
     if (walletsList) {
       const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
+      const chainName = toLower(chain) === 'eth' ? 'Ethereum' : 'Binance smart chain' // Fix me
 
       if (checkTokenWallets) {
         return history.push('/add-token-to-address', {
           symbol,
           chain,
+          chainName,
+          tokenName,
         })
       }
 
@@ -111,7 +114,7 @@ const SelectCurrency: React.FC = () => {
               const { name, symbol, chain } = token
 
               return (
-                <Styles.CurrencyBlock key={symbol} onClick={() => onAddToken(symbol, chain)}>
+                <Styles.CurrencyBlock key={symbol} onClick={() => onAddToken(symbol, chain, name)}>
                   <CurrencyLogo
                     symbol={symbol}
                     width={40}

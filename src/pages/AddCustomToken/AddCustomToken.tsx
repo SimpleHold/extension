@@ -43,7 +43,7 @@ const networks: INetwork[] = [
     chain: 'eth',
   },
   {
-    name: 'Binance',
+    name: 'Binance smart chain',
     symbol: 'bnb',
     chain: 'bsc',
   },
@@ -115,12 +115,17 @@ const AddCustomToken: React.FC = () => {
         return history.push('/add-token-to-address', {
           symbol,
           chain,
+          chainName: selectedNetwork.name,
+          tokenName: tokenInfo.name,
+          contractAddress,
         })
       }
 
       return history.push('/new-wallet', {
         symbol,
         chain,
+        tokenName: tokenInfo.name,
+        contractAddress,
       })
     }
   }

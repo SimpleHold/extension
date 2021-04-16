@@ -84,7 +84,7 @@ const currencies: ICurrency[] = [
     minSendAmount: 52850000000000000,
   },
   {
-    name: 'Binance Coin',
+    name: 'Binance Smart Chain',
     symbol: 'bnb',
     logo: binanceLogo,
     background: '#EBBB4E',

@@ -8,6 +8,8 @@ export interface IWallet {
   uuid: string
   privateKey?: string
   chain?: string
+  name?: string
+  contractAddress?: string
 }
 
 export const getWallets = (): IWallet[] | null => {
@@ -67,7 +69,9 @@ export const addNew = (
   address: string,
   symbol: string,
   uuid: string,
-  chain?: string
+  chain?: string,
+  name?: string,
+  contractAddress?: string
 ): string | null => {
   const walletsList = localStorage.getItem('wallets')
   const validateWallets = validateWallet(walletsList)
@@ -80,6 +84,8 @@ export const addNew = (
       address,
       uuid,
       chain,
+      name,
+      contractAddress,
     })
 
     return JSON.stringify(parseWallets)

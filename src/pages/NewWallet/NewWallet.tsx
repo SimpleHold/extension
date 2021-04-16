@@ -30,6 +30,8 @@ interface LocationState {
   warning?: string
   backTitle?: string
   chain?: string
+  tokenName?: string
+  contractAddress?: string
 }
 
 const NewWallet: React.FC = () => {
@@ -40,7 +42,14 @@ const NewWallet: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol, warning = undefined, backTitle = undefined, chain = undefined },
+    state: {
+      symbol,
+      warning = undefined,
+      backTitle = undefined,
+      chain = undefined,
+      tokenName = undefined,
+      contractAddress = undefined,
+    },
   } = useLocation<LocationState>()
 
   const onSuccess = (password: string): void => {
@@ -98,7 +107,14 @@ const NewWallet: React.FC = () => {
 
           if (address) {
             const uuid = v4()
-            const newWalletsList = addNewWallet(address, symbol, uuid, chain)
+            const newWalletsList = addNewWallet(
+              address,
+              symbol,
+              uuid,
+              chain,
+              tokenName,
+              contractAddress
+            )
 
             parseBackup.wallets.push({
               symbol,
@@ -106,6 +122,8 @@ const NewWallet: React.FC = () => {
               uuid,
               privateKey,
               chain,
+              tokenName,
+              contractAddress,
             })
 
             if (newWalletsList) {

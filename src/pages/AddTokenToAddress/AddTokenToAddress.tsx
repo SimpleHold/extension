@@ -23,12 +23,14 @@ import Styles from './styles'
 interface LocationState {
   symbol: string
   chain: string
+  chainName: string
+  tokenName: string
 }
 
 const AddTokenToAddress: React.FC = () => {
   const history = useHistory()
   const {
-    state: { symbol, chain },
+    state: { symbol, chain, chainName, tokenName },
   } = useLocation<LocationState>()
 
   const [chainAddresses, setChainAddresses] = React.useState<string[]>([])
@@ -122,7 +124,7 @@ const AddTokenToAddress: React.FC = () => {
             <Styles.Title>Add to {toUpper(chain)} address</Styles.Title>
             <Styles.Description>
               You are trying to add new ERC20 token address. Do you want to associate one of your
-              Ethereum address with Tether? Press Skip if you want to add new address
+              {chainName} address with {tokenName}? Press Skip if you want to add new address
             </Styles.Description>
 
             <CurrenciesDropdown
