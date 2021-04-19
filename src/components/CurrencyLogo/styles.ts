@@ -8,7 +8,7 @@ type TContainerProps = {
 type TLogoRowProps = {
   width: number
   height: number
-  background: string
+  background?: string
   br?: number
 }
 
