@@ -190,6 +190,10 @@ const Send: React.FC = () => {
     history.goBack()
   }
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+  }
+
   return (
     <Styles.Wrapper>
       <Cover />
@@ -206,7 +210,7 @@ const Send: React.FC = () => {
             <Styles.USDEstimated>{`$${price(estimated, 2)} USD`}</Styles.USDEstimated>
           </Skeleton>
         </Styles.Row>
-        <Styles.Form>
+        <Styles.Form onSubmit={onSubmitForm}>
           {addresses?.length ? (
             <CurrenciesDropdown
               symbol={symbol}
