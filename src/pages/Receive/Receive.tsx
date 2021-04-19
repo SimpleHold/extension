@@ -32,6 +32,7 @@ import { IWallet } from '@utils/wallet'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
+import { getCurrency } from '@config/currencies'
 
 // Icons
 import privateKeyIcon from '@assets/icons/privateKey.svg'
@@ -42,7 +43,7 @@ import plusCircleIcon from '@assets/icons/plusCircle.svg'
 import Styles from './styles'
 
 interface LocationState {
-  currency: string
+  name: string
   symbol: string
   address: string
   chain: string
@@ -50,10 +51,11 @@ interface LocationState {
 
 const Receive: React.FC = () => {
   const {
-    state: { currency, symbol, address, chain },
+    state: { name, symbol, address, chain },
   } = useLocation<LocationState>()
 
   const history = useHistory()
+  const currency = getCurrency(symbol)
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false)
@@ -90,7 +92,7 @@ const Receive: React.FC = () => {
       { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
     ]
 
-    if (['eth', 'bsc'].indexOf(symbol) !== -1) {
+    if (['eth', 'bnb'].indexOf(symbol) !== -1) {
       list.push({
         icon: { source: plusCircleIcon, width: 18, height: 18 },
         title: 'Add token',
@@ -108,12 +110,12 @@ const Receive: React.FC = () => {
     history.push('/send', {
       symbol,
       address,
-      chain,
+      chain: currency?.chain,
     })
   }
 
   const loadBalance = async (): Promise<void> => {
-    const { balance, balance_usd, pending } = await getBalance(address, chain)
+    const { balance, balance_usd, pending } = await getBalance(address, currency?.chain)
 
     setBalance(balance)
     setEstimated(balance_usd)
@@ -130,11 +132,10 @@ const Receive: React.FC = () => {
     if (index === 0) {
       setActiveDrawer('confirm')
     } else if (index === 1) {
-      openWebPage(`https://blockchair.com/${chain}/address/${address}`)
+      openWebPage(`https://blockchair.com/${currency?.chain}/address/${address}`)
     } else if (index === 2) {
       history.push('/select-token', {
-        currencyFrom: currency,
-        chain,
+        chain: currency?.chain,
       })
     }
   }
@@ -215,15 +216,8 @@ const Receive: React.FC = () => {
             />
 
             <Styles.CurrencyBlock>
-              <CurrencyLogo
-                symbol={symbol}
-                width={22}
-                height={22}
-                br={5}
-                chain={chain}
-                isToken={chain !== undefined}
-              />
-              <Styles.CurrencyName>{currency}</Styles.CurrencyName>
+              <CurrencyLogo symbol={symbol} width={22} height={22} br={5} chain={chain} />
+              <Styles.CurrencyName>{name}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
 
             <Skeleton width={250} height={36} mt={10} type="gray" isLoading={balance === null}>

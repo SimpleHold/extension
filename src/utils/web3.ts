@@ -1,8 +1,8 @@
 import Web3 from 'web3'
 
-const web3 = new Web3()
+import config from '@config/index'
 
-export type TWeb3Symbols = 'eth' | 'etc' | 'bnb'
+const web3 = new Web3()
 
 export type Unit =
   | 'noether'
@@ -63,22 +63,25 @@ export const toWei = (value: string, unit: Unit): number => {
 }
 
 export const createTransaction = async (
-  from: string,
   to: string,
   amount: number,
+  gas: number,
+  chainId: number,
+  gasPrice: string,
+  nonce: number,
   privateKey: string
 ): Promise<TCreatedTransaction | null> => {
   try {
-    const { gasLimit } = await web3.eth.getBlock('latest')
-    const gasPrice = await web3.eth.getGasPrice()
+    const value = web3.utils.toWei(`${amount}`, 'ether')
 
     const { rawTransaction, transactionHash } = await web3.eth.accounts.signTransaction(
       {
-        from,
         to,
-        value: web3.utils.toWei(`${amount}`, 'ether'),
-        gas: gasLimit,
-        gasPrice: web3.utils.fromWei(gasPrice, 'gwei'),
+        value,
+        gas,
+        chainId,
+        gasPrice,
+        nonce,
       },
       privateKey
     )

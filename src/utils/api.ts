@@ -27,10 +27,18 @@ export interface ITokensBalance {
   symbol: string
 }
 
+interface Web3TxParams {
+  chainId: number
+  nonce: number
+  gas: number
+  gasPrice: string
+}
+
 export const getBalance = async (
   address: string,
-  chain: string,
-  tokenSymbol?: string
+  chain?: string,
+  tokenSymbol?: string,
+  contractAddress?: string
 ): Promise<IGetBalance> => {
   try {
     const { data }: AxiosResponse = await axios(
@@ -38,6 +46,7 @@ export const getBalance = async (
       {
         params: {
           tokenSymbol,
+          contractAddress,
         },
       }
     )
@@ -140,6 +149,31 @@ export const getTokensBalance = async (
     const { data } = await axios.get(`${config.serverUrl}/contract/balances`, {
       params: {
         address,
+        chain,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const getWeb3TxParams = async (
+  from: string,
+  to: string,
+  value: number,
+  chain: string
+): Promise<Web3TxParams | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/network-fee`, {
+      params: {
+        from,
+        to,
+        value,
         chain,
       },
       headers: {

@@ -126,7 +126,7 @@ const Wallets: React.FC = () => {
       {wallets?.length ? (
         <Styles.WalletsList>
           {wallets.map((wallet: IWallet, index: number) => {
-            const { address, symbol, chain } = wallet
+            const { address, symbol, chain, name, contractAddress } = wallet
 
             return (
               <WalletCard
@@ -134,6 +134,8 @@ const Wallets: React.FC = () => {
                 address={address}
                 chain={chain}
                 symbol={symbol.toLowerCase()}
+                name={name}
+                contractAddress={contractAddress}
                 sumBalance={sumBalance}
                 sumEstimated={sumEstimated}
                 sumPending={sumPending}

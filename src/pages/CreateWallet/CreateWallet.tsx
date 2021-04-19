@@ -32,6 +32,12 @@ const Wallets: React.FC = () => {
     null
   )
 
+  const passwordInputRef = React.useRef<HTMLInputElement>(null)
+
+  React.useEffect(() => {
+    passwordInputRef.current?.focus()
+  }, [])
+
   const isButtonDisabled = password.length < 7 || password !== confirmPassword || !isAgreed
 
   const onConfirm = (): void => {
@@ -102,6 +108,7 @@ const Wallets: React.FC = () => {
             withPasswordVisible
             errorLabel={passwordErrorLabel}
             onBlurInput={onBlurPassword}
+            inputRef={passwordInputRef}
           />
           <TextInput
             label="Confirm password"

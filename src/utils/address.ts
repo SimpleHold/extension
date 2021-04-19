@@ -3,10 +3,21 @@ import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import addressValidate from '@config/addressValidate'
+import { getWeb3TxParams } from '@utils/api'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
-const isEthereumLike = (symbol: TSymbols, chain?: string): boolean => {
+type TGetNetworkFeeResponse = {
+  networkFee?: number
+  networkFeeLabel?: string
+  utxos: UnspentOutput[]
+  chainId?: number
+  gas?: number
+  gasPrice?: string
+  nonce?: number
+}
+
+export const isEthereumLike = (symbol: TSymbols, chain?: string): boolean => {
   return web3Symbols.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
 }
 
@@ -45,10 +56,17 @@ export const createTransaction = async (
   symbol: TSymbols,
   chain?: string,
   outputs?: UnspentOutput[],
-  networkFee?: number
+  networkFee?: number,
+  gas?: number,
+  chainId?: number,
+  gasPrice?: string,
+  nonce?: number
 ): Promise<TCreatedTransaction | null> => {
   if (isEthereumLike(symbol, chain)) {
-    return await web3.createTransaction(from, to, amount, privateKey)
+    if (gas && chainId && gasPrice && nonce) {
+      return await web3.createTransaction(to, amount, gas, chainId, gasPrice, nonce, privateKey)
+    }
+    return null
   }
 
   if (outputs?.length && networkFee) {
@@ -65,17 +83,24 @@ export const createTransaction = async (
   return null
 }
 
-export const getAddressNetworkFee = (
+export const getAddressNetworkFee = async (
   symbol: TSymbols,
   outputs: UnspentOutput[],
   fee: number,
   amount: string,
+  from: string,
+  to: string,
   chain?: string
-) => {
-  if (isEthereumLike(symbol, chain)) {
+): Promise<TGetNetworkFeeResponse | null> => {
+  if (chain && isEthereumLike(symbol, chain)) {
+    const value = web3.toWei(amount, 'ether')
+    const params = await getWeb3TxParams(from, to, value, chain)
+
     return {
-      networkFee: 21000, // Fix me
+      networkFee: params?.gas,
+      networkFeeLabel: 'wei',
       utxos: [],
+      ...params,
     }
   }
   return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)

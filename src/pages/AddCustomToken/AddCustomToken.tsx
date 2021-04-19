@@ -12,6 +12,7 @@ import Skeleton from '@components/Skeleton'
 
 // Config
 import { validateContractAddress, checkExistWallet } from '@config/tokens'
+import networks, { getEthNetwork, IEthNetwork } from '@config/ethLikeNetworks'
 
 // Utils
 import { getContractInfo } from '@utils/api'
@@ -24,36 +25,17 @@ import useToastContext from '@hooks/useToastContext'
 // Styles
 import Styles from './styles'
 
-interface INetwork {
-  name: string
-  symbol: string
-  chain: string
-}
-
 interface IToken {
   name: string
   symbol: string
   decimals: number
 }
 
-const networks: INetwork[] = [
-  {
-    name: 'Ethereum',
-    symbol: 'eth',
-    chain: 'eth',
-  },
-  {
-    name: 'Binance smart chain',
-    symbol: 'bnb',
-    chain: 'bsc',
-  },
-]
-
 const AddCustomToken: React.FC = () => {
   const history = useHistory()
 
   const [contractAddress, setContractAddress] = React.useState<string>('')
-  const [selectedNetwork, setSelectedNetwork] = React.useState<INetwork>(networks[0])
+  const [selectedNetwork, setSelectedNetwork] = React.useState<IEthNetwork>(networks[0])
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [tokenInfo, setTokenInfo] = React.useState<IToken>({
@@ -111,30 +93,25 @@ const AddCustomToken: React.FC = () => {
 
       const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
 
-      if (checkTokenWallets) {
-        return history.push('/add-token-to-address', {
-          symbol,
-          chain,
-          chainName: selectedNetwork.name,
-          tokenName: tokenInfo.name,
-          contractAddress,
-        })
-      }
-
-      return history.push('/new-wallet', {
+      const routeProps = {
         symbol,
         chain,
+        chainName: selectedNetwork.name,
         tokenName: tokenInfo.name,
         contractAddress,
-      })
+      }
+
+      if (checkTokenWallets) {
+        return history.push('/add-token-to-address', routeProps)
+      }
+
+      return history.push('/new-wallet', routeProps)
     }
   }
 
   const onSelectDropdown = (index: number): void => {
     const getNetwork = mapList[index]
-    const getNetworkInfo = networks.find(
-      (network: INetwork) => network.symbol === getNetwork.logo.symbol
-    )
+    const getNetworkInfo = getEthNetwork(getNetwork.logo.symbol)
 
     if (getNetworkInfo) {
       setSelectedNetwork(getNetworkInfo)
@@ -158,10 +135,10 @@ const AddCustomToken: React.FC = () => {
   }
 
   const dropDownList = networks.filter(
-    (network: INetwork) => network.symbol !== selectedNetwork.symbol
+    (network: IEthNetwork) => network.symbol !== selectedNetwork.symbol
   )
 
-  const mapList = dropDownList.map((network: INetwork) => {
+  const mapList = dropDownList.map((network: IEthNetwork) => {
     return {
       logo: {
         symbol: network.symbol,
@@ -196,7 +173,7 @@ const AddCustomToken: React.FC = () => {
               height={40}
               symbol={selectedNetwork.symbol}
               chain={selectedNetwork.chain}
-              letter={tokenInfo.name[0] || 'T'}
+              name={tokenInfo.name || 'T'}
               background="#132BD8"
             />
             <Styles.TokenCardRow>

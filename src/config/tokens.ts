@@ -186,7 +186,7 @@ export const checkExistWallet = (
   chain: string
 ): boolean => {
   const getWalletsByChain = walletsList.filter(
-    (wallet: IWallet) => toLower(wallet.symbol) === toLower(chain)
+    (wallet: IWallet) => toLower(wallet.symbol) === toLower(symbol)
   )
 
   if (getWalletsByChain.length) {

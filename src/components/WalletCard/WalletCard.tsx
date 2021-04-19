@@ -20,13 +20,24 @@ interface Props {
   address: string
   symbol: string
   chain?: string
+  name?: string
+  contractAddress?: string
   sumBalance: (balance: number) => void
   sumEstimated: (estimated: number) => void
   sumPending: (pending: number) => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
-  const { address, symbol, sumBalance, sumEstimated, sumPending, chain } = props
+  const {
+    address,
+    symbol,
+    chain,
+    name,
+    contractAddress,
+    sumBalance,
+    sumEstimated,
+    sumPending,
+  } = props
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
   const history = useHistory()
@@ -40,47 +51,40 @@ const WalletCard: React.FC<Props> = (props) => {
   }, [])
 
   const fetchBalance = async (): Promise<void> => {
-    if (currency) {
-      const tryGetBalance = await getBalance(
-        address,
-        currency?.chain,
-        chain ? currency.symbol : undefined
-      )
+    const tryGetBalance = await getBalance(
+      address,
+      currency?.chain || chain,
+      chain ? currency?.symbol : undefined,
+      contractAddress
+    )
 
-      const { balance, balance_usd, balance_btc, pending, pending_btc } = tryGetBalance
+    const { balance, balance_usd, balance_btc, pending, pending_btc } = tryGetBalance
 
-      setBalance(balance)
-      sumBalance(balance_btc)
+    setBalance(balance)
+    sumBalance(balance_btc)
 
-      sumPending(pending_btc)
-      setPendingBalance(pending)
+    sumPending(pending_btc)
+    setPendingBalance(pending)
 
-      setEstimated(balance_usd)
-      sumEstimated(balance_usd)
-    }
+    setEstimated(balance_usd)
+    sumEstimated(balance_usd)
   }
 
   const openWallet = (): void => {
     history.push('/receive', {
-      currency: currency?.name,
+      name: currency?.name || name,
       symbol,
       address,
-      chain: currency?.chain,
+      chain,
     })
   }
 
   return (
     <Styles.Container onClick={openWallet}>
-      <CurrencyLogo
-        width={40}
-        height={40}
-        symbol={symbol}
-        isToken={chain !== undefined}
-        chain={chain}
-      />
+      <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} name={name} />
       <Styles.Row>
         <Styles.AddressInfo>
-          {currency ? <Styles.Currency>{currency.name}</Styles.Currency> : null}
+          {currency || name ? <Styles.Currency>{currency?.name || name}</Styles.Currency> : null}
           <Styles.Address>{address}</Styles.Address>
         </Styles.AddressInfo>
         <Styles.Balances>

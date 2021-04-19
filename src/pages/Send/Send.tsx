@@ -16,7 +16,7 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
 import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import { validateAddress, getAddressNetworkFee, formatUnit } from '@utils/address'
+import { validateAddress, getAddressNetworkFee, formatUnit, isEthereumLike } from '@utils/address'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -54,6 +54,7 @@ const Send: React.FC = () => {
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
   const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
+  const [networkFeeLabel, setNetworkFeeLabel] = React.useState<string>(symbol)
 
   const debounced = useDebounce(amount, 1000)
 
@@ -67,7 +68,7 @@ const Send: React.FC = () => {
   }, [selectedAddress])
 
   React.useEffect(() => {
-    if (amount.length && Number(balance) > 0 && outputs.length && !amountErrorLabel) {
+    if (amount.length && Number(balance) > 0 && !amountErrorLabel) {
       setNetworkFeeLoading(true)
       getNetworkFee()
     }
@@ -90,11 +91,31 @@ const Send: React.FC = () => {
     const fee = await getFees(chain)
     setUtxosList([])
 
-    const { networkFee, utxos } = getAddressNetworkFee(symbol, outputs, fee, amount, chain)
+    const data = await getAddressNetworkFee(
+      symbol,
+      outputs,
+      fee,
+      amount,
+      selectedAddress,
+      address,
+      chain
+    )
 
-    setUtxosList(utxos)
-    setNetworkFee(networkFee)
     setNetworkFeeLoading(false)
+
+    if (data) {
+      if (data.utxos) {
+        setUtxosList(data?.utxos)
+      }
+
+      if (data.networkFee) {
+        setNetworkFee(data.networkFee)
+      }
+
+      if (data.networkFeeLabel) {
+        setNetworkFeeLabel(data.networkFeeLabel)
+      }
+    }
   }
 
   const getWalletsList = (): void => {
@@ -267,7 +288,7 @@ const Send: React.FC = () => {
                   <Styles.NetworkFee>-</Styles.NetworkFee>
                 ) : (
                   <Styles.NetworkFee>
-                    {networkFee} {toUpper(symbol)}
+                    {networkFee} {toUpper(networkFeeLabel)}
                   </Styles.NetworkFee>
                 )}
               </>

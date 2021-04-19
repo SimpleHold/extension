@@ -73,7 +73,7 @@ const currencies: ICurrency[] = [
     logo: ethereumLogo,
     background: '#132BD8',
     chain: 'eth',
-    minSendAmount: 2400000000000000,
+    minSendAmount: 1000000000000000,
   },
   {
     name: 'Ethereum Classic',
@@ -81,7 +81,7 @@ const currencies: ICurrency[] = [
     logo: ethereumClassicLogo,
     background: '#49803D',
     chain: 'etc',
-    minSendAmount: 52850000000000000,
+    minSendAmount: 1000000000000000,
   },
   {
     name: 'Binance Smart Chain',
@@ -89,7 +89,7 @@ const currencies: ICurrency[] = [
     logo: binanceLogo,
     background: '#EBBB4E',
     chain: 'bsc',
-    minSendAmount: 14770000000000000,
+    minSendAmount: 1000000000000000,
   },
 ]
 

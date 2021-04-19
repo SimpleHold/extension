@@ -90,6 +90,8 @@ const NewWallet: React.FC = () => {
     history.push('/import-private-key', {
       symbol,
       chain,
+      tokenName,
+      contractAddress,
     })
   }
 

@@ -15,6 +15,7 @@ import { getWallets } from '@utils/wallet'
 // Config
 import currencies, { ICurrency } from '@config/currencies'
 import tokens, { IToken, checkExistWallet } from '@config/tokens'
+import networks, { IEthNetwork } from '@config/ethLikeNetworks'
 
 // Styles
 import Styles from './styles'
@@ -55,13 +56,15 @@ const SelectCurrency: React.FC = () => {
 
     if (walletsList) {
       const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
-      const chainName = toLower(chain) === 'eth' ? 'Ethereum' : 'Binance smart chain' // Fix me
+      const getNetwork = networks.find(
+        (network: IEthNetwork) => toLower(network.chain) === toLower(chain)
+      )
 
-      if (checkTokenWallets) {
+      if (getNetwork && checkTokenWallets) {
         return history.push('/add-token-to-address', {
           symbol,
           chain,
-          chainName,
+          chainName: getNetwork.name,
           tokenName,
         })
       }
@@ -115,14 +118,7 @@ const SelectCurrency: React.FC = () => {
 
               return (
                 <Styles.CurrencyBlock key={symbol} onClick={() => onAddToken(symbol, chain, name)}>
-                  <CurrencyLogo
-                    symbol={symbol}
-                    width={40}
-                    height={40}
-                    br={10}
-                    chain={chain}
-                    isToken
-                  />
+                  <CurrencyLogo symbol={symbol} width={40} height={40} br={10} chain={chain} />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>
                   <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
                 </Styles.CurrencyBlock>

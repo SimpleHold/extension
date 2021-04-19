@@ -10,6 +10,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 
 // Config
 import tokens, { IToken, checkExistWallet } from '@config/tokens'
+import networks, { IEthNetwork } from '@config/ethLikeNetworks'
 
 // Utils
 import { toUpper, toLower } from '@utils/format'
@@ -19,29 +20,28 @@ import { getWallets } from '@utils/wallet'
 import Styles from './styles'
 
 interface LocationState {
-  currencyFrom: string
   chain: string
 }
 
 const SelectToken: React.FC = () => {
   const history = useHistory()
   const {
-    state: { currencyFrom, chain },
+    state: { chain },
   } = useLocation<LocationState>()
 
   const [searchValue, setSearchValue] = React.useState<string>('')
 
-  const filterTokensList = tokens
-    .filter((token: IToken) => toLower(token.chain) === toLower(chain))
-    .filter((token: IToken) => {
-      if (searchValue.length) {
-        const findByName = toLower(token.name)?.indexOf(toLower(searchValue) || '') !== -1
-        const findBySymbol = toLower(token.symbol)?.indexOf(toLower(searchValue) || '') !== -1
+  const filterByChain = tokens.filter((token: IToken) => toLower(token.chain) === toLower(chain))
 
-        return findByName || findBySymbol
-      }
-      return token
-    })
+  const filterTokensList = filterByChain.filter((token: IToken) => {
+    if (searchValue.length) {
+      const findByName = toLower(token.name)?.indexOf(toLower(searchValue) || '') !== -1
+      const findBySymbol = toLower(token.symbol)?.indexOf(toLower(searchValue) || '') !== -1
+
+      return findByName || findBySymbol
+    }
+    return token
+  })
 
   const onAddCustomToken = (): void => {
     history.push('/add-custom-token')
@@ -52,13 +52,15 @@ const SelectToken: React.FC = () => {
 
     if (walletsList) {
       const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
-      const chainName = toLower(chain) === 'eth' ? 'Ethereum' : 'Binance smart chain' // Fix me
+      const getNetwork = networks.find(
+        (network: IEthNetwork) => toLower(network.chain) === toLower(chain)
+      )
 
-      if (checkTokenWallets) {
+      if (getNetwork && checkTokenWallets) {
         return history.push('/add-token-to-address', {
           symbol,
           chain,
-          chainName,
+          chainName: getNetwork.name,
           tokenName,
         })
       }
@@ -73,7 +75,7 @@ const SelectToken: React.FC = () => {
   return (
     <Styles.Wrapper>
       <Cover />
-      <Header withBack onBack={history.goBack} backTitle={`${currencyFrom} wallet`} />
+      <Header withBack onBack={history.goBack} backTitle="Receive" />
       <Styles.Container>
         <Styles.Row>
           <Styles.Title>Select token</Styles.Title>
@@ -84,7 +86,7 @@ const SelectToken: React.FC = () => {
             onChange={setSearchValue}
           />
 
-          {!filterTokensList.length ? (
+          {!filterTokensList.length && filterByChain.length ? (
             <Styles.NotFoundMessage>
               Currency was not found but you can add custom token
             </Styles.NotFoundMessage>
@@ -96,14 +98,7 @@ const SelectToken: React.FC = () => {
 
               return (
                 <Styles.TokenBlock key={symbol} onClick={() => onAddToken(symbol, chain, name)}>
-                  <CurrencyLogo
-                    symbol={symbol}
-                    width={40}
-                    height={40}
-                    br={10}
-                    chain={chain}
-                    isToken
-                  />
+                  <CurrencyLogo symbol={symbol} width={40} height={40} br={10} chain={chain} />
                   <Styles.TokenName>{name}</Styles.TokenName>
                   <Styles.TokenSymbol>{toUpper(symbol)}</Styles.TokenSymbol>
                 </Styles.TokenBlock>

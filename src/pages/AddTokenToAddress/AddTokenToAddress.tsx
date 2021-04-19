@@ -25,12 +25,13 @@ interface LocationState {
   chain: string
   chainName: string
   tokenName: string
+  contractAddress: string
 }
 
 const AddTokenToAddress: React.FC = () => {
   const history = useHistory()
   const {
-    state: { symbol, chain, chainName, tokenName },
+    state: { symbol, chain, chainName, tokenName, contractAddress },
   } = useLocation<LocationState>()
 
   const [chainAddresses, setChainAddresses] = React.useState<string[]>([])
@@ -38,6 +39,21 @@ const AddTokenToAddress: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+
+  const mapList = chainAddresses
+    .filter((address: string) => toLower(address) !== toLower(selectedAddress))
+    .map((address: string) => {
+      return {
+        logo: {
+          symbol,
+          width: 40,
+          height: 40,
+          br: 20,
+          background: '#1D1D22',
+        },
+        value: address,
+      }
+    })
 
   React.useEffect(() => {
     getChainAddresses()
@@ -54,7 +70,7 @@ const AddTokenToAddress: React.FC = () => {
 
     if (walletsList) {
       const filterWallets = walletsList
-        .filter((wallet: IWallet) => toLower(wallet.symbol) === toLower(chain))
+        .filter((wallet: IWallet) => toLower(wallet.symbol) === toLower(symbol))
         .map((wallet: IWallet) => wallet.address)
 
       setChainAddresses(filterWallets)
@@ -89,13 +105,23 @@ const AddTokenToAddress: React.FC = () => {
           )
 
           const uuid = v4()
-          const newWalletsList = addNewWallet(selectedAddress, symbol, uuid, chain)
+          const newWalletsList = addNewWallet(
+            selectedAddress,
+            symbol,
+            uuid,
+            chain,
+            tokenName,
+            contractAddress
+          )
 
           parseBackup.wallets.push({
             symbol,
             selectedAddress,
             uuid,
             privateKey: findWallet.privateKey,
+            chain,
+            tokenName,
+            contractAddress,
           })
 
           if (newWalletsList) {
@@ -123,28 +149,16 @@ const AddTokenToAddress: React.FC = () => {
           <Styles.Row>
             <Styles.Title>Add to {toUpper(chain)} address</Styles.Title>
             <Styles.Description>
-              You are trying to add new ERC20 token address. Do you want to associate one of your
+              You are trying to add new ERC20 token address. Do you want to associate one of your{' '}
               {chainName} address with {tokenName}? Press Skip if you want to add new address
             </Styles.Description>
 
             <CurrenciesDropdown
-              currencySymbol={chain}
-              list={[
-                {
-                  logo: {
-                    // Fix me
-                    symbol: 'eth',
-                    width: 40,
-                    height: 40,
-                    br: 20,
-                    background: '#1D1D22',
-                  },
-                  value: '0x4ef3e1eb84b17a5582461285b5ebf32a6538f610',
-                },
-              ]}
-              onSelect={setSelectedAddress}
               label="Select address"
               value={selectedAddress}
+              currencySymbol={symbol}
+              list={mapList}
+              onSelect={setSelectedAddress}
               disabled={chainAddresses.length < 2}
               currencyBr={20}
             />

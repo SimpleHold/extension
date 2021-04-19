@@ -30,6 +30,8 @@ import Styles from './styles'
 interface LocationState {
   symbol: TSymbols
   chain?: string
+  tokenName?: string
+  contractAddress?: string
 }
 
 const ImportPrivateKey: React.FC = () => {
@@ -41,7 +43,7 @@ const ImportPrivateKey: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol, chain = undefined },
+    state: { symbol, chain = undefined, tokenName = undefined, contractAddress = undefined },
   } = useLocation<LocationState>()
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
@@ -114,12 +116,22 @@ const ImportPrivateKey: React.FC = () => {
 
         if (address) {
           const uuid = v4()
-          const newWalletsList = addNewWallet(address, symbol, uuid)
+          const newWalletsList = addNewWallet(
+            address,
+            symbol,
+            uuid,
+            chain,
+            tokenName,
+            contractAddress
+          )
           parseBackup.wallets.push({
             symbol,
             address,
             uuid,
             privateKey,
+            chain,
+            tokenName,
+            contractAddress,
           })
           if (newWalletsList) {
             localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
