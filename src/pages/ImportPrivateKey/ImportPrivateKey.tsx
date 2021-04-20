@@ -14,7 +14,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
+import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets } from '@utils/wallet'
 import { decrypt, encrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toLower, toUpper } from '@utils/format'
@@ -60,7 +60,7 @@ const ImportPrivateKey: React.FC = () => {
     const getAddress = importPrivateKey(symbol, privateKey, chain)
 
     if (getAddress) {
-      const checkExist = checkExistWallet(getAddress, chain)
+      const checkExist = checkExistWallet(getAddress, symbol, chain)
 
       if (checkExist) {
         return setErrorLabel('This address has already been added')
@@ -83,20 +83,33 @@ const ImportPrivateKey: React.FC = () => {
       const filterData = data?.filter((item) => toLower(item.symbol) !== toLower(symbol))
 
       setImportButtonLoading(false)
+      const wallets = getWallets()
 
-      if (filterData?.length) {
+      if (filterData?.length && wallets) {
         const mapTokens = filterData.map((token: ITokensBalance) => token.symbol)
         const mapExistTokens = tokens.map((token: IToken) => token.symbol)
         const filterByExistTokens = mapTokens.filter((token: string) =>
           mapExistTokens.includes(token)
         )
+        const mapWalletsExistTokens = wallets
+          .filter(
+            (wallet: IWallet) =>
+              toLower(wallet.chain) === toLower(chain) &&
+              filterByExistTokens.includes(wallet.symbol)
+          )
+          .map((wallet: IWallet) => wallet.symbol)
+        const removeDuplicates = filterByExistTokens.filter(
+          (i) => !mapWalletsExistTokens.includes(i)
+        )
 
-        if (filterByExistTokens.length) {
+        if (removeDuplicates.length) {
           return history.push('/found-tokens', {
             chain,
             symbol,
             privateKey,
-            tokens: filterByExistTokens,
+            tokens: removeDuplicates,
+            tokenName,
+            contractAddress,
           })
         }
       }
