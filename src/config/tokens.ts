@@ -14,6 +14,8 @@ import truLogo from '@assets/tokens/tru.svg'
 import markLogo from '@assets/tokens/mark.svg'
 import astaLogo from '@assets/tokens/asta.svg'
 import bnbLogo from '@assets/tokens/bnb.svg'
+import cakeLogo from '@assets/tokens/cake.svg'
+import inchLogo from '@assets/tokens/inch.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -164,6 +166,33 @@ const tokens: IToken[] = [
     logo: bnbLogo,
     background: '#132BD8',
     chain: 'eth',
+  },
+  {
+    address: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
+    name: 'BUSD Token',
+    symbol: 'busd',
+    decimals: 18,
+    logo: busdLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
+  },
+  {
+    address: '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82',
+    name: 'PancakeSwap',
+    symbol: 'cake',
+    decimals: 18,
+    logo: cakeLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
+  },
+  {
+    address: '0x111111111117dc0aa78b770fa6a738034120c302',
+    name: '1INCH Token',
+    symbol: '1inch',
+    decimals: 18,
+    logo: inchLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
   },
 ]
 
