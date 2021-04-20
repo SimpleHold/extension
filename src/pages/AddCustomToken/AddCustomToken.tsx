@@ -50,7 +50,7 @@ const AddCustomToken: React.FC = () => {
   const { state } = useLocation<LocationState>()
 
   const activeNetwork = state?.activeNetwork || undefined
-  const currency = state.currency || undefined
+  const currency = state?.currency || undefined
 
   const [contractAddress, setContractAddress] = React.useState<string>('')
   const [selectedNetwork, setSelectedNetwork] = React.useState<IEthNetwork>(networks[0])
@@ -126,15 +126,16 @@ const AddCustomToken: React.FC = () => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      const { symbol, chain } = selectedNetwork
+      const { chain, name: chainName } = selectedNetwork
+      const { symbol, name: tokenName } = tokenInfo
 
       const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
 
       const routeProps = {
         symbol,
         chain,
-        chainName: selectedNetwork.name,
-        tokenName: tokenInfo.name,
+        chainName,
+        tokenName,
         contractAddress,
       }
 
@@ -148,7 +149,7 @@ const AddCustomToken: React.FC = () => {
 
   const onSelectDropdown = (index: number): void => {
     const getNetwork = mapList[index]
-    const getNetworkInfo = getEthNetwork(getNetwork.logo.symbol)
+    const getNetworkInfo = getEthNetwork(getNetwork.chain)
 
     if (getNetworkInfo) {
       setSelectedNetwork(getNetworkInfo)
@@ -234,6 +235,7 @@ const AddCustomToken: React.FC = () => {
         background: '#1D1D22',
       },
       value: network.name,
+      chain: network.chain,
     }
   })
 
