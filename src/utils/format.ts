@@ -42,3 +42,12 @@ export const price = (price: number | null, toFixed = 2): string => {
     .toString()
     .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
+
+export const groupBy = (key: string, array: any[]) =>
+  array.reduce(
+    (objectsByKeyValue, obj) => ({
+      ...objectsByKeyValue,
+      [obj[key]]: (objectsByKeyValue[obj[key]] || []).concat(obj),
+    }),
+    {}
+  )
