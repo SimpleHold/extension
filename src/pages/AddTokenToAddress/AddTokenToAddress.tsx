@@ -17,6 +17,9 @@ import { getWallets, IWallet, addNew as addNewWallet } from '@utils/wallet'
 import { validatePassword } from '@utils/validate'
 import { decrypt, encrypt } from '@utils/crypto'
 
+// Config
+import { getUnusedAddressesForToken } from '@config/tokens'
+
 // Styles
 import Styles from './styles'
 
@@ -45,7 +48,7 @@ const AddTokenToAddress: React.FC = () => {
     .map((address: string) => {
       return {
         logo: {
-          symbol,
+          symbol: chain,
           width: 40,
           height: 40,
           br: 20,
@@ -69,11 +72,8 @@ const AddTokenToAddress: React.FC = () => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      const filterWallets = walletsList
-        .filter((wallet: IWallet) => toLower(wallet.symbol) === toLower(symbol))
-        .map((wallet: IWallet) => wallet.address)
-
-      setChainAddresses(filterWallets)
+      const addresses = getUnusedAddressesForToken(walletsList, symbol, chain)
+      setChainAddresses(addresses)
     }
   }
 
@@ -156,7 +156,7 @@ const AddTokenToAddress: React.FC = () => {
             <CurrenciesDropdown
               label="Select address"
               value={selectedAddress}
-              currencySymbol={symbol}
+              currencySymbol={chain}
               list={mapList}
               onSelect={setSelectedAddress}
               disabled={chainAddresses.length < 2}
