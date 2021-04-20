@@ -16,7 +16,7 @@ import { validatePassword } from '@utils/validate'
 import { decrypt, encrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { importPrivateKey } from '@utils/address'
-import { toUpper } from '@utils/format'
+import { toLower, toUpper } from '@utils/format'
 import { setUserProperties } from '@utils/amplitude'
 
 // Styles
@@ -27,12 +27,21 @@ interface LocationState {
   symbol: TSymbols
   privateKey: string
   tokens: string[]
+  tokenName?: string
+  contractAddress?: string
 }
 
 const FoundTokens: React.FC = () => {
   const history = useHistory()
   const {
-    state: { chain, symbol, privateKey, tokens },
+    state: {
+      chain,
+      symbol,
+      privateKey,
+      tokens,
+      tokenName = undefined,
+      contractAddress = undefined,
+    },
   } = useLocation<LocationState>()
 
   const [selectedTokens, setSelectedTokens] = React.useState<string[]>(tokens)
@@ -56,32 +65,37 @@ const FoundTokens: React.FC = () => {
 
   const getNewWallets = (
     decryptBackup: string,
-    address: string
-  ): {
-    newBackup: string
-    walletsList: string | null
-  } => {
+    address: string,
+    password: string
+  ): string | null => {
     const parseBackup = JSON.parse(decryptBackup)
     let newWalletsList: string | null = ''
 
-    for (const token of isIncludeTokens ? [...tokens, symbol] : [symbol]) {
+    const tokensList = isIncludeTokens ? [...tokens, symbol] : [symbol]
+
+    for (const [index, token] of tokensList.entries()) {
       const uuid = v4()
 
-      newWalletsList = addNewWallet(address, token, uuid, chain)
+      const getTokenName = index == 0 && tokenName ? tokenName : undefined
+      const getContractAddress = index === 0 && contractAddress ? contractAddress : undefined
+
+      newWalletsList = addNewWallet(address, token, uuid, chain, getTokenName, getContractAddress)
 
       parseBackup.wallets.push({
-        symbol: token,
+        symbol: toLower(token),
         address,
         uuid,
         privateKey,
         chain,
+        tokenName: getTokenName,
+        contractAddress: getContractAddress,
       })
+
+      localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+      localStorage.setItem('wallets', `${newWalletsList}`)
     }
 
-    return {
-      newBackup: JSON.stringify(parseBackup),
-      walletsList: newWalletsList,
-    }
+    return newWalletsList
   }
 
   const onConfirmDrawer = (): void => {
@@ -99,12 +113,9 @@ const FoundTokens: React.FC = () => {
           const address = importPrivateKey(symbol, privateKey, chain)
 
           if (address) {
-            const { newBackup, walletsList } = getNewWallets(decryptBackup, address)
+            const walletsList = getNewWallets(decryptBackup, address, password)
 
             if (walletsList) {
-              localStorage.setItem('backup', encrypt(newBackup, password))
-              localStorage.setItem('wallets', walletsList)
-
               const walletAmount = JSON.parse(walletsList).filter(
                 (wallet: IWallet) => wallet.symbol === symbol
               ).length
