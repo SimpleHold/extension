@@ -117,7 +117,10 @@ const SelectCurrency: React.FC = () => {
               const { name, symbol, chain } = token
 
               return (
-                <Styles.CurrencyBlock key={symbol} onClick={() => onAddToken(symbol, chain, name)}>
+                <Styles.CurrencyBlock
+                  key={`${symbol}/${chain}`}
+                  onClick={() => onAddToken(symbol, chain, name)}
+                >
                   <CurrencyLogo symbol={symbol} width={40} height={40} br={10} chain={chain} />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>
                   <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
