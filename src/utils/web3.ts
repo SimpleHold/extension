@@ -64,7 +64,7 @@ export const toWei = (value: string, unit: Unit): number => {
 
 export const createTransaction = async (
   to: string,
-  amount: number,
+  value: number,
   gas: number,
   chainId: number,
   gasPrice: string,
@@ -72,8 +72,6 @@ export const createTransaction = async (
   privateKey: string
 ): Promise<TCreatedTransaction | null> => {
   try {
-    const value = web3.utils.toWei(`${amount}`, 'ether')
-
     const { rawTransaction, transactionHash } = await web3.eth.accounts.signTransaction(
       {
         to,

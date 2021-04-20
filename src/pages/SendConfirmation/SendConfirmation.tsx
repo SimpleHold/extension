@@ -16,9 +16,9 @@ import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { IRawTransaction, sendRawTransaction } from '@utils/api'
+import { IRawTransaction, sendRawTransaction, getWeb3TxParams } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import { formatUnit, createTransaction } from '@utils/address'
+import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
 
 // Config
 import {
@@ -39,7 +39,7 @@ interface LocationState {
   addressFrom: string
   addressTo: string
   outputs: UnspentOutput[]
-  chain?: string
+  chain: string
 }
 
 const SendConfirmation: React.FC = () => {
@@ -54,6 +54,7 @@ const SendConfirmation: React.FC = () => {
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
   const [rawTransaction, setRawTransaction] = React.useState<null | IRawTransaction>(null)
+  const [transactionLink, setTransactionLink] = React.useState<string>('')
 
   const onConfirmModal = async (): Promise<void> => {
     logEvent({
@@ -78,22 +79,30 @@ const SendConfirmation: React.FC = () => {
           const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
           const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
-          const transaction = await createTransaction(
-            addressFrom,
-            addressTo,
-            parseAmount,
-            findWallet.privateKey,
+          const ethTxData =
+            isEthereumLike(symbol, chain) && chain
+              ? await getWeb3TxParams(addressFrom, addressTo, parseAmount, chain)
+              : {}
+
+          const transactionData = {
+            from: addressFrom,
+            to: addressTo,
+            amount: parseAmount,
+            privateKey: findWallet.privateKey,
             symbol,
             chain,
             outputs,
-            parseNetworkFee
-          )
+            networkFee: parseNetworkFee,
+          }
+
+          const transaction = await createTransaction({ ...transactionData, ...ethTxData })
 
           if (transaction?.hash && transaction?.raw) {
-            const sendTransaction = await sendRawTransaction(transaction.raw, symbol)
+            const sendTransaction = await sendRawTransaction(transaction.raw, chain)
 
             if (sendTransaction === transaction.hash) {
-              setRawTransaction(transaction)
+              const link = getTransactionLink(transaction.hash, symbol, currency?.chain)
+              setTransactionLink(link)
               return setActiveDrawer('success')
             }
           }
@@ -206,7 +215,7 @@ const SendConfirmation: React.FC = () => {
         isActive={activeDrawer === 'success'}
         onClose={() => setActiveDrawer(null)}
         text="Your transaction has successfully sent. You can check it here:"
-        link={`https://blockchair.com/${currency?.chain}/transaction/${rawTransaction?.hash}`}
+        link={transactionLink}
       />
     </>
   )

@@ -22,6 +22,21 @@ type TGetNetworkFeeResponse = {
   nonce?: number
 }
 
+type TCreateTransactionProps = {
+  from: string
+  to: string
+  amount: number
+  privateKey: string
+  symbol: TSymbols
+  chain?: string
+  outputs?: UnspentOutput[]
+  networkFee?: number
+  gas?: number
+  chainId?: number
+  gasPrice?: string
+  nonce?: number
+}
+
 export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boolean => {
   return web3Symbols.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
 }
@@ -53,39 +68,43 @@ export const validateAddress = (symbol: TSymbols, address: string): boolean => {
   return new RegExp(addressValidate[symbol])?.test(address)
 }
 
-export const createTransaction = async (
-  from: string,
-  to: string,
-  amount: number,
-  privateKey: string,
-  symbol: TSymbols,
-  chain?: string,
-  outputs?: UnspentOutput[],
-  networkFee?: number,
-  gas?: number,
-  chainId?: number,
-  gasPrice?: string,
-  nonce?: number
-): Promise<TCreatedTransaction | null> => {
-  if (isEthereumLike(symbol, chain)) {
-    if (gas && chainId && gasPrice && nonce) {
-      return await web3.createTransaction(to, amount, gas, chainId, gasPrice, nonce, privateKey)
+export const createTransaction = async ({
+  from,
+  to,
+  amount,
+  privateKey,
+  symbol,
+  chain,
+  outputs,
+  networkFee,
+  gas,
+  chainId,
+  gasPrice,
+  nonce,
+}: TCreateTransactionProps): Promise<TCreatedTransaction | null> => {
+  try {
+    if (isEthereumLike(symbol, chain)) {
+      if (gas && chainId && gasPrice && nonce) {
+        return await web3.createTransaction(to, amount, gas, chainId, gasPrice, nonce, privateKey)
+      }
+      return null
     }
+
+    if (outputs?.length && networkFee) {
+      return new bitcoinLike(symbol).createTransaction(
+        outputs,
+        to,
+        amount,
+        networkFee,
+        from,
+        privateKey
+      )
+    }
+
+    return null
+  } catch {
     return null
   }
-
-  if (outputs?.length && networkFee) {
-    return new bitcoinLike(symbol).createTransaction(
-      outputs,
-      to,
-      amount,
-      networkFee,
-      from,
-      privateKey
-    )
-  }
-
-  return null
 }
 
 export const getAddressNetworkFee = async (
@@ -157,4 +176,20 @@ export const getExplorerLink = (
     }
   }
   return `https://blockchair.com/${currency?.chain}/address/${address}`
+}
+
+export const getTransactionLink = (hash: string, symbol: string, chain?: string): string => {
+  if (isEthereumLike(symbol, chain)) {
+    const parseChain = toLower(chain)
+
+    if (parseChain === 'eth') {
+      return `https://etherscan.io/tx/${hash}`
+    } else if (parseChain === 'bsc') {
+      return `https://bscscan.com/tx/${hash}`
+    } else if (parseChain === 'etc') {
+      return `https://blockscout.com/etc/mainnet/tx/${hash}/internal-transactions`
+    }
+  } else {
+    return `https://blockchair.com/${chain}/transaction/${.hash}`
+  }
 }
