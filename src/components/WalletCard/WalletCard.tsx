@@ -76,6 +76,7 @@ const WalletCard: React.FC<Props> = (props) => {
       symbol,
       address,
       chain,
+      contractAddress,
     })
   }
 

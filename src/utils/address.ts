@@ -3,7 +3,12 @@ import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import addressValidate from '@config/addressValidate'
+import { ICurrency } from '@config/currencies'
+import { getToken } from '@config/tokens'
+
+// Utils
 import { getEtherNetworkFee } from '@utils/api'
+import { toLower } from './format'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
@@ -119,4 +124,37 @@ export const formatUnit = (
   return type === 'from'
     ? new bitcoinLike(symbol).fromSat(Number(value))
     : new bitcoinLike(symbol).toSat(Number(value))
+}
+
+export const getExplorerLink = (
+  address: string,
+  symbol: string,
+  currency?: ICurrency,
+  chain?: string,
+  contractAddress?: string
+) => {
+  if (isEthereumLike(symbol, chain)) {
+    const parseSymbol = toLower(symbol)
+
+    if (chain) {
+      const parseChain = toLower(chain)
+      const tokenInfo = getToken(symbol, chain)
+      const tokenAddress = tokenInfo?.address || contractAddress
+
+      if (parseChain === 'eth') {
+        return `https://etherscan.io/token/${tokenAddress}?a=${address}`
+      } else if (parseChain === 'bsc') {
+        ;`https://bscscan.com/token/${tokenAddress}?a=${address}`
+      }
+    } else {
+      if (parseSymbol === 'eth') {
+        return `https://etherscan.io/address/${address}`
+      } else if (parseSymbol === 'bnb') {
+        return `https://bscscan.com/address/${address}`
+      } else if (parseSymbol === 'etc') {
+        return `https://blockscout.com/etc/mainnet/address/${address}/transactions`
+      }
+    }
+  }
+  return `https://blockchair.com/${currency?.chain}/address/${address}`
 }

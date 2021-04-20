@@ -29,6 +29,7 @@ import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
+import { getExplorerLink } from '@utils/address'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
@@ -46,12 +47,13 @@ interface LocationState {
   name: string
   symbol: string
   address: string
-  chain: string
+  chain?: string
+  contractAddress?: string
 }
 
 const Receive: React.FC = () => {
   const {
-    state: { name, symbol, address, chain },
+    state: { name, symbol, address, chain = undefined, contractAddress = undefined },
   } = useLocation<LocationState>()
 
   const history = useHistory()
@@ -132,10 +134,12 @@ const Receive: React.FC = () => {
     if (index === 0) {
       setActiveDrawer('confirm')
     } else if (index === 1) {
-      openWebPage(`https://blockchair.com/${currency?.chain}/address/${address}`)
+      const link = getExplorerLink(address, symbol, currency, chain, contractAddress)
+      openWebPage(link)
     } else if (index === 2) {
       history.push('/select-token', {
         chain: currency?.chain,
+        address,
       })
     }
   }
