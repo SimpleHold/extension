@@ -169,7 +169,7 @@ export const getWeb3TxParams = async (
   chain: string
 ): Promise<Web3TxParams | null> => {
   try {
-    const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/network-fee`, {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/params`, {
       params: {
         from,
         to,
@@ -184,5 +184,30 @@ export const getWeb3TxParams = async (
     return data.data
   } catch {
     return null
+  }
+}
+
+export const getEtherNetworkFee = async (
+  from: string,
+  to: string,
+  value: number,
+  chain: string
+): Promise<number> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/network-fee`, {
+      params: {
+        from,
+        to,
+        value,
+        chain,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return 0
   }
 }

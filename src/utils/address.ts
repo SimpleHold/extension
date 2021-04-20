@@ -3,14 +3,14 @@ import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import addressValidate from '@config/addressValidate'
-import { getWeb3TxParams } from '@utils/api'
+import { getEtherNetworkFee } from '@utils/api'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
 type TGetNetworkFeeResponse = {
   networkFee?: number
   networkFeeLabel?: string
-  utxos: UnspentOutput[]
+  utxos?: UnspentOutput[]
   chainId?: number
   gas?: number
   gasPrice?: string
@@ -94,13 +94,10 @@ export const getAddressNetworkFee = async (
 ): Promise<TGetNetworkFeeResponse | null> => {
   if (chain && isEthereumLike(symbol, chain)) {
     const value = web3.toWei(amount, 'ether')
-    const params = await getWeb3TxParams(from, to, value, chain)
+    const networkFee = await getEtherNetworkFee(from, to, value, chain)
 
     return {
-      networkFee: params?.gas,
-      networkFeeLabel: 'wei',
-      utxos: [],
-      ...params,
+      networkFee,
     }
   }
   return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)

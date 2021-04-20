@@ -111,10 +111,6 @@ const Send: React.FC = () => {
       if (data.networkFee) {
         setNetworkFee(data.networkFee)
       }
-
-      if (data.networkFeeLabel) {
-        setNetworkFeeLabel(data.networkFeeLabel)
-      }
     }
   }
 
@@ -191,17 +187,24 @@ const Send: React.FC = () => {
   }
 
   const isButtonDisabled = (): boolean => {
-    return (
-      !validateAddress(symbol, address) ||
-      !amount.length ||
-      Number(amount) <= 0 ||
-      !outputs.length ||
-      addressErrorLabel !== null ||
-      amountErrorLabel !== null ||
-      Number(balance) <= 0 ||
-      networkFee === 0 ||
-      isNetworkFeeLoading
-    )
+    if (
+      validateAddress(symbol, address) &&
+      amount.length &&
+      Number(amount) > 0 &&
+      addressErrorLabel === null &&
+      amountErrorLabel === null &&
+      Number(balance) > 0 &&
+      networkFee > 0 &&
+      !isNetworkFeeLoading
+    ) {
+      if (!outputs.length) {
+        if (isEthereumLike(symbol, chain)) {
+          return false
+        }
+        return true
+      }
+    }
+    return true
   }
 
   const onCancel = (): void => {
