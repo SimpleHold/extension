@@ -123,7 +123,7 @@ const FoundTokens: React.FC = () => {
 
               localStorage.setItem('backupStatus', 'notDownloaded')
 
-              history.push('/download-backup', {
+              history.replace('/download-backup', {
                 password,
                 from: 'foundTokens',
               })

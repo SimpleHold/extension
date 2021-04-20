@@ -59,7 +59,7 @@ const Wallets: React.FC = () => {
         NUMBER_WALLET_BTC: '1',
       })
 
-      history.push('/download-backup')
+      history.replace('/download-backup')
     }
   }
 

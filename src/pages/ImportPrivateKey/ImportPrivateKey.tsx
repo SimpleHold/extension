@@ -156,7 +156,7 @@ const ImportPrivateKey: React.FC = () => {
             ).length
             setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
-            return history.push('/download-backup', {
+            return history.replace('/download-backup', {
               password,
               from: 'privateKey',
             })
