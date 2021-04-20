@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
+import { v4 } from 'uuid'
 
 // Components
 import Cover from '@components/Cover'
@@ -10,13 +11,20 @@ import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
 
+// Drawers
+import ConfirmDrawer from '@drawers/Confirm'
+
 // Config
 import { validateContractAddress, checkExistWallet } from '@config/tokens'
 import networks, { getEthNetwork, IEthNetwork } from '@config/ethLikeNetworks'
+import { ICurrency } from '@config/currencies'
 
 // Utils
 import { getContractInfo } from '@utils/api'
-import { getWallets } from '@utils/wallet'
+import { addNew as addNewWallet, getWallets, IWallet } from '@utils/wallet'
+import { toLower } from '@utils/format'
+import { validatePassword } from '@utils/validate'
+import { decrypt, encrypt } from '@utils/crypto'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -31,8 +39,18 @@ interface IToken {
   decimals: number
 }
 
+interface LocationState {
+  activeNetwork?: string
+  currency?: ICurrency
+  address?: string
+}
+
 const AddCustomToken: React.FC = () => {
   const history = useHistory()
+  const { state } = useLocation<LocationState>()
+
+  const activeNetwork = state?.activeNetwork || undefined
+  const currency = state.currency || undefined
 
   const [contractAddress, setContractAddress] = React.useState<string>('')
   const [selectedNetwork, setSelectedNetwork] = React.useState<IEthNetwork>(networks[0])
@@ -43,6 +61,9 @@ const AddCustomToken: React.FC = () => {
     symbol: '',
     decimals: 0,
   })
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
+  const [password, setPassword] = React.useState<string>('')
+  const [drawerErrorLabel, setDrawerErrorLabel] = React.useState<null | string>(null)
 
   const debounced = useDebounce(contractAddress, 1000)
   const useToast = useToastContext()
@@ -56,6 +77,19 @@ const AddCustomToken: React.FC = () => {
       getContractAddressInfo()
     }
   }, [debounced])
+
+  React.useEffect(() => {
+    if (
+      typeof activeNetwork !== 'undefined' &&
+      toLower(selectedNetwork.chain) !== toLower(activeNetwork)
+    ) {
+      const getNetworkInfo = getEthNetwork(activeNetwork)
+
+      if (getNetworkInfo) {
+        setSelectedNetwork(getNetworkInfo)
+      }
+    }
+  }, [activeNetwork])
 
   const getContractAddressInfo = async (): Promise<void> => {
     setIsLoading(true)
@@ -86,6 +120,9 @@ const AddCustomToken: React.FC = () => {
   }
 
   const onConfirm = (): void => {
+    if (currency) {
+      return setActiveDrawer('confirm')
+    }
     const walletsList = getWallets()
 
     if (walletsList) {
@@ -134,6 +171,55 @@ const AddCustomToken: React.FC = () => {
     }
   }
 
+  const onConfirmDrawer = (): void => {
+    if (validatePassword(password) && currency) {
+      const backup = localStorage.getItem('backup')
+      if (backup) {
+        const { address } = state
+        const decryptBackup = decrypt(backup, password)
+        if (decryptBackup && state) {
+          const parseBackup = JSON.parse(decryptBackup)
+          const findWallet = parseBackup?.wallets?.find(
+            (wallet: IWallet) => wallet.address === address
+          )
+
+          if (findWallet) {
+            const uuid = v4()
+            const newWalletsList = addNewWallet(
+              `${address}`,
+              tokenInfo.symbol,
+              uuid,
+              currency.chain,
+              tokenInfo.name,
+              contractAddress
+            )
+            parseBackup.wallets.push({
+              symbol: tokenInfo.symbol,
+              address,
+              uuid,
+              privateKey: findWallet.privateKey,
+              chain: currency.chain,
+              tokenName: tokenInfo.name,
+              contractAddress,
+            })
+            if (newWalletsList) {
+              localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+              localStorage.setItem('wallets', newWalletsList)
+
+              localStorage.setItem('backupStatus', 'notDownloaded')
+
+              history.push('/download-backup', {
+                password,
+                from: 'addCustomToken',
+              })
+            }
+          }
+        }
+      }
+    }
+    return setDrawerErrorLabel('Password is not valid')
+  }
+
   const dropDownList = networks.filter(
     (network: IEthNetwork) => network.symbol !== selectedNetwork.symbol
   )
@@ -160,63 +246,78 @@ const AddCustomToken: React.FC = () => {
     errorLabel !== null
 
   return (
-    <Styles.Wrapper>
-      <Cover />
-      <Header withBack onBack={history.goBack} backTitle="Select currency" />
-      <Styles.Container>
-        <Styles.Row>
-          <Styles.Title>Add custom token</Styles.Title>
+    <>
+      <Styles.Wrapper>
+        <Cover />
+        <Header withBack onBack={history.goBack} backTitle="Select currency" />
+        <Styles.Container>
+          <Styles.Row>
+            <Styles.Title>Add custom token</Styles.Title>
 
-          <Styles.TokenCard>
-            <CurrencyLogo
-              width={40}
-              height={40}
-              symbol={selectedNetwork.symbol}
-              chain={selectedNetwork.chain}
-              name={tokenInfo.name || 'T'}
-              background="#132BD8"
-            />
-            <Styles.TokenCardRow>
-              <Skeleton width={90} height={19} mt={6} isLoading={isLoading} type="gray">
-                <Styles.TokenName>{tokenInfo.name || 'Token name'}</Styles.TokenName>
-              </Skeleton>
-              <Skeleton width={40} height={15} mt={4} isLoading={isLoading} type="gray">
-                <Styles.TokenSymbol>{tokenInfo.symbol || 'Ticker'}</Styles.TokenSymbol>
-              </Skeleton>
-              <Styles.DecimalRow>
-                <Styles.TokenDecimalLabel>Decimals of precion:</Styles.TokenDecimalLabel>
-                <Skeleton width={20} height={14} mt={0} isLoading={isLoading} type="gray">
-                  {tokenInfo.decimals > 0 ? (
-                    <Styles.TokenDecimal>{tokenInfo.decimals}</Styles.TokenDecimal>
-                  ) : null}
+            <Styles.TokenCard>
+              <CurrencyLogo
+                width={40}
+                height={40}
+                symbol={selectedNetwork.symbol}
+                chain={selectedNetwork.chain}
+                name={tokenInfo.name || 'T'}
+                background="#132BD8"
+              />
+              <Styles.TokenCardRow>
+                <Skeleton width={90} height={19} mt={6} isLoading={isLoading} type="gray">
+                  <Styles.TokenName>{tokenInfo.name || 'Token name'}</Styles.TokenName>
                 </Skeleton>
-              </Styles.DecimalRow>
-            </Styles.TokenCardRow>
-          </Styles.TokenCard>
-        </Styles.Row>
+                <Skeleton width={40} height={15} mt={4} isLoading={isLoading} type="gray">
+                  <Styles.TokenSymbol>{tokenInfo.symbol || 'Ticker'}</Styles.TokenSymbol>
+                </Skeleton>
+                <Styles.DecimalRow>
+                  <Styles.TokenDecimalLabel>Decimals of precion:</Styles.TokenDecimalLabel>
+                  <Skeleton width={20} height={14} mt={0} isLoading={isLoading} type="gray">
+                    {tokenInfo.decimals > 0 ? (
+                      <Styles.TokenDecimal>{tokenInfo.decimals}</Styles.TokenDecimal>
+                    ) : null}
+                  </Skeleton>
+                </Styles.DecimalRow>
+              </Styles.TokenCardRow>
+            </Styles.TokenCard>
+          </Styles.Row>
 
-        <Styles.Form>
-          <CurrenciesDropdown
-            label="Select network"
-            value={selectedNetwork.name}
-            currencySymbol={selectedNetwork.symbol}
-            list={mapList}
-            onSelect={onSelectDropdown}
-            currencyBr={20}
-          />
-          <TextInput
-            label="Token Contract Address"
-            value={contractAddress}
-            onChange={onChangeAddress}
-            onBlurInput={onBlurInput}
-            errorLabel={errorLabel}
-          />
-          <Styles.ButtonRow>
-            <Button label="Confirm" disabled={isButtonDisabled} onClick={onConfirm} />
-          </Styles.ButtonRow>
-        </Styles.Form>
-      </Styles.Container>
-    </Styles.Wrapper>
+          <Styles.Form>
+            <CurrenciesDropdown
+              label={activeNetwork ? 'Network' : 'Select network'}
+              value={selectedNetwork.name}
+              currencySymbol={selectedNetwork.symbol}
+              list={mapList}
+              onSelect={onSelectDropdown}
+              currencyBr={20}
+              disabled={typeof activeNetwork !== 'undefined'}
+            />
+            <TextInput
+              label="Token Contract Address"
+              value={contractAddress}
+              onChange={onChangeAddress}
+              onBlurInput={onBlurInput}
+              errorLabel={errorLabel}
+            />
+            <Styles.ButtonRow>
+              <Button label="Confirm" disabled={isButtonDisabled} onClick={onConfirm} />
+            </Styles.ButtonRow>
+          </Styles.Form>
+        </Styles.Container>
+      </Styles.Wrapper>
+      <ConfirmDrawer
+        isActive={activeDrawer === 'confirm'}
+        onClose={() => setActiveDrawer(null)}
+        title="Confirm adding new address"
+        inputLabel="Enter password"
+        textInputValue={password}
+        isButtonDisabled={!validatePassword(password)}
+        onConfirm={onConfirmDrawer}
+        onChangeText={setPassword}
+        textInputType="password"
+        inputErrorLabel={drawerErrorLabel}
+      />
+    </>
   )
 }
 

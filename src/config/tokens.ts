@@ -21,6 +21,9 @@ import inchLogo from '@assets/tokens/inch.svg'
 import { IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 
+// Config
+import { getCurrencyByChain } from '@config/currencies'
+
 export interface IToken {
   address: string
   name: string
@@ -214,26 +217,30 @@ export const checkExistWallet = (
   symbol: string,
   chain: string
 ): boolean => {
-  const getWalletsByChain = walletsList.filter(
-    (wallet) => toLower(wallet.symbol) === toLower(chain)
-  )
+  const getCurrencyInfo = getCurrencyByChain(chain)
 
-  if (getWalletsByChain.length) {
-    let result = 0
+  if (getCurrencyInfo) {
+    const getWalletsByChain = walletsList.filter(
+      (wallet) => toLower(wallet.symbol) === toLower(getCurrencyInfo.symbol)
+    )
 
-    for (const wallet of getWalletsByChain) {
-      const findExist = walletsList.find(
-        (walletItem: IWallet) =>
-          toLower(walletItem.address) === toLower(wallet.address) &&
-          toLower(walletItem.symbol) === toLower(symbol)
-      )
+    if (getWalletsByChain.length) {
+      let result = 0
 
-      if (!findExist) {
-        result += 1
+      for (const wallet of getWalletsByChain) {
+        const findExist = walletsList.find(
+          (walletItem: IWallet) =>
+            toLower(walletItem.address) === toLower(wallet.address) &&
+            toLower(walletItem.symbol) === toLower(symbol)
+        )
+
+        if (!findExist) {
+          result += 1
+        }
       }
-    }
 
-    return result > 0
+      return result > 0
+    }
   }
   return false
 }
@@ -244,20 +251,23 @@ export const getUnusedAddressesForToken = (
   chain: string
 ): string[] => {
   const addresses: string[] = []
+  const getCurrencyInfo = getCurrencyByChain(chain)
 
-  const filterWallets = walletsList
-    .filter((wallet) => toLower(wallet.symbol) === toLower(chain) || wallet.chain)
-    .filter((wallet) => toLower(wallet.symbol) !== toLower(symbol))
+  if (getCurrencyInfo) {
+    const filterWallets = walletsList
+      .filter((wallet) => toLower(wallet.symbol) === toLower(getCurrencyInfo.symbol))
+      .filter((wallet) => toLower(wallet.symbol) !== toLower(symbol))
 
-  for (const wallet of filterWallets) {
-    if (
-      !walletsList.find(
-        (walletItem) =>
-          toLower(walletItem.symbol) === toLower(symbol) &&
-          toLower(walletItem.address) === toLower(wallet.address)
-      )
-    ) {
-      addresses.push(wallet.address)
+    for (const wallet of filterWallets) {
+      if (
+        !walletsList.find(
+          (walletItem) =>
+            toLower(walletItem.symbol) === toLower(symbol) &&
+            toLower(walletItem.address) === toLower(wallet.address)
+        )
+      ) {
+        addresses.push(wallet.address)
+      }
     }
   }
 

@@ -28,7 +28,7 @@ import { price, toUpper, toLower } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet } from '@utils/wallet'
+import { IWallet, getWallets } from '@utils/wallet'
 import { getExplorerLink } from '@utils/address'
 
 // Config
@@ -138,7 +138,7 @@ const Receive: React.FC = () => {
       openWebPage(link)
     } else if (index === 2) {
       history.push('/select-token', {
-        chain: currency?.chain,
+        currency,
         address,
       })
     }

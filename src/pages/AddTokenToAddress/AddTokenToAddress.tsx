@@ -19,6 +19,7 @@ import { decrypt, encrypt } from '@utils/crypto'
 
 // Config
 import { getUnusedAddressesForToken } from '@config/tokens'
+import { getCurrencyByChain } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -37,6 +38,8 @@ const AddTokenToAddress: React.FC = () => {
     state: { symbol, chain, chainName, tokenName, contractAddress },
   } = useLocation<LocationState>()
 
+  const getCurrencyInfo = getCurrencyByChain(chain)
+
   const [chainAddresses, setChainAddresses] = React.useState<string[]>([])
   const [selectedAddress, setSelectedAddress] = React.useState<string>('')
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
@@ -48,7 +51,7 @@ const AddTokenToAddress: React.FC = () => {
     .map((address: string) => {
       return {
         logo: {
-          symbol: chain,
+          symbol: getCurrencyInfo?.symbol || chain,
           width: 40,
           height: 40,
           br: 20,
@@ -101,7 +104,7 @@ const AddTokenToAddress: React.FC = () => {
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
           const findWallet = parseBackup?.wallets?.find(
-            (wallet: IWallet) => (wallet.address = selectedAddress)
+            (wallet: IWallet) => wallet.address === selectedAddress
           )
 
           const uuid = v4()
@@ -156,7 +159,7 @@ const AddTokenToAddress: React.FC = () => {
             <CurrenciesDropdown
               label="Select address"
               value={selectedAddress}
-              currencySymbol={chain}
+              currencySymbol={getCurrencyInfo?.symbol || chain}
               list={mapList}
               onSelect={setSelectedAddress}
               disabled={chainAddresses.length < 2}

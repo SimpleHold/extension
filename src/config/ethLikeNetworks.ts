@@ -20,8 +20,8 @@ const networks: IEthNetwork[] = [
   },
 ]
 
-export const getEthNetwork = (symbol: string): IEthNetwork | undefined => {
-  return networks.find((network: IEthNetwork) => toLower(network.symbol) === toLower(symbol))
+export const getEthNetwork = (chain: string): IEthNetwork | undefined => {
+  return networks.find((network: IEthNetwork) => toLower(network.chain) === toLower(chain))
 }
 
 export default networks

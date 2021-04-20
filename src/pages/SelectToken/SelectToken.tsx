@@ -14,39 +14,61 @@ import ConfirmDrawer from '@drawers/Confirm'
 
 // Config
 import tokens, { IToken } from '@config/tokens'
+import { ICurrency } from '@config/currencies'
 
 // Utils
 import { toUpper, toLower } from '@utils/format'
-import { addNew as addNewWallet, IWallet } from '@utils/wallet'
+import { addNew as addNewWallet, getWallets, IWallet } from '@utils/wallet'
 import { setUserProperties } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt, encrypt } from '@utils/crypto'
-import { importPrivateKey } from '@utils/address'
 
 // Styles
 import Styles from './styles'
 
 interface LocationState {
-  chain: string
   address: string
+  currency: ICurrency
 }
 
 const SelectToken: React.FC = () => {
   const history = useHistory()
   const {
-    state: { chain, address },
+    state: { address, currency },
   } = useLocation<LocationState>()
 
   const [searchValue, setSearchValue] = React.useState<string>('')
-  const [privateKey, setPrivateKey] = React.useState<null | string>(null)
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
   const [tokenSymbol, setTokenSymbol] = React.useState<string>('')
+  const [tokensList, setTokensList] = React.useState<IToken[]>([])
 
-  const filterByChain = tokens.filter((token: IToken) => toLower(token.chain) === toLower(chain))
+  React.useEffect(() => {
+    getTokensList()
+  }, [])
 
-  const filterTokensList = filterByChain.filter((token: IToken) => {
+  const getTokensList = (): void => {
+    const wallets = getWallets()
+
+    if (wallets) {
+      const getExistTokens: string[] = wallets
+        .filter(
+          (wallet: IWallet) =>
+            toLower(wallet.address) === toLower(address) &&
+            toLower(wallet.chain) === toLower(currency.chain)
+        )
+        .map((wallet: IWallet) => wallet.symbol)
+      const removeExistTokens: IToken[] = tokens.filter(
+        (token: IToken) =>
+          toLower(token.chain) === toLower(currency.chain) && !getExistTokens.includes(token.symbol)
+      )
+
+      setTokensList(removeExistTokens)
+    }
+  }
+
+  const filterTokensList = tokensList.filter((token: IToken) => {
     if (searchValue.length) {
       const findByName = toLower(token.name)?.indexOf(toLower(searchValue) || '') !== -1
       const findBySymbol = toLower(token.symbol)?.indexOf(toLower(searchValue) || '') !== -1
@@ -57,10 +79,14 @@ const SelectToken: React.FC = () => {
   })
 
   const onAddCustomToken = (): void => {
-    history.push('/add-custom-token')
+    history.push('/add-custom-token', {
+      activeNetwork: currency.chain,
+      currency,
+      address,
+    })
   }
 
-  const onAddToken = (symbol: string, chain: string): void => {
+  const onAddToken = (symbol: string): void => {
     setActiveDrawer('confirm')
     setTokenSymbol(symbol)
   }
@@ -68,23 +94,23 @@ const SelectToken: React.FC = () => {
   const onConfirm = (): void => {
     if (validatePassword(password)) {
       const backup = localStorage.getItem('backup')
-      if (backup && privateKey) {
+      if (backup) {
         const decryptBackup = decrypt(backup, password)
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
           const findWallet = parseBackup?.wallets?.find(
-            (wallet: IWallet) => (wallet.address = address)
+            (wallet: IWallet) => wallet.address === address
           )
 
           if (findWallet) {
             const uuid = v4()
-            const newWalletsList = addNewWallet(address, tokenSymbol, uuid, chain)
+            const newWalletsList = addNewWallet(address, tokenSymbol, uuid, currency.chain)
             parseBackup.wallets.push({
               tokenSymbol,
               address,
               uuid,
               privateKey: findWallet.privateKey,
-              chain,
+              chain: currency.chain,
             })
             if (newWalletsList) {
               localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
@@ -93,7 +119,6 @@ const SelectToken: React.FC = () => {
                 (wallet: IWallet) => wallet.symbol === tokenSymbol
               ).length
               setUserProperties({ [`NUMBER_WALLET_${toUpper(tokenSymbol)}`]: `${walletAmount}` })
-              setPrivateKey(null)
 
               localStorage.setItem('backupStatus', 'notDownloaded')
 
@@ -124,7 +149,7 @@ const SelectToken: React.FC = () => {
               onChange={setSearchValue}
             />
 
-            {!filterTokensList.length && filterByChain.length ? (
+            {!filterTokensList.length && tokensList.length ? (
               <Styles.NotFoundMessage>
                 Currency was not found but you can add custom token
               </Styles.NotFoundMessage>
@@ -135,7 +160,7 @@ const SelectToken: React.FC = () => {
                 const { name, symbol, chain } = token
 
                 return (
-                  <Styles.TokenBlock key={symbol} onClick={() => onAddToken(symbol, chain)}>
+                  <Styles.TokenBlock key={symbol} onClick={() => onAddToken(symbol)}>
                     <CurrencyLogo symbol={symbol} width={40} height={40} br={10} chain={chain} />
                     <Styles.TokenName>{name}</Styles.TokenName>
                     <Styles.TokenSymbol>{toUpper(symbol)}</Styles.TokenSymbol>
