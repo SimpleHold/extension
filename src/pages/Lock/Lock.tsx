@@ -62,7 +62,7 @@ const Lock: React.FC = () => {
 
           localStorage.removeItem('passcode')
           localStorage.removeItem('isLocked')
-          return history.push('/wallets', {
+          return history.replace('/wallets', {
             status: state?.status,
           })
         }

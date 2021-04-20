@@ -79,7 +79,7 @@ const RestoreWallet: React.FC = () => {
         if (getWalletsList) {
           localStorage.setItem('backup', backupData)
           localStorage.setItem('wallets', getWalletsList)
-          history.push('/wallets')
+          history.replace('/wallets')
         } else {
           setActiveDrawer('fail')
         }

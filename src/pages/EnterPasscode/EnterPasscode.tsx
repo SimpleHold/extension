@@ -56,7 +56,7 @@ const EnterPasscode: React.FC = () => {
 
     if (getPasscodeHash && getPasscodeHash === sha256hash(passcode)) {
       localStorage.removeItem('isLocked')
-      history.push('/wallets')
+      history.replace('/wallets')
     } else {
       setIsError(true)
       setPasscode('')
