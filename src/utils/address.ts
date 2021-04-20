@@ -178,7 +178,7 @@ export const getExplorerLink = (
   return `https://blockchair.com/${currency?.chain}/address/${address}`
 }
 
-export const getTransactionLink = (hash: string, symbol: string, chain?: string): string => {
+export const getTransactionLink = (hash: string, symbol: string, chain?: string): string | null => {
   if (isEthereumLike(symbol, chain)) {
     const parseChain = toLower(chain)
 
@@ -189,7 +189,8 @@ export const getTransactionLink = (hash: string, symbol: string, chain?: string)
     } else if (parseChain === 'etc') {
       return `https://blockscout.com/etc/mainnet/tx/${hash}/internal-transactions`
     }
+    return null
   } else {
-    return `https://blockchair.com/${chain}/transaction/${.hash}`
+    return `https://blockchair.com/${chain}/transaction/${hash}`
   }
 }

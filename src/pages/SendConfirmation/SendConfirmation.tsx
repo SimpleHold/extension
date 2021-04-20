@@ -102,7 +102,10 @@ const SendConfirmation: React.FC = () => {
 
             if (sendTransaction === transaction.hash) {
               const link = getTransactionLink(transaction.hash, symbol, currency?.chain)
-              setTransactionLink(link)
+
+              if (link) {
+                setTransactionLink(link)
+              }
               return setActiveDrawer('success')
             }
           }
