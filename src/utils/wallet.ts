@@ -51,14 +51,16 @@ export const getLatestBalance = (address: string): number => {
   return 0
 }
 
-export const checkExistWallet = (address: string, chain?: string): boolean => {
+export const checkExistWallet = (address: string, symbol: string, chain?: string): boolean => {
   const wallets = getWallets()
 
   if (wallets?.length) {
     return (
       wallets.find(
         (wallet: IWallet) =>
-          toLower(wallet.address) === toLower(address) && toLower(wallet.chain) === toLower(chain)
+          toLower(wallet.address) === toLower(address) &&
+          toLower(wallet.symbol) === toLower(symbol) &&
+          toLower(wallet.chain) === toLower(chain)
       ) !== undefined
     )
   }
