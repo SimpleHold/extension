@@ -17,11 +17,11 @@ type TGetNetworkFeeResponse = {
   nonce?: number
 }
 
-export const isEthereumLike = (symbol: TSymbols, chain?: string): boolean => {
+export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boolean => {
   return web3Symbols.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
 }
 
-export const generate = (symbol: TSymbols, chain?: string): TGenerateAddress | null => {
+export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
   if (isEthereumLike(symbol, chain)) {
     return web3.generateAddress()
   } else {
@@ -32,7 +32,7 @@ export const generate = (symbol: TSymbols, chain?: string): TGenerateAddress | n
 }
 
 export const importPrivateKey = (
-  symbol: TSymbols,
+  symbol: TSymbols | string,
   privateKey: string,
   chain?: string
 ): string | null => {

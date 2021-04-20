@@ -1,7 +1,7 @@
 class GenerateAddress {
-  symbol: TSymbols
+  symbol: TSymbols | string
 
-  constructor(symbol: TSymbols) {
+  constructor(symbol: TSymbols | string) {
     this.symbol = symbol
   }
 
