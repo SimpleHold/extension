@@ -14,10 +14,9 @@ import ConfirmDrawer from '@drawers/Confirm'
 // Utils
 import { validatePassword } from '@utils/validate'
 import { decrypt, encrypt } from '@utils/crypto'
-import { addNew as addNewWallet, IWallet } from '@utils/wallet'
+import { addNew as addNewWallet } from '@utils/wallet'
 import { importPrivateKey } from '@utils/address'
-import { toLower, toUpper } from '@utils/format'
-import { setUserProperties } from '@utils/amplitude'
+import { toLower } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -71,13 +70,13 @@ const FoundTokens: React.FC = () => {
     const parseBackup = JSON.parse(decryptBackup)
     let newWalletsList: string | null = ''
 
-    const tokensList = isIncludeTokens ? [...tokens, symbol] : [symbol]
+    const tokensList = isIncludeTokens ? [symbol, ...tokens] : [symbol]
 
     for (const [index, token] of tokensList.entries()) {
       const uuid = v4()
 
-      const getTokenName = index == 0 && tokenName ? tokenName : undefined
-      const getContractAddress = index === 0 && contractAddress ? contractAddress : undefined
+      const getTokenName = index == 0 ? tokenName : undefined
+      const getContractAddress = index === 0 ? contractAddress : undefined
 
       newWalletsList = addNewWallet(address, token, uuid, chain, getTokenName, getContractAddress)
 
@@ -92,7 +91,10 @@ const FoundTokens: React.FC = () => {
       })
 
       localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
-      localStorage.setItem('wallets', `${newWalletsList}`)
+
+      if (newWalletsList) {
+        localStorage.setItem('wallets', newWalletsList)
+      }
     }
 
     return newWalletsList
@@ -116,11 +118,6 @@ const FoundTokens: React.FC = () => {
             const walletsList = getNewWallets(decryptBackup, address, password)
 
             if (walletsList) {
-              const walletAmount = JSON.parse(walletsList).filter(
-                (wallet: IWallet) => wallet.symbol === symbol
-              ).length
-              setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
-
               localStorage.setItem('backupStatus', 'notDownloaded')
 
               history.replace('/download-backup', {
@@ -148,7 +145,7 @@ const FoundTokens: React.FC = () => {
             </Styles.Description>
 
             <Styles.TokensList>
-              <TokenCard symbol={symbol} chain={chain} hideSelect />
+              <TokenCard symbol={symbol} chain={chain} hideSelect name={tokenName} />
 
               {tokens.map((tokenSymbol: string) => {
                 const isActive = selectedTokens.indexOf(tokenSymbol) !== -1
@@ -159,6 +156,7 @@ const FoundTokens: React.FC = () => {
                     chain={chain}
                     isActive={isActive}
                     onToggle={() => onToggle(tokenSymbol, isActive)}
+                    key={tokenSymbol}
                   />
                 )
               })}
