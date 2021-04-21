@@ -106,7 +106,7 @@ const SelectToken: React.FC = () => {
             const uuid = v4()
             const newWalletsList = addNewWallet(address, tokenSymbol, uuid, currency.chain)
             parseBackup.wallets.push({
-              tokenSymbol,
+              symbol: tokenSymbol,
               address,
               uuid,
               privateKey: findWallet.privateKey,

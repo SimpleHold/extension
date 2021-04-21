@@ -119,7 +119,7 @@ const AddTokenToAddress: React.FC = () => {
 
           parseBackup.wallets.push({
             symbol,
-            selectedAddress,
+            address: selectedAddress,
             uuid,
             privateKey: findWallet.privateKey,
             chain,

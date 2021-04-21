@@ -105,7 +105,7 @@ const ImportPrivateKey: React.FC = () => {
         if (removeDuplicates.length) {
           return history.push('/found-tokens', {
             chain,
-            symbol,
+            symbol: toLower(symbol),
             privateKey,
             tokens: removeDuplicates,
             tokenName,
