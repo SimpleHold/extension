@@ -38,6 +38,7 @@ const WalletCard: React.FC<Props> = (props) => {
     sumEstimated,
     sumPending,
   } = props
+
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
   const history = useHistory()
@@ -54,7 +55,7 @@ const WalletCard: React.FC<Props> = (props) => {
     const tryGetBalance = await getBalance(
       address,
       currency?.chain || chain,
-      chain ? currency?.symbol : undefined,
+      chain ? currency?.symbol : contractAddress ? symbol : undefined,
       contractAddress
     )
 
