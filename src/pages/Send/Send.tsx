@@ -21,6 +21,7 @@ import { validateAddress, getAddressNetworkFee, formatUnit, isEthereumLike } fro
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
 import { getCurrency } from '@config/currencies'
+import { getToken } from '@config/tokens'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -32,15 +33,25 @@ interface LocationState {
   symbol: TSymbols
   address: string
   chain: string
+  tokenChain?: string
+  contractAddress?: string
+  tokenName?: string
 }
 
 const Send: React.FC = () => {
   const history = useHistory()
   const {
-    state: { symbol, address: locationAddress, chain },
+    state: {
+      symbol,
+      address: locationAddress,
+      chain,
+      tokenChain = undefined,
+      contractAddress = undefined,
+      tokenName = undefined,
+    },
   } = useLocation<LocationState>()
 
-  const currency = getCurrency(symbol)
+  const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
 
   const [address, setAddress] = React.useState<string>('')
   const [amount, setAmount] = React.useState<string>('')
@@ -130,7 +141,12 @@ const Send: React.FC = () => {
     setEstimated(null)
 
     if (currency) {
-      const { balance, balance_usd } = await getBalance(selectedAddress, currency?.chain)
+      const { balance, balance_usd } = await getBalance(
+        selectedAddress,
+        currency?.chain || tokenChain,
+        tokenChain ? currency?.symbol : contractAddress ? symbol : undefined,
+        contractAddress
+      )
 
       setBalance(balance)
       setEstimated(balance_usd)
