@@ -53,7 +53,6 @@ const SendConfirmation: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
-  const [rawTransaction, setRawTransaction] = React.useState<null | IRawTransaction>(null)
   const [transactionLink, setTransactionLink] = React.useState<string>('')
 
   const onConfirmModal = async (): Promise<void> => {
