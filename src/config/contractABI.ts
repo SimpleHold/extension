@@ -1,22 +1,6 @@
-export interface IContract {
-  constant: boolean
-  inputs: {
-    internalType: 'address' | 'uint256'
-    name: string
-    type: 'address' | 'uint256'
-  }[]
-  name: string
-  outputs: {
-    internalType: 'bool'
-    name: string
-    type: 'bool'
-  }[]
-  payable: boolean
-  stateMutability: string
-  type: string
-}
+import { AbiItem } from 'web3-utils'
 
-const contract: IContract[] = [
+const contract: AbiItem[] = [
   {
     constant: false,
     inputs: [
