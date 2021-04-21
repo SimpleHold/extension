@@ -32,6 +32,7 @@ export interface IToken {
   logo: string
   background: string
   chain: string
+  minSendAmount: number
 }
 
 const tokens: IToken[] = [
@@ -43,6 +44,7 @@ const tokens: IToken[] = [
     logo: usdtLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000,
   },
   {
     address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
@@ -52,6 +54,7 @@ const tokens: IToken[] = [
     logo: usdcLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000,
   },
   {
     address: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -61,6 +64,7 @@ const tokens: IToken[] = [
     logo: daiLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0x8e870d67f660d95d5be530380d0ec0bd388289e1',
@@ -70,6 +74,7 @@ const tokens: IToken[] = [
     logo: paxLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0x4Fabb145d64652a948d72533023f6E7A623C7C53',
@@ -79,6 +84,7 @@ const tokens: IToken[] = [
     logo: busdLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0xa47c8bf37f92aBed4A126BDA807A7b7498661acD',
@@ -88,6 +94,7 @@ const tokens: IToken[] = [
     logo: ustLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0xf629cbd94d3791c9250152bd8dfbdf380e2a3b9c',
@@ -97,6 +104,7 @@ const tokens: IToken[] = [
     logo: enjLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
@@ -106,6 +114,7 @@ const tokens: IToken[] = [
     logo: sandLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0xb59490ab09a0f526cc7305822ac65f2ab12f9723',
@@ -115,6 +124,7 @@ const tokens: IToken[] = [
     logo: litLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0x6468e79A80C0eaB0F9A2B574c8d5bC374Af59414',
@@ -124,6 +134,7 @@ const tokens: IToken[] = [
     logo: exdrLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0x5580ab97F226C324c671746a1787524AEF42E415',
@@ -133,6 +144,7 @@ const tokens: IToken[] = [
     logo: julLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0x4c19596f5aaff459fa38b0f7ed92f11ae6543784',
@@ -142,6 +154,7 @@ const tokens: IToken[] = [
     logo: truLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 100000,
   },
   {
     address: '0x67c597624b17b16fb77959217360b7cd18284253',
@@ -151,6 +164,7 @@ const tokens: IToken[] = [
     logo: markLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000,
   },
   {
     address: '0xf2ddae89449b7d26309a5d54614b1fc99c608af5',
@@ -160,6 +174,7 @@ const tokens: IToken[] = [
     logo: astaLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0xB8c77482e45F1F44dE1745F52C74426C631bDD52',
@@ -169,6 +184,7 @@ const tokens: IToken[] = [
     logo: bnbLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
@@ -178,6 +194,7 @@ const tokens: IToken[] = [
     logo: busdLogo,
     background: '#EBBB4E',
     chain: 'bsc',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82',
@@ -187,6 +204,7 @@ const tokens: IToken[] = [
     logo: cakeLogo,
     background: '#EBBB4E',
     chain: 'bsc',
+    minSendAmount: 1000000000000000,
   },
   {
     address: '0x111111111117dc0aa78b770fa6a738034120c302',
@@ -196,13 +214,17 @@ const tokens: IToken[] = [
     logo: inchLogo,
     background: '#EBBB4E',
     chain: 'bsc',
+    minSendAmount: 1000000000000000,
   },
 ]
 
 export default tokens
 
-export const getToken = (symbol: String, chain: string) => {
-  return tokens.find((token: IToken) => token.symbol === symbol && token.chain === chain)
+export const getToken = (symbol: string, chain: string) => {
+  return tokens.find(
+    (token: IToken) =>
+      toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain)
+  )
 }
 
 export const validateContractAddress = (address: string, chain: string): boolean => {

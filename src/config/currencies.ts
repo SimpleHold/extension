@@ -9,6 +9,9 @@ import ethereumLogo from '@assets/currencies/eth.svg'
 import ethereumClassicLogo from '@assets/currencies/etc.svg'
 import binanceLogo from '@assets/currencies/bnb.svg'
 
+// Utils
+import { toLower } from '@utils/format'
+
 export interface ICurrency {
   name: string
   symbol: string
@@ -94,11 +97,11 @@ const currencies: ICurrency[] = [
 ]
 
 export const getCurrency = (symbol: string): ICurrency | undefined => {
-  return currencies.find((currency: ICurrency) => currency.symbol === symbol)
+  return currencies.find((currency: ICurrency) => toLower(currency.symbol) === toLower(symbol))
 }
 
 export const getCurrencyByChain = (chain: string): ICurrency | undefined => {
-  return currencies.find((currency: ICurrency) => currency.chain === chain)
+  return currencies.find((currency: ICurrency) => toLower(currency.chain) === toLower(chain))
 }
 
 export default currencies

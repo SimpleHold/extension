@@ -14,9 +14,9 @@ import Skeleton from '@components/Skeleton'
 import ConfirmDrawer from '@drawers/Confirm'
 
 // Config
-import { validateContractAddress, checkExistWallet } from '@config/tokens'
+import { validateContractAddress, checkExistWallet, getToken } from '@config/tokens'
 import networks, { getEthNetwork, IEthNetwork } from '@config/ethLikeNetworks'
-import { ICurrency } from '@config/currencies'
+import { ICurrency, getCurrency } from '@config/currencies'
 
 // Utils
 import { getContractInfo } from '@utils/api'
@@ -63,19 +63,23 @@ const AddCustomToken: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [drawerErrorLabel, setDrawerErrorLabel] = React.useState<null | string>(null)
+  const [logoSymbol, setLogoSymbol] = React.useState<string>(networks[0].symbol)
+  const [logoBackground, setLogoBackground] = React.useState<string>('#132BD8')
 
   const debounced = useDebounce(contractAddress, 1000)
   const useToast = useToastContext()
 
   React.useEffect(() => {
-    if (
-      contractAddress.length &&
-      !errorLabel &&
-      validateContractAddress(contractAddress, selectedNetwork.chain)
-    ) {
+    if (!errorLabel && validateContractAddress(contractAddress, selectedNetwork.chain)) {
       getContractAddressInfo()
     }
   }, [debounced])
+
+  React.useEffect(() => {
+    if (!isLoading && validateContractAddress(contractAddress, selectedNetwork.chain)) {
+      getContractAddressInfo()
+    }
+  }, [selectedNetwork])
 
   React.useEffect(() => {
     if (
@@ -86,12 +90,22 @@ const AddCustomToken: React.FC = () => {
 
       if (getNetworkInfo) {
         setSelectedNetwork(getNetworkInfo)
+
+        const findCurrency = getCurrency(getNetworkInfo.symbol)
+
+        if (findCurrency) {
+          setLogoBackground(findCurrency.background)
+        }
       }
     }
   }, [activeNetwork])
 
   const getContractAddressInfo = async (): Promise<void> => {
     setIsLoading(true)
+
+    if (errorLabel) {
+      setErrorLabel(null)
+    }
 
     if (tokenInfo.name.length || tokenInfo.symbol.length || tokenInfo.decimals > 0) {
       setTokenInfo({
@@ -107,6 +121,9 @@ const AddCustomToken: React.FC = () => {
 
     if (data) {
       const { name, symbol, decimals } = data
+
+      const checkExistToken = getToken(symbol, selectedNetwork.chain)
+      setLogoSymbol(checkExistToken?.symbol || selectedNetwork.symbol)
 
       setTokenInfo({
         name,
@@ -152,6 +169,12 @@ const AddCustomToken: React.FC = () => {
 
     if (getNetworkInfo) {
       setSelectedNetwork(getNetworkInfo)
+
+      const findCurrency = getCurrency(getNetworkInfo.symbol)
+
+      if (findCurrency) {
+        setLogoBackground(findCurrency.background)
+      }
     }
   }
 
@@ -248,10 +271,10 @@ const AddCustomToken: React.FC = () => {
               <CurrencyLogo
                 width={40}
                 height={40}
-                symbol={selectedNetwork.symbol}
+                symbol={logoSymbol}
                 chain={selectedNetwork.chain}
                 name={tokenInfo.name || 'T'}
-                background="#132BD8"
+                background={logoBackground}
               />
               <Styles.TokenCardRow>
                 <Skeleton width={90} height={19} mt={6} isLoading={isLoading} type="gray">
