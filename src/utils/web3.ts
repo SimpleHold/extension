@@ -1,6 +1,7 @@
 import Web3 from 'web3'
 
-import config from '@config/index'
+import contractABI from '@config/contractABI'
+import { getToken } from '@config/tokens'
 
 const web3 = new Web3()
 
@@ -32,6 +33,20 @@ export type Unit =
   | 'mether'
   | 'gether'
   | 'tether'
+
+interface TransferTokenOptions {
+  amount: number
+  chain: string
+  symbol: string
+  from: string
+  to: string
+  privateKey: string
+  gasPrice: string
+  gas: string
+  nonce: number
+  chainId: number
+  contractAddress?: string
+}
 
 export const generateAddress = (): TGenerateAddress | null => {
   try {
@@ -80,6 +95,57 @@ export const createTransaction = async (
         chainId,
         gasPrice,
         nonce,
+      },
+      privateKey
+    )
+
+    if (rawTransaction && transactionHash) {
+      return {
+        raw: rawTransaction,
+        hash: transactionHash,
+      }
+    }
+
+    return null
+  } catch {
+    return null
+  }
+}
+
+export const transferToken = async ({
+  amount,
+  chain,
+  symbol,
+  from,
+  to,
+  privateKey,
+  gasPrice,
+  gas,
+  nonce,
+  chainId,
+  contractAddress,
+}: TransferTokenOptions): Promise<TCreatedTransaction | null> => {
+  try {
+    const decimals = 18
+    const value = web3.utils
+      .toBN(10)
+      .pow(web3.utils.toBN(decimals))
+      .mul(web3.utils.toBN(amount))
+      .toString()
+
+    const getContractAddress = getToken(symbol, chain)?.address || contractAddress
+
+    const contract = new web3.eth.Contract(contractABI, getContractAddress, { from })
+    const data = contract.methods.transfer(to, value)
+
+    const { rawTransaction, transactionHash } = await web3.eth.accounts.signTransaction(
+      {
+        to: getContractAddress,
+        gasPrice,
+        gas,
+        data: data.encodeABI(),
+        nonce,
+        chainId,
       },
       privateKey
     )
