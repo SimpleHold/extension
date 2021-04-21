@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import { v4 } from 'uuid'
 
 // Components
 import Cover from '@components/Cover'
@@ -24,7 +23,7 @@ import { getContractInfo } from '@utils/api'
 import { addNew as addNewWallet, getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
-import { decrypt, encrypt } from '@utils/crypto'
+import { decrypt } from '@utils/crypto'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -176,44 +175,33 @@ const AddCustomToken: React.FC = () => {
     if (validatePassword(password) && currency) {
       const backup = localStorage.getItem('backup')
       if (backup) {
-        const { address } = state
         const decryptBackup = decrypt(backup, password)
-        if (decryptBackup && state) {
+        if (decryptBackup && state?.address) {
           const parseBackup = JSON.parse(decryptBackup)
+
           const findWallet = parseBackup?.wallets?.find(
-            (wallet: IWallet) => wallet.address === address
+            (wallet: IWallet) => wallet.address === state.address
           )
 
-          if (findWallet) {
-            const uuid = v4()
-            const newWalletsList = addNewWallet(
-              `${address}`,
-              tokenInfo.symbol,
-              uuid,
-              currency.chain,
-              tokenInfo.name,
-              contractAddress
-            )
-            parseBackup.wallets.push({
-              symbol: tokenInfo.symbol,
-              address,
-              uuid,
-              privateKey: findWallet.privateKey,
-              chain: currency.chain,
-              tokenName: tokenInfo.name,
-              contractAddress,
+          const walletsList = addNewWallet(
+            state.address,
+            findWallet.privateKey,
+            decryptBackup,
+            password,
+            [tokenInfo.symbol],
+            false,
+            currency.chain,
+            tokenInfo.name,
+            contractAddress
+          )
+
+          if (walletsList) {
+            localStorage.setItem('backupStatus', 'notDownloaded')
+
+            return history.replace('/download-backup', {
+              password,
+              from: 'addCustomToken',
             })
-            if (newWalletsList) {
-              localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
-              localStorage.setItem('wallets', newWalletsList)
-
-              localStorage.setItem('backupStatus', 'notDownloaded')
-
-              history.replace('/download-backup', {
-                password,
-                from: 'addCustomToken',
-              })
-            }
           }
         }
       }

@@ -28,12 +28,13 @@ import { price, toUpper, toLower } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet, getWallets } from '@utils/wallet'
+import { IWallet } from '@utils/wallet'
 import { getExplorerLink } from '@utils/address'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
 import { getCurrency } from '@config/currencies'
+import { getToken } from '@config/tokens'
 
 // Icons
 import privateKeyIcon from '@assets/icons/privateKey.svg'
@@ -49,15 +50,23 @@ interface LocationState {
   address: string
   chain?: string
   contractAddress?: string
+  tokenName?: string
 }
 
 const Receive: React.FC = () => {
   const {
-    state: { name, symbol, address, chain = undefined, contractAddress = undefined },
+    state: {
+      name,
+      symbol,
+      address,
+      chain = undefined,
+      contractAddress = undefined,
+      tokenName = undefined,
+    },
   } = useLocation<LocationState>()
 
   const history = useHistory()
-  const currency = getCurrency(symbol)
+  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false)
@@ -113,11 +122,19 @@ const Receive: React.FC = () => {
       symbol,
       address,
       chain: currency?.chain,
+      tokenChain: chain,
+      contractAddress,
+      tokenName,
     })
   }
 
   const loadBalance = async (): Promise<void> => {
-    const { balance, balance_usd, pending } = await getBalance(address, currency?.chain)
+    const { balance, balance_usd, pending } = await getBalance(
+      address,
+      currency?.chain || chain,
+      chain ? currency?.symbol : contractAddress ? symbol : undefined,
+      contractAddress
+    )
 
     setBalance(balance)
     setEstimated(balance_usd)
@@ -220,7 +237,14 @@ const Receive: React.FC = () => {
             />
 
             <Styles.CurrencyBlock>
-              <CurrencyLogo symbol={symbol} width={22} height={22} br={5} chain={chain} />
+              <CurrencyLogo
+                symbol={symbol}
+                width={22}
+                height={22}
+                br={5}
+                chain={chain}
+                name={tokenName}
+              />
               <Styles.CurrencyName>{name}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
 

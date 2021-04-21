@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import { v4 } from 'uuid'
 
 // Components
 import Cover from '@components/Cover'
@@ -13,10 +12,12 @@ import ConfirmDrawer from '@drawers/Confirm'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { decrypt, encrypt } from '@utils/crypto'
+import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet } from '@utils/wallet'
 import { importPrivateKey } from '@utils/address'
-import { toLower } from '@utils/format'
+
+// Config
+import { getCurrencyByChain } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -62,44 +63,6 @@ const FoundTokens: React.FC = () => {
     setActiveDrawer('confirm')
   }
 
-  const getNewWallets = (
-    decryptBackup: string,
-    address: string,
-    password: string
-  ): string | null => {
-    const parseBackup = JSON.parse(decryptBackup)
-    let newWalletsList: string | null = ''
-
-    const tokensList = isIncludeTokens ? [symbol, ...tokens] : [symbol]
-
-    for (const [index, token] of tokensList.entries()) {
-      const uuid = v4()
-
-      const getTokenName = index == 0 ? tokenName : undefined
-      const getContractAddress = index === 0 ? contractAddress : undefined
-
-      newWalletsList = addNewWallet(address, token, uuid, chain, getTokenName, getContractAddress)
-
-      parseBackup.wallets.push({
-        symbol: toLower(token),
-        address,
-        uuid,
-        privateKey,
-        chain,
-        tokenName: getTokenName,
-        contractAddress: getContractAddress,
-      })
-
-      localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
-
-      if (newWalletsList) {
-        localStorage.setItem('wallets', newWalletsList)
-      }
-    }
-
-    return newWalletsList
-  }
-
   const onConfirmDrawer = (): void => {
     if (errorLabel) {
       setErrorLabel(null)
@@ -113,9 +76,25 @@ const FoundTokens: React.FC = () => {
 
         if (decryptBackup) {
           const address = importPrivateKey(symbol, privateKey, chain)
+          const getCurrencyInfo = getCurrencyByChain(chain)
 
-          if (address) {
-            const walletsList = getNewWallets(decryptBackup, address, password)
+          if (address && getCurrencyInfo) {
+            const tokensList = [getCurrencyInfo.symbol, symbol]
+
+            if (isIncludeTokens) {
+              tokensList.push(...tokens)
+            }
+            const walletsList = addNewWallet(
+              address,
+              privateKey,
+              decryptBackup,
+              password,
+              tokensList,
+              true,
+              chain,
+              tokenName,
+              contractAddress
+            )
 
             if (walletsList) {
               localStorage.setItem('backupStatus', 'notDownloaded')

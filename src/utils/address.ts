@@ -4,7 +4,7 @@ import bitcoinLike from '@utils/bitcoinLike'
 // Config
 import addressValidate from '@config/addressValidate'
 import { ICurrency } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getToken, IToken } from '@config/tokens'
 
 // Utils
 import { getEtherNetworkFee } from '@utils/api'
@@ -148,7 +148,7 @@ export const formatUnit = (
 export const getExplorerLink = (
   address: string,
   symbol: string,
-  currency?: ICurrency,
+  currency?: ICurrency | IToken,
   chain?: string,
   contractAddress?: string
 ) => {

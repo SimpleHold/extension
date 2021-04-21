@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
-import { v4 } from 'uuid'
 
 // Components
 import Cover from '@components/Cover'
@@ -14,13 +13,14 @@ import ConfirmDrawer from '@drawers/Confirm'
 // Utils
 import { logEvent, setUserProperties } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
-import { decrypt, encrypt } from '@utils/crypto'
+import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
 import { generate, importPrivateKey } from '@utils/address'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
+import { getCurrencyByChain } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -51,21 +51,6 @@ const NewWallet: React.FC = () => {
       contractAddress = undefined,
     },
   } = useLocation<LocationState>()
-
-  const onSuccess = (password: string): void => {
-    logEvent({
-      name: ADD_ADDRESS_CONFIRM,
-    })
-
-    setPrivateKey(null)
-
-    localStorage.setItem('backupStatus', 'notDownloaded')
-
-    history.replace('/download-backup', {
-      password,
-      from: 'newWallet',
-    })
-  }
 
   const onGenerateAddress = (): void => {
     logEvent({
@@ -103,41 +88,44 @@ const NewWallet: React.FC = () => {
         const decryptBackup = decrypt(backup, password)
 
         if (decryptBackup) {
-          const parseBackup = JSON.parse(decryptBackup)
-
           const address = importPrivateKey(symbol, privateKey, chain)
 
           if (address) {
-            const uuid = v4()
-            const newWalletsList = addNewWallet(
+            const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
+            const currenciesList =
+              chain && getCurrencyInfo ? [symbol, getCurrencyInfo.symbol] : [symbol]
+
+            const walletsList = addNewWallet(
               address,
-              symbol,
-              uuid,
+              privateKey,
+              decryptBackup,
+              password,
+              currenciesList,
+              false,
               chain,
               tokenName,
               contractAddress
             )
 
-            parseBackup.wallets.push({
-              symbol,
-              address,
-              uuid,
-              privateKey,
-              chain,
-              tokenName,
-              contractAddress,
-            })
-
-            if (newWalletsList) {
-              localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
-              localStorage.setItem('wallets', newWalletsList)
-
-              const walletAmount = JSON.parse(newWalletsList).filter(
+            if (walletsList) {
+              const walletAmount = JSON.parse(walletsList).filter(
                 (wallet: IWallet) => wallet.symbol === symbol
               ).length
+
               setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
-              return onSuccess(password)
+              logEvent({
+                name: ADD_ADDRESS_CONFIRM,
+              })
+
+              setPrivateKey(null)
+
+              localStorage.setItem('backupStatus', 'notDownloaded')
+
+              return history.replace('/download-backup', {
+                password,
+                from: 'newWallet',
+              })
             }
           }
         }

@@ -78,6 +78,7 @@ const WalletCard: React.FC<Props> = (props) => {
       address,
       chain,
       contractAddress,
+      tokenName: name,
     })
   }
 

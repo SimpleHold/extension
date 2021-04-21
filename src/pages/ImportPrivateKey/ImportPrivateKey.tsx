@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import { v4 } from 'uuid'
 
 // Components
 import Cover from '@components/Cover'
@@ -15,7 +14,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 // Utils
 import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets } from '@utils/wallet'
-import { decrypt, encrypt } from '@utils/crypto'
+import { decrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toLower, toUpper } from '@utils/format'
 import { importPrivateKey } from '@utils/address'
@@ -23,6 +22,7 @@ import { getTokensBalance, ITokensBalance } from '@utils/api'
 
 // Config
 import tokens, { IToken } from '@config/tokens'
+import { getCurrencyByChain } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -124,34 +124,29 @@ const ImportPrivateKey: React.FC = () => {
     if (backup && privateKey) {
       const decryptBackup = decrypt(backup, password)
       if (decryptBackup) {
-        const parseBackup = JSON.parse(decryptBackup)
         const address = importPrivateKey(symbol, privateKey, chain)
 
         if (address) {
-          const uuid = v4()
-          const newWalletsList = addNewWallet(
+          const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
+          const currenciesList =
+            chain && getCurrencyInfo ? [symbol, getCurrencyInfo.symbol] : [symbol]
+
+          const walletsList = addNewWallet(
             address,
-            symbol,
-            uuid,
+            privateKey,
+            decryptBackup,
+            password,
+            currenciesList,
+            false,
             chain,
             tokenName,
             contractAddress
           )
-          parseBackup.wallets.push({
-            symbol,
-            address,
-            uuid,
-            privateKey,
-            chain,
-            tokenName,
-            contractAddress,
-          })
-          if (newWalletsList) {
-            localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
-            localStorage.setItem('wallets', newWalletsList)
+
+          if (walletsList) {
             localStorage.setItem('backupStatus', 'notDownloaded')
 
-            const walletAmount = JSON.parse(newWalletsList).filter(
+            const walletAmount = JSON.parse(walletsList).filter(
               (wallet: IWallet) => wallet.symbol === symbol
             ).length
             setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })

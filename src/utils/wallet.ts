@@ -1,5 +1,8 @@
+import { v4 } from 'uuid'
+
 import { validateWallet } from '@utils/validate'
 import { toLower } from '@utils/format'
+import { encrypt } from '@utils/crypto'
 
 export interface IWallet {
   symbol: string
@@ -69,28 +72,50 @@ export const checkExistWallet = (address: string, symbol: string, chain?: string
 
 export const addNew = (
   address: string,
-  symbol: string,
-  uuid: string,
+  privateKey: string,
+  decryptBackup: string,
+  password: string,
+  currencies: string[],
+  includeChain?: boolean,
   chain?: string,
-  name?: string,
+  tokenName?: string,
   contractAddress?: string
 ): string | null => {
-  const walletsList = localStorage.getItem('wallets')
-  const validateWallets = validateWallet(walletsList)
+  const parseBackup = JSON.parse(decryptBackup)
 
-  if (validateWallets && walletsList) {
-    const parseWallets = JSON.parse(walletsList)
+  for (const [index, currency] of currencies.entries()) {
+    const getTokenName = index == 0 ? tokenName : undefined
+    const getContractAddress = index === 0 ? contractAddress : undefined
+    const getChain = includeChain
+      ? index !== 0
+        ? chain
+        : undefined
+      : index === 0
+      ? chain
+      : undefined
 
-    parseWallets.push({
-      symbol,
-      address,
-      uuid,
-      chain,
-      name,
-      contractAddress,
-    })
+    const walletsList = localStorage.getItem('wallets')
+    const validateWallets = validateWallet(walletsList)
 
-    return JSON.stringify(parseWallets)
+    if (validateWallets && walletsList) {
+      const parseWallets = JSON.parse(walletsList)
+
+      const data = {
+        symbol: toLower(currency),
+        address,
+        uuid: v4(),
+        chain: getChain,
+        name: getTokenName,
+        contractAddress: getContractAddress,
+      }
+
+      parseWallets.push(data)
+      parseBackup.wallets.push({ ...data, ...{ privateKey } })
+
+      localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+      localStorage.setItem('wallets', JSON.stringify(parseWallets))
+    }
   }
-  return null
+
+  return localStorage.getItem('wallets')
 }

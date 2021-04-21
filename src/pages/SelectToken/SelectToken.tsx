@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
-import { v4 } from 'uuid'
 
 // Components
 import Cover from '@components/Cover'
@@ -21,7 +20,7 @@ import { toUpper, toLower } from '@utils/format'
 import { addNew as addNewWallet, getWallets, IWallet } from '@utils/wallet'
 import { setUserProperties } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
-import { decrypt, encrypt } from '@utils/crypto'
+import { decrypt } from '@utils/crypto'
 
 // Styles
 import Styles from './styles'
@@ -103,26 +102,25 @@ const SelectToken: React.FC = () => {
           )
 
           if (findWallet) {
-            const uuid = v4()
-            const newWalletsList = addNewWallet(address, tokenSymbol, uuid, currency.chain)
-            parseBackup.wallets.push({
-              symbol: tokenSymbol,
+            const walletsList = addNewWallet(
               address,
-              uuid,
-              privateKey: findWallet.privateKey,
-              chain: currency.chain,
-            })
-            if (newWalletsList) {
-              localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
-              localStorage.setItem('wallets', newWalletsList)
-              const walletAmount = JSON.parse(newWalletsList).filter(
+              findWallet.privateKey,
+              decryptBackup,
+              password,
+              [tokenSymbol],
+              false,
+              currency.chain
+            )
+
+            if (walletsList) {
+              const walletAmount = JSON.parse(walletsList).filter(
                 (wallet: IWallet) => wallet.symbol === tokenSymbol
               ).length
               setUserProperties({ [`NUMBER_WALLET_${toUpper(tokenSymbol)}`]: `${walletAmount}` })
 
               localStorage.setItem('backupStatus', 'notDownloaded')
 
-              history.replace('/download-backup', {
+              return history.replace('/download-backup', {
                 password,
                 from: 'selectToken',
               })
