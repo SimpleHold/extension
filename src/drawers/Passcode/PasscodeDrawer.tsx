@@ -46,6 +46,10 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
     }
   }
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+  }
+
   return (
     <DrawerWrapper
       title={type === 'create' ? 'Create your passcode' : 'Enter your passcode'}
@@ -53,7 +57,7 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
       onClose={onClose}
     >
       <Styles.Row>
-        <Styles.Form>
+        <Styles.Form onSubmit={onSubmitForm}>
           <OneTimePassword value={passcode} onChange={setPasscode} isError={isError} />
         </Styles.Form>
 

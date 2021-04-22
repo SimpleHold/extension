@@ -13,7 +13,7 @@ interface Props {
   isActive: boolean
   title: string
   isButtonDisabled?: boolean
-  onConfirm: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onConfirm: () => void
   textInputValue: string
   onChangeText: (data: string) => void
   inputLabel: string
@@ -49,10 +49,18 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
     }
   }, [isActive])
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!isButtonDisabled) {
+      onConfirm()
+    }
+  }
+
   return (
     <DrawerWrapper title={title} isActive={isActive} onClose={onClose}>
       <Styles.Row>
-        <Styles.Form>
+        <Styles.Form onSubmit={onSubmitForm}>
           <TextInput
             label={inputLabel}
             value={textInputValue}

@@ -99,6 +99,14 @@ const Lock: React.FC = () => {
     }
   }
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (validatePassword(password)) {
+      onUnlock()
+    }
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -106,7 +114,7 @@ const Lock: React.FC = () => {
         <Styles.Container>
           <Styles.Image src="../../assets/illustrate/lock.svg" alt="lock" />
           <Styles.Title>Welcome back!</Styles.Title>
-          <Styles.Form>
+          <Styles.Form onSubmit={onSubmitForm}>
             <TextInput
               label="Password"
               type="password"

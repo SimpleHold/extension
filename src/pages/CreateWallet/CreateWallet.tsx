@@ -83,6 +83,14 @@ const Wallets: React.FC = () => {
     }
   }
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!isButtonDisabled) {
+      onConfirm()
+    }
+  }
+
   return (
     <Styles.Wrapper>
       <Header noActions logoColor="#3FBB7D" withBorder />
@@ -99,7 +107,7 @@ const Wallets: React.FC = () => {
             mt={44}
           />
         </Styles.Row>
-        <Styles.Form>
+        <Styles.Form onSubmit={onSubmitForm}>
           <TextInput
             label="Enter password"
             value={password}

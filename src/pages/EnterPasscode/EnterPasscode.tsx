@@ -77,6 +77,10 @@ const EnterPasscode: React.FC = () => {
     })
   }
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -86,7 +90,7 @@ const EnterPasscode: React.FC = () => {
             <Styles.Image />
             <Styles.Title>Enter your passcode</Styles.Title>
 
-            <Styles.Form>
+            <Styles.Form onSubmit={onSubmitForm}>
               <OneTimePassword value={passcode} onChange={setPasscode} isError={isError} />
             </Styles.Form>
           </Styles.Row>
