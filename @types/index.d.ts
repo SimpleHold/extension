@@ -97,4 +97,4 @@ declare const dogecoin: {
   ) => TCreatedTransaction | null
 }
 
-type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash' | 'eth' | 'etc' | 'bsc'
+type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash' | 'eth' | 'etc' | 'bsc' | 'bnb'

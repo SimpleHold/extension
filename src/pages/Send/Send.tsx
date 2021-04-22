@@ -174,7 +174,7 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (address.length && !validateAddress(symbol, address)) {
+    if (address.length && !validateAddress(symbol, address, chain)) {
       setAddressErrorLabel('Address is not valid')
     }
 

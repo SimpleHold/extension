@@ -64,8 +64,9 @@ export const importPrivateKey = (
   }
 }
 
-export const validateAddress = (symbol: TSymbols, address: string): boolean => {
-  return new RegExp(addressValidate[symbol])?.test(address)
+export const validateAddress = (symbol: TSymbols, address: string, chain?: string): boolean => {
+  const findRegexp = chain ? addressValidate.eth : addressValidate[symbol]
+  return new RegExp(findRegexp)?.test(address)
 }
 
 export const createTransaction = async ({

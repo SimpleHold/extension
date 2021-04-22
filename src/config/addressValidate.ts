@@ -9,4 +9,5 @@ export default {
   eth: '^(0x)[0-9A-Fa-f]{40}$',
   etc: '^(0x)[0-9A-Fa-f]{40}$',
   bsc: '^(0x)[0-9A-Fa-f]{40}$',
+  bnb: '^(0x)[0-9A-Fa-f]{40}$',
 }
