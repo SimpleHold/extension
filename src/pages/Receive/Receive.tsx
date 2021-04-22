@@ -132,7 +132,7 @@ const Receive: React.FC = () => {
     const { balance, balance_usd, pending } = await getBalance(
       address,
       currency?.chain || chain,
-      chain ? currency?.symbol : contractAddress ? symbol : undefined,
+      chain ? symbol : undefined,
       contractAddress
     )
 

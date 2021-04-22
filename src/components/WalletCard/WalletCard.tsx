@@ -55,7 +55,7 @@ const WalletCard: React.FC<Props> = (props) => {
     const tryGetBalance = await getBalance(
       address,
       currency?.chain || chain,
-      chain ? currency?.symbol : contractAddress ? symbol : undefined,
+      chain ? symbol : undefined,
       contractAddress
     )
 
