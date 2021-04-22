@@ -51,6 +51,7 @@ interface LocationState {
   chain?: string
   contractAddress?: string
   tokenName?: string
+  decimals?: number
 }
 
 const Receive: React.FC = () => {
@@ -62,6 +63,7 @@ const Receive: React.FC = () => {
       chain = undefined,
       contractAddress = undefined,
       tokenName = undefined,
+      decimals = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -125,6 +127,7 @@ const Receive: React.FC = () => {
       tokenChain: chain,
       contractAddress,
       tokenName,
+      decimals,
     })
   }
 

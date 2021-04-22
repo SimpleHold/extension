@@ -22,6 +22,7 @@ interface Props {
   chain?: string
   name?: string
   contractAddress?: string
+  decimals?: number
   sumBalance: (balance: number) => void
   sumEstimated: (estimated: number) => void
   sumPending: (pending: number) => void
@@ -34,6 +35,7 @@ const WalletCard: React.FC<Props> = (props) => {
     chain,
     name,
     contractAddress,
+    decimals,
     sumBalance,
     sumEstimated,
     sumPending,
@@ -79,6 +81,7 @@ const WalletCard: React.FC<Props> = (props) => {
       chain,
       contractAddress,
       tokenName: name,
+      decimals,
     })
   }
 
