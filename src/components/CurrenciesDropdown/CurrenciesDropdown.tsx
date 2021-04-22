@@ -4,6 +4,9 @@ import SVG from 'react-inlinesvg'
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
 
+// Utils
+import { getCurrencyByChain } from '@config/currencies'
+
 // Hooks
 import useVisible from '@hooks/useVisible'
 
@@ -31,12 +34,27 @@ interface Props {
   disabled?: boolean
   currencyBr: number
   background?: string
+  tokenChain?: string
+  tokenName?: string
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
-  const { currencySymbol, list, onSelect, label, value, disabled, currencyBr, background } = props
+  const {
+    currencySymbol,
+    list,
+    onSelect,
+    label,
+    value,
+    disabled,
+    currencyBr,
+    background,
+    tokenChain,
+    tokenName,
+  } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
+  const getTokenBackground =
+    tokenChain && tokenName ? getCurrencyByChain(tokenChain)?.background : '#1D1D22'
 
   const onSelectItem = (index: number): void => {
     onSelect(index)
@@ -55,7 +73,9 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
           width={40}
           height={40}
           br={currencyBr}
-          background={background || '#1D1D22'}
+          background={background || getTokenBackground}
+          chain={tokenChain}
+          name={tokenName}
         />
         <Styles.Row>
           <Styles.Info>
@@ -88,6 +108,8 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
                   height={logo.height}
                   br={logo.br}
                   background={logo.background}
+                  chain={tokenChain}
+                  name={tokenName}
                 />
                 <Styles.ListItemRow>
                   <Styles.ListItemLabel>{label}</Styles.ListItemLabel>

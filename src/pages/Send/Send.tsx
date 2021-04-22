@@ -278,6 +278,8 @@ const Send: React.FC = () => {
               list={mapDropDownList}
               onSelect={onSelectDropDown}
               disabled={addresses.length < 2}
+              tokenChain={tokenChain}
+              tokenName={tokenName}
             />
           ) : null}
           <TextInput
