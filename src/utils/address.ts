@@ -7,20 +7,10 @@ import { ICurrency } from '@config/currencies'
 import { getToken, IToken } from '@config/tokens'
 
 // Utils
-import { getEtherNetworkFee } from '@utils/api'
+import { getEtherNetworkFee, IGetNetworkFeeResponse } from '@utils/api'
 import { toLower } from './format'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
-
-type TGetNetworkFeeResponse = {
-  networkFee?: number
-  networkFeeLabel?: string
-  utxos?: UnspentOutput[]
-  chainId?: number
-  gas?: number
-  gasPrice?: string
-  nonce?: number
-}
 
 type TCreateTransactionProps = {
   from: string
@@ -138,10 +128,10 @@ export const getAddressNetworkFee = async (
   tokenChain?: string,
   contractAddress?: string,
   decimals?: number
-): Promise<TGetNetworkFeeResponse | null> => {
+): Promise<IGetNetworkFeeResponse | null> => {
   if (chain && isEthereumLike(symbol, chain)) {
     const value = web3.toWei(amount, 'ether')
-    const networkFee = await getEtherNetworkFee(
+    const data = await getEtherNetworkFee(
       from,
       to,
       value,
@@ -151,9 +141,7 @@ export const getAddressNetworkFee = async (
       decimals
     )
 
-    return {
-      networkFee,
-    }
+    return data
   }
   return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
 }

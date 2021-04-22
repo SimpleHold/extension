@@ -47,6 +47,7 @@ const NetworkFeeBlock = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  position: relative;
 `
 
 const NetworkFeeLabel = styled.p`
@@ -71,6 +72,14 @@ const Actions = styled.div`
   margin: 24px 0 0 0;
 `
 
+const NetworkFeeError = styled.p`
+  font-size: 12px;
+  line-height: 14px;
+  color: #eb5757;
+  position: absolute;
+  top: 12px;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -83,6 +92,7 @@ const Styles = {
   NetworkFeeLabel,
   NetworkFee,
   Actions,
+  NetworkFeeError,
 }
 
 export default Styles

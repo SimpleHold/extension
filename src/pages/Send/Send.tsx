@@ -72,6 +72,7 @@ const Send: React.FC = () => {
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
   const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
+  const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
 
   const debounced = useDebounce(amount, 1000)
 
@@ -130,6 +131,10 @@ const Send: React.FC = () => {
 
       if (data.networkFee) {
         setNetworkFee(data.networkFee)
+      }
+
+      if (data.currencyBalance) {
+        setCurrencyBalance(data.currencyBalance)
       }
     }
   }
@@ -330,6 +335,9 @@ const Send: React.FC = () => {
                 )}
               </>
             )}
+            {tokenChain && !isNetworkFeeLoading && networkFee && networkFee > currencyBalance ? (
+              <Styles.NetworkFeeError>Insufficient funds</Styles.NetworkFeeError>
+            ) : null}
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>

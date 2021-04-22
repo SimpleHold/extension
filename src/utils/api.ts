@@ -30,6 +30,17 @@ interface Web3TxParams {
   gasPrice: string
 }
 
+export interface IGetNetworkFeeResponse {
+  networkFee?: number
+  networkFeeLabel?: string
+  utxos?: UnspentOutput[]
+  chainId?: number
+  gas?: number
+  gasPrice?: string
+  nonce?: number
+  currencyBalance?: number
+}
+
 export const getBalance = async (
   address: string,
   chain?: string,
@@ -197,7 +208,7 @@ export const getEtherNetworkFee = async (
   tokenSymbol?: string,
   contractAddress?: string,
   decimals?: number
-): Promise<number> => {
+): Promise<IGetNetworkFeeResponse> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/network-fee`, {
       params: {
@@ -216,6 +227,8 @@ export const getEtherNetworkFee = async (
 
     return data.data
   } catch {
-    return 0
+    return {
+      networkFee: 0,
+    }
   }
 }
