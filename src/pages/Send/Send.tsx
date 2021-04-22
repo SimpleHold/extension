@@ -54,7 +54,9 @@ const Send: React.FC = () => {
   } = useLocation<LocationState>()
 
   const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
-  const getCurrencySymbol = tokenChain
+  const getCurrencySymbol = tokenName
+    ? tokenName
+    : tokenChain
     ? getCurrencyByChain(tokenChain)?.symbol
     : getCurrency(symbol)?.symbol
 
@@ -173,11 +175,13 @@ const Send: React.FC = () => {
       amount: Number(amount),
       symbol,
       networkFee,
+      networkFeeSymbol: getCurrencySymbol,
       addressFrom: selectedAddress,
       addressTo: address,
       outputs: utxosList,
       chain,
       contractAddress: tokenContractAddress,
+      tokenChain,
     })
   }
 

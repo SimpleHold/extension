@@ -209,8 +209,13 @@ export const getExplorerLink = (
   return `https://blockchair.com/${currency?.chain}/address/${address}`
 }
 
-export const getTransactionLink = (hash: string, symbol: string, chain?: string): string | null => {
-  if (isEthereumLike(symbol, chain)) {
+export const getTransactionLink = (
+  hash: string,
+  symbol: string,
+  chain: string,
+  tokenChain?: string
+): string | null => {
+  if (isEthereumLike(symbol, tokenChain)) {
     const parseChain = toLower(chain)
 
     if (parseChain === 'eth') {

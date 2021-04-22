@@ -40,7 +40,9 @@ interface LocationState {
   addressTo: string
   outputs: UnspentOutput[]
   chain: string
+  networkFeeSymbol: string
   contractAddress?: string
+  tokenChain?: string
 }
 
 const SendConfirmation: React.FC = () => {
@@ -54,7 +56,9 @@ const SendConfirmation: React.FC = () => {
       addressTo,
       outputs,
       chain,
+      networkFeeSymbol,
       contractAddress = undefined,
+      tokenChain = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -109,7 +113,7 @@ const SendConfirmation: React.FC = () => {
             const sendTransaction = await sendRawTransaction(transaction.raw, chain)
 
             if (sendTransaction === transaction.hash) {
-              const link = getTransactionLink(transaction.hash, symbol, chain)
+              const link = getTransactionLink(transaction.hash, symbol, chain, tokenChain)
 
               if (link) {
                 setTransactionLink(link)
@@ -172,23 +176,27 @@ const SendConfirmation: React.FC = () => {
                 <Styles.ListTitle>Network fee:</Styles.ListTitle>
                 <Styles.ListRow>
                   <Styles.Amount>{numeral(networkFee).format('0.[00000000]')}</Styles.Amount>
-                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                  <Styles.ListText>{toUpper(networkFeeSymbol)}</Styles.ListText>
                 </Styles.ListRow>
               </Styles.List>
 
-              <Styles.DashedDivider>
-                <Styles.DashedDividerLine />
-              </Styles.DashedDivider>
+              {toUpper(symbol) === toUpper(networkFeeSymbol) ? (
+                <>
+                  <Styles.DashedDivider>
+                    <Styles.DashedDividerLine />
+                  </Styles.DashedDivider>
 
-              <Styles.List>
-                <Styles.ListTitle>Total:</Styles.ListTitle>
-                <Styles.ListRow>
-                  <Styles.Amount>
-                    {numeral(amount + networkFee).format('0.[00000000]')}
-                  </Styles.Amount>
-                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
-                </Styles.ListRow>
-              </Styles.List>
+                  <Styles.List>
+                    <Styles.ListTitle>Total:</Styles.ListTitle>
+                    <Styles.ListRow>
+                      <Styles.Amount>
+                        {numeral(amount + networkFee).format('0.[00000000]')}
+                      </Styles.Amount>
+                      <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                    </Styles.ListRow>
+                  </Styles.List>
+                </>
+              ) : null}
             </Styles.OrderCheck>
 
             <Styles.DestinationsList>
