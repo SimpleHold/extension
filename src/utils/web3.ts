@@ -35,14 +35,14 @@ export type Unit =
   | 'tether'
 
 interface TransferTokenOptions {
-  amount: number
+  value: string
   chain: string
   symbol: string
   from: string
   to: string
   privateKey: string
   gasPrice: string
-  gas: string
+  gas: number
   nonce: number
   chainId: number
   contractAddress?: string
@@ -113,7 +113,7 @@ export const createTransaction = async (
 }
 
 export const transferToken = async ({
-  amount,
+  value,
   chain,
   symbol,
   from,
@@ -126,13 +126,6 @@ export const transferToken = async ({
   contractAddress,
 }: TransferTokenOptions): Promise<TCreatedTransaction | null> => {
   try {
-    const decimals = 18
-    const value = web3.utils
-      .toBN(10)
-      .pow(web3.utils.toBN(decimals))
-      .mul(web3.utils.toBN(amount))
-      .toString()
-
     const getContractAddress = getToken(symbol, chain)?.address || contractAddress
 
     const contract = new web3.eth.Contract(contractABI, getContractAddress, { from })

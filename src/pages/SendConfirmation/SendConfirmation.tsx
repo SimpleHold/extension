@@ -16,7 +16,7 @@ import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { IRawTransaction, sendRawTransaction, getWeb3TxParams } from '@utils/api'
+import { sendRawTransaction, getWeb3TxParams } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
 import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
 
@@ -40,15 +40,23 @@ interface LocationState {
   addressTo: string
   outputs: UnspentOutput[]
   chain: string
+  contractAddress?: string
 }
 
 const SendConfirmation: React.FC = () => {
   const history = useHistory()
   const {
-    state: { amount, symbol, networkFee, addressFrom, addressTo, outputs, chain },
+    state: {
+      amount,
+      symbol,
+      networkFee,
+      addressFrom,
+      addressTo,
+      outputs,
+      chain,
+      contractAddress = undefined,
+    },
   } = useLocation<LocationState>()
-
-  const currency = getCurrency(symbol)
 
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
@@ -80,7 +88,7 @@ const SendConfirmation: React.FC = () => {
 
           const ethTxData =
             isEthereumLike(symbol, chain) && chain
-              ? await getWeb3TxParams(addressFrom, addressTo, parseAmount, chain)
+              ? await getWeb3TxParams(addressFrom, addressTo, parseAmount, chain, contractAddress)
               : {}
 
           const transactionData = {
@@ -92,6 +100,7 @@ const SendConfirmation: React.FC = () => {
             chain,
             outputs,
             networkFee: parseNetworkFee,
+            contractAddress,
           }
 
           const transaction = await createTransaction({ ...transactionData, ...ethTxData })
@@ -100,7 +109,7 @@ const SendConfirmation: React.FC = () => {
             const sendTransaction = await sendRawTransaction(transaction.raw, chain)
 
             if (sendTransaction === transaction.hash) {
-              const link = getTransactionLink(transaction.hash, symbol, currency?.chain)
+              const link = getTransactionLink(transaction.hash, symbol, chain)
 
               if (link) {
                 setTransactionLink(link)

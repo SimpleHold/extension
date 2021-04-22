@@ -20,7 +20,7 @@ import { validateAddress, getAddressNetworkFee, formatUnit, isEthereumLike } fro
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
-import { getCurrency } from '@config/currencies'
+import { getCurrency, getCurrencyByChain } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
 // Hooks
@@ -36,6 +36,7 @@ interface LocationState {
   tokenChain?: string
   contractAddress?: string
   tokenName?: string
+  decimals?: number
 }
 
 const Send: React.FC = () => {
@@ -48,10 +49,14 @@ const Send: React.FC = () => {
       tokenChain = undefined,
       contractAddress = undefined,
       tokenName = undefined,
+      decimals = undefined,
     },
   } = useLocation<LocationState>()
 
   const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
+  const getCurrencySymbol = tokenChain
+    ? getCurrencyByChain(tokenChain)?.symbol
+    : getCurrency(symbol)?.symbol
 
   const [address, setAddress] = React.useState<string>('')
   const [amount, setAmount] = React.useState<string>('')
@@ -65,7 +70,6 @@ const Send: React.FC = () => {
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
   const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
-  const [networkFeeLabel, setNetworkFeeLabel] = React.useState<string>(symbol)
 
   const debounced = useDebounce(amount, 1000)
 
@@ -99,7 +103,7 @@ const Send: React.FC = () => {
   }
 
   const getNetworkFee = async (): Promise<void> => {
-    const fee = await getFees(chain)
+    const fee = await getFees(symbol, chain)
     setUtxosList([])
 
     const data = await getAddressNetworkFee(
@@ -109,7 +113,10 @@ const Send: React.FC = () => {
       amount,
       selectedAddress,
       address,
-      chain
+      chain,
+      tokenChain,
+      contractAddress,
+      decimals
     )
 
     setNetworkFeeLoading(false)
@@ -158,6 +165,10 @@ const Send: React.FC = () => {
       name: ADDRESS_SEND,
     })
 
+    const tokenContractAddress = tokenChain
+      ? getToken(symbol, tokenChain)?.address
+      : contractAddress
+
     history.push('/send-confirm', {
       amount: Number(amount),
       symbol,
@@ -166,6 +177,7 @@ const Send: React.FC = () => {
       addressTo: address,
       outputs: utxosList,
       chain,
+      contractAddress: tokenContractAddress,
     })
   }
 
@@ -309,7 +321,7 @@ const Send: React.FC = () => {
                   <Styles.NetworkFee>-</Styles.NetworkFee>
                 ) : (
                   <Styles.NetworkFee>
-                    {networkFee} {toUpper(networkFeeLabel)}
+                    {networkFee} {toUpper(getCurrencySymbol)}
                   </Styles.NetworkFee>
                 )}
               </>

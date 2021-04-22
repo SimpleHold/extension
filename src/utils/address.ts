@@ -35,6 +35,7 @@ type TCreateTransactionProps = {
   chainId?: number
   gasPrice?: string
   nonce?: number
+  contractAddress?: string
 }
 
 export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boolean => {
@@ -82,10 +83,28 @@ export const createTransaction = async ({
   chainId,
   gasPrice,
   nonce,
+  contractAddress,
 }: TCreateTransactionProps): Promise<TCreatedTransaction | null> => {
   try {
     if (isEthereumLike(symbol, chain)) {
+      const getContractAddress = chain ? getToken(symbol, chain)?.address : contractAddress
+
       if (gas && chainId && gasPrice && nonce) {
+        if (chain && getContractAddress) {
+          return await web3.transferToken({
+            value: `${amount}`,
+            chain,
+            symbol,
+            from,
+            to,
+            privateKey,
+            gasPrice,
+            gas,
+            nonce,
+            chainId,
+            contractAddress,
+          })
+        }
         return await web3.createTransaction(to, amount, gas, chainId, gasPrice, nonce, privateKey)
       }
       return null
@@ -115,11 +134,22 @@ export const getAddressNetworkFee = async (
   amount: string,
   from: string,
   to: string,
-  chain?: string
+  chain?: string,
+  tokenChain?: string,
+  contractAddress?: string,
+  decimals?: number
 ): Promise<TGetNetworkFeeResponse | null> => {
   if (chain && isEthereumLike(symbol, chain)) {
     const value = web3.toWei(amount, 'ether')
-    const networkFee = await getEtherNetworkFee(from, to, value, chain)
+    const networkFee = await getEtherNetworkFee(
+      from,
+      to,
+      value,
+      chain,
+      tokenChain ? symbol : undefined,
+      contractAddress,
+      decimals
+    )
 
     return {
       networkFee,

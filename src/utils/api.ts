@@ -2,11 +2,7 @@ import axios, { AxiosResponse } from 'axios'
 
 // Config
 import config from '@config/index'
-
-export interface IRawTransaction {
-  hash: string
-  raw: string
-}
+import { isEthereumLike } from './address'
 
 interface IGetBalance {
   balance: number
@@ -118,8 +114,12 @@ export const sendRawTransaction = async (
   }
 }
 
-export const getFees = async (chain: string): Promise<number> => {
+export const getFees = async (symbol: string, chain: string): Promise<number> => {
   try {
+    if (isEthereumLike(symbol, chain)) {
+      return 0
+    }
+
     const { data } = await axios.get(`${config.serverUrl}/wallet/fee/${chain}`)
 
     return data.data || 0
@@ -166,7 +166,8 @@ export const getWeb3TxParams = async (
   from: string,
   to: string,
   value: number,
-  chain: string
+  chain: string,
+  contractAddress?: string
 ): Promise<Web3TxParams | null> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/params`, {
@@ -175,6 +176,7 @@ export const getWeb3TxParams = async (
         to,
         value,
         chain,
+        contractAddress,
       },
       headers: {
         'Content-Type': 'application/json',
@@ -191,7 +193,10 @@ export const getEtherNetworkFee = async (
   from: string,
   to: string,
   value: number,
-  chain: string
+  chain: string,
+  tokenSymbol?: string,
+  contractAddress?: string,
+  decimals?: number
 ): Promise<number> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/network-fee`, {
@@ -200,6 +205,9 @@ export const getEtherNetworkFee = async (
         to,
         value,
         chain,
+        tokenSymbol,
+        contractAddress,
+        decimals,
       },
       headers: {
         'Content-Type': 'application/json',
