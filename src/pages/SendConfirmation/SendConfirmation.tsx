@@ -96,8 +96,14 @@ const SendConfirmation: React.FC = () => {
           const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           const ethTxData =
-            isEthereumLike(symbol, chain) && chain
-              ? await getWeb3TxParams(addressFrom, addressTo, parseAmount, chain, contractAddress)
+            isEthereumLike(symbol, tokenChain) && tokenChain
+              ? await getWeb3TxParams(
+                  addressFrom,
+                  addressTo,
+                  parseAmount,
+                  tokenChain,
+                  contractAddress
+                )
               : {}
 
           const transactionData = {
@@ -106,7 +112,7 @@ const SendConfirmation: React.FC = () => {
             amount: parseAmount,
             privateKey: findWallet.privateKey,
             symbol,
-            chain,
+            tokenChain,
             outputs,
             networkFee: parseNetworkFee,
             contractAddress,
@@ -114,8 +120,8 @@ const SendConfirmation: React.FC = () => {
 
           const transaction = await createTransaction({ ...transactionData, ...ethTxData })
 
-          if (transaction?.hash && transaction?.raw) {
-            const sendTransaction = await sendRawTransaction(transaction.raw, chain)
+          if (transaction?.hash && transaction?.raw && tokenChain) {
+            const sendTransaction = await sendRawTransaction(transaction.raw, chain || tokenChain)
 
             if (sendTransaction === transaction.hash) {
               const link = getTransactionLink(transaction.hash, symbol, chain, tokenChain)

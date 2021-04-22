@@ -18,7 +18,7 @@ type TCreateTransactionProps = {
   amount: number
   privateKey: string
   symbol: TSymbols
-  chain?: string
+  tokenChain?: string
   outputs?: UnspentOutput[]
   networkFee?: number
   gas?: number
@@ -66,7 +66,7 @@ export const createTransaction = async ({
   amount,
   privateKey,
   symbol,
-  chain,
+  tokenChain,
   outputs,
   networkFee,
   gas,
@@ -76,14 +76,18 @@ export const createTransaction = async ({
   contractAddress,
 }: TCreateTransactionProps): Promise<TCreatedTransaction | null> => {
   try {
-    if (isEthereumLike(symbol, chain)) {
-      const getContractAddress = chain ? getToken(symbol, chain)?.address : contractAddress
+    if (isEthereumLike(symbol, tokenChain)) {
+      const getContractAddress = contractAddress
+        ? contractAddress
+        : tokenChain
+        ? getToken(symbol, tokenChain)?.address
+        : undefined
 
       if (gas && chainId && gasPrice && nonce) {
-        if (chain && getContractAddress) {
+        if (tokenChain && getContractAddress) {
           return await web3.transferToken({
             value: `${amount}`,
-            chain,
+            chain: tokenChain,
             symbol,
             from,
             to,
@@ -92,7 +96,7 @@ export const createTransaction = async ({
             gas,
             nonce,
             chainId,
-            contractAddress,
+            contractAddress: getContractAddress,
           })
         }
         return await web3.createTransaction(to, amount, gas, chainId, gasPrice, nonce, privateKey)
@@ -124,18 +128,18 @@ export const getAddressNetworkFee = async (
   amount: string,
   from: string,
   to: string,
-  chain?: string,
+  chain: string,
   tokenChain?: string,
   contractAddress?: string,
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
-  if (chain && isEthereumLike(symbol, chain)) {
+  if (tokenChain && (contractAddress || isEthereumLike(symbol, tokenChain))) {
     const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
     const data = await getEtherNetworkFee(
       from,
       to,
       value,
-      chain,
+      chain || tokenChain,
       tokenChain ? symbol : undefined,
       contractAddress,
       decimals
@@ -204,7 +208,7 @@ export const getTransactionLink = (
   tokenChain?: string
 ): string | null => {
   if (isEthereumLike(symbol, tokenChain)) {
-    const parseChain = toLower(chain)
+    const parseChain = toLower(tokenChain)
 
     if (parseChain === 'eth') {
       return `https://etherscan.io/tx/${hash}`

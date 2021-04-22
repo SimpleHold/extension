@@ -81,7 +81,7 @@ const FoundTokens: React.FC = () => {
           const getCurrencyInfo = getCurrencyByChain(chain)
 
           if (address && getCurrencyInfo) {
-            const tokensList = [getCurrencyInfo.symbol, symbol]
+            const tokensList = [symbol, getCurrencyInfo.symbol]
 
             if (isIncludeTokens) {
               tokensList.push(...tokens)

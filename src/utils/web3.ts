@@ -1,7 +1,6 @@
 import Web3 from 'web3'
 
 import contractABI from '@config/contractABI'
-import { getToken } from '@config/tokens'
 
 const web3 = new Web3()
 
@@ -130,14 +129,12 @@ export const transferToken = async ({
   contractAddress,
 }: TransferTokenOptions): Promise<TCreatedTransaction | null> => {
   try {
-    const getContractAddress = getToken(symbol, chain)?.address || contractAddress
-
-    const contract = new web3.eth.Contract(contractABI, getContractAddress, { from })
+    const contract = new web3.eth.Contract(contractABI, contractAddress, { from })
     const data = contract.methods.transfer(to, value)
 
     const { rawTransaction, transactionHash } = await web3.eth.accounts.signTransaction(
       {
-        to: getContractAddress,
+        to: contractAddress,
         gasPrice,
         gas,
         data: data.encodeABI(),

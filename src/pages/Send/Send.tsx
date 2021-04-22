@@ -54,9 +54,7 @@ const Send: React.FC = () => {
   } = useLocation<LocationState>()
 
   const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
-  const getCurrencySymbol = tokenName
-    ? tokenName
-    : tokenChain
+  const getCurrencySymbol = tokenChain
     ? getCurrencyByChain(tokenChain)?.symbol
     : getCurrency(symbol)?.symbol
 
@@ -101,6 +99,9 @@ const Send: React.FC = () => {
   }, [networkFee])
 
   const getOutputs = async (): Promise<void> => {
+    if (contractAddress || isEthereumLike(symbol, chain)) {
+      return
+    }
     const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
     setOutputs(unspentOutputs)
   }
@@ -121,7 +122,7 @@ const Send: React.FC = () => {
       chain,
       tokenChain,
       contractAddress,
-      getTokenDecimals
+      getTokenDecimals || decimals
     )
 
     setNetworkFeeLoading(false)
@@ -156,11 +157,11 @@ const Send: React.FC = () => {
     setBalance(null)
     setEstimated(null)
 
-    if (currency) {
+    if (currency || contractAddress) {
       const { balance, balance_usd } = await getBalance(
         selectedAddress,
         currency?.chain || tokenChain,
-        tokenChain ? symbol : undefined,
+        chain ? symbol : undefined,
         contractAddress
       )
 
@@ -174,11 +175,8 @@ const Send: React.FC = () => {
       name: ADDRESS_SEND,
     })
 
-    const tokenContractAddress = tokenChain
-      ? getToken(symbol, tokenChain)?.address
-      : contractAddress
-
-    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
+    const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
+    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
 
     history.push('/send-confirm', {
       amount: Number(amount),
@@ -189,9 +187,9 @@ const Send: React.FC = () => {
       addressTo: address,
       outputs: utxosList,
       chain,
-      contractAddress: tokenContractAddress,
+      contractAddress: tokenContractAddress || contractAddress,
       tokenChain,
-      decimals: getTokenDecimals,
+      decimals: getTokenDecimals || decimals,
     })
   }
 
@@ -247,7 +245,7 @@ const Send: React.FC = () => {
       !isNetworkFeeLoading
     ) {
       if (!outputs.length) {
-        if (isEthereumLike(symbol, chain)) {
+        if (contractAddress || isEthereumLike(symbol, chain)) {
           return false
         }
         return true

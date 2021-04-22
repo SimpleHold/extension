@@ -88,8 +88,10 @@ export const addNew = (
   for (const [index, currency] of currencies.entries()) {
     const getTokenName = index == 0 ? tokenName : undefined
     const getContractAddress = index === 0 ? contractAddress : undefined
+    const getDecimals = index === 0 ? decimals : undefined
+
     const getChain = includeChain
-      ? index !== 0
+      ? index !== 1
         ? chain
         : undefined
       : index === 0
@@ -109,7 +111,7 @@ export const addNew = (
         chain: getChain,
         name: getTokenName,
         contractAddress: getContractAddress,
-        decimals,
+        decimals: getDecimals,
       }
 
       parseWallets.push(data)
