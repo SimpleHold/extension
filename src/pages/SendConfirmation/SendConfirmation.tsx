@@ -19,6 +19,7 @@ import { IWallet } from '@utils/wallet'
 import { sendRawTransaction, getWeb3TxParams } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
 import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
+import { convertDecimals } from '@utils/web3'
 
 // Config
 import {
@@ -27,7 +28,6 @@ import {
   ADDRESS_SEND_PASSWORD,
   ADDRESS_SEND_PASSWORD_CANCEL,
 } from '@config/events'
-import { getCurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -43,6 +43,7 @@ interface LocationState {
   networkFeeSymbol: string
   contractAddress?: string
   tokenChain?: string
+  decimals?: number
 }
 
 const SendConfirmation: React.FC = () => {
@@ -59,6 +60,7 @@ const SendConfirmation: React.FC = () => {
       networkFeeSymbol,
       contractAddress = undefined,
       tokenChain = undefined,
+      decimals = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -87,7 +89,10 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
-          const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+          const parseAmount =
+            tokenChain && decimals
+              ? convertDecimals(amount, decimals)
+              : formatUnit(symbol, amount, 'to', chain, 'ether')
           const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           const ethTxData =

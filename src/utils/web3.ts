@@ -77,6 +77,10 @@ export const toWei = (value: string, unit: Unit): number => {
   return +web3.utils.toWei(value, unit)
 }
 
+export const convertDecimals = (value: string | number, decimals: number): number => {
+  return +web3.utils.toBN(10).pow(web3.utils.toBN(decimals)).mul(web3.utils.toBN(value)).toString()
+}
+
 export const createTransaction = async (
   to: string,
   value: number,

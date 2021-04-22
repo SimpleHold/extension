@@ -130,7 +130,7 @@ export const getAddressNetworkFee = async (
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
   if (chain && isEthereumLike(symbol, chain)) {
-    const value = web3.toWei(amount, 'ether')
+    const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
     const data = await getEtherNetworkFee(
       from,
       to,

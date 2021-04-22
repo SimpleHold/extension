@@ -109,6 +109,8 @@ const Send: React.FC = () => {
     const fee = await getFees(symbol, chain)
     setUtxosList([])
 
+    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
+
     const data = await getAddressNetworkFee(
       symbol,
       outputs,
@@ -119,7 +121,7 @@ const Send: React.FC = () => {
       chain,
       tokenChain,
       contractAddress,
-      decimals
+      getTokenDecimals
     )
 
     setNetworkFeeLoading(false)
@@ -176,6 +178,8 @@ const Send: React.FC = () => {
       ? getToken(symbol, tokenChain)?.address
       : contractAddress
 
+    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
+
     history.push('/send-confirm', {
       amount: Number(amount),
       symbol,
@@ -187,6 +191,7 @@ const Send: React.FC = () => {
       chain,
       contractAddress: tokenContractAddress,
       tokenChain,
+      decimals: getTokenDecimals,
     })
   }
 
@@ -214,8 +219,15 @@ const Send: React.FC = () => {
     }
 
     if (currency) {
-      const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
-      const parseMinAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
+      let parseAmount: number = Number(amount)
+      let parseMinAmount: number = 0
+
+      if (tokenChain) {
+        parseMinAmount = currency.minSendAmount || 0.001
+      } else {
+        parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+        parseMinAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
+      }
 
       if (parseAmount < currency.minSendAmount) {
         return setAmountErrorLabel(`Min. amount: ${parseMinAmount} ${toUpper(symbol)}`)
