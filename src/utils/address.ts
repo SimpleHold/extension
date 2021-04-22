@@ -83,7 +83,7 @@ export const createTransaction = async ({
         ? getToken(symbol, tokenChain)?.address
         : undefined
 
-      if (gas && chainId && gasPrice && nonce) {
+      if (gas && chainId && gasPrice && typeof nonce === 'number') {
         if (tokenChain && getContractAddress) {
           return await web3.transferToken({
             value: `${amount}`,
@@ -133,13 +133,13 @@ export const getAddressNetworkFee = async (
   contractAddress?: string,
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
-  if (tokenChain && (contractAddress || isEthereumLike(symbol, tokenChain))) {
+  if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
     const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
     const data = await getEtherNetworkFee(
       from,
       to,
       value,
-      chain || tokenChain,
+      tokenChain || chain,
       tokenChain ? symbol : undefined,
       contractAddress,
       decimals
@@ -208,7 +208,7 @@ export const getTransactionLink = (
   tokenChain?: string
 ): string | null => {
   if (isEthereumLike(symbol, tokenChain)) {
-    const parseChain = toLower(tokenChain)
+    const parseChain = tokenChain ? toLower(tokenChain) : toLower(chain)
 
     if (parseChain === 'eth') {
       return `https://etherscan.io/tx/${hash}`

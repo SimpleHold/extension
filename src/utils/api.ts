@@ -103,23 +103,26 @@ export const getUnspentOutputs = async (address: string, chain: string): Promise
 
 export const sendRawTransaction = async (
   transaction: string,
-  currency: string
+  currency?: string
 ): Promise<string | null> => {
   try {
-    const { data } = await axios.post(
-      `${config.serverUrl}/transaction/send`,
-      {
-        currency,
-        transaction,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
+    if (currency) {
+      const { data } = await axios.post(
+        `${config.serverUrl}/transaction/send`,
+        {
+          currency,
+          transaction,
         },
-      }
-    )
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }
+      )
 
-    return data?.data || null
+      return data?.data || null
+    }
+    return null
   } catch {
     return null
   }
@@ -177,7 +180,7 @@ export const getWeb3TxParams = async (
   from: string,
   to: string,
   value: number,
-  chain: string,
+  chain?: string,
   contractAddress?: string
 ): Promise<Web3TxParams | null> => {
   try {

@@ -95,16 +95,15 @@ const SendConfirmation: React.FC = () => {
               : formatUnit(symbol, amount, 'to', chain, 'ether')
           const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
-          const ethTxData =
-            isEthereumLike(symbol, tokenChain) && tokenChain
-              ? await getWeb3TxParams(
-                  addressFrom,
-                  addressTo,
-                  parseAmount,
-                  tokenChain,
-                  contractAddress
-                )
-              : {}
+          const ethTxData = isEthereumLike(symbol, tokenChain)
+            ? await getWeb3TxParams(
+                addressFrom,
+                addressTo,
+                parseAmount,
+                chain || tokenChain,
+                contractAddress
+              )
+            : {}
 
           const transactionData = {
             from: addressFrom,
@@ -120,7 +119,7 @@ const SendConfirmation: React.FC = () => {
 
           const transaction = await createTransaction({ ...transactionData, ...ethTxData })
 
-          if (transaction?.hash && transaction?.raw && tokenChain) {
+          if (transaction?.hash && transaction?.raw) {
             const sendTransaction = await sendRawTransaction(transaction.raw, chain || tokenChain)
 
             if (sendTransaction === transaction.hash) {
