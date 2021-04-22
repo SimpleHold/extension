@@ -32,6 +32,7 @@ interface LocationState {
   chain?: string
   tokenName?: string
   contractAddress?: string
+  decimals?: number
 }
 
 const ImportPrivateKey: React.FC = () => {
@@ -43,7 +44,13 @@ const ImportPrivateKey: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol, chain = undefined, tokenName = undefined, contractAddress = undefined },
+    state: {
+      symbol,
+      chain = undefined,
+      tokenName = undefined,
+      contractAddress = undefined,
+      decimals = undefined,
+    },
   } = useLocation<LocationState>()
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
@@ -110,6 +117,7 @@ const ImportPrivateKey: React.FC = () => {
             tokens: removeDuplicates,
             tokenName,
             contractAddress,
+            decimals,
           })
         }
       }
@@ -140,7 +148,8 @@ const ImportPrivateKey: React.FC = () => {
             false,
             chain,
             tokenName,
-            contractAddress
+            contractAddress,
+            decimals
           )
 
           if (walletsList) {

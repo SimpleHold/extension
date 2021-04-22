@@ -28,13 +28,21 @@ interface LocationState {
   chain: string
   chainName: string
   tokenName: string
-  contractAddress: string
+  contractAddress?: string
+  decimals?: number
 }
 
 const AddTokenToAddress: React.FC = () => {
   const history = useHistory()
   const {
-    state: { symbol, chain, chainName, tokenName, contractAddress },
+    state: {
+      symbol,
+      chain,
+      chainName,
+      tokenName,
+      contractAddress = undefined,
+      decimals = undefined,
+    },
   } = useLocation<LocationState>()
 
   const getCurrencyInfo = getCurrencyByChain(chain)
@@ -116,7 +124,8 @@ const AddTokenToAddress: React.FC = () => {
               false,
               chain,
               tokenName,
-              contractAddress
+              contractAddress,
+              decimals
             )
 
             if (walletsList) {

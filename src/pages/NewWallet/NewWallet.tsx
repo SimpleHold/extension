@@ -32,6 +32,7 @@ interface LocationState {
   chain?: string
   tokenName?: string
   contractAddress?: string
+  decimals?: number
 }
 
 const NewWallet: React.FC = () => {
@@ -49,6 +50,7 @@ const NewWallet: React.FC = () => {
       chain = undefined,
       tokenName = undefined,
       contractAddress = undefined,
+      decimals = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -77,6 +79,7 @@ const NewWallet: React.FC = () => {
       chain,
       tokenName,
       contractAddress,
+      decimals,
     })
   }
 
@@ -104,7 +107,8 @@ const NewWallet: React.FC = () => {
               false,
               chain,
               tokenName,
-              contractAddress
+              contractAddress,
+              decimals
             )
 
             if (walletsList) {

@@ -13,6 +13,7 @@ export interface IWallet {
   chain?: string
   name?: string
   contractAddress?: string
+  decimals?: number
 }
 
 export const getWallets = (): IWallet[] | null => {
@@ -79,7 +80,8 @@ export const addNew = (
   includeChain?: boolean,
   chain?: string,
   tokenName?: string,
-  contractAddress?: string
+  contractAddress?: string,
+  decimals?: number
 ): string | null => {
   const parseBackup = JSON.parse(decryptBackup)
 
@@ -107,6 +109,7 @@ export const addNew = (
         chain: getChain,
         name: getTokenName,
         contractAddress: getContractAddress,
+        decimals,
       }
 
       parseWallets.push(data)

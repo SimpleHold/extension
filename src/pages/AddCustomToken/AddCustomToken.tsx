@@ -143,7 +143,7 @@ const AddCustomToken: React.FC = () => {
 
     if (walletsList) {
       const { chain, name: chainName } = selectedNetwork
-      const { symbol, name: tokenName } = tokenInfo
+      const { symbol, name: tokenName, decimals } = tokenInfo
 
       const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
 
@@ -153,6 +153,7 @@ const AddCustomToken: React.FC = () => {
         chainName,
         tokenName,
         contractAddress,
+        decimals,
       }
 
       if (checkTokenWallets) {

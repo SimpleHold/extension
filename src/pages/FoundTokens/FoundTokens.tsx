@@ -29,6 +29,7 @@ interface LocationState {
   tokens: string[]
   tokenName?: string
   contractAddress?: string
+  decimals: number
 }
 
 const FoundTokens: React.FC = () => {
@@ -41,6 +42,7 @@ const FoundTokens: React.FC = () => {
       tokens,
       tokenName = undefined,
       contractAddress = undefined,
+      decimals = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -93,7 +95,8 @@ const FoundTokens: React.FC = () => {
               true,
               chain,
               tokenName,
-              contractAddress
+              contractAddress,
+              decimals
             )
 
             if (walletsList) {
