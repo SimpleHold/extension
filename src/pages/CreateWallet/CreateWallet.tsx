@@ -83,11 +83,13 @@ const Wallets: React.FC = () => {
     }
   }
 
-  const onSubmitForm = (e: React.FormEvent) => {
-    e.preventDefault()
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
 
-    if (!isButtonDisabled) {
-      onConfirm()
+      if (!isButtonDisabled) {
+        onConfirm()
+      }
     }
   }
 
@@ -107,7 +109,7 @@ const Wallets: React.FC = () => {
             mt={44}
           />
         </Styles.Row>
-        <Styles.Form onSubmit={onSubmitForm}>
+        <Styles.Form onKeyDown={onKeyDown}>
           <TextInput
             label="Enter password"
             value={password}
