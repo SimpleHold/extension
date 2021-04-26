@@ -24,7 +24,7 @@ const extensionReloaderPlugin =
         entries: {
           contentScript: 'contentScript',
           background: 'background',
-          extensionPage: ['popup', 'options'],
+          extensionPage: ['popup', 'downloadBackup', 'restoreBackup'],
         },
       })
     : () => {
@@ -57,6 +57,8 @@ module.exports = {
     background: path.join(sourcePath, 'utils', 'background.ts'),
     contentScript: path.join(sourcePath, 'utils', 'contentScript.ts'),
     popup: path.join(sourcePath, 'app.tsx'),
+    downloadBackup: path.join(sourcePath, 'downloadBackup.tsx'),
+    restoreBackup: path.join(sourcePath, 'restoreBackup.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -124,6 +126,20 @@ module.exports = {
       chunks: ['popup'],
       hash: true,
       filename: 'popup.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'download-backup.html'),
+      inject: 'body',
+      chunks: ['downloadBackup'],
+      hash: true,
+      filename: 'download-backup.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'restore-backup.html'),
+      inject: 'body',
+      chunks: ['restoreBackup'],
+      hash: true,
+      filename: 'restore-backup.html',
     }),
     new CopyWebpackPlugin({
       patterns: [
