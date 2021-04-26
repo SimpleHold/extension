@@ -22,7 +22,7 @@ const Drawer = styled.div`
   border-radius: 5px 5px 0 0;
   padding: ${({ withIcon }: TDrawerProps) =>
     withIcon ? '20px 30px 30px 30px' : '40px 30px 30px 30px'};
-  word-break: break-all;
+  word-break: break-word;
   position: fixed;
   z-index: 11;
   left: 0;
