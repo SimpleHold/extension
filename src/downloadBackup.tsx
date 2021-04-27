@@ -10,7 +10,9 @@ import Styles from './styles/downloadBackup.page'
 
 const DownloadBackup: React.FC = () => {
   React.useEffect(() => {
-    onDownload()
+    setTimeout(() => {
+      onDownload()
+    }, 2000)
   }, [])
 
   const onDownload = (): void => {

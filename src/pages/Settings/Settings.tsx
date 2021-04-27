@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
-import { browser, Tabs } from 'webextension-polyfill-ts'
 
 // Components
 import Header from '@components/Header'
@@ -17,6 +16,8 @@ import LogoutDrawer from '@drawers/Logout'
 import { download as downloadBackup } from '@utils/backup'
 import { logEvent } from '@utils/amplitude'
 import { sha256hash } from '@utils/crypto'
+import { detectBrowser, detectOS } from '@utils/detect'
+import { getUrl, openWebPage } from '@utils/extension'
 
 // Config
 import { BACKUP_SETTINGS, PASSCODE_ENABLED, PASSCODE_DISABLED } from '@config/events'
@@ -49,20 +50,34 @@ const Settings: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'passcode' | 'logout'>(null)
   const [passcodeDrawerType, setPasscodeDrawerType] = React.useState<'create' | 'remove'>('create')
   const [isPasscodeError, setIsPasscodeError] = React.useState<boolean>(false)
+  const [isDownloadManually, setDownloadManually] = React.useState<boolean>(false)
 
-  const onDownloadBackup = () => {
-    const backup = localStorage.getItem('backup')
+  React.useEffect(() => {
+    checkBrowserAndOS()
+  }, [])
 
-    if (backup) {
-      logEvent({
-        name: BACKUP_SETTINGS,
-      })
-      downloadBackup(backup)
+  const checkBrowserAndOS = () => {
+    const os = detectOS()
+    const browser = detectBrowser()
+
+    if (os === 'macos' && browser === 'chrome') {
+      setDownloadManually(true)
     }
   }
 
-  const openWebPage = (url: string): Promise<Tabs.Tab> => {
-    return browser.tabs.create({ url })
+  const onDownloadBackup = () => {
+    if (isDownloadManually) {
+      openWebPage(getUrl('download-backup.html'))
+    } else {
+      const backup = localStorage.getItem('backup')
+
+      if (backup) {
+        logEvent({
+          name: BACKUP_SETTINGS,
+        })
+        downloadBackup(backup)
+      }
+    }
   }
 
   const togglePasscode = (): void => {
@@ -77,9 +92,9 @@ const Settings: React.FC = () => {
       isButton: true,
       title: 'Download backup',
       icon: {
-        source: cloudIcon,
-        width: 22,
-        height: 14,
+        source: isDownloadManually ? linkIcon : cloudIcon,
+        width: isDownloadManually ? 16 : 22,
+        height: isDownloadManually ? 16 : 14,
       },
       onClick: onDownloadBackup,
     },
