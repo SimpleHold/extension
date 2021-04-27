@@ -116,9 +116,20 @@ const Label = styled.p`
   line-height: 19px;
 `
 
+const IconRow = styled.div`
+  margin: 0 12px 0 0;
+  width: 16px;
+  height: 16px;
+
+  path {
+    fill: #ffffff;
+  }
+`
+
 const Styles = {
   Container,
   Label,
+  IconRow,
 }
 
 export default Styles

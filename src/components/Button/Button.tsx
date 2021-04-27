@@ -1,4 +1,5 @@
 import * as React from 'react'
+import SVG from 'react-inlinesvg'
 
 // Components
 import Spinner from '@components/Spinner'
@@ -16,10 +17,11 @@ interface Props {
   isSmall?: boolean
   isDanger?: boolean
   isLoading?: boolean
+  icon?: string
 }
 
 const Button: React.FC<Props> = (props) => {
-  const { label, disabled, isLight, mr, ml, isSmall, isDanger, onClick, isLoading } = props
+  const { label, disabled, isLight, mr, ml, isSmall, isDanger, onClick, isLoading, icon } = props
 
   const buttonOnClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     event.preventDefault()
@@ -36,6 +38,11 @@ const Button: React.FC<Props> = (props) => {
       isDanger={isDanger}
       onClick={buttonOnClick}
     >
+      {icon ? (
+        <Styles.IconRow>
+          <SVG src={icon} width={16} height={16} />
+        </Styles.IconRow>
+      ) : null}
       {isLoading ? <Spinner size={24} /> : <Styles.Label>{label}</Styles.Label>}
     </Styles.Container>
   )
