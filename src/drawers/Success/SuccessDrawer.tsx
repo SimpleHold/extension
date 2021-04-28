@@ -13,10 +13,13 @@ interface Props {
   onClose: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   text?: string
   link?: string
+  openFrom?: string
+  disableClose?: boolean
+  icon?: string
 }
 
 const SuccessDrawer: React.FC<Props> = (props) => {
-  const { isActive, onClose, text, link } = props
+  const { isActive, onClose, text, link, openFrom, disableClose, icon } = props
 
   const openLink = (): Promise<Tabs.Tab> => {
     return browser.tabs.create({
@@ -29,15 +32,18 @@ const SuccessDrawer: React.FC<Props> = (props) => {
       title="Success!"
       isActive={isActive}
       onClose={onClose}
-      icon="../../assets/drawer/success.svg"
+      icon={icon || '../../assets/drawer/success.svg'}
+      openFrom={openFrom}
     >
       <Styles.Row>
         {text ? <Styles.Text>{text}</Styles.Text> : null}
         {link ? <Styles.Link onClick={openLink}>{link}</Styles.Link> : null}
 
-        <Styles.Actions>
-          <Button label="Ok" onClick={onClose} isSmall />
-        </Styles.Actions>
+        {!disableClose ? (
+          <Styles.Actions>
+            <Button label="Ok" onClick={onClose} isSmall />
+          </Styles.Actions>
+        ) : null}
       </Styles.Row>
     </DrawerWrapper>
   )

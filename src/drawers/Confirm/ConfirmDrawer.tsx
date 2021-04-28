@@ -19,6 +19,7 @@ interface Props {
   inputLabel: string
   textInputType?: string
   inputErrorLabel?: string | null
+  openFrom?: string
 }
 
 const ConfirmDrawer: React.FC<Props> = (props) => {
@@ -33,6 +34,7 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
     inputLabel,
     textInputType,
     inputErrorLabel,
+    openFrom,
   } = props
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
@@ -58,7 +60,7 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
   }
 
   return (
-    <DrawerWrapper title={title} isActive={isActive} onClose={onClose}>
+    <DrawerWrapper title={title} isActive={isActive} onClose={onClose} openFrom={openFrom}>
       <Styles.Row>
         <Styles.Form onSubmit={onSubmitForm}>
           <TextInput
@@ -68,6 +70,7 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
             type={textInputType}
             errorLabel={inputErrorLabel}
             inputRef={textInputRef}
+            openFrom={openFrom}
           />
         </Styles.Form>
         <Styles.Actions>
