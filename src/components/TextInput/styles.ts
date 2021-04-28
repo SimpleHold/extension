@@ -12,6 +12,7 @@ type TContainerProps = {
 
 type TRowProps = {
   isActive: boolean
+  openFrom?: string
 }
 
 type TEyeIconPRops = {
@@ -51,7 +52,14 @@ const Row = styled.div`
   label {
     font-size: ${({ isActive }: TRowProps) => (isActive ? '12px' : '16px')};
     line-height: ${({ isActive }: TRowProps) => (isActive ? '14px' : '19px')};
-    margin-top: ${({ isActive }: TRowProps) => (isActive ? '0' : '10px')};
+    margin-top: ${({ isActive, openFrom }: TRowProps) =>
+      isActive
+        ? openFrom === 'browser'
+          ? '10px'
+          : '0'
+        : openFrom === 'browser'
+        ? '20px'
+        : '10px'};
   }
 
   input {

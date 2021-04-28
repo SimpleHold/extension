@@ -13,6 +13,7 @@ interface Props {
   onBlurInput?: Function
   inputRef?: React.RefObject<HTMLInputElement>
   disabled?: boolean
+  openFrom?: string
 }
 
 const TextInput: React.FC<Props> = (props) => {
@@ -26,6 +27,7 @@ const TextInput: React.FC<Props> = (props) => {
     onBlurInput,
     inputRef,
     disabled,
+    openFrom,
   } = props
 
   const textInputRef = inputRef || React.useRef<HTMLInputElement>(null)
@@ -99,7 +101,7 @@ const TextInput: React.FC<Props> = (props) => {
       isError={errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0}
       disabled={disabled}
     >
-      <Styles.Row isActive={isFocused || value?.length > 0}>
+      <Styles.Row isActive={isFocused || value?.length > 0} openFrom={openFrom}>
         <Styles.Label>
           {errorLabel && !isFocused && value.length > 0 ? errorLabel : label}
         </Styles.Label>
