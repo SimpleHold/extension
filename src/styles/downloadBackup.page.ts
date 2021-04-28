@@ -1,10 +1,10 @@
 import styled from 'styled-components'
 
 const Wrapper = styled.div`
-  background-color: #ffffff;
+  background-color: #f8f8f8;
   display: flex;
   justify-content: center;
-  padding: 80px 0;
+  padding: 40px 0 80px 0;
 `
 
 const Extension = styled.div`
@@ -86,7 +86,7 @@ const DownloadLink = styled.a`
 const DividerLine = styled.div`
   margin: 56px 0 0 0;
   width: 100%;
-  height: 0.5px;
+  height: 1px;
   background-color: #eaeaea;
 `
 
