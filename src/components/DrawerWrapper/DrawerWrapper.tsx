@@ -10,13 +10,7 @@ interface Props {
   isActive: boolean
   onClose: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   icon?: string
-}
-
-const TransitionStyles = {
-  entering: { transform: 'translate3d(0, 100%, 0)' },
-  entered: { transform: 'none' },
-  exiting: { transform: 'translate3d(0, 100%, 0)' },
-  exited: { display: 'none' },
+  openFrom?: string
 }
 
 const BackgroundStyles = {
@@ -27,9 +21,16 @@ const BackgroundStyles = {
 }
 
 const DrawerWrapper: React.FC<Props> = (props) => {
-  const { title, children, isActive, onClose, icon } = props
+  const { title, children, isActive, onClose, icon, openFrom } = props
 
   const nodeRef = React.useRef(null)
+
+  const drawerStyle = {
+    entering: { transform: `translate3d(0, ${openFrom === 'browser' ? '80px' : '100%'}, 0)` },
+    entered: { transform: 'none' },
+    exiting: { transform: 'translate3d(0, 100%, 0)' },
+    exited: { display: 'none' },
+  }
 
   return (
     <Transition
@@ -47,12 +48,13 @@ const DrawerWrapper: React.FC<Props> = (props) => {
             style={{
               ...BackgroundStyles[state],
             }}
+            openFrom={openFrom}
           />
           <Styles.Drawer
             withIcon={icon !== undefined}
+            openFrom={openFrom}
             style={{
-              ...TransitionStyles[state],
-              position: 'fixed',
+              ...drawerStyle[state],
             }}
           >
             {icon ? (

@@ -2,12 +2,17 @@ import styled from 'styled-components'
 
 type TDrawerProps = {
   withIcon: boolean
+  openFrom?: string
+}
+
+type TBackgroundProps = {
+  openFrom?: string
 }
 
 const Wrapper = styled.div``
 
 const Background = styled.div`
-  position: fixed;
+  position: ${({ openFrom }: TBackgroundProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
   z-index: 10;
   background-color: rgba(29, 29, 34, 0.2);
   top: 0;
@@ -15,6 +20,7 @@ const Background = styled.div`
   width: 100%;
   height: 100%;
   transition: opacity 250ms;
+  border-radius: ${({ openFrom }: TBackgroundProps) => (openFrom === 'browser' ? '16px' : '0')};
 `
 
 const Drawer = styled.div`
@@ -23,11 +29,11 @@ const Drawer = styled.div`
   padding: ${({ withIcon }: TDrawerProps) =>
     withIcon ? '20px 30px 30px 30px' : '40px 30px 30px 30px'};
   word-break: break-word;
-  position: fixed;
+  position: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
   z-index: 11;
   left: 0;
   bottom: 0;
-  width: 100%;
+  width: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? '315px' : '100%')};
   transition: transform 250ms;
 `
 
