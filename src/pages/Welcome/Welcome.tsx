@@ -8,6 +8,8 @@ import Link from '@components/Link'
 
 // Utils
 import { logEvent } from '@utils/amplitude'
+import { detectBrowser, detectOS } from '@utils/detect'
+import { getUrl, openWebPage } from '@utils/extension'
 
 // Config
 import { WELCOME, START_CREATE, START_RESTORE } from '@config/events'
@@ -16,28 +18,49 @@ import { WELCOME, START_CREATE, START_RESTORE } from '@config/events'
 import Styles from './styles'
 
 const Wallets: React.FC = () => {
+  const [isManualRestore, setManualRestore] = React.useState<boolean>(false)
   const history = useHistory()
+
+  const os = detectOS()
+  const browser = detectBrowser()
 
   React.useEffect(() => {
     logEvent({
       name: WELCOME,
     })
+
+    checkManualRestore()
   }, [])
+
+  const checkManualRestore = () => {
+    if (((os === 'macos' && browser === 'chrome') || browser === 'firefox') && !isManualRestore) {
+      setManualRestore(true)
+    }
+  }
 
   const onCreateWallet = (): void => {
     logEvent({
       name: START_CREATE,
     })
 
+    if (localStorage.getItem('manualRestoreBackup')) {
+      localStorage.removeItem('manualRestoreBackup')
+    }
+
     history.push('/create-wallet')
   }
 
-  const onRestoreWallet = (): void => {
+  const onRestoreWallet = () => {
     logEvent({
       name: START_RESTORE,
     })
 
-    history.push('/restore-wallet')
+    if (isManualRestore) {
+      localStorage.setItem('manualRestoreBackup', 'active')
+      return openWebPage(getUrl('restore-backup.html'))
+    }
+
+    return history.push('/restore-wallet')
   }
 
   return (
@@ -70,6 +93,9 @@ const Wallets: React.FC = () => {
               />
             </Styles.ActionIcon>
             <Styles.ActionName>Restore wallet</Styles.ActionName>
+            {isManualRestore ? (
+              <Styles.HoverActionText>The link will open in a new tab</Styles.HoverActionText>
+            ) : null}
           </Styles.Action>
         </Styles.WalletActions>
 
