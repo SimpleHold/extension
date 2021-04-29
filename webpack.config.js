@@ -24,7 +24,7 @@ const extensionReloaderPlugin =
         entries: {
           contentScript: 'contentScript',
           background: 'background',
-          extensionPage: ['popup', 'downloadBackup', 'restoreBackup'],
+          extensionPage: ['popup', 'downloadBackup', 'restoreBackup', 'selectAddress'],
         },
       })
     : () => {
@@ -59,6 +59,7 @@ module.exports = {
     popup: path.join(sourcePath, 'app.tsx'),
     downloadBackup: path.join(sourcePath, 'downloadBackup.tsx'),
     restoreBackup: path.join(sourcePath, 'restoreBackup.tsx'),
+    selectAddress: path.join(sourcePath, 'selectAddress.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -140,6 +141,13 @@ module.exports = {
       chunks: ['restoreBackup'],
       hash: true,
       filename: 'restore-backup.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'select-address.html'),
+      inject: 'body',
+      chunks: ['selectAddress'],
+      hash: true,
+      filename: 'select-address.html',
     }),
     new CopyWebpackPlugin({
       patterns: [
