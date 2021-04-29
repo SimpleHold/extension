@@ -1,18 +1,20 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
 import { useHistory } from 'react-router-dom'
+import { v4 } from 'uuid'
 
 // Components
 import Header from '@components/Header'
 import Link from '@components/Link'
 
 // Utils
-import { logEvent } from '@utils/amplitude'
+import { init, logEvent } from '@utils/amplitude'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
 
 // Config
-import { WELCOME, START_CREATE, START_RESTORE } from '@config/events'
+import config from '@config/index'
+import { WELCOME, START_CREATE, START_RESTORE, FIRST_ENTER } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -25,17 +27,32 @@ const Wallets: React.FC = () => {
   const browser = detectBrowser()
 
   React.useEffect(() => {
-    logEvent({
-      name: WELCOME,
-    })
-
     checkManualRestore()
+    initAmplitude()
   }, [])
 
   const checkManualRestore = () => {
     if (((os === 'macos' && browser === 'chrome') || browser === 'firefox') && !isManualRestore) {
       setManualRestore(true)
     }
+  }
+
+  const initAmplitude = (): void => {
+    const clientId = localStorage.getItem('clientId') || v4()
+
+    init(config.apiKey.amplitude, clientId)
+
+    if (!localStorage.getItem('clientId')) {
+      localStorage.setItem('clientId', clientId)
+
+      logEvent({
+        name: FIRST_ENTER,
+      })
+    }
+
+    logEvent({
+      name: WELCOME,
+    })
   }
 
   const onCreateWallet = (): void => {
