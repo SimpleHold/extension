@@ -23,9 +23,10 @@ interface Props {
   name?: string
   contractAddress?: string
   decimals?: number
-  sumBalance: (balance: number) => void
-  sumEstimated: (estimated: number) => void
-  sumPending: (pending: number) => void
+  sumBalance?: (balance: number) => void
+  sumEstimated?: (estimated: number) => void
+  sumPending?: (pending: number) => void
+  handleClick?: () => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -39,6 +40,7 @@ const WalletCard: React.FC<Props> = (props) => {
     sumBalance,
     sumEstimated,
     sumPending,
+    handleClick,
   } = props
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
@@ -64,16 +66,25 @@ const WalletCard: React.FC<Props> = (props) => {
     const { balance, balance_usd, balance_btc, pending, pending_btc } = tryGetBalance
 
     setBalance(balance)
-    sumBalance(balance_btc)
+    if (sumBalance) {
+      sumBalance(balance_btc)
+    }
 
-    sumPending(pending_btc)
     setPendingBalance(pending)
+    if (sumPending) {
+      sumPending(pending_btc)
+    }
 
     setEstimated(balance_usd)
-    sumEstimated(balance_usd)
+    if (sumEstimated) {
+      sumEstimated(balance_usd)
+    }
   }
 
   const openWallet = (): void => {
+    if (handleClick) {
+      return handleClick()
+    }
     history.push('/receive', {
       name: currency?.name || name,
       symbol,
