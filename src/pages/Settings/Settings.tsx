@@ -90,7 +90,7 @@ const Settings: React.FC = () => {
   const list: List[] = [
     {
       isButton: true,
-      title: 'Download backup',
+      title: 'Download the backup',
       icon: {
         source: isDownloadManually ? linkIcon : cloudIcon,
         width: isDownloadManually ? 16 : 22,
@@ -100,7 +100,7 @@ const Settings: React.FC = () => {
     },
     {
       isButton: true,
-      title: 'Contact to support',
+      title: 'Contact support',
       icon: {
         source: linkIcon,
         width: 16,
@@ -110,7 +110,7 @@ const Settings: React.FC = () => {
     },
     {
       title: 'Use passcode',
-      text: 'Use passcode instead of password to easily hide extension data from other people',
+      text: 'Use a passcode instead of a password to easily hide wallet data from other people.',
       withSwitch: true,
       switchValue: localStorage.getItem('passcode') !== null,
       onToggle: togglePasscode,

@@ -229,7 +229,7 @@ const Send: React.FC = () => {
       }
 
       if (parseAmount < currency.minSendAmount) {
-        return setAmountErrorLabel(`Min. amount: ${parseMinAmount} ${toUpper(symbol)}`)
+        return setAmountErrorLabel(`Min amount is ${parseMinAmount} ${toUpper(symbol)}`)
       }
     }
   }

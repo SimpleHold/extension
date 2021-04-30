@@ -20,8 +20,8 @@ const LogoutDrawer: React.FC<Props> = (props) => {
     <DrawerWrapper title="Confirm log out" isActive={isActive} onClose={onClose}>
       <Styles.Row>
         <Styles.Text>
-          Are you sure that you want to clear cache and log out? Note: backup file will downloaded
-          after you confirm this action
+          Are you sure that you want to clear cache and log out? Note: the backup file will be
+          downloaded after you confirm this action.
         </Styles.Text>
 
         <Styles.Actions>

@@ -171,8 +171,8 @@ const SendConfirmation: React.FC = () => {
         <Header withBack backTitle="Send" onBack={history.goBack} />
         <Styles.Container>
           <Styles.Row>
-            <Styles.Title>Confirm sending</Styles.Title>
-            <Styles.Description>Check transaction details and confirm sending:</Styles.Description>
+            <Styles.Title>Confirm the sending</Styles.Title>
+            <Styles.Description>Check transaction details</Styles.Description>
 
             <Styles.OrderCheck>
               <Styles.List>
@@ -230,7 +230,7 @@ const SendConfirmation: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={onCloseConfirmModal}
-        title="Confirm sending"
+        title="Confirm the sending"
         inputLabel="Enter password"
         textInputType="password"
         textInputValue={password}
@@ -243,7 +243,7 @@ const SendConfirmation: React.FC = () => {
       <SuccessDrawer
         isActive={activeDrawer === 'success'}
         onClose={() => setActiveDrawer(null)}
-        text="Your transaction has successfully sent. You can check it here:"
+        text="Your transaction has been successfully sent. You can check it here:"
         link={transactionLink}
       />
     </>

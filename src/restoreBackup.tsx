@@ -144,12 +144,12 @@ const RestoreBackup: React.FC = () => {
             {isFileBroken || backupData.length > 0 ? (
               <Styles.DNDText isFileBroken={isFileBroken} isFileUploaded={backupData.length > 0}>
                 {isFileBroken
-                  ? 'File you chose is invalid or broken, please pick another one'
-                  : 'Backup file is successfully loaded!'}
+                  ? 'The chosen file is invalid or broken, please pick another one.'
+                  : 'The backup file is successfully loaded'}
               </Styles.DNDText>
             ) : (
               <Styles.DNDText>
-                Drag and drop or choose backup file to restore your wallet
+                Drag and drop or choose a backup file to restore your wallet.
               </Styles.DNDText>
             )}
           </Styles.DNDArea>
@@ -183,7 +183,7 @@ const RestoreBackup: React.FC = () => {
         <ConfirmDrawer
           isActive={activeDrawer === 'confirm'}
           onClose={() => setActiveDrawer(null)}
-          title="Enter your password to restore wallet"
+          title="Enter your password to restore the wallet."
           textInputValue={password}
           onChangeText={setPassword}
           onConfirm={onConfirmRestore}
@@ -196,7 +196,7 @@ const RestoreBackup: React.FC = () => {
         <FailDrawer
           isActive={activeDrawer === 'fail'}
           onClose={() => setActiveDrawer(null)}
-          text="Backup file is broken. We cannot restore your wallet. Check your backup file and try again."
+          text="The backup file is broken. We cannot restore your wallet. Check your backup file and try again."
           openFrom="browser"
         />
         <SuccessDrawer

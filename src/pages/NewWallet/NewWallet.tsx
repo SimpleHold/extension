@@ -146,8 +146,8 @@ const NewWallet: React.FC = () => {
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
-            You can generate new address or import private key to add address you already use. Enter
-            your password to keep your backup up-to-date and encrypted.
+            You can generate a new address or import a private key to add the address you already
+            use. Enter your password to keep your backup up-to-date and encrypted.
           </Styles.Description>
 
           {warning ? <Warning text={warning} /> : null}
@@ -159,10 +159,10 @@ const NewWallet: React.FC = () => {
                   src="../../assets/icons/import.svg"
                   width={18}
                   height={18}
-                  title="Import private key"
+                  title="Import a private key"
                 />
               </Styles.ActionIcon>
-              <Styles.ActionName>Import private key</Styles.ActionName>
+              <Styles.ActionName>Import a private key</Styles.ActionName>
             </Styles.Action>
             <Styles.Action onClick={onGenerateAddress} size={warning ? 'small' : 'big'}>
               <Styles.ActionIcon>
@@ -170,10 +170,10 @@ const NewWallet: React.FC = () => {
                   src="../../assets/icons/plusCircle.svg"
                   width={20}
                   height={20}
-                  title="Generate new address"
+                  title="Generate a new address"
                 />
               </Styles.ActionIcon>
-              <Styles.ActionName>Generate new address</Styles.ActionName>
+              <Styles.ActionName>Generate a new address</Styles.ActionName>
             </Styles.Action>
           </Styles.Actions>
         </Styles.Container>
