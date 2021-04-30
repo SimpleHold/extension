@@ -1,5 +1,13 @@
 import styled from 'styled-components'
 
+type TFiltersButtonProps = {
+  isActive: boolean
+}
+
+type TFiltersRowProps = {
+  isActive: boolean
+}
+
 const Wrapper = styled.div`
   display: flex;
   align-items: center;
@@ -86,11 +94,10 @@ const SiteInfo = styled.div`
   align-items: center;
 `
 
-const SiteFavicon = styled.div`
+const SiteFavicon = styled.img`
   width: 16px;
   height: 16px;
   border-radius: 8px;
-  background-color: #1b4295;
 `
 
 const SiteUrl = styled.p`
@@ -132,6 +139,10 @@ const FiltersButton = styled.div`
   align-items: center;
   justify-content: center;
 
+  path {
+    fill: ${({ isActive }: TFiltersButtonProps) => (isActive ? '#3fbb7d' : '#C3C3C3')};
+  }
+
   &:hover {
     cursor: pointer;
 
@@ -143,6 +154,13 @@ const FiltersButton = styled.div`
 
 const AddressesList = styled.div`
   margin: 10px 0 0 0;
+`
+
+const FiltersRow = styled.div`
+  margin: 10px 0 0 0;
+  opacity: ${({ isActive }: TFiltersRowProps) => (isActive ? '1' : '0')};
+  height: ${({ isActive }: TFiltersRowProps) => (isActive ? '60px' : '0')};
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
 `
 
 const Styles = {
@@ -164,6 +182,7 @@ const Styles = {
   AddressesLabel,
   FiltersButton,
   AddressesList,
+  FiltersRow,
 }
 
 export default Styles
