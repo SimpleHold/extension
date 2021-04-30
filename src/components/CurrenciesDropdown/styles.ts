@@ -14,6 +14,7 @@ const Wrapper = styled.div`
   position: relative;
   filter: ${({ isVisible }: TVisibleProps) =>
     isVisible ? 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.3))' : 'none'};
+  z-index: 2;
 `
 
 const Container = styled.div`
