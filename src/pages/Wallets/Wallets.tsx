@@ -69,8 +69,8 @@ const Wallets: React.FC = () => {
   React.useEffect(() => {
     if (totalBalance !== null && totalEstimated !== null) {
       const getLatesTotalBalance = wallets?.reduce((a, b) => {
-        if (b.balance) {
-          return a + b.balance
+        if (b.balance_btc) {
+          return a + b.balance_btc
         }
         return 0
       }, 0)
@@ -81,7 +81,7 @@ const Wallets: React.FC = () => {
         })
       }
     }
-  }, [totalBalance])
+  }, [totalBalance, totalEstimated])
 
   const getWalletsList = () => {
     const walletsList = getWallets()

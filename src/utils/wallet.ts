@@ -7,6 +7,7 @@ import { encrypt } from '@utils/crypto'
 export interface IWallet {
   symbol: string
   balance?: number
+  balance_btc?: number
   address: string
   uuid: string
   privateKey?: string
@@ -31,12 +32,21 @@ export const getWallets = (): IWallet[] | null => {
   }
 }
 
-export const updateBalance = (address: string, amount: number): void => {
+export const updateBalance = (
+  address: string,
+  symbol: string,
+  balance: number,
+  balance_btc: number
+): void => {
   const wallets = getWallets()
-  const findWallet = wallets?.find((wallet: IWallet) => wallet.address === address)
+  const findWallet = wallets?.find(
+    (wallet: IWallet) =>
+      toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol)
+  )
 
   if (findWallet) {
-    findWallet.balance = amount
+    findWallet.balance = balance
+    findWallet.balance_btc = balance_btc
     localStorage.setItem('wallets', JSON.stringify(wallets))
   }
 }

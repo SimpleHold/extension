@@ -12,7 +12,7 @@ import Spinner from '@components/Spinner'
 import CurrenciesDropdown from '@components/CurrenciesDropdown'
 
 // Utils
-import { getWallets, IWallet } from '@utils/wallet'
+import { getWallets, IWallet, updateBalance } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
 import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
@@ -158,7 +158,7 @@ const Send: React.FC = () => {
     setEstimated(null)
 
     if (currency || contractAddress) {
-      const { balance, balance_usd } = await getBalance(
+      const { balance, balance_usd, balance_btc } = await getBalance(
         selectedAddress,
         currency?.chain || tokenChain,
         chain ? symbol : undefined,
@@ -166,6 +166,7 @@ const Send: React.FC = () => {
       )
 
       setBalance(balance)
+      updateBalance(address, symbol, balance, balance_btc)
       setEstimated(balance_usd)
     }
   }
