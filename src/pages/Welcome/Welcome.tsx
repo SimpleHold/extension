@@ -86,7 +86,8 @@ const Wallets: React.FC = () => {
       <Styles.Container>
         <Styles.Title>Welcome</Styles.Title>
         <Styles.Description>
-          SimpleHold would like to gather usage data to better understand how our users interact
+          SimpleHold is a light wallet for Bitcoin, Ethereum, and many other assets. It's never been
+          easier to use crypto!
         </Styles.Description>
         <Styles.WalletActions>
           <Styles.Action onClick={onCreateWallet}>
@@ -98,7 +99,7 @@ const Wallets: React.FC = () => {
                 title="Create new wallet"
               />
             </Styles.ActionIcon>
-            <Styles.ActionName>Create new wallet</Styles.ActionName>
+            <Styles.ActionName>Create a new wallet</Styles.ActionName>
           </Styles.Action>
           <Styles.Action onClick={onRestoreWallet}>
             <Styles.ActionIcon>
@@ -109,7 +110,7 @@ const Wallets: React.FC = () => {
                 title="Restore wallet"
               />
             </Styles.ActionIcon>
-            <Styles.ActionName>Restore wallet</Styles.ActionName>
+            <Styles.ActionName>Restore your wallet</Styles.ActionName>
             {isManualRestore ? (
               <Styles.HoverActionText>The link will open in a new tab</Styles.HoverActionText>
             ) : null}

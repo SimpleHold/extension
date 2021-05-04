@@ -11,6 +11,9 @@ import Skeleton from '@components/Skeleton'
 import { getCurrency } from '@config/currencies'
 import { getBalance } from '@utils/api'
 import { toUpper, numberFriendly } from '@utils/format'
+import { updateBalance } from '@utils/wallet'
+
+// Config
 import { getToken } from '@config/tokens'
 
 // Styles
@@ -69,6 +72,7 @@ const WalletCard: React.FC<Props> = (props) => {
     if (sumBalance) {
       sumBalance(balance_btc)
     }
+    updateBalance(address, symbol, balance, balance_btc)
 
     setPendingBalance(pending)
     if (sumPending) {

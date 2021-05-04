@@ -10,6 +10,7 @@ import Button from '@components/Button'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
+import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import { validatePassword } from '@utils/validate'
@@ -37,7 +38,7 @@ interface LocationState {
 
 const ImportPrivateKey: React.FC = () => {
   const [privateKey, setPrivateKey] = React.useState<string>('')
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
   const [password, setPassword] = React.useState<string>('')
   const [isImportButtonLoading, setImportButtonLoading] = React.useState<boolean>(false)
@@ -160,15 +161,19 @@ const ImportPrivateKey: React.FC = () => {
             ).length
             setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
-            return history.replace('/download-backup', {
-              password,
-              from: 'privateKey',
-            })
+            setActiveDrawer('success')
           }
         }
       }
     }
     return setErrorLabel('Password is not valid')
+  }
+
+  const onDownloadBackup = (): void => {
+    return history.replace('/download-backup', {
+      password,
+      from: 'privateKey',
+    })
   }
 
   return (
@@ -178,10 +183,10 @@ const ImportPrivateKey: React.FC = () => {
         <Header withBack onBack={history.goBack} backTitle="Add address" />
         <Styles.Container>
           <Styles.Heading>
-            <Styles.Title>Import private key</Styles.Title>
+            <Styles.Title>Import a private key</Styles.Title>
             <Styles.Description>
-              Enter private key of existing address to import it in SimpleHold and use for receive
-              and send crypto.
+              Use your existing address to receive and send crypto. Just enter a private key of this
+              address to import it into SimpleHold.
             </Styles.Description>
             <Link
               to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
@@ -191,7 +196,7 @@ const ImportPrivateKey: React.FC = () => {
           </Styles.Heading>
           <Styles.Form>
             <TextInput
-              label="Enter private key"
+              label="Enter key"
               value={privateKey}
               onChange={setPrivateKey}
               errorLabel={errorLabel}
@@ -213,7 +218,7 @@ const ImportPrivateKey: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
-        title="Confirm adding new address"
+        title="Please enter your password to add a new address"
         inputLabel="Enter password"
         textInputValue={password}
         isButtonDisabled={!validatePassword(password)}
@@ -221,6 +226,11 @@ const ImportPrivateKey: React.FC = () => {
         onChangeText={setPassword}
         textInputType="password"
         inputErrorLabel={errorLabel}
+      />
+      <SuccessDrawer
+        isActive={activeDrawer === 'success'}
+        onClose={onDownloadBackup}
+        text="The new address has been successfully added!"
       />
     </>
   )

@@ -9,6 +9,7 @@ import Warning from '@components/Warning'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
+import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import { logEvent, setUserProperties } from '@utils/amplitude'
@@ -37,7 +38,7 @@ interface LocationState {
 
 const NewWallet: React.FC = () => {
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
@@ -126,16 +127,20 @@ const NewWallet: React.FC = () => {
 
               localStorage.setItem('backupStatus', 'notDownloaded')
 
-              return history.replace('/download-backup', {
-                password,
-                from: 'newWallet',
-              })
+              setActiveDrawer('success')
             }
           }
         }
       }
     }
     return setErrorLabel('Password is not valid')
+  }
+
+  const onDownloadBackup = (): void => {
+    return history.replace('/download-backup', {
+      password,
+      from: 'newWallet',
+    })
   }
 
   return (
@@ -146,8 +151,8 @@ const NewWallet: React.FC = () => {
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
-            You can generate new address or import private key to add address you already use. Enter
-            your password to keep your backup up-to-date and encrypted.
+            You can generate a new address or import a private key to add the address you already
+            use. Enter your password to keep your backup up-to-date and encrypted.
           </Styles.Description>
 
           {warning ? <Warning text={warning} /> : null}
@@ -159,10 +164,10 @@ const NewWallet: React.FC = () => {
                   src="../../assets/icons/import.svg"
                   width={18}
                   height={18}
-                  title="Import private key"
+                  title="Import a private key"
                 />
               </Styles.ActionIcon>
-              <Styles.ActionName>Import private key</Styles.ActionName>
+              <Styles.ActionName>Import a private key</Styles.ActionName>
             </Styles.Action>
             <Styles.Action onClick={onGenerateAddress} size={warning ? 'small' : 'big'}>
               <Styles.ActionIcon>
@@ -170,10 +175,10 @@ const NewWallet: React.FC = () => {
                   src="../../assets/icons/plusCircle.svg"
                   width={20}
                   height={20}
-                  title="Generate new address"
+                  title="Generate a new address"
                 />
               </Styles.ActionIcon>
-              <Styles.ActionName>Generate new address</Styles.ActionName>
+              <Styles.ActionName>Generate a new address</Styles.ActionName>
             </Styles.Action>
           </Styles.Actions>
         </Styles.Container>
@@ -181,7 +186,7 @@ const NewWallet: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
-        title="Confirm adding new address"
+        title="Please enter your password to add a new address"
         inputLabel="Enter password"
         textInputValue={password}
         isButtonDisabled={!validatePassword(password)}
@@ -189,6 +194,11 @@ const NewWallet: React.FC = () => {
         onChangeText={setPassword}
         textInputType="password"
         inputErrorLabel={errorLabel}
+      />
+      <SuccessDrawer
+        isActive={activeDrawer === 'success'}
+        onClose={onDownloadBackup}
+        text="The new address has been successfully added!"
       />
     </>
   )

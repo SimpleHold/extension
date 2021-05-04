@@ -88,7 +88,7 @@ const EnterPasscode: React.FC = () => {
         <Styles.Container>
           <Styles.Row>
             <Styles.Image />
-            <Styles.Title>Enter your passcode</Styles.Title>
+            <Styles.Title>Welcome back!</Styles.Title>
 
             <Styles.Form onSubmit={onSubmitForm}>
               <OneTimePassword value={passcode} onChange={setPasscode} isError={isError} />

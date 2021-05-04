@@ -129,9 +129,9 @@ const Lock: React.FC = () => {
           </Styles.Form>
 
           <Styles.Links>
-            <Styles.Link onClick={onLogout}>Download backup and log out</Styles.Link>
+            <Styles.Link onClick={onLogout}>Download a backup and log out</Styles.Link>
             <Styles.Link onClick={() => openWebPage('https://simplehold.io/about')}>
-              Contact to support
+              Contact support
             </Styles.Link>
           </Styles.Links>
         </Styles.Container>

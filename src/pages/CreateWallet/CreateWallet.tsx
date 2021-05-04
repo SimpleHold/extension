@@ -69,7 +69,7 @@ const Wallets: React.FC = () => {
     }
 
     if (!validatePassword(password)) {
-      setPasswordErrorLabel('Password should have at least 8 symbols')
+      setPasswordErrorLabel('Password must be at least 8 symbols')
     }
   }
 
@@ -79,7 +79,7 @@ const Wallets: React.FC = () => {
     }
 
     if (confirmPassword.length && confirmPassword !== password) {
-      setConfirmPasswordErrorLabel("Passwords doesn't match")
+      setConfirmPasswordErrorLabel("Passwords don't match")
     }
   }
 
@@ -100,8 +100,8 @@ const Wallets: React.FC = () => {
         <Styles.Row>
           <Styles.Title>Create password</Styles.Title>
           <Styles.Description>
-            The password needs to encrypt your private keys. We dont have access to your keys, so be
-            careful.
+            The password is needed to encrypt your backup with private keys. Be careful and don't
+            lose your password as it's impossible to restore it.
           </Styles.Description>
           <Link
             title="How it works?"

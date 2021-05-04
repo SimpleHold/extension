@@ -76,19 +76,19 @@ const DownloadBackup: React.FC = () => {
       <Styles.Container>
         <Styles.Row>
           <Styles.Image src="../../assets/illustrate/downloadbackup.svg" alt="image" />
-          <Styles.Title>Download backup</Styles.Title>
+          <Styles.Title>Backup</Styles.Title>
           <Styles.Description>
-            Please save your backup file and keep it properly as well as password. It ensures access
-            to your funds.
+            Please save your backup file and keep it properly as well as your password. It ensures
+            access to your funds.
           </Styles.Description>
           <Link
-            title="Read more about how it works."
+            title="Read more about how it works"
             to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
             mt={17}
           />
         </Styles.Row>
         <Button
-          label="Download backup file"
+          label="Download a backup file"
           onClick={downloadFile}
           icon={isDownloadManually ? linkIcon : undefined}
         />

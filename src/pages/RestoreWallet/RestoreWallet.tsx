@@ -28,7 +28,6 @@ const RestoreWallet: React.FC = () => {
   const history = useHistory()
 
   const [isInvalidFile, setInvalidFile] = React.useState<boolean>(false)
-  const [fileName, setFileName] = React.useState<null | string>(null)
   const [backupData, setBackupData] = React.useState<null | string>(null)
   const [isAgreed, setIsAgreed] = React.useState<boolean>(true)
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'fail'>(null)
@@ -37,11 +36,11 @@ const RestoreWallet: React.FC = () => {
 
   const onDrop = React.useCallback(async (acceptedFiles) => {
     const text = await acceptedFiles[0]?.text()
-    if (!text?.length) {
-      setInvalidFile(true)
-    } else {
-      setFileName(acceptedFiles[0]?.name)
+
+    if (text?.length > 0 && acceptedFiles[0].name.indexOf('.dat') !== -1) {
       setBackupData(text)
+    } else {
+      setInvalidFile(true)
     }
   }, [])
 
@@ -94,13 +93,13 @@ const RestoreWallet: React.FC = () => {
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Restore</Styles.Title>
-            <Styles.Text>You can restore your SimpleHold wallet with backup file</Styles.Text>
+            <Styles.Text>You can restore your SimpleHold wallet with a backup file.</Styles.Text>
 
             <Styles.DNDBlock {...getRootProps()}>
               <Styles.DNDArea isDragActive={isDragActive}>
                 <input {...getInputProps()} />
                 <Styles.DNDIconRow
-                  isDragActive={isDragActive || (backupData !== null && fileName !== null)}
+                  isDragActive={isDragActive || backupData !== null}
                   isInvalidFile={isInvalidFile}
                 >
                   {isInvalidFile ? (
@@ -119,17 +118,17 @@ const RestoreWallet: React.FC = () => {
                     />
                   )}
                 </Styles.DNDIconRow>
-                {backupData && fileName ? (
-                  <Styles.DNDText>{fileName} uploaded successfully</Styles.DNDText>
+                {backupData ? (
+                  <Styles.DNDText>The backup file is successfully loaded</Styles.DNDText>
                 ) : null}
-                {!backupData && !fileName && !isInvalidFile ? (
+                {!backupData && !isInvalidFile ? (
                   <Styles.DNDText>
-                    Drag and drop or choose backup file to restore your wallet
+                    Drag and drop or choose a backup file to restore your wallet.
                   </Styles.DNDText>
                 ) : null}
                 {isInvalidFile ? (
                   <Styles.DNDText>
-                    File you chose is invalid or broken, please pick another one
+                    The chosen file is invalid or broken, please pick another one
                   </Styles.DNDText>
                 ) : null}
               </Styles.DNDArea>
@@ -142,7 +141,7 @@ const RestoreWallet: React.FC = () => {
               label="Confirm"
               onClick={onConfirm}
               ml={7.5}
-              disabled={!backupData?.length || !fileName?.length || !isAgreed}
+              disabled={!backupData?.length || !isAgreed}
             />
           </Styles.Actions>
         </Styles.Container>
@@ -150,7 +149,7 @@ const RestoreWallet: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
-        title="Enter your password to restore wallet"
+        title="Enter your password to restore the wallet."
         textInputValue={password}
         onChangeText={setPassword}
         onConfirm={onConfirmRestore}
@@ -162,7 +161,7 @@ const RestoreWallet: React.FC = () => {
       <FailDrawer
         isActive={activeDrawer === 'fail'}
         onClose={() => setActiveDrawer(null)}
-        text="Backup file is broken. We cannot restore your wallet. Check your backup file and try again."
+        text="The backup file is broken. We cannot restore your wallet. Check your backup file and try again."
       />
     </>
   )

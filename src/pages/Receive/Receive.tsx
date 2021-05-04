@@ -17,7 +17,7 @@ import PendingBalance from '@components/PendingBalance'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
-import ShowPrivateKeyDrawer from '@drawers/ShowPrivateKey'
+import PrivateKeyDrawer from 'drawers/PrivateKey'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
@@ -28,7 +28,7 @@ import { price, toUpper, toLower } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet } from '@utils/wallet'
+import { IWallet, updateBalance } from '@utils/wallet'
 import { getExplorerLink } from '@utils/address'
 
 // Config
@@ -132,7 +132,7 @@ const Receive: React.FC = () => {
   }
 
   const loadBalance = async (): Promise<void> => {
-    const { balance, balance_usd, pending } = await getBalance(
+    const { balance, balance_usd, pending, balance_btc } = await getBalance(
       address,
       currency?.chain || chain,
       chain ? symbol : undefined,
@@ -140,6 +140,7 @@ const Receive: React.FC = () => {
     )
 
     setBalance(balance)
+    updateBalance(address, symbol, balance, balance_btc)
     setEstimated(balance_usd)
     setPendingBalance(pending)
   }
@@ -287,7 +288,7 @@ const Receive: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
-        title="Confirm showing private key"
+        title="Please enter your password to see the private key"
         isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirmModal}
         textInputValue={password}
@@ -296,7 +297,7 @@ const Receive: React.FC = () => {
         textInputType="password"
         inputErrorLabel={passwordErrorLabel}
       />
-      <ShowPrivateKeyDrawer
+      <PrivateKeyDrawer
         isActive={activeDrawer === 'privateKey'}
         onClose={() => {
           setActiveDrawer(null)
