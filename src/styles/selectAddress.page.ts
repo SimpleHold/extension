@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 
+import lockIllustrate from '@assets/illustrate/lock.svg'
+
 type TFiltersButtonProps = {
   isActive: boolean
 }
@@ -51,14 +53,21 @@ const CloseButton = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 15px;
 
   &:hover {
     cursor: pointer;
+    background-color: rgb(255 255 255 / 80%);
+
+    path {
+      fill: #3fbb7d;
+    }
   }
 `
 
 const Body = styled.div`
   background-color: #ffffff;
+  height: 640px;
 `
 
 const Row = styled.div`
@@ -154,6 +163,7 @@ const FiltersButton = styled.div`
 
 const AddressesList = styled.div`
   margin: 10px 0 0 0;
+  position: relative;
 `
 
 const FiltersRow = styled.div`
@@ -161,6 +171,35 @@ const FiltersRow = styled.div`
   opacity: ${({ isActive }: TFiltersRowProps) => (isActive ? '1' : '0')};
   height: ${({ isActive }: TFiltersRowProps) => (isActive ? '60px' : '0')};
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+`
+
+const LockedRow = styled.div`
+  padding: 50px 30px 0 30px;
+`
+
+const LockImage = styled.div`
+  width: 315px;
+  height: 180px;
+  background-image: url(${lockIllustrate});
+  background-repeat: no-repeat;
+  background-size: contain;
+`
+
+const LockedTitle = styled.p`
+  margin: 30px 0 0 0;
+  font-weight: bold;
+  font-size: 23px;
+  line-height: 27px;
+  text-align: center;
+  color: #1d1d22;
+`
+
+const LockedForm = styled.form`
+  margin: 20px 0 0 0;
+`
+
+const LockedFormActions = styled.div`
+  margin: 5px 0 0 0;
 `
 
 const Styles = {
@@ -183,6 +222,11 @@ const Styles = {
   FiltersButton,
   AddressesList,
   FiltersRow,
+  LockedRow,
+  LockImage,
+  LockedTitle,
+  LockedForm,
+  LockedFormActions,
 }
 
 export default Styles
