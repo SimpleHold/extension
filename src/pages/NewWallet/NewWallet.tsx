@@ -9,6 +9,7 @@ import Warning from '@components/Warning'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
+import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import { logEvent, setUserProperties } from '@utils/amplitude'
@@ -37,7 +38,7 @@ interface LocationState {
 
 const NewWallet: React.FC = () => {
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
 
@@ -126,16 +127,20 @@ const NewWallet: React.FC = () => {
 
               localStorage.setItem('backupStatus', 'notDownloaded')
 
-              return history.replace('/download-backup', {
-                password,
-                from: 'newWallet',
-              })
+              setActiveDrawer('success')
             }
           }
         }
       }
     }
     return setErrorLabel('Password is not valid')
+  }
+
+  const onDownloadBackup = (): void => {
+    return history.replace('/download-backup', {
+      password,
+      from: 'newWallet',
+    })
   }
 
   return (
@@ -189,6 +194,11 @@ const NewWallet: React.FC = () => {
         onChangeText={setPassword}
         textInputType="password"
         inputErrorLabel={errorLabel}
+      />
+      <SuccessDrawer
+        isActive={activeDrawer === 'success'}
+        onClose={onDownloadBackup}
+        text="The new address has been successfully added!"
       />
     </>
   )
