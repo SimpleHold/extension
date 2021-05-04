@@ -7,6 +7,15 @@ type TVisibleProps = {
 type TContainerProps = {
   disabled?: boolean
   isVisible: boolean
+  isNotSelected: boolean
+}
+
+type TRowProps = {
+  isNotSelected: boolean
+}
+
+type TLabelProps = {
+  isNotSelected: boolean
 }
 
 const Wrapper = styled.div`
@@ -18,13 +27,15 @@ const Wrapper = styled.div`
 `
 
 const Container = styled.div`
-  padding: 10px;
+  padding: ${({ isNotSelected }: TContainerProps) =>
+    isNotSelected ? '15px 10px 15px 20px' : '10px'};
   background-color: #ffffff;
   border: ${({ isVisible }: TContainerProps) => `1px solid ${isVisible ? '#3fbb7d' : '#eaeaea'}`};
   border-radius: ${({ isVisible }: TContainerProps) => (isVisible ? '5px 5px 0px 0px' : '5px')};
   display: flex;
   flex-direction: row;
   align-items: center;
+  width: calc(100% - 30px);
 
   &:hover {
     cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
@@ -33,7 +44,7 @@ const Container = styled.div`
 `
 
 const Row = styled.div`
-  margin: 0 0 0 10px;
+  margin: ${({ isNotSelected }: TRowProps) => (isNotSelected ? '0' : '0 0 0 10px')};
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -48,8 +59,8 @@ const Info = styled.div`
 
 const Label = styled.p`
   margin: 0;
-  font-size: 12px;
-  line-height: 14px;
+  font-size: ${({ isNotSelected }: TLabelProps) => (isNotSelected ? '16px' : '12px')};
+  line-height: ${({ isNotSelected }: TLabelProps) => (isNotSelected ? '19px' : '16px')};
   color: #7d7e8d;
 `
 
@@ -81,7 +92,7 @@ const ArrowIconRow = styled.div`
 `
 
 const NetworksList = styled.div`
-  border: 1px solid #eaeaea;
+  border: 1px solid #3fbb7d;
   border-top: none;
   background-color: #ffffff;
   width: 100%;
@@ -101,6 +112,10 @@ const ListItem = styled.div`
   align-items: center;
   padding: 10px;
   overflow: hidden;
+
+  &:last-child {
+    border-radius: 0 0 5px 5px;
+  }
 
   &:hover {
     cursor: pointer;

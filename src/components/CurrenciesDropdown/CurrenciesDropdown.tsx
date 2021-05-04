@@ -26,11 +26,11 @@ type TList = {
 }
 
 interface Props {
-  currencySymbol: string
+  currencySymbol?: string
   list: TList[]
   onSelect: Function
   label?: string
-  value: string
+  value?: string
   disabled?: boolean
   currencyBr: number
   background?: string
@@ -67,20 +67,25 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
         onClick={() => (disabled ? null : setIsVisible(!isVisible))}
         isVisible={isVisible}
         disabled={disabled}
+        isNotSelected={!currencySymbol && !value}
       >
-        <CurrencyLogo
-          symbol={currencySymbol}
-          width={40}
-          height={40}
-          br={currencyBr}
-          background={background || getTokenBackground}
-          chain={tokenChain}
-          name={tokenName}
-        />
-        <Styles.Row>
+        {currencySymbol ? (
+          <CurrencyLogo
+            symbol={currencySymbol}
+            width={40}
+            height={40}
+            br={currencyBr}
+            background={background || getTokenBackground}
+            chain={tokenChain}
+            name={tokenName}
+          />
+        ) : null}
+        <Styles.Row isNotSelected={!currencySymbol && !value}>
           <Styles.Info>
-            {label ? <Styles.Label>{label}</Styles.Label> : null}
-            <Styles.Value>{value}</Styles.Value>
+            {label ? (
+              <Styles.Label isNotSelected={!currencySymbol && !value}>{label}</Styles.Label>
+            ) : null}
+            {value ? <Styles.Value>{value}</Styles.Value> : null}
           </Styles.Info>
           {!disabled ? (
             <Styles.ArrowIconRow>
