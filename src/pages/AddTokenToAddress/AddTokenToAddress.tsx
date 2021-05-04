@@ -91,7 +91,7 @@ const AddTokenToAddress: React.FC = () => {
     history.push('/new-wallet', {
       symbol,
       warning:
-        'You are trying to add new ERC20 token address. Corresponding Ethereum address will also be added to your wallet',
+        'You are trying to add a new ERC20 token address. The corresponding Ethereum address will also be added to your wallet.',
       backTitle: `Add to ${toUpper(chain)} address`,
       chain,
     })
@@ -152,8 +152,9 @@ const AddTokenToAddress: React.FC = () => {
           <Styles.Row>
             <Styles.Title>Add to {toUpper(chain)} address</Styles.Title>
             <Styles.Description>
-              You are trying to add new ERC20 token address. Do you want to associate one of your{' '}
-              {chainName} address with {tokenName}? Press Skip if you want to add new address
+              You are trying to add a new ERC20 token address. Do you want to use one of your
+              current {chainName} addresses with {tokenName}? Skip it if you want to add the new
+              address.
             </Styles.Description>
 
             <CurrenciesDropdown
@@ -176,7 +177,7 @@ const AddTokenToAddress: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
-        title="Confirm adding new address"
+        title="Please enter your password to add a new address"
         inputLabel="Enter password"
         textInputValue={password}
         isButtonDisabled={!validatePassword(password)}

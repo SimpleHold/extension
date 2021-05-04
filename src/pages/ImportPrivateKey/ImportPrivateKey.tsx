@@ -196,7 +196,7 @@ const ImportPrivateKey: React.FC = () => {
           </Styles.Heading>
           <Styles.Form>
             <TextInput
-              label="Enter private key"
+              label="Enter key"
               value={privateKey}
               onChange={setPrivateKey}
               errorLabel={errorLabel}

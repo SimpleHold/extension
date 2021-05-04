@@ -90,13 +90,13 @@ const SelectCurrency: React.FC = () => {
 
           <TextInput
             value={searchValue}
-            label="Type a currency or ticker"
+            label="Type a currency or a ticker"
             onChange={setSearchValue}
           />
 
           {!filterCurrenciesList.length && !filterTokensList.length ? (
             <Styles.NotFoundMessage>
-              Currency was not found but you can add custom token
+              The currency was not found but you can add a custom token
             </Styles.NotFoundMessage>
           ) : null}
 

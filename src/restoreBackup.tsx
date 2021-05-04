@@ -183,7 +183,7 @@ const RestoreBackup: React.FC = () => {
         <ConfirmDrawer
           isActive={activeDrawer === 'confirm'}
           onClose={() => setActiveDrawer(null)}
-          title="Enter your password to restore the wallet."
+          title="Enter the password to restore your wallet"
           textInputValue={password}
           onChangeText={setPassword}
           onConfirm={onConfirmRestore}
@@ -203,7 +203,7 @@ const RestoreBackup: React.FC = () => {
           isActive={activeDrawer === 'success'}
           onClose={() => null}
           icon={puzzleIcon}
-          text="We successfully restored your wallet. Go to the extension by clicking on the SimpleHold icon in the extensions bar and enjoy your crypto!"
+          text="We successfully restored your wallet. Go to the extension by clicking on the SimpleHold icon in the extensions menu and enjoy your crypto!"
           openFrom="browser"
           disableClose
         />

@@ -128,7 +128,7 @@ const RestoreWallet: React.FC = () => {
                 ) : null}
                 {isInvalidFile ? (
                   <Styles.DNDText>
-                    The chosen file is invalid or broken, please pick another one.
+                    The chosen file is invalid or broken, please pick another one
                   </Styles.DNDText>
                 ) : null}
               </Styles.DNDArea>

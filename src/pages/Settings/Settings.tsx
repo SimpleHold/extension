@@ -110,7 +110,7 @@ const Settings: React.FC = () => {
     },
     {
       title: 'Use passcode',
-      text: 'Use a passcode instead of a password to easily hide wallet data from other people.',
+      text: 'Use a passcode instead of a password to easily hide wallet data from other people',
       withSwitch: true,
       switchValue: localStorage.getItem('passcode') !== null,
       onToggle: togglePasscode,

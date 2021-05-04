@@ -186,7 +186,7 @@ const NewWallet: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
-        title="Confirm adding new address"
+        title="Please enter your password to add a new address"
         inputLabel="Enter password"
         textInputValue={password}
         isButtonDisabled={!validatePassword(password)}

@@ -42,10 +42,7 @@ const DownloadBackup: React.FC = () => {
         <Styles.Body>
           <Styles.Image src="./assets/illustrate/downloadbackup.svg" />
           <Styles.Title>Download backup</Styles.Title>
-          <Styles.Description>
-            Downloading backup file for your SimpleHold wallet. Your download will start in few
-            seconds…
-          </Styles.Description>
+          <Styles.Description>Your download will start in few seconds.</Styles.Description>
           <Styles.DownloadLink onClick={onDownload}>If not, click here</Styles.DownloadLink>
 
           <Styles.DividerLine />
@@ -56,9 +53,9 @@ const DownloadBackup: React.FC = () => {
           </Styles.QuestionBlock>
 
           <Styles.Answer>
-            There are some trouble in Chrome for Mac OS X with uploading and downloading files from
-            extension window. To avoid problems we need to move this functional to separate tab.
-            Thank you for understanding.
+            There are some troubles in Chrome for Mac OS X and Firefox with uploading and
+            downloading files from the extension window. To avoid problems, we need to move this
+            functionality to a separate tab. Thank you for using SimpleHold.
           </Styles.Answer>
         </Styles.Body>
       </Styles.Extension>

@@ -17,7 +17,7 @@ import PendingBalance from '@components/PendingBalance'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
-import ShowPrivateKeyDrawer from '@drawers/ShowPrivateKey'
+import PrivateKeyDrawer from 'drawers/PrivateKey'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
@@ -297,7 +297,7 @@ const Receive: React.FC = () => {
         textInputType="password"
         inputErrorLabel={passwordErrorLabel}
       />
-      <ShowPrivateKeyDrawer
+      <PrivateKeyDrawer
         isActive={activeDrawer === 'privateKey'}
         onClose={() => {
           setActiveDrawer(null)

@@ -33,19 +33,19 @@ const OnBoard: React.FC = () => {
       image: illustrate1,
       title: 'Hello!',
       description:
-        'Welcome to the new crypto wallet from SimpleSwap! Take a little tour before you can start',
+        'Welcome to the new crypto wallet from SimpleSwap! Take a little tour before you can start.',
     },
     {
       image: illustrate2,
       title: '100% light wallet',
       description:
-        "We don't have access to your private keys, so only you can manage your funds. Be careful, always update your backup and keep it in a safe place",
+        "We don't have access to your private keys, so only you can manage your funds. Be careful, always update your backup and keep it in a safe place.",
     },
     {
       image: illustrate3,
       title: 'Support',
       description:
-        'Our support team is always glad to help you. Share your feedback or ask questions here. Besides that you can read more about us at our knowledge base',
+        'Our support team is always glad to help you. Share your feedback or ask questions here. Besides that you can read more about us at our knowledge base.',
     },
   ]
 

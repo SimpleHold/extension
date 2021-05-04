@@ -76,7 +76,7 @@ const DownloadBackup: React.FC = () => {
       <Styles.Container>
         <Styles.Row>
           <Styles.Image src="../../assets/illustrate/downloadbackup.svg" alt="image" />
-          <Styles.Title>Download backup</Styles.Title>
+          <Styles.Title>Backup</Styles.Title>
           <Styles.Description>
             Please save your backup file and keep it properly as well as your password. It ensures
             access to your funds.
