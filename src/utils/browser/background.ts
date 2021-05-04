@@ -3,7 +3,7 @@ import { IRequest } from 'utils/browser/types'
 
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
-    const { screenX, outerWidth, site, favicon } = request.data
+    const { screenX, screenY, outerWidth, site, favicon } = request.data
 
     localStorage.setItem('requesterSite', JSON.stringify({ url: site, favicon }))
 
@@ -13,7 +13,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       width: 375,
       height: 700,
       left: Math.max(screenX + (outerWidth - 375), 0),
-      top: 0,
+      top: screenY,
     })
   }
 

@@ -24,7 +24,13 @@ browser.runtime.onMessage.addListener((request: IRequest) => {
     ) as HTMLInputElement
 
     if (findInput && data?.address) {
-      findInput.value = data.address
+      document.dispatchEvent(
+        new CustomEvent('sh-select-address', {
+          detail: {
+            address: data.address,
+          },
+        })
+      )
     }
   }
 })
@@ -32,12 +38,13 @@ browser.runtime.onMessage.addListener((request: IRequest) => {
 document.addEventListener('request_addresses', (request: IRequest) => {
   if (request.type === 'request_addresses') {
     const { site, favicon } = request.detail
-    const { screenX, outerWidth } = window
+    const { screenX, screenY, outerWidth } = window
 
     browser.runtime.sendMessage({
       type: 'request_addresses',
       data: {
         screenX,
+        screenY,
         outerWidth,
         site,
         favicon,
