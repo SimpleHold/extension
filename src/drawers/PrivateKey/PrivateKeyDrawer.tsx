@@ -14,11 +14,11 @@ interface Props {
   privateKey: string | null
 }
 
-const ShowPrivateKeyDrawer: React.FC<Props> = (props) => {
+const PrivateKeyDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive, privateKey } = props
 
   return (
-    <DrawerWrapper title="Show private key" isActive={isActive} onClose={onClose}>
+    <DrawerWrapper title="Private key" isActive={isActive} onClose={onClose}>
       <Styles.Row>
         {privateKey ? (
           <CopyToClipboard value={privateKey}>
@@ -33,4 +33,4 @@ const ShowPrivateKeyDrawer: React.FC<Props> = (props) => {
   )
 }
 
-export default ShowPrivateKeyDrawer
+export default PrivateKeyDrawer
