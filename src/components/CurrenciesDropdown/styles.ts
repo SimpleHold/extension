@@ -35,7 +35,6 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: calc(100% - 30px);
 
   &:hover {
     cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
@@ -92,7 +91,6 @@ const ArrowIconRow = styled.div`
 `
 
 const NetworksList = styled.div`
-  border: 1px solid #3fbb7d;
   border-top: none;
   background-color: #ffffff;
   width: 100%;
@@ -102,8 +100,9 @@ const NetworksList = styled.div`
   visibility: ${({ isVisible }: TVisibleProps) => (isVisible ? 'visible' : 'hidden')};
   transform: ${({ isVisible }: TVisibleProps) => `translateY(${isVisible ? '0' : '-20px'})`};
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
-  width: 100%;
   top: 62px;
+  max-height: 255px;
+  overflow-y: scroll;
 `
 
 const ListItem = styled.div`
@@ -112,6 +111,24 @@ const ListItem = styled.div`
   align-items: center;
   padding: 10px;
   overflow: hidden;
+  border: 1px solid #3fbb7d;
+  position: relative;
+
+  &:not(:last-child) {
+    border-bottom: none;
+  }
+
+  &:first-child {
+    &:after {
+      content: '';
+      width: calc(100% + 20px);
+      margin: 0 0 0 -20px;
+      position: absolute;
+      height: 1px;
+      background-color: #eaeaea;
+      bottom: 0;
+    }
+  }
 
   &:last-child {
     border-radius: 0 0 5px 5px;

@@ -20,6 +20,7 @@ type TList = {
     height: number
     br: number
     background?: string
+    chain?: string
   }
   value: string
   label?: string
@@ -82,10 +83,10 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
         ) : null}
         <Styles.Row isNotSelected={!currencySymbol && !value}>
           <Styles.Info>
-            {label ? (
+            {label?.length ? (
               <Styles.Label isNotSelected={!currencySymbol && !value}>{label}</Styles.Label>
             ) : null}
-            {value ? <Styles.Value>{value}</Styles.Value> : null}
+            {value?.length ? <Styles.Value>{value}</Styles.Value> : null}
           </Styles.Info>
           {!disabled ? (
             <Styles.ArrowIconRow>
@@ -113,7 +114,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
                   height={logo.height}
                   br={logo.br}
                   background={logo.background}
-                  chain={tokenChain}
+                  chain={logo?.chain}
                   name={tokenName}
                 />
                 <Styles.ListItemRow>
