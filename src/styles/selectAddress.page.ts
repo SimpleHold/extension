@@ -164,6 +164,8 @@ const FiltersButton = styled.div`
 const AddressesList = styled.div`
   margin: 10px 0 0 0;
   position: relative;
+  max-height: 440px;
+  overflow-y: scroll;
 `
 
 const FiltersRow = styled.div`
@@ -202,6 +204,13 @@ const LockedFormActions = styled.div`
   margin: 5px 0 0 0;
 `
 
+const NotFound = styled.p`
+  margin: 10px 0 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: #7d7e8d;
+`
+
 const Styles = {
   Wrapper,
   Extension,
@@ -227,6 +236,7 @@ const Styles = {
   LockedTitle,
   LockedForm,
   LockedFormActions,
+  NotFound,
 }
 
 export default Styles

@@ -15,9 +15,11 @@ import OneTimePassword from '@components/OneTimePassword'
 import { getWallets, IWallet } from '@utils/wallet'
 import { validatePassword } from '@utils/validate'
 import { decrypt, sha256hash } from '@utils/crypto'
+import { toLower, toUpper, unique } from '@utils/format'
 
 // Config
 import { getCurrency } from '@config/currencies'
+import { getToken } from '@config/tokens'
 
 // Styles
 import Styles from './styles/selectAddress.page'
@@ -25,8 +27,8 @@ import Styles from './styles/selectAddress.page'
 type TSelectedCurrency = {
   symbol: string
   name: string
-  chain?: string
   background: string
+  chain?: string
 }
 
 const SelectAddress: React.FC = () => {
@@ -46,6 +48,7 @@ const SelectAddress: React.FC = () => {
   React.useEffect(() => {
     getWalletsList()
     getRequesterSiteInfo()
+    getInitialCurrency()
 
     if (localStorage.getItem('isLocked') && !localStorage.getItem('passcode')) {
       textInputRef.current?.focus()
@@ -57,6 +60,32 @@ const SelectAddress: React.FC = () => {
       checkPasscode()
     }
   }, [passcode])
+
+  const getInitialCurrency = (): void => {
+    const searchParams = new URLSearchParams(location.search)
+
+    const queryCurrency = searchParams.get('currency')
+    const queryChain = searchParams.get('chain')
+
+    const parseChain = queryChain !== 'null' && queryChain !== null ? queryChain : null
+
+    if (queryCurrency !== 'null' && queryCurrency !== null) {
+      const getCurrencyInfo = parseChain
+        ? getToken(queryCurrency, parseChain)
+        : getCurrency(queryCurrency)
+
+      if (getCurrencyInfo) {
+        const { symbol, name, background } = getCurrencyInfo
+
+        setSelectedCurrency({
+          symbol,
+          name,
+          background,
+          chain: parseChain || undefined,
+        })
+      }
+    }
+  }
 
   const checkPasscode = (): void => {
     const getPasscodeHash = localStorage.getItem('passcode')
@@ -110,15 +139,18 @@ const SelectAddress: React.FC = () => {
 
   const onSelectCurrency = (index: number): void => {
     const currency = getDropdownList()[index]
-    const getCurrencyInfo = getCurrency(currency.logo.symbol)
+    const getCurrencyInfo = currency.logo?.chain
+      ? getToken(currency.logo.symbol, currency.logo.chain)
+      : getCurrency(currency.logo.symbol)
 
     if (getCurrencyInfo) {
-      const { symbol, name, background } = getCurrencyInfo
+      const { symbol, name, background, chain } = getCurrencyInfo
 
       setSelectedCurrency({
         symbol,
         name,
         background,
+        chain: currency.logo.chain || undefined,
       })
     }
   }
@@ -128,26 +160,35 @@ const SelectAddress: React.FC = () => {
 
     if (walletsList?.length) {
       const mapWallets = walletsList
-        .map((wallet: IWallet) => wallet.symbol)
-        .filter((value, index, self) => self.indexOf(value) === index)
-        .filter((currencySymbol: string) => currencySymbol !== selectedCurrency?.symbol)
+        .filter(
+          (v, i, a) =>
+            a.findIndex(
+              (wallet: IWallet) => wallet.symbol === v.symbol && wallet.chain === v.chain
+            ) === i
+        )
+        .filter(
+          (wallet: IWallet) =>
+            toLower(wallet.symbol) !== toLower(selectedCurrency?.symbol) ||
+            toLower(wallet.chain) !== toLower(selectedCurrency?.chain)
+        )
 
-      return mapWallets
-        .map((currencySymbol: string) => {
-          const getCurrencyInfo = getCurrency(currencySymbol)
+      return mapWallets.map((wallet: IWallet) => {
+        const getCurrencyInfo = wallet?.chain
+          ? getToken(wallet.symbol, wallet.chain)
+          : getCurrency(wallet.symbol)
 
-          return {
-            logo: {
-              symbol: currencySymbol,
-              width: 40,
-              height: 40,
-              br: 13,
-              background: getCurrencyInfo?.background || '',
-            },
-            value: getCurrencyInfo?.name || '',
-          }
-        })
-        .filter((i) => i)
+        return {
+          logo: {
+            symbol: wallet?.symbol,
+            width: 40,
+            height: 40,
+            br: 13,
+            background: getCurrencyInfo?.background || '',
+            chain: wallet.chain,
+          },
+          value: getCurrencyInfo?.name || '',
+        }
+      })
     }
     return []
   }
@@ -177,6 +218,16 @@ const SelectAddress: React.FC = () => {
     return setPasswordErrorLabel('Password is not valid')
   }
 
+  const filterWallets = wallets?.filter((wallet: IWallet) => {
+    if (selectedCurrency) {
+      return (
+        toLower(wallet.symbol) === toLower(selectedCurrency.symbol) &&
+        toLower(wallet?.chain) === toLower(selectedCurrency?.chain)
+      )
+    }
+    return wallet
+  })
+
   const renderPage = () => (
     <Styles.Body>
       <Styles.Row>
@@ -188,7 +239,7 @@ const SelectAddress: React.FC = () => {
 
             <Styles.SiteInfo>
               {siteFavicon && siteUrl ? (
-                <Styles.SiteFavicon src={`${siteUrl}${siteFavicon}`} />
+                <Styles.SiteFavicon src={`https://${siteUrl}${siteFavicon}`} />
               ) : null}
               {siteUrl ? <Styles.SiteUrl>{siteUrl}</Styles.SiteUrl> : null}
             </Styles.SiteInfo>
@@ -198,7 +249,9 @@ const SelectAddress: React.FC = () => {
 
       <Styles.Addresses>
         <Styles.AddressesRow>
-          <Styles.AddressesLabel>My addresses</Styles.AddressesLabel>
+          <Styles.AddressesLabel>
+            {selectedCurrency ? `My ${toUpper(selectedCurrency.symbol)} addresses` : 'My addresses'}
+          </Styles.AddressesLabel>
           <Styles.FiltersButton
             onClick={() => setFiltersActive((prevState: boolean) => !prevState)}
             isActive={isFiltersActive}
@@ -213,6 +266,7 @@ const SelectAddress: React.FC = () => {
             value={selectedCurrency?.name}
             currencySymbol={selectedCurrency?.symbol}
             background={selectedCurrency?.background}
+            tokenChain={selectedCurrency?.chain}
             list={getDropdownList()}
             onSelect={onSelectCurrency}
             currencyBr={13}
@@ -220,33 +274,28 @@ const SelectAddress: React.FC = () => {
           />
         </Styles.FiltersRow>
 
-        {wallets?.length ? (
+        {filterWallets?.length ? (
           <Styles.AddressesList>
-            {wallets
-              .filter((wallet: IWallet) =>
-                selectedCurrency
-                  ? wallet.symbol === selectedCurrency.symbol &&
-                    wallet?.chain === selectedCurrency?.chain
-                  : wallet
-              )
-              .map((wallet: IWallet, index: number) => {
-                const { address, symbol, chain, name, contractAddress, decimals } = wallet
+            {filterWallets.map((wallet: IWallet, index: number) => {
+              const { address, symbol, chain, name, contractAddress, decimals } = wallet
 
-                return (
-                  <WalletCard
-                    key={`${address}/${index}`}
-                    address={address}
-                    chain={chain}
-                    symbol={symbol.toLowerCase()}
-                    name={name}
-                    contractAddress={contractAddress}
-                    decimals={decimals}
-                    handleClick={() => handleClick(address)}
-                  />
-                )
-              })}
+              return (
+                <WalletCard
+                  key={`${address}/${index}`}
+                  address={address}
+                  chain={chain}
+                  symbol={symbol.toLowerCase()}
+                  name={name}
+                  contractAddress={contractAddress}
+                  decimals={decimals}
+                  handleClick={() => handleClick(address)}
+                />
+              )
+            })}
           </Styles.AddressesList>
-        ) : null}
+        ) : (
+          <Styles.NotFound>Addresses was not found</Styles.NotFound>
+        )}
       </Styles.Addresses>
     </Styles.Body>
   )
