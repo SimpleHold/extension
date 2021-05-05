@@ -3,12 +3,12 @@ import { IRequest } from 'utils/browser/types'
 
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
-    const { screenX, screenY, outerWidth, site, favicon } = request.data
+    const { screenX, screenY, outerWidth, site, favicon, currency, chain } = request.data
 
     localStorage.setItem('requesterSite', JSON.stringify({ url: site, favicon }))
 
     browser.windows.create({
-      url: 'select-address.html',
+      url: `select-address.html?currency=${currency}&chain=${chain}`,
       type: 'popup',
       width: 375,
       height: 700,

@@ -40,6 +40,9 @@ document.addEventListener('request_addresses', (request: IRequest) => {
     const { site, favicon } = request.detail
     const { screenX, screenY, outerWidth } = window
 
+    const currency = document.getElementById('sh-button')?.getAttribute('sh-currency')
+    const chain = document.getElementById('sh-button')?.getAttribute('sh-currency-chain')
+
     browser.runtime.sendMessage({
       type: 'request_addresses',
       data: {
@@ -48,6 +51,8 @@ document.addEventListener('request_addresses', (request: IRequest) => {
         outerWidth,
         site,
         favicon,
+        currency,
+        chain,
       },
     })
   }
