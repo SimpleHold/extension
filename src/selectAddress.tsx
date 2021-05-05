@@ -15,7 +15,7 @@ import OneTimePassword from '@components/OneTimePassword'
 import { getWallets, IWallet } from '@utils/wallet'
 import { validatePassword } from '@utils/validate'
 import { decrypt, sha256hash } from '@utils/crypto'
-import { toLower, toUpper, unique } from '@utils/format'
+import { toLower, toUpper } from '@utils/format'
 
 // Config
 import { getCurrency } from '@config/currencies'
