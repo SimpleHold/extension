@@ -314,7 +314,12 @@ const AddCustomToken: React.FC = () => {
               errorLabel={errorLabel}
             />
             <Styles.ButtonRow>
-              <Button label="Confirm" disabled={isButtonDisabled} onClick={onConfirm} />
+              <Button
+                label="Confirm"
+                disabled={isButtonDisabled}
+                onClick={onConfirm}
+                isLoading={isLoading}
+              />
             </Styles.ButtonRow>
           </Styles.Form>
         </Styles.Container>

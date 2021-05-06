@@ -14,7 +14,7 @@ const networks: IEthNetwork[] = [
     chain: 'eth',
   },
   {
-    name: 'Binance smart chain',
+    name: 'Binance Smart Chain',
     symbol: 'bnb',
     chain: 'bsc',
   },
