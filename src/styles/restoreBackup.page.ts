@@ -14,6 +14,7 @@ const Wrapper = styled.div`
   display: flex;
   justify-content: center;
   padding: 40px 0 80px 0;
+  min-height: 100vh;
 `
 
 const Extension = styled.div`
@@ -23,6 +24,7 @@ const Extension = styled.div`
   box-shadow: 0px 5px 15px rgba(125, 126, 141, 0.15);
   border-radius: 16px;
   position: relative;
+  height: 100%;
 `
 
 const Header = styled.div`

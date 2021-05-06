@@ -1,8 +1,12 @@
 import { v4 } from 'uuid'
 
+// Utils
 import { validateWallet } from '@utils/validate'
 import { toLower } from '@utils/format'
 import { encrypt } from '@utils/crypto'
+
+// Config
+import { getCurrencyByChain } from '@config/currencies'
 
 export interface IWallet {
   symbol: string
@@ -69,14 +73,29 @@ export const checkExistWallet = (address: string, symbol: string, chain?: string
   const wallets = getWallets()
 
   if (wallets?.length) {
-    return (
+    const checkExistWallet =
       wallets.find(
         (wallet: IWallet) =>
           toLower(wallet.address) === toLower(address) &&
           toLower(wallet.symbol) === toLower(symbol) &&
           toLower(wallet.chain) === toLower(chain)
       ) !== undefined
-    )
+
+    if (chain) {
+      const getCurrency = getCurrencyByChain(chain)
+
+      if (getCurrency) {
+        const checkExistChainWallet =
+          wallets.find(
+            (wallet: IWallet) =>
+              toLower(wallet.address) === toLower(address) &&
+              toLower(wallet.symbol) === toLower(getCurrency.symbol)
+          ) !== undefined
+
+        return checkExistChainWallet || checkExistWallet
+      }
+    }
+    return checkExistWallet
   }
   return false
 }

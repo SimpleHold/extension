@@ -94,6 +94,9 @@ const AddTokenToAddress: React.FC = () => {
         'You are trying to add a new ERC20 token address. The corresponding Ethereum address will also be added to your wallet.',
       backTitle: `Add to ${toUpper(chain)} address`,
       chain,
+      tokenName,
+      contractAddress,
+      decimals,
     })
   }
 

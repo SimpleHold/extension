@@ -285,7 +285,7 @@ const AddCustomToken: React.FC = () => {
                   <Styles.TokenSymbol>{tokenInfo.symbol || 'Ticker'}</Styles.TokenSymbol>
                 </Skeleton>
                 <Styles.DecimalRow>
-                  <Styles.TokenDecimalLabel>Decimals of precion:</Styles.TokenDecimalLabel>
+                  <Styles.TokenDecimalLabel>Decimals:</Styles.TokenDecimalLabel>
                   <Skeleton width={20} height={14} mt={0} isLoading={isLoading} type="gray">
                     {tokenInfo.decimals > 0 ? (
                       <Styles.TokenDecimal>{tokenInfo.decimals}</Styles.TokenDecimal>
