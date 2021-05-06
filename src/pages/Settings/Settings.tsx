@@ -18,6 +18,7 @@ import { logEvent } from '@utils/amplitude'
 import { sha256hash } from '@utils/crypto'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
+import { getManifest } from '@utils/extension'
 
 // Config
 import { BACKUP_SETTINGS, PASSCODE_ENABLED, PASSCODE_DISABLED } from '@config/events'
@@ -51,10 +52,17 @@ const Settings: React.FC = () => {
   const [passcodeDrawerType, setPasscodeDrawerType] = React.useState<'create' | 'remove'>('create')
   const [isPasscodeError, setIsPasscodeError] = React.useState<boolean>(false)
   const [isDownloadManually, setDownloadManually] = React.useState<boolean>(false)
+  const [version, setVersion] = React.useState<string>('1')
 
   React.useEffect(() => {
     checkBrowserAndOS()
+    getManifestInfo()
   }, [])
+
+  const getManifestInfo = () => {
+    const data = getManifest()
+    setVersion(data.version)
+  }
 
   const checkBrowserAndOS = () => {
     const os = detectOS()
@@ -200,6 +208,11 @@ const Settings: React.FC = () => {
                 )
               })}
             </Styles.List>
+
+            <Styles.ExtensionInfo>
+              <Styles.CopyRight>© 2021 SimpleHold</Styles.CopyRight>
+              <Styles.Version>Version {version}</Styles.Version>
+            </Styles.ExtensionInfo>
           </Styles.Row>
           <Styles.Actions>
             <Button label="Log out & clear cache" onClick={onLogout} isDanger />
