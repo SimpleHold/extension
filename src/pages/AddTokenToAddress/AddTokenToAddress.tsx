@@ -101,6 +101,10 @@ const AddTokenToAddress: React.FC = () => {
     setActiveDrawer('confirm')
   }
 
+  const onSelectDropdown = (index: number): void => {
+    setSelectedAddress(mapList[index].value)
+  }
+
   const onConfirmDrawer = (): void => {
     if (validatePassword(password)) {
       const backup = localStorage.getItem('backup')
@@ -162,7 +166,7 @@ const AddTokenToAddress: React.FC = () => {
               value={selectedAddress}
               currencySymbol={getCurrencyInfo?.symbol || chain}
               list={mapList}
-              onSelect={setSelectedAddress}
+              onSelect={onSelectDropdown}
               disabled={chainAddresses.length < 2}
               currencyBr={20}
             />
