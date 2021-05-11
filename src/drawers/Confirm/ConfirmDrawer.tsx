@@ -20,6 +20,7 @@ interface Props {
   textInputType?: string
   inputErrorLabel?: string | null
   openFrom?: string
+  isButtonLoading?: boolean
 }
 
 const ConfirmDrawer: React.FC<Props> = (props) => {
@@ -35,6 +36,7 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
     textInputType,
     inputErrorLabel,
     openFrom,
+    isButtonLoading,
   } = props
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
@@ -75,7 +77,14 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
         </Styles.Form>
         <Styles.Actions>
           <Button label="Cancel" isLight isSmall mr={7.5} onClick={onClose} />
-          <Button label="Ok" disabled={isButtonDisabled} isSmall mr={7.5} onClick={onConfirm} />
+          <Button
+            label="Ok"
+            disabled={isButtonDisabled}
+            isSmall
+            mr={7.5}
+            onClick={onConfirm}
+            isLoading={isButtonLoading}
+          />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>
