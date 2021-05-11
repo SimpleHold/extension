@@ -40,7 +40,7 @@ const Row = styled.div`
   padding: 8px 15px;
 `
 
-const BTCValue = styled.p`
+const Pending = styled.p`
   margin: 0 10px 0 0;
   font-weight: 500;
   font-size: 12px;
@@ -58,7 +58,7 @@ const Styles = {
   Container,
   IconRow,
   Row,
-  BTCValue,
+  Pending,
   USDValue,
 }
 

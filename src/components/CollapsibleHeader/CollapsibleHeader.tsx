@@ -121,7 +121,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
               marginTop: pendingBalanceRowMarginTop,
             }}
           >
-            <PendingBalance btcValue={pendingBalance} type="light" symbol="btc" />
+            <PendingBalance pending={pendingBalance} type="light" symbol="btc" />
           </Styles.PendingBalanceRow>
         ) : null}
 

@@ -272,7 +272,7 @@ const Receive: React.FC = () => {
             </Skeleton>
 
             {pendingBalance !== null && Number(pendingBalance) !== 0 ? (
-              <PendingBalance btcValue={pendingBalance} type="gray" symbol={symbol} />
+              <PendingBalance pending={pendingBalance} type="gray" symbol={symbol} />
             ) : null}
           </Styles.Row>
 
