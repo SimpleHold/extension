@@ -56,7 +56,7 @@ const EnterPasscode: React.FC = () => {
 
     if (getPasscodeHash && getPasscodeHash === sha256hash(passcode)) {
       localStorage.removeItem('isLocked')
-      history.push('/wallets')
+      history.replace('/wallets')
     } else {
       setIsError(true)
       setPasscode('')
@@ -77,6 +77,10 @@ const EnterPasscode: React.FC = () => {
     })
   }
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -84,9 +88,9 @@ const EnterPasscode: React.FC = () => {
         <Styles.Container>
           <Styles.Row>
             <Styles.Image />
-            <Styles.Title>Enter your passcode</Styles.Title>
+            <Styles.Title>Welcome back!</Styles.Title>
 
-            <Styles.Form>
+            <Styles.Form onSubmit={onSubmitForm}>
               <OneTimePassword value={passcode} onChange={setPasscode} isError={isError} />
             </Styles.Form>
           </Styles.Row>

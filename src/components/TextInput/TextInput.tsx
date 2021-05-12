@@ -6,13 +6,14 @@ import Styles from './styles'
 interface Props {
   label: string
   value: string
-  onChange: (event: React.ChangeEvent<HTMLInputElement>) => void
+  onChange: (value: string) => void
   type?: string
   errorLabel?: string | null
   withPasswordVisible?: boolean
   onBlurInput?: Function
   inputRef?: React.RefObject<HTMLInputElement>
   disabled?: boolean
+  openFrom?: string
 }
 
 const TextInput: React.FC<Props> = (props) => {
@@ -26,6 +27,7 @@ const TextInput: React.FC<Props> = (props) => {
     onBlurInput,
     inputRef,
     disabled,
+    openFrom,
   } = props
 
   const textInputRef = inputRef || React.useRef<HTMLInputElement>(null)
@@ -61,6 +63,10 @@ const TextInput: React.FC<Props> = (props) => {
     }
   }
 
+  const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value)
+  }
+
   const renderInput = () => {
     if (type === 'number') {
       return (
@@ -69,7 +75,7 @@ const TextInput: React.FC<Props> = (props) => {
           onFocus={onFocus}
           onBlur={onBlur}
           value={value}
-          onChange={onChange}
+          onChange={onChangeInput}
           decimalScale={8}
           disabled={disabled}
         />
@@ -81,7 +87,7 @@ const TextInput: React.FC<Props> = (props) => {
         onFocus={onFocus}
         onBlur={onBlur}
         value={value}
-        onChange={onChange}
+        onChange={onChangeInput}
         type={type === 'password' && isPasswordVisible ? 'text' : type}
         disabled={disabled}
       />
@@ -95,7 +101,7 @@ const TextInput: React.FC<Props> = (props) => {
       isError={errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0}
       disabled={disabled}
     >
-      <Styles.Row isActive={isFocused || value?.length > 0}>
+      <Styles.Row isActive={isFocused || value?.length > 0} openFrom={openFrom}>
         <Styles.Label>
           {errorLabel && !isFocused && value.length > 0 ? errorLabel : label}
         </Styles.Label>

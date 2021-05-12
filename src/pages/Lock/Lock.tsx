@@ -62,7 +62,7 @@ const Lock: React.FC = () => {
 
           localStorage.removeItem('passcode')
           localStorage.removeItem('isLocked')
-          return history.push('/wallets', {
+          return history.replace('/wallets', {
             status: state?.status,
           })
         }
@@ -99,6 +99,14 @@ const Lock: React.FC = () => {
     }
   }
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (validatePassword(password)) {
+      onUnlock()
+    }
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -106,14 +114,12 @@ const Lock: React.FC = () => {
         <Styles.Container>
           <Styles.Image src="../../assets/illustrate/lock.svg" alt="lock" />
           <Styles.Title>Welcome back!</Styles.Title>
-          <Styles.Form>
+          <Styles.Form onSubmit={onSubmitForm}>
             <TextInput
               label="Password"
               type="password"
               value={password}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-                setPassword(e.target.value)
-              }
+              onChange={setPassword}
               errorLabel={errorLabel}
               inputRef={textInputRef}
             />
@@ -123,9 +129,9 @@ const Lock: React.FC = () => {
           </Styles.Form>
 
           <Styles.Links>
-            <Styles.Link onClick={onLogout}>Download backup and log out</Styles.Link>
+            <Styles.Link onClick={onLogout}>Download a backup and log out</Styles.Link>
             <Styles.Link onClick={() => openWebPage('https://simplehold.io/about')}>
-              Contact to support
+              Contact support
             </Styles.Link>
           </Styles.Links>
         </Styles.Container>

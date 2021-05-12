@@ -16,9 +16,10 @@ import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { IRawTransaction, sendRawTransaction } from '@utils/api'
+import { sendRawTransaction, getWeb3TxParams } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
+import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
+import { convertDecimals } from '@utils/web3'
 
 // Config
 import {
@@ -27,7 +28,6 @@ import {
   ADDRESS_SEND_PASSWORD,
   ADDRESS_SEND_PASSWORD_CANCEL,
 } from '@config/events'
-import { getCurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -39,20 +39,36 @@ interface LocationState {
   addressFrom: string
   addressTo: string
   outputs: UnspentOutput[]
+  chain: string
+  networkFeeSymbol: string
+  contractAddress?: string
+  tokenChain?: string
+  decimals?: number
 }
 
 const SendConfirmation: React.FC = () => {
   const history = useHistory()
   const {
-    state: { amount, symbol, networkFee, addressFrom, addressTo, outputs },
+    state: {
+      amount,
+      symbol,
+      networkFee,
+      addressFrom,
+      addressTo,
+      outputs,
+      chain,
+      networkFeeSymbol,
+      contractAddress = undefined,
+      tokenChain = undefined,
+      decimals = undefined,
+    },
   } = useLocation<LocationState>()
-
-  const currency = getCurrency(symbol)
 
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
-  const [rawTransaction, setRawTransaction] = React.useState<null | IRawTransaction>(null)
+  const [transactionLink, setTransactionLink] = React.useState<string>('')
+  const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
 
   const onConfirmModal = async (): Promise<void> => {
     logEvent({
@@ -74,23 +90,49 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
-          const parseAmount = new bitcoinLike(symbol).toSat(amount)
-          const parseNetworkFee = new bitcoinLike(symbol).toSat(networkFee)
+          setButtonLoading(true)
 
-          const transaction: TCreatedTransaction | null = new bitcoinLike(symbol).createTransaction(
+          const parseAmount =
+            tokenChain && decimals
+              ? convertDecimals(amount, decimals)
+              : formatUnit(symbol, amount, 'to', chain, 'ether')
+          const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
+
+          const ethTxData = isEthereumLike(symbol, tokenChain)
+            ? await getWeb3TxParams(
+                addressFrom,
+                addressTo,
+                parseAmount,
+                chain || tokenChain,
+                contractAddress
+              )
+            : {}
+
+          const transactionData = {
+            from: addressFrom,
+            to: addressTo,
+            amount: parseAmount,
+            privateKey: findWallet.privateKey,
+            symbol,
+            tokenChain,
             outputs,
-            addressTo,
-            parseAmount,
-            parseNetworkFee,
-            addressFrom,
-            findWallet.privateKey
-          )
+            networkFee: parseNetworkFee,
+            contractAddress,
+          }
+
+          const transaction = await createTransaction({ ...transactionData, ...ethTxData })
+
+          setButtonLoading(false)
 
           if (transaction?.hash && transaction?.raw) {
-            const sendTransaction = await sendRawTransaction(transaction.raw, symbol)
+            const sendTransaction = await sendRawTransaction(transaction.raw, chain || tokenChain)
 
             if (sendTransaction === transaction.hash) {
-              setRawTransaction(transaction)
+              const link = getTransactionLink(transaction.hash, symbol, chain, tokenChain)
+
+              if (link) {
+                setTransactionLink(link)
+              }
               return setActiveDrawer('success')
             }
           }
@@ -127,6 +169,14 @@ const SendConfirmation: React.FC = () => {
     setActiveDrawer(null)
   }
 
+  const closeSuccessDrawer = (): void => {
+    if (isButtonLoading) {
+      return
+    }
+
+    history.replace('/wallets')
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -134,8 +184,8 @@ const SendConfirmation: React.FC = () => {
         <Header withBack backTitle="Send" onBack={history.goBack} />
         <Styles.Container>
           <Styles.Row>
-            <Styles.Title>Confirm sending</Styles.Title>
-            <Styles.Description>Check transaction details and confirm sending:</Styles.Description>
+            <Styles.Title>Confirm the sending</Styles.Title>
+            <Styles.Description>Check transaction details</Styles.Description>
 
             <Styles.OrderCheck>
               <Styles.List>
@@ -149,23 +199,27 @@ const SendConfirmation: React.FC = () => {
                 <Styles.ListTitle>Network fee:</Styles.ListTitle>
                 <Styles.ListRow>
                   <Styles.Amount>{numeral(networkFee).format('0.[00000000]')}</Styles.Amount>
-                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                  <Styles.ListText>{toUpper(networkFeeSymbol)}</Styles.ListText>
                 </Styles.ListRow>
               </Styles.List>
 
-              <Styles.DashedDivider>
-                <Styles.DashedDividerLine />
-              </Styles.DashedDivider>
+              {toUpper(symbol) === toUpper(networkFeeSymbol) ? (
+                <>
+                  <Styles.DashedDivider>
+                    <Styles.DashedDividerLine />
+                  </Styles.DashedDivider>
 
-              <Styles.List>
-                <Styles.ListTitle>Total:</Styles.ListTitle>
-                <Styles.ListRow>
-                  <Styles.Amount>
-                    {numeral(amount + networkFee).format('0.[00000000]')}
-                  </Styles.Amount>
-                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
-                </Styles.ListRow>
-              </Styles.List>
+                  <Styles.List>
+                    <Styles.ListTitle>Total:</Styles.ListTitle>
+                    <Styles.ListRow>
+                      <Styles.Amount>
+                        {numeral(amount + networkFee).format('0.[00000000]')}
+                      </Styles.Amount>
+                      <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
+                    </Styles.ListRow>
+                  </Styles.List>
+                </>
+              ) : null}
             </Styles.OrderCheck>
 
             <Styles.DestinationsList>
@@ -189,7 +243,7 @@ const SendConfirmation: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={onCloseConfirmModal}
-        title="Confirm sending"
+        title="Confirm the sending"
         inputLabel="Enter password"
         textInputType="password"
         textInputValue={password}
@@ -197,13 +251,14 @@ const SendConfirmation: React.FC = () => {
         onChangeText={setPassword}
         isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirmModal}
+        isButtonLoading={isButtonLoading}
       />
 
       <SuccessDrawer
         isActive={activeDrawer === 'success'}
-        onClose={() => setActiveDrawer(null)}
-        text="Your transaction has successfully sent. You can check it here:"
-        link={`https://blockchair.com/${currency?.chain}/transaction/${rawTransaction?.hash}`}
+        onClose={closeSuccessDrawer}
+        text="Your transaction has been successfully sent. You can check it here:"
+        link={transactionLink}
       />
     </>
   )

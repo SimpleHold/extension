@@ -24,7 +24,7 @@ const AgreeTerms: React.FC<Props> = (props) => {
     <Styles.Container onClick={setIsAgreed} mt={mt}>
       <CheckBox value={isAgreed} onClick={setIsAgreed} />
       <Styles.Text>
-        I have read and agree to the{' '}
+        I have read and agreed with the{' '}
         <Styles.TermsLink onClick={openTerms}>Terms of Use</Styles.TermsLink>
       </Styles.Text>
     </Styles.Container>

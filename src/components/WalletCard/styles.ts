@@ -32,6 +32,9 @@ const Currency = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: #1d1d22;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `
 
 const Address = styled.p`

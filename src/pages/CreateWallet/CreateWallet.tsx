@@ -13,7 +13,7 @@ import { validatePassword } from '@utils/validate'
 import { logEvent, setUserProperties } from '@utils/amplitude'
 import { generate } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
-import bitcoinLike from '@utils/bitcoinLike'
+import { generate as generateAddress } from '@utils/address'
 
 // Config
 import { START_PASSWORD } from '@config/events'
@@ -32,6 +32,12 @@ const Wallets: React.FC = () => {
     null
   )
 
+  const passwordInputRef = React.useRef<HTMLInputElement>(null)
+
+  React.useEffect(() => {
+    passwordInputRef.current?.focus()
+  }, [])
+
   const isButtonDisabled = password.length < 7 || password !== confirmPassword || !isAgreed
 
   const onConfirm = (): void => {
@@ -39,7 +45,7 @@ const Wallets: React.FC = () => {
       name: START_PASSWORD,
     })
 
-    const geneateAddress = new bitcoinLike('btc').generate()
+    const geneateAddress = generateAddress('btc')
 
     if (geneateAddress) {
       const { address, privateKey } = geneateAddress
@@ -53,7 +59,7 @@ const Wallets: React.FC = () => {
         NUMBER_WALLET_BTC: '1',
       })
 
-      history.push('/download-backup')
+      history.replace('/download-backup')
     }
   }
 
@@ -63,7 +69,7 @@ const Wallets: React.FC = () => {
     }
 
     if (!validatePassword(password)) {
-      setPasswordErrorLabel('Password should have at least 8 symbols')
+      setPasswordErrorLabel('Password must be at least 8 symbols')
     }
   }
 
@@ -73,7 +79,17 @@ const Wallets: React.FC = () => {
     }
 
     if (confirmPassword.length && confirmPassword !== password) {
-      setConfirmPasswordErrorLabel("Passwords doesn't match")
+      setConfirmPasswordErrorLabel("Passwords don't match")
+    }
+  }
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+
+      if (!isButtonDisabled) {
+        onConfirm()
+      }
     }
   }
 
@@ -84,31 +100,30 @@ const Wallets: React.FC = () => {
         <Styles.Row>
           <Styles.Title>Create password</Styles.Title>
           <Styles.Description>
-            The password needs to encrypt your private keys. We dont have access to your keys, so be
-            careful.
+            The password is needed to encrypt your backup with private keys. Be careful and don't
+            lose your password as it's impossible to restore it.
           </Styles.Description>
           <Link
             title="How it works?"
             to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
-            mt={44}
+            mt={22}
           />
         </Styles.Row>
-        <Styles.Form>
+        <Styles.Form onKeyDown={onKeyDown}>
           <TextInput
             label="Enter password"
             value={password}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setPassword(e.target.value)}
+            onChange={setPassword}
             type="password"
             withPasswordVisible
             errorLabel={passwordErrorLabel}
             onBlurInput={onBlurPassword}
+            inputRef={passwordInputRef}
           />
           <TextInput
             label="Confirm password"
             value={confirmPassword}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void =>
-              setConfirmPassword(e.target.value)
-            }
+            onChange={setConfirmPassword}
             type="password"
             withPasswordVisible
             errorLabel={confirmPasswordErrorLabel}

@@ -12,6 +12,7 @@ import useToastContext from '@hooks/useToastContext'
 // Utils
 import { IWallet, getWallets } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
+import { setBadgeText, getBadgeText } from '@utils/extension'
 
 // Config
 import { ADD_ADDRESS, BALANCE_CHANGED } from '@config/events'
@@ -40,6 +41,7 @@ const Wallets: React.FC = () => {
 
   React.useEffect(() => {
     getWalletsList()
+    checkBadgeText()
   }, [])
 
   React.useEffect(() => {
@@ -69,8 +71,8 @@ const Wallets: React.FC = () => {
   React.useEffect(() => {
     if (totalBalance !== null && totalEstimated !== null) {
       const getLatesTotalBalance = wallets?.reduce((a, b) => {
-        if (b.balance) {
-          return a + b.balance
+        if (b.balance_btc) {
+          return a + b.balance_btc
         }
         return 0
       }, 0)
@@ -81,7 +83,15 @@ const Wallets: React.FC = () => {
         })
       }
     }
-  }, [totalBalance])
+  }, [totalBalance, totalEstimated])
+
+  const checkBadgeText = async () => {
+    const text = await getBadgeText()
+
+    if (text?.length) {
+      setBadgeText('')
+    }
+  }
 
   const getWalletsList = () => {
     const walletsList = getWallets()
@@ -125,14 +135,18 @@ const Wallets: React.FC = () => {
       />
       {wallets?.length ? (
         <Styles.WalletsList>
-          {wallets.map((wallet: IWallet) => {
-            const { address, symbol } = wallet
+          {wallets.map((wallet: IWallet, index: number) => {
+            const { address, symbol, chain, name, contractAddress, decimals } = wallet
 
             return (
               <WalletCard
-                key={address}
+                key={`${address}/${index}`}
                 address={address}
+                chain={chain}
                 symbol={symbol.toLowerCase()}
+                name={name}
+                contractAddress={contractAddress}
+                decimals={decimals}
                 sumBalance={sumBalance}
                 sumEstimated={sumEstimated}
                 sumPending={sumPending}

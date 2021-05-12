@@ -1,34 +1,83 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
+import SVG from 'react-inlinesvg'
 
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
-import Button from '@components/Button'
+import TextInput from '@components/TextInput'
 import CurrencyLogo from '@components/CurrencyLogo'
 
 // Utils
-import { toUpper } from '@utils/format'
+import { toUpper, toLower } from '@utils/format'
+import { getWallets } from '@utils/wallet'
 
 // Config
 import currencies, { ICurrency } from '@config/currencies'
+import tokens, { IToken, checkExistWallet } from '@config/tokens'
+import networks, { IEthNetwork } from '@config/ethLikeNetworks'
 
 // Styles
 import Styles from './styles'
 
-const Receive: React.FC = () => {
+const SelectCurrency: React.FC = () => {
   const history = useHistory()
 
-  const [selectedCurrency, setSelectedCurrency] = React.useState<null | ICurrency>(null)
+  const [searchValue, setSearchValue] = React.useState<string>('')
 
-  const onAddAddress = (): void => {
-    if (selectedCurrency) {
-      const { symbol } = selectedCurrency
+  const filterCurrenciesList = currencies.filter((currency: ICurrency) => {
+    if (searchValue.length) {
+      const findByName = toLower(currency.name)?.indexOf(toLower(searchValue) || '') !== -1
+      const findBySymbol = toLower(currency.symbol)?.indexOf(toLower(searchValue) || '') !== -1
 
-      history.push('/new-wallet', {
+      return findByName || findBySymbol
+    }
+    return currency
+  })
+
+  const filterTokensList = tokens.filter((token: IToken) => {
+    if (searchValue.length) {
+      const findByName = toLower(token.name)?.indexOf(toLower(searchValue) || '') !== -1
+      const findBySymbol = toLower(token.symbol)?.indexOf(toLower(searchValue) || '') !== -1
+
+      return findByName || findBySymbol
+    }
+    return token
+  })
+
+  const onAddAddress = (symbol: string): void => {
+    history.push('/new-wallet', {
+      symbol,
+    })
+  }
+
+  const onAddToken = (symbol: string, chain: string, tokenName: string): void => {
+    const walletsList = getWallets()
+
+    if (walletsList) {
+      const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
+      const getNetwork = networks.find(
+        (network: IEthNetwork) => toLower(network.chain) === toLower(chain)
+      )
+
+      if (getNetwork && checkTokenWallets) {
+        return history.push('/add-token-to-address', {
+          symbol,
+          chain,
+          chainName: getNetwork.name,
+          tokenName,
+        })
+      }
+
+      return history.push('/new-wallet', {
         symbol,
+        chain,
       })
     }
+  }
+
+  const onAddCustomToken = (): void => {
+    history.push('/add-custom-token')
   }
 
   return (
@@ -38,31 +87,63 @@ const Receive: React.FC = () => {
       <Styles.Container>
         <Styles.Row>
           <Styles.Title>Select currency</Styles.Title>
+
+          <TextInput
+            value={searchValue}
+            label="Type a currency or a ticker"
+            onChange={setSearchValue}
+          />
+
+          {!filterCurrenciesList.length && !filterTokensList.length ? (
+            <Styles.NotFoundMessage>
+              The currency was not found but you can add a custom token
+            </Styles.NotFoundMessage>
+          ) : null}
+
           <Styles.CurrenciesList>
-            {currencies.map((currency: ICurrency) => {
+            {filterCurrenciesList.map((currency: ICurrency) => {
               const { name, symbol } = currency
-              const isActive = selectedCurrency?.symbol === symbol
 
               return (
-                <Styles.CurrencyBlock
-                  key={symbol}
-                  onClick={() => setSelectedCurrency(currency)}
-                  isActive={isActive}
-                >
+                <Styles.CurrencyBlock key={symbol} onClick={() => onAddAddress(symbol)}>
                   <CurrencyLogo symbol={symbol} width={40} height={40} br={10} />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>
                   <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
                 </Styles.CurrencyBlock>
               )
             })}
+
+            {filterTokensList.map((token: IToken) => {
+              const { name, symbol, chain } = token
+
+              return (
+                <Styles.CurrencyBlock
+                  key={`${symbol}/${chain}`}
+                  onClick={() => onAddToken(symbol, chain, name)}
+                >
+                  <CurrencyLogo symbol={symbol} width={40} height={40} br={10} chain={chain} />
+                  <Styles.CurrencyName>{name}</Styles.CurrencyName>
+                  <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
+                </Styles.CurrencyBlock>
+              )
+            })}
+
+            <Styles.CurrencyBlock onClick={onAddCustomToken}>
+              <Styles.CustomTokenLogo>
+                <SVG
+                  src="../../assets/icons/plusCircle.svg"
+                  width={20}
+                  height={20}
+                  title="Create new wallet"
+                />
+              </Styles.CustomTokenLogo>
+              <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
+            </Styles.CurrencyBlock>
           </Styles.CurrenciesList>
         </Styles.Row>
-        <Styles.Actions>
-          <Button label="Add address" disabled={!selectedCurrency} onClick={onAddAddress} />
-        </Styles.Actions>
       </Styles.Container>
     </Styles.Wrapper>
   )
 }
 
-export default Receive
+export default SelectCurrency

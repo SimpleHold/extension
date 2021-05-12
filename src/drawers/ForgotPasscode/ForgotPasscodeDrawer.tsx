@@ -17,11 +17,11 @@ const ForgotPasscodeDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive, onConfirm } = props
 
   return (
-    <DrawerWrapper title="Reset passcode" isActive={isActive} onClose={onClose}>
+    <DrawerWrapper title="Forgot my passcode" isActive={isActive} onClose={onClose}>
       <Styles.Row>
         <Styles.Text>
-          You can unlock your wallet with password. Passcode will be disabled, you can turn it on in
-          settings after unlocking.
+          You can unlock your wallet with the password. The passcode will be disabled, and you can
+          turn it on again in settings after unlocking.
         </Styles.Text>
 
         <Styles.Actions>

@@ -1,12 +1,7 @@
-// Validate address
-import addressValidate from '@config/addressValidate'
-
-export type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash'
-
 class GenerateAddress {
-  symbol: TSymbols
+  symbol: TSymbols | string
 
-  constructor(symbol: TSymbols) {
+  constructor(symbol: TSymbols | string) {
     this.symbol = symbol
   }
 
@@ -133,12 +128,6 @@ class GenerateAddress {
     }
   }
 
-  validate = (address: string): boolean => {
-    const { symbol } = this
-
-    return new RegExp(addressValidate[symbol])?.test(address)
-  }
-
   createTransaction = (
     outputs: UnspentOutput[],
     to: string,
@@ -171,8 +160,7 @@ class GenerateAddress {
       }
 
       return null
-    } catch (err) {
-      console.log('err', err)
+    } catch {
       return null
     }
   }

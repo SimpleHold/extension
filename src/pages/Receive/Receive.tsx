@@ -17,7 +17,7 @@ import PendingBalance from '@components/PendingBalance'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
-import ShowPrivateKeyDrawer from '@drawers/ShowPrivateKey'
+import PrivateKeyDrawer from 'drawers/PrivateKey'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
@@ -28,31 +28,47 @@ import { price, toUpper, toLower } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet } from '@utils/wallet'
+import { IWallet, updateBalance } from '@utils/wallet'
+import { getExplorerLink } from '@utils/address'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
+import { getCurrency } from '@config/currencies'
+import { getToken } from '@config/tokens'
 
 // Icons
 import privateKeyIcon from '@assets/icons/privateKey.svg'
 import linkIcon from '@assets/icons/link.svg'
+import plusCircleIcon from '@assets/icons/plusCircle.svg'
 
 // Styles
 import Styles from './styles'
 
 interface LocationState {
-  currency: string
+  name: string
   symbol: string
   address: string
-  chain: string
+  chain?: string
+  contractAddress?: string
+  tokenName?: string
+  decimals?: number
 }
 
 const Receive: React.FC = () => {
   const {
-    state: { currency, symbol, address, chain },
+    state: {
+      name,
+      symbol,
+      address,
+      chain = undefined,
+      contractAddress = undefined,
+      tokenName = undefined,
+      decimals = undefined,
+    },
   } = useLocation<LocationState>()
 
   const history = useHistory()
+  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false)
@@ -63,6 +79,7 @@ const Receive: React.FC = () => {
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
   const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
+  const [dropDownList, setDropDownList] = React.useState<any[]>([])
 
   React.useEffect(() => {
     logEvent({
@@ -70,6 +87,7 @@ const Receive: React.FC = () => {
     })
 
     loadBalance()
+    getDropDownList()
   }, [])
 
   React.useEffect(() => {
@@ -77,6 +95,25 @@ const Receive: React.FC = () => {
       setIsRefreshing(false)
     }
   }, [balance, estimated, isRefreshing])
+
+  const getDropDownList = (): void => {
+    const list = [
+      {
+        icon: { source: privateKeyIcon, width: 18, height: 18 },
+        title: 'Show Private key',
+      },
+      { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
+    ]
+
+    if (['eth', 'bnb'].indexOf(symbol) !== -1) {
+      list.push({
+        icon: { source: plusCircleIcon, width: 18, height: 18 },
+        title: 'Add token',
+      })
+    }
+
+    setDropDownList(list)
+  }
 
   const onSend = (): void => {
     logEvent({
@@ -86,14 +123,24 @@ const Receive: React.FC = () => {
     history.push('/send', {
       symbol,
       address,
-      chain,
+      chain: currency?.chain,
+      tokenChain: chain,
+      contractAddress,
+      tokenName,
+      decimals,
     })
   }
 
   const loadBalance = async (): Promise<void> => {
-    const { balance, balance_usd, pending } = await getBalance(address, chain)
+    const { balance, balance_usd, pending, balance_btc } = await getBalance(
+      address,
+      currency?.chain || chain,
+      chain ? symbol : undefined,
+      contractAddress
+    )
 
     setBalance(balance)
+    updateBalance(address, symbol, balance, balance_btc)
     setEstimated(balance_usd)
     setPendingBalance(pending)
   }
@@ -108,7 +155,13 @@ const Receive: React.FC = () => {
     if (index === 0) {
       setActiveDrawer('confirm')
     } else if (index === 1) {
-      openWebPage(`https://blockchair.com/${chain}/address/${address}`)
+      const link = getExplorerLink(address, symbol, currency, chain, contractAddress)
+      openWebPage(link)
+    } else if (index === 2) {
+      history.push('/select-token', {
+        currency,
+        address,
+      })
     }
   }
 
@@ -183,19 +236,20 @@ const Receive: React.FC = () => {
             <DropDown
               dropDownRef={ref}
               isVisible={isVisible}
-              list={[
-                {
-                  icon: { source: privateKeyIcon, width: 18, height: 18 },
-                  title: 'Show Private key',
-                },
-                { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
-              ]}
+              list={dropDownList}
               onClick={onClickDropDown}
             />
 
             <Styles.CurrencyBlock>
-              <CurrencyLogo symbol={symbol} width={22} height={22} />
-              <Styles.CurrencyName>{currency}</Styles.CurrencyName>
+              <CurrencyLogo
+                symbol={symbol}
+                width={22}
+                height={22}
+                br={5}
+                chain={chain}
+                name={tokenName}
+              />
+              <Styles.CurrencyName>{name}</Styles.CurrencyName>
             </Styles.CurrencyBlock>
 
             <Skeleton width={250} height={36} mt={10} type="gray" isLoading={balance === null}>
@@ -218,7 +272,7 @@ const Receive: React.FC = () => {
             </Skeleton>
 
             {pendingBalance !== null && Number(pendingBalance) !== 0 ? (
-              <PendingBalance btcValue={pendingBalance} type="gray" symbol={symbol} />
+              <PendingBalance pending={pendingBalance} type="gray" symbol={symbol} />
             ) : null}
           </Styles.Row>
 
@@ -234,7 +288,7 @@ const Receive: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
-        title="Confirm showing private key"
+        title="Please enter your password to see the private key"
         isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirmModal}
         textInputValue={password}
@@ -243,7 +297,7 @@ const Receive: React.FC = () => {
         textInputType="password"
         inputErrorLabel={passwordErrorLabel}
       />
-      <ShowPrivateKeyDrawer
+      <PrivateKeyDrawer
         isActive={activeDrawer === 'privateKey'}
         onClose={() => {
           setActiveDrawer(null)

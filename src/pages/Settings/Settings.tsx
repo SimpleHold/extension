@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
-import { browser, Tabs } from 'webextension-polyfill-ts'
 
 // Components
 import Header from '@components/Header'
@@ -17,6 +16,9 @@ import LogoutDrawer from '@drawers/Logout'
 import { download as downloadBackup } from '@utils/backup'
 import { logEvent } from '@utils/amplitude'
 import { sha256hash } from '@utils/crypto'
+import { detectBrowser, detectOS } from '@utils/detect'
+import { getUrl, openWebPage } from '@utils/extension'
+import { getManifest } from '@utils/extension'
 
 // Config
 import { BACKUP_SETTINGS, PASSCODE_ENABLED, PASSCODE_DISABLED } from '@config/events'
@@ -49,20 +51,41 @@ const Settings: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'passcode' | 'logout'>(null)
   const [passcodeDrawerType, setPasscodeDrawerType] = React.useState<'create' | 'remove'>('create')
   const [isPasscodeError, setIsPasscodeError] = React.useState<boolean>(false)
+  const [isDownloadManually, setDownloadManually] = React.useState<boolean>(false)
+  const [version, setVersion] = React.useState<string>('1')
 
-  const onDownloadBackup = () => {
-    const backup = localStorage.getItem('backup')
+  React.useEffect(() => {
+    checkBrowserAndOS()
+    getManifestInfo()
+  }, [])
 
-    if (backup) {
-      logEvent({
-        name: BACKUP_SETTINGS,
-      })
-      downloadBackup(backup)
+  const getManifestInfo = () => {
+    const data = getManifest()
+    setVersion(data.version)
+  }
+
+  const checkBrowserAndOS = () => {
+    const os = detectOS()
+    const browser = detectBrowser()
+
+    if (os === 'macos' && browser === 'chrome') {
+      setDownloadManually(true)
     }
   }
 
-  const openWebPage = (url: string): Promise<Tabs.Tab> => {
-    return browser.tabs.create({ url })
+  const onDownloadBackup = () => {
+    if (isDownloadManually) {
+      openWebPage(getUrl('download-backup.html'))
+    } else {
+      const backup = localStorage.getItem('backup')
+
+      if (backup) {
+        logEvent({
+          name: BACKUP_SETTINGS,
+        })
+        downloadBackup(backup)
+      }
+    }
   }
 
   const togglePasscode = (): void => {
@@ -75,17 +98,17 @@ const Settings: React.FC = () => {
   const list: List[] = [
     {
       isButton: true,
-      title: 'Download backup',
+      title: 'Download the backup',
       icon: {
-        source: cloudIcon,
-        width: 22,
-        height: 14,
+        source: isDownloadManually ? linkIcon : cloudIcon,
+        width: isDownloadManually ? 16 : 22,
+        height: isDownloadManually ? 16 : 14,
       },
       onClick: onDownloadBackup,
     },
     {
       isButton: true,
-      title: 'Contact to support',
+      title: 'Contact support',
       icon: {
         source: linkIcon,
         width: 16,
@@ -95,7 +118,7 @@ const Settings: React.FC = () => {
     },
     {
       title: 'Use passcode',
-      text: 'Use passcode instead of password to easily hide extension data from other people',
+      text: 'Use a passcode instead of a password to easily hide wallet data from other people',
       withSwitch: true,
       switchValue: localStorage.getItem('passcode') !== null,
       onToggle: togglePasscode,
@@ -185,6 +208,11 @@ const Settings: React.FC = () => {
                 )
               })}
             </Styles.List>
+
+            <Styles.ExtensionInfo>
+              <Styles.CopyRight>© 2021 SimpleHold</Styles.CopyRight>
+              <Styles.Version>Version {version}</Styles.Version>
+            </Styles.ExtensionInfo>
           </Styles.Row>
           <Styles.Actions>
             <Button label="Log out & clear cache" onClick={onLogout} isDanger />

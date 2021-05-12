@@ -40,10 +40,7 @@ const ListItem = styled.div`
   justify-content: space-between;
   padding: ${({ isButton }: TListItemProps) => (isButton ? `15px 0` : '20px 0')};
   height: ${({ isButton }: TListItemProps) => (isButton ? `60px` : 'auto')};
-
-  &:not(:last-child) {
-    border-bottom: 1px solid #eaeaea;
-  }
+  border-bottom: 1px solid #eaeaea;
 
   &:hover {
     cursor: ${({ isButton }: TListItemProps) => (isButton ? `pointer` : 'default')};
@@ -90,6 +87,28 @@ const Text = styled.p`
   color: #7d7e8d;
 `
 
+const ExtensionInfo = styled.div`
+  margin: 20px 0 0 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+`
+
+const CopyRight = styled.p`
+  margin: 0;
+  font-size: 14px;
+  line-height: 16px;
+  color: #c3c3c3;
+`
+
+const Version = styled.p`
+  margin: 0;
+  font-size: 14px;
+  line-height: 16px;
+  color: #c3c3c3;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -103,6 +122,9 @@ const Styles = {
   ListTitle,
   IconRow,
   Text,
+  ExtensionInfo,
+  CopyRight,
+  Version,
 }
 
 export default Styles

@@ -11,10 +11,11 @@ interface Props {
   onClose: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   isActive: boolean
   text: string
+  openFrom?: string
 }
 
 const FailDrawer: React.FC<Props> = (props) => {
-  const { onClose, isActive, text } = props
+  const { onClose, isActive, text, openFrom } = props
 
   return (
     <DrawerWrapper
@@ -22,6 +23,7 @@ const FailDrawer: React.FC<Props> = (props) => {
       isActive={isActive}
       onClose={onClose}
       icon="../../assets/drawer/fail.svg"
+      openFrom={openFrom}
     >
       <Styles.Row>
         <Styles.Text>{text}</Styles.Text>

@@ -57,6 +57,7 @@ const ListText = styled.p`
   font-size: 16px;
   line-height: 19px;
   color: #1d1d22;
+  width: 40px;
 `
 
 const DashedDivider = styled.div`

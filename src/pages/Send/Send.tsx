@@ -5,22 +5,23 @@ import numeral from 'numeral'
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
-import CurrenciesDropdown from '@components/CurrenciesDropdown'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
 import Spinner from '@components/Spinner'
+import CurrenciesDropdown from '@components/CurrenciesDropdown'
 
 // Utils
-import { getWallets, IWallet } from '@utils/wallet'
+import { getWallets, IWallet, updateBalance } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
 import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import bitcoinLike, { TSymbols } from '@utils/bitcoinLike'
+import { validateAddress, getAddressNetworkFee, formatUnit, isEthereumLike } from '@utils/address'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
-import { getCurrency } from '@config/currencies'
+import { getCurrency, getCurrencyByChain } from '@config/currencies'
+import { getToken } from '@config/tokens'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -32,15 +33,30 @@ interface LocationState {
   symbol: TSymbols
   address: string
   chain: string
+  tokenChain?: string
+  contractAddress?: string
+  tokenName?: string
+  decimals?: number
 }
 
 const Send: React.FC = () => {
   const history = useHistory()
   const {
-    state: { symbol, address: locationAddress, chain },
+    state: {
+      symbol,
+      address: locationAddress,
+      chain,
+      tokenChain = undefined,
+      contractAddress = undefined,
+      tokenName = undefined,
+      decimals = undefined,
+    },
   } = useLocation<LocationState>()
 
-  const currency = getCurrency(symbol)
+  const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
+  const getCurrencySymbol = tokenChain
+    ? getCurrencyByChain(tokenChain)?.symbol
+    : getCurrency(symbol)?.symbol
 
   const [address, setAddress] = React.useState<string>('')
   const [amount, setAmount] = React.useState<string>('')
@@ -54,6 +70,7 @@ const Send: React.FC = () => {
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
   const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
+  const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
 
   const debounced = useDebounce(amount, 1000)
 
@@ -67,7 +84,7 @@ const Send: React.FC = () => {
   }, [selectedAddress])
 
   React.useEffect(() => {
-    if (amount.length && Number(balance) > 0 && outputs.length && !amountErrorLabel) {
+    if (amount.length && Number(balance) > 0 && !amountErrorLabel) {
       setNetworkFeeLoading(true)
       getNetworkFee()
     }
@@ -82,19 +99,47 @@ const Send: React.FC = () => {
   }, [networkFee])
 
   const getOutputs = async (): Promise<void> => {
+    if (contractAddress || isEthereumLike(symbol, chain)) {
+      return
+    }
     const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
     setOutputs(unspentOutputs)
   }
 
   const getNetworkFee = async (): Promise<void> => {
-    const fee = await getFees(chain)
+    const fee = await getFees(symbol, chain)
     setUtxosList([])
 
-    const { networkFee, utxos } = new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
+    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
 
-    setUtxosList(utxos)
-    setNetworkFee(networkFee)
+    const data = await getAddressNetworkFee(
+      symbol,
+      outputs,
+      fee,
+      amount,
+      selectedAddress,
+      address,
+      chain,
+      tokenChain,
+      contractAddress,
+      getTokenDecimals || decimals
+    )
+
     setNetworkFeeLoading(false)
+
+    if (data) {
+      if (data.utxos) {
+        setUtxosList(data?.utxos)
+      }
+
+      if (data.networkFee) {
+        setNetworkFee(data.networkFee)
+      }
+
+      if (data.currencyBalance) {
+        setCurrencyBalance(data.currencyBalance)
+      }
+    }
   }
 
   const getWalletsList = (): void => {
@@ -112,10 +157,16 @@ const Send: React.FC = () => {
     setBalance(null)
     setEstimated(null)
 
-    if (currency) {
-      const { balance, balance_usd } = await getBalance(selectedAddress, currency?.chain)
+    if (currency || contractAddress) {
+      const { balance, balance_usd, balance_btc } = await getBalance(
+        selectedAddress,
+        currency?.chain || tokenChain,
+        tokenChain ? symbol : undefined,
+        contractAddress
+      )
 
       setBalance(balance)
+      updateBalance(address, symbol, balance, balance_btc)
       setEstimated(balance_usd)
     }
   }
@@ -125,13 +176,21 @@ const Send: React.FC = () => {
       name: ADDRESS_SEND,
     })
 
+    const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
+    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
+
     history.push('/send-confirm', {
       amount: Number(amount),
       symbol,
       networkFee,
+      networkFeeSymbol: getCurrencySymbol,
       addressFrom: selectedAddress,
       addressTo: address,
       outputs: utxosList,
+      chain,
+      contractAddress: tokenContractAddress || contractAddress,
+      tokenChain,
+      decimals: getTokenDecimals || decimals,
     })
   }
 
@@ -140,7 +199,7 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (address.length && !new bitcoinLike(symbol).validate(address)) {
+    if (address.length && !validateAddress(symbol, address, chain)) {
       setAddressErrorLabel('Address is not valid')
     }
 
@@ -159,27 +218,41 @@ const Send: React.FC = () => {
     }
 
     if (currency) {
-      const parseAmount = new bitcoinLike(symbol).toSat(Number(amount))
-      const parseMinAmount = new bitcoinLike(symbol).fromSat(currency.minSendAmount)
+      let parseAmount: number = Number(amount)
+      let parseMinAmount: number = 0
+
+      if (tokenChain) {
+        parseMinAmount = currency.minSendAmount || 0.001
+      } else {
+        parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+        parseMinAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
+      }
 
       if (parseAmount < currency.minSendAmount) {
-        return setAmountErrorLabel(`Min. amount: ${parseMinAmount} ${toUpper(symbol)}`)
+        return setAmountErrorLabel(`Min amount is ${parseMinAmount} ${toUpper(symbol)}`)
       }
     }
   }
 
   const isButtonDisabled = (): boolean => {
-    return (
-      !new bitcoinLike(symbol).validate(address) ||
-      !amount.length ||
-      Number(amount) <= 0 ||
-      !outputs.length ||
-      addressErrorLabel !== null ||
-      amountErrorLabel !== null ||
-      Number(balance) <= 0 ||
-      networkFee === 0 ||
-      isNetworkFeeLoading
-    )
+    if (
+      validateAddress(symbol, address) &&
+      amount.length &&
+      Number(amount) > 0 &&
+      addressErrorLabel === null &&
+      amountErrorLabel === null &&
+      Number(balance) > 0 &&
+      networkFee > 0 &&
+      !isNetworkFeeLoading
+    ) {
+      if (!outputs.length) {
+        if (contractAddress || isEthereumLike(symbol, chain)) {
+          return false
+        }
+        return true
+      }
+    }
+    return true
   }
 
   const onCancel = (): void => {
@@ -188,6 +261,30 @@ const Send: React.FC = () => {
     })
 
     history.goBack()
+  }
+
+  const mapDropDownList = addresses
+    .filter((address: string) => address !== selectedAddress)
+    .map((address: string) => {
+      return {
+        logo: {
+          symbol: symbol,
+          width: 40,
+          height: 40,
+          br: 10,
+          background: currency?.background,
+        },
+        label: currency?.name,
+        value: address,
+      }
+    })
+
+  const onSelectDropDown = (index: number) => {
+    setSelectedAddress(mapDropDownList[index].value)
+  }
+
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
   }
 
   return (
@@ -206,20 +303,25 @@ const Send: React.FC = () => {
             <Styles.USDEstimated>{`$${price(estimated, 2)} USD`}</Styles.USDEstimated>
           </Skeleton>
         </Styles.Row>
-        <Styles.Form>
+        <Styles.Form onSubmit={onSubmitForm}>
           {addresses?.length ? (
             <CurrenciesDropdown
-              symbol={symbol}
-              isDisabled={addresses.length < 2}
-              selectedAddress={selectedAddress}
-              addresses={addresses}
-              setAddress={setSelectedAddress}
+              label={currency?.name}
+              value={selectedAddress}
+              currencySymbol={symbol}
+              currencyBr={10}
+              background={currency?.background}
+              list={mapDropDownList}
+              onSelect={onSelectDropDown}
+              disabled={addresses.length < 2}
+              tokenChain={tokenChain}
+              tokenName={tokenName}
             />
           ) : null}
           <TextInput
             label="Recipient Address"
             value={address}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAddress(e.target.value)}
+            onChange={setAddress}
             errorLabel={addressErrorLabel}
             onBlurInput={onBlurAddressInput}
             disabled={balance === null}
@@ -227,7 +329,7 @@ const Send: React.FC = () => {
           <TextInput
             label={`Amount (${toUpper(symbol)})`}
             value={amount}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>): void => setAmount(e.target.value)}
+            onChange={setAmount}
             type="number"
             errorLabel={amountErrorLabel}
             onBlurInput={onBlurAmountInput}
@@ -236,18 +338,21 @@ const Send: React.FC = () => {
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
             {isNetworkFeeLoading ? (
-              <Spinner ml={10} />
+              <Spinner ml={10} size={16} />
             ) : (
               <>
                 {networkFee === 0 ? (
                   <Styles.NetworkFee>-</Styles.NetworkFee>
                 ) : (
                   <Styles.NetworkFee>
-                    {networkFee} {toUpper(symbol)}
+                    {networkFee} {toUpper(getCurrencySymbol)}
                   </Styles.NetworkFee>
                 )}
               </>
             )}
+            {tokenChain && !isNetworkFeeLoading && networkFee && networkFee > currencyBalance ? (
+              <Styles.NetworkFeeError>Insufficient funds</Styles.NetworkFeeError>
+            ) : null}
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>

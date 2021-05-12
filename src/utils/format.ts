@@ -1,11 +1,11 @@
-export const toUpper = (text: string | null | undefined) => {
+export const toUpper = (text?: string): string | undefined => {
   if (text?.length) {
     return text.toUpperCase()
   }
   return text
 }
 
-export const toLower = (text: string | null | undefined) => {
+export const toLower = (text?: string): string | undefined => {
   if (text?.length) {
     return text.toLowerCase()
   }
@@ -42,3 +42,12 @@ export const price = (price: number | null, toFixed = 2): string => {
     .toString()
     .replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 }
+
+export const groupBy = (key: string, array: any[]) =>
+  array.reduce(
+    (objectsByKeyValue, obj) => ({
+      ...objectsByKeyValue,
+      [obj[key]]: (objectsByKeyValue[obj[key]] || []).concat(obj),
+    }),
+    {}
+  )

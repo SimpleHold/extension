@@ -13,12 +13,14 @@ interface Props {
   isActive: boolean
   title: string
   isButtonDisabled?: boolean
-  onConfirm: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
+  onConfirm: () => void
   textInputValue: string
   onChangeText: (data: string) => void
   inputLabel: string
   textInputType?: string
   inputErrorLabel?: string | null
+  openFrom?: string
+  isButtonLoading?: boolean
 }
 
 const ConfirmDrawer: React.FC<Props> = (props) => {
@@ -33,6 +35,8 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
     inputLabel,
     textInputType,
     inputErrorLabel,
+    openFrom,
+    isButtonLoading,
   } = props
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
@@ -49,26 +53,38 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
     }
   }, [isActive])
 
-  const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    onChangeText(e.target.value)
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!isButtonDisabled) {
+      onConfirm()
+    }
   }
 
   return (
-    <DrawerWrapper title={title} isActive={isActive} onClose={onClose}>
+    <DrawerWrapper title={title} isActive={isActive} onClose={onClose} openFrom={openFrom}>
       <Styles.Row>
-        <Styles.Form>
+        <Styles.Form onSubmit={onSubmitForm}>
           <TextInput
             label={inputLabel}
             value={textInputValue}
-            onChange={onChangeInput}
+            onChange={onChangeText}
             type={textInputType}
             errorLabel={inputErrorLabel}
             inputRef={textInputRef}
+            openFrom={openFrom}
           />
         </Styles.Form>
         <Styles.Actions>
           <Button label="Cancel" isLight isSmall mr={7.5} onClick={onClose} />
-          <Button label="Ok" disabled={isButtonDisabled} isSmall mr={7.5} onClick={onConfirm} />
+          <Button
+            label="Ok"
+            disabled={isButtonDisabled}
+            isSmall
+            mr={7.5}
+            onClick={onConfirm}
+            isLoading={isButtonLoading}
+          />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>

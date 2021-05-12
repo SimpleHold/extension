@@ -11,11 +11,12 @@ const rotating = keyframes`
 
 type TContainerProps = {
   ml?: number
+  size: number
 }
 
 const Container = styled.div`
-  width: 16px;
-  height: 16px;
+  width: ${({ size }: TContainerProps) => `${size}px`};
+  height: ${({ size }: TContainerProps) => `${size}px`};
   margin-left: ${({ ml }: TContainerProps) => (ml ? `${ml}px` : '0')};
 
   svg {

@@ -23,8 +23,14 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
   const [passcode, setPasscode] = React.useState<string>('')
 
   React.useEffect(() => {
-    if (isActive && type === 'remove') {
-      addFormEventsListener()
+    if (isActive) {
+      setTimeout(() => {
+        document.querySelectorAll('input')[0]?.focus()
+      }, 100)
+
+      if (type === 'remove') {
+        addFormEventsListener()
+      }
     }
 
     if (passcode.length) {
@@ -46,6 +52,10 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
     }
   }
 
+  const onSubmitForm = (e: React.FormEvent) => {
+    e.preventDefault()
+  }
+
   return (
     <DrawerWrapper
       title={type === 'create' ? 'Create your passcode' : 'Enter your passcode'}
@@ -53,7 +63,7 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
       onClose={onClose}
     >
       <Styles.Row>
-        <Styles.Form>
+        <Styles.Form onSubmit={onSubmitForm}>
           <OneTimePassword value={passcode} onChange={setPasscode} isError={isError} />
         </Styles.Form>
 
