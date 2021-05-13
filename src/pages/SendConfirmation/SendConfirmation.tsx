@@ -68,6 +68,7 @@ const SendConfirmation: React.FC = () => {
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
   const [transactionLink, setTransactionLink] = React.useState<string>('')
+  const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
 
   const onConfirmModal = async (): Promise<void> => {
     logEvent({
@@ -89,6 +90,8 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
+          setButtonLoading(true)
+
           const parseAmount =
             tokenChain && decimals
               ? convertDecimals(amount, decimals)
@@ -118,6 +121,8 @@ const SendConfirmation: React.FC = () => {
           }
 
           const transaction = await createTransaction({ ...transactionData, ...ethTxData })
+
+          setButtonLoading(false)
 
           if (transaction?.hash && transaction?.raw) {
             const sendTransaction = await sendRawTransaction(transaction.raw, chain || tokenChain)
@@ -162,6 +167,14 @@ const SendConfirmation: React.FC = () => {
     })
 
     setActiveDrawer(null)
+  }
+
+  const closeSuccessDrawer = (): void => {
+    if (isButtonLoading) {
+      return
+    }
+
+    history.replace('/wallets')
   }
 
   return (
@@ -238,11 +251,12 @@ const SendConfirmation: React.FC = () => {
         onChangeText={setPassword}
         isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirmModal}
+        isButtonLoading={isButtonLoading}
       />
 
       <SuccessDrawer
         isActive={activeDrawer === 'success'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={closeSuccessDrawer}
         text="Your transaction has been successfully sent. You can check it here:"
         link={transactionLink}
       />

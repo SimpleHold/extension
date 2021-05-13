@@ -17,6 +17,7 @@ import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { validate as validateBackup } from '@utils/backup'
+import { setBadgeBackgroundColor, setBadgeText } from '@utils/extension'
 
 // Config
 import { START_RESTORE_CONFIRM, START_RESTORE_PASSWORD } from '@config/events'
@@ -97,6 +98,9 @@ const RestoreBackup: React.FC = () => {
           localStorage.setItem('wallets', getWalletsList)
           localStorage.removeItem('manualRestoreBackup')
 
+          setBadgeBackgroundColor('#EB5757')
+          setBadgeText('1')
+
           setActiveDrawer('success')
         } else {
           setActiveDrawer('fail')
@@ -149,7 +153,7 @@ const RestoreBackup: React.FC = () => {
               </Styles.DNDText>
             ) : (
               <Styles.DNDText>
-                Drag and drop or choose a backup file to restore your wallet.
+                Drag and drop or choose a backup file to restore your wallet
               </Styles.DNDText>
             )}
           </Styles.DNDArea>

@@ -94,11 +94,18 @@ const AddTokenToAddress: React.FC = () => {
         'You are trying to add a new ERC20 token address. The corresponding Ethereum address will also be added to your wallet.',
       backTitle: `Add to ${toUpper(chain)} address`,
       chain,
+      tokenName,
+      contractAddress,
+      decimals,
     })
   }
 
   const onConfirm = (): void => {
     setActiveDrawer('confirm')
+  }
+
+  const onSelectDropdown = (index: number): void => {
+    setSelectedAddress(mapList[index].value)
   }
 
   const onConfirmDrawer = (): void => {
@@ -162,7 +169,7 @@ const AddTokenToAddress: React.FC = () => {
               value={selectedAddress}
               currencySymbol={getCurrencyInfo?.symbol || chain}
               list={mapList}
-              onSelect={setSelectedAddress}
+              onSelect={onSelectDropdown}
               disabled={chainAddresses.length < 2}
               currencyBr={20}
             />

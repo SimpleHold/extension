@@ -12,6 +12,7 @@ import useToastContext from '@hooks/useToastContext'
 // Utils
 import { IWallet, getWallets } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
+import { setBadgeText, getBadgeText } from '@utils/extension'
 
 // Config
 import { ADD_ADDRESS, BALANCE_CHANGED } from '@config/events'
@@ -40,6 +41,7 @@ const Wallets: React.FC = () => {
 
   React.useEffect(() => {
     getWalletsList()
+    checkBadgeText()
   }, [])
 
   React.useEffect(() => {
@@ -82,6 +84,14 @@ const Wallets: React.FC = () => {
       }
     }
   }, [totalBalance, totalEstimated])
+
+  const checkBadgeText = async () => {
+    const text = await getBadgeText()
+
+    if (text?.length) {
+      setBadgeText('')
+    }
+  }
 
   const getWalletsList = () => {
     const walletsList = getWallets()

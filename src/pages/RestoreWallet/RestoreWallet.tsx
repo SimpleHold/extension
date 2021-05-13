@@ -123,7 +123,7 @@ const RestoreWallet: React.FC = () => {
                 ) : null}
                 {!backupData && !isInvalidFile ? (
                   <Styles.DNDText>
-                    Drag and drop or choose a backup file to restore your wallet.
+                    Drag and drop or choose a backup file to restore your wallet
                   </Styles.DNDText>
                 ) : null}
                 {isInvalidFile ? (

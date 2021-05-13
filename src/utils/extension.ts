@@ -11,3 +11,19 @@ export const getUrl = (path: string): string => {
 export const openWebPage = (url: string): Promise<Tabs.Tab> => {
   return browser.tabs.create({ url })
 }
+
+export const setBadgeBackgroundColor = (color: string) => {
+  browser.browserAction.setBadgeBackgroundColor({ color })
+}
+
+export const setBadgeText = (text: string) => {
+  browser.browserAction.setBadgeText({ text })
+}
+
+export const getBadgeText = async (): Promise<string> => {
+  return await browser.browserAction.getBadgeText({})
+}
+
+export const getManifest = () => {
+  return browser.runtime.getManifest()
+}

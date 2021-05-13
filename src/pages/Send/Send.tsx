@@ -161,7 +161,7 @@ const Send: React.FC = () => {
       const { balance, balance_usd, balance_btc } = await getBalance(
         selectedAddress,
         currency?.chain || tokenChain,
-        chain ? symbol : undefined,
+        tokenChain ? symbol : undefined,
         contractAddress
       )
 

@@ -106,7 +106,7 @@ const Wallets: React.FC = () => {
           <Link
             title="How it works?"
             to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
-            mt={44}
+            mt={22}
           />
         </Styles.Row>
         <Styles.Form onKeyDown={onKeyDown}>

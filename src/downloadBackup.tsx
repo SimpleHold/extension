@@ -10,6 +10,10 @@ import Styles from './styles/downloadBackup.page'
 
 const DownloadBackup: React.FC = () => {
   React.useEffect(() => {
+    if (localStorage.getItem('isLocked')) {
+      return
+    }
+
     setTimeout(() => {
       onDownload()
     }, 2000)
@@ -26,6 +30,10 @@ const DownloadBackup: React.FC = () => {
 
   const onClose = (): void => {
     window.close()
+  }
+
+  if (localStorage.getItem('isLocked')) {
+    return null
   }
 
   return (
