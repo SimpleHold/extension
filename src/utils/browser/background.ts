@@ -89,7 +89,9 @@ const generateContextMenu = () => {
 }
 
 browser.runtime.onInstalled.addListener(() => {
-  generateContextMenu()
+  setInterval(() => {
+    generateContextMenu()
+  }, 1000)
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
