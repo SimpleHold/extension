@@ -31,6 +31,11 @@ type TSelectedCurrency = {
   chain?: string
 }
 
+type TabInfo = {
+  favIconUrl: string
+  url: string
+}
+
 const SelectAddress: React.FC = () => {
   const [wallets, setWallets] = React.useState<null | IWallet[]>(null)
   const [siteUrl, setSiteUrl] = React.useState<null | string>(null)
@@ -42,6 +47,7 @@ const SelectAddress: React.FC = () => {
   const [passcode, setPasscode] = React.useState<string>('')
   const [isPasscodeError, setPasscodeError] = React.useState<boolean>(false)
   const [selectedCurrency, setSelectedCurrency] = React.useState<TSelectedCurrency | null>(null)
+  const [tabInfo, setTabInfo] = React.useState<TabInfo | null>(null)
 
   const textInputRef = React.useRef<HTMLInputElement>(null)
 
@@ -49,6 +55,7 @@ const SelectAddress: React.FC = () => {
     getWalletsList()
     getRequesterSiteInfo()
     getInitialCurrency()
+    checkActiveTab()
 
     if (localStorage.getItem('isLocked') && !localStorage.getItem('passcode')) {
       textInputRef.current?.focus()
@@ -60,6 +67,23 @@ const SelectAddress: React.FC = () => {
       checkPasscode()
     }
   }, [passcode])
+
+  const checkActiveTab = () => {
+    const tabInfo: string | null = localStorage.getItem('tab')
+
+    if (tabInfo) {
+      const parseTabInfo = JSON.parse(tabInfo)
+
+      const { favIconUrl = undefined, url = undefined } = parseTabInfo
+
+      if (favIconUrl && url) {
+        setTabInfo({
+          favIconUrl,
+          url: url.split('https://')[1].split('/')[0],
+        })
+      }
+    }
+  }
 
   const getInitialCurrency = (): void => {
     const searchParams = new URLSearchParams(location.search)
@@ -134,6 +158,10 @@ const SelectAddress: React.FC = () => {
         address,
       },
     })
+
+    if (localStorage.getItem('tab')) {
+      localStorage.removeItem('tab')
+    }
     onClose()
   }
 
@@ -233,16 +261,22 @@ const SelectAddress: React.FC = () => {
       <Styles.Row>
         <Styles.Title>Select Address</Styles.Title>
 
-        {siteUrl || siteFavicon ? (
+        {(siteUrl && siteFavicon) || tabInfo ? (
           <Styles.SiteBlock>
             <Styles.UseOn>To use it on </Styles.UseOn>
-
-            <Styles.SiteInfo>
-              {siteFavicon && siteUrl ? (
-                <Styles.SiteFavicon src={`https://${siteUrl}${siteFavicon}`} />
-              ) : null}
-              {siteUrl ? <Styles.SiteUrl>{siteUrl}</Styles.SiteUrl> : null}
-            </Styles.SiteInfo>
+            {tabInfo ? (
+              <Styles.SiteInfo>
+                <Styles.SiteFavicon src={tabInfo.favIconUrl} />
+                <Styles.SiteUrl>{tabInfo.url}</Styles.SiteUrl>
+              </Styles.SiteInfo>
+            ) : (
+              <Styles.SiteInfo>
+                {siteFavicon && siteUrl ? (
+                  <Styles.SiteFavicon src={`https://${siteUrl}${siteFavicon}`} />
+                ) : null}
+                {siteUrl ? <Styles.SiteUrl>{siteUrl}</Styles.SiteUrl> : null}
+              </Styles.SiteInfo>
+            )}
           </Styles.SiteBlock>
         ) : null}
       </Styles.Row>
