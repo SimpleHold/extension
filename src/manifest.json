@@ -11,7 +11,7 @@
   "description": "Light wallet for Bitcoin and other cryptocurrencies.",
   "homepage_url": "https://simplehold.io",
   "short_name": "SimpleHold",
-  "permissions": ["activeTab", "tabs"],
+  "permissions": ["activeTab", "tabs", "contextMenus", "clipboardWrite", "clipboardRead"],
   "content_security_policy": "script-src 'self'; object-src 'self'",
   "__chrome|firefox__author": "SimpleHold",
   "__opera__developer": {
