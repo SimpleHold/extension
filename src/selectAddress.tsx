@@ -57,6 +57,8 @@ const SelectAddress: React.FC = () => {
     getInitialCurrency()
     checkActiveTab()
 
+    document.body.style.overflow = 'hidden'
+
     if (localStorage.getItem('isLocked') && !localStorage.getItem('passcode')) {
       textInputRef.current?.focus()
     }

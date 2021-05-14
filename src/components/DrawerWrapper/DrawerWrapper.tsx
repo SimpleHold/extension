@@ -26,7 +26,9 @@ const DrawerWrapper: React.FC<Props> = (props) => {
   const nodeRef = React.useRef(null)
 
   const drawerStyle = {
-    entering: { transform: `translate3d(0, ${openFrom === 'browser' ? '80px' : '100%'}, 0)` },
+    entering: {
+      transform: `translate3d(0, ${openFrom === 'browser' ? '80px' : '100%'}, 0)`,
+    },
     entered: { transform: 'none' },
     exiting: { transform: 'translate3d(0, 100%, 0)' },
     exited: { display: 'none' },
