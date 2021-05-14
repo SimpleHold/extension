@@ -1,5 +1,8 @@
 import { browser } from 'webextension-polyfill-ts'
-import { IRequest } from 'utils/browser/types'
+import copy from 'copy-to-clipboard'
+
+// utils
+import { IRequest } from '@utils/browser/types'
 
 const setSHAttribute = () => {
   document.documentElement.setAttribute('sh-ex-status', 'installed')
@@ -19,19 +22,30 @@ setSHAttribute()
 browser.runtime.onMessage.addListener((request: IRequest) => {
   if (request.type === 'set_address') {
     const { data } = request
+
     const findInput = document.querySelector<HTMLInputElement>(
       "[sh-input='address']"
     ) as HTMLInputElement
 
-    if (findInput && data?.address) {
-      document.dispatchEvent(
-        new CustomEvent('sh-select-address', {
-          detail: {
-            address: data.address,
-          },
-        })
-      )
+    if (data?.address) {
+      if (findInput) {
+        document.dispatchEvent(
+          new CustomEvent('sh-select-address', {
+            detail: {
+              address: data.address,
+            },
+          })
+        )
+      } else {
+        copy(data.address)
+        document.execCommand('paste')
+      }
     }
+  } else if (request.type === 'context-menu-address') {
+    const { data } = request
+
+    copy(data.address)
+    document.execCommand('paste')
   }
 })
 
