@@ -33,19 +33,21 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   }
 })
 
-const generateContextMenu = () => {
+const generateContextMenu = async () => {
   const wallets = getWallets()
+
+  await browser.contextMenus.removeAll()
 
   if (wallets?.length) {
     const parent = browser.contextMenus.create({
       title: 'SimpleHold',
-      id: 'one',
+      id: 'sh-parent',
       contexts: ['editable'],
     })
 
     const allowedSymbols = ['btc', 'eth', 'ltc', 'bnb', 'dash']
 
-    for (const item of allowedSymbols) {
+    for (const [index, item] of allowedSymbols.entries()) {
       const getSymbolWallets = wallets.filter(
         (wallet: IWallet) => toLower(wallet.symbol) === toLower(item)
       )
@@ -77,28 +79,30 @@ const generateContextMenu = () => {
           }
         }
       }
-    }
 
-    browser.contextMenus.create({
-      title: 'Other',
-      parentId: parent,
-      id: 'other-wallets',
-      contexts: ['editable'],
-    })
+      if (index === allowedSymbols.length - 1) {
+        browser.contextMenus.create({
+          title: 'More...',
+          parentId: parent,
+          id: 'sh-other-wallets',
+          contexts: ['editable'],
+        })
+      }
+    }
   }
 }
 
 browser.runtime.onInstalled.addListener(() => {
   setInterval(() => {
     generateContextMenu()
-  }, 1000)
+  }, 5000)
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
   const tabs = await browser.tabs.query({ active: true })
 
   if (tabs[0]?.id) {
-    if (info.menuItemId !== 'other-wallets') {
+    if (info.menuItemId !== 'sh-other-wallets') {
       browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',
         data: {
