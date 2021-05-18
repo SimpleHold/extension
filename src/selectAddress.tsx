@@ -81,7 +81,7 @@ const SelectAddress: React.FC = () => {
       if (favIconUrl && url) {
         setTabInfo({
           favIconUrl,
-          url: url.split('https://')[1].split('/')[0],
+          url: new URL(url).host,
         })
       }
     }
