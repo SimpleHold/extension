@@ -62,6 +62,7 @@ module.exports = {
     downloadBackup: path.join(sourcePath, 'downloadBackup.tsx'),
     restoreBackup: path.join(sourcePath, 'restoreBackup.tsx'),
     selectAddress: path.join(sourcePath, 'selectAddress.tsx'),
+    send: path.join(sourcePath, 'externalPages/Send/Send.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -150,6 +151,13 @@ module.exports = {
       chunks: ['selectAddress'],
       hash: true,
       filename: 'select-address.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'send.html'),
+      inject: 'body',
+      chunks: ['send'],
+      hash: true,
+      filename: 'send.html',
     }),
     new CopyWebpackPlugin({
       patterns: [
