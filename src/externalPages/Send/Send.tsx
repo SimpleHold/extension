@@ -14,26 +14,43 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { getBalance } from '@utils/api'
-import { getCurrentTab, updateTab, getUrl, openWebPage } from '@utils/extension'
+import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
+import { price, toLower, toUpper } from '@utils/format'
+import { validateAddress } from '@utils/address'
 
 // Config
-import { getCurrency } from '@config/currencies'
+import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
-import { price, toUpper } from 'utils/format'
+
+type TabInfo = {
+  favIconUrl: string
+  url: string
+}
+
+interface Props {
+  readOnly?: boolean
+  currency?: string
+  amount?: number
+  recipientAddress?: string
+}
 
 const Send: React.FC = () => {
   const [address, setAddress] = React.useState<string>('')
   const [amount, setAmount] = React.useState<string>('')
   const [walletsList, setWalletsList] = React.useState<IWallet[]>([])
   const [selectedWallet, setSelectedWallet] = React.useState<null | IWallet>(null)
-  const [selectedCurrencyName, setSelectedCurrencyName] = React.useState<string>('')
+  const [currencyInfo, setCurrencyInfo] = React.useState<ICurrency | null>(null)
   const [balance, setBalance] = React.useState<number | null>(null)
   const [estimated, setEstimated] = React.useState<number | null>(null)
+  const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
+  const [tabInfo, setTabInfo] = React.useState<TabInfo | null>(null)
+  const [props, setProps] = React.useState<Props>({})
 
   React.useEffect(() => {
     getWalletsList()
+    getStorageData()
   }, [])
 
   React.useEffect(() => {
@@ -43,12 +60,50 @@ const Send: React.FC = () => {
     }
   }, [selectedWallet])
 
+  React.useEffect(() => {
+    if (Object.keys(props).length) {
+      const { amount: propsAmount, recipientAddress } = props
+
+      if (propsAmount) {
+        setAmount(`${propsAmount}`)
+      }
+
+      if (recipientAddress) {
+        setAddress(recipientAddress)
+      }
+    }
+  }, [props])
+
+  const getStorageData = (): void => {
+    const tabInfo = localStorage.getItem('tab')
+    const getProps = localStorage.getItem('sendPageProps')
+
+    if (tabInfo) {
+      const { favIconUrl = undefined, url = undefined } = JSON.parse(tabInfo)
+
+      if (favIconUrl && url) {
+        setTabInfo({
+          favIconUrl,
+          url: new URL(url).host,
+        })
+      }
+      localStorage.removeItem('tab')
+    }
+
+    if (getProps) {
+      const parseProps = JSON.parse(getProps)
+
+      setProps(parseProps)
+      localStorage.removeItem('sendPageProps')
+    }
+  }
+
   const getCurrencyInfo = (): void => {
     if (selectedWallet) {
       const info = getCurrency(selectedWallet?.symbol)
 
       if (info) {
-        setSelectedCurrencyName(info.name)
+        setCurrencyInfo(info)
       }
     }
   }
@@ -93,16 +148,78 @@ const Send: React.FC = () => {
     }
   }
 
+  const dropdownList = walletsList
+    ?.filter(
+      (wallet: IWallet) =>
+        toLower(wallet.address) !== toLower(selectedWallet?.address) ||
+        toLower(wallet?.chain) !== toLower(selectedWallet?.chain)
+    )
+    .map((wallet: IWallet) => {
+      const currencyInfo = wallet?.chain
+        ? getCurrencyByChain(wallet.chain)
+        : getCurrency(wallet?.symbol)
+
+      return {
+        logo: {
+          symbol: wallet.symbol,
+          width: 40,
+          height: 40,
+          br: 13,
+          background: currencyInfo?.background,
+          chain: wallet?.chain,
+        },
+        label: wallet?.name || currencyInfo?.name,
+        value: wallet.address,
+        chain: wallet?.chain,
+      }
+    })
+
+  const onSelectDropdown = (index: number) => {
+    const currency = dropdownList[index]
+
+    const findWallet = walletsList.find(
+      (wallet: IWallet) =>
+        toLower(wallet.address) === toLower(currency.value) &&
+        toLower(wallet?.chain) === toLower(currency?.chain)
+    )
+
+    if (findWallet) {
+      setSelectedWallet(findWallet)
+    }
+  }
+
+  const onBlurAddressInput = (): void => {
+    if (addressErrorLabel) {
+      setAddressErrorLabel(null)
+    }
+
+    if (selectedWallet) {
+      if (
+        address.length &&
+        // @ts-ignore
+        !validateAddress(selectedWallet.symbol, address, selectedWallet?.chain)
+      ) {
+        setAddressErrorLabel('Address is not valid')
+      }
+
+      if (address === selectedWallet.address) {
+        setAddressErrorLabel('Address same as sender')
+      }
+    }
+  }
+
   return (
     <ExternalPageContainer onClose={onClose}>
       <Styles.Body>
         <Styles.Heading>
           <Styles.TitleRow>
             <Styles.Title>Send it on</Styles.Title>
-            <Styles.SiteInfo>
-              <Styles.SiteFavicon src="https://simpleswap.io/static/favicon/favicon.ico?v=zXvRzEYzbj" />
-              <Styles.SiteUrl>simpleswap.io</Styles.SiteUrl>
-            </Styles.SiteInfo>
+            {tabInfo ? (
+              <Styles.SiteInfo>
+                <Styles.SiteFavicon src={tabInfo.favIconUrl} />
+                <Styles.SiteUrl>{tabInfo.url}</Styles.SiteUrl>
+              </Styles.SiteInfo>
+            ) : null}
           </Styles.TitleRow>
           <Skeleton width={250} height={42} type="gray" mt={31} isLoading={balance === null}>
             <Styles.Balance>
@@ -116,12 +233,14 @@ const Send: React.FC = () => {
         <Styles.Form>
           {walletsList.length && selectedWallet ? (
             <CurrenciesDropdown
-              list={[]}
-              onSelect={() => null}
+              list={dropdownList}
+              onSelect={onSelectDropdown}
               currencyBr={13}
-              label={selectedCurrencyName}
+              label={currencyInfo?.name}
               value={selectedWallet.address}
               currencySymbol={selectedWallet.symbol}
+              background={currencyInfo?.background}
+              disabled={walletsList.length < 2}
             />
           ) : null}
           <TextInput
@@ -129,6 +248,9 @@ const Send: React.FC = () => {
             value={address}
             onChange={setAddress}
             openFrom="browser"
+            errorLabel={addressErrorLabel}
+            onBlurInput={onBlurAddressInput}
+            disabled={balance === null || props?.readOnly}
           />
           <TextInput
             label="Amount (BTC)"
@@ -136,6 +258,7 @@ const Send: React.FC = () => {
             onChange={setAmount}
             type="number"
             openFrom="browser"
+            disabled={props?.readOnly}
           />
           <Styles.NetworkFee>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>

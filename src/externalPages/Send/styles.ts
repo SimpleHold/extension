@@ -35,6 +35,7 @@ const SiteInfo = styled.div`
 const SiteFavicon = styled.img`
   width: 16px;
   height: 16px;
+  border-radius: 8px;
   margin: 0 5px 0 0;
 `
 
