@@ -24,7 +24,8 @@ const extensionReloaderPlugin =
         entries: {
           contentScript: 'contentScript',
           background: 'background',
-          extensionPage: ['popup', 'downloadBackup', 'restoreBackup'],
+          inpage: 'inpage',
+          extensionPage: ['popup', 'downloadBackup', 'restoreBackup', 'selectAddress'],
         },
       })
     : () => {
@@ -54,11 +55,13 @@ module.exports = {
   mode: nodeEnv,
   entry: {
     manifest: path.join(sourcePath, 'manifest.json'),
-    background: path.join(sourcePath, 'utils', 'background.ts'),
-    contentScript: path.join(sourcePath, 'utils', 'contentScript.ts'),
+    background: path.join(sourcePath, 'utils', 'browser', 'background.ts'),
+    contentScript: path.join(sourcePath, 'utils', 'browser', 'contentScript.ts'),
+    inpage: path.join(sourcePath, 'utils', 'browser', 'inpage.ts'),
     popup: path.join(sourcePath, 'app.tsx'),
     downloadBackup: path.join(sourcePath, 'downloadBackup.tsx'),
     restoreBackup: path.join(sourcePath, 'restoreBackup.tsx'),
+    selectAddress: path.join(sourcePath, 'selectAddress.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -140,6 +143,13 @@ module.exports = {
       chunks: ['restoreBackup'],
       hash: true,
       filename: 'restore-backup.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'select-address.html'),
+      inject: 'body',
+      chunks: ['selectAddress'],
+      hash: true,
+      filename: 'select-address.html',
     }),
     new CopyWebpackPlugin({
       patterns: [

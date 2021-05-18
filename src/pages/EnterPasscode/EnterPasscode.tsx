@@ -72,6 +72,8 @@ const EnterPasscode: React.FC = () => {
       status: 'passcodeTurnedOff',
     })
 
+    localStorage.removeItem('passcode')
+
     logEvent({
       name: PASSCODE_LOCKED_FORGOT,
     })

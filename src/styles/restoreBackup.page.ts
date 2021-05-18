@@ -25,6 +25,7 @@ const Extension = styled.div`
   border-radius: 16px;
   position: relative;
   height: 100%;
+  overflow: hidden;
 `
 
 const Header = styled.div`

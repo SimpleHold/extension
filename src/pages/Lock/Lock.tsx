@@ -59,8 +59,6 @@ const Lock: React.FC = () => {
           logEvent({
             name: SUCCESS_ENTER,
           })
-
-          localStorage.removeItem('passcode')
           localStorage.removeItem('isLocked')
           return history.replace('/wallets', {
             status: state?.status,

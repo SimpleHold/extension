@@ -7,6 +7,15 @@ type TVisibleProps = {
 type TContainerProps = {
   disabled?: boolean
   isVisible: boolean
+  isNotSelected: boolean
+}
+
+type TRowProps = {
+  isNotSelected: boolean
+}
+
+type TLabelProps = {
+  isNotSelected: boolean
 }
 
 const Wrapper = styled.div`
@@ -14,10 +23,12 @@ const Wrapper = styled.div`
   position: relative;
   filter: ${({ isVisible }: TVisibleProps) =>
     isVisible ? 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.3))' : 'none'};
+  z-index: 2;
 `
 
 const Container = styled.div`
-  padding: 10px;
+  padding: ${({ isNotSelected }: TContainerProps) =>
+    isNotSelected ? '15px 10px 15px 20px' : '10px'};
   background-color: #ffffff;
   border: ${({ isVisible }: TContainerProps) => `1px solid ${isVisible ? '#3fbb7d' : '#eaeaea'}`};
   border-radius: ${({ isVisible }: TContainerProps) => (isVisible ? '5px 5px 0px 0px' : '5px')};
@@ -32,7 +43,7 @@ const Container = styled.div`
 `
 
 const Row = styled.div`
-  margin: 0 0 0 10px;
+  margin: ${({ isNotSelected }: TRowProps) => (isNotSelected ? '0' : '0 0 0 10px')};
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -47,8 +58,8 @@ const Info = styled.div`
 
 const Label = styled.p`
   margin: 0;
-  font-size: 12px;
-  line-height: 14px;
+  font-size: ${({ isNotSelected }: TLabelProps) => (isNotSelected ? '16px' : '12px')};
+  line-height: ${({ isNotSelected }: TLabelProps) => (isNotSelected ? '19px' : '16px')};
   color: #7d7e8d;
 `
 
@@ -80,7 +91,6 @@ const ArrowIconRow = styled.div`
 `
 
 const NetworksList = styled.div`
-  border: 1px solid #eaeaea;
   border-top: none;
   background-color: #ffffff;
   width: 100%;
@@ -90,8 +100,9 @@ const NetworksList = styled.div`
   visibility: ${({ isVisible }: TVisibleProps) => (isVisible ? 'visible' : 'hidden')};
   transform: ${({ isVisible }: TVisibleProps) => `translateY(${isVisible ? '0' : '-20px'})`};
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
-  width: 100%;
   top: 62px;
+  max-height: 255px;
+  overflow-y: scroll;
 `
 
 const ListItem = styled.div`
@@ -100,6 +111,28 @@ const ListItem = styled.div`
   align-items: center;
   padding: 10px;
   overflow: hidden;
+  border: 1px solid #3fbb7d;
+  position: relative;
+
+  &:not(:last-child) {
+    border-bottom: none;
+  }
+
+  &:first-child {
+    &:after {
+      content: '';
+      width: calc(100% + 20px);
+      margin: 0 0 0 -20px;
+      position: absolute;
+      height: 1px;
+      background-color: #eaeaea;
+      bottom: 0;
+    }
+  }
+
+  &:last-child {
+    border-radius: 0 0 5px 5px;
+  }
 
   &:hover {
     cursor: pointer;

@@ -273,6 +273,7 @@ const Send: React.FC = () => {
           height: 40,
           br: 10,
           background: currency?.background,
+          chain: tokenChain,
         },
         label: currency?.name,
         value: address,
