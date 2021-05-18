@@ -1,4 +1,4 @@
-import { browser } from 'webextension-polyfill-ts'
+import { browser, Tabs } from 'webextension-polyfill-ts'
 
 // Utils
 import { IRequest } from '@utils/browser/types'
@@ -30,6 +30,45 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     if (tabs[0]?.id) {
       browser.tabs.sendMessage(tabs[0].id, request)
     }
+  }
+
+  if (request.type === 'request_send_screen') {
+    const {
+      screenX,
+      screenY,
+      outerWidth,
+      size,
+      readOnly,
+      currency,
+      amount,
+      recipientAddress,
+    } = request.data
+
+    const tabs = await browser.tabs.query({ active: true })
+    const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
+
+    localStorage.setItem('tab', JSON.stringify(currentTab[0]))
+    localStorage.setItem(
+      'sendPageProps',
+      JSON.stringify({ size, readOnly, currency, amount, recipientAddress })
+    )
+
+    const checkExist: Tabs.Tab | undefined = tabs.find((tab: Tabs.Tab) => tab.url === 'send.html')
+
+    if (checkExist?.id) {
+      const { id } = checkExist
+
+      await browser.tabs.remove(id) // Fix me
+    }
+
+    browser.windows.create({
+      url: 'send.html',
+      type: 'popup',
+      width: 375,
+      height: 705,
+      left: Math.max(screenX + (outerWidth - 375), 0),
+      top: screenY,
+    })
   }
 })
 

@@ -1,3 +1,5 @@
+import { IRequest } from './types'
+
 const addCustomEventListener = (selector: string, event: any, handler: Function) => {
   const rootElement = document.querySelector<HTMLBodyElement>('body')
   if (rootElement) {
@@ -47,6 +49,16 @@ addCustomEventListener('#sh-button', 'click', () => {
       })
     )
   }
+})
+
+document.addEventListener('request_send', (request: IRequest) => {
+  const { detail } = request
+
+  document.dispatchEvent(
+    new CustomEvent('request_send_screen', {
+      detail,
+    })
+  )
 })
 
 export {}
