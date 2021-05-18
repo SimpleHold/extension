@@ -63,6 +63,7 @@ module.exports = {
     restoreBackup: path.join(sourcePath, 'restoreBackup.tsx'),
     selectAddress: path.join(sourcePath, 'selectAddress.tsx'),
     send: path.join(sourcePath, 'externalPages/Send/Send.tsx'),
+    sendConfirmation: path.join(sourcePath, 'externalPages/SendConfirmation/SendConfirmation.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -158,6 +159,13 @@ module.exports = {
       chunks: ['send'],
       hash: true,
       filename: 'send.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'send-confirmation.html'),
+      inject: 'body',
+      chunks: ['sendConfirmation'],
+      hash: true,
+      filename: 'send-confirmation.html',
     }),
     new CopyWebpackPlugin({
       patterns: [
