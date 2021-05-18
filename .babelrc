@@ -50,7 +50,8 @@
           "@hooks": "./src/hooks",
           "@config": "./src/config",
           "@drawers": "./src/drawers",
-          "@contexts": "./src/contexts"
+          "@contexts": "./src/contexts",
+          "@containers": "./src/containers"
         }
       }
     ]
