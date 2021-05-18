@@ -2,6 +2,10 @@ import styled from 'styled-components'
 
 import lockIllustrate from '@assets/illustrate/lock.svg'
 
+type THeaderRowProps = {
+  withBack: boolean
+}
+
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -27,6 +31,53 @@ const Header = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+`
+
+const HeaderRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+  justify-content: ${({ withBack }: THeaderRowProps) => (withBack ? 'space-between' : 'flex-end')};
+`
+
+const HeaderBackRow = styled.div`
+  margin: 0 0 0 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  path {
+    fill: #ffffff;
+    opacity: 0.6;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    p,
+    path {
+      opacity: 1;
+    }
+  }
+`
+
+const HeaderBackIconRow = styled.div`
+  width: 14px;
+  height: 14px;
+  margin: 0 6px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const HeaderBackTitle = styled.p`
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  color: #ffffff;
+  opacity: 0.6;
 `
 
 const Logo = styled.div`
@@ -96,6 +147,10 @@ const Styles = {
   Wrapper,
   Extension,
   Header,
+  HeaderRow,
+  HeaderBackRow,
+  HeaderBackIconRow,
+  HeaderBackTitle,
   Logo,
   CloseButton,
   Body,
