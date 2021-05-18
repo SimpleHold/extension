@@ -16,6 +16,7 @@ import astaLogo from '@assets/tokens/asta.svg'
 import bnbLogo from '@assets/tokens/bnb.svg'
 import cakeLogo from '@assets/tokens/cake.svg'
 import inchLogo from '@assets/tokens/inch.svg'
+import shibLogo from '@assets/tokens/shib.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -182,6 +183,16 @@ const tokens: IToken[] = [
     symbol: 'bnb',
     decimals: 18,
     logo: bnbLogo,
+    background: '#132BD8',
+    chain: 'eth',
+    minSendAmount: 0.001,
+  },
+  {
+    address: '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce',
+    name: 'SHIBA INU',
+    symbol: 'shib',
+    decimals: 18,
+    logo: shibLogo,
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
