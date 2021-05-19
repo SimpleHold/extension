@@ -4,6 +4,7 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 import { IRequest } from '@utils/browser/types'
 import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
+import { getUrl } from '@utils/extension'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -32,12 +33,11 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     }
   }
 
-  if (request.type === 'request_send_screen') {
+  if (request.type === 'request_send') {
     const {
       screenX,
       screenY,
       outerWidth,
-      size,
       readOnly,
       currency,
       amount,
@@ -50,15 +50,15 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     localStorage.setItem('tab', JSON.stringify(currentTab[0]))
     localStorage.setItem(
       'sendPageProps',
-      JSON.stringify({ size, readOnly, currency, amount, recipientAddress })
+      JSON.stringify({ readOnly, currency, amount, recipientAddress })
     )
 
-    const checkExist: Tabs.Tab | undefined = tabs.find((tab: Tabs.Tab) => tab.url === 'send.html')
+    const checkExist: Tabs.Tab | undefined = tabs.find(
+      (tab: Tabs.Tab) => tab.url === getUrl('send.html')
+    )
 
     if (checkExist?.id) {
-      const { id } = checkExist
-
-      await browser.tabs.remove(id) // Fix me
+      await browser.tabs.remove(checkExist.id)
     }
 
     browser.windows.create({

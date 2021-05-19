@@ -51,12 +51,17 @@ addCustomEventListener('#sh-button', 'click', () => {
   }
 })
 
-document.addEventListener('request_send', (request: IRequest) => {
-  const { detail } = request
+addCustomEventListener('#sh-send-button', 'click', () => {
+  const button = <HTMLDivElement>document.getElementById('sh-send-button')
 
   document.dispatchEvent(
-    new CustomEvent('request_send_screen', {
-      detail,
+    new CustomEvent('request_send', {
+      detail: {
+        readOnly: button.getAttribute('sh-read-only'),
+        currency: button.getAttribute('sh-currency'),
+        amount: button.getAttribute('sh-amount'),
+        recipientAddress: button.getAttribute('sh-recipient-address'),
+      },
     })
   )
 })

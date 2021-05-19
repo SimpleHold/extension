@@ -72,17 +72,16 @@ document.addEventListener('request_addresses', (request: IRequest) => {
   }
 })
 
-document.addEventListener('request_send_screen', async (request: IRequest) => {
-  const { size, readOnly, currency, amount, recipientAddress } = request.detail
+document.addEventListener('request_send', async (request: IRequest) => {
+  const { readOnly, currency, amount, recipientAddress } = request.detail
   const { screenX, screenY, outerWidth } = window
 
   browser.runtime.sendMessage({
-    type: 'request_send_screen',
+    type: 'request_send',
     data: {
       screenX,
       screenY,
       outerWidth,
-      size,
       readOnly,
       currency,
       amount,
