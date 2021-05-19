@@ -49,7 +49,6 @@ const Send: React.FC = () => {
   const [props, setProps] = React.useState<Props>({})
 
   React.useEffect(() => {
-    getWalletsList()
     getStorageData()
   }, [])
 
@@ -61,8 +60,13 @@ const Send: React.FC = () => {
   }, [selectedWallet])
 
   React.useEffect(() => {
+    checkProps()
+    getWalletsList()
+  }, [props])
+
+  const checkProps = () => {
     if (Object.keys(props).length) {
-      const { amount: propsAmount, recipientAddress } = props
+      const { amount: propsAmount, recipientAddress, currency } = props
 
       if (propsAmount) {
         setAmount(`${propsAmount}`)
@@ -72,7 +76,7 @@ const Send: React.FC = () => {
         setAddress(recipientAddress)
       }
     }
-  }, [props])
+  }
 
   const getStorageData = (): void => {
     const tabInfo = localStorage.getItem('tab')
@@ -127,8 +131,22 @@ const Send: React.FC = () => {
     const wallets = getWallets()
 
     if (wallets) {
-      setWalletsList(wallets)
-      setSelectedWallet(wallets[0])
+      if (props?.currency) {
+        const filterWallets = wallets.filter(
+          (wallet: IWallet) => toLower(wallet.symbol) === toLower(props.currency)
+        )
+
+        setWalletsList(filterWallets)
+
+        if (filterWallets.length) {
+          setSelectedWallet(filterWallets[0])
+        } else {
+          setSelectedWallet(null)
+        }
+      } else {
+        setWalletsList(wallets)
+        setSelectedWallet(wallets[0])
+      }
     }
   }
 
