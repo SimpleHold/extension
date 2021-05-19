@@ -10,16 +10,20 @@ import CurrenciesDropdown from '@components/CurrenciesDropdown'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
+import Spinner from '@components/Spinner'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
-import { getBalance } from '@utils/api'
+import { getBalance, getFees } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
-import { validateAddress } from '@utils/address'
+import { validateAddress, getAddressNetworkFee, getNewNetworkFee } from '@utils/address'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
+
+// Hooks
+import useDebounce from '@hooks/useDebounce'
 
 // Styles
 import Styles from './styles'
@@ -47,6 +51,12 @@ const Send: React.FC = () => {
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [tabInfo, setTabInfo] = React.useState<TabInfo | null>(null)
   const [props, setProps] = React.useState<Props>({})
+  const [networkFee, setNetworkFee] = React.useState<number>(0)
+  const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
+  const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
+  const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
+
+  const debounced = useDebounce(amount, 1000)
 
   React.useEffect(() => {
     getStorageData()
@@ -56,6 +66,7 @@ const Send: React.FC = () => {
     if (selectedWallet) {
       getCurrencyInfo()
       getCurrencyBalance()
+      checkValidAddress()
     }
   }, [selectedWallet])
 
@@ -64,9 +75,43 @@ const Send: React.FC = () => {
     getWalletsList()
   }, [props])
 
+  React.useEffect(() => {
+    if (amount.length && Number(balance) > 0 && !amountErrorLabel && selectedWallet) {
+      getNetworkFee()
+    }
+  }, [debounced])
+
+  const getNetworkFee = async (): Promise<void> => {
+    if (selectedWallet) {
+      setNetworkFeeLoading(true)
+
+      const { symbol } = selectedWallet
+
+      const currencyInfo = getCurrency(symbol)
+
+      if (currencyInfo) {
+        const data = await getNewNetworkFee({
+          symbol,
+          amount,
+          chain: currencyInfo.chain,
+          from: selectedWallet.address,
+          to: address,
+        })
+
+        setNetworkFeeLoading(false)
+
+        if (data) {
+          if (data.networkFee) {
+            setNetworkFee(data.networkFee)
+          }
+        }
+      }
+    }
+  }
+
   const checkProps = () => {
     if (Object.keys(props).length) {
-      const { amount: propsAmount, recipientAddress, currency } = props
+      const { amount: propsAmount, recipientAddress } = props
 
       if (propsAmount) {
         setAmount(`${propsAmount}`)
@@ -113,17 +158,20 @@ const Send: React.FC = () => {
   }
 
   const getCurrencyBalance = async (): Promise<void> => {
+    setBalance(null)
+    setEstimated(null)
+
     if (selectedWallet) {
-      setBalance(null)
-      setEstimated(null)
+      const { address, symbol } = selectedWallet
 
-      const { balance, balance_usd } = await getBalance(
-        selectedWallet.address,
-        selectedWallet.symbol
-      )
+      const getCurrencyInfo = getCurrency(symbol)
 
-      setBalance(balance)
-      setEstimated(balance_usd)
+      if (getCurrencyInfo) {
+        const { balance, balance_usd } = await getBalance(address, getCurrencyInfo?.chain)
+
+        setBalance(balance)
+        setEstimated(balance_usd)
+      }
     }
   }
 
@@ -136,11 +184,11 @@ const Send: React.FC = () => {
           (wallet: IWallet) => toLower(wallet.symbol) === toLower(props.currency)
         )
 
-        setWalletsList(filterWallets)
-
         if (filterWallets.length) {
+          setWalletsList(filterWallets)
           setSelectedWallet(filterWallets[0])
         } else {
+          setWalletsList(wallets)
           setSelectedWallet(null)
         }
       } else {
@@ -159,7 +207,18 @@ const Send: React.FC = () => {
 
     const url = getUrl('send-confirmation.html')
 
-    if (currenctTab?.id) {
+    if (currenctTab?.id && selectedWallet) {
+      localStorage.setItem(
+        'sendConfirmationData',
+        JSON.stringify({
+          amount: Number(amount),
+          symbol: selectedWallet.symbol,
+          addressFrom: selectedWallet.address,
+          addressTo: address,
+          networkFee,
+          tabInfo,
+        })
+      )
       await updateTab(currenctTab.id, {
         url,
       })
@@ -206,7 +265,7 @@ const Send: React.FC = () => {
     }
   }
 
-  const onBlurAddressInput = (): void => {
+  const checkValidAddress = (): void => {
     if (addressErrorLabel) {
       setAddressErrorLabel(null)
     }
@@ -226,6 +285,18 @@ const Send: React.FC = () => {
     }
   }
 
+  const onBlurAmountInput = (): void => {
+    if (amountErrorLabel) {
+      setAmountErrorLabel(null)
+    }
+
+    if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
+      return setAmountErrorLabel('Insufficient funds')
+    }
+  }
+
+  const isButtonDisabled = !selectedWallet || !address.length
+
   return (
     <ExternalPageContainer onClose={onClose} headerStyle="green">
       <Styles.Body>
@@ -239,24 +310,36 @@ const Send: React.FC = () => {
               </Styles.SiteInfo>
             ) : null}
           </Styles.TitleRow>
-          <Skeleton width={250} height={42} type="gray" mt={31} isLoading={balance === null}>
+          <Skeleton
+            width={250}
+            height={42}
+            type="gray"
+            mt={31}
+            isLoading={balance === null || !selectedWallet}
+          >
             <Styles.Balance>
               {numeral(balance).format('0.[000000]')} {toUpper(selectedWallet?.symbol)}
             </Styles.Balance>
           </Skeleton>
-          <Skeleton width={130} height={23} mt={10} type="gray" isLoading={estimated === null}>
+          <Skeleton
+            width={130}
+            height={23}
+            mt={10}
+            type="gray"
+            isLoading={estimated === null || !selectedWallet}
+          >
             <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
           </Skeleton>
         </Styles.Heading>
         <Styles.Form>
-          {walletsList.length && selectedWallet ? (
+          {walletsList.length ? (
             <CurrenciesDropdown
               list={dropdownList}
               onSelect={onSelectDropdown}
               currencyBr={13}
-              label={currencyInfo?.name}
-              value={selectedWallet.address}
-              currencySymbol={selectedWallet.symbol}
+              label="Select address"
+              value={selectedWallet?.address}
+              currencySymbol={selectedWallet?.symbol}
               background={currencyInfo?.background}
               disabled={walletsList.length < 2}
             />
@@ -267,7 +350,7 @@ const Send: React.FC = () => {
             onChange={setAddress}
             openFrom="browser"
             errorLabel={addressErrorLabel}
-            onBlurInput={onBlurAddressInput}
+            onBlurInput={checkValidAddress}
             disabled={balance === null || props?.readOnly}
           />
           <TextInput
@@ -276,15 +359,30 @@ const Send: React.FC = () => {
             onChange={setAmount}
             type="number"
             openFrom="browser"
+            errorLabel={amountErrorLabel}
+            onBlurInput={onBlurAmountInput}
             disabled={props?.readOnly}
           />
-          <Styles.NetworkFee>
+          <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
-          </Styles.NetworkFee>
+            {isNetworkFeeLoading ? (
+              <Spinner ml={10} size={16} />
+            ) : (
+              <>
+                {networkFee === 0 ? (
+                  <Styles.NetworkFee>-</Styles.NetworkFee>
+                ) : (
+                  <Styles.NetworkFee>
+                    {networkFee} {toUpper(selectedWallet?.symbol)}
+                  </Styles.NetworkFee>
+                )}
+              </>
+            )}
+          </Styles.NetworkFeeBlock>
 
           <Styles.Actions>
             <Button label="Cancel" isLight onClick={onClose} isSmall mr={7.5} />
-            <Button label="Send" onClick={onConfirm} isSmall ml={7.5} />
+            <Button label="Send" disabled={isButtonDisabled} onClick={onConfirm} isSmall ml={7.5} />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Body>

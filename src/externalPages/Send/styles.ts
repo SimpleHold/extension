@@ -69,14 +69,26 @@ const Form = styled.form`
   border-radius: 0 0 16px 16px;
 `
 
-const NetworkFee = styled.div`
+const NetworkFeeBlock = styled.div`
   margin: 15px 0 0 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: relative;
 `
 
 const NetworkFeeLabel = styled.p`
   margin: 0;
   font-size: 14px;
   line-height: 20px;
+  color: #7d7e8d;
+`
+
+const NetworkFee = styled.p`
+  margin: 0 0 0 5px;
+  font-weight: bold;
+  font-size: 14px;
+  line-height: 25px;
   color: #7d7e8d;
 `
 
@@ -98,8 +110,9 @@ const Styles = {
   Balance,
   Estimated,
   Form,
-  NetworkFee,
+  NetworkFeeBlock,
   NetworkFeeLabel,
+  NetworkFee,
   Actions,
 }
 
