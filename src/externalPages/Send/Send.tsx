@@ -209,7 +209,7 @@ const Send: React.FC = () => {
   }
 
   return (
-    <ExternalPageContainer onClose={onClose}>
+    <ExternalPageContainer onClose={onClose} headerStyle="green">
       <Styles.Body>
         <Styles.Heading>
           <Styles.TitleRow>

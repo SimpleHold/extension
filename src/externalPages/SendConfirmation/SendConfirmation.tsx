@@ -13,7 +13,12 @@ const SendConfirmation: React.FC = () => {
   }
 
   return (
-    <ExternalPageContainer onClose={onClose} backPageTitle="Send" backPageUrl="send.html">
+    <ExternalPageContainer
+      onClose={onClose}
+      headerStyle="green"
+      backPageTitle="Send"
+      backPageUrl="send.html"
+    >
       <Styles.Body>
         <p>SendConfirmation</p>
       </Styles.Body>

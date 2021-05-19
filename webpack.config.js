@@ -25,7 +25,14 @@ const extensionReloaderPlugin =
           contentScript: 'contentScript',
           background: 'background',
           inpage: 'inpage',
-          extensionPage: ['popup', 'downloadBackup', 'restoreBackup', 'selectAddress'],
+          extensionPage: [
+            'popup',
+            'downloadBackup',
+            'restoreBackup',
+            'selectAddress',
+            'send',
+            'sendConfirmation',
+          ],
         },
       })
     : () => {
@@ -59,9 +66,9 @@ module.exports = {
     contentScript: path.join(sourcePath, 'utils', 'browser', 'contentScript.ts'),
     inpage: path.join(sourcePath, 'utils', 'browser', 'inpage.ts'),
     popup: path.join(sourcePath, 'app.tsx'),
-    downloadBackup: path.join(sourcePath, 'downloadBackup.tsx'),
-    restoreBackup: path.join(sourcePath, 'restoreBackup.tsx'),
-    selectAddress: path.join(sourcePath, 'selectAddress.tsx'),
+    downloadBackup: path.join(sourcePath, 'externalPages/DownloadBackup/DownloadBackup.tsx'),
+    restoreBackup: path.join(sourcePath, 'externalPages/RestoreBackup/RestoreBackup.tsx'),
+    selectAddress: path.join(sourcePath, 'externalPages/SelectAddress/SelectAddress.tsx'),
     send: path.join(sourcePath, 'externalPages/Send/Send.tsx'),
     sendConfirmation: path.join(sourcePath, 'externalPages/SendConfirmation/SendConfirmation.tsx'),
   },
