@@ -19,10 +19,12 @@ interface Props {
   children: React.ReactElement<any, any> | null
   backPageTitle?: string
   backPageUrl?: string
+  height?: string
+  headerStyle: 'white' | 'green'
 }
 
 const ExternalPageContainer: React.FC<Props> = (props) => {
-  const { onClose, children, backPageTitle, backPageUrl } = props
+  const { onClose, children, backPageTitle, backPageUrl, height, headerStyle } = props
 
   const [isLocked, setIsLocked] = React.useState<boolean>(localStorage.getItem('isLocked') !== null)
   const [passcode, setPasscode] = React.useState<string>('')
@@ -141,10 +143,10 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
           __html: `body { padding: 0; margin: 0;font-family: 'Roboto', sans-serif; background-color: #f8f8f8;}`,
         }}
       />
-      <Styles.Extension>
-        <Cover />
+      <Styles.Extension height={height}>
+        {headerStyle === 'green' ? <Cover /> : null}
         <Styles.Header>
-          <Styles.Logo>
+          <Styles.Logo headerStyle={headerStyle}>
             <SVG src="../../assets/logo.svg" width={30} height={24} />
           </Styles.Logo>
           <Styles.HeaderRow withBack={backPageTitle !== undefined && backPageUrl !== undefined}>
@@ -156,7 +158,7 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
                 <Styles.HeaderBackTitle>{backPageTitle}</Styles.HeaderBackTitle>
               </Styles.HeaderBackRow>
             ) : null}
-            <Styles.CloseButton onClick={onClose}>
+            <Styles.CloseButton onClick={onClose} headerStyle={headerStyle}>
               <SVG src="../../assets/icons/times.svg" width={15} height={15} />
             </Styles.CloseButton>
           </Styles.HeaderRow>

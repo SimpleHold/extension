@@ -6,6 +6,18 @@ type THeaderRowProps = {
   withBack: boolean
 }
 
+type TExtensionProps = {
+  height?: string
+}
+
+type TLogoProps = {
+  headerStyle: 'white' | 'green'
+}
+
+type TCloseButtonProps = {
+  headerStyle: 'white' | 'green'
+}
+
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -19,7 +31,7 @@ const Extension = styled.div`
   border: 1px solid #eaeaea;
   box-shadow: 0px 5px 15px rgba(125, 126, 141, 0.15);
   border-radius: 16px;
-  height: 700px;
+  height: ${({ height }: TExtensionProps) => height || '700px'};
   overflow: hidden;
   filter: drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.15));
 `
@@ -87,7 +99,7 @@ const Logo = styled.div`
   align-items: center;
 
   path {
-    fill: #ffffff;
+    fill: ${({ headerStyle }: TLogoProps) => (headerStyle === 'green' ? '#ffffff' : '#3fbb7d')};
   }
 `
 
@@ -98,6 +110,10 @@ const CloseButton = styled.div`
   align-items: center;
   justify-content: center;
   border-radius: 15px;
+
+  path {
+    fill: ${({ headerStyle }: TLogoProps) => (headerStyle === 'green' ? '#ffffff' : '#cccccc')};
+  }
 
   &:hover {
     cursor: pointer;
