@@ -114,12 +114,12 @@ const Send: React.FC = () => {
 
     const data = await getAddressNetworkFee(
       symbol,
-      outputs,
       fee,
       amount,
       selectedAddress,
       address,
       chain,
+      outputs,
       tokenChain,
       contractAddress,
       getTokenDecimals || decimals

@@ -121,14 +121,59 @@ export const createTransaction = async ({
   }
 }
 
+interface IFetNetworkFeeParams {
+  symbol: string
+  amount: string
+  from: string
+  to: string
+  chain: string
+  web3Params?: {
+    tokenChain: string
+    contractAddress: string
+    decimals: number
+  }
+  outputs?: UnspentOutput[]
+  fee?: number
+}
+
+export const getNewNetworkFee = async (
+  params: IFetNetworkFeeParams
+): Promise<IGetNetworkFeeResponse | null> => {
+  const { symbol, amount, from, to, chain, web3Params, outputs, fee } = params
+
+  if (web3Params || isEthereumLike(symbol)) {
+    const value = web3Params?.decimals
+      ? web3.convertDecimals(amount, web3Params.decimals)
+      : web3.toWei(amount, 'ether')
+    const web3Chain = web3Params?.tokenChain || chain
+    const web3TokenChain = web3Params?.tokenChain ? symbol : undefined
+
+    return await getEtherNetworkFee(
+      from,
+      to,
+      value,
+      web3Chain,
+      web3TokenChain,
+      web3Params?.contractAddress,
+      web3Params?.decimals
+    )
+  }
+
+  if (outputs?.length && fee) {
+    return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
+  }
+
+  return null
+}
+
 export const getAddressNetworkFee = async (
-  symbol: TSymbols,
-  outputs: UnspentOutput[],
+  symbol: string,
   fee: number,
   amount: string,
   from: string,
   to: string,
   chain: string,
+  outputs?: UnspentOutput[],
   tokenChain?: string,
   contractAddress?: string,
   decimals?: number
@@ -147,7 +192,12 @@ export const getAddressNetworkFee = async (
 
     return data
   }
-  return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
+
+  if (outputs?.length) {
+    return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
+  }
+
+  return null
 }
 
 export const formatUnit = (

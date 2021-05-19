@@ -128,7 +128,7 @@ export const sendRawTransaction = async (
   }
 }
 
-export const getFees = async (symbol: string, chain: string): Promise<number> => {
+export const getFees = async (symbol: string, chain?: string): Promise<number> => {
   try {
     if (isEthereumLike(symbol, chain)) {
       return 0
