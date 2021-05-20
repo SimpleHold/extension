@@ -188,20 +188,36 @@ const SendConfirmation: React.FC = () => {
             <Styles.Description>Check transaction details</Styles.Description>
 
             <Styles.OrderCheck>
-              <Styles.List>
-                <Styles.ListTitle>Amount:</Styles.ListTitle>
-                <Styles.ListRow>
-                  <Styles.Amount>{numeral(amount).format('0.[00000000]')}</Styles.Amount>
-                  <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
-                </Styles.ListRow>
-              </Styles.List>
-              <Styles.List>
-                <Styles.ListTitle>Network fee:</Styles.ListTitle>
-                <Styles.ListRow>
-                  <Styles.Amount>{numeral(networkFee).format('0.[00000000]')}</Styles.Amount>
-                  <Styles.ListText>{toUpper(networkFeeSymbol)}</Styles.ListText>
-                </Styles.ListRow>
-              </Styles.List>
+              <Styles.Table>
+                <Styles.Tbody>
+                  <Styles.TableTr>
+                    <Styles.TableTd>
+                      <Styles.TableTitle>Amount:</Styles.TableTitle>
+                    </Styles.TableTd>
+                    <Styles.TableTd>
+                      <Styles.TableAmount>
+                        {numeral(amount).format('0.[00000000]')}
+                      </Styles.TableAmount>
+                    </Styles.TableTd>
+                    <Styles.TableTd>
+                      <Styles.TableSymbol>{toUpper(symbol)}</Styles.TableSymbol>
+                    </Styles.TableTd>
+                  </Styles.TableTr>
+                  <Styles.TableTr>
+                    <Styles.TableTd>
+                      <Styles.TableTitle>Network fee:</Styles.TableTitle>
+                    </Styles.TableTd>
+                    <Styles.TableTd>
+                      <Styles.TableAmount>
+                        {numeral(networkFee).format('0.[00000000]')}
+                      </Styles.TableAmount>
+                    </Styles.TableTd>
+                    <Styles.TableTd>
+                      <Styles.TableSymbol>{toUpper(networkFeeSymbol)}</Styles.TableSymbol>
+                    </Styles.TableTd>
+                  </Styles.TableTr>
+                </Styles.Tbody>
+              </Styles.Table>
 
               {toUpper(symbol) === toUpper(networkFeeSymbol) ? (
                 <>
@@ -209,15 +225,23 @@ const SendConfirmation: React.FC = () => {
                     <Styles.DashedDividerLine />
                   </Styles.DashedDivider>
 
-                  <Styles.List>
-                    <Styles.ListTitle>Total:</Styles.ListTitle>
-                    <Styles.ListRow>
-                      <Styles.Amount>
-                        {numeral(amount + networkFee).format('0.[00000000]')}
-                      </Styles.Amount>
-                      <Styles.ListText>{toUpper(symbol)}</Styles.ListText>
-                    </Styles.ListRow>
-                  </Styles.List>
+                  <Styles.Table>
+                    <Styles.Tbody>
+                      <Styles.TableTr>
+                        <Styles.TableTd>
+                          <Styles.TableTitle>Total:</Styles.TableTitle>
+                        </Styles.TableTd>
+                        <Styles.TableTd>
+                          <Styles.TableAmount>
+                            {numeral(amount + networkFee).format('0.[00000000]')}
+                          </Styles.TableAmount>
+                        </Styles.TableTd>
+                        <Styles.TableTd>
+                          <Styles.TableSymbol>{toUpper(symbol)}</Styles.TableSymbol>
+                        </Styles.TableTd>
+                      </Styles.TableTr>
+                    </Styles.Tbody>
+                  </Styles.Table>
                 </>
               ) : null}
             </Styles.OrderCheck>

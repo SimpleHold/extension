@@ -36,30 +36,6 @@ const OrderCheck = styled.div`
   margin: 34px 0 0 0;
 `
 
-const List = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 0 10px 0;
-`
-
-const ListTitle = styled.p`
-  margin: 0;
-  font-size: 16px;
-  line-height: 19px;
-  color: #7d7e8d;
-`
-
-const ListText = styled.p`
-  margin: 0;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
-  color: #1d1d22;
-  width: 40px;
-`
-
 const DashedDivider = styled.div`
   padding: 5px 0 15px 0;
 `
@@ -135,15 +111,40 @@ const DestinateText = styled.p`
   white-space: nowrap;
 `
 
-const ListRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+const Table = styled.table`
+  width: 100%;
+  border-spacing: 0;
+  border: none;
 `
 
-const Amount = styled.p`
-  margin: 0;
-  width: 90px;
+const Tbody = styled.tbody``
+
+const TableTr = styled.tr``
+
+const TableTd = styled.td`
+  &:not(:first-child) {
+    width: 1%;
+    white-space: nowrap;
+  }
+`
+
+const TableTitle = styled.p`
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  line-height: 19px;
+  color: #7d7e8d;
+`
+
+const TableAmount = styled.p`
+  margin: 0 0 10px 0;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
+`
+
+const TableSymbol = styled.p`
+  margin: 0 0 10px 4px;
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
@@ -157,9 +158,6 @@ const Styles = {
   Title,
   Description,
   OrderCheck,
-  List,
-  ListTitle,
-  ListText,
   DashedDivider,
   DashedDividerLine,
   Actions,
@@ -167,8 +165,13 @@ const Styles = {
   Destinate,
   DestinateTitle,
   DestinateText,
-  ListRow,
-  Amount,
+  Table,
+  Tbody,
+  TableTr,
+  TableTd,
+  TableTitle,
+  TableAmount,
+  TableSymbol,
 }
 
 export default Styles
