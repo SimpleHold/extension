@@ -25,20 +25,21 @@ const SiteInfo = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  flex-wrap: wrap;
 `
 
 const SiteInfoLabel = styled.p`
-  margin: 0;
+  margin: 0 10px 5px 0;
   font-size: 16px;
   line-height: 19px;
   color: #7d7e8d;
 `
 
 const SiteInfoRow = styled.div`
-  margin: 0 0 0 10px;
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin: 0 0 5px 0;
 `
 
 const SiteFavicon = styled.img`
@@ -60,30 +61,6 @@ const OrderCheck = styled.div`
   margin: 50px 0 0 0;
 `
 
-const List = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin: 0 0 10px 0;
-`
-
-const ListTitle = styled.p`
-  margin: 0;
-  font-size: 16px;
-  line-height: 19px;
-  color: #7d7e8d;
-`
-
-const ListText = styled.p`
-  margin: 0;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
-  color: #1d1d22;
-  width: 40px;
-`
-
 const DashedDivider = styled.div`
   padding: 5px 0 15px 0;
 `
@@ -91,21 +68,6 @@ const DashedDivider = styled.div`
 const DashedDividerLine = styled.div`
   width: 100%;
   border-top: 1px dashed #c3c3c3;
-`
-
-const ListRow = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-`
-
-const Amount = styled.p`
-  margin: 0;
-  width: 90px;
-  font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
-  color: #1d1d22;
 `
 
 const DestinationsList = styled.ul`
@@ -174,6 +136,46 @@ const Actions = styled.div`
   padding: 0 30px 30px 30px;
 `
 
+const Table = styled.table`
+  width: 100%;
+  border-spacing: 0;
+  border: none;
+`
+
+const Tbody = styled.tbody``
+
+const TableTr = styled.tr``
+
+const TableTd = styled.td`
+  &:not(:first-child) {
+    width: 1%;
+    white-space: nowrap;
+  }
+`
+
+const TableTitle = styled.p`
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  line-height: 19px;
+  color: #7d7e8d;
+`
+
+const TableAmount = styled.p`
+  margin: 0 0 10px 0;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
+`
+
+const TableSymbol = styled.p`
+  margin: 0 0 10px 4px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
+`
+
 const Styles = {
   Body,
   Row,
@@ -184,18 +186,20 @@ const Styles = {
   SiteFavicon,
   SiteUrl,
   OrderCheck,
-  List,
-  ListTitle,
-  ListText,
   DashedDivider,
   DashedDividerLine,
-  ListRow,
-  Amount,
   DestinationsList,
   Destinate,
   DestinateTitle,
   DestinateText,
   Actions,
+  Table,
+  Tbody,
+  TableTr,
+  TableTd,
+  TableTitle,
+  TableAmount,
+  TableSymbol,
 }
 
 export default Styles

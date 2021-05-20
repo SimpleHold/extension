@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-dom'
+import numeral from 'numeral'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -38,6 +39,7 @@ interface Props {
   chain?: string
   contractAddress?: string
   outputs?: UnspentOutput[]
+  networkFeeSymbol?: string
 }
 
 const SendConfirmation: React.FC = () => {
@@ -76,6 +78,10 @@ const SendConfirmation: React.FC = () => {
   }
 
   const onClose = (): void => {
+    if (localStorage.getItem('sendPageProps')) {
+      localStorage.removeItem('sendPageProps')
+    }
+
     window.close()
   }
 
@@ -197,32 +203,62 @@ const SendConfirmation: React.FC = () => {
             </Styles.SiteInfo>
 
             <Styles.OrderCheck>
-              <Styles.List>
-                <Styles.ListTitle>Amount:</Styles.ListTitle>
-                <Styles.ListRow>
-                  <Styles.Amount>{props?.amount}</Styles.Amount>
-                  <Styles.ListText>{toUpper(props.symbol)}</Styles.ListText>
-                </Styles.ListRow>
-              </Styles.List>
-              <Styles.List>
-                <Styles.ListTitle>Network fee:</Styles.ListTitle>
-                <Styles.ListRow>
-                  <Styles.Amount>{props.networkFee}</Styles.Amount>
-                  <Styles.ListText>{toUpper(props.symbol)}</Styles.ListText>
-                </Styles.ListRow>
-              </Styles.List>
+              <Styles.Table>
+                <Styles.Tbody>
+                  <Styles.TableTr>
+                    <Styles.TableTd>
+                      <Styles.TableTitle>Amount:</Styles.TableTitle>
+                    </Styles.TableTd>
+                    <Styles.TableTd>
+                      <Styles.TableAmount>
+                        {numeral(props?.amount).format('0.[00000000]')}
+                      </Styles.TableAmount>
+                    </Styles.TableTd>
+                    <Styles.TableTd>
+                      <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
+                    </Styles.TableTd>
+                  </Styles.TableTr>
+                  <Styles.TableTr>
+                    <Styles.TableTd>
+                      <Styles.TableTitle>Network fee:</Styles.TableTitle>
+                    </Styles.TableTd>
+                    <Styles.TableTd>
+                      <Styles.TableAmount>
+                        {numeral(props?.networkFee).format('0.[00000000]')}
+                      </Styles.TableAmount>
+                    </Styles.TableTd>
+                    <Styles.TableTd>
+                      <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
+                    </Styles.TableTd>
+                  </Styles.TableTr>
+                </Styles.Tbody>
+              </Styles.Table>
 
-              <Styles.DashedDivider>
-                <Styles.DashedDividerLine />
-              </Styles.DashedDivider>
+              {toUpper(props?.symbol) === toUpper(props?.networkFeeSymbol) ? (
+                <>
+                  <Styles.DashedDivider>
+                    <Styles.DashedDividerLine />
+                  </Styles.DashedDivider>
 
-              <Styles.List>
-                <Styles.ListTitle>Total:</Styles.ListTitle>
-                <Styles.ListRow>
-                  <Styles.Amount>{Number(props?.amount) + Number(props.networkFee)}</Styles.Amount>
-                  <Styles.ListText>{toUpper(props.symbol)}</Styles.ListText>
-                </Styles.ListRow>
-              </Styles.List>
+                  <Styles.Table>
+                    <Styles.Tbody>
+                      <Styles.TableTr>
+                        <Styles.TableTd>
+                          <Styles.TableTitle>Total:</Styles.TableTitle>
+                        </Styles.TableTd>
+                        <Styles.TableTd>
+                          <Styles.TableAmount>
+                            {Number(props?.amount) + Number(props.networkFee)}
+                          </Styles.TableAmount>
+                        </Styles.TableTd>
+                        <Styles.TableTd>
+                          <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
+                        </Styles.TableTd>
+                      </Styles.TableTr>
+                    </Styles.Tbody>
+                  </Styles.Table>
+                </>
+              ) : null}
             </Styles.OrderCheck>
 
             <Styles.DestinationsList>
