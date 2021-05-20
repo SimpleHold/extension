@@ -126,27 +126,32 @@ export const createTransaction = async ({
   }
 }
 
-interface IFetNetworkFeeParams {
+interface IGetNetworkFeeParams {
   symbol: string
   amount: string
   from: string
   to: string
   chain: string
-  web3Params?: {
-    tokenChain: string
-    contractAddress: string
-    decimals: number
+  web3Params: {
+    tokenChain?: string
+    contractAddress?: string
+    decimals?: number
   }
   outputs?: UnspentOutput[]
   fee?: number
 }
 
 export const getNewNetworkFee = async (
-  params: IFetNetworkFeeParams
+  params: IGetNetworkFeeParams
 ): Promise<IGetNetworkFeeResponse | null> => {
   const { symbol, amount, from, to, chain, web3Params, outputs, fee } = params
 
-  if (web3Params || isEthereumLike(symbol)) {
+  if (
+    web3Params?.contractAddress ||
+    web3Params?.decimals ||
+    web3Params?.tokenChain ||
+    isEthereumLike(symbol)
+  ) {
     const value = web3Params?.decimals
       ? web3.convertDecimals(amount, web3Params.decimals)
       : web3.toWei(amount, 'ether')
