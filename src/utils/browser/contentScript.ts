@@ -70,7 +70,7 @@ document.addEventListener('request_addresses', (request: IRequest) => {
 })
 
 document.addEventListener('request_send', async (request: IRequest) => {
-  const { readOnly, currency, amount, recipientAddress } = request.detail
+  const { readOnly, currency, amount, recipientAddress, chain } = request.detail
   const { screenX, screenY, outerWidth } = window
 
   browser.runtime.sendMessage({
@@ -83,6 +83,7 @@ document.addEventListener('request_send', async (request: IRequest) => {
       currency,
       amount,
       recipientAddress,
+      chain,
     },
   })
 })

@@ -11,13 +11,23 @@ import { getCurrency } from '@config/currencies'
 
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
-    const { screenX, screenY, outerWidth, site, favicon, currency, chain } = request.data
+    const { screenX, screenY, outerWidth, currency, chain } = request.data
 
     const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
 
     localStorage.setItem('tab', JSON.stringify(currentTab[0]))
 
-    browser.windows.create({
+    const tabs = await browser.tabs.query({ active: true })
+
+    const checkExist: Tabs.Tab | undefined = tabs.find(
+      (tab: Tabs.Tab) => tab.title === 'SimpleHold Wallet | Select address'
+    )
+
+    if (checkExist?.id) {
+      await browser.tabs.remove(checkExist.id)
+    }
+
+    await browser.windows.create({
       url: `select-address.html?currency=${currency}&chain=${chain}`,
       type: 'popup',
       width: 375,
@@ -44,6 +54,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       currency,
       amount,
       recipientAddress,
+      chain,
     } = request.data
 
     const tabs = await browser.tabs.query({ active: true })
@@ -52,7 +63,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     localStorage.setItem('tab', JSON.stringify(currentTab[0]))
     localStorage.setItem(
       'sendPageProps',
-      JSON.stringify({ readOnly, currency, amount, recipientAddress })
+      JSON.stringify({ readOnly, currency, amount, recipientAddress, chain })
     )
 
     const checkExist: Tabs.Tab | undefined = tabs.find(
@@ -63,7 +74,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       await browser.tabs.remove(checkExist.id)
     }
 
-    browser.windows.create({
+    await browser.windows.create({
       url: 'send.html',
       type: 'popup',
       width: 375,
@@ -155,7 +166,17 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 
       const { screenX, screenY, outerWidth } = window
 
-      browser.windows.create({
+      const tabs = await browser.tabs.query({ active: true })
+
+      const checkExist: Tabs.Tab | undefined = tabs.find(
+        (tab: Tabs.Tab) => tab.title === 'SimpleHold Wallet | Select address'
+      )
+
+      if (checkExist?.id) {
+        await browser.tabs.remove(checkExist.id)
+      }
+
+      await browser.windows.create({
         url: `select-address.html`,
         type: 'popup',
         width: 375,
