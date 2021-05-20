@@ -10,6 +10,7 @@ import Button from '@components/Button'
 // Utils
 import { validatePassword } from '@utils/validate'
 import { decrypt, sha256hash } from '@utils/crypto'
+import { getCurrentTab, getUrl, updateTab } from '@utils/extension'
 
 // Styles
 import Styles from './styles'
@@ -106,6 +107,20 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
     return setPasswordErrorLabel('Password is not valid')
   }
 
+  const goBack = async (): Promise<void> => {
+    if (backPageUrl) {
+      const currenctTab = await getCurrentTab()
+
+      if (currenctTab?.id) {
+        const url = getUrl(backPageUrl)
+
+        await updateTab(currenctTab.id, {
+          url,
+        })
+      }
+    }
+  }
+
   const renderLocked = () => (
     <Styles.Body>
       <Styles.LockedRow>
@@ -151,7 +166,7 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
           </Styles.Logo>
           <Styles.HeaderRow withBack={backPageTitle !== undefined && backPageUrl !== undefined}>
             {backPageTitle && backPageUrl ? (
-              <Styles.HeaderBackRow onClick={() => null}>
+              <Styles.HeaderBackRow onClick={goBack}>
                 <Styles.HeaderBackIconRow>
                   <SVG src="../../assets/icons/arrow.svg" width={6} height={10} title="Back" />
                 </Styles.HeaderBackIconRow>
