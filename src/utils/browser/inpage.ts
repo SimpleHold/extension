@@ -40,14 +40,7 @@ addCustomEventListener('#sh-button', 'click', () => {
   if (findInput) {
     const favicon = getFavicon()
 
-    document.dispatchEvent(
-      new CustomEvent('request_addresses', {
-        detail: {
-          site: location.host,
-          favicon,
-        },
-      })
-    )
+    document.dispatchEvent(new CustomEvent('request_addresses'))
   }
 })
 

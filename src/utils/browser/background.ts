@@ -13,7 +13,9 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
     const { screenX, screenY, outerWidth, site, favicon, currency, chain } = request.data
 
-    localStorage.setItem('requesterSite', JSON.stringify({ url: site, favicon }))
+    const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
+
+    localStorage.setItem('tab', JSON.stringify(currentTab[0]))
 
     browser.windows.create({
       url: `select-address.html?currency=${currency}&chain=${chain}`,

@@ -51,7 +51,6 @@ browser.runtime.onMessage.addListener((request: IRequest) => {
 
 document.addEventListener('request_addresses', (request: IRequest) => {
   if (request.type === 'request_addresses') {
-    const { site, favicon } = request.detail
     const { screenX, screenY, outerWidth } = window
 
     const currency = document.getElementById('sh-button')?.getAttribute('sh-currency')
@@ -63,8 +62,6 @@ document.addEventListener('request_addresses', (request: IRequest) => {
         screenX,
         screenY,
         outerWidth,
-        site,
-        favicon,
         currency,
         chain,
       },

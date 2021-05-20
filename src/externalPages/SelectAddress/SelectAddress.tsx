@@ -35,15 +35,12 @@ type TabInfo = {
 
 const SelectAddress: React.FC = () => {
   const [wallets, setWallets] = React.useState<null | IWallet[]>(null)
-  const [siteUrl, setSiteUrl] = React.useState<null | string>(null)
-  const [siteFavicon, setSiteFavicon] = React.useState<null | string>(null)
   const [isFiltersActive, setFiltersActive] = React.useState<boolean>(false)
   const [selectedCurrency, setSelectedCurrency] = React.useState<TSelectedCurrency | null>(null)
   const [tabInfo, setTabInfo] = React.useState<TabInfo | null>(null)
 
   React.useEffect(() => {
     getWalletsList()
-    getRequesterSiteInfo()
     getInitialCurrency()
     checkActiveTab()
 
@@ -89,22 +86,6 @@ const SelectAddress: React.FC = () => {
           background,
           chain: parseChain || undefined,
         })
-      }
-    }
-  }
-
-  const getRequesterSiteInfo = (): void => {
-    const data = localStorage.getItem('requesterSite')
-
-    if (data) {
-      const parseData = JSON.parse(data)
-
-      if (parseData.url) {
-        setSiteUrl(parseData.url)
-      }
-
-      if (parseData.favicon) {
-        setSiteFavicon(parseData.favicon)
       }
     }
   }
@@ -207,22 +188,13 @@ const SelectAddress: React.FC = () => {
         <Styles.Row>
           <Styles.Title>Select Address</Styles.Title>
 
-          {(siteUrl && siteFavicon) || tabInfo ? (
+          {tabInfo ? (
             <Styles.SiteBlock>
               <Styles.UseOn>To use it on </Styles.UseOn>
-              {tabInfo ? (
-                <Styles.SiteInfo>
-                  <Styles.SiteFavicon src={tabInfo.favIconUrl} />
-                  <Styles.SiteUrl>{tabInfo.url}</Styles.SiteUrl>
-                </Styles.SiteInfo>
-              ) : (
-                <Styles.SiteInfo>
-                  {siteFavicon && siteUrl ? (
-                    <Styles.SiteFavicon src={`https://${siteUrl}${siteFavicon}`} />
-                  ) : null}
-                  {siteUrl ? <Styles.SiteUrl>{siteUrl}</Styles.SiteUrl> : null}
-                </Styles.SiteInfo>
-              )}
+              <Styles.SiteInfo>
+                <Styles.SiteFavicon src={tabInfo.favIconUrl} />
+                <Styles.SiteUrl>{tabInfo.url}</Styles.SiteUrl>
+              </Styles.SiteInfo>
             </Styles.SiteBlock>
           ) : null}
         </Styles.Row>
