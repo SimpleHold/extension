@@ -14,13 +14,14 @@ import Spinner from '@components/Spinner'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
-import { getBalance, getFees } from '@utils/api'
+import { getBalance } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
-import { validateAddress, getAddressNetworkFee, getNewNetworkFee } from '@utils/address'
+import { validateAddress, getNewNetworkFee, isEthereumLike } from '@utils/address'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
+import { getToken } from '@config/tokens'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -59,6 +60,7 @@ const Send: React.FC = () => {
   const debounced = useDebounce(amount, 1000)
 
   React.useEffect(() => {
+    getWalletsList(localStorage.getItem('sendPageProps'))
     getStorageData()
   }, [])
 
@@ -72,7 +74,6 @@ const Send: React.FC = () => {
 
   React.useEffect(() => {
     checkProps()
-    getWalletsList()
   }, [props])
 
   React.useEffect(() => {
@@ -175,13 +176,23 @@ const Send: React.FC = () => {
     }
   }
 
-  const getWalletsList = (): void => {
+  const getWalletsList = (sendPageProps: string | null): void => {
     const wallets = getWallets()
 
-    if (wallets) {
-      if (props?.currency) {
+    let currency: undefined | string = undefined
+
+    if (sendPageProps) {
+      const parsePageProps = JSON.parse(sendPageProps)
+
+      if (parsePageProps?.currency) {
+        currency = parsePageProps.currency
+      }
+    }
+
+    if (wallets?.length) {
+      if (currency) {
         const filterWallets = wallets.filter(
-          (wallet: IWallet) => toLower(wallet.symbol) === toLower(props.currency)
+          (wallet: IWallet) => toLower(wallet.symbol) === toLower(currency)
         )
 
         if (filterWallets.length) {
@@ -208,17 +219,21 @@ const Send: React.FC = () => {
     const url = getUrl('send-confirmation.html')
 
     if (currenctTab?.id && selectedWallet) {
-      localStorage.setItem(
-        'sendConfirmationData',
-        JSON.stringify({
-          amount: Number(amount),
-          symbol: selectedWallet.symbol,
-          addressFrom: selectedWallet.address,
-          addressTo: address,
-          networkFee,
-          tabInfo,
-        })
-      )
+      const currency = selectedWallet?.chain
+        ? getToken(selectedWallet.symbol, selectedWallet.chain)
+        : getCurrency(selectedWallet.symbol)
+
+      const data = {
+        amount: Number(amount),
+        symbol: selectedWallet.symbol,
+        addressFrom: selectedWallet.address,
+        addressTo: address,
+        networkFee,
+        tabInfo,
+        chain: currency?.chain,
+      }
+
+      localStorage.setItem('sendConfirmationData', JSON.stringify(data))
       await updateTab(currenctTab.id, {
         url,
       })
@@ -276,12 +291,16 @@ const Send: React.FC = () => {
         // @ts-ignore
         !validateAddress(selectedWallet.symbol, address, selectedWallet?.chain)
       ) {
-        setAddressErrorLabel('Address is not valid')
+        return setAddressErrorLabel('Address is not valid')
       }
 
       if (address === selectedWallet.address) {
-        setAddressErrorLabel('Address same as sender')
+        return setAddressErrorLabel('Address same as sender')
       }
+    }
+
+    if (!networkFee && Number(amount) > 0) {
+      getNetworkFee()
     }
   }
 
@@ -295,7 +314,31 @@ const Send: React.FC = () => {
     }
   }
 
-  const isButtonDisabled = !selectedWallet || !address.length
+  const isButtonDisabled = (): boolean => {
+    if (selectedWallet) {
+      if (
+        validateAddress(selectedWallet.symbol, address) &&
+        amount.length &&
+        Number(amount) > 0 &&
+        addressErrorLabel === null &&
+        amountErrorLabel === null &&
+        Number(balance) > 0 &&
+        networkFee > 0 &&
+        !isNetworkFeeLoading
+      ) {
+        if (!outputs.length) {
+          if (
+            selectedWallet?.contractAddress ||
+            isEthereumLike(selectedWallet.symbol, selectedWallet?.chain)
+          ) {
+            return false
+          }
+          return true
+        }
+      }
+    }
+    return true
+  }
 
   return (
     <ExternalPageContainer onClose={onClose} headerStyle="green">
@@ -382,7 +425,13 @@ const Send: React.FC = () => {
 
           <Styles.Actions>
             <Button label="Cancel" isLight onClick={onClose} isSmall mr={7.5} />
-            <Button label="Send" disabled={isButtonDisabled} onClick={onConfirm} isSmall ml={7.5} />
+            <Button
+              label="Send"
+              disabled={isButtonDisabled()}
+              onClick={onConfirm}
+              isSmall
+              ml={7.5}
+            />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Body>

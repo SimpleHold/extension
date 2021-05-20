@@ -88,7 +88,7 @@ const NetworkFee = styled.p`
   margin: 0 0 0 5px;
   font-weight: bold;
   font-size: 14px;
-  line-height: 25px;
+  line-height: 20px;
   color: #7d7e8d;
 `
 
