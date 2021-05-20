@@ -19,7 +19,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       url: `select-address.html?currency=${currency}&chain=${chain}`,
       type: 'popup',
       width: 375,
-      height: 700,
+      height: 728,
       left: Math.max(screenX + (outerWidth - 375), 0),
       top: screenY,
     })
@@ -65,7 +65,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       url: 'send.html',
       type: 'popup',
       width: 375,
-      height: 705,
+      height: 728,
       left: Math.max(screenX + (outerWidth - 375), 0),
       top: screenY,
     })
@@ -157,7 +157,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         url: `select-address.html`,
         type: 'popup',
         width: 375,
-        height: 700,
+        height: 728,
         left: Math.max(screenX + (outerWidth - 375), 0),
         top: screenY,
       })

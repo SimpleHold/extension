@@ -14,10 +14,6 @@ type TLogoProps = {
   headerStyle: 'white' | 'green'
 }
 
-type TCloseButtonProps = {
-  headerStyle: 'white' | 'green'
-}
-
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -31,7 +27,7 @@ const Extension = styled.div`
   border: 1px solid #eaeaea;
   box-shadow: 0px 5px 15px rgba(125, 126, 141, 0.15);
   border-radius: 16px;
-  height: ${({ height }: TExtensionProps) => height || '700px'};
+  height: ${({ height }: TExtensionProps) => height || '698px'};
   overflow: hidden;
   filter: drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.15));
 `
