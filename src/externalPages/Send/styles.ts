@@ -8,25 +8,27 @@ const Body = styled.div`
 `
 
 const Heading = styled.div`
-  padding: 30px 30px 70px 30px;
+  padding: 30px 30px 0 30px;
   border-bottom: 1px solid #eaeaea;
+  height: 220px;
 `
 
 const TitleRow = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  flex-wrap: wrap;
 `
 
 const Title = styled.p`
-  margin: 0;
+  margin: 0 10px 5px 0;
   font-size: 16px;
   line-height: 19px;
   color: #7d7e8d;
 `
 
 const SiteInfo = styled.div`
-  margin: 0 0 0 10px;
+  margin: 0 0 5px 0;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -99,6 +101,14 @@ const Actions = styled.div`
   margin: 63px 0 0 0;
 `
 
+const NetworkFeeError = styled.p`
+  font-size: 12px;
+  line-height: 14px;
+  color: #eb5757;
+  position: absolute;
+  top: 12px;
+`
+
 const Styles = {
   Body,
   Heading,
@@ -114,6 +124,7 @@ const Styles = {
   NetworkFeeLabel,
   NetworkFee,
   Actions,
+  NetworkFeeError,
 }
 
 export default Styles

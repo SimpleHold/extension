@@ -14,10 +14,10 @@ import Spinner from '@components/Spinner'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
-import { getBalance } from '@utils/api'
+import { getBalance, getFees, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
-import { validateAddress, getNewNetworkFee, isEthereumLike } from '@utils/address'
+import { validateAddress, getNewNetworkFee, isEthereumLike, formatUnit } from '@utils/address'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -39,6 +39,7 @@ interface Props {
   currency?: string
   amount?: number
   recipientAddress?: string
+  chain?: string
 }
 
 const Send: React.FC = () => {
@@ -56,6 +57,9 @@ const Send: React.FC = () => {
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
+  const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
+  const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
+  const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
 
   const debounced = useDebounce(amount, 1000)
 
@@ -69,8 +73,15 @@ const Send: React.FC = () => {
       getCurrencyInfo()
       getCurrencyBalance()
       checkValidAddress()
+      getNetworkFeeSymbol()
     }
   }, [selectedWallet])
+
+  React.useEffect(() => {
+    if (selectedWallet && currencyInfo) {
+      getOutputs()
+    }
+  }, [currencyInfo, selectedWallet])
 
   React.useEffect(() => {
     checkProps()
@@ -82,13 +93,53 @@ const Send: React.FC = () => {
     }
   }, [debounced])
 
+  React.useEffect(() => {
+    if (balance !== null) {
+      onBlurAmountInput()
+      checkValidAddress()
+    }
+  }, [balance])
+
+  React.useEffect(() => {
+    if (isNetworkFeeLoading && amountErrorLabel) {
+      setNetworkFeeLoading(false)
+    }
+  }, [isNetworkFeeLoading, amountErrorLabel])
+
+  const getOutputs = async (): Promise<void> => {
+    if (selectedWallet && currencyInfo) {
+      const { contractAddress, symbol, address } = selectedWallet
+      const { chain } = currencyInfo
+
+      if (contractAddress || isEthereumLike(symbol, chain)) {
+        return
+      }
+
+      const unspentOutputs = await getUnspentOutputs(address, chain)
+      setOutputs(unspentOutputs)
+    }
+  }
+
+  const getNetworkFeeSymbol = (): void => {
+    if (selectedWallet) {
+      const { chain, symbol } = selectedWallet
+      const currency = chain ? getCurrencyByChain(chain) : getCurrency(symbol)
+
+      if (currency) {
+        setNetworkFeeSymbol(currency.symbol)
+      }
+    }
+  }
+
   const getNetworkFee = async (): Promise<void> => {
     if (selectedWallet) {
       setNetworkFeeLoading(true)
 
-      const { symbol } = selectedWallet
+      const { symbol, chain, decimals, contractAddress } = selectedWallet
 
-      const currencyInfo = getCurrency(symbol)
+      const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+
+      const fee = await getFees(symbol, chain)
 
       if (currencyInfo) {
         const data = await getNewNetworkFee({
@@ -97,13 +148,28 @@ const Send: React.FC = () => {
           chain: currencyInfo.chain,
           from: selectedWallet.address,
           to: address,
+          web3Params: {
+            tokenChain: chain,
+            decimals,
+            contractAddress,
+          },
+          fee,
+          outputs,
         })
 
         setNetworkFeeLoading(false)
 
         if (data) {
+          if (data.utxos) {
+            setUtxosList(data?.utxos)
+          }
+
           if (data.networkFee) {
             setNetworkFee(data.networkFee)
+          }
+
+          if (data.currencyBalance) {
+            setCurrencyBalance(data.currencyBalance)
           }
         }
       }
@@ -114,11 +180,11 @@ const Send: React.FC = () => {
     if (Object.keys(props).length) {
       const { amount: propsAmount, recipientAddress } = props
 
-      if (propsAmount) {
+      if (propsAmount && !isNaN(Number(propsAmount)) && Number(propsAmount) > 0) {
         setAmount(`${propsAmount}`)
       }
 
-      if (recipientAddress) {
+      if (recipientAddress?.length) {
         setAddress(recipientAddress)
       }
     }
@@ -144,13 +210,14 @@ const Send: React.FC = () => {
       const parseProps = JSON.parse(getProps)
 
       setProps(parseProps)
-      localStorage.removeItem('sendPageProps')
     }
   }
 
   const getCurrencyInfo = (): void => {
     if (selectedWallet) {
-      const info = getCurrency(selectedWallet?.symbol)
+      const info = selectedWallet?.chain
+        ? getToken(selectedWallet?.symbol, selectedWallet.chain)
+        : getCurrency(selectedWallet?.symbol)
 
       if (info) {
         setCurrencyInfo(info)
@@ -163,12 +230,17 @@ const Send: React.FC = () => {
     setEstimated(null)
 
     if (selectedWallet) {
-      const { address, symbol } = selectedWallet
+      const { address, symbol, chain, contractAddress } = selectedWallet
 
-      const getCurrencyInfo = getCurrency(symbol)
+      const getCurrencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
       if (getCurrencyInfo) {
-        const { balance, balance_usd } = await getBalance(address, getCurrencyInfo?.chain)
+        const { balance, balance_usd } = await getBalance(
+          address,
+          getCurrencyInfo?.chain,
+          chain ? symbol : undefined,
+          contractAddress
+        )
 
         setBalance(balance)
         setEstimated(balance_usd)
@@ -180,6 +252,7 @@ const Send: React.FC = () => {
     const wallets = getWallets()
 
     let currency: undefined | string = undefined
+    let chain: undefined | string = undefined
 
     if (sendPageProps) {
       const parsePageProps = JSON.parse(sendPageProps)
@@ -187,12 +260,17 @@ const Send: React.FC = () => {
       if (parsePageProps?.currency) {
         currency = parsePageProps.currency
       }
+
+      if (parsePageProps?.chain) {
+        chain = parsePageProps.chain
+      }
     }
 
     if (wallets?.length) {
       if (currency) {
         const filterWallets = wallets.filter(
-          (wallet: IWallet) => toLower(wallet.symbol) === toLower(currency)
+          (wallet: IWallet) =>
+            toLower(wallet.symbol) === toLower(currency) && toLower(wallet.chain) === toLower(chain)
         )
 
         if (filterWallets.length) {
@@ -210,6 +288,10 @@ const Send: React.FC = () => {
   }
 
   const onClose = (): void => {
+    if (localStorage.getItem('sendPageProps')) {
+      localStorage.removeItem('sendPageProps')
+    }
+
     window.close()
   }
 
@@ -231,6 +313,11 @@ const Send: React.FC = () => {
         networkFee,
         tabInfo,
         chain: currency?.chain,
+        networkFeeSymbol,
+        outputs: utxosList,
+        contractAddress: selectedWallet?.contractAddress,
+        tokenChain: currencyInfo?.chain,
+        decimals: selectedWallet?.decimals,
       }
 
       localStorage.setItem('sendConfirmationData', JSON.stringify(data))
@@ -299,7 +386,7 @@ const Send: React.FC = () => {
       }
     }
 
-    if (!networkFee && Number(amount) > 0) {
+    if (!networkFee && Number(amount) > 0 && !amountErrorLabel) {
       getNetworkFee()
     }
   }
@@ -311,6 +398,36 @@ const Send: React.FC = () => {
 
     if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
       return setAmountErrorLabel('Insufficient funds')
+    }
+
+    if (currencyInfo && selectedWallet) {
+      let parseAmount: number = Number(amount)
+      let parseMinAmount: number = 0
+
+      if (selectedWallet?.chain) {
+        parseMinAmount = currencyInfo.minSendAmount || 0.001
+      } else {
+        parseAmount = formatUnit(
+          selectedWallet.symbol,
+          amount,
+          'to',
+          selectedWallet?.chain,
+          'ether'
+        )
+        parseMinAmount = formatUnit(
+          selectedWallet.symbol,
+          currencyInfo.minSendAmount,
+          'from',
+          currencyInfo.chain,
+          'ether'
+        )
+      }
+
+      if (parseAmount < currencyInfo.minSendAmount) {
+        return setAmountErrorLabel(
+          `Min amount is ${parseMinAmount} ${toUpper(selectedWallet.symbol)}`
+        )
+      }
     }
   }
 
@@ -385,6 +502,7 @@ const Send: React.FC = () => {
               currencySymbol={selectedWallet?.symbol}
               background={currencyInfo?.background}
               disabled={walletsList.length < 2}
+              tokenChain={props?.chain}
             />
           ) : null}
           <TextInput
@@ -397,7 +515,7 @@ const Send: React.FC = () => {
             disabled={balance === null || props?.readOnly}
           />
           <TextInput
-            label="Amount (BTC)"
+            label={`Amount (${toUpper(selectedWallet?.symbol)})`}
             value={amount}
             onChange={setAmount}
             type="number"
@@ -416,11 +534,17 @@ const Send: React.FC = () => {
                   <Styles.NetworkFee>-</Styles.NetworkFee>
                 ) : (
                   <Styles.NetworkFee>
-                    {networkFee} {toUpper(selectedWallet?.symbol)}
+                    {networkFee} {toUpper(networkFeeSymbol)}
                   </Styles.NetworkFee>
                 )}
               </>
             )}
+            {selectedWallet?.chain &&
+            !isNetworkFeeLoading &&
+            networkFee &&
+            networkFee > currencyBalance ? (
+              <Styles.NetworkFeeError>Insufficient funds</Styles.NetworkFeeError>
+            ) : null}
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>
