@@ -17,7 +17,7 @@ type TCreateTransactionProps = {
   to: string
   amount: number
   privateKey: string
-  symbol: TSymbols
+  symbol: string
   tokenChain?: string
   outputs?: UnspentOutput[]
   networkFee?: number
@@ -55,7 +55,12 @@ export const importPrivateKey = (
   }
 }
 
-export const validateAddress = (symbol: TSymbols, address: string, chain?: string): boolean => {
+export const validateAddress = (
+  symbol: TSymbols | string,
+  address: string,
+  chain?: string
+): boolean => {
+  // @ts-ignore
   const findRegexp = chain ? addressValidate.eth : addressValidate[symbol]
   return new RegExp(findRegexp)?.test(address)
 }
@@ -201,7 +206,7 @@ export const getAddressNetworkFee = async (
 }
 
 export const formatUnit = (
-  symbol: TSymbols,
+  symbol: string,
   value: string | number,
   type: 'from' | 'to',
   chain?: string,
