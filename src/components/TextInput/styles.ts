@@ -85,6 +85,7 @@ const Input = styled.input`
 
   &:disabled {
     background-color: #ffffff !important;
+    color: #7d7e8d;
   }
 `
 
@@ -118,6 +119,7 @@ const NumberInput = styled(NumberFormat)`
 
   &:disabled {
     background-color: #ffffff !important;
+    color: #7d7e8d;
   }
 `
 
