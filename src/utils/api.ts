@@ -2,7 +2,9 @@ import axios, { AxiosResponse } from 'axios'
 
 // Config
 import config from '@config/index'
-import { isEthereumLike } from './address'
+
+// Utils
+import { isEthereumLike } from '@utils/address'
 
 interface IGetBalance {
   balance: number

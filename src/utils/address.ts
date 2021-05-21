@@ -8,7 +8,8 @@ import { getToken, IToken } from '@config/tokens'
 
 // Utils
 import { getEtherNetworkFee, IGetNetworkFeeResponse } from '@utils/api'
-import { toLower } from './format'
+import { toLower } from '@utils/format'
+import * as theta from '@utils/currencies/theta'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
@@ -35,6 +36,8 @@ export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boole
 export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
   if (isEthereumLike(symbol, chain)) {
     return web3.generateAddress()
+  } else if (symbol === 'theta') {
+    return theta.generateWallet()
   } else {
     const generateBTCLikeAddress = new bitcoinLike(symbol).generate()
 
@@ -49,6 +52,8 @@ export const importPrivateKey = (
 ): string | null => {
   if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
+  } else if (symbol === 'theta' || symbol === 'tfuel') {
+    return theta.importPrivateKey(privateKey)
   } else {
     const importBTCLikePrivateKey = new bitcoinLike(symbol).import(privateKey)
     return importBTCLikePrivateKey

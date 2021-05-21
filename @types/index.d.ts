@@ -1,5 +1,6 @@
 declare module '*.png'
 declare module '*.svg'
+declare module '@thetalabs/theta-js'
 
 type TGenerateAddress = {
   address: string
@@ -97,4 +98,15 @@ declare const dogecoin: {
   ) => TCreatedTransaction | null
 }
 
-type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash' | 'eth' | 'etc' | 'bsc' | 'bnb'
+type TSymbols =
+  | 'btc'
+  | 'bch'
+  | 'bsv'
+  | 'ltc'
+  | 'doge'
+  | 'dash'
+  | 'eth'
+  | 'etc'
+  | 'bsc'
+  | 'bnb'
+  | 'theta'
