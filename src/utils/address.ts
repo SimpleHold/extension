@@ -208,6 +208,12 @@ export const getAddressNetworkFee = async (
     return data
   }
 
+  if (theta.coins.indexOf(symbol) !== -1) {
+    return {
+      networkFee: 0.000001,
+    }
+  }
+
   if (outputs?.length) {
     return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
   }

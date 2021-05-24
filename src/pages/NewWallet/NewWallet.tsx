@@ -21,7 +21,7 @@ import { generate, importPrivateKey } from '@utils/address'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
-import { getCurrencyByChain } from '@config/currencies'
+import { getCurrencyByChain, ICurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -84,6 +84,17 @@ const NewWallet: React.FC = () => {
     })
   }
 
+  const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
+    const thetaCoins = ['theta', 'tfuel']
+
+    if (thetaCoins.indexOf(symbol) !== -1) {
+      return thetaCoins
+    } else if (chain && getCurrencyInfo) {
+      return [symbol, getCurrencyInfo.symbol]
+    }
+    return [symbol]
+  }
+
   const onConfirm = (): void => {
     if (validatePassword(password)) {
       const backup = localStorage.getItem('backup')
@@ -96,8 +107,7 @@ const NewWallet: React.FC = () => {
 
           if (address) {
             const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
-            const currenciesList =
-              chain && getCurrencyInfo ? [symbol, getCurrencyInfo.symbol] : [symbol]
+            const currenciesList = getCurrenciesList(getCurrencyInfo)
 
             const walletsList = addNewWallet(
               address,

@@ -23,7 +23,7 @@ import { getTokensBalance, ITokensBalance } from '@utils/api'
 
 // Config
 import tokens, { IToken } from '@config/tokens'
-import { getCurrencyByChain } from '@config/currencies'
+import { getCurrencyByChain, ICurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -127,6 +127,17 @@ const ImportPrivateKey: React.FC = () => {
     }
   }
 
+  const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
+    const thetaCoins = ['theta', 'tfuel']
+
+    if (thetaCoins.indexOf(symbol) !== -1) {
+      return thetaCoins
+    } else if (chain && getCurrencyInfo) {
+      return [symbol, getCurrencyInfo.symbol]
+    }
+    return [symbol]
+  }
+
   const onConfirmDrawer = (): void => {
     const backup = localStorage.getItem('backup')
 
@@ -137,8 +148,7 @@ const ImportPrivateKey: React.FC = () => {
 
         if (address) {
           const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
-          const currenciesList =
-            chain && getCurrencyInfo ? [symbol, getCurrencyInfo.symbol] : [symbol]
+          const currenciesList = getCurrenciesList(getCurrencyInfo)
 
           const walletsList = addNewWallet(
             address,

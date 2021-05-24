@@ -1,7 +1,10 @@
 import * as thetajs from '@thetalabs/theta-js'
+import { BigNumber } from 'bignumber.js'
 
 // Utils
 import { fromWei } from '@utils/web3'
+
+export const coins = ['theta', 'tfuel']
 
 export const generateWallet = (): TGenerateAddress | null => {
   try {
@@ -43,4 +46,46 @@ export const getBalance = async (
   } catch {
     return null
   }
+}
+
+export const createTransaction = async (
+  currency: string,
+  from: string,
+  to: string,
+  amount: string | number,
+  privateKey: string
+): Promise<string | null> => {
+  try {
+    const ten18 = new BigNumber(10).pow(18)
+    const thetaWeiToSend =
+      currency === 'theta' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
+    const tfuelWeiToSend =
+      currency === 'tfuel' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
+
+    const transaction = new thetajs.transactions.SendTransaction({
+      from,
+      outputs: [
+        {
+          address: to,
+          thetaWei: thetaWeiToSend,
+          tfuelWei: tfuelWeiToSend,
+        },
+      ],
+    })
+
+    const provider = new thetajs.providers.HttpProvider(thetajs.networks.ChainIds.Mainnet)
+    const wallet = new thetajs.Wallet(privateKey, provider)
+    const result = await wallet.sendTransaction(transaction)
+
+    if (result?.hash) {
+      return result.hash
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+export const getTransactionLink = (hash: string): string => {
+  return `https://explorer.thetatoken.org/txs/${hash}`
 }

@@ -17,6 +17,7 @@ import { toUpper, price } from '@utils/format'
 import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
 import { validateAddress, getAddressNetworkFee, formatUnit, isEthereumLike } from '@utils/address'
+import * as bitcoinLike from '@utils/currencies/bitcoinLike'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -99,11 +100,10 @@ const Send: React.FC = () => {
   }, [networkFee])
 
   const getOutputs = async (): Promise<void> => {
-    if (contractAddress || isEthereumLike(symbol, chain)) {
-      return
+    if (bitcoinLike.coins.indexOf(chain) !== -1) {
+      const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
+      setOutputs(unspentOutputs)
     }
-    const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
-    setOutputs(unspentOutputs)
   }
 
   const getNetworkFee = async (): Promise<void> => {
