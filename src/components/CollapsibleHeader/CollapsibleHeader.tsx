@@ -113,7 +113,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
           ) : null}
         </Skeleton>
 
-        {pendingBalance !== null && Number(pendingBalance) !== 0 ? (
+        {pendingBalance !== null ? (
           <Styles.PendingBalanceRow
             style={{
               height: pendingBalanceRowHeight,

@@ -78,7 +78,7 @@ const Receive: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'privateKey'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
-  const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
+  const [pendingBalance, setPendingBalance] = React.useState<number>(0)
   const [dropDownList, setDropDownList] = React.useState<any[]>([])
 
   React.useEffect(() => {
@@ -271,7 +271,7 @@ const Receive: React.FC = () => {
               ) : null}
             </Skeleton>
 
-            {pendingBalance !== null && Number(pendingBalance) !== 0 ? (
+            {pendingBalance !== 0 ? (
               <PendingBalance pending={pendingBalance} type="gray" symbol={symbol} />
             ) : null}
           </Styles.Row>

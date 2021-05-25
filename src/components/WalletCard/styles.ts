@@ -72,9 +72,12 @@ const BalanceRow = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  align-items: center;
 `
 
 const PendingIcon = styled.div`
+  width: 12px;
+  height: 12px;
   margin: 0 5px 0 0;
 
   svg {
