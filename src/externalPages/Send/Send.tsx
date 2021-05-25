@@ -17,7 +17,8 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { getBalance, getFees, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
-import { validateAddress, getNewNetworkFee, isEthereumLike, formatUnit } from '@utils/address'
+import { validateAddress, getNewNetworkFee, formatUnit } from '@utils/address'
+import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -108,15 +109,13 @@ const Send: React.FC = () => {
 
   const getOutputs = async (): Promise<void> => {
     if (selectedWallet && currencyInfo) {
-      const { contractAddress, symbol, address } = selectedWallet
+      const { address } = selectedWallet
       const { chain } = currencyInfo
 
-      if (contractAddress || isEthereumLike(symbol, chain)) {
-        return
+      if (bitcoinLike.coins().indexOf(chain) !== -1) {
+        const unspentOutputs = await getUnspentOutputs(address, chain)
+        setOutputs(unspentOutputs)
       }
-
-      const unspentOutputs = await getUnspentOutputs(address, chain)
-      setOutputs(unspentOutputs)
     }
   }
 
@@ -139,9 +138,9 @@ const Send: React.FC = () => {
 
       const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
-      const fee = await getFees(symbol, chain)
-
       if (currencyInfo) {
+        const fee = await getFees(currencyInfo.chain)
+
         const data = await getNewNetworkFee({
           symbol,
           amount,
@@ -444,13 +443,10 @@ const Send: React.FC = () => {
         !isNetworkFeeLoading
       ) {
         if (!outputs.length) {
-          if (
-            selectedWallet?.contractAddress ||
-            isEthereumLike(selectedWallet.symbol, selectedWallet?.chain)
-          ) {
-            return false
+          if (currencyInfo && bitcoinLike.coins().indexOf(currencyInfo?.chain) !== -1) {
+            return true
           }
-          return true
+          return false
         }
       }
     }

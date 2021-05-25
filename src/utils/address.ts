@@ -36,7 +36,7 @@ export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boole
 export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
   if (isEthereumLike(symbol, chain)) {
     return web3.generateAddress()
-  } else if (symbol === 'theta') {
+  } else if (theta.coins.indexOf(symbol) !== -1) {
     return theta.generateWallet()
   } else {
     const generateBTCLikeAddress = new bitcoinLike(symbol).generate()
@@ -52,11 +52,10 @@ export const importPrivateKey = (
 ): string | null => {
   if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
-  } else if (symbol === 'theta' || symbol === 'tfuel') {
+  } else if (theta.coins.indexOf(symbol) !== -1) {
     return theta.importPrivateKey(privateKey)
   } else {
-    const importBTCLikePrivateKey = new bitcoinLike(symbol).import(privateKey)
-    return importBTCLikePrivateKey
+    return new bitcoinLike(symbol).import(privateKey)
   }
 }
 
@@ -97,8 +96,6 @@ export const createTransaction = async ({
         if (tokenChain && getContractAddress) {
           return await web3.transferToken({
             value: `${amount}`,
-            chain: tokenChain,
-            symbol,
             from,
             to,
             privateKey,
@@ -214,7 +211,7 @@ export const getAddressNetworkFee = async (
     }
   }
 
-  if (outputs?.length) {
+  if (typeof outputs !== 'undefined') {
     return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
   }
 
@@ -228,15 +225,18 @@ export const formatUnit = (
   chain?: string,
   unit?: web3.Unit
 ): number => {
+  if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
+    return type === 'from'
+      ? new bitcoinLike(symbol).fromSat(Number(value))
+      : new bitcoinLike(symbol).toSat(Number(value))
+  }
   if (isEthereumLike(symbol, chain)) {
     if (unit) {
       return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
     }
     return Number(value)
   }
-  return type === 'from'
-    ? new bitcoinLike(symbol).fromSat(Number(value))
-    : new bitcoinLike(symbol).toSat(Number(value))
+  return 0
 }
 
 export const getExplorerLink = (
@@ -246,6 +246,9 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
+  if (theta.coins.indexOf(symbol) !== -1) {
+    return `https://explorer.thetatoken.org/account/${address}`
+  }
   if (isEthereumLike(symbol, chain)) {
     const parseSymbol = toLower(symbol)
 

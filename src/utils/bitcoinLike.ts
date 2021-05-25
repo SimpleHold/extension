@@ -5,6 +5,10 @@ class GenerateAddress {
     this.symbol = symbol
   }
 
+  static coins() {
+    return ['bitcoin', 'bitcoin-cash', 'bitcoin-sv', 'litecoin', 'dogecoin', 'dash']
+  }
+
   generate = (): TGenerateAddress | null => {
     try {
       const { symbol } = this

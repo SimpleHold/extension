@@ -35,8 +35,6 @@ export type Unit =
 
 interface TransferTokenOptions {
   value: string
-  chain: string
-  symbol: string
   from: string
   to: string
   privateKey: string
@@ -127,8 +125,6 @@ export const createTransaction = async (
 
 export const transferToken = async ({
   value,
-  chain,
-  symbol,
   from,
   to,
   privateKey,

@@ -20,6 +20,7 @@ import { IWallet } from '@utils/wallet'
 import { convertDecimals } from '@utils/web3'
 import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
 import { sendRawTransaction, getWeb3TxParams } from '@utils/api'
+import * as theta from '@utils/currencies/theta'
 
 // Styles
 import Styles from './styles'
@@ -154,6 +155,23 @@ const SendConfirmation: React.FC = () => {
             outputs,
             networkFee: parseNetworkFee,
             contractAddress,
+          }
+
+          if (theta.coins.indexOf(symbol) !== -1) {
+            const transaction = await theta.createTransaction(
+              symbol,
+              addressFrom,
+              addressTo,
+              amount,
+              findWallet.privateKey
+            )
+
+            if (transaction) {
+              setTransactionLink(theta.getTransactionLink(transaction))
+              setButtonLoading(false)
+              return setActiveDrawer('success')
+            }
+            return setInputErrorLabel('Error while creating transaction')
           }
 
           const transaction = await createTransaction({ ...transactionData, ...ethTxData })

@@ -16,8 +16,8 @@ import { getWallets, IWallet, updateBalance } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
 import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import { validateAddress, getAddressNetworkFee, formatUnit, isEthereumLike } from '@utils/address'
-import * as bitcoinLike from '@utils/currencies/bitcoinLike'
+import { validateAddress, getAddressNetworkFee, formatUnit } from '@utils/address'
+import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -100,14 +100,14 @@ const Send: React.FC = () => {
   }, [networkFee])
 
   const getOutputs = async (): Promise<void> => {
-    if (bitcoinLike.coins.indexOf(chain) !== -1) {
+    if (bitcoinLike.coins().indexOf(chain) !== -1) {
       const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
       setOutputs(unspentOutputs)
     }
   }
 
   const getNetworkFee = async (): Promise<void> => {
-    const fee = await getFees(symbol, chain)
+    const fee = await getFees(chain)
     setUtxosList([])
 
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
@@ -199,7 +199,7 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (address.length && !validateAddress(symbol, address, chain)) {
+    if (address.length && !validateAddress(symbol, address, tokenChain)) {
       setAddressErrorLabel('Address is not valid')
     }
 
@@ -236,7 +236,7 @@ const Send: React.FC = () => {
 
   const isButtonDisabled = (): boolean => {
     if (
-      validateAddress(symbol, address) &&
+      validateAddress(symbol, address, tokenChain) &&
       amount.length &&
       Number(amount) > 0 &&
       addressErrorLabel === null &&
@@ -246,11 +246,11 @@ const Send: React.FC = () => {
       !isNetworkFeeLoading
     ) {
       if (!outputs.length) {
-        if (contractAddress || isEthereumLike(symbol, chain)) {
-          return false
+        if (bitcoinLike.coins().indexOf(chain) !== -1) {
+          return true
         }
-        return true
       }
+      return false
     }
     return true
   }

@@ -171,7 +171,7 @@ const ImportPrivateKey: React.FC = () => {
             ).length
             setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
-            setActiveDrawer('success')
+            return setActiveDrawer('success')
           }
         }
       }
