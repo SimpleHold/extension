@@ -70,7 +70,7 @@ const currencies: ICurrency[] = [
     logo: dashLogo,
     background: '#008DE4',
     chain: 'dash',
-    minSendAmount: 200000,
+    minSendAmount: 100000,
   },
   {
     name: 'Ethereum',

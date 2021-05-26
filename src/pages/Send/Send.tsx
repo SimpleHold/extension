@@ -14,7 +14,7 @@ import CurrenciesDropdown from '@components/CurrenciesDropdown'
 // Utils
 import { getWallets, IWallet, updateBalance } from '@utils/wallet'
 import { toUpper, price } from '@utils/format'
-import { getBalance, getUnspentOutputs, getFees } from '@utils/api'
+import { getBalance, getUnspentOutputs } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
 import { validateAddress, getAddressNetworkFee, formatUnit } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
@@ -107,14 +107,13 @@ const Send: React.FC = () => {
   }
 
   const getNetworkFee = async (): Promise<void> => {
-    const fee = await getFees(chain)
     setUtxosList([])
 
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
 
     const data = await getAddressNetworkFee(
+      selectedAddress,
       symbol,
-      fee,
       amount,
       selectedAddress,
       address,

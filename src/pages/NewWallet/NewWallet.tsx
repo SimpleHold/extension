@@ -18,6 +18,7 @@ import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
 import { generate, importPrivateKey } from '@utils/address'
+import * as theta from '@utils/currencies/theta'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
@@ -85,10 +86,8 @@ const NewWallet: React.FC = () => {
   }
 
   const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
-    const thetaCoins = ['theta', 'tfuel']
-
-    if (thetaCoins.indexOf(symbol) !== -1) {
-      return thetaCoins
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return theta.coins.sort((a: string, b: string) => a.indexOf(symbol) - b.indexOf(symbol))
     } else if (chain && getCurrencyInfo) {
       return [symbol, getCurrencyInfo.symbol]
     }

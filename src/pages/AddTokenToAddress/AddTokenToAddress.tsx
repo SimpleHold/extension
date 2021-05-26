@@ -28,6 +28,7 @@ interface LocationState {
   chain: string
   chainName: string
   tokenName: string
+  tokenStandart: string
   contractAddress?: string
   decimals?: number
 }
@@ -40,6 +41,7 @@ const AddTokenToAddress: React.FC = () => {
       chain,
       chainName,
       tokenName,
+      tokenStandart,
       contractAddress = undefined,
       decimals = undefined,
     },
@@ -90,8 +92,7 @@ const AddTokenToAddress: React.FC = () => {
   const onSkip = (): void => {
     history.push('/new-wallet', {
       symbol,
-      warning:
-        'You are trying to add a new ERC20 token address. The corresponding Ethereum address will also be added to your wallet.',
+      warning: `You are trying to add a new ${tokenStandart} token address. The corresponding ${chainName} address will also be added to your wallet.`,
       backTitle: `Add to ${toUpper(chain)} address`,
       chain,
       tokenName,
@@ -159,9 +160,9 @@ const AddTokenToAddress: React.FC = () => {
           <Styles.Row>
             <Styles.Title>Add to {toUpper(chain)} address</Styles.Title>
             <Styles.Description>
-              You are trying to add a new ERC20 token address. Do you want to use one of your
-              current {chainName} addresses with {tokenName}? Skip it if you want to add the new
-              address.
+              You are trying to add a new {tokenStandart} token address. Do you want to use one of
+              your current {chainName} addresses with {tokenName}? Skip it if you want to add the
+              new address.
             </Styles.Description>
 
             <CurrenciesDropdown

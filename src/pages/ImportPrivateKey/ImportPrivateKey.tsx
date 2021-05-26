@@ -20,6 +20,7 @@ import { setUserProperties } from '@utils/amplitude'
 import { toLower, toUpper } from '@utils/format'
 import { importPrivateKey } from '@utils/address'
 import { getTokensBalance, ITokensBalance } from '@utils/api'
+import * as theta from '@utils/currencies/theta'
 
 // Config
 import tokens, { IToken } from '@config/tokens'
@@ -119,6 +120,7 @@ const ImportPrivateKey: React.FC = () => {
             tokenName,
             contractAddress,
             decimals,
+            tokenStandart: toLower(chain) === 'bsc' ? 'BEP20' : 'ERC20',
           })
         }
       }
@@ -128,10 +130,8 @@ const ImportPrivateKey: React.FC = () => {
   }
 
   const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
-    const thetaCoins = ['theta', 'tfuel']
-
-    if (thetaCoins.indexOf(symbol) !== -1) {
-      return thetaCoins
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return theta.coins.sort((a: string, b: string) => a.indexOf(symbol) - b.indexOf(symbol))
     } else if (chain && getCurrencyInfo) {
       return [symbol, getCurrencyInfo.symbol]
     }

@@ -154,6 +154,7 @@ const AddCustomToken: React.FC = () => {
         tokenName,
         contractAddress,
         decimals,
+        tokenStandart: toLower(chain) === 'bsc' ? 'BEP20' : 'ERC20',
       }
 
       if (checkTokenWallets) {

@@ -27,6 +27,7 @@ interface LocationState {
   symbol: TSymbols
   privateKey: string
   tokens: string[]
+  tokenStandart: string
   tokenName?: string
   contractAddress?: string
   decimals: number
@@ -40,6 +41,7 @@ const FoundTokens: React.FC = () => {
       symbol,
       privateKey,
       tokens,
+      tokenStandart,
       tokenName = undefined,
       contractAddress = undefined,
       decimals = undefined,
@@ -123,7 +125,8 @@ const FoundTokens: React.FC = () => {
           <Styles.Row>
             <Styles.Title>Found tokens</Styles.Title>
             <Styles.Description>
-              We found these ERC20 tokens on your address. Do you want to add them to your wallet?
+              We found these {tokenStandart} tokens on your address. Do you want to add them to your
+              wallet?
             </Styles.Description>
 
             <Styles.TokensList>

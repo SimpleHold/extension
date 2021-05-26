@@ -14,7 +14,7 @@ import Spinner from '@components/Spinner'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
-import { getBalance, getFees, getUnspentOutputs } from '@utils/api'
+import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
 import { validateAddress, getNewNetworkFee, formatUnit } from '@utils/address'
@@ -139,9 +139,8 @@ const Send: React.FC = () => {
       const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
       if (currencyInfo) {
-        const fee = await getFees(currencyInfo.chain)
-
         const data = await getNewNetworkFee({
+          address: selectedWallet.address,
           symbol,
           amount,
           chain: currencyInfo.chain,
@@ -152,7 +151,6 @@ const Send: React.FC = () => {
             decimals,
             contractAddress,
           },
-          fee,
           outputs,
         })
 

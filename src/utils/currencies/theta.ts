@@ -6,6 +6,16 @@ import { fromWei } from '@utils/web3'
 
 export const coins = ['theta', 'tfuel']
 
+const ten18 = new BigNumber(10).pow(18)
+
+export const toTheta = (value: number | string): number => {
+  return Number(new BigNumber(value).multipliedBy(ten18))
+}
+
+export const fromTheta = (value: number | string): number => {
+  return Number(new BigNumber(value).div(ten18))
+}
+
 export const generateWallet = (): TGenerateAddress | null => {
   try {
     const wallet = thetajs.Wallet.createRandom()
@@ -56,7 +66,6 @@ export const createTransaction = async (
   privateKey: string
 ): Promise<string | null> => {
   try {
-    const ten18 = new BigNumber(10).pow(18)
     const thetaWeiToSend =
       currency === 'theta' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
     const tfuelWeiToSend =
