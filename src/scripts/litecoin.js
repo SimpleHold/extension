@@ -18,10 +18,6 @@ const litecoin = (function () {
     return new litecore.PrivateKey(privateKey).toAddress().toString()
   }
 
-  const getTransactionSize = (outputs) => {
-    return new litecore.Transaction().from(outputs).toString().length
-  }
-
   const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {
     const transaction = new litecore.Transaction()
       .from(outputs)
@@ -36,10 +32,14 @@ const litecoin = (function () {
     }
   }
 
+  const getFee = (outputs, to, amount, changeAddress) => {
+    return new litecore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
+  }
+
   return {
     generateWallet,
     importPrivateKey,
-    getTransactionSize,
     createTransaction,
+    getFee,
   }
 })()

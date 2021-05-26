@@ -18,10 +18,6 @@ const dogecoin = (function () {
     return new dogecore.PrivateKey(privateKey).toAddress().toString()
   }
 
-  const getTransactionSize = (outputs) => {
-    return new dogecore.Transaction().from(outputs).toString().length
-  }
-
   const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {
     const transaction = new dogecore.Transaction()
       .from(outputs)
@@ -36,10 +32,14 @@ const dogecoin = (function () {
     }
   }
 
+  const getFee = (outputs, to, amount, changeAddress) => {
+    return new dogecore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
+  }
+
   return {
     generateWallet,
     importPrivateKey,
-    getTransactionSize,
     createTransaction,
+    getFee,
   }
 })()

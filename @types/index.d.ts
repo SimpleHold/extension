@@ -26,10 +26,9 @@ interface UnspentOutput {
   address: string
 }
 
-declare const bitcoin: {
+interface BitcoinLikeProvider {
   generateWallet: () => TGenerateAddress
   importPrivateKey: (privateKey: string) => string
-  getTransactionSize: (outputs: UnspentOutput[]) => number
   toSat: (value: number) => number
   fromSat: (value: number) => number
   createTransaction: (
@@ -40,63 +39,14 @@ declare const bitcoin: {
     changeAddress: string,
     privateKey: string
   ) => TCreatedTransaction
+  getFee: (outputs: UnspentOutput[], to: string, amount: number, changeAddress: string) => number
 }
 
-declare const bitcoincash: {
-  generateWallet: () => TGenerateAddress
-  importPrivateKey: (privateKey: string) => string
-  getTransactionSize: (outputs: UnspentOutput[]) => number
-  createTransaction: (
-    outputs: UnspentOutput[],
-    to: string,
-    amount: number,
-    fee: number,
-    changeAddress: string,
-    privateKey: string
-  ) => TCreatedTransaction | null
-}
-
-declare const dash: {
-  generateWallet: () => TGenerateAddress
-  importPrivateKey: (privateKey: string) => string
-  getTransactionSize: (outputs: UnspentOutput[]) => number
-  createTransaction: (
-    outputs: UnspentOutput[],
-    to: string,
-    amount: number,
-    fee: number,
-    changeAddress: string,
-    privateKey: string
-  ) => TCreatedTransaction
-}
-
-declare const litecoin: {
-  generateWallet: () => TGenerateAddress
-  importPrivateKey: (privateKey: string) => string
-  getTransactionSize: (outputs: UnspentOutput[]) => number
-  createTransaction: (
-    outputs: UnspentOutput[],
-    to: string,
-    amount: number,
-    fee: number,
-    changeAddress: string,
-    privateKey: string
-  ) => TCreatedTransaction | null
-}
-
-declare const dogecoin: {
-  generateWallet: () => TGenerateAddress
-  importPrivateKey: (privateKey: string) => string
-  getTransactionSize: (outputs: UnspentOutput[]) => number
-  createTransaction: (
-    outputs: UnspentOutput[],
-    to: string,
-    amount: number,
-    fee: number,
-    changeAddress: string,
-    privateKey: string
-  ) => TCreatedTransaction | null
-}
+declare const bitcoin: BitcoinLikeProvider
+declare const bitcoincash: BitcoinLikeProvider
+declare const dash: BitcoinLikeProvider
+declare const litecoin: BitcoinLikeProvider
+declare const dogecoin: BitcoinLikeProvider
 
 type TSymbols =
   | 'btc'

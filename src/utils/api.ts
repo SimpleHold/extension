@@ -131,18 +131,6 @@ export const sendRawTransaction = async (
   }
 }
 
-export const getFees = async (chain: string): Promise<number> => {
-  try {
-    if (bitcoinLike.coins().indexOf(chain) !== -1) {
-      const { data } = await axios.get(`${config.serverUrl}/wallet/fee/${chain}`)
-      return data.data || 0
-    }
-    return 0
-  } catch {
-    return 0
-  }
-}
-
 export const getContractInfo = async (
   address: string,
   chain: string

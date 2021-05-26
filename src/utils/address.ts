@@ -129,6 +129,7 @@ export const createTransaction = async ({
 }
 
 interface IGetNetworkFeeParams {
+  address: string
   symbol: string
   amount: string
   from: string
@@ -140,13 +141,12 @@ interface IGetNetworkFeeParams {
     decimals?: number
   }
   outputs?: UnspentOutput[]
-  fee?: number
 }
 
 export const getNewNetworkFee = async (
   params: IGetNetworkFeeParams
 ): Promise<IGetNetworkFeeResponse | null> => {
-  const { symbol, amount, from, to, chain, web3Params, outputs, fee } = params
+  const { address, symbol, amount, from, to, chain, web3Params, outputs } = params
 
   if (
     web3Params?.contractAddress ||
@@ -171,16 +171,22 @@ export const getNewNetworkFee = async (
     )
   }
 
-  if (outputs?.length && fee) {
-    return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
+  if (outputs?.length) {
+    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+  }
+
+  if (theta.coins.indexOf(symbol) !== -1) {
+    return {
+      networkFee: 0.000001,
+    }
   }
 
   return null
 }
 
 export const getAddressNetworkFee = async (
+  address: string,
   symbol: string,
-  fee: number,
   amount: string,
   from: string,
   to: string,
@@ -212,7 +218,7 @@ export const getAddressNetworkFee = async (
   }
 
   if (typeof outputs !== 'undefined') {
-    return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
+    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
   }
 
   return null
@@ -235,6 +241,9 @@ export const formatUnit = (
       return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
     }
     return Number(value)
+  }
+  if (theta.coins.indexOf(symbol) !== -1) {
+    return type === 'from' ? theta.fromTheta(value) : theta.toTheta(value)
   }
   return 0
 }
