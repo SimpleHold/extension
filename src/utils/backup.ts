@@ -12,6 +12,7 @@ export const generate = (address: string, privateKey: string): { [key: string]: 
         address,
         uuid: walletUuid,
         privateKey,
+        createdAt: new Date(),
       },
     ],
     version: 1.5,
@@ -23,6 +24,7 @@ export const generate = (address: string, privateKey: string): { [key: string]: 
       symbol: 'btc',
       address,
       uuid: walletUuid,
+      createdAt: new Date(),
     },
   ])
 

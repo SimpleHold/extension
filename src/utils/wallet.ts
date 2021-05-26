@@ -19,6 +19,13 @@ export interface IWallet {
   name?: string
   contractAddress?: string
   decimals?: number
+  createdAt?: Date
+}
+
+const sortWallets = (a: IWallet, b: IWallet): number => {
+  return b?.createdAt && a?.createdAt
+    ? new Date(b?.createdAt).getTime() - new Date(a?.createdAt).getTime()
+    : 0
 }
 
 export const getWallets = (): IWallet[] | null => {
@@ -28,7 +35,7 @@ export const getWallets = (): IWallet[] | null => {
     if (walletsList) {
       const parseWallets = JSON.parse(walletsList)
 
-      return parseWallets
+      return parseWallets.sort(sortWallets)
     }
     return null
   } catch {
@@ -141,6 +148,7 @@ export const addNew = (
         name: getTokenName,
         contractAddress: getContractAddress,
         decimals: getDecimals,
+        createdAt: new Date(),
       }
 
       parseWallets.push(data)
