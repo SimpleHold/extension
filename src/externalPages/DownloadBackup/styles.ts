@@ -1,58 +1,8 @@
 import styled from 'styled-components'
 
-const Wrapper = styled.div`
-  background-color: #f8f8f8;
-  display: flex;
-  justify-content: center;
-  padding: 40px 0 80px 0;
-  min-height: 100vh;
-`
-
-const Extension = styled.div`
-  width: 375px;
-  background-color: #ffffff;
-  border: 1px solid #eaeaea;
-  box-shadow: 0px 5px 15px rgba(125, 126, 141, 0.15);
-  border-radius: 16px;
-  height: 100%;
-`
-
-const Header = styled.div`
-  padding: 18px 20px 18px 30px;
-  border-bottom: 1px solid #eaeaea;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-`
-
-const LogoRow = styled.div`
-  width: 30px;
-  height: 24px;
-
-  path {
-    fill: #3fbb7d;
-  }
-`
-
-const CloseIconRow = styled.div`
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  path {
-    fill: #cccccc;
-  }
-
-  &:hover {
-    cursor: pointer;
-  }
-`
-
 const Body = styled.div`
   padding: 40px 30px;
+  background-color: #ffffff;
 `
 
 const Image = styled.img`
@@ -117,11 +67,6 @@ const Answer = styled.p`
 `
 
 const Styles = {
-  Wrapper,
-  Extension,
-  Header,
-  LogoRow,
-  CloseIconRow,
   Body,
   Image,
   Title,

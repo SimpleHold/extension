@@ -19,6 +19,8 @@ const injectScript = () => {
 injectScript()
 setSHAttribute()
 
+let activeRequest: string | null
+
 browser.runtime.onMessage.addListener((request: IRequest) => {
   if (request.type === 'set_address') {
     const { data } = request
@@ -49,25 +51,55 @@ browser.runtime.onMessage.addListener((request: IRequest) => {
   }
 })
 
-document.addEventListener('request_addresses', (request: IRequest) => {
+document.addEventListener('request_addresses', async (request: IRequest) => {
   if (request.type === 'request_addresses') {
-    const { site, favicon } = request.detail
+    if (activeRequest === request.type) {
+      return
+    }
+    activeRequest = request.type
+
     const { screenX, screenY, outerWidth } = window
 
     const currency = document.getElementById('sh-button')?.getAttribute('sh-currency')
     const chain = document.getElementById('sh-button')?.getAttribute('sh-currency-chain')
 
-    browser.runtime.sendMessage({
+    await browser.runtime.sendMessage({
       type: 'request_addresses',
       data: {
         screenX,
         screenY,
         outerWidth,
-        site,
-        favicon,
         currency,
         chain,
       },
     })
+
+    activeRequest = null
   }
+})
+
+document.addEventListener('request_send', async (request: IRequest) => {
+  if (activeRequest === request.type) {
+    return
+  }
+  activeRequest = request.type
+
+  const { readOnly, currency, amount, recipientAddress, chain } = request.detail
+  const { screenX, screenY, outerWidth } = window
+
+  await browser.runtime.sendMessage({
+    type: 'request_send',
+    data: {
+      screenX,
+      screenY,
+      outerWidth,
+      readOnly,
+      currency,
+      amount,
+      recipientAddress,
+      chain,
+    },
+  })
+
+  activeRequest = null
 })

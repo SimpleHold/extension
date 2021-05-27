@@ -27,3 +27,14 @@ export const getBadgeText = async (): Promise<string> => {
 export const getManifest = () => {
   return browser.runtime.getManifest()
 }
+
+export const getCurrentTab = async (): Promise<Tabs.Tab> => {
+  return await browser.tabs.getCurrent()
+}
+
+export const updateTab = async (
+  tabId: number,
+  props: Tabs.UpdateUpdatePropertiesType
+): Promise<Tabs.Tab> => {
+  return await browser.tabs.update(tabId, props)
+}

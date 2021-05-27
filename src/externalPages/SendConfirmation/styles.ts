@@ -1,39 +1,64 @@
 import styled from 'styled-components'
 
-const Wrapper = styled.div`
-  height: 600px;
-`
-
-const Container = styled.div`
+const Body = styled.div`
+  height: 640px;
   background-color: #ffffff;
-  border-radius: 5px 5px 0 0;
-  padding: 30px;
-  height: 540px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 `
 
-const Row = styled.div``
+const Row = styled.div`
+  padding: 40px 30px 0 30px;
+  flex: 1;
+`
 
 const Title = styled.p`
   margin: 0;
   font-weight: bold;
-  font-size: 23px;
-  line-height: 25px;
+  font-size: 30px;
+  line-height: 35px;
   color: #1d1d22;
 `
 
-const Description = styled.p`
-  margin: 5px 0 0 0;
+const SiteInfo = styled.div`
+  margin: 10px 0 0 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
+`
+
+const SiteInfoLabel = styled.p`
+  margin: 0 10px 5px 0;
   font-size: 16px;
-  line-height: 23px;
+  line-height: 19px;
+  color: #7d7e8d;
+`
+
+const SiteInfoRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 0 5px 0;
+`
+
+const SiteFavicon = styled.img`
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  margin: 0 5px 0 0;
+`
+
+const SiteUrl = styled.p`
+  margin: 0;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
   color: #7d7e8d;
 `
 
 const OrderCheck = styled.div`
-  margin: 34px 0 0 0;
+  margin: 50px 0 0 0;
 `
 
 const DashedDivider = styled.div`
@@ -42,19 +67,12 @@ const DashedDivider = styled.div`
 
 const DashedDividerLine = styled.div`
   width: 100%;
-  height: 1px;
-  border: 1px dashed #c3c3c3;
-`
-
-const Actions = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+  border-top: 1px dashed #c3c3c3;
 `
 
 const DestinationsList = styled.ul`
   list-style-type: none;
-  padding: 47px 0 0 20px;
+  padding: 30px 0 0 20px;
   overflow: hidden;
 `
 
@@ -111,6 +129,13 @@ const DestinateText = styled.p`
   white-space: nowrap;
 `
 
+const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 30px 30px 30px;
+`
+
 const Table = styled.table`
   width: 100%;
   border-spacing: 0;
@@ -152,19 +177,22 @@ const TableSymbol = styled.p`
 `
 
 const Styles = {
-  Wrapper,
-  Container,
+  Body,
   Row,
   Title,
-  Description,
+  SiteInfo,
+  SiteInfoLabel,
+  SiteInfoRow,
+  SiteFavicon,
+  SiteUrl,
   OrderCheck,
   DashedDivider,
   DashedDividerLine,
-  Actions,
   DestinationsList,
   Destinate,
   DestinateTitle,
   DestinateText,
+  Actions,
   Table,
   Tbody,
   TableTr,

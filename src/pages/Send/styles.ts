@@ -12,7 +12,7 @@ const Container = styled.div`
 `
 
 const Row = styled.div`
-  padding: 20px 30px 40px 40px;
+  padding: 20px 30px 40px 30px;
 `
 
 const PageTitle = styled.p`

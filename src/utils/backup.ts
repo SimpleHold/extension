@@ -14,7 +14,7 @@ export const generate = (address: string, privateKey: string): { [key: string]: 
         privateKey,
       },
     ],
-    version: 1.3,
+    version: 1.4,
     uuid: v4(),
   })
 

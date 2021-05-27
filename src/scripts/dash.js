@@ -17,10 +17,6 @@ const dash = (function () {
     return new window.dashcore.PrivateKey(privateKey).toAddress().toString()
   }
 
-  const getTransactionSize = (outputs) => {
-    return new window.dashcore.Transaction().from(outputs).toString().length
-  }
-
   const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {
     const transaction = new window.dashcore.Transaction()
       .from(outputs)
@@ -35,10 +31,18 @@ const dash = (function () {
     }
   }
 
+  const getFee = (outputs, to, amount, changeAddress) => {
+    return new window.dashcore.Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .change(changeAddress)
+      .getFee()
+  }
+
   return {
     generateWallet,
     importPrivateKey,
-    getTransactionSize,
     createTransaction,
+    getFee,
   }
 })()

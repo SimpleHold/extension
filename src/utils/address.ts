@@ -17,7 +17,7 @@ type TCreateTransactionProps = {
   to: string
   amount: number
   privateKey: string
-  symbol: TSymbols
+  symbol: string
   tokenChain?: string
   outputs?: UnspentOutput[]
   networkFee?: number
@@ -55,7 +55,12 @@ export const importPrivateKey = (
   }
 }
 
-export const validateAddress = (symbol: TSymbols, address: string, chain?: string): boolean => {
+export const validateAddress = (
+  symbol: TSymbols | string,
+  address: string,
+  chain?: string
+): boolean => {
+  // @ts-ignore
   const findRegexp = chain ? addressValidate.eth : addressValidate[symbol]
   return new RegExp(findRegexp)?.test(address)
 }
@@ -121,51 +126,118 @@ export const createTransaction = async ({
   }
 }
 
+interface IGetNetworkFeeParams {
+  address: string
+  symbol: string
+  amount: string
+  from: string
+  to: string
+  chain: string
+  web3Params: {
+    tokenChain?: string
+    contractAddress?: string
+    decimals?: number
+  }
+  outputs?: UnspentOutput[]
+  fee?: number
+}
+
+export const getNewNetworkFee = async (
+  params: IGetNetworkFeeParams
+): Promise<IGetNetworkFeeResponse | null> => {
+  const { address, symbol, amount, from, to, chain, web3Params, outputs, fee } = params
+
+  if (
+    web3Params?.contractAddress ||
+    web3Params?.decimals ||
+    web3Params?.tokenChain ||
+    isEthereumLike(symbol)
+  ) {
+    const value = web3Params?.decimals
+      ? web3.convertDecimals(amount, web3Params.decimals)
+      : web3.toWei(amount, 'ether')
+    const web3Chain = web3Params?.tokenChain || chain
+    const web3TokenChain = web3Params?.tokenChain ? symbol : undefined
+
+    return await getEtherNetworkFee(
+      from,
+      to,
+      value,
+      web3Chain,
+      web3TokenChain,
+      web3Params?.contractAddress,
+      web3Params?.decimals
+    )
+  }
+
+  if (outputs?.length) {
+    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+  }
+
+  return null
+}
+
 export const getAddressNetworkFee = async (
-  symbol: TSymbols,
-  outputs: UnspentOutput[],
-  fee: number,
+  address: string,
+  symbol: string,
   amount: string,
   from: string,
   to: string,
   chain: string,
+  outputs?: UnspentOutput[],
   tokenChain?: string,
   contractAddress?: string,
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
-  if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
-    const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
-    const data = await getEtherNetworkFee(
-      from,
-      to,
-      value,
-      tokenChain || chain,
-      tokenChain ? symbol : undefined,
-      contractAddress,
-      decimals
-    )
+  try {
+    if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
+      const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
+      const data = await getEtherNetworkFee(
+        from,
+        to,
+        value,
+        tokenChain || chain,
+        tokenChain ? symbol : undefined,
+        contractAddress,
+        decimals
+      )
 
-    return data
+      return data
+    }
+
+    if (typeof outputs !== 'undefined') {
+      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+    }
+
+    return null
+  } catch {
+    return null
   }
-  return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
 }
 
 export const formatUnit = (
-  symbol: TSymbols,
+  symbol: string,
   value: string | number,
   type: 'from' | 'to',
   chain?: string,
   unit?: web3.Unit
 ): number => {
-  if (isEthereumLike(symbol, chain)) {
-    if (unit) {
-      return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
+  try {
+    if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
+      return type === 'from'
+        ? new bitcoinLike(symbol).fromSat(Number(value))
+        : new bitcoinLike(symbol).toSat(Number(value))
     }
-    return Number(value)
+    if (isEthereumLike(symbol, chain)) {
+      if (unit) {
+        return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
+      }
+      return Number(value)
+    }
+    return 0
+  } catch {
+    return 0
   }
-  return type === 'from'
-    ? new bitcoinLike(symbol).fromSat(Number(value))
-    : new bitcoinLike(symbol).toSat(Number(value))
 }
 
 export const getExplorerLink = (

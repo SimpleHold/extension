@@ -1,7 +1,5 @@
 import styled from 'styled-components'
 
-import lockIllustrate from '@assets/illustrate/lock.svg'
-
 type TFiltersButtonProps = {
   isActive: boolean
 }
@@ -9,61 +7,6 @@ type TFiltersButtonProps = {
 type TFiltersRowProps = {
   isActive: boolean
 }
-
-const Wrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
-`
-
-const Extension = styled.div`
-  width: 375px;
-  height: 700px;
-  background-color: white;
-  border: 1px solid #eaeaea;
-  filter: drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.15));
-  border-radius: 16px;
-  overflow: hidden;
-`
-
-const Header = styled.header`
-  padding: 15px 30px;
-  border-radius: 16px 16px 0 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-`
-
-const Logo = styled.div`
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-
-  path {
-    fill: #ffffff;
-  }
-`
-
-const CloseButton = styled.div`
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 15px;
-
-  &:hover {
-    cursor: pointer;
-    background-color: rgb(255 255 255 / 80%);
-
-    path {
-      fill: #3fbb7d;
-    }
-  }
-`
 
 const Body = styled.div`
   background-color: #ffffff;
@@ -175,35 +118,6 @@ const FiltersRow = styled.div`
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
 `
 
-const LockedRow = styled.div`
-  padding: 50px 30px 0 30px;
-`
-
-const LockImage = styled.div`
-  width: 315px;
-  height: 180px;
-  background-image: url(${lockIllustrate});
-  background-repeat: no-repeat;
-  background-size: contain;
-`
-
-const LockedTitle = styled.p`
-  margin: 30px 0 0 0;
-  font-weight: bold;
-  font-size: 23px;
-  line-height: 27px;
-  text-align: center;
-  color: #1d1d22;
-`
-
-const LockedForm = styled.form`
-  margin: 20px 0 0 0;
-`
-
-const LockedFormActions = styled.div`
-  margin: 5px 0 0 0;
-`
-
 const NotFound = styled.p`
   margin: 10px 0 0 0;
   font-size: 14px;
@@ -212,11 +126,6 @@ const NotFound = styled.p`
 `
 
 const Styles = {
-  Wrapper,
-  Extension,
-  Header,
-  Logo,
-  CloseButton,
   Body,
   Row,
   Title,
@@ -231,11 +140,6 @@ const Styles = {
   FiltersButton,
   AddressesList,
   FiltersRow,
-  LockedRow,
-  LockImage,
-  LockedTitle,
-  LockedForm,
-  LockedFormActions,
   NotFound,
 }
 

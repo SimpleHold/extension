@@ -107,7 +107,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
             const { logo, value, label } = item
 
             return (
-              <Styles.ListItem key={value} onClick={() => onSelectItem(index)}>
+              <Styles.ListItem key={`${value}/${index}`} onClick={() => onSelectItem(index)}>
                 <CurrencyLogo
                   symbol={logo.symbol}
                   width={logo.width}
