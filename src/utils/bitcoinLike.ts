@@ -139,6 +139,15 @@ class GenerateAddress {
       return null
     }
   }
+
+  isAddressValid = (address: string): boolean => {
+    const provider = this.getProvider()
+
+    if (provider) {
+      return provider.isAddressValid(address)
+    }
+    return false
+  }
 }
 
 export default GenerateAddress

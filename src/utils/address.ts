@@ -61,12 +61,19 @@ export const importPrivateKey = (
 
 export const validateAddress = (
   symbol: TSymbols | string,
+  chain: string,
   address: string,
-  chain?: string
+  tokenChain?: string
 ): boolean => {
-  // @ts-ignore
-  const findRegexp = chain ? addressValidate.eth : addressValidate[symbol]
-  return new RegExp(findRegexp)?.test(address)
+  try {
+    if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
+      return new bitcoinLike(symbol).isAddressValid(address)
+    }
+    // @ts-ignore
+    return new RegExp(chain ? addressValidate.eth : addressValidate[symbol])?.test(address)
+  } catch {
+    return false
+  }
 }
 
 export const createTransaction = async ({
@@ -212,15 +219,15 @@ export const getAddressNetworkFee = async (
       return data
     }
 
-  if (theta.coins.indexOf(symbol) !== -1) {
-    return {
-      networkFee: 0.000001,
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return {
+        networkFee: 0.000001,
+      }
     }
-  }
 
-  if (typeof outputs !== 'undefined') {
-    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
-  }
+    if (typeof outputs !== 'undefined') {
+      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+    }
 
     return null
   } catch {

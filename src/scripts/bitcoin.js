@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable func-names */
@@ -44,6 +45,15 @@ const bitcoin = (function () {
     return new bitcore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
   }
 
+  const isAddressValid = (address) => {
+    try {
+      const getAddress = new bitcore.Address.fromString(address)
+      return getAddress.toString().toLowerCase() === address.toLowerCase()
+    } catch (err) {
+      return false
+    }
+  }
+
   return {
     generateWallet,
     importPrivateKey,
@@ -51,5 +61,6 @@ const bitcoin = (function () {
     fromSat,
     createTransaction,
     getFee,
+    isAddressValid,
   }
 })()
