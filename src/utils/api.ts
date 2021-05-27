@@ -128,20 +128,6 @@ export const sendRawTransaction = async (
   }
 }
 
-export const getFees = async (symbol: string, chain: string): Promise<number> => {
-  try {
-    if (isEthereumLike(symbol, chain)) {
-      return 0
-    }
-
-    const { data } = await axios.get(`${config.serverUrl}/wallet/fee/${chain}`)
-
-    return data.data || 0
-  } catch {
-    return 0
-  }
-}
-
 export const getContractInfo = async (
   address: string,
   chain: string

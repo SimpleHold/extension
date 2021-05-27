@@ -18,10 +18,6 @@ const bitcoin = (function () {
     return new bitcore.PrivateKey(privateKey).toAddress().toString()
   }
 
-  const getTransactionSize = (outputs) => {
-    return new bitcore.Transaction().from(outputs).toString().length
-  }
-
   const toSat = (value) => {
     return bitcore.Unit.fromBTC(value).toSatoshis()
   }
@@ -44,12 +40,16 @@ const bitcoin = (function () {
     }
   }
 
+  const getFee = (outputs, to, amount, changeAddress) => {
+    return new bitcore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
+  }
+
   return {
     generateWallet,
     importPrivateKey,
-    getTransactionSize,
     toSat,
     fromSat,
     createTransaction,
+    getFee,
   }
 })()

@@ -127,7 +127,7 @@ const NewWallet: React.FC = () => {
 
               localStorage.setItem('backupStatus', 'notDownloaded')
 
-              setActiveDrawer('success')
+              return setActiveDrawer('success')
             }
           }
         }

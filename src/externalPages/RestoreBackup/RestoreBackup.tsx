@@ -3,6 +3,9 @@ import { render } from 'react-dom'
 import SVG from 'react-inlinesvg'
 import { useDropzone } from 'react-dropzone'
 
+// Container
+import ExternalPageContainer from '@containers/ExternalPage'
+
 // Components
 import AgreeTerms from '@components/AgreeTerms'
 import Button from '@components/Button'
@@ -23,10 +26,10 @@ import { setBadgeBackgroundColor, setBadgeText } from '@utils/extension'
 import { START_RESTORE_CONFIRM, START_RESTORE_PASSWORD } from '@config/events'
 
 // Icons
-import puzzleIcon from './assets/modalIcons/puzzle.svg'
+import puzzleIcon from '../../assets/modalIcons/puzzle.svg'
 
 // Styles
-import Styles from './styles/restoreBackup.page'
+import Styles from './styles'
 
 const RestoreBackup: React.FC = () => {
   const [isAgreed, setIsAgreed] = React.useState<boolean>(true)
@@ -114,16 +117,8 @@ const RestoreBackup: React.FC = () => {
   }
 
   return (
-    <Styles.Wrapper>
-      <Styles.Extension>
-        <Styles.Header>
-          <Styles.LogoRow>
-            <SVG src="./assets/logo.svg" width={30} height={24} />
-          </Styles.LogoRow>
-          <Styles.CloseIconRow onClick={onClose}>
-            <SVG src="./assets/icons/times.svg" width={15} height={15} />
-          </Styles.CloseIconRow>
-        </Styles.Header>
+    <ExternalPageContainer onClose={onClose} headerStyle="white">
+      <>
         <Styles.Body>
           <Styles.Title>Restore</Styles.Title>
 
@@ -134,14 +129,14 @@ const RestoreBackup: React.FC = () => {
                 <SVG
                   src={
                     isFileBroken
-                      ? './assets/icons/invalidFile.svg'
-                      : './assets/icons/fileUploaded.svg'
+                      ? '../../assets/icons/invalidFile.svg'
+                      : '../../assets/icons/fileUploaded.svg'
                   }
                   width={26.5}
                   height={34.8}
                 />
               ) : (
-                <SVG src="./assets/icons/file.svg" width={26.5} height={34.8} />
+                <SVG src="../../assets/icons/file.svg" width={26.5} height={34.8} />
               )}
             </Styles.FileIconRow>
 
@@ -174,7 +169,7 @@ const RestoreBackup: React.FC = () => {
           <Styles.DividerLine />
 
           <Styles.QuestionBlock>
-            <SVG src="./assets/icons/ask.svg" width={15} height={15} title="ask" />
+            <SVG src="../../assets/icons/ask.svg" width={15} height={15} title="ask" />
             <Styles.Question>Why I see this page?</Styles.Question>
           </Styles.QuestionBlock>
 
@@ -211,8 +206,8 @@ const RestoreBackup: React.FC = () => {
           openFrom="browser"
           disableClose
         />
-      </Styles.Extension>
-    </Styles.Wrapper>
+      </>
+    </ExternalPageContainer>
   )
 }
 

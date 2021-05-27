@@ -82,6 +82,11 @@ const Input = styled.input`
   font-size: 16px;
   line-height: 19px;
   color: #1d1d22;
+
+  &:disabled {
+    background-color: #ffffff !important;
+    color: #7d7e8d;
+  }
 `
 
 const VisibleInput = styled.div`
@@ -111,6 +116,11 @@ const NumberInput = styled(NumberFormat)`
   font-size: 16px;
   line-height: 19px;
   color: #1d1d22;
+
+  &:disabled {
+    background-color: #ffffff !important;
+    color: #7d7e8d;
+  }
 `
 
 const Styles = {
