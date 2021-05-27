@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Transition } from 'react-transition-group'
+import SVG from 'react-inlinesvg'
 
 // Styles
 import Styles from './styles'
@@ -11,6 +12,7 @@ interface Props {
   onClose: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   icon?: string
   openFrom?: string
+  withCloseIcon?: boolean
 }
 
 const BackgroundStyles = {
@@ -21,7 +23,7 @@ const BackgroundStyles = {
 }
 
 const DrawerWrapper: React.FC<Props> = (props) => {
-  const { title, children, isActive, onClose, icon, openFrom } = props
+  const { title, children, isActive, onClose, icon, openFrom, withCloseIcon } = props
 
   const nodeRef = React.useRef(null)
 
@@ -65,6 +67,11 @@ const DrawerWrapper: React.FC<Props> = (props) => {
               </Styles.IconRow>
             ) : null}
             <Styles.Title>{title}</Styles.Title>
+            {withCloseIcon ? (
+              <Styles.CloseIconRow onClick={onClose}>
+                <SVG src="../../assets/icons/times.svg" width={16} height={16} />
+              </Styles.CloseIconRow>
+            ) : null}
             {children}
           </Styles.Drawer>
         </Styles.Wrapper>

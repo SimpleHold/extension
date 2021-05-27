@@ -13,6 +13,7 @@ const Wrapper = styled.div``
 
 const Background = styled.div`
   position: ${({ openFrom }: TBackgroundProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
+  backdrop-filter: blur(2px);
   z-index: 10;
   background-color: rgba(29, 29, 34, 0.2);
   top: 0;
@@ -26,8 +27,7 @@ const Background = styled.div`
 const Drawer = styled.div`
   background-color: #ffffff;
   border-radius: 5px 5px 0 0;
-  padding: ${({ withIcon }: TDrawerProps) =>
-    withIcon ? '20px 30px 30px 30px' : '40px 30px 30px 30px'};
+  padding: ${({ withIcon }: TDrawerProps) => (withIcon ? '20px 30px 30px 30px' : '30px')};
   word-break: break-word;
   position: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
   z-index: 11;
@@ -58,6 +58,29 @@ const Icon = styled.img`
   height: 60px;
 `
 
+const CloseIconRow = styled.div`
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  path {
+    fill: #cccccc;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
+`
+
 const Styles = {
   Wrapper,
   Background,
@@ -65,6 +88,7 @@ const Styles = {
   Title,
   IconRow,
   Icon,
+  CloseIconRow,
 }
 
 export default Styles
