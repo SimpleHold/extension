@@ -14,10 +14,11 @@ import Spinner from '@components/Spinner'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
-import { getBalance, getFees, getUnspentOutputs } from '@utils/api'
+import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
 import { validateAddress, getNewNetworkFee, isEthereumLike, formatUnit } from '@utils/address'
+import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -78,12 +79,6 @@ const Send: React.FC = () => {
   }, [selectedWallet])
 
   React.useEffect(() => {
-    if (selectedWallet && currencyInfo) {
-      getOutputs()
-    }
-  }, [currencyInfo, selectedWallet])
-
-  React.useEffect(() => {
     checkProps()
   }, [props])
 
@@ -106,17 +101,12 @@ const Send: React.FC = () => {
     }
   }, [isNetworkFeeLoading, amountErrorLabel])
 
-  const getOutputs = async (): Promise<void> => {
-    if (selectedWallet && currencyInfo) {
-      const { contractAddress, symbol, address } = selectedWallet
-      const { chain } = currencyInfo
-
-      if (contractAddress || isEthereumLike(symbol, chain)) {
-        return
+  const getOutputs = async (info: ICurrency): Promise<void> => {
+    if (selectedWallet) {
+      if (bitcoinLike.coins().indexOf(info.chain) !== -1) {
+        const unspentOutputs = await getUnspentOutputs(selectedWallet.address, info.chain)
+        setOutputs(unspentOutputs)
       }
-
-      const unspentOutputs = await getUnspentOutputs(address, chain)
-      setOutputs(unspentOutputs)
     }
   }
 
@@ -139,10 +129,9 @@ const Send: React.FC = () => {
 
       const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
-      const fee = await getFees(symbol, chain)
-
       if (currencyInfo) {
         const data = await getNewNetworkFee({
+          address: selectedWallet.address,
           symbol,
           amount,
           chain: currencyInfo.chain,
@@ -153,7 +142,6 @@ const Send: React.FC = () => {
             decimals,
             contractAddress,
           },
-          fee,
           outputs,
         })
 
@@ -221,6 +209,7 @@ const Send: React.FC = () => {
 
       if (info) {
         setCurrencyInfo(info)
+        getOutputs(info)
       }
     }
   }
@@ -316,7 +305,7 @@ const Send: React.FC = () => {
         networkFeeSymbol,
         outputs: utxosList,
         contractAddress: selectedWallet?.contractAddress,
-        tokenChain: currencyInfo?.chain,
+        tokenChain: selectedWallet?.chain,
         decimals: selectedWallet?.decimals,
       }
 
@@ -407,13 +396,7 @@ const Send: React.FC = () => {
       if (selectedWallet?.chain) {
         parseMinAmount = currencyInfo.minSendAmount || 0.001
       } else {
-        parseAmount = formatUnit(
-          selectedWallet.symbol,
-          amount,
-          'to',
-          selectedWallet?.chain,
-          'ether'
-        )
+        parseAmount = formatUnit(selectedWallet.symbol, amount, 'to', currencyInfo.chain, 'ether')
         parseMinAmount = formatUnit(
           selectedWallet.symbol,
           currencyInfo.minSendAmount,
@@ -432,9 +415,9 @@ const Send: React.FC = () => {
   }
 
   const isButtonDisabled = (): boolean => {
-    if (selectedWallet) {
+    if (selectedWallet && currencyInfo) {
       if (
-        validateAddress(selectedWallet.symbol, address) &&
+        validateAddress(selectedWallet.symbol, address, selectedWallet?.chain) &&
         amount.length &&
         Number(amount) > 0 &&
         addressErrorLabel === null &&
@@ -444,14 +427,11 @@ const Send: React.FC = () => {
         !isNetworkFeeLoading
       ) {
         if (!outputs.length) {
-          if (
-            selectedWallet?.contractAddress ||
-            isEthereumLike(selectedWallet.symbol, selectedWallet?.chain)
-          ) {
-            return false
+          if (bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1) {
+            return true
           }
-          return true
         }
+        return false
       }
     }
     return true

@@ -9,8 +9,15 @@ import { getUrl } from '@utils/extension'
 // Config
 import { getCurrency } from '@config/currencies'
 
+let activeRequest: string | null
+
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
+    if (activeRequest === request.type) {
+      return
+    }
+    activeRequest = request.type
+
     const { screenX, screenY, outerWidth, currency, chain } = request.data
 
     const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
@@ -35,6 +42,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       left: Math.max(screenX + (outerWidth - 375), 0),
       top: screenY,
     })
+    activeRequest = null
   }
 
   if (request.type === 'set_address') {
@@ -46,6 +54,11 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   }
 
   if (request.type === 'request_send') {
+    if (activeRequest === request.type) {
+      return
+    }
+    activeRequest = request.type
+
     const {
       screenX,
       screenY,
@@ -82,6 +95,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       left: Math.max(screenX + (outerWidth - 375), 0),
       top: screenY,
     })
+    activeRequest = null
   }
 })
 

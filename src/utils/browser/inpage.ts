@@ -1,5 +1,3 @@
-import { IRequest } from './types'
-
 const addCustomEventListener = (selector: string, event: any, handler: Function) => {
   const rootElement = document.querySelector<HTMLBodyElement>('body')
   if (rootElement) {
@@ -24,22 +22,7 @@ const addCustomEventListener = (selector: string, event: any, handler: Function)
 addCustomEventListener('#sh-button', 'click', () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
-  const getFavicon = (): string | null | undefined => {
-    let favicon = undefined
-    const nodeLinks = document.getElementsByTagName('link')
-
-    for (const link of nodeLinks) {
-      if (link.getAttribute('rel') === 'icon' || link.getAttribute('rel') === 'shortcut icon') {
-        favicon = link.getAttribute('href')
-      }
-    }
-
-    return favicon
-  }
-
   if (findInput) {
-    const favicon = getFavicon()
-
     document.dispatchEvent(new CustomEvent('request_addresses'))
   }
 })
