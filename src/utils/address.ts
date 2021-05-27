@@ -196,20 +196,21 @@ export const getAddressNetworkFee = async (
   contractAddress?: string,
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
-  if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
-    const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
-    const data = await getEtherNetworkFee(
-      from,
-      to,
-      value,
-      tokenChain || chain,
-      tokenChain ? symbol : undefined,
-      contractAddress,
-      decimals
-    )
+  try {
+    if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
+      const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
+      const data = await getEtherNetworkFee(
+        from,
+        to,
+        value,
+        tokenChain || chain,
+        tokenChain ? symbol : undefined,
+        contractAddress,
+        decimals
+      )
 
-    return data
-  }
+      return data
+    }
 
   if (theta.coins.indexOf(symbol) !== -1) {
     return {
@@ -221,7 +222,10 @@ export const getAddressNetworkFee = async (
     return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
   }
 
-  return null
+    return null
+  } catch {
+    return null
+  }
 }
 
 export const formatUnit = (

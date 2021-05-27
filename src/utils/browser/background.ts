@@ -9,8 +9,15 @@ import { getUrl } from '@utils/extension'
 // Config
 import { getCurrency } from '@config/currencies'
 
+let activeRequest: string | null
+
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
+    if (activeRequest === request.type) {
+      return
+    }
+    activeRequest = request.type
+
     const { screenX, screenY, outerWidth, currency, chain } = request.data
 
     const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
@@ -35,6 +42,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       left: Math.max(screenX + (outerWidth - 375), 0),
       top: screenY,
     })
+    activeRequest = null
   }
 
   if (request.type === 'set_address') {
@@ -46,6 +54,11 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   }
 
   if (request.type === 'request_send') {
+    if (activeRequest === request.type) {
+      return
+    }
+    activeRequest = request.type
+
     const {
       screenX,
       screenY,
@@ -82,6 +95,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       left: Math.max(screenX + (outerWidth - 375), 0),
       top: screenY,
     })
+    activeRequest = null
   }
 })
 
@@ -108,23 +122,21 @@ const generateContextMenu = async () => {
         const getCurrencyInfo = getCurrency(item)
 
         if (getCurrencyInfo) {
-          const { name } = getCurrencyInfo
-
           const currencyMenu = browser.contextMenus.create({
-            title: name,
+            title: getCurrencyInfo.name,
             parentId: parent,
             id: item,
             contexts: ['editable'],
           })
 
-          const latestBtcAddresses = getSymbolWallets.slice(-5)
+          const latestWallets = getSymbolWallets.slice(-5)
 
-          for (const btcAddress of latestBtcAddresses) {
-            const { address } = btcAddress
+          for (const latestWallet of latestWallets) {
+            const { address } = latestWallet
 
             browser.contextMenus.create({
               title: address,
-              id: address,
+              id: `${toLower(item)}_${address}`,
               contexts: ['editable'],
               parentId: currencyMenu,
             })
@@ -155,10 +167,12 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 
   if (tabs[0]?.id) {
     if (info.menuItemId !== 'sh-other-wallets') {
-      browser.tabs.sendMessage(tabs[0].id, {
+      const [, address] = `${info.menuItemId}`.split('_')
+
+      await browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',
         data: {
-          address: info.menuItemId,
+          address,
         },
       })
     } else {
