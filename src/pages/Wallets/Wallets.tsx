@@ -93,11 +93,17 @@ const Wallets: React.FC = () => {
     }
   }
 
+  const sortWallets = (a: IWallet, b: IWallet) => {
+    return b?.createdAt && a?.createdAt
+      ? new Date(b?.createdAt).getTime() - new Date(a?.createdAt).getTime()
+      : -1
+  }
+
   const getWalletsList = () => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      setWallets(walletsList)
+      setWallets(walletsList.sort(sortWallets))
     } else {
       localStorage.clear()
       history.push('/welcome')

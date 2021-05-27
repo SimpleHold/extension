@@ -79,12 +79,6 @@ const Send: React.FC = () => {
   }, [selectedWallet])
 
   React.useEffect(() => {
-    if (selectedWallet && currencyInfo) {
-      getOutputs()
-    }
-  }, [currencyInfo, selectedWallet])
-
-  React.useEffect(() => {
     checkProps()
   }, [props])
 
@@ -107,13 +101,10 @@ const Send: React.FC = () => {
     }
   }, [isNetworkFeeLoading, amountErrorLabel])
 
-  const getOutputs = async (): Promise<void> => {
-    if (selectedWallet && currencyInfo) {
-      const { address } = selectedWallet
-      const { chain } = currencyInfo
-
-      if (bitcoinLike.coins().indexOf(chain) !== -1) {
-        const unspentOutputs = await getUnspentOutputs(address, chain)
+  const getOutputs = async (info: ICurrency): Promise<void> => {
+    if (selectedWallet) {
+      if (bitcoinLike.coins().indexOf(info.chain) !== -1) {
+        const unspentOutputs = await getUnspentOutputs(selectedWallet.address, info.chain)
         setOutputs(unspentOutputs)
       }
     }
@@ -218,6 +209,7 @@ const Send: React.FC = () => {
 
       if (info) {
         setCurrencyInfo(info)
+        getOutputs(info)
       }
     }
   }
@@ -313,7 +305,7 @@ const Send: React.FC = () => {
         networkFeeSymbol,
         outputs: utxosList,
         contractAddress: selectedWallet?.contractAddress,
-        tokenChain: currencyInfo?.chain,
+        tokenChain: selectedWallet?.chain,
         decimals: selectedWallet?.decimals,
       }
 
@@ -404,13 +396,7 @@ const Send: React.FC = () => {
       if (selectedWallet?.chain) {
         parseMinAmount = currencyInfo.minSendAmount || 0.001
       } else {
-        parseAmount = formatUnit(
-          selectedWallet.symbol,
-          amount,
-          'to',
-          selectedWallet?.chain,
-          'ether'
-        )
+        parseAmount = formatUnit(selectedWallet.symbol, amount, 'to', currencyInfo.chain, 'ether')
         parseMinAmount = formatUnit(
           selectedWallet.symbol,
           currencyInfo.minSendAmount,
@@ -429,9 +415,9 @@ const Send: React.FC = () => {
   }
 
   const isButtonDisabled = (): boolean => {
-    if (selectedWallet) {
+    if (selectedWallet && currencyInfo) {
       if (
-        validateAddress(selectedWallet.symbol, address) &&
+        validateAddress(selectedWallet.symbol, address, selectedWallet?.chain) &&
         amount.length &&
         Number(amount) > 0 &&
         addressErrorLabel === null &&
@@ -441,11 +427,11 @@ const Send: React.FC = () => {
         !isNetworkFeeLoading
       ) {
         if (!outputs.length) {
-          if (currencyInfo && bitcoinLike.coins().indexOf(currencyInfo?.chain) !== -1) {
+          if (bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1) {
             return true
           }
-          return false
         }
+        return false
       }
     }
     return true

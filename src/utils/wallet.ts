@@ -22,12 +22,6 @@ export interface IWallet {
   createdAt?: Date
 }
 
-const sortWallets = (a: IWallet, b: IWallet): number => {
-  return b?.createdAt && a?.createdAt
-    ? new Date(b?.createdAt).getTime() - new Date(a?.createdAt).getTime()
-    : 0
-}
-
 export const getWallets = (): IWallet[] | null => {
   try {
     const walletsList = localStorage.getItem('wallets')
@@ -35,7 +29,7 @@ export const getWallets = (): IWallet[] | null => {
     if (walletsList) {
       const parseWallets = JSON.parse(walletsList)
 
-      return parseWallets.sort(sortWallets)
+      return parseWallets
     }
     return null
   } catch {

@@ -231,21 +231,25 @@ export const formatUnit = (
   chain?: string,
   unit?: web3.Unit
 ): number => {
-  if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
-    return type === 'from'
-      ? new bitcoinLike(symbol).fromSat(Number(value))
-      : new bitcoinLike(symbol).toSat(Number(value))
-  }
-  if (isEthereumLike(symbol, chain)) {
-    if (unit) {
-      return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
+  try {
+    if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
+      return type === 'from'
+        ? new bitcoinLike(symbol).fromSat(Number(value))
+        : new bitcoinLike(symbol).toSat(Number(value))
     }
-    return Number(value)
+    if (isEthereumLike(symbol, chain)) {
+      if (unit) {
+        return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
+      }
+      return Number(value)
+    }
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? theta.fromTheta(value) : theta.toTheta(value)
+    }
+    return 0
+  } catch {
+    return 0
   }
-  if (theta.coins.indexOf(symbol) !== -1) {
-    return type === 'from' ? theta.fromTheta(value) : theta.toTheta(value)
-  }
-  return 0
 }
 
 export const getExplorerLink = (

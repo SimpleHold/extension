@@ -10,21 +10,26 @@ import Styles from './styles'
 
 interface Props {
   isActive: boolean
-  onClose: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+  onClose: (event?: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   text?: string
   link?: string
   openFrom?: string
   disableClose?: boolean
   icon?: string
+  isCloseOnLinkClick?: boolean
 }
 
 const SuccessDrawer: React.FC<Props> = (props) => {
-  const { isActive, onClose, text, link, openFrom, disableClose, icon } = props
+  const { isActive, onClose, text, link, openFrom, disableClose, icon, isCloseOnLinkClick } = props
 
-  const openLink = (): Promise<Tabs.Tab> => {
-    return browser.tabs.create({
+  const openLink = async (): Promise<void> => {
+    await browser.tabs.create({
       url: link,
     })
+
+    if (isCloseOnLinkClick) {
+      onClose()
+    }
   }
 
   return (

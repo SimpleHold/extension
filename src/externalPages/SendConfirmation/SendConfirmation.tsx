@@ -315,6 +315,7 @@ const SendConfirmation: React.FC = () => {
           text="Your transaction has been successfully sent. You can check it here:"
           link={transactionLink}
           openFrom="browser"
+          isCloseOnLinkClick
         />
       </>
     </ExternalPageContainer>
