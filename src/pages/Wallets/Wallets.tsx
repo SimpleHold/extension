@@ -1,9 +1,13 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import SVG from 'react-inlinesvg'
 
 // Components
 import WalletCard from '@components/WalletCard'
 import CollapsibleHeader from '@components/CollapsibleHeader'
+
+// Drawers
+import SortWalletsDrawer from '@drawers/SortWallets'
 
 // Hooks
 import useScroll from '@hooks/useScroll'
@@ -35,6 +39,7 @@ const Wallets: React.FC = () => {
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
   const [walletsPending, setWalletsPending] = React.useState<number[]>([])
   const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<'sort' | 'filters' | null>(null)
 
   const { scrollPosition } = useScroll()
   const addToast = useToastContext()
@@ -130,38 +135,57 @@ const Wallets: React.FC = () => {
     setWalletsPending((prevArray: number[]) => [...prevArray, amount])
   }
 
-  return (
-    <Styles.Wrapper>
-      <CollapsibleHeader
-        onAddNewAddress={onAddNewAddress}
-        scrollPosition={scrollPosition}
-        balance={totalBalance}
-        estimated={totalEstimated}
-        pendingBalance={pendingBalance}
-      />
-      {wallets?.length ? (
-        <Styles.WalletsList>
-          {wallets.map((wallet: IWallet, index: number) => {
-            const { address, symbol, chain, name, contractAddress, decimals } = wallet
+  const onSortWallets = (): void => {
+    setActiveDrawer('sort')
+  }
 
-            return (
-              <WalletCard
-                key={`${address}/${index}`}
-                address={address}
-                chain={chain}
-                symbol={symbol.toLowerCase()}
-                name={name}
-                contractAddress={contractAddress}
-                decimals={decimals}
-                sumBalance={sumBalance}
-                sumEstimated={sumEstimated}
-                sumPending={sumPending}
-              />
-            )
-          })}
-        </Styles.WalletsList>
-      ) : null}
-    </Styles.Wrapper>
+  const onFilterWallets = (): void => {
+    setActiveDrawer('filters')
+  }
+
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
+  return (
+    <>
+      <Styles.Wrapper>
+        <CollapsibleHeader
+          scrollPosition={scrollPosition}
+          balance={totalBalance}
+          estimated={totalEstimated}
+          pendingBalance={pendingBalance}
+          onSortWallets={onSortWallets}
+          onFilterWallets={onFilterWallets}
+        />
+        {wallets?.length ? (
+          <Styles.WalletsList>
+            {wallets.map((wallet: IWallet, index: number) => {
+              const { address, symbol, chain, name, contractAddress, decimals } = wallet
+
+              return (
+                <WalletCard
+                  key={`${address}/${index}`}
+                  address={address}
+                  chain={chain}
+                  symbol={symbol.toLowerCase()}
+                  name={name}
+                  contractAddress={contractAddress}
+                  decimals={decimals}
+                  sumBalance={sumBalance}
+                  sumEstimated={sumEstimated}
+                  sumPending={sumPending}
+                />
+              )
+            })}
+          </Styles.WalletsList>
+        ) : null}
+        <Styles.AddWalletButton onClick={onAddNewAddress}>
+          <SVG src="../../assets/icons/plus.svg" width={14} height={14} title="Add new wallet" />
+        </Styles.AddWalletButton>
+      </Styles.Wrapper>
+      <SortWalletsDrawer isActive={activeDrawer === 'sort'} onClose={onCloseDrawer} />
+    </>
   )
 }
 
