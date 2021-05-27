@@ -198,7 +198,7 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (address.length && !validateAddress(symbol, address, tokenChain)) {
+    if (address.length && !validateAddress(symbol, chain, address, tokenChain)) {
       setAddressErrorLabel('Address is not valid')
     }
 
@@ -235,7 +235,7 @@ const Send: React.FC = () => {
 
   const isButtonDisabled = (): boolean => {
     if (
-      validateAddress(symbol, address, tokenChain) &&
+      validateAddress(symbol, chain, address, tokenChain) &&
       amount.length &&
       Number(amount) > 0 &&
       addressErrorLabel === null &&

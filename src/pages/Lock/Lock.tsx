@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { browser, Tabs } from 'webextension-polyfill-ts'
 import { useHistory, useLocation } from 'react-router-dom'
 
 // Components
@@ -15,6 +14,7 @@ import { decrypt } from '@utils/crypto'
 import { download as downloadBackup } from '@utils/backup'
 import { validatePassword } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
+import { openWebPage } from '@utils/extension'
 
 // Config
 import { LOG_OUT_CACHE, PASSWORD_AFTER_LOG_OUT, SUCCESS_ENTER } from '@config/events'
@@ -68,10 +68,6 @@ const Lock: React.FC = () => {
     }
 
     return setErrorLabel('Password is not valid')
-  }
-
-  const openWebPage = (url: string): Promise<Tabs.Tab> => {
-    return browser.tabs.create({ url })
   }
 
   const onLogout = (): void => {

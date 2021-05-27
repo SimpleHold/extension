@@ -8,6 +8,7 @@ import CollapsibleHeader from '@components/CollapsibleHeader'
 
 // Drawers
 import SortWalletsDrawer from '@drawers/SortWallets'
+import FilterWalletsDrawer from '@drawers/FilterWallets'
 
 // Hooks
 import useScroll from '@hooks/useScroll'
@@ -185,6 +186,7 @@ const Wallets: React.FC = () => {
         </Styles.AddWalletButton>
       </Styles.Wrapper>
       <SortWalletsDrawer isActive={activeDrawer === 'sort'} onClose={onCloseDrawer} />
+      <FilterWalletsDrawer isActive={activeDrawer === 'filters'} onClose={onCloseDrawer} />
     </>
   )
 }

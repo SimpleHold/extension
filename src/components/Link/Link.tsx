@@ -1,6 +1,8 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
-import { browser, Tabs } from 'webextension-polyfill-ts'
+
+// Utils
+import { openWebPage } from '@utils/extension'
 
 // Styles
 import Styles from './styles'
@@ -14,12 +16,8 @@ interface Props {
 const Link: React.FC<Props> = (props) => {
   const { to, title, mt = 0 } = props
 
-  const openWebPage = (): Promise<Tabs.Tab> => {
-    return browser.tabs.create({ url: to })
-  }
-
   return (
-    <Styles.Container onClick={openWebPage} mt={mt}>
+    <Styles.Container onClick={() => openWebPage(to)} mt={mt}>
       <Styles.IconRow>
         <SVG src="../../assets/icons/ask.svg" width={15} height={15} title="ask" />
       </Styles.IconRow>

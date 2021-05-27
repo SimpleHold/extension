@@ -361,11 +361,10 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (selectedWallet) {
+    if (selectedWallet && currencyInfo) {
       if (
         address.length &&
-        // @ts-ignore
-        !validateAddress(selectedWallet.symbol, address, selectedWallet?.chain)
+        !validateAddress(selectedWallet.symbol, currencyInfo.chain, address, selectedWallet?.chain)
       ) {
         return setAddressErrorLabel('Address is not valid')
       }
@@ -417,7 +416,12 @@ const Send: React.FC = () => {
   const isButtonDisabled = (): boolean => {
     if (selectedWallet && currencyInfo) {
       if (
-        validateAddress(selectedWallet.symbol, address, selectedWallet?.chain) &&
+        validateAddress(
+          selectedWallet.symbol,
+          currencyInfo.chain,
+          address,
+          selectedWallet?.chain
+        ) &&
         amount.length &&
         Number(amount) > 0 &&
         addressErrorLabel === null &&
