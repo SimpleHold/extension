@@ -34,41 +34,6 @@ const Estimated = styled.p`
   color: rgba(255, 255, 255, 0.8);
 `
 
-const AddWallet = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  position: absolute;
-  width: calc(100% - 60px);
-  bottom: 10px;
-`
-
-const AddWalletLabel = styled.p`
-  margin: 0;
-`
-
-const AddWalletButton = styled.button`
-  border: none;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
-  width: 60px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  outline: none;
-
-  &:hover {
-    cursor: pointer;
-    background-color: #ffffffcc;
-
-    line {
-      stroke: #31a76c;
-    }
-  }
-`
-
 const TotalBalanceLabel = styled.p`
   margin: 0;
   font-size: 16px;
@@ -79,6 +44,54 @@ const TotalBalanceLabel = styled.p`
 
 const PendingBalanceRow = styled.div``
 
+const Bottom = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: absolute;
+  bottom: 10px;
+  width: calc(100% - 60px);
+  justify-content: space-between;
+`
+
+const WalletsLabel = styled.p`
+  margin: 0;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #ffffff;
+`
+
+const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const Button = styled.div`
+  padding: 8px 11px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+
+  &:not(:last-child) {
+    margin: 0 10px 0 0;
+  }
+
+  path {
+    fill: #ffffff;
+  }
+
+  &:hover {
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.8);
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
+`
+
 const Styles = {
   Container,
   Row,
@@ -86,11 +99,12 @@ const Styles = {
   Balance,
   ClockIcon,
   Estimated,
-  AddWallet,
-  AddWalletLabel,
-  AddWalletButton,
   TotalBalanceLabel,
   PendingBalanceRow,
+  Bottom,
+  WalletsLabel,
+  Actions,
+  Button,
 }
 
 export default Styles

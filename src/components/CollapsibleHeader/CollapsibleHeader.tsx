@@ -14,15 +14,23 @@ import { price } from '@utils/format'
 import Styles from './styles'
 
 interface Props {
-  onAddNewAddress: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void
   scrollPosition: number
   balance: null | number
   estimated: null | number
   pendingBalance: null | number
+  onSortWallets: () => void
+  onFilterWallets: () => void
 }
 
 const CollapsibleHeader: React.FC<Props> = (props) => {
-  const { onAddNewAddress, scrollPosition, balance, estimated, pendingBalance } = props
+  const {
+    scrollPosition,
+    balance,
+    estimated,
+    pendingBalance,
+    onSortWallets,
+    onFilterWallets,
+  } = props
 
   const сontainerHeight = Math.max(110, 290 - 1.25 * scrollPosition)
 
@@ -125,13 +133,17 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
           </Styles.PendingBalanceRow>
         ) : null}
 
-        <Styles.AddWallet>
-          <Styles.AddWalletLabel style={{ opacity: 0, height: 0 }}>Wallets</Styles.AddWalletLabel>
-
-          <Styles.AddWalletButton onClick={onAddNewAddress}>
-            <SVG src="../../assets/icons/plus.svg" width={16} height={16} title="Add new wallet" />
-          </Styles.AddWalletButton>
-        </Styles.AddWallet>
+        <Styles.Bottom>
+          <Styles.WalletsLabel>Wallets</Styles.WalletsLabel>
+          <Styles.Actions>
+            <Styles.Button onClick={onSortWallets}>
+              <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
+            </Styles.Button>
+            <Styles.Button onClick={onFilterWallets}>
+              <SVG src="../../assets/icons/filter.svg" width={18} height={14} />
+            </Styles.Button>
+          </Styles.Actions>
+        </Styles.Bottom>
       </Styles.Row>
     </Styles.Container>
   )
