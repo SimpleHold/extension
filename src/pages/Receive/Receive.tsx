@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
-import { browser, Tabs } from 'webextension-polyfill-ts'
 import numeral from 'numeral'
 
 // Components
@@ -14,6 +13,7 @@ import Skeleton from '@components/Skeleton'
 import QRCode from '@components/QRCode'
 import CopyToClipboard from '@components/CopyToClipboard'
 import PendingBalance from '@components/PendingBalance'
+import Tooltip from '@components/Tooltip'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -30,6 +30,7 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet, updateBalance } from '@utils/wallet'
 import { getExplorerLink } from '@utils/address'
+import { openWebPage } from '@utils/extension'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
@@ -40,6 +41,9 @@ import { getToken } from '@config/tokens'
 import privateKeyIcon from '@assets/icons/privateKey.svg'
 import linkIcon from '@assets/icons/link.svg'
 import plusCircleIcon from '@assets/icons/plusCircle.svg'
+import eyeIcon from '@assets/icons/eye.svg'
+import refreshIcon from '@assets/icons/refresh.svg'
+import moreIcon from '@assets/icons/more.svg'
 
 // Styles
 import Styles from './styles'
@@ -145,18 +149,13 @@ const Receive: React.FC = () => {
     setPendingBalance(pending)
   }
 
-  const openWebPage = (url: string): Promise<Tabs.Tab> => {
-    return browser.tabs.create({ url })
-  }
-
   const onClickDropDown = (index: number) => {
     setIsVisible(false)
 
     if (index === 0) {
       setActiveDrawer('confirm')
     } else if (index === 1) {
-      const link = getExplorerLink(address, symbol, currency, chain, contractAddress)
-      openWebPage(link)
+      openWebPage(getExplorerLink(address, symbol, currency, chain, contractAddress))
     } else if (index === 2) {
       history.push('/select-token', {
         currency,
@@ -217,20 +216,27 @@ const Receive: React.FC = () => {
         <Styles.Container>
           <Styles.Row>
             <Styles.Heading>
-              <Styles.UpdateBalanceBlock>
-                <Styles.BalanceLabel>Balance</Styles.BalanceLabel>
-                <Styles.RefreshIconRow isRefreshing={isRefreshing} onClick={onRefresh}>
-                  <SVG
-                    src="../../assets/icons/refresh.svg"
-                    width={13}
-                    height={13}
-                    title="Refresh balance"
-                  />
-                </Styles.RefreshIconRow>
-              </Styles.UpdateBalanceBlock>
-              <Styles.MoreButton onClick={() => setIsVisible(!isVisible)}>
-                <SVG src="../../assets/icons/more.svg" width={18} height={3.78} title="More" />
-              </Styles.MoreButton>
+              <Styles.Currency>
+                <CurrencyLogo
+                  symbol={symbol}
+                  width={30}
+                  height={30}
+                  br={8}
+                  chain={chain}
+                  name={tokenName}
+                />
+                <Styles.CurrencyName>{name}</Styles.CurrencyName>
+              </Styles.Currency>
+              <Styles.Actions>
+                <Styles.Action>
+                  <Tooltip text="Show address">
+                    <SVG src={eyeIcon} width={16.7} height={15} />
+                  </Tooltip>
+                </Styles.Action>
+                <Styles.Action onClick={() => setIsVisible(!isVisible)}>
+                  <SVG src={moreIcon} width={16} height={3.36} />
+                </Styles.Action>
+              </Styles.Actions>
             </Styles.Heading>
 
             <DropDown
@@ -240,28 +246,21 @@ const Receive: React.FC = () => {
               onClick={onClickDropDown}
             />
 
-            <Styles.CurrencyBlock>
-              <CurrencyLogo
-                symbol={symbol}
-                width={22}
-                height={22}
-                br={5}
-                chain={chain}
-                name={tokenName}
-              />
-              <Styles.CurrencyName>{name}</Styles.CurrencyName>
-            </Styles.CurrencyBlock>
-
-            <Skeleton width={250} height={36} mt={10} type="gray" isLoading={balance === null}>
-              <Styles.Balance>
-                {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
-              </Styles.Balance>
+            <Skeleton width={250} height={36} mt={30} type="gray" isLoading={balance === null}>
+              <Styles.BalanceRow>
+                <Styles.Balance>
+                  {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
+                </Styles.Balance>
+                <Styles.RefreshButton>
+                  <SVG src={refreshIcon} width={16} height={16} />
+                </Styles.RefreshButton>
+              </Styles.BalanceRow>
             </Skeleton>
 
             <Skeleton
               width={130}
               height={23}
-              mt={5}
+              mt={10}
               mb={10}
               type="gray"
               isLoading={estimated === null}
@@ -272,16 +271,18 @@ const Receive: React.FC = () => {
             </Skeleton>
 
             {pendingBalance !== 0 ? (
-              <PendingBalance pending={pendingBalance} type="gray" symbol={symbol} />
+              <Styles.PendingRow>
+                <PendingBalance pending={pendingBalance} type="gray" symbol={symbol} />
+              </Styles.PendingRow>
             ) : null}
           </Styles.Row>
 
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />
-            <CopyToClipboard value={address} mb={20} onCopy={onCopyAddress}>
+            <CopyToClipboard value={address} mb={30} onCopy={onCopyAddress}>
               <Styles.Address>{address}</Styles.Address>
             </CopyToClipboard>
-            <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} />
+            <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} isSmall />
           </Styles.ReceiveBlock>
         </Styles.Container>
       </Styles.Wrapper>
