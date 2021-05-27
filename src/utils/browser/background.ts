@@ -122,23 +122,21 @@ const generateContextMenu = async () => {
         const getCurrencyInfo = getCurrency(item)
 
         if (getCurrencyInfo) {
-          const { name } = getCurrencyInfo
-
           const currencyMenu = browser.contextMenus.create({
-            title: name,
+            title: getCurrencyInfo.name,
             parentId: parent,
             id: item,
             contexts: ['editable'],
           })
 
-          const latestBtcAddresses = getSymbolWallets.slice(-5)
+          const latestWallets = getSymbolWallets.slice(-5)
 
-          for (const btcAddress of latestBtcAddresses) {
-            const { address } = btcAddress
+          for (const latestWallet of latestWallets) {
+            const { address } = latestWallet
 
             browser.contextMenus.create({
               title: address,
-              id: address,
+              id: `${toLower(item)}_${address}`,
               contexts: ['editable'],
               parentId: currencyMenu,
             })
@@ -169,10 +167,12 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 
   if (tabs[0]?.id) {
     if (info.menuItemId !== 'sh-other-wallets') {
-      browser.tabs.sendMessage(tabs[0].id, {
+      const [, address] = `${info.menuItemId}`.split('_')
+
+      await browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',
         data: {
-          address: info.menuItemId,
+          address,
         },
       })
     } else {
