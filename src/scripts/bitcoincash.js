@@ -18,10 +18,6 @@ const bitcoincash = (function () {
     return new bitcorecash.PrivateKey(privateKey).toAddress().toString()
   }
 
-  const getTransactionSize = (outputs) => {
-    return new bitcorecash.Transaction().from(outputs).toString().length
-  }
-
   const createTransaction = (outputs, to, amount, fee, changeAddress, privateKey) => {
     const transaction = new bitcorecash.Transaction()
       .from(outputs)
@@ -36,10 +32,14 @@ const bitcoincash = (function () {
     }
   }
 
+  const getFee = (outputs, to, amount, changeAddress) => {
+    return new bitcorecash.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
+  }
+
   return {
     generateWallet,
     importPrivateKey,
-    getTransactionSize,
     createTransaction,
+    getFee,
   }
 })()

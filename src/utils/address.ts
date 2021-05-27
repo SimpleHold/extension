@@ -127,6 +127,7 @@ export const createTransaction = async ({
 }
 
 interface IGetNetworkFeeParams {
+  address: string
   symbol: string
   amount: string
   from: string
@@ -144,7 +145,7 @@ interface IGetNetworkFeeParams {
 export const getNewNetworkFee = async (
   params: IGetNetworkFeeParams
 ): Promise<IGetNetworkFeeResponse | null> => {
-  const { symbol, amount, from, to, chain, web3Params, outputs, fee } = params
+  const { address, symbol, amount, from, to, chain, web3Params, outputs, fee } = params
 
   if (
     web3Params?.contractAddress ||
@@ -169,16 +170,16 @@ export const getNewNetworkFee = async (
     )
   }
 
-  if (outputs?.length && fee) {
-    return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
+  if (outputs?.length) {
+    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
   }
 
   return null
 }
 
 export const getAddressNetworkFee = async (
+  address: string,
   symbol: string,
-  fee: number,
   amount: string,
   from: string,
   to: string,
@@ -188,26 +189,30 @@ export const getAddressNetworkFee = async (
   contractAddress?: string,
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
-  if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
-    const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
-    const data = await getEtherNetworkFee(
-      from,
-      to,
-      value,
-      tokenChain || chain,
-      tokenChain ? symbol : undefined,
-      contractAddress,
-      decimals
-    )
+  try {
+    if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
+      const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
+      const data = await getEtherNetworkFee(
+        from,
+        to,
+        value,
+        tokenChain || chain,
+        tokenChain ? symbol : undefined,
+        contractAddress,
+        decimals
+      )
 
-    return data
+      return data
+    }
+
+    if (typeof outputs !== 'undefined') {
+      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+    }
+
+    return null
+  } catch {
+    return null
   }
-
-  if (outputs?.length) {
-    return new bitcoinLike(symbol).getNetworkFee(outputs, fee, amount)
-  }
-
-  return null
 }
 
 export const formatUnit = (
@@ -217,15 +222,22 @@ export const formatUnit = (
   chain?: string,
   unit?: web3.Unit
 ): number => {
-  if (isEthereumLike(symbol, chain)) {
-    if (unit) {
-      return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
+  try {
+    if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
+      return type === 'from'
+        ? new bitcoinLike(symbol).fromSat(Number(value))
+        : new bitcoinLike(symbol).toSat(Number(value))
     }
-    return Number(value)
+    if (isEthereumLike(symbol, chain)) {
+      if (unit) {
+        return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
+      }
+      return Number(value)
+    }
+    return 0
+  } catch {
+    return 0
   }
-  return type === 'from'
-    ? new bitcoinLike(symbol).fromSat(Number(value))
-    : new bitcoinLike(symbol).toSat(Number(value))
 }
 
 export const getExplorerLink = (

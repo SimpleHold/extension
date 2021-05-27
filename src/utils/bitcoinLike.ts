@@ -1,3 +1,5 @@
+import { toLower } from '@utils/format'
+
 class GenerateAddress {
   symbol: TSymbols | string
 
@@ -5,28 +7,42 @@ class GenerateAddress {
     this.symbol = symbol
   }
 
+  static coins() {
+    return ['bitcoin', 'bitcoin-cash', 'bitcoin-sv', 'litecoin', 'dogecoin', 'dash']
+  }
+
+  getProvider = (): BitcoinLikeProvider | null => {
+    const { symbol } = this
+
+    if (symbol === 'btc' || symbol === 'bsv') {
+      return bitcoin
+    }
+
+    if (symbol === 'bch') {
+      return bitcoincash
+    }
+
+    if (symbol === 'dash') {
+      return dash
+    }
+
+    if (symbol === 'doge') {
+      return dogecoin
+    }
+
+    if (symbol === 'ltc') {
+      return litecoin
+    }
+
+    return null
+  }
+
   generate = (): TGenerateAddress | null => {
     try {
-      const { symbol } = this
+      const provider = this.getProvider()
 
-      if (symbol === 'btc' || symbol === 'bsv') {
-        return bitcoin.generateWallet()
-      }
-
-      if (symbol === 'bch') {
-        return bitcoincash.generateWallet()
-      }
-
-      if (symbol === 'dash') {
-        return dash.generateWallet()
-      }
-
-      if (symbol === 'doge') {
-        return dogecoin.generateWallet()
-      }
-
-      if (symbol === 'ltc') {
-        return litecoin.generateWallet()
+      if (provider) {
+        return provider.generateWallet()
       }
 
       return null
@@ -37,26 +53,10 @@ class GenerateAddress {
 
   import = (privateKey: string): string | null => {
     try {
-      const { symbol } = this
+      const provider = this.getProvider()
 
-      if (symbol === 'btc' || symbol === 'bsv') {
-        return bitcoin.importPrivateKey(privateKey)
-      }
-
-      if (symbol === 'bch') {
-        return bitcoincash.importPrivateKey(privateKey)
-      }
-
-      if (symbol === 'dash') {
-        return dash.importPrivateKey(privateKey)
-      }
-
-      if (symbol === 'doge') {
-        return dogecoin.importPrivateKey(privateKey)
-      }
-
-      if (symbol === 'ltc') {
-        return litecoin.importPrivateKey(privateKey)
+      if (provider) {
+        return provider.importPrivateKey(privateKey)
       }
 
       return null
@@ -65,30 +65,18 @@ class GenerateAddress {
     }
   }
 
-  getTransactionSize = (outputs: UnspentOutput[]): number => {
-    const { symbol } = this
+  getFee = (address: string, outputs: UnspentOutput[], amount: string): number => {
+    try {
+      const provider = this.getProvider()
 
-    if (symbol === 'btc' || symbol === 'bsv') {
-      return bitcoin.getTransactionSize(outputs)
+      if (provider) {
+        return provider.getFee(outputs, address, this.toSat(Number(amount)), address)
+      }
+
+      return 0
+    } catch {
+      return 0
     }
-
-    if (symbol === 'bch') {
-      return bitcoincash.getTransactionSize(outputs)
-    }
-
-    if (symbol === 'dash') {
-      return dash.getTransactionSize(outputs)
-    }
-
-    if (symbol === 'doge') {
-      return dogecoin.getTransactionSize(outputs)
-    }
-
-    if (symbol === 'ltc') {
-      return litecoin.getTransactionSize(outputs)
-    }
-
-    return 0
   }
 
   toSat = (value: number): number => {
@@ -107,13 +95,14 @@ class GenerateAddress {
     }
   }
 
-  getNetworkFee = (unspentOutputs: UnspentOutput[], feePerByteSat: number, amount: string) => {
+  getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], amount: string) => {
+    const { symbol } = this
     const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
     const utxos: UnspentOutput[] = []
 
     for (const output of sortOutputs) {
       const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-      const transactionFeeBytes = this.getTransactionSize(utxos) * feePerByteSat
+      const transactionFeeBytes = this.getFee(address, utxos, amount)
 
       if (getUtxosValue >= this.toSat(Number(amount)) + transactionFeeBytes) {
         break
@@ -122,8 +111,10 @@ class GenerateAddress {
       utxos.push(output)
     }
 
+    const networkFee = this.fromSat(this.getFee(address, utxos, amount))
+
     return {
-      networkFee: this.fromSat(this.getTransactionSize(utxos) * feePerByteSat),
+      networkFee: toLower(symbol) === 'doge' && networkFee < 1 ? 1 : networkFee,
       utxos,
     }
   }
@@ -137,26 +128,10 @@ class GenerateAddress {
     privateKey: string
   ): TCreatedTransaction | null => {
     try {
-      const { symbol } = this
+      const provider = this.getProvider()
 
-      if (symbol === 'btc' || symbol === 'bsv') {
-        return bitcoin.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
-      }
-
-      if (symbol === 'bch') {
-        return bitcoincash.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
-      }
-
-      if (symbol === 'dash') {
-        return dash.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
-      }
-
-      if (symbol === 'doge') {
-        return dogecoin.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
-      }
-
-      if (symbol === 'ltc') {
-        return litecoin.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
+      if (provider) {
+        return provider.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
       }
 
       return null
