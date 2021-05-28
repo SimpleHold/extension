@@ -28,7 +28,7 @@ import { price, toUpper, toLower } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet, updateBalance } from '@utils/wallet'
+import { IWallet, toggleVisibleWallet, updateBalance } from '@utils/wallet'
 import { getExplorerLink } from '@utils/address'
 import { openWebPage } from '@utils/extension'
 
@@ -42,6 +42,7 @@ import privateKeyIcon from '@assets/icons/privateKey.svg'
 import linkIcon from '@assets/icons/link.svg'
 import plusCircleIcon from '@assets/icons/plusCircle.svg'
 import eyeIcon from '@assets/icons/eye.svg'
+import eyeVisibleIcon from '@assets/icons/eyeVisible.svg'
 import refreshIcon from '@assets/icons/refresh.svg'
 import moreIcon from '@assets/icons/more.svg'
 
@@ -56,6 +57,7 @@ interface LocationState {
   contractAddress?: string
   tokenName?: string
   decimals?: number
+  isHidden?: boolean
 }
 
 const Receive: React.FC = () => {
@@ -68,6 +70,7 @@ const Receive: React.FC = () => {
       contractAddress = undefined,
       tokenName = undefined,
       decimals = undefined,
+      isHidden = false,
     },
   } = useLocation<LocationState>()
 
@@ -84,6 +87,7 @@ const Receive: React.FC = () => {
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
   const [pendingBalance, setPendingBalance] = React.useState<number>(0)
   const [dropDownList, setDropDownList] = React.useState<any[]>([])
+  const [isHiddenWallet, setIsHiddenWallet] = React.useState<boolean>(isHidden)
 
   React.useEffect(() => {
     logEvent({
@@ -208,6 +212,11 @@ const Receive: React.FC = () => {
     return setPasswordErrorLabel('Password is not valid')
   }
 
+  const onVisibleWallet = (): void => {
+    toggleVisibleWallet(address, symbol, !isHiddenWallet)
+    setIsHiddenWallet(!isHiddenWallet)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -228,11 +237,11 @@ const Receive: React.FC = () => {
                 <Styles.CurrencyName>{name}</Styles.CurrencyName>
               </Styles.Currency>
               <Styles.Actions>
-                <Styles.Action>
-                  <Tooltip text="Show address">
-                    <SVG src={eyeIcon} width={16.7} height={15} />
-                  </Tooltip>
-                </Styles.Action>
+                <Tooltip text={`${isHiddenWallet ? 'Show' : 'Hide'} address`} mt={5}>
+                  <Styles.Action onClick={onVisibleWallet}>
+                    <SVG src={isHiddenWallet ? eyeVisibleIcon : eyeIcon} width={30} height={30} />
+                  </Styles.Action>
+                </Tooltip>
                 <Styles.Action onClick={() => setIsVisible(!isVisible)}>
                   <SVG src={moreIcon} width={16} height={3.36} />
                 </Styles.Action>
@@ -245,26 +254,18 @@ const Receive: React.FC = () => {
               list={dropDownList}
               onClick={onClickDropDown}
             />
-
-            <Skeleton width={250} height={36} mt={30} type="gray" isLoading={balance === null}>
-              <Styles.BalanceRow>
+            <Styles.BalanceRow>
+              <Skeleton width={250} height={36} type="gray" isLoading={balance === null}>
                 <Styles.Balance>
                   {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
                 </Styles.Balance>
-                <Styles.RefreshButton>
-                  <SVG src={refreshIcon} width={16} height={16} />
-                </Styles.RefreshButton>
-              </Styles.BalanceRow>
-            </Skeleton>
+              </Skeleton>
+              <Styles.RefreshButton onClick={onRefresh} isRefreshing={isRefreshing}>
+                <SVG src={refreshIcon} width={16} height={16} />
+              </Styles.RefreshButton>
+            </Styles.BalanceRow>
 
-            <Skeleton
-              width={130}
-              height={23}
-              mt={10}
-              mb={10}
-              type="gray"
-              isLoading={estimated === null}
-            >
+            <Skeleton width={130} height={23} mt={10} type="gray" isLoading={estimated === null}>
               {estimated !== null ? (
                 <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
               ) : null}
@@ -279,10 +280,10 @@ const Receive: React.FC = () => {
 
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />
-            <CopyToClipboard value={address} mb={30} onCopy={onCopyAddress}>
+            <CopyToClipboard value={address} onCopy={onCopyAddress}>
               <Styles.Address>{address}</Styles.Address>
             </CopyToClipboard>
-            <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} isSmall />
+            <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} isSmall mt={30} />
           </Styles.ReceiveBlock>
         </Styles.Container>
       </Styles.Wrapper>

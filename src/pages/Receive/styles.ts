@@ -9,7 +9,7 @@ const rotating = keyframes`
   }
 `
 
-type TRefreshIconRowProps = {
+type TRefreshButtonProps = {
   isRefreshing: boolean
 }
 
@@ -28,38 +28,8 @@ const Container = styled.div`
   justify-content: space-between;
 `
 
-// const RefreshIconRow = styled.div`
-//   width: 24px;
-//   height: 24px;
-//   background-color: #c3c3c326;
-//   border-radius: 12px;
-//   margin: 0 0 0 10px;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-
-//   path {
-//     fill: ${({ isRefreshing }: TRefreshIconRowProps) => (isRefreshing ? '#3fbb7d' : '#c3c3c3')};
-//   }
-
-//   svg {
-//     animation: ${rotating} 2s infinite linear;
-//     animation-duration: ${({ isRefreshing }: TRefreshIconRowProps) =>
-//       isRefreshing ? '2s' : 'inherit'};
-//   }
-
-//   &:hover {
-//     cursor: ${({ isRefreshing }: TRefreshIconRowProps) => (isRefreshing ? 'default' : 'pointer')};
-
-//     path {
-//       fill: #3fbb7d;
-//     }
-//   }
-// `
-
 const Row = styled.div`
-  padding: 20px 30px 0 30px;
-  height: 233px;
+  padding: 20px 30px 35px 30px;
   position: relative;
 `
 
@@ -88,6 +58,12 @@ const Actions = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  > div {
+    &:not(:last-child) {
+      margin: 0 5px 0 0;
+    }
+  }
 `
 
 const Action = styled.div`
@@ -101,10 +77,6 @@ const Action = styled.div`
 
   path {
     fill: #c3c3c3;
-  }
-
-  &:not(:last-child) {
-    margin: 0 5px 0 0;
   }
 
   &:hover {
@@ -123,6 +95,8 @@ const ReceiveBlock = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-end;
+  height: 100%;
 `
 
 const Address = styled.p`
@@ -144,8 +118,9 @@ const BalanceRow = styled.div`
 const Balance = styled.p`
   margin: 0;
   font-weight: 500;
-  font-size: 36px;
-  line-height: 36px;
+  font-size: 32px;
+  line-height: 32px;
+  white-space: nowrap;
   color: #1d1d22;
 `
 
@@ -156,8 +131,26 @@ const RefreshButton = styled.div`
   border-radius: 15px;
   margin: 0 0 0 10px;
   display: flex;
-  flex-direction: column;
   align-items: center;
+  justify-content: center;
+
+  path {
+    fill: ${({ isRefreshing }: TRefreshButtonProps) => (isRefreshing ? '#3fbb7d' : '#c3c3c3')};
+  }
+
+  svg {
+    animation: ${rotating} 2s infinite linear;
+    animation-duration: ${({ isRefreshing }: TRefreshButtonProps) =>
+      isRefreshing ? '2s' : 'inherit'};
+  }
+
+  &:hover {
+    cursor: ${({ isRefreshing }: TRefreshButtonProps) => (isRefreshing ? 'default' : 'pointer')};
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
 `
 
 const Estimated = styled.p`
