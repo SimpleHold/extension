@@ -3,6 +3,7 @@ import SVG from 'react-inlinesvg'
 
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
+import RadioButton from '@components/RadioButton'
 
 // Utils
 import { getCurrencyByChain } from '@config/currencies'
@@ -13,8 +14,8 @@ import useVisible from '@hooks/useVisible'
 // Styles
 import Styles from './styles'
 
-type TList = {
-  logo: {
+export type TList = {
+  logo?: {
     symbol: string
     width: number
     height: number
@@ -24,6 +25,7 @@ type TList = {
   }
   value: string
   label?: string
+  radioButtonValue?: boolean
 }
 
 interface Props {
@@ -33,10 +35,11 @@ interface Props {
   label?: string
   value?: string
   disabled?: boolean
-  currencyBr: number
+  currencyBr?: number
   background?: string
   tokenChain?: string
   tokenName?: string
+  toggleRadioButton?: (value: string) => void
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
@@ -51,6 +54,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     background,
     tokenChain,
     tokenName,
+    toggleRadioButton,
   } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
@@ -75,7 +79,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
             symbol={currencySymbol}
             width={40}
             height={40}
-            br={currencyBr}
+            br={currencyBr || 13}
             background={background || getTokenBackground}
             chain={tokenChain}
             name={tokenName}
@@ -104,23 +108,40 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
       {!disabled ? (
         <Styles.NetworksList isVisible={isVisible}>
           {list.map((item: TList, index: number) => {
-            const { logo, value, label } = item
+            const { logo, value, label, radioButtonValue } = item
+
+            const showRadioButton =
+              typeof radioButtonValue !== 'undefined' && typeof toggleRadioButton !== 'undefined'
 
             return (
-              <Styles.ListItem key={`${value}/${index}`} onClick={() => onSelectItem(index)}>
-                <CurrencyLogo
-                  symbol={logo.symbol}
-                  width={logo.width}
-                  height={logo.height}
-                  br={logo.br}
-                  background={logo.background}
-                  chain={logo?.chain}
-                  name={tokenName}
-                />
-                <Styles.ListItemRow>
-                  <Styles.ListItemLabel>{label}</Styles.ListItemLabel>
+              <Styles.ListItem
+                key={`${value}/${index}`}
+                onClick={() => (showRadioButton ? null : onSelectItem(index))}
+                disabled={showRadioButton}
+              >
+                {logo ? (
+                  <CurrencyLogo
+                    symbol={logo.symbol}
+                    width={logo.width}
+                    height={logo.height}
+                    br={logo.br}
+                    background={logo.background}
+                    chain={logo?.chain}
+                    name={tokenName}
+                  />
+                ) : null}
+                <Styles.ListItemRow withLogo={typeof logo !== 'undefined'}>
+                  {label?.length ? <Styles.ListItemLabel>{label}</Styles.ListItemLabel> : null}
                   <Styles.ListItemValue>{value}</Styles.ListItemValue>
                 </Styles.ListItemRow>
+
+                {typeof radioButtonValue !== 'undefined' &&
+                typeof toggleRadioButton !== 'undefined' ? (
+                  <RadioButton
+                    isActive={radioButtonValue}
+                    onToggle={() => toggleRadioButton(value)}
+                  />
+                ) : null}
               </Styles.ListItem>
             )
           })}

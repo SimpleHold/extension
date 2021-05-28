@@ -18,6 +18,14 @@ type TLabelProps = {
   isNotSelected: boolean
 }
 
+type TListItemProps = {
+  disabled: boolean
+}
+
+type TListItemRowProps = {
+  withLogo: boolean
+}
+
 const Wrapper = styled.div`
   margin: 0 0 10px 0;
   position: relative;
@@ -113,6 +121,8 @@ const ListItem = styled.div`
   overflow: hidden;
   border: 1px solid #3fbb7d;
   position: relative;
+  height: 60px;
+  background-color: #ffffff;
 
   &:not(:last-child) {
     border-bottom: none;
@@ -135,11 +145,11 @@ const ListItem = styled.div`
   }
 
   &:hover {
-    cursor: pointer;
-    background-color: #f8f8f8;
+    cursor: ${({ disabled }: TListItemProps) => (disabled ? 'default' : 'pointer')};
+    background-color: ${({ disabled }: TListItemProps) => (disabled ? '#ffffff' : '#f8f8f8')};
 
     p:last-child {
-      color: #3fbb7d;
+      color: ${({ disabled }: TListItemProps) => (disabled ? '#1d1d22' : '#3fbb7d')};
     }
   }
 `
@@ -155,8 +165,9 @@ const ListItemValue = styled.p`
 `
 
 const ListItemRow = styled.div`
-  margin: 0 0 0 10px;
+  margin: ${({ withLogo }: TListItemRowProps) => (withLogo ? '0 0 0 10px' : '0')};
   overflow: hidden;
+  flex: 1;
 `
 
 const ListItemLabel = styled.p`
