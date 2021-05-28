@@ -62,10 +62,12 @@ const FilterBadgeText = styled.p`
   color: #3fbb7d;
 `
 
-const Switch = styled.div`
+const SwitchRow = styled.div`
   width: 30px;
   height: 30px;
-  background-color: red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const Actions = styled.div`
@@ -82,7 +84,7 @@ const Styles = {
   FilterTitle,
   FilterBadge,
   FilterBadgeText,
-  Switch,
+  SwitchRow,
   Actions,
 }
 
