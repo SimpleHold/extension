@@ -1,6 +1,13 @@
 import styled from 'styled-components'
 
-import sortArrow from '@assets/icons/sortArrow.svg'
+type TListItemProps = {
+  isActive: boolean
+}
+
+type TListArrowProps = {
+  position: 'up' | 'down'
+  isActive: boolean
+}
 
 const Row = styled.div`
   margin: 10px 0 0 0;
@@ -13,6 +20,22 @@ const ListItem = styled.div`
   flex-direction: row;
   align-items: center;
   padding: 15px 0;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #eaeaea;
+  }
+
+  path {
+    fill: ${({ isActive }: TListItemProps) => (isActive ? '#3FBB7D' : '#C3C3C3')};
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
 `
 
 const ListItemRow = styled.div`
@@ -32,14 +55,26 @@ const ListArrows = styled.div`
   flex-direction: column;
 `
 
+const ListArrowsRow = styled.div`
+  width: 8px;
+  height: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+`
+
 const ListArrow = styled.div`
   width: 8px;
   height: 6px;
-  background-image: url(${sortArrow});
   background-repeat: no-repeat;
+  transform: ${({ position }: TListArrowProps) =>
+    `rotate(${position === 'down' ? '180' : '0'}deg)`};
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  &:last-child {
-    margin: 3px 0 0 0;
+  path {
+    fill: ${({ isActive }: TListItemProps) => (isActive ? '#3FBB7D' : '#C3C3C3')};
   }
 `
 
@@ -67,6 +102,7 @@ const Styles = {
   ListItem,
   ListItemRow,
   ListArrows,
+  ListArrowsRow,
   ListArrow,
   ListTitle,
   ListSortType,
