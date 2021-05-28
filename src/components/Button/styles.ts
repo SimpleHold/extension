@@ -7,6 +7,7 @@ type TContainerProps = {
   mr?: number
   isSmall?: boolean
   isDanger?: boolean
+  mt?: number
 }
 
 const getBackgroundColor = (props: TContainerProps) => {
@@ -97,6 +98,7 @@ const Container = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: ${({ mt }: TContainerProps) => (mt ? `${mt}px` : '0')};
 
   &:hover {
     cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
