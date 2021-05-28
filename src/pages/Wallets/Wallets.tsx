@@ -15,7 +15,7 @@ import useScroll from '@hooks/useScroll'
 import useToastContext from '@hooks/useToastContext'
 
 // Utils
-import { IWallet, getWallets } from '@utils/wallet'
+import { IWallet, getWallets, sortWallets } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import { setBadgeText, getBadgeText } from '@utils/extension'
 
@@ -99,12 +99,6 @@ const Wallets: React.FC = () => {
     }
   }
 
-  const sortWallets = (a: IWallet, b: IWallet) => {
-    return b?.createdAt && a?.createdAt
-      ? new Date(b?.createdAt).getTime() - new Date(a?.createdAt).getTime()
-      : -1
-  }
-
   const getWalletsList = () => {
     const walletsList = getWallets()
 
@@ -148,6 +142,11 @@ const Wallets: React.FC = () => {
     setActiveDrawer(null)
   }
 
+  const onApplyDrawer = (): void => {
+    onCloseDrawer()
+    getWalletsList()
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -162,7 +161,7 @@ const Wallets: React.FC = () => {
         {wallets?.length ? (
           <Styles.WalletsList>
             {wallets.map((wallet: IWallet, index: number) => {
-              const { address, symbol, chain, name, contractAddress, decimals } = wallet
+              const { address, symbol, chain, name, contractAddress, decimals, isHidden } = wallet
 
               return (
                 <WalletCard
@@ -173,20 +172,34 @@ const Wallets: React.FC = () => {
                   name={name}
                   contractAddress={contractAddress}
                   decimals={decimals}
+                  isHidden={isHidden}
                   sumBalance={sumBalance}
                   sumEstimated={sumEstimated}
                   sumPending={sumPending}
                 />
               )
             })}
+            <Styles.AddWalletButton onClick={onAddNewAddress}>
+              <SVG
+                src="../../assets/icons/plus.svg"
+                width={14}
+                height={14}
+                title="Add new wallet"
+              />
+            </Styles.AddWalletButton>
           </Styles.WalletsList>
         ) : null}
-        <Styles.AddWalletButton onClick={onAddNewAddress}>
-          <SVG src="../../assets/icons/plus.svg" width={14} height={14} title="Add new wallet" />
-        </Styles.AddWalletButton>
       </Styles.Wrapper>
-      <SortWalletsDrawer isActive={activeDrawer === 'sort'} onClose={onCloseDrawer} />
-      <FilterWalletsDrawer isActive={activeDrawer === 'filters'} onClose={onCloseDrawer} />
+      <SortWalletsDrawer
+        isActive={activeDrawer === 'sort'}
+        onClose={onCloseDrawer}
+        onApply={onApplyDrawer}
+      />
+      <FilterWalletsDrawer
+        isActive={activeDrawer === 'filters'}
+        onClose={onCloseDrawer}
+        onApply={onApplyDrawer}
+      />
     </>
   )
 }
