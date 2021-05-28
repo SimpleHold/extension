@@ -61,3 +61,4 @@ type TSymbols =
   | 'bsc'
   | 'bnb'
   | 'theta'
+  | 'tfuel'

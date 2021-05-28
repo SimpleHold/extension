@@ -13,15 +13,20 @@ import CurrenciesDropdown from '@components/CurrenciesDropdown'
 
 // Utils
 import { getWallets, IWallet, updateBalance } from '@utils/wallet'
-import { toUpper, price } from '@utils/format'
+import { toUpper, price, toLower } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import { validateAddress, getAddressNetworkFee, formatUnit } from '@utils/address'
+import {
+  validateAddress,
+  getAddressNetworkFee,
+  formatUnit,
+  getNetworkFeeSymbol,
+} from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
-import { getCurrency, getCurrencyByChain } from '@config/currencies'
+import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
 // Hooks
@@ -55,9 +60,6 @@ const Send: React.FC = () => {
   } = useLocation<LocationState>()
 
   const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
-  const getCurrencySymbol = tokenChain
-    ? getCurrencyByChain(tokenChain)?.symbol
-    : getCurrency(symbol)?.symbol
 
   const [address, setAddress] = React.useState<string>('')
   const [amount, setAmount] = React.useState<string>('')
@@ -71,12 +73,14 @@ const Send: React.FC = () => {
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
   const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
-  const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
+  const [currencyBalance, setCurrencyBalance] = React.useState<number | null>(null)
+  const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
 
   const debounced = useDebounce(amount, 1000)
 
   React.useEffect(() => {
     getWalletsList()
+    onGetNetworkFeeSymbol()
   }, [])
 
   React.useEffect(() => {
@@ -98,6 +102,11 @@ const Send: React.FC = () => {
       }
     }
   }, [networkFee])
+
+  const onGetNetworkFeeSymbol = () => {
+    const data = getNetworkFeeSymbol(symbol, tokenChain)
+    setNetworkFeeSymbol(data)
+  }
 
   const getOutputs = async (): Promise<void> => {
     if (bitcoinLike.coins().indexOf(chain) !== -1) {
@@ -135,7 +144,7 @@ const Send: React.FC = () => {
         setNetworkFee(data.networkFee)
       }
 
-      if (data.currencyBalance) {
+      if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
         setCurrencyBalance(data.currencyBalance)
       }
     }
@@ -182,7 +191,7 @@ const Send: React.FC = () => {
       amount: Number(amount),
       symbol,
       networkFee,
-      networkFeeSymbol: getCurrencySymbol,
+      networkFeeSymbol,
       addressFrom: selectedAddress,
       addressTo: address,
       outputs: utxosList,
@@ -345,13 +354,20 @@ const Send: React.FC = () => {
                   <Styles.NetworkFee>-</Styles.NetworkFee>
                 ) : (
                   <Styles.NetworkFee>
-                    {networkFee} {toUpper(getCurrencySymbol)}
+                    {networkFee} {toUpper(networkFeeSymbol)}
                   </Styles.NetworkFee>
                 )}
               </>
             )}
-            {tokenChain && !isNetworkFeeLoading && networkFee && networkFee > currencyBalance ? (
-              <Styles.NetworkFeeError>Insufficient funds</Styles.NetworkFeeError>
+            {(tokenChain || toLower(symbol) === 'theta') &&
+            currencyBalance &&
+            !isNetworkFeeLoading &&
+            networkFee &&
+            networkFee > currencyBalance ? (
+              <Styles.NetworkFeeError>
+                Insufficient funds {Number(networkFee - currencyBalance)}{' '}
+                {toUpper(networkFeeSymbol)}
+              </Styles.NetworkFeeError>
             ) : null}
           </Styles.NetworkFeeBlock>
 

@@ -26,6 +26,7 @@ interface Props {
   name?: string
   contractAddress?: string
   decimals?: number
+  isHidden?: boolean
   sumBalance?: (balance: number) => void
   sumEstimated?: (estimated: number) => void
   sumPending?: (pending: number) => void
@@ -40,6 +41,7 @@ const WalletCard: React.FC<Props> = (props) => {
     name,
     contractAddress,
     decimals,
+    isHidden,
     sumBalance,
     sumEstimated,
     sumPending,
@@ -97,6 +99,7 @@ const WalletCard: React.FC<Props> = (props) => {
       contractAddress,
       tokenName: name,
       decimals,
+      isHidden,
     })
   }
 

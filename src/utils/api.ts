@@ -224,3 +224,22 @@ export const getEtherNetworkFee = async (
     }
   }
 }
+
+export const getThetaNetworkFee = async (address: string): Promise<IGetNetworkFeeResponse> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/theta/network-fee`, {
+      params: {
+        address,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return {
+      networkFee: 0.000001,
+    }
+  }
+}

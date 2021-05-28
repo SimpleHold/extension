@@ -3,11 +3,11 @@ import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import addressValidate from '@config/addressValidate'
-import { ICurrency } from '@config/currencies'
+import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
 import { getToken, IToken } from '@config/tokens'
 
 // Utils
-import { getEtherNetworkFee, IGetNetworkFeeResponse } from '@utils/api'
+import { getEtherNetworkFee, IGetNetworkFeeResponse, getThetaNetworkFee } from '@utils/api'
 import { toLower } from '@utils/format'
 import * as theta from '@utils/currencies/theta'
 
@@ -220,9 +220,7 @@ export const getAddressNetworkFee = async (
     }
 
     if (theta.coins.indexOf(symbol) !== -1) {
-      return {
-        networkFee: 0.000001,
-      }
+      return await getThetaNetworkFee(address)
     }
 
     if (typeof outputs !== 'undefined') {
@@ -318,5 +316,18 @@ export const getTransactionLink = (
     return null
   } else {
     return `https://blockchair.com/${chain}/transaction/${hash}`
+  }
+}
+
+export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string => {
+  try {
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return 'tfuel'
+    } else if (tokenChain) {
+      return getCurrencyByChain(tokenChain)?.symbol || symbol
+    }
+    return getCurrency(symbol)?.symbol || symbol
+  } catch {
+    return symbol
   }
 }

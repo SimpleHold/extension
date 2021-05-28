@@ -4,7 +4,7 @@ const Container = styled.div`
   width: 16px;
   height: 16px;
   border-radius: 8px;
-  border: 1px solid #eaeaea;
+  border: 1px solid #c3c3c3;
   display: flex;
   align-items: center;
   justify-content: center;
