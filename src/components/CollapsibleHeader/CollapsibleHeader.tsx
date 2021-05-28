@@ -55,6 +55,8 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
   const clockIconSize = Math.max(12, 23 - 0.1 * scrollPosition)
   const clockIconMarginLeft = Math.max(6, 10 - scrollPosition)
 
+  const walletsLabelFontSize = Math.max(0, 16 - 0.05 * scrollPosition)
+
   return (
     <Styles.Container style={{ height: сontainerHeight }}>
       <Header />
@@ -134,13 +136,19 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
         ) : null}
 
         <Styles.Bottom>
-          <Styles.WalletsLabel>Wallets</Styles.WalletsLabel>
+          <Styles.WalletsLabel
+            style={{ fontSize: walletsLabelFontSize, opacity: scrollPosition > 50 ? 0 : 1 }}
+          >
+            Wallets
+          </Styles.WalletsLabel>
           <Styles.Actions>
             <Styles.Button onClick={onSortWallets}>
               <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
+              {localStorage.getItem('activeSortKey') ? <Styles.ButtonDot /> : null}
             </Styles.Button>
             <Styles.Button onClick={onFilterWallets}>
               <SVG src="../../assets/icons/filter.svg" width={18} height={14} />
+              {localStorage.getItem('activeFilter') ? <Styles.ButtonDot /> : null}
             </Styles.Button>
           </Styles.Actions>
         </Styles.Bottom>

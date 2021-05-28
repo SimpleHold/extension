@@ -57,7 +57,6 @@ const Bottom = styled.div`
 const WalletsLabel = styled.p`
   margin: 0;
   font-weight: 500;
-  font-size: 16px;
   line-height: 19px;
   color: #ffffff;
 `
@@ -69,10 +68,15 @@ const Actions = styled.div`
 `
 
 const Button = styled.div`
-  padding: 8px 11px;
   border-radius: 5px;
   background: rgba(255, 255, 255, 0.2);
   transition: all 0.3s;
+  width: 40px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 
   &:not(:last-child) {
     margin: 0 10px 0 0;
@@ -92,6 +96,16 @@ const Button = styled.div`
   }
 `
 
+const ButtonDot = styled.div`
+  width: 6px;
+  height: 6px;
+  background-color: #eb5757;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border-radius: 3px;
+`
+
 const Styles = {
   Container,
   Row,
@@ -105,6 +119,7 @@ const Styles = {
   WalletsLabel,
   Actions,
   Button,
+  ButtonDot,
 }
 
 export default Styles
