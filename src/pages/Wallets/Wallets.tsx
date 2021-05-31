@@ -15,7 +15,7 @@ import useScroll from '@hooks/useScroll'
 import useToastContext from '@hooks/useToastContext'
 
 // Utils
-import { IWallet, getWallets, sortWallets } from '@utils/wallet'
+import { IWallet, getWallets, sortWallets, filterWallets } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import { setBadgeText, getBadgeText } from '@utils/extension'
 
@@ -49,6 +49,13 @@ const Wallets: React.FC = () => {
     getWalletsList()
     checkBadgeText()
   }, [])
+
+  React.useEffect(() => {
+    if (wallets?.length === 0 && totalBalance === null && totalEstimated === null) {
+      setTotalBalance(0)
+      setTotalEstimated(0)
+    }
+  }, [wallets, totalBalance, totalEstimated])
 
   React.useEffect(() => {
     if (state?.status === 'passcodeTurnedOff') {
@@ -103,7 +110,7 @@ const Wallets: React.FC = () => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      setWallets(walletsList.sort(sortWallets))
+      setWallets(walletsList.filter(filterWallets).sort(sortWallets))
     } else {
       localStorage.clear()
       history.push('/welcome')
@@ -130,12 +137,8 @@ const Wallets: React.FC = () => {
     setWalletsPending((prevArray: number[]) => [...prevArray, amount])
   }
 
-  const onSortWallets = (): void => {
-    setActiveDrawer('sort')
-  }
-
-  const onFilterWallets = (): void => {
-    setActiveDrawer('filters')
+  const onShowDrawer = (drawerType: 'sort' | 'filters'): void => {
+    setActiveDrawer(drawerType)
   }
 
   const onCloseDrawer = (): void => {
@@ -155,12 +158,12 @@ const Wallets: React.FC = () => {
           balance={totalBalance}
           estimated={totalEstimated}
           pendingBalance={pendingBalance}
-          onSortWallets={onSortWallets}
-          onFilterWallets={onFilterWallets}
+          onShowDrawer={onShowDrawer}
+          isDrawersActive={activeDrawer !== null}
         />
-        {wallets?.length ? (
+        {wallets !== null ? (
           <Styles.WalletsList>
-            {wallets.map((wallet: IWallet, index: number) => {
+            {wallets?.map((wallet: IWallet, index: number) => {
               const { address, symbol, chain, name, contractAddress, decimals, isHidden } = wallet
 
               return (
@@ -179,6 +182,9 @@ const Wallets: React.FC = () => {
                 />
               )
             })}
+            {wallets.length === 0 ? (
+              <Styles.NotFound>Nothing was found for the specified parameters</Styles.NotFound>
+            ) : null}
             <Styles.AddWalletButton onClick={onAddNewAddress}>
               <SVG
                 src="../../assets/icons/plus.svg"

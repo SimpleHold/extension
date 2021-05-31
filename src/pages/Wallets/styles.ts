@@ -30,10 +30,18 @@ const AddWalletButton = styled.div`
   }
 `
 
+const NotFound = styled.p`
+  margin: 0;
+  font-size: 16px;
+  line-height: 23px;
+  color: #7d7e8d;
+`
+
 const Styles = {
   Wrapper,
   WalletsList,
   AddWalletButton,
+  NotFound,
 }
 
 export default Styles
