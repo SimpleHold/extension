@@ -173,6 +173,7 @@ const Receive: React.FC = () => {
       setIsRefreshing(true)
       setBalance(null)
       setEstimated(null)
+      setPendingBalance(0)
 
       loadBalance()
     }
