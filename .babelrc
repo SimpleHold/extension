@@ -51,7 +51,8 @@
           "@config": "./src/config",
           "@drawers": "./src/drawers",
           "@contexts": "./src/contexts",
-          "@containers": "./src/containers"
+          "@containers": "./src/containers",
+          "@pages": "./src/pages"
         }
       }
     ]
