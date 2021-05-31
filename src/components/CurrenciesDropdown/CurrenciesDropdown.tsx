@@ -25,13 +25,13 @@ export type TList = {
   }
   value: string
   label?: string
-  radioButtonValue?: boolean
+  withRadioButton?: boolean
 }
 
 interface Props {
   currencySymbol?: string
   list: TList[]
-  onSelect: Function
+  onSelect?: (index: number) => void
   label?: string
   value?: string
   disabled?: boolean
@@ -40,6 +40,7 @@ interface Props {
   tokenChain?: string
   tokenName?: string
   toggleRadioButton?: (value: string) => void
+  radioButtonValues?: string[]
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
@@ -55,6 +56,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     tokenChain,
     tokenName,
     toggleRadioButton,
+    radioButtonValues,
   } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
@@ -62,8 +64,10 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     tokenChain && tokenName ? getCurrencyByChain(tokenChain)?.background : '#1D1D22'
 
   const onSelectItem = (index: number): void => {
-    onSelect(index)
-    setIsVisible(false)
+    if (onSelect) {
+      onSelect(index)
+      setIsVisible(false)
+    }
   }
 
   return (
@@ -108,16 +112,18 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
       {!disabled ? (
         <Styles.NetworksList isVisible={isVisible}>
           {list.map((item: TList, index: number) => {
-            const { logo, value, label, radioButtonValue } = item
+            const { logo, value, label, withRadioButton } = item
 
             const showRadioButton =
-              typeof radioButtonValue !== 'undefined' && typeof toggleRadioButton !== 'undefined'
+              withRadioButton === true && typeof toggleRadioButton !== 'undefined'
+            const isRadioButtonActive = radioButtonValues?.indexOf(value) !== -1
 
             return (
               <Styles.ListItem
                 key={`${value}/${index}`}
-                onClick={() => (showRadioButton ? null : onSelectItem(index))}
+                onClick={() => onSelectItem(index)}
                 disabled={showRadioButton}
+                pv={showRadioButton && !logo ? 18 : 10}
               >
                 {logo ? (
                   <CurrencyLogo
@@ -135,10 +141,9 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
                   <Styles.ListItemValue>{value}</Styles.ListItemValue>
                 </Styles.ListItemRow>
 
-                {typeof radioButtonValue !== 'undefined' &&
-                typeof toggleRadioButton !== 'undefined' ? (
+                {withRadioButton && typeof toggleRadioButton !== 'undefined' ? (
                   <RadioButton
-                    isActive={radioButtonValue}
+                    isActive={isRadioButtonActive}
                     onToggle={() => toggleRadioButton(value)}
                   />
                 ) : null}

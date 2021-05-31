@@ -20,6 +20,7 @@ type TLabelProps = {
 
 type TListItemProps = {
   disabled: boolean
+  pv?: number
 }
 
 type TListItemRowProps = {
@@ -117,11 +118,10 @@ const ListItem = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 10px;
+  padding: ${({ pv }: TListItemProps) => (pv ? `${pv}px 10px` : '10px')};
   overflow: hidden;
   border: 1px solid #3fbb7d;
   position: relative;
-  height: 60px;
   background-color: #ffffff;
 
   &:not(:last-child) {
