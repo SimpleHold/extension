@@ -8,6 +8,7 @@ import Switch from '@components/Switch'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
+import { getItem, setItem, removeMany } from '@utils/storage'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -25,37 +26,46 @@ interface Props {
 const FilterWalletsDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive, onApply } = props
 
-  const [showHiddenAddress, setShowHiddenAddress] = React.useState<boolean>(true)
-  const [showZeroBalances, setShowZeroBalances] = React.useState<boolean>(true)
+  const [isShowHiddenAddress, setShowHiddenAddress] = React.useState<boolean>(false)
+  const [isShowZeroBalances, setShowZeroBalances] = React.useState<boolean>(true)
   const [totalHiddenWallets, setTotalHiddenWallet] = React.useState<number>(0)
   const [totalZeroBalancesWallets, setTotalZeroBalancesWallets] = React.useState<number>(0)
   const [dropDownList, setDropDownList] = React.useState<TList[]>([])
-  const [selectedWallets, setSelectedWallets] = React.useState<string[]>([])
+  const [isShowPrevHiddenAddress, setShowPrevHiddenAddress] = React.useState<boolean>(false)
+  const [isShowPrevZeroBalances, setShowPrevZeroBalances] = React.useState<boolean>(true)
+  const [radioButtonValues, setRadioButtonValues] = React.useState<string[]>([])
+  const [prevSelectedCurrencies, setPrevSelectedCurrencies] = React.useState<string[]>([])
 
   React.useEffect(() => {
-    checkFilters()
-    getFiltersData()
-  }, [])
-
-  React.useEffect(() => {
-    if (dropDownList.length && dropDownList[0].value !== 'All') {
-      dropDownList.unshift({
-        radioButtonValue: selectedWallets.length === dropDownList.length,
-        value: 'All',
-      })
+    if (isActive) {
+      checkFilters()
+      getFiltersData()
+      getSelectedCurrencies()
     }
-  }, [dropDownList])
+  }, [isActive])
+
+  const getSelectedCurrencies = (): void => {
+    const getSelectedCurrenciesFilter = localStorage.getItem('selectedCurrenciesFilter')
+    const parseData = getSelectedCurrenciesFilter
+      ? JSON.parse(getSelectedCurrenciesFilter)
+      : ['All']
+
+    setRadioButtonValues(parseData)
+    setPrevSelectedCurrencies(parseData)
+  }
 
   const checkFilters = (): void => {
-    const getHiddenWalletsFilter = localStorage.getItem('hiddenWalletsFilter')
-    const getZeroBalancesFilter = localStorage.getItem('seroBalancesFilter')
+    const getHiddenWalletsFilter = getItem('hiddenWalletsFilter')
+    const getZeroBalancesFilter = getItem('zeroBalancesFilter')
 
     if (getHiddenWalletsFilter) {
       setShowHiddenAddress(getHiddenWalletsFilter === 'true')
+      setShowPrevHiddenAddress(getHiddenWalletsFilter === 'true')
     }
 
     if (getZeroBalancesFilter) {
       setShowZeroBalances(getZeroBalancesFilter === 'true')
+      setShowPrevZeroBalances(getZeroBalancesFilter === 'true')
     }
   }
 
@@ -63,8 +73,6 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
     const wallets = getWallets()
 
     if (wallets?.length) {
-      setSelectedWallets(wallets.map((wallet: IWallet) => wallet.symbol))
-
       const getZeroBalances = wallets.filter(
         (wallet: IWallet) => wallet.balance === 0 || typeof wallet.balance === 'undefined'
       ).length
@@ -73,7 +81,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       setTotalZeroBalancesWallets(getZeroBalances)
       setTotalHiddenWallet(getHiddenWallets)
 
-      const mapDropDownList = wallets
+      const mapDropDownList: TList[] = wallets
         .filter((v, i, a) => a.findIndex((t) => t.symbol === v.symbol) === i)
         .sort((a: IWallet, b: IWallet) => a.symbol.localeCompare(b.symbol))
         .map((wallet: IWallet) => {
@@ -90,21 +98,77 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
               background: getWalletInfo ? getWalletInfo.background : '#1D1D22',
             },
             value: getWalletInfo?.name || '',
-            radioButtonValue: selectedWallets.indexOf(symbol) !== -1,
+            withRadioButton: true,
           }
         })
+
+      mapDropDownList.unshift({
+        withRadioButton: true,
+        value: 'All',
+      })
 
       setDropDownList(mapDropDownList)
     }
   }
 
-  const onSelectDropdown = (index: number): void => {}
-
   const toggleRadioButton = (value: string) => {
-    setSelectedWallets(['btc'])
+    const findListItem = dropDownList.find((list: TList) => list.value === value)
+
+    if (findListItem) {
+      const checkExist = radioButtonValues.indexOf(value) !== -1
+
+      if (checkExist) {
+        if (value !== 'All' && radioButtonValues.length > 1) {
+          setRadioButtonValues(
+            radioButtonValues.filter((item: string) => item !== 'All' && item !== value)
+          )
+        }
+      } else {
+        if (value === 'All') {
+          setRadioButtonValues(['All', ...dropDownList.map((list: TList) => list.value)])
+        } else {
+          setRadioButtonValues([
+            ...radioButtonValues.filter((item: string) => item !== 'All'),
+            value,
+          ])
+        }
+      }
+    }
   }
 
-  const isButtonDisabled = false // Fix me
+  const onApplyFilters = (): void => {
+    setItem('hiddenWalletsFilter', isShowHiddenAddress.toString())
+    setItem('zeroBalancesFilter', isShowZeroBalances.toString())
+    const filterSelectedCurrencies = radioButtonValues.filter((item: string) => item !== 'All')
+    if (filterSelectedCurrencies.length) {
+      setItem('selectedCurrenciesFilter', JSON.stringify(filterSelectedCurrencies))
+    }
+    onApply()
+  }
+
+  const isButtonDisabled = (): boolean => {
+    return (
+      isShowPrevHiddenAddress === isShowHiddenAddress &&
+      isShowPrevZeroBalances === isShowZeroBalances &&
+      JSON.stringify(prevSelectedCurrencies) === JSON.stringify(radioButtonValues)
+    )
+  }
+
+  const onReset = (): void => {
+    removeMany(['hiddenWalletsFilter', 'zeroBalancesFilter', 'selectedCurrenciesFilter'])
+    onApply()
+  }
+
+  const isShowResetButton = (): boolean => {
+    if (
+      getItem('hiddenWalletsFilter') ||
+      getItem('zeroBalancesFilter') ||
+      (getItem('selectedCurrenciesFilter') && isButtonDisabled())
+    ) {
+      return true
+    }
+    return false
+  }
 
   return (
     <DrawerWrapper title="Filters" isActive={isActive} onClose={onClose} withCloseIcon>
@@ -112,11 +176,14 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
         <Styles.SelectCurrencyRow>
           <CurrenciesDropdown
             list={dropDownList}
-            onSelect={onSelectDropdown}
             label="Select currency"
             toggleRadioButton={toggleRadioButton}
+            radioButtonValues={radioButtonValues}
           />
-          <Styles.SelectedAmount>Selected all currencies</Styles.SelectedAmount>
+          <Styles.SelectedAmount>
+            Selected {radioButtonValues.indexOf('All') !== -1 ? 'All' : radioButtonValues.length}{' '}
+            currencies
+          </Styles.SelectedAmount>
         </Styles.SelectCurrencyRow>
 
         <Styles.DividerLine />
@@ -130,7 +197,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
           </Styles.FilterRow>
           <Styles.SwitchRow>
             <Switch
-              value={showHiddenAddress}
+              value={isShowHiddenAddress}
               onToggle={() => setShowHiddenAddress((prevValue: boolean) => !prevValue)}
             />
           </Styles.SwitchRow>
@@ -147,14 +214,20 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
           </Styles.FilterRow>
           <Styles.SwitchRow>
             <Switch
-              value={showZeroBalances}
+              value={isShowZeroBalances}
               onToggle={() => setShowZeroBalances((prevValue: boolean) => !prevValue)}
             />
           </Styles.SwitchRow>
         </Styles.Filter>
 
         <Styles.Actions>
-          <Button label="Apply" isSmall disabled={isButtonDisabled} onClick={onApply} />
+          <Button
+            label={isShowResetButton() ? 'Reset' : 'Apply'}
+            isSmall
+            isDanger={isShowResetButton()}
+            disabled={isShowResetButton() ? false : isButtonDisabled()}
+            onClick={isShowResetButton() ? onReset : onApplyFilters}
+          />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>
