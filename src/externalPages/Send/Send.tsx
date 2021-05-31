@@ -17,7 +17,7 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
-import { validateAddress, getNewNetworkFee, formatUnit } from '@utils/address'
+import { validateAddress, getNewNetworkFee, formatUnit, getNetworkFeeSymbol } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
@@ -74,7 +74,7 @@ const Send: React.FC = () => {
       getCurrencyInfo()
       getCurrencyBalance()
       checkValidAddress()
-      getNetworkFeeSymbol()
+      onGetNetworkFeeSymbol()
     }
   }, [selectedWallet])
 
@@ -110,14 +110,12 @@ const Send: React.FC = () => {
     }
   }
 
-  const getNetworkFeeSymbol = (): void => {
+  const onGetNetworkFeeSymbol = () => {
     if (selectedWallet) {
       const { chain, symbol } = selectedWallet
-      const currency = chain ? getCurrencyByChain(chain) : getCurrency(symbol)
 
-      if (currency) {
-        setNetworkFeeSymbol(currency.symbol)
-      }
+      const data = getNetworkFeeSymbol(symbol, chain)
+      setNetworkFeeSymbol(data)
     }
   }
 
@@ -156,7 +154,7 @@ const Send: React.FC = () => {
             setNetworkFee(data.networkFee)
           }
 
-          if (data.currencyBalance) {
+          if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
             setCurrencyBalance(data.currencyBalance)
           }
         }
@@ -413,6 +411,14 @@ const Send: React.FC = () => {
     }
   }
 
+  const isCurrencyBalanceError =
+    selectedWallet &&
+    (selectedWallet?.chain || toLower(selectedWallet.symbol) === 'theta') &&
+    currencyBalance !== null &&
+    !isNetworkFeeLoading &&
+    networkFee &&
+    networkFee > currencyBalance
+
   const isButtonDisabled = (): boolean => {
     if (selectedWallet && currencyInfo) {
       if (
@@ -428,7 +434,8 @@ const Send: React.FC = () => {
         amountErrorLabel === null &&
         Number(balance) > 0 &&
         networkFee > 0 &&
-        !isNetworkFeeLoading
+        !isNetworkFeeLoading &&
+        !isCurrencyBalanceError
       ) {
         if (!outputs.length) {
           if (bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1) {
@@ -523,11 +530,11 @@ const Send: React.FC = () => {
                 )}
               </>
             )}
-            {selectedWallet?.chain &&
-            !isNetworkFeeLoading &&
-            networkFee &&
-            networkFee > currencyBalance ? (
-              <Styles.NetworkFeeError>Insufficient funds</Styles.NetworkFeeError>
+            {isCurrencyBalanceError ? (
+              <Styles.NetworkFeeError>
+                Insufficient funds {Number(networkFee - currencyBalance)}{' '}
+                {toUpper(networkFeeSymbol)}
+              </Styles.NetworkFeeError>
             ) : null}
           </Styles.NetworkFeeBlock>
 
