@@ -70,7 +70,7 @@ export const validateAddress = (
       return new bitcoinLike(symbol).isAddressValid(address)
     }
     // @ts-ignore
-    return new RegExp(chain ? addressValidate.eth : addressValidate[symbol])?.test(address)
+    return new RegExp(tokenChain ? addressValidate.eth : addressValidate[symbol])?.test(address)
   } catch {
     return false
   }
@@ -183,9 +183,7 @@ export const getNewNetworkFee = async (
   }
 
   if (theta.coins.indexOf(symbol) !== -1) {
-    return {
-      networkFee: 0.000001,
-    }
+    return await getThetaNetworkFee(address)
   }
 
   return null
