@@ -18,8 +18,8 @@ interface Props {
   balance: null | number
   estimated: null | number
   pendingBalance: null | number
-  onSortWallets: () => void
-  onFilterWallets: () => void
+  isDrawersActive: boolean
+  onShowDrawer: (drawerType: 'sort' | 'filters') => void
 }
 
 const CollapsibleHeader: React.FC<Props> = (props) => {
@@ -28,34 +28,57 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
     balance,
     estimated,
     pendingBalance,
-    onSortWallets,
-    onFilterWallets,
+    isDrawersActive,
+    onShowDrawer,
   } = props
 
-  const сontainerHeight = Math.max(110, 290 - 1.25 * scrollPosition)
+  const [latesScrollPosition, setLatestScrollPosition] = React.useState<number>(0)
 
-  const balanceRowMarginTop = Math.max(3, 50 - scrollPosition)
-  const balanceFontSize = Math.max(16, 36 - 0.2 * scrollPosition)
-  const balanceLineHeight = Math.max(19, 36 - 0.1 * scrollPosition)
+  React.useEffect(() => {
+    if (!isDrawersActive) {
+      setLatestScrollPosition(scrollPosition)
+    }
+  }, [scrollPosition, isDrawersActive])
 
-  const estimatedFontSize = Math.max(14, 20 - 0.2 * scrollPosition)
-  const estimatedLineHeight = Math.max(16, 23 - 0.1 * scrollPosition)
-  const estimatedMarginTop = Math.max(2, 11 - scrollPosition)
+  const сontainerHeight = Math.max(110, 290 - 1.25 * latesScrollPosition)
 
-  const totalBalanceOpacity = Math.max(0, 1 - 0.1 * scrollPosition)
-  const totalBalanceTop = Math.max(0, 70 - scrollPosition)
-  const totalBalanceHeight = Math.max(0, 19 - scrollPosition)
+  const balanceRowMarginTop = Math.max(3, 50 - latesScrollPosition)
+  const balanceFontSize = Math.max(16, 36 - 0.2 * latesScrollPosition)
+  const balanceLineHeight = Math.max(19, 36 - 0.1 * latesScrollPosition)
 
-  const pendingBalanceRowHeight = Math.max(0, 30 - 0.05 * scrollPosition)
-  const pendingBalanceRowOpacity = Math.max(0, 1 - 0.05 * scrollPosition)
-  const pendingBalanceRowMarginTop = Math.max(0, 10 - 0.05 * scrollPosition)
+  const estimatedFontSize = Math.max(14, 20 - 0.2 * latesScrollPosition)
+  const estimatedLineHeight = Math.max(16, 23 - 0.1 * latesScrollPosition)
+  const estimatedMarginTop = Math.max(2, 11 - latesScrollPosition)
 
-  const balanceSkeletonWidth = Math.max(150, 250 - scrollPosition)
+  const totalBalanceOpacity = Math.max(0, 1 - 0.1 * latesScrollPosition)
+  const totalBalanceTop = Math.max(0, 70 - latesScrollPosition)
+  const totalBalanceHeight = Math.max(0, 19 - latesScrollPosition)
 
-  const clockIconSize = Math.max(12, 23 - 0.1 * scrollPosition)
-  const clockIconMarginLeft = Math.max(6, 10 - scrollPosition)
+  const pendingBalanceRowHeight = Math.max(0, 30 - 0.05 * latesScrollPosition)
+  const pendingBalanceRowOpacity = Math.max(0, 1 - 0.05 * latesScrollPosition)
+  const pendingBalanceRowMarginTop = Math.max(0, 10 - 0.05 * latesScrollPosition)
 
-  const walletsLabelFontSize = Math.max(0, 16 - 0.05 * scrollPosition)
+  const balanceSkeletonWidth = Math.max(150, 250 - latesScrollPosition)
+
+  const clockIconSize = Math.max(12, 23 - 0.1 * latesScrollPosition)
+  const clockIconMarginLeft = Math.max(6, 10 - latesScrollPosition)
+
+  const walletsLabelFontSize = Math.max(0, 16 - 0.05 * latesScrollPosition)
+
+  const isSortActive = (): boolean => {
+    return (
+      localStorage.getItem('activeSortKey') !== null ||
+      localStorage.getItem('activeSortType') !== null
+    )
+  }
+
+  const isFiltersActive = (): boolean => {
+    return (
+      localStorage.getItem('selectedCurrenciesFilter') !== null ||
+      localStorage.getItem('hiddenWalletsFilter') !== null ||
+      localStorage.getItem('zeroBalancesFilter') !== null
+    )
+  }
 
   return (
     <Styles.Container style={{ height: сontainerHeight }}>
@@ -84,7 +107,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
             >
               {numeral(balance).format('0.[000000]')} BTC
             </Styles.Balance>
-            {scrollPosition > 80 && pendingBalance !== null && Number(pendingBalance) > 0 ? (
+            {latesScrollPosition > 80 && pendingBalance !== null && Number(pendingBalance) > 0 ? (
               <Styles.ClockIcon
                 style={{
                   width: clockIconSize,
@@ -137,18 +160,18 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
 
         <Styles.Bottom>
           <Styles.WalletsLabel
-            style={{ fontSize: walletsLabelFontSize, opacity: scrollPosition > 50 ? 0 : 1 }}
+            style={{ fontSize: walletsLabelFontSize, opacity: latesScrollPosition > 50 ? 0 : 1 }}
           >
             Wallets
           </Styles.WalletsLabel>
           <Styles.Actions>
-            <Styles.Button onClick={onSortWallets}>
+            <Styles.Button onClick={() => onShowDrawer('sort')}>
               <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
-              {localStorage.getItem('activeSortKey') ? <Styles.ButtonDot /> : null}
+              {isSortActive() ? <Styles.ButtonDot /> : null}
             </Styles.Button>
-            <Styles.Button onClick={onFilterWallets}>
+            <Styles.Button onClick={() => onShowDrawer('filters')}>
               <SVG src="../../assets/icons/filter.svg" width={18} height={14} />
-              {localStorage.getItem('activeFilter') ? <Styles.ButtonDot /> : null}
+              {isFiltersActive() ? <Styles.ButtonDot /> : null}
             </Styles.Button>
           </Styles.Actions>
         </Styles.Bottom>
