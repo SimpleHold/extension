@@ -4,6 +4,7 @@ import { v4 } from 'uuid'
 import { validateWallet } from '@utils/validate'
 import { toLower } from '@utils/format'
 import { encrypt } from '@utils/crypto'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
@@ -52,8 +53,8 @@ const sortByName = (a: IWallet, b: IWallet, isAscending: boolean) => {
 }
 
 export const sortWallets = (a: IWallet, b: IWallet) => {
-  const getSortKey = localStorage.getItem('activeSortKey')
-  const getSortType = localStorage.getItem('activeSortType')
+  const getSortKey = getItem('activeSortKey')
+  const getSortType = getItem('activeSortType')
 
   if (getSortKey && getSortType) {
     const isAscending = getSortType === 'asc'
@@ -72,9 +73,24 @@ export const sortWallets = (a: IWallet, b: IWallet) => {
     : -1
 }
 
+export const filterWallets = (wallet: IWallet) => {
+  const zeroBalances = getItem('zeroBalancesFilter')
+  const hiddenWallets = getItem('hiddenWalletsFilter')
+  const selectedCurrencies = getItem('selectedCurrenciesFilter')
+
+  const filterByZeroBalance =
+    zeroBalances === 'false' ? typeof wallet.balance !== 'undefined' && wallet.balance > 0 : wallet
+  const filterByHidden = hiddenWallets === 'true' ? wallet.isHidden !== true : wallet
+  const filterByCurrency = selectedCurrencies
+    ? JSON.parse(selectedCurrencies).indexOf(wallet.symbol) !== -1
+    : wallet
+
+  return filterByZeroBalance || filterByHidden || filterByCurrency
+}
+
 export const getWallets = (): IWallet[] | null => {
   try {
-    const walletsList = localStorage.getItem('wallets')
+    const walletsList = getItem('wallets')
 
     if (walletsList) {
       const parseWallets = JSON.parse(walletsList)
@@ -102,7 +118,7 @@ export const updateBalance = (
   if (findWallet) {
     findWallet.balance = balance
     findWallet.balance_btc = balance_btc
-    localStorage.setItem('wallets', JSON.stringify(wallets))
+    setItem('wallets', JSON.stringify(wallets))
   }
 }
 
@@ -178,7 +194,7 @@ export const addNew = (
       ? chain
       : undefined
 
-    const walletsList = localStorage.getItem('wallets')
+    const walletsList = getItem('wallets')
     const validateWallets = validateWallet(walletsList)
 
     if (validateWallets && walletsList) {
@@ -198,12 +214,12 @@ export const addNew = (
       parseWallets.push(data)
       parseBackup.wallets.push({ ...data, ...{ privateKey } })
 
-      localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
-      localStorage.setItem('wallets', JSON.stringify(parseWallets))
+      setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+      setItem('wallets', JSON.stringify(parseWallets))
     }
   }
 
-  return localStorage.getItem('wallets')
+  return getItem('wallets')
 }
 
 export const toggleVisibleWallet = (address: string, symbol: string, isHidden: boolean): void => {
@@ -215,6 +231,6 @@ export const toggleVisibleWallet = (address: string, symbol: string, isHidden: b
 
   if (findWallet) {
     findWallet.isHidden = isHidden
-    localStorage.setItem('wallets', JSON.stringify(wallets))
+    setItem('wallets', JSON.stringify(wallets))
   }
 }
