@@ -242,6 +242,13 @@ const Send: React.FC = () => {
     }
   }
 
+  const isCurrencyBalanceError =
+    (tokenChain || toLower(symbol) === 'theta') &&
+    currencyBalance !== null &&
+    !isNetworkFeeLoading &&
+    networkFee &&
+    networkFee > currencyBalance
+
   const isButtonDisabled = (): boolean => {
     if (
       validateAddress(symbol, chain, address, tokenChain) &&
@@ -251,7 +258,8 @@ const Send: React.FC = () => {
       amountErrorLabel === null &&
       Number(balance) > 0 &&
       networkFee > 0 &&
-      !isNetworkFeeLoading
+      !isNetworkFeeLoading &&
+      !isCurrencyBalanceError
     ) {
       if (!outputs.length) {
         if (bitcoinLike.coins().indexOf(chain) !== -1) {
@@ -359,11 +367,7 @@ const Send: React.FC = () => {
                 )}
               </>
             )}
-            {(tokenChain || toLower(symbol) === 'theta') &&
-            currencyBalance &&
-            !isNetworkFeeLoading &&
-            networkFee &&
-            networkFee > currencyBalance ? (
+            {isCurrencyBalanceError && currencyBalance !== null ? (
               <Styles.NetworkFeeError>
                 Insufficient funds {Number(networkFee - currencyBalance)}{' '}
                 {toUpper(networkFeeSymbol)}
