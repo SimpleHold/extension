@@ -109,6 +109,11 @@ const generateContextMenu = async () => {
       title: 'SimpleHold',
       id: 'sh-parent',
       contexts: ['editable'],
+      documentUrlPatterns: [
+        'https://simpleswap.io/*',
+        'https://simplehold.io/*',
+        'http://localhost/*',
+      ],
     })
 
     const allowedSymbols = ['btc', 'eth', 'ltc', 'bnb', 'dash']
