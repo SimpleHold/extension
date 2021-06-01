@@ -11,6 +11,7 @@ import { download as downloadBackup } from '@utils/backup'
 import { logEvent } from '@utils/amplitude'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
+import { getItem, removeItem } from '@utils/storage'
 
 // Config
 import {
@@ -62,10 +63,11 @@ const DownloadBackup: React.FC = () => {
         name: START_BACKUP,
       })
     }
-    const backup = localStorage.getItem('backup')
+    const backup = getItem('backup')
+
     if (backup) {
       downloadBackup(backup)
-      localStorage.removeItem('backupStatus')
+      removeItem('backupStatus')
       history.replace('/wallets')
     }
   }

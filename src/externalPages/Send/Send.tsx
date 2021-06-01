@@ -19,6 +19,7 @@ import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
 import { validateAddress, getNewNetworkFee, formatUnit, getNetworkFeeSymbol } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
+import { getItem, setItem, removeItem } from '@utils/storage'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -65,7 +66,7 @@ const Send: React.FC = () => {
   const debounced = useDebounce(amount, 1000)
 
   React.useEffect(() => {
-    getWalletsList(localStorage.getItem('sendPageProps'))
+    getWalletsList(getItem('sendPageProps'))
     getStorageData()
   }, [])
 
@@ -177,8 +178,8 @@ const Send: React.FC = () => {
   }
 
   const getStorageData = (): void => {
-    const tabInfo = localStorage.getItem('tab')
-    const getProps = localStorage.getItem('sendPageProps')
+    const tabInfo = getItem('tab')
+    const getProps = getItem('sendPageProps')
 
     if (tabInfo) {
       const { favIconUrl = undefined, url = undefined } = JSON.parse(tabInfo)
@@ -189,7 +190,7 @@ const Send: React.FC = () => {
           url: new URL(url).host,
         })
       }
-      localStorage.removeItem('tab')
+      removeItem('tab')
     }
 
     if (getProps) {
@@ -275,8 +276,8 @@ const Send: React.FC = () => {
   }
 
   const onClose = (): void => {
-    if (localStorage.getItem('sendPageProps')) {
-      localStorage.removeItem('sendPageProps')
+    if (getItem('sendPageProps')) {
+      removeItem('sendPageProps')
     }
 
     window.close()
@@ -307,7 +308,7 @@ const Send: React.FC = () => {
         decimals: selectedWallet?.decimals,
       }
 
-      localStorage.setItem('sendConfirmationData', JSON.stringify(data))
+      setItem('sendConfirmationData', JSON.stringify(data))
       await updateTab(currenctTab.id, {
         url,
       })

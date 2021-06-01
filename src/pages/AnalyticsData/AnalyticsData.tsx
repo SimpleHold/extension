@@ -8,6 +8,7 @@ import Button from '@components/Button'
 
 // Utils
 import { logEvent } from '@utils/amplitude'
+import { setItem } from '@utils/storage'
 
 // Config
 import { ANALYTICS_OK } from '@config/events'
@@ -19,7 +20,7 @@ const AnalyticsData: React.FC = () => {
   const history = useHistory()
 
   const onNext = (): void => {
-    localStorage.setItem('analytics', 'agreed')
+    setItem('analytics', 'agreed')
 
     logEvent({
       name: ANALYTICS_OK,

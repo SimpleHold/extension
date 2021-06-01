@@ -17,6 +17,7 @@ import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { validate as validateBackup } from '@utils/backup'
+import { setItem } from '@utils/storage'
 
 // Config
 import { START_RESTORE_CONFIRM, START_RESTORE_PASSWORD } from '@config/events'
@@ -76,8 +77,8 @@ const RestoreWallet: React.FC = () => {
         const getWalletsList = validateBackup(decryptBackup)
 
         if (getWalletsList) {
-          localStorage.setItem('backup', backupData)
-          localStorage.setItem('wallets', getWalletsList)
+          setItem('backup', backupData)
+          setItem('wallets', getWalletsList)
           history.replace('/wallets')
         } else {
           setActiveDrawer('fail')

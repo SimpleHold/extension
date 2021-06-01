@@ -19,6 +19,7 @@ import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
 import { generate, importPrivateKey } from '@utils/address'
 import * as theta from '@utils/currencies/theta'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
@@ -96,7 +97,7 @@ const NewWallet: React.FC = () => {
 
   const onConfirm = (): void => {
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup && privateKey) {
         const decryptBackup = decrypt(backup, password)
@@ -134,7 +135,7 @@ const NewWallet: React.FC = () => {
 
               setPrivateKey(null)
 
-              localStorage.setItem('backupStatus', 'notDownloaded')
+              setItem('backupStatus', 'notDownloaded')
 
               return setActiveDrawer('success')
             }

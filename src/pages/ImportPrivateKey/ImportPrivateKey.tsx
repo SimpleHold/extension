@@ -21,6 +21,7 @@ import { toLower, toUpper } from '@utils/format'
 import { importPrivateKey } from '@utils/address'
 import { getTokensBalance, ITokensBalance } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import tokens, { IToken } from '@config/tokens'
@@ -139,7 +140,7 @@ const ImportPrivateKey: React.FC = () => {
   }
 
   const onConfirmDrawer = (): void => {
-    const backup = localStorage.getItem('backup')
+    const backup = getItem('backup')
 
     if (backup && privateKey) {
       const decryptBackup = decrypt(backup, password)
@@ -164,7 +165,7 @@ const ImportPrivateKey: React.FC = () => {
           )
 
           if (walletsList) {
-            localStorage.setItem('backupStatus', 'notDownloaded')
+            setItem('backupStatus', 'notDownloaded')
 
             const walletAmount = JSON.parse(walletsList).filter(
               (wallet: IWallet) => wallet.symbol === symbol

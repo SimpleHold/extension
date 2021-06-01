@@ -45,7 +45,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
   }, [isActive])
 
   const getSelectedCurrencies = (): void => {
-    const getSelectedCurrenciesFilter = localStorage.getItem('selectedCurrenciesFilter')
+    const getSelectedCurrenciesFilter = getItem('selectedCurrenciesFilter')
     const parseData = getSelectedCurrenciesFilter
       ? JSON.parse(getSelectedCurrenciesFilter)
       : ['All']

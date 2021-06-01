@@ -15,6 +15,7 @@ import { toUpper, toLower } from '@utils/format'
 import { getWallets, IWallet, addNew as addNewWallet } from '@utils/wallet'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getUnusedAddressesForToken } from '@config/tokens'
@@ -111,7 +112,7 @@ const AddTokenToAddress: React.FC = () => {
 
   const onConfirmDrawer = (): void => {
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup) {
         const decryptBackup = decrypt(backup, password)
@@ -137,7 +138,7 @@ const AddTokenToAddress: React.FC = () => {
             )
 
             if (walletsList) {
-              localStorage.setItem('backupStatus', 'notDownloaded')
+              setItem('backupStatus', 'notDownloaded')
 
               history.replace('/download-backup', {
                 password,

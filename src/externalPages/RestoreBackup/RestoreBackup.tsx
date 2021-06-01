@@ -21,6 +21,7 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { validate as validateBackup } from '@utils/backup'
 import { setBadgeBackgroundColor, setBadgeText } from '@utils/extension'
+import { getItem, setItem, removeItem } from '@utils/storage'
 
 // Config
 import { START_RESTORE_CONFIRM, START_RESTORE_PASSWORD } from '@config/events'
@@ -43,7 +44,7 @@ const RestoreBackup: React.FC = () => {
   const [isPageActive, setPageActive] = React.useState<boolean>(false)
 
   React.useEffect(() => {
-    if (localStorage.getItem('manualRestoreBackup') === 'active') {
+    if (getItem('manualRestoreBackup') === 'active') {
       setPageActive(true)
     }
   }, [])
@@ -97,9 +98,9 @@ const RestoreBackup: React.FC = () => {
         const getWalletsList = validateBackup(decryptBackup)
 
         if (getWalletsList) {
-          localStorage.setItem('backup', backupData)
-          localStorage.setItem('wallets', getWalletsList)
-          localStorage.removeItem('manualRestoreBackup')
+          setItem('backup', backupData)
+          setItem('wallets', getWalletsList)
+          removeItem('manualRestoreBackup')
 
           setBadgeBackgroundColor('#EB5757')
           setBadgeText('1')

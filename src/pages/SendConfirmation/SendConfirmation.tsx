@@ -21,6 +21,7 @@ import { logEvent } from '@utils/amplitude'
 import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
 import { convertDecimals } from '@utils/web3'
 import * as theta from '@utils/currencies/theta'
+import { getItem } from '@utils/storage'
 
 // Config
 import {
@@ -80,7 +81,7 @@ const SendConfirmation: React.FC = () => {
       setInputErrorLabel(null)
     }
 
-    const backup = localStorage.getItem('backup')
+    const backup = getItem('backup')
 
     if (backup) {
       const decryptBackup = decrypt(backup, password)

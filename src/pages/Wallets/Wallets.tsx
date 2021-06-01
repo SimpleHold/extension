@@ -18,6 +18,7 @@ import useToastContext from '@hooks/useToastContext'
 import { IWallet, getWallets, sortWallets, filterWallets } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import { setBadgeText, getBadgeText } from '@utils/extension'
+import { clear } from '@utils/storage'
 
 // Config
 import { ADD_ADDRESS, BALANCE_CHANGED } from '@config/events'
@@ -112,7 +113,7 @@ const Wallets: React.FC = () => {
     if (walletsList) {
       setWallets(walletsList.filter(filterWallets).sort(sortWallets))
     } else {
-      localStorage.clear()
+      clear()
       history.push('/welcome')
     }
   }

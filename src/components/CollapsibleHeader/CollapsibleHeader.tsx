@@ -9,6 +9,7 @@ import PendingBalance from '@components/PendingBalance'
 
 // Utils
 import { price } from '@utils/format'
+import { getItem } from '@utils/storage'
 
 // Styles
 import Styles from './styles'
@@ -66,17 +67,14 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
   const walletsLabelFontSize = Math.max(0, 16 - 0.05 * latesScrollPosition)
 
   const isSortActive = (): boolean => {
-    return (
-      localStorage.getItem('activeSortKey') !== null ||
-      localStorage.getItem('activeSortType') !== null
-    )
+    return getItem('activeSortKey') !== null || getItem('activeSortType') !== null
   }
 
   const isFiltersActive = (): boolean => {
     return (
-      localStorage.getItem('selectedCurrenciesFilter') !== null ||
-      localStorage.getItem('hiddenWalletsFilter') !== null ||
-      localStorage.getItem('zeroBalancesFilter') !== null
+      getItem('selectedCurrenciesFilter') !== null ||
+      getItem('hiddenWalletsFilter') !== null ||
+      getItem('zeroBalancesFilter') !== null
     )
   }
 

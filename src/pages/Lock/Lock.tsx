@@ -15,6 +15,7 @@ import { download as downloadBackup } from '@utils/backup'
 import { validatePassword } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
 import { openWebPage } from '@utils/extension'
+import { getItem, removeItem } from '@utils/storage'
 
 // Config
 import { LOG_OUT_CACHE, PASSWORD_AFTER_LOG_OUT, SUCCESS_ENTER } from '@config/events'
@@ -50,7 +51,7 @@ const Lock: React.FC = () => {
     }
 
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup) {
         const decryptWallet = decrypt(backup, password)
@@ -59,7 +60,7 @@ const Lock: React.FC = () => {
           logEvent({
             name: SUCCESS_ENTER,
           })
-          localStorage.removeItem('isLocked')
+          removeItem('isLocked')
           return history.replace('/wallets', {
             status: state?.status,
           })
@@ -76,7 +77,7 @@ const Lock: React.FC = () => {
 
   const onConfirmLogout = () => {
     setActiveDrawer(null)
-    const backup = localStorage.getItem('backup')
+    const backup = getItem('backup')
 
     if (backup) {
       downloadBackup(backup)
@@ -85,9 +86,9 @@ const Lock: React.FC = () => {
         name: LOG_OUT_CACHE,
       })
 
-      localStorage.removeItem('backup')
-      localStorage.removeItem('wallets')
-      localStorage.removeItem('isLocked')
+      removeItem('backup')
+      removeItem('wallets')
+      removeItem('isLocked')
 
       history.push('/welcome')
     }

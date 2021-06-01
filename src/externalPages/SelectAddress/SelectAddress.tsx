@@ -13,6 +13,7 @@ import CurrenciesDropdown from '@components/CurrenciesDropdown'
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { toLower, toUpper } from '@utils/format'
+import { getItem, removeItem } from '@utils/storage'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -48,7 +49,7 @@ const SelectAddress: React.FC = () => {
   }, [])
 
   const checkActiveTab = () => {
-    const tabInfo: string | null = localStorage.getItem('tab')
+    const tabInfo: string | null = getItem('tab')
 
     if (tabInfo) {
       const parseTabInfo = JSON.parse(tabInfo)
@@ -110,8 +111,8 @@ const SelectAddress: React.FC = () => {
       },
     })
 
-    if (localStorage.getItem('tab')) {
-      localStorage.removeItem('tab')
+    if (getItem('tab')) {
+      removeItem('tab')
     }
     onClose()
   }

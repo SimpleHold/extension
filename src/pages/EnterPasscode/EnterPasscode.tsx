@@ -11,6 +11,7 @@ import ForgotPasscodeDrawer from '@drawers/ForgotPasscode'
 // Utils
 import { sha256hash } from '@utils/crypto'
 import { logEvent } from '@utils/amplitude'
+import { getItem, removeItem } from '@utils/storage'
 
 // Config
 import { PASSCODE_LOCKED_INVALID, PASSCODE_LOCKED_FORGOT } from '@config/events'
@@ -52,10 +53,10 @@ const EnterPasscode: React.FC = () => {
   }, [passcode])
 
   const checkPasscode = (): void => {
-    const getPasscodeHash = localStorage.getItem('passcode')
+    const getPasscodeHash = getItem('passcode')
 
     if (getPasscodeHash && getPasscodeHash === sha256hash(passcode)) {
-      localStorage.removeItem('isLocked')
+      removeItem('isLocked')
       history.replace('/wallets')
     } else {
       setIsError(true)
@@ -72,7 +73,7 @@ const EnterPasscode: React.FC = () => {
       status: 'passcodeTurnedOff',
     })
 
-    localStorage.removeItem('passcode')
+    removeItem('passcode')
 
     logEvent({
       name: PASSCODE_LOCKED_FORGOT,

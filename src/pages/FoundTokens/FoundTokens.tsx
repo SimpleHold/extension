@@ -15,6 +15,7 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet } from '@utils/wallet'
 import { importPrivateKey } from '@utils/address'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getCurrencyByChain } from '@config/currencies'
@@ -73,7 +74,7 @@ const FoundTokens: React.FC = () => {
     }
 
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup) {
         const decryptBackup = decrypt(backup, password)
@@ -102,7 +103,7 @@ const FoundTokens: React.FC = () => {
             )
 
             if (walletsList) {
-              localStorage.setItem('backupStatus', 'notDownloaded')
+              setItem('backupStatus', 'notDownloaded')
 
               history.replace('/download-backup', {
                 password,

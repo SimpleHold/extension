@@ -21,6 +21,7 @@ import { convertDecimals } from '@utils/web3'
 import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
 import { sendRawTransaction, getWeb3TxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
+import { getItem, removeItem } from '@utils/storage'
 
 // Styles
 import Styles from './styles'
@@ -64,13 +65,13 @@ const SendConfirmation: React.FC = () => {
   }
 
   const checkProps = async (): Promise<void> => {
-    const data = localStorage.getItem('sendConfirmationData')
+    const data = getItem('sendConfirmationData')
 
     if (data) {
       const parseData = parseJson(data)
 
       if (parseData) {
-        localStorage.removeItem('sendConfirmationData')
+        removeItem('sendConfirmationData')
         return setProps(parseData)
       }
     }
@@ -79,8 +80,8 @@ const SendConfirmation: React.FC = () => {
   }
 
   const onClose = (): void => {
-    if (localStorage.getItem('sendPageProps')) {
-      localStorage.removeItem('sendPageProps')
+    if (getItem('sendPageProps')) {
+      removeItem('sendPageProps')
     }
 
     window.close()
@@ -95,7 +96,7 @@ const SendConfirmation: React.FC = () => {
       setInputErrorLabel(null)
     }
 
-    const backup = localStorage.getItem('backup')
+    const backup = getItem('backup')
 
     if (
       backup &&

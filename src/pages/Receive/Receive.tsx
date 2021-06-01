@@ -31,6 +31,7 @@ import { decrypt } from '@utils/crypto'
 import { IWallet, toggleVisibleWallet, updateBalance } from '@utils/wallet'
 import { getExplorerLink } from '@utils/address'
 import { openWebPage } from '@utils/extension'
+import { getItem } from '@utils/storage'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
@@ -191,7 +192,7 @@ const Receive: React.FC = () => {
     }
 
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup?.length) {
         const decryptBackup = decrypt(backup, password)

@@ -13,6 +13,7 @@ import arrowIcon from '@assets/icons/arrow.svg'
 
 // Utils
 import { logEvent } from '@utils/amplitude'
+import { setItem } from '@utils/storage'
 
 // Styles
 import Styles from './styles'
@@ -53,7 +54,7 @@ const OnBoard: React.FC = () => {
     if (currentStep !== 2) {
       setCurrentStep(currentStep + 1)
     } else {
-      localStorage.setItem('onBoard', 'passed')
+      setItem('onBoard', 'passed')
       history.push('/analytics-data')
     }
   }

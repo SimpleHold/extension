@@ -11,6 +11,7 @@ import Link from '@components/Link'
 import { init, logEvent } from '@utils/amplitude'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
+import { getItem, setItem, removeItem } from '@utils/storage'
 
 // Config
 import config from '@config/index'
@@ -38,12 +39,12 @@ const Wallets: React.FC = () => {
   }
 
   const initAmplitude = (): void => {
-    const clientId = localStorage.getItem('clientId') || v4()
+    const clientId = getItem('clientId') || v4()
 
     init(config.apiKey.amplitude, clientId)
 
-    if (!localStorage.getItem('clientId')) {
-      localStorage.setItem('clientId', clientId)
+    if (!getItem('clientId')) {
+      setItem('clientId', clientId)
 
       logEvent({
         name: FIRST_ENTER,
@@ -60,8 +61,8 @@ const Wallets: React.FC = () => {
       name: START_CREATE,
     })
 
-    if (localStorage.getItem('manualRestoreBackup')) {
-      localStorage.removeItem('manualRestoreBackup')
+    if (getItem('manualRestoreBackup')) {
+      removeItem('manualRestoreBackup')
     }
 
     history.push('/create-wallet')
@@ -73,7 +74,7 @@ const Wallets: React.FC = () => {
     })
 
     if (isManualRestore) {
-      localStorage.setItem('manualRestoreBackup', 'active')
+      setItem('manualRestoreBackup', 'active')
       return openWebPage(getUrl('restore-backup.html'))
     }
 

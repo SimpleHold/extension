@@ -15,3 +15,7 @@ export const removeMany = (keys: string[]): void => {
     removeItem(key)
   }
 }
+
+export const clear = (): void => {
+  localStorage.clear()
+}

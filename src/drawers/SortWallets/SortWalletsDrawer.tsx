@@ -7,6 +7,7 @@ import Button from '@components/Button'
 
 // Utils
 import { toLower } from '@utils/format'
+import { getItem, setItem, removeItem } from '@utils/storage'
 
 // Assets
 import sortArrow from '@assets/icons/sortArrow.svg'
@@ -67,8 +68,8 @@ const SortWalletsDrawer: React.FC<Props> = (props) => {
   }, [])
 
   const checkActiveSortType = (): void => {
-    const getSortKey = localStorage.getItem('activeSortKey')
-    const getSortType = localStorage.getItem('activeSortType')
+    const getSortKey = getItem('activeSortKey')
+    const getSortType = getItem('activeSortType')
 
     if (getSortKey || getSortType) {
       const findListItem = getSortKey
@@ -79,23 +80,23 @@ const SortWalletsDrawer: React.FC<Props> = (props) => {
         setActiveSortKey(getSortKey)
         setActiveSortType(getSortType)
       } else {
-        localStorage.removeItem('activeSortKey')
-        localStorage.removeItem('activeSortType')
+        removeItem('activeSortKey')
+        removeItem('activeSortType')
       }
     }
   }
 
   const onApplySort = (): void => {
     if (activeSortKey) {
-      localStorage.setItem('activeSortKey', activeSortKey)
+      setItem('activeSortKey', activeSortKey)
     } else {
-      localStorage.removeItem('activeSortKey')
+      removeItem('activeSortKey')
     }
 
     if (activeSortType) {
-      localStorage.setItem('activeSortType', activeSortType)
+      setItem('activeSortType', activeSortType)
     } else {
-      localStorage.removeItem('activeSortType')
+      removeItem('activeSortType')
     }
     onApply()
   }
@@ -120,10 +121,9 @@ const SortWalletsDrawer: React.FC<Props> = (props) => {
   const isButtonDisabled =
     (!activeSortKey &&
       !activeSortType &&
-      !localStorage.getItem('activeSortKey') &&
-      !localStorage.getItem('activeSortType')) ||
-    (localStorage.getItem('activeSortKey') === activeSortKey &&
-      localStorage.getItem('activeSortType') === activeSortType)
+      !getItem('activeSortKey') &&
+      !getItem('activeSortType')) ||
+    (getItem('activeSortKey') === activeSortKey && getItem('activeSortType') === activeSortType)
 
   return (
     <DrawerWrapper title="Sort by" isActive={isActive} onClose={onClose} withCloseIcon>
