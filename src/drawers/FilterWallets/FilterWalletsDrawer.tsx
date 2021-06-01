@@ -85,19 +85,20 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
         .filter((v, i, a) => a.findIndex((t) => t.symbol === v.symbol) === i)
         .sort((a: IWallet, b: IWallet) => a.symbol.localeCompare(b.symbol))
         .map((wallet: IWallet) => {
-          const { chain, symbol } = wallet
+          const { chain, symbol, name } = wallet
 
           const getWalletInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
           return {
             logo: {
-              symbol,
+              symbol: getWalletInfo?.symbol || symbol,
               width: 40,
               height: 40,
               br: 13,
-              background: getWalletInfo ? getWalletInfo.background : '#1D1D22',
+              name,
+              chain,
             },
-            value: getWalletInfo?.name || '',
+            value: name || getWalletInfo?.name || '',
             withRadioButton: true,
           }
         })

@@ -22,6 +22,7 @@ export type TList = {
     br: number
     background?: string
     chain?: string
+    name?: string
   }
   value: string
   label?: string
@@ -121,8 +122,8 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
             return (
               <Styles.ListItem
                 key={`${value}/${index}`}
-                onClick={() => onSelectItem(index)}
-                disabled={showRadioButton}
+                onClick={() => (toggleRadioButton ? toggleRadioButton(value) : onSelectItem(index))}
+                disabled={false}
                 pv={showRadioButton && !logo ? 18 : 10}
               >
                 {logo ? (
@@ -133,7 +134,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
                     br={logo.br}
                     background={logo.background}
                     chain={logo?.chain}
-                    name={tokenName}
+                    name={logo?.name || tokenName}
                   />
                 ) : null}
                 <Styles.ListItemRow withLogo={typeof logo !== 'undefined'}>

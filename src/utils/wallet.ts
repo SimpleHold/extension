@@ -7,8 +7,7 @@ import { encrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
-import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyByChain } from '@config/currencies'
 
 export interface IWallet {
   symbol: string
@@ -23,6 +22,11 @@ export interface IWallet {
   decimals?: number
   createdAt?: Date
   isHidden?: boolean
+}
+
+type TSelectedWalletFilter = {
+  symbol: string
+  chain?: string
 }
 
 const sortByBalance = (a: IWallet, b: IWallet, isAscending: boolean) => {
@@ -41,15 +45,7 @@ const sortByDate = (a: IWallet, b: IWallet, isAscending: boolean) => {
 }
 
 const sortByName = (a: IWallet, b: IWallet, isAscending: boolean) => {
-  const currencyA = a.chain ? getToken(a.symbol, a.chain) : getCurrency(a.symbol)
-  const currencyB = b.chain ? getToken(b.symbol, b.chain) : getCurrency(b.symbol)
-
-  if (currencyA && currencyB) {
-    return isAscending
-      ? currencyA.name.localeCompare(currencyB.name)
-      : currencyB.name.localeCompare(currencyA.name)
-  }
-  return -1
+  return isAscending ? a.symbol.localeCompare(b.symbol) : b.symbol.localeCompare(a.symbol)
 }
 
 export const sortWallets = (a: IWallet, b: IWallet) => {
@@ -86,10 +82,13 @@ export const filterWallets = (wallet: IWallet) => {
     zeroBalances === 'false' ? typeof wallet.balance !== 'undefined' && wallet.balance > 0 : wallet
   const filterByHidden = hiddenWallets === 'true' ? wallet.isHidden !== true : wallet
   const filterByCurrency = selectedCurrencies
-    ? JSON.parse(selectedCurrencies).indexOf(wallet.symbol) !== -1
+    ? JSON.parse(selectedCurrencies).some(
+        (i: TSelectedWalletFilter) =>
+          toLower(i.symbol) === toLower(wallet.symbol) && toLower(i.chain) === toLower(wallet.chain)
+      )
     : wallet
 
-  return filterByZeroBalance || filterByHidden || filterByCurrency
+  return filterByZeroBalance && filterByHidden && filterByCurrency
 }
 
 export const getWallets = (): IWallet[] | null => {
