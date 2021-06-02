@@ -6,6 +6,9 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import RadioButton from '@components/RadioButton'
 
 // Utils
+import { toLower } from '@utils/format'
+
+// Config
 import { getCurrencyByChain } from '@config/currencies'
 
 // Hooks
@@ -29,6 +32,12 @@ export type TList = {
   withRadioButton?: boolean
 }
 
+type TSelectedCurrency = {
+  symbol?: string
+  chain?: string
+  type?: string
+}
+
 interface Props {
   currencySymbol?: string
   list: TList[]
@@ -41,7 +50,7 @@ interface Props {
   tokenChain?: string
   tokenName?: string
   toggleRadioButton?: (value: string) => void
-  radioButtonValues?: string[]
+  selectedCurrencies?: TSelectedCurrency[]
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
@@ -57,7 +66,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     tokenChain,
     tokenName,
     toggleRadioButton,
-    radioButtonValues,
+    selectedCurrencies,
   } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
@@ -117,7 +126,15 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
 
             const showRadioButton =
               withRadioButton === true && typeof toggleRadioButton !== 'undefined'
-            const isRadioButtonActive = radioButtonValues?.indexOf(value) !== -1
+            const isRadioButtonActive = logo
+              ? selectedCurrencies?.find(
+                  (currency: TSelectedCurrency) =>
+                    toLower(currency.symbol) === toLower(logo.symbol) &&
+                    toLower(currency?.chain) === toLower(logo?.chain)
+                ) !== undefined
+              : selectedCurrencies?.find(
+                  (currency: TSelectedCurrency) => toLower(currency.type) === toLower(value)
+                ) !== undefined
 
             return (
               <Styles.ListItem

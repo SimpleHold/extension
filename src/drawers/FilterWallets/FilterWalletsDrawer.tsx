@@ -8,7 +8,8 @@ import Switch from '@components/Switch'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
-import { getItem, setItem, removeMany } from '@utils/storage'
+import { getItem, setItem, removeMany, removeItem } from '@utils/storage'
+import { toLower } from '@utils/format'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -23,6 +24,12 @@ interface Props {
   isActive: boolean
 }
 
+type TSelectedCurrency = {
+  symbol?: string
+  chain?: string
+  type?: string
+}
+
 const FilterWalletsDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive, onApply } = props
 
@@ -33,8 +40,9 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
   const [dropDownList, setDropDownList] = React.useState<TList[]>([])
   const [isShowPrevHiddenAddress, setShowPrevHiddenAddress] = React.useState<boolean>(false)
   const [isShowPrevZeroBalances, setShowPrevZeroBalances] = React.useState<boolean>(true)
-  const [radioButtonValues, setRadioButtonValues] = React.useState<string[]>([])
   const [prevSelectedCurrencies, setPrevSelectedCurrencies] = React.useState<string[]>([])
+  const [selectedCurrencies, setSelectedCurrencies] = React.useState<TSelectedCurrency[]>([])
+  const [isInitialSetup, setInitialSetup] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     if (isActive) {
@@ -44,13 +52,26 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
     }
   }, [isActive])
 
+  React.useEffect(() => {
+    if (
+      !isInitialSetup &&
+      dropDownList.length &&
+      selectedCurrencies.length &&
+      dropDownList.length - 1 === selectedCurrencies.length &&
+      selectedCurrencies.find((i: TSelectedCurrency) => i.type === 'All') === undefined
+    ) {
+      setSelectedCurrencies([...[{ type: 'All' }], ...selectedCurrencies])
+      setInitialSetup(true)
+    }
+  }, [selectedCurrencies, dropDownList])
+
   const getSelectedCurrencies = (): void => {
     const getSelectedCurrenciesFilter = getItem('selectedCurrenciesFilter')
     const parseData = getSelectedCurrenciesFilter
       ? JSON.parse(getSelectedCurrenciesFilter)
-      : ['All']
+      : [{ type: 'All' }]
 
-    setRadioButtonValues(parseData)
+    setSelectedCurrencies(parseData)
     setPrevSelectedCurrencies(parseData)
   }
 
@@ -82,7 +103,12 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       setTotalHiddenWallet(getHiddenWallets)
 
       const mapDropDownList: TList[] = wallets
-        .filter((v, i, a) => a.findIndex((t) => t.symbol === v.symbol) === i)
+        .filter(
+          (v, i, a) =>
+            a.findIndex(
+              (wallet: IWallet) => wallet.symbol === v.symbol && wallet.chain === v.chain
+            ) === i
+        )
         .sort((a: IWallet, b: IWallet) => a.symbol.localeCompare(b.symbol))
         .map((wallet: IWallet) => {
           const { chain, symbol, name } = wallet
@@ -116,21 +142,40 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
     const findListItem = dropDownList.find((list: TList) => list.value === value)
 
     if (findListItem) {
-      const checkExist = radioButtonValues.indexOf(value) !== -1
+      const { logo } = findListItem
+      const checkExist =
+        selectedCurrencies?.find(
+          (currency: TSelectedCurrency) =>
+            toLower(currency.type) === toLower(value) ||
+            (toLower(currency.symbol) === toLower(logo?.symbol) &&
+              toLower(currency?.chain) === toLower(logo?.chain))
+        ) !== undefined
 
       if (checkExist) {
-        if (value !== 'All' && radioButtonValues.length > 1) {
-          setRadioButtonValues(
-            radioButtonValues.filter((item: string) => item !== 'All' && item !== value)
+        if (value !== 'All' && selectedCurrencies.length > 1) {
+          setSelectedCurrencies(
+            selectedCurrencies.filter(
+              (i: TSelectedCurrency) =>
+                (i.type !== 'All' && toLower(i.symbol) !== toLower(logo?.symbol)) ||
+                toLower(i.chain) !== toLower(logo?.chain)
+            )
           )
         }
       } else {
         if (value === 'All') {
-          setRadioButtonValues(['All', ...dropDownList.map((list: TList) => list.value)])
+          setSelectedCurrencies([
+            ...[{ type: 'All' }],
+            ...dropDownList.map((list: TList) => {
+              return {
+                symbol: list.logo?.symbol,
+                chain: list.logo?.chain,
+              }
+            }),
+          ])
         } else {
-          setRadioButtonValues([
-            ...radioButtonValues.filter((item: string) => item !== 'All'),
-            value,
+          setSelectedCurrencies([
+            ...selectedCurrencies.filter((i: TSelectedCurrency) => i.type !== 'All'),
+            ...[{ symbol: logo?.symbol, chain: logo?.chain }],
           ])
         }
       }
@@ -140,9 +185,15 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
   const onApplyFilters = (): void => {
     setItem('hiddenWalletsFilter', isShowHiddenAddress.toString())
     setItem('zeroBalancesFilter', isShowZeroBalances.toString())
-    const filterSelectedCurrencies = radioButtonValues.filter((item: string) => item !== 'All')
+
+    const filterSelectedCurrencies = selectedCurrencies.filter(
+      (item: TSelectedCurrency) => item.type !== 'All'
+    )
+
     if (filterSelectedCurrencies.length) {
       setItem('selectedCurrenciesFilter', JSON.stringify(filterSelectedCurrencies))
+    } else {
+      removeItem('selectedCurrenciesFilter')
     }
     onApply()
   }
@@ -151,24 +202,26 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
     return (
       isShowPrevHiddenAddress === isShowHiddenAddress &&
       isShowPrevZeroBalances === isShowZeroBalances &&
-      JSON.stringify(prevSelectedCurrencies) === JSON.stringify(radioButtonValues)
+      prevSelectedCurrencies.length === selectedCurrencies.length
+    )
+  }
+
+  const isShowResetButton = (): boolean => {
+    const getHiddenWalletsFilter = getItem('hiddenWalletsFilter')
+    const getZeroBalancesFilter = getItem('zeroBalancesFilter')
+    const getSelectedCurrenciesFilter = getItem('selectedCurrenciesFilter')
+
+    return (
+      (getHiddenWalletsFilter !== null ||
+        getZeroBalancesFilter !== null ||
+        getSelectedCurrenciesFilter !== null) &&
+      isButtonDisabled()
     )
   }
 
   const onReset = (): void => {
     removeMany(['hiddenWalletsFilter', 'zeroBalancesFilter', 'selectedCurrenciesFilter'])
     onApply()
-  }
-
-  const isShowResetButton = (): boolean => {
-    if (
-      getItem('hiddenWalletsFilter') ||
-      getItem('zeroBalancesFilter') ||
-      (getItem('selectedCurrenciesFilter') && isButtonDisabled())
-    ) {
-      return true
-    }
-    return false
   }
 
   return (
@@ -179,10 +232,13 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
             list={dropDownList}
             label="Select currency"
             toggleRadioButton={toggleRadioButton}
-            radioButtonValues={radioButtonValues}
+            selectedCurrencies={selectedCurrencies}
           />
           <Styles.SelectedAmount>
-            Selected {radioButtonValues.indexOf('All') !== -1 ? 'All' : radioButtonValues.length}{' '}
+            Selected{' '}
+            {selectedCurrencies.find((i: TSelectedCurrency) => i.type === 'All') !== undefined
+              ? 'all'
+              : selectedCurrencies.length}{' '}
             currencies
           </Styles.SelectedAmount>
         </Styles.SelectCurrencyRow>
