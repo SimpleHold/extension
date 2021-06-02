@@ -21,10 +21,12 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
+    "@emurgo/cardano-serialization-lib-asmjs": "^7.0.0",
     "advanced-css-reset": "^1.2.2",
     "amplitude-js": "^7.4.4",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
+    "bip39": "^3.0.4",
     "copy-to-clipboard": "^3.3.1",
     "crypto-js": "^4.0.0",
     "detect-browser": "^5.2.0",

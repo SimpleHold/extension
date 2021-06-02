@@ -19,6 +19,7 @@ export interface IWallet {
   name?: string
   contractAddress?: string
   decimals?: number
+  mnemonic?: string
 }
 
 export const getWallets = (): IWallet[] | null => {
@@ -110,7 +111,8 @@ export const addNew = (
   chain?: string,
   tokenName?: string,
   contractAddress?: string,
-  decimals?: number
+  decimals?: number,
+  mnemonic?: string | null
 ): string | null => {
   const parseBackup = JSON.parse(decryptBackup)
 
@@ -144,7 +146,7 @@ export const addNew = (
       }
 
       parseWallets.push(data)
-      parseBackup.wallets.push({ ...data, ...{ privateKey } })
+      parseBackup.wallets.push({ ...data, ...{ privateKey, mnemonic } })
 
       localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
       localStorage.setItem('wallets', JSON.stringify(parseWallets))

@@ -41,6 +41,7 @@ const NewWallet: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+  const [mnemonic, setMnemonic] = React.useState<null | string>(null)
 
   const history = useHistory()
   const {
@@ -63,7 +64,11 @@ const NewWallet: React.FC = () => {
     const generateAddress = generate(symbol, chain)
 
     if (generateAddress) {
-      const { privateKey: walletPrivateKey } = generateAddress
+      const { privateKey: walletPrivateKey, mnemonic: walletMnemonic } = generateAddress
+
+      if (walletMnemonic) {
+        setMnemonic(walletMnemonic)
+      }
 
       setPrivateKey(walletPrivateKey)
       setActiveDrawer('confirm')
@@ -92,7 +97,7 @@ const NewWallet: React.FC = () => {
         const decryptBackup = decrypt(backup, password)
 
         if (decryptBackup) {
-          const address = importPrivateKey(symbol, privateKey, chain)
+          const address = importPrivateKey(symbol, privateKey, chain, mnemonic)
 
           if (address) {
             const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
@@ -109,7 +114,8 @@ const NewWallet: React.FC = () => {
               chain,
               tokenName,
               contractAddress,
-              decimals
+              decimals,
+              mnemonic
             )
 
             if (walletsList) {

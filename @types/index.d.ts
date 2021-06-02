@@ -4,6 +4,7 @@ declare module '*.svg'
 type TGenerateAddress = {
   address: string
   privateKey: string
+  mnemonic?: string
 }
 
 type TCreatedTransaction = {

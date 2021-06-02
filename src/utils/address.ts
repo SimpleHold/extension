@@ -8,7 +8,10 @@ import { getToken, IToken } from '@config/tokens'
 
 // Utils
 import { getEtherNetworkFee, IGetNetworkFeeResponse } from '@utils/api'
-import { toLower } from './format'
+import { toLower } from '@utils/format'
+
+// Currencies
+import * as cardano from '@utils/currencies/cardano'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
@@ -33,6 +36,9 @@ export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boole
 }
 
 export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
+  if (cardano.coins.indexOf(symbol) !== -1) {
+    return cardano.generateWallet()
+  }
   if (isEthereumLike(symbol, chain)) {
     return web3.generateAddress()
   } else {
@@ -45,8 +51,12 @@ export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAd
 export const importPrivateKey = (
   symbol: TSymbols | string,
   privateKey: string,
-  chain?: string
+  chain?: string,
+  mnemonic?: string | null
 ): string | null => {
+  if (cardano.coins.indexOf(symbol) !== -1 && mnemonic) {
+    return cardano.importMnemonic(mnemonic)
+  }
   if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
   } else {

@@ -8,6 +8,7 @@ import dashLogo from '@assets/currencies/dash.svg'
 import ethereumLogo from '@assets/currencies/eth.svg'
 import ethereumClassicLogo from '@assets/currencies/etc.svg'
 import binanceLogo from '@assets/currencies/bnb.svg'
+import cardanoLogo from '@assets/currencies/ada.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -93,6 +94,14 @@ const currencies: ICurrency[] = [
     background: '#EBBB4E',
     chain: 'bsc',
     minSendAmount: 1000000000000000,
+  },
+  {
+    name: 'Cardano',
+    symbol: 'ada',
+    logo: cardanoLogo,
+    background: '#2B55BB',
+    chain: 'ada',
+    minSendAmount: 0.001, // Fix me
   },
 ]
 
