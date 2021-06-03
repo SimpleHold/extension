@@ -97,7 +97,7 @@ const NewWallet: React.FC = () => {
         const decryptBackup = decrypt(backup, password)
 
         if (decryptBackup) {
-          const address = importPrivateKey(symbol, privateKey, chain, mnemonic)
+          const address = importPrivateKey(symbol, privateKey, chain)
 
           if (address) {
             const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null

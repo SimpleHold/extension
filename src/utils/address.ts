@@ -51,11 +51,10 @@ export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAd
 export const importPrivateKey = (
   symbol: TSymbols | string,
   privateKey: string,
-  chain?: string,
-  mnemonic?: string | null
+  chain?: string
 ): string | null => {
-  if (cardano.coins.indexOf(symbol) !== -1 && mnemonic) {
-    return cardano.importMnemonic(mnemonic)
+  if (cardano.coins.indexOf(symbol) !== -1) {
+    return cardano.importPrivateKey(privateKey)
   }
   if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
@@ -257,6 +256,9 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
+  if (cardano.coins.indexOf(symbol) !== -1) {
+    return cardano.getExplorerLink(address)
+  }
   if (isEthereumLike(symbol, chain)) {
     const parseSymbol = toLower(symbol)
 
@@ -289,6 +291,10 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string | null => {
+  if (cardano.coins.indexOf(symbol) !== -1) {
+    return cardano.getTransactionLink(hash)
+  }
+
   if (isEthereumLike(symbol, tokenChain)) {
     const parseChain = tokenChain ? toLower(tokenChain) : toLower(chain)
 

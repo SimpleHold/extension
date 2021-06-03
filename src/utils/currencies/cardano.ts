@@ -1,5 +1,6 @@
 import * as bip39 from 'bip39'
 import * as serializationLib from '@emurgo/cardano-serialization-lib-asmjs'
+import { BigNumber } from 'bignumber.js'
 
 export const coins = ['ada']
 
@@ -38,32 +39,38 @@ export const generateWallet = (): TGenerateAddress | null => {
   }
 }
 
-export const importMnemonic = (mnemonic: string): null | string => {
+export const importPrivateKey = (privateKey: string): null | string => {
   try {
-    const entropy = bip39.mnemonicToEntropy(mnemonic)
-    const rootKey = serializationLib.Bip32PrivateKey.from_bip39_entropy(
-      Buffer.from(entropy, 'hex'),
-      Buffer.from('')
-    )
-
-    const accountKey = rootKey.derive(harden(1852)).derive(harden(1815)).derive(harden(0))
-    const utxoPubKey = accountKey.derive(0).derive(0).to_public()
-    const stakeKey = accountKey.derive(2).derive(0).to_public()
-
-    return serializationLib.BaseAddress.new(
+    const rootKey = serializationLib.Bip32PrivateKey.from_bech32(privateKey)
+    const utxoKey = rootKey.derive(0).derive(0)
+    const utxoPublicKey = utxoKey.to_public()
+    const stakePublicKey = rootKey.derive(2).derive(0).to_public()
+    let address = serializationLib.BaseAddress.new(
       serializationLib.NetworkInfo.mainnet().network_id(),
-      serializationLib.StakeCredential.from_keyhash(utxoPubKey.to_raw_key().hash()),
-      serializationLib.StakeCredential.from_keyhash(stakeKey.to_raw_key().hash())
-    )
-      .to_address()
-      .to_bech32()
+      serializationLib.StakeCredential.from_keyhash(utxoPublicKey.to_raw_key().hash()),
+      serializationLib.StakeCredential.from_keyhash(stakePublicKey.to_raw_key().hash())
+    ).to_address()
+
+    return address.to_bech32()
   } catch {
     return null
   }
 }
 
-export const validateAddress = (address: string): boolean => {
-  return new RegExp(
-    '^(([1-9A-HJ-NP-Za-km-z]{59})|([0-9A-Za-z]{100,104}))$|^(addr)[0-9A-Za-z]{45,65}$'
-  ).test(address)
+export const getExplorerLink = (address: string): string => {
+  return `https://cardanoscan.io/address/${address}`
+}
+
+export const getTransactionLink = (hash: string): string => {
+  return `https://cardanoscan.io/transaction/${hash}`
+}
+
+const ten6 = new BigNumber(10).pow(6)
+
+export const toAda = (value: string | number): number => {
+  return Number(new BigNumber(value).div(ten6))
+}
+
+export const fromAda = (value: string | number): number => {
+  return Number(new BigNumber(value).multipliedBy(ten6))
 }

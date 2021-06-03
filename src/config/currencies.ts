@@ -96,12 +96,12 @@ const currencies: ICurrency[] = [
     minSendAmount: 1000000000000000,
   },
   {
-    name: 'Cardano',
+    name: 'Cardano Shelley',
     symbol: 'ada',
     logo: cardanoLogo,
     background: '#2B55BB',
     chain: 'ada',
-    minSendAmount: 0.001, // Fix me
+    minSendAmount: 1000000,
   },
 ]
 
