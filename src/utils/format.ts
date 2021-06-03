@@ -51,3 +51,11 @@ export const groupBy = (key: string, array: any[]) =>
     }),
     {}
   )
+
+export const short = (data: string, max: number): string => {
+  return data.length > max
+    ? data.substring(0, max / 2 - 1) +
+        '...' +
+        data.substring(data.length - max / 2 + 2, data.length)
+    : data
+}

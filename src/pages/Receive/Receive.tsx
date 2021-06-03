@@ -24,7 +24,7 @@ import useVisible from '@hooks/useVisible'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { price, toUpper, toLower } from '@utils/format'
+import { price, toUpper, toLower, short } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
@@ -279,7 +279,7 @@ const Receive: React.FC = () => {
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />
             <CopyToClipboard value={address} mb={20} onCopy={onCopyAddress}>
-              <Styles.Address>{address}</Styles.Address>
+              <Styles.Address>{short(address, 55)}</Styles.Address>
             </CopyToClipboard>
             <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} />
           </Styles.ReceiveBlock>
