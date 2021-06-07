@@ -11,6 +11,20 @@ import { getCurrency } from '@config/currencies'
 
 let activeRequest: string | null
 
+let currentWindowId: number
+
+browser.windows.onFocusChanged.addListener(async (windowId) => {
+  if (windowId !== -1) {
+    const getAllWindows = await browser.windows.getAll()
+
+    const checkIsNonPopup = getAllWindows.find((window) => window.id === windowId)
+
+    if (checkIsNonPopup?.type !== 'popup') {
+      currentWindowId = windowId
+    }
+  }
+})
+
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
     if (activeRequest === request.type) {
@@ -46,17 +60,13 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   }
 
   if (request.type === 'set_address') {
-    const getAllWindows = await browser.windows.getAll({ windowTypes: ['normal'] })
+    const tabs = await browser.tabs.query({
+      active: true,
+      windowId: currentWindowId,
+    })
 
-    if (getAllWindows.length) {
-      const tabs = await browser.tabs.query({
-        active: true,
-        windowId: getAllWindows[0].id,
-      })
-
-      if (tabs[0]?.id) {
-        browser.tabs.sendMessage(tabs[0].id, request)
-      }
+    if (tabs[0]?.id) {
+      browser.tabs.sendMessage(tabs[0].id, request)
     }
   }
 
@@ -175,48 +185,44 @@ browser.runtime.onInstalled.addListener(() => {
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-  const getAllWindows = await browser.windows.getAll({ windowTypes: ['normal'] })
+  const tabs = await browser.tabs.query({
+    active: true,
+    windowId: currentWindowId,
+  })
 
-  if (getAllWindows.length) {
-    const tabs = await browser.tabs.query({
-      active: true,
-      windowId: getAllWindows[0].id,
-    })
+  if (tabs[0]?.id) {
+    if (info.menuItemId !== 'sh-other-wallets') {
+      const [, address] = `${info.menuItemId}`.split('_')
 
-    if (tabs[0]?.id) {
-      if (info.menuItemId !== 'sh-other-wallets') {
-        const [, address] = `${info.menuItemId}`.split('_')
+      await browser.tabs.sendMessage(tabs[0].id, {
+        type: 'context-menu-address',
+        data: {
+          address,
+        },
+      })
+    } else {
+      localStorage.setItem('tab', JSON.stringify(tab))
 
-        await browser.tabs.sendMessage(tabs[0].id, {
-          type: 'context-menu-address',
-          data: {
-            address,
-          },
-        })
-      } else {
-        localStorage.setItem('tab', JSON.stringify(tab))
+      const { screenX, screenY, outerWidth } = window
 
-        const { screenX, screenY, outerWidth } = window
+      const tabs = await browser.tabs.query({ active: true })
 
-        const tabs = await browser.tabs.query({ active: true })
+      const checkExist: Tabs.Tab | undefined = tabs.find(
+        (tab: Tabs.Tab) => tab.title === 'SimpleHold Wallet | Select address'
+      )
 
-        const checkExist: Tabs.Tab | undefined = tabs.find(
-          (tab: Tabs.Tab) => tab.title === 'SimpleHold Wallet | Select address'
-        )
-
-        if (checkExist?.id) {
-          await browser.tabs.remove(checkExist.id)
-        }
-
-        await browser.windows.create({
-          url: `select-address.html`,
-          type: 'popup',
-          width: 375,
-          height: 728,
-          left: Math.max(screenX + (outerWidth - 375), 0),
-          top: screenY,
-        })
+      if (checkExist?.id) {
+        await browser.tabs.remove(checkExist.id)
       }
+
+      await browser.windows.create({
+        url: `select-address.html`,
+        type: 'popup',
+        width: 375,
+        height: 728,
+        left: Math.max(screenX + (outerWidth - 375), 0),
+        top: screenY,
+      })
     }
   }
 })
