@@ -1,5 +1,8 @@
 import amplitudeSDK from 'amplitude-js'
 
+// Utils
+import { getItem } from '@utils/storage'
+
 interface IEvent {
   name: string
   properties?: { [key: string]: string }
@@ -13,7 +16,7 @@ export const logEvent = ({ name, properties = {} }: IEvent) => {
   properties = {
     ...properties,
     ...{
-      ID_CLIENT: localStorage.getItem('clientId') || '',
+      ID_CLIENT: getItem('clientId') || '',
       TIME: new Date().toString(),
     },
   }
@@ -24,6 +27,6 @@ export const logEvent = ({ name, properties = {} }: IEvent) => {
 export const setUserProperties = (properties: { [key: string]: string } = {}) => {
   amplitudeSDK.getInstance().setUserProperties({
     ...properties,
-    ID_CLIENT: localStorage.getItem('clientId'),
+    ID_CLIENT: getItem('clientId'),
   })
 }

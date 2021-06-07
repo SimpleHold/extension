@@ -21,6 +21,7 @@ import { addNew as addNewWallet, getWallets, IWallet } from '@utils/wallet'
 import { setUserProperties } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
+import { getItem, setItem } from '@utils/storage'
 
 // Styles
 import Styles from './styles'
@@ -92,7 +93,8 @@ const SelectToken: React.FC = () => {
 
   const onConfirm = (): void => {
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
+
       if (backup) {
         const decryptBackup = decrypt(backup, password)
         if (decryptBackup) {
@@ -118,7 +120,7 @@ const SelectToken: React.FC = () => {
               ).length
               setUserProperties({ [`NUMBER_WALLET_${toUpper(tokenSymbol)}`]: `${walletAmount}` })
 
-              localStorage.setItem('backupStatus', 'notDownloaded')
+              setItem('backupStatus', 'notDownloaded')
 
               return history.replace('/download-backup', {
                 password,

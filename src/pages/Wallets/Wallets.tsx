@@ -1,18 +1,24 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
+import SVG from 'react-inlinesvg'
 
 // Components
 import WalletCard from '@components/WalletCard'
 import CollapsibleHeader from '@components/CollapsibleHeader'
+
+// Drawers
+import SortWalletsDrawer from '@drawers/SortWallets'
+import FilterWalletsDrawer from '@drawers/FilterWallets'
 
 // Hooks
 import useScroll from '@hooks/useScroll'
 import useToastContext from '@hooks/useToastContext'
 
 // Utils
-import { IWallet, getWallets } from '@utils/wallet'
+import { IWallet, getWallets, sortWallets, filterWallets } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import { setBadgeText, getBadgeText } from '@utils/extension'
+import { clear } from '@utils/storage'
 
 // Config
 import { ADD_ADDRESS, BALANCE_CHANGED } from '@config/events'
@@ -35,6 +41,7 @@ const Wallets: React.FC = () => {
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
   const [walletsPending, setWalletsPending] = React.useState<number[]>([])
   const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<'sort' | 'filters' | null>(null)
 
   const { scrollPosition } = useScroll()
   const addToast = useToastContext()
@@ -43,6 +50,13 @@ const Wallets: React.FC = () => {
     getWalletsList()
     checkBadgeText()
   }, [])
+
+  React.useEffect(() => {
+    if (wallets?.length === 0 && totalBalance === null && totalEstimated === null) {
+      setTotalBalance(0)
+      setTotalEstimated(0)
+    }
+  }, [wallets, totalBalance, totalEstimated])
 
   React.useEffect(() => {
     if (state?.status === 'passcodeTurnedOff') {
@@ -97,9 +111,9 @@ const Wallets: React.FC = () => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      setWallets(walletsList)
+      setWallets(walletsList.filter(filterWallets).sort(sortWallets))
     } else {
-      localStorage.clear()
+      clear()
       history.push('/welcome')
     }
   }
@@ -124,38 +138,76 @@ const Wallets: React.FC = () => {
     setWalletsPending((prevArray: number[]) => [...prevArray, amount])
   }
 
-  return (
-    <Styles.Wrapper>
-      <CollapsibleHeader
-        onAddNewAddress={onAddNewAddress}
-        scrollPosition={scrollPosition}
-        balance={totalBalance}
-        estimated={totalEstimated}
-        pendingBalance={pendingBalance}
-      />
-      {wallets?.length ? (
-        <Styles.WalletsList>
-          {wallets.map((wallet: IWallet, index: number) => {
-            const { address, symbol, chain, name, contractAddress, decimals } = wallet
+  const onShowDrawer = (drawerType: 'sort' | 'filters'): void => {
+    setActiveDrawer(drawerType)
+  }
 
-            return (
-              <WalletCard
-                key={`${address}/${index}`}
-                address={address}
-                chain={chain}
-                symbol={symbol.toLowerCase()}
-                name={name}
-                contractAddress={contractAddress}
-                decimals={decimals}
-                sumBalance={sumBalance}
-                sumEstimated={sumEstimated}
-                sumPending={sumPending}
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
+  const onApplyDrawer = (): void => {
+    onCloseDrawer()
+    getWalletsList()
+  }
+
+  return (
+    <>
+      <Styles.Wrapper>
+        <CollapsibleHeader
+          scrollPosition={scrollPosition}
+          balance={totalBalance}
+          estimated={totalEstimated}
+          pendingBalance={pendingBalance}
+          onShowDrawer={onShowDrawer}
+          isDrawersActive={activeDrawer !== null}
+        />
+        {wallets !== null ? (
+          <Styles.WalletsList>
+            {wallets?.map((wallet: IWallet, index: number) => {
+              const { address, symbol, chain, name, contractAddress, decimals, isHidden } = wallet
+
+              return (
+                <WalletCard
+                  key={`${address}/${index}`}
+                  address={address}
+                  chain={chain}
+                  symbol={symbol.toLowerCase()}
+                  name={name}
+                  contractAddress={contractAddress}
+                  decimals={decimals}
+                  isHidden={isHidden}
+                  sumBalance={sumBalance}
+                  sumEstimated={sumEstimated}
+                  sumPending={sumPending}
+                />
+              )
+            })}
+            {wallets.length === 0 ? (
+              <Styles.NotFound>Nothing was found for the specified parameters</Styles.NotFound>
+            ) : null}
+            <Styles.AddWalletButton onClick={onAddNewAddress}>
+              <SVG
+                src="../../assets/icons/plus.svg"
+                width={14}
+                height={14}
+                title="Add new wallet"
               />
-            )
-          })}
-        </Styles.WalletsList>
-      ) : null}
-    </Styles.Wrapper>
+            </Styles.AddWalletButton>
+          </Styles.WalletsList>
+        ) : null}
+      </Styles.Wrapper>
+      <SortWalletsDrawer
+        isActive={activeDrawer === 'sort'}
+        onClose={onCloseDrawer}
+        onApply={onApplyDrawer}
+      />
+      <FilterWalletsDrawer
+        isActive={activeDrawer === 'filters'}
+        onClose={onCloseDrawer}
+        onApply={onApplyDrawer}
+      />
+    </>
   )
 }
 

@@ -15,6 +15,7 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet } from '@utils/wallet'
 import { importPrivateKey } from '@utils/address'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getCurrencyByChain } from '@config/currencies'
@@ -27,6 +28,7 @@ interface LocationState {
   symbol: TSymbols
   privateKey: string
   tokens: string[]
+  tokenStandart: string
   tokenName?: string
   contractAddress?: string
   decimals: number
@@ -40,6 +42,7 @@ const FoundTokens: React.FC = () => {
       symbol,
       privateKey,
       tokens,
+      tokenStandart,
       tokenName = undefined,
       contractAddress = undefined,
       decimals = undefined,
@@ -71,7 +74,7 @@ const FoundTokens: React.FC = () => {
     }
 
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup) {
         const decryptBackup = decrypt(backup, password)
@@ -100,7 +103,7 @@ const FoundTokens: React.FC = () => {
             )
 
             if (walletsList) {
-              localStorage.setItem('backupStatus', 'notDownloaded')
+              setItem('backupStatus', 'notDownloaded')
 
               history.replace('/download-backup', {
                 password,
@@ -123,7 +126,8 @@ const FoundTokens: React.FC = () => {
           <Styles.Row>
             <Styles.Title>Found tokens</Styles.Title>
             <Styles.Description>
-              We found these ERC20 tokens on your address. Do you want to add them to your wallet?
+              We found these {tokenStandart} tokens on your address. Do you want to add them to your
+              wallet?
             </Styles.Description>
 
             <Styles.TokensList>

@@ -11,6 +11,7 @@ import Button from '@components/Button'
 import { validatePassword } from '@utils/validate'
 import { decrypt, sha256hash } from '@utils/crypto'
 import { getCurrentTab, getUrl, updateTab } from '@utils/extension'
+import { getItem, removeItem } from '@utils/storage'
 
 // Styles
 import Styles from './styles'
@@ -27,7 +28,7 @@ interface Props {
 const ExternalPageContainer: React.FC<Props> = (props) => {
   const { onClose, children, backPageTitle, backPageUrl, height, headerStyle } = props
 
-  const [isLocked, setIsLocked] = React.useState<boolean>(localStorage.getItem('isLocked') !== null)
+  const [isLocked, setIsLocked] = React.useState<boolean>(getItem('isLocked') !== null)
   const [passcode, setPasscode] = React.useState<string>('')
   const [isPasscodeError, setPasscodeError] = React.useState<boolean>(false)
   const [password, setPassword] = React.useState<string>('')
@@ -44,7 +45,7 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
   }, [])
 
   React.useEffect(() => {
-    if (localStorage.getItem('isLocked') && !localStorage.getItem('passcode')) {
+    if (getItem('isLocked') && !getItem('passcode')) {
       textInputRef.current?.focus()
     }
   }, [])
@@ -67,10 +68,10 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
   }, [passcode])
 
   const checkPasscode = (): void => {
-    const getPasscodeHash = localStorage.getItem('passcode')
+    const getPasscodeHash = getItem('passcode')
 
     if (getPasscodeHash && getPasscodeHash === sha256hash(passcode)) {
-      localStorage.removeItem('isLocked')
+      removeItem('isLocked')
       return setIsLocked(false)
     } else {
       setPasscodeError(true)
@@ -79,7 +80,7 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
   }
 
   const localStorageUpdated = () => {
-    setIsLocked(localStorage.getItem('isLocked') !== null)
+    setIsLocked(getItem('isLocked') !== null)
   }
 
   const onSubmitForm = (e: React.FormEvent) => {
@@ -92,13 +93,13 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
     }
 
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup) {
         const decryptWallet = decrypt(backup, password)
 
         if (decryptWallet) {
-          localStorage.removeItem('isLocked')
+          removeItem('isLocked')
           return setIsLocked(false)
         }
       }
@@ -128,7 +129,7 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
         <Styles.LockedTitle>Welcome back!</Styles.LockedTitle>
 
         <Styles.LockedForm onSubmit={onSubmitForm}>
-          {localStorage.getItem('passcode') !== null ? (
+          {getItem('passcode') !== null ? (
             <OneTimePassword value={passcode} onChange={setPasscode} isError={isPasscodeError} />
           ) : (
             <>

@@ -19,6 +19,7 @@ import { sha256hash } from '@utils/crypto'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getManifest } from '@utils/extension'
+import { getItem, setItem, removeItem, removeMany } from '@utils/storage'
 
 // Config
 import { BACKUP_SETTINGS, PASSCODE_ENABLED, PASSCODE_DISABLED } from '@config/events'
@@ -77,7 +78,7 @@ const Settings: React.FC = () => {
     if (isDownloadManually) {
       openWebPage(getUrl('download-backup.html'))
     } else {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup) {
         logEvent({
@@ -89,7 +90,7 @@ const Settings: React.FC = () => {
   }
 
   const togglePasscode = (): void => {
-    const getPasscode = localStorage.getItem('passcode')
+    const getPasscode = getItem('passcode')
     setPasscodeDrawerType(getPasscode !== null ? 'remove' : 'create')
 
     setActiveDrawer('passcode')
@@ -120,7 +121,7 @@ const Settings: React.FC = () => {
       title: 'Use passcode',
       text: 'Use a passcode instead of a password to easily hide wallet data from other people',
       withSwitch: true,
-      switchValue: localStorage.getItem('passcode') !== null,
+      switchValue: getItem('passcode') !== null,
       onToggle: togglePasscode,
     },
   ]
@@ -130,15 +131,14 @@ const Settings: React.FC = () => {
   }
 
   const onConfirmLogout = (): void => {
-    localStorage.removeItem('wallets')
-    localStorage.removeItem('backup')
+    removeMany(['wallets', 'backup'])
     history.push('/welcome')
   }
 
   const onConfirmPasscode = (passcode: string) => {
     if (passcodeDrawerType === 'remove') {
-      if (sha256hash(passcode) === localStorage.getItem('passcode')) {
-        localStorage.removeItem('passcode')
+      if (sha256hash(passcode) === getItem('passcode')) {
+        removeItem('passcode')
 
         setActiveDrawer(null)
         setPasscodeDrawerType('create')
@@ -150,7 +150,7 @@ const Settings: React.FC = () => {
         setIsPasscodeError(true)
       }
     } else {
-      localStorage.setItem('passcode', sha256hash(passcode))
+      setItem('passcode', sha256hash(passcode))
 
       setActiveDrawer(null)
       setPasscodeDrawerType('remove')

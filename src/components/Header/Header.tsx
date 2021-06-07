@@ -4,6 +4,7 @@ import { useHistory } from 'react-router-dom'
 
 // Utils
 import { logEvent } from '@utils/amplitude'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { LOCK } from '@config/events'
@@ -39,8 +40,8 @@ const Header: React.FC<Props> = (props) => {
   }
 
   const lockWallet = (): void => {
-    localStorage.setItem('isLocked', 'true')
-    const isPasscodeEnabled = localStorage.getItem('passcode') !== null
+    setItem('isLocked', 'true')
+    const isPasscodeEnabled = getItem('passcode') !== null
 
     logEvent({
       name: LOCK,

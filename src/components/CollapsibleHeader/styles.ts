@@ -34,41 +34,6 @@ const Estimated = styled.p`
   color: rgba(255, 255, 255, 0.8);
 `
 
-const AddWallet = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  position: absolute;
-  width: calc(100% - 60px);
-  bottom: 10px;
-`
-
-const AddWalletLabel = styled.p`
-  margin: 0;
-`
-
-const AddWalletButton = styled.button`
-  border: none;
-  background-color: rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
-  width: 60px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  outline: none;
-
-  &:hover {
-    cursor: pointer;
-    background-color: #ffffffcc;
-
-    line {
-      stroke: #31a76c;
-    }
-  }
-`
-
 const TotalBalanceLabel = styled.p`
   margin: 0;
   font-size: 16px;
@@ -79,6 +44,68 @@ const TotalBalanceLabel = styled.p`
 
 const PendingBalanceRow = styled.div``
 
+const Bottom = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  position: absolute;
+  bottom: 10px;
+  width: calc(100% - 60px);
+  justify-content: space-between;
+`
+
+const WalletsLabel = styled.p`
+  margin: 0;
+  font-weight: 500;
+  line-height: 19px;
+  color: #ffffff;
+`
+
+const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const Button = styled.div`
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s;
+  width: 40px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  &:not(:last-child) {
+    margin: 0 10px 0 0;
+  }
+
+  path {
+    fill: #ffffff;
+  }
+
+  &:hover {
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.8);
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
+`
+
+const ButtonDot = styled.div`
+  width: 6px;
+  height: 6px;
+  background-color: #eb5757;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border-radius: 3px;
+`
+
 const Styles = {
   Container,
   Row,
@@ -86,11 +113,13 @@ const Styles = {
   Balance,
   ClockIcon,
   Estimated,
-  AddWallet,
-  AddWalletLabel,
-  AddWalletButton,
   TotalBalanceLabel,
   PendingBalanceRow,
+  Bottom,
+  WalletsLabel,
+  Actions,
+  Button,
+  ButtonDot,
 }
 
 export default Styles

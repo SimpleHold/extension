@@ -21,7 +21,7 @@ interface Props {
 const PendingBalance: React.FC<Props> = (props) => {
   const { pending, type, symbol } = props
 
-  const [USDValue, setUSDValue] = React.useState<number | null>(null)
+  const [USDValue, setUSDValue] = React.useState<number>(0)
 
   React.useEffect(() => {
     getUSDEstimated()
@@ -32,7 +32,7 @@ const PendingBalance: React.FC<Props> = (props) => {
     setUSDValue(data)
   }
 
-  if (USDValue !== null && Number(USDValue) > 0) {
+  if (USDValue !== 0) {
     return (
       <Styles.Container type={type}>
         <Styles.IconRow>

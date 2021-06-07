@@ -15,6 +15,7 @@ import { toUpper, toLower } from '@utils/format'
 import { getWallets, IWallet, addNew as addNewWallet } from '@utils/wallet'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getUnusedAddressesForToken } from '@config/tokens'
@@ -28,6 +29,7 @@ interface LocationState {
   chain: string
   chainName: string
   tokenName: string
+  tokenStandart: string
   contractAddress?: string
   decimals?: number
 }
@@ -40,6 +42,7 @@ const AddTokenToAddress: React.FC = () => {
       chain,
       chainName,
       tokenName,
+      tokenStandart,
       contractAddress = undefined,
       decimals = undefined,
     },
@@ -90,8 +93,7 @@ const AddTokenToAddress: React.FC = () => {
   const onSkip = (): void => {
     history.push('/new-wallet', {
       symbol,
-      warning:
-        'You are trying to add a new ERC20 token address. The corresponding Ethereum address will also be added to your wallet.',
+      warning: `You are trying to add a new ${tokenStandart} token address. The corresponding ${chainName} address will also be added to your wallet.`,
       backTitle: `Add to ${toUpper(chain)} address`,
       chain,
       tokenName,
@@ -110,7 +112,7 @@ const AddTokenToAddress: React.FC = () => {
 
   const onConfirmDrawer = (): void => {
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup) {
         const decryptBackup = decrypt(backup, password)
@@ -136,7 +138,7 @@ const AddTokenToAddress: React.FC = () => {
             )
 
             if (walletsList) {
-              localStorage.setItem('backupStatus', 'notDownloaded')
+              setItem('backupStatus', 'notDownloaded')
 
               history.replace('/download-backup', {
                 password,
@@ -159,9 +161,9 @@ const AddTokenToAddress: React.FC = () => {
           <Styles.Row>
             <Styles.Title>Add to {toUpper(chain)} address</Styles.Title>
             <Styles.Description>
-              You are trying to add a new ERC20 token address. Do you want to use one of your
-              current {chainName} addresses with {tokenName}? Skip it if you want to add the new
-              address.
+              You are trying to add a new {tokenStandart} token address. Do you want to use one of
+              your current {chainName} addresses with {tokenName}? Skip it if you want to add the
+              new address.
             </Styles.Description>
 
             <CurrenciesDropdown

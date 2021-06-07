@@ -4,10 +4,16 @@ type TContainerProps = {
   isActive: boolean
 }
 
+const colors = {
+  active: '#3FBB7D',
+  disabled: '#C3C3C3',
+}
+
 const Container = styled.div`
-  width: 20px;
-  height: 10px;
-  border: ${({ isActive }: TContainerProps) => `1.5px solid ${isActive ? '#3FBB7D' : '#C3C3C3'}`};
+  width: 24px;
+  height: 12px;
+  border: ${({ isActive }: TContainerProps) =>
+    `1.5px solid ${isActive ? colors.active : colors.disabled}`};
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -15,21 +21,18 @@ const Container = styled.div`
 
   div {
     background-color: ${({ isActive }: TContainerProps) =>
-      `1.5px solid ${isActive ? '#3FBB7D' : '#C3C3C3'}`};
-    transform: ${({ isActive }: TContainerProps) => `translateX(${isActive ? '10px' : '0'})`};
-    background-color: ${({ isActive }: TContainerProps) => (isActive ? '#3FBB7D' : '#C3C3C3')};
-  }
-
-  &:hover {
-    cursor: pointer;
+      `1.5px solid ${isActive ? colors.active : colors.disabled}`};
+    transform: ${({ isActive }: TContainerProps) => `translateX(${isActive ? '13px' : '1px'})`};
+    background-color: ${({ isActive }: TContainerProps) =>
+      isActive ? colors.active : colors.disabled};
   }
 `
 
 const Dot = styled.div`
   transition: all 0.2s;
-  width: 4px;
-  height: 4px;
-  border-radius: 2px;
+  width: 6px;
+  height: 6px;
+  border-radius: 3px;
 `
 
 const Styles = {

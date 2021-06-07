@@ -9,8 +9,10 @@ import GlobalStyles from './styles/global'
 import config from '@config/index'
 import { FIRST_ENTER, SESSION_START } from '@config/events'
 
+// Utils
 import { validateWallet } from '@utils/validate'
 import { init, logEvent } from '@utils/amplitude'
+import { getItem, setItem } from '@utils/storage'
 
 import { ToastContextProvider } from '@contexts/Toast/Toast'
 
@@ -20,12 +22,12 @@ const App: React.FC = () => {
   }, [])
 
   const initAmplitude = (): void => {
-    const clientId = localStorage.getItem('clientId') || v4()
+    const clientId = getItem('clientId') || v4()
 
     init(config.apiKey.amplitude, clientId)
 
-    if (!localStorage.getItem('clientId')) {
-      localStorage.setItem('clientId', clientId)
+    if (!getItem('clientId')) {
+      setItem('clientId', clientId)
 
       logEvent({
         name: FIRST_ENTER,
@@ -38,22 +40,22 @@ const App: React.FC = () => {
   }
 
   const getInitialPage = (): string => {
-    if (localStorage.getItem('isLocked')) {
-      return localStorage.getItem('passcode') !== null ? '/enter-passcode' : '/lock'
+    if (getItem('isLocked')) {
+      return getItem('passcode') !== null ? '/enter-passcode' : '/lock'
     }
-    if (localStorage.getItem('onBoard') !== 'passed') {
+    if (getItem('onBoard') !== 'passed') {
       return '/onboard'
     }
 
-    if (localStorage.getItem('analytics') !== 'agreed') {
+    if (getItem('analytics') !== 'agreed') {
       return '/analytics-data'
     }
 
-    if (localStorage.getItem('backupStatus') === 'notDownloaded') {
+    if (getItem('backupStatus') === 'notDownloaded') {
       return '/download-backup'
     }
 
-    const validateWallets = validateWallet(localStorage.getItem('wallets'))
+    const validateWallets = validateWallet(getItem('wallets'))
     return validateWallets ? '/wallets' : '/welcome'
   }
 

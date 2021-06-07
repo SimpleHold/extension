@@ -11,4 +11,6 @@ export default {
   bsc: '^(0x)[0-9A-Fa-f]{40}$',
   bnb: '^(0x)[0-9A-Fa-f]{40}$',
   ada: '^(([1-9A-HJ-NP-Za-km-z]{59})|([0-9A-Za-z]{100,104}))$|^(addr)[0-9A-Za-z]{45,65}$',
+  theta: '^(0x)[0-9A-Fa-f]{40}$',
+  tfuel: '^(0x)[0-9A-Fa-f]{40}$',
 }

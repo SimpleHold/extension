@@ -14,6 +14,7 @@ import { logEvent, setUserProperties } from '@utils/amplitude'
 import { generate } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
 import { generate as generateAddress } from '@utils/address'
+import { setItem } from '@utils/storage'
 
 // Config
 import { START_PASSWORD } from '@config/events'
@@ -51,9 +52,9 @@ const Wallets: React.FC = () => {
       const { address, privateKey } = geneateAddress
       const { backup, wallets } = generate(address, privateKey)
 
-      localStorage.setItem('backup', encrypt(backup, password))
-      localStorage.setItem('wallets', wallets)
-      localStorage.setItem('backupStatus', 'notDownloaded')
+      setItem('backup', encrypt(backup, password))
+      setItem('wallets', wallets)
+      setItem('backupStatus', 'notDownloaded')
 
       setUserProperties({
         NUMBER_WALLET_BTC: '1',

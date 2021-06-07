@@ -3,14 +3,13 @@ import bitcoinLike from '@utils/bitcoinLike'
 
 // Config
 import addressValidate from '@config/addressValidate'
-import { ICurrency } from '@config/currencies'
+import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
 import { getToken, IToken } from '@config/tokens'
 
 // Utils
-import { getEtherNetworkFee, IGetNetworkFeeResponse } from '@utils/api'
+import { getEtherNetworkFee, IGetNetworkFeeResponse, getThetaNetworkFee } from '@utils/api'
 import { toLower } from '@utils/format'
-
-// Currencies
+import * as theta from '@utils/currencies/theta'
 import * as cardano from '@utils/currencies/cardano'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
@@ -41,6 +40,8 @@ export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAd
   }
   if (isEthereumLike(symbol, chain)) {
     return web3.generateAddress()
+  } else if (theta.coins.indexOf(symbol) !== -1) {
+    return theta.generateWallet()
   } else {
     const generateBTCLikeAddress = new bitcoinLike(symbol).generate()
 
@@ -58,20 +59,28 @@ export const importPrivateKey = (
   }
   if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
+  } else if (theta.coins.indexOf(symbol) !== -1) {
+    return theta.importPrivateKey(privateKey)
   } else {
-    const importBTCLikePrivateKey = new bitcoinLike(symbol).import(privateKey)
-    return importBTCLikePrivateKey
+    return new bitcoinLike(symbol).import(privateKey)
   }
 }
 
 export const validateAddress = (
   symbol: TSymbols | string,
+  chain: string,
   address: string,
-  chain?: string
+  tokenChain?: string
 ): boolean => {
-  // @ts-ignore
-  const findRegexp = chain ? addressValidate.eth : addressValidate[symbol]
-  return new RegExp(findRegexp)?.test(address)
+  try {
+    if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
+      return new bitcoinLike(symbol).isAddressValid(address)
+    }
+    // @ts-ignore
+    return new RegExp(tokenChain ? addressValidate.eth : addressValidate[symbol])?.test(address)
+  } catch {
+    return false
+  }
 }
 
 export const createTransaction = async ({
@@ -101,8 +110,6 @@ export const createTransaction = async ({
         if (tokenChain && getContractAddress) {
           return await web3.transferToken({
             value: `${amount}`,
-            chain: tokenChain,
-            symbol,
             from,
             to,
             privateKey,
@@ -148,13 +155,12 @@ interface IGetNetworkFeeParams {
     decimals?: number
   }
   outputs?: UnspentOutput[]
-  fee?: number
 }
 
 export const getNewNetworkFee = async (
   params: IGetNetworkFeeParams
 ): Promise<IGetNetworkFeeResponse | null> => {
-  const { address, symbol, amount, from, to, chain, web3Params, outputs, fee } = params
+  const { address, symbol, amount, from, to, chain, web3Params, outputs } = params
 
   if (
     web3Params?.contractAddress ||
@@ -181,6 +187,10 @@ export const getNewNetworkFee = async (
 
   if (outputs?.length) {
     return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+  }
+
+  if (theta.coins.indexOf(symbol) !== -1) {
+    return await getThetaNetworkFee(address)
   }
 
   return null
@@ -214,6 +224,10 @@ export const getAddressNetworkFee = async (
       return data
     }
 
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return await getThetaNetworkFee(address)
+    }
+
     if (typeof outputs !== 'undefined') {
       return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
     }
@@ -243,6 +257,9 @@ export const formatUnit = (
       }
       return Number(value)
     }
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? theta.fromTheta(value) : theta.toTheta(value)
+    }
     return 0
   } catch {
     return 0
@@ -258,8 +275,9 @@ export const getExplorerLink = (
 ) => {
   if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.getExplorerLink(address)
-  }
-  if (isEthereumLike(symbol, chain)) {
+  } else if (theta.coins.indexOf(symbol) !== -1) {
+    return `https://explorer.thetatoken.org/account/${address}`
+  } else if (isEthereumLike(symbol, chain)) {
     const parseSymbol = toLower(symbol)
 
     if (chain) {
@@ -308,5 +326,18 @@ export const getTransactionLink = (
     return null
   } else {
     return `https://blockchair.com/${chain}/transaction/${hash}`
+  }
+}
+
+export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string => {
+  try {
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return 'tfuel'
+    } else if (tokenChain) {
+      return getCurrencyByChain(tokenChain)?.symbol || symbol
+    }
+    return getCurrency(symbol)?.symbol || symbol
+  } catch {
+    return symbol
   }
 }

@@ -53,8 +53,7 @@ const TokenLogo = styled.img`
   height: 10px;
 `
 
-const LetterLogo = styled.p`
-  margin: 0;
+const LetterLogo = styled.span`
   font-size: 23px;
   line-height: 27px;
   text-transform: capitalize;

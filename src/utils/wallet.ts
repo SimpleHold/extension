@@ -4,6 +4,7 @@ import { v4 } from 'uuid'
 import { validateWallet } from '@utils/validate'
 import { toLower } from '@utils/format'
 import { encrypt } from '@utils/crypto'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getCurrencyByChain } from '@config/currencies'
@@ -19,12 +20,80 @@ export interface IWallet {
   name?: string
   contractAddress?: string
   decimals?: number
-  mnemonic?: string
+  createdAt?: Date
+  isHidden?: boolean
+}
+
+type TSelectedWalletFilter = {
+  symbol: string
+  chain?: string
+}
+
+const sortByBalance = (a: IWallet, b: IWallet, isAscending: boolean) => {
+  return isAscending
+    ? Number(a.balance_btc || 0) - Number(b.balance_btc || 0)
+    : Number(b.balance_btc || 0) - Number(a.balance_btc || 0)
+}
+
+const sortByDate = (a: IWallet, b: IWallet, isAscending: boolean) => {
+  if (a.createdAt && b.createdAt) {
+    return isAscending
+      ? new Date(a?.createdAt).getTime() - new Date(b?.createdAt).getTime()
+      : new Date(b?.createdAt).getTime() - new Date(a?.createdAt).getTime()
+  }
+  return -1
+}
+
+const sortByName = (a: IWallet, b: IWallet, isAscending: boolean) => {
+  return isAscending ? a.symbol.localeCompare(b.symbol) : b.symbol.localeCompare(a.symbol)
+}
+
+export const sortWallets = (a: IWallet, b: IWallet) => {
+  const getSortKey = getItem('activeSortKey')
+  const getSortType = getItem('activeSortType')
+
+  if (getSortKey && getSortType) {
+    const isAscending = getSortType === 'asc'
+
+    if (getSortKey === 'balances') {
+      return sortByBalance(a, b, isAscending)
+    } else if (getSortKey === 'date') {
+      return sortByDate(a, b, isAscending)
+    } else if (getSortKey === 'alphabet') {
+      return sortByName(a, b, isAscending)
+    }
+  }
+
+  return b?.createdAt && a?.createdAt
+    ? new Date(b?.createdAt).getTime() - new Date(a?.createdAt).getTime()
+    : -1
+}
+
+export const filterWallets = (wallet: IWallet) => {
+  const zeroBalances = getItem('zeroBalancesFilter')
+  const hiddenWallets = getItem('hiddenWalletsFilter')
+  const selectedCurrencies = getItem('selectedCurrenciesFilter')
+
+  if (!zeroBalances && !hiddenWallets && !selectedCurrencies) {
+    return wallet
+  }
+
+  const filterByZeroBalance =
+    zeroBalances === 'false' ? typeof wallet.balance !== 'undefined' && wallet.balance > 0 : wallet
+  const filterByHidden = hiddenWallets === 'true' ? wallet.isHidden !== true : wallet
+  const filterByCurrency = selectedCurrencies
+    ? JSON.parse(selectedCurrencies).some(
+        (i: TSelectedWalletFilter) =>
+          toLower(i.symbol) === toLower(wallet.symbol) && toLower(i.chain) === toLower(wallet.chain)
+      )
+    : wallet
+
+  return filterByZeroBalance && filterByHidden && filterByCurrency
 }
 
 export const getWallets = (): IWallet[] | null => {
   try {
-    const walletsList = localStorage.getItem('wallets')
+    const walletsList = getItem('wallets')
 
     if (walletsList) {
       const parseWallets = JSON.parse(walletsList)
@@ -52,7 +121,7 @@ export const updateBalance = (
   if (findWallet) {
     findWallet.balance = balance
     findWallet.balance_btc = balance_btc
-    localStorage.setItem('wallets', JSON.stringify(wallets))
+    setItem('wallets', JSON.stringify(wallets))
   }
 }
 
@@ -129,7 +198,7 @@ export const addNew = (
       ? chain
       : undefined
 
-    const walletsList = localStorage.getItem('wallets')
+    const walletsList = getItem('wallets')
     const validateWallets = validateWallet(walletsList)
 
     if (validateWallets && walletsList) {
@@ -143,15 +212,29 @@ export const addNew = (
         name: getTokenName,
         contractAddress: getContractAddress,
         decimals: getDecimals,
+        createdAt: new Date(),
       }
 
       parseWallets.push(data)
       parseBackup.wallets.push({ ...data, ...{ privateKey, mnemonic } })
 
-      localStorage.setItem('backup', encrypt(JSON.stringify(parseBackup), password))
-      localStorage.setItem('wallets', JSON.stringify(parseWallets))
+      setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+      setItem('wallets', JSON.stringify(parseWallets))
     }
   }
 
-  return localStorage.getItem('wallets')
+  return getItem('wallets')
+}
+
+export const toggleVisibleWallet = (address: string, symbol: string, isHidden: boolean): void => {
+  const wallets = getWallets()
+  const findWallet = wallets?.find(
+    (wallet: IWallet) =>
+      toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol)
+  )
+
+  if (findWallet) {
+    findWallet.isHidden = isHidden
+    setItem('wallets', JSON.stringify(wallets))
+  }
 }

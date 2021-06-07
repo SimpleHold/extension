@@ -11,6 +11,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 // Utils
 import { toUpper, toLower } from '@utils/format'
 import { getWallets } from '@utils/wallet'
+import * as theta from '@utils/currencies/theta'
 
 // Config
 import currencies, { ICurrency } from '@config/currencies'
@@ -45,9 +46,23 @@ const SelectCurrency: React.FC = () => {
     return token
   })
 
+  const getWarning = (symbol: string): string | undefined => {
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return `You are trying to add a new ${
+        toLower(symbol) === 'theta' ? 'Theta' : 'TFuel'
+      } address. The same address for ${
+        toLower(symbol) === 'theta' ? 'TFuel' : 'Theta'
+      } will also be added to your wallet.`
+    }
+    return undefined
+  }
+
   const onAddAddress = (symbol: string): void => {
+    const warning = getWarning(symbol)
+
     history.push('/new-wallet', {
       symbol,
+      warning,
     })
   }
 
@@ -66,6 +81,7 @@ const SelectCurrency: React.FC = () => {
           chain,
           chainName: getNetwork.name,
           tokenName,
+          tokenStandart: toLower(getNetwork.name) === 'bsc' ? 'BEP20' : 'ERC20',
         })
       }
 

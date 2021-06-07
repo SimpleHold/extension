@@ -1,5 +1,6 @@
 declare module '*.png'
 declare module '*.svg'
+declare module '@thetalabs/theta-js'
 
 type TGenerateAddress = {
   address: string
@@ -40,6 +41,7 @@ interface BitcoinLikeProvider {
     privateKey: string
   ) => TCreatedTransaction
   getFee: (outputs: UnspentOutput[], to: string, amount: number, changeAddress: string) => number
+  isAddressValid: (address: string) => boolean
 }
 
 declare const bitcoin: BitcoinLikeProvider
@@ -48,4 +50,16 @@ declare const dash: BitcoinLikeProvider
 declare const litecoin: BitcoinLikeProvider
 declare const dogecoin: BitcoinLikeProvider
 
-type TSymbols = 'btc' | 'bch' | 'bsv' | 'ltc' | 'doge' | 'dash' | 'eth' | 'etc' | 'bsc' | 'bnb'
+type TSymbols =
+  | 'btc'
+  | 'bch'
+  | 'bsv'
+  | 'ltc'
+  | 'doge'
+  | 'dash'
+  | 'eth'
+  | 'etc'
+  | 'bsc'
+  | 'bnb'
+  | 'theta'
+  | 'tfuel'

@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable no-undef */
 /* eslint-disable import/no-unresolved */
@@ -39,10 +40,20 @@ const dash = (function () {
       .getFee()
   }
 
+  const isAddressValid = (address) => {
+    try {
+      const getAddress = new window.dashcore.Address.fromString(address)
+      return getAddress.toString().toLowerCase() === address.toLowerCase()
+    } catch (err) {
+      return false
+    }
+  }
+
   return {
     generateWallet,
     importPrivateKey,
     createTransaction,
     getFee,
+    isAddressValid,
   }
 })()

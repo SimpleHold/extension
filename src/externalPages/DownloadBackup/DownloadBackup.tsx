@@ -7,13 +7,14 @@ import ExternalPageContainer from '@containers/ExternalPage'
 
 // Utils
 import { download } from '@utils/backup'
+import { getItem, removeItem } from '@utils/storage'
 
 // Styles
 import Styles from './styles'
 
 const DownloadBackup: React.FC = () => {
   React.useEffect(() => {
-    if (localStorage.getItem('isLocked')) {
+    if (getItem('isLocked')) {
       return
     }
 
@@ -23,11 +24,11 @@ const DownloadBackup: React.FC = () => {
   }, [])
 
   const onDownload = (): void => {
-    const backup = localStorage.getItem('backup')
+    const backup = getItem('backup')
 
     if (backup) {
       download(backup)
-      localStorage.removeItem('backupStatus')
+      removeItem('backupStatus')
     }
   }
 
@@ -35,7 +36,7 @@ const DownloadBackup: React.FC = () => {
     window.close()
   }
 
-  if (localStorage.getItem('isLocked')) {
+  if (getItem('isLocked')) {
     return null
   }
 

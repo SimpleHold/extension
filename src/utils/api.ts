@@ -2,7 +2,10 @@ import axios, { AxiosResponse } from 'axios'
 
 // Config
 import config from '@config/index'
-import { isEthereumLike } from './address'
+
+// Utils
+import { isEthereumLike } from '@utils/address'
+import bitcoinLike from '@utils/bitcoinLike'
 
 interface IGetBalance {
   balance: number
@@ -218,6 +221,25 @@ export const getEtherNetworkFee = async (
   } catch {
     return {
       networkFee: 0,
+    }
+  }
+}
+
+export const getThetaNetworkFee = async (address: string): Promise<IGetNetworkFeeResponse> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/theta/network-fee`, {
+      params: {
+        address,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return {
+      networkFee: 0.000001,
     }
   }
 }

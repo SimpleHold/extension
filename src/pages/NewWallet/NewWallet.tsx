@@ -18,10 +18,12 @@ import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
 import { generate, importPrivateKey } from '@utils/address'
+import * as theta from '@utils/currencies/theta'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
-import { getCurrencyByChain } from '@config/currencies'
+import { getCurrencyByChain, ICurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -89,9 +91,18 @@ const NewWallet: React.FC = () => {
     })
   }
 
+  const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return theta.coins.sort((a: string, b: string) => a.indexOf(symbol) - b.indexOf(symbol))
+    } else if (chain && getCurrencyInfo) {
+      return [symbol, getCurrencyInfo.symbol]
+    }
+    return [symbol]
+  }
+
   const onConfirm = (): void => {
     if (validatePassword(password)) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
 
       if (backup && privateKey) {
         const decryptBackup = decrypt(backup, password)
@@ -101,8 +112,7 @@ const NewWallet: React.FC = () => {
 
           if (address) {
             const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
-            const currenciesList =
-              chain && getCurrencyInfo ? [symbol, getCurrencyInfo.symbol] : [symbol]
+            const currenciesList = getCurrenciesList(getCurrencyInfo)
 
             const walletsList = addNewWallet(
               address,
@@ -131,7 +141,7 @@ const NewWallet: React.FC = () => {
 
               setPrivateKey(null)
 
-              localStorage.setItem('backupStatus', 'notDownloaded')
+              setItem('backupStatus', 'notDownloaded')
 
               return setActiveDrawer('success')
             }

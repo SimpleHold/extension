@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 /* eslint-disable no-underscore-dangle */
 /* eslint-disable import/no-unresolved */
 /* eslint-disable func-names */
@@ -36,10 +37,20 @@ const litecoin = (function () {
     return new litecore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
   }
 
+  const isAddressValid = (address) => {
+    try {
+      const getAddress = new litecore.Address.fromString(address)
+      return getAddress.toString().toLowerCase() === address.toLowerCase()
+    } catch (err) {
+      return false
+    }
+  }
+
   return {
     generateWallet,
     importPrivateKey,
     createTransaction,
     getFee,
+    isAddressValid,
   }
 })()

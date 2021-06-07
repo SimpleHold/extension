@@ -24,6 +24,7 @@ import { addNew as addNewWallet, getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
+import { getItem, setItem } from '@utils/storage'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -154,6 +155,7 @@ const AddCustomToken: React.FC = () => {
         tokenName,
         contractAddress,
         decimals,
+        tokenStandart: toLower(chain) === 'bsc' ? 'BEP20' : 'ERC20',
       }
 
       if (checkTokenWallets) {
@@ -197,7 +199,8 @@ const AddCustomToken: React.FC = () => {
 
   const onConfirmDrawer = (): void => {
     if (validatePassword(password) && currency) {
-      const backup = localStorage.getItem('backup')
+      const backup = getItem('backup')
+
       if (backup) {
         const decryptBackup = decrypt(backup, password)
         if (decryptBackup && state?.address) {
@@ -220,7 +223,7 @@ const AddCustomToken: React.FC = () => {
           )
 
           if (walletsList) {
-            localStorage.setItem('backupStatus', 'notDownloaded')
+            setItem('backupStatus', 'notDownloaded')
 
             return history.replace('/download-backup', {
               password,

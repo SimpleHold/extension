@@ -1,18 +1,20 @@
 import * as React from 'react'
 import copy from 'copy-to-clipboard'
 
+// Components
+import Tooltip from '@components/Tooltip'
+
 // Styles
 import Styles from './styles'
 
 interface Props {
   children: React.ReactElement<any, any> | null
   value: string
-  mb?: number
   onCopy?: () => void
 }
 
 const CopyToClipboard: React.FC<Props> = (props) => {
-  const { children, value, mb, onCopy: onCopySuccess } = props
+  const { children, value, onCopy: onCopySuccess } = props
 
   const [isCopied, setIsCopied] = React.useState<boolean>(false)
 
@@ -32,12 +34,11 @@ const CopyToClipboard: React.FC<Props> = (props) => {
   }
 
   return (
-    <Styles.Container onMouseLeave={onMouseLeave} mb={mb}>
-      <Styles.Row onClick={onCopy}>{children}</Styles.Row>
-      <Styles.Tooltip>
-        <Styles.TooltipText>{isCopied ? 'Copied!' : 'Сopy to clipboard'}</Styles.TooltipText>
-      </Styles.Tooltip>
-    </Styles.Container>
+    <Tooltip text={isCopied ? 'Copied!' : 'Сopy to clipboard'}>
+      <Styles.Container onMouseLeave={onMouseLeave}>
+        <Styles.Row onClick={onCopy}>{children}</Styles.Row>
+      </Styles.Container>
+    </Tooltip>
   )
 }
 
