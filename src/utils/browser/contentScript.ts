@@ -4,7 +4,9 @@ import copy from 'copy-to-clipboard'
 // Utils
 import { IRequest } from '@utils/browser/types'
 
-const setSHAttribute = () => {
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const setSHAttribute = async () => {
   document.documentElement.setAttribute('sh-ex-status', 'installed')
 }
 
@@ -21,7 +23,7 @@ setSHAttribute()
 
 let activeRequest: string | null
 
-browser.runtime.onMessage.addListener((request: IRequest) => {
+browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'set_address') {
     const { data } = request
 
@@ -34,8 +36,13 @@ browser.runtime.onMessage.addListener((request: IRequest) => {
 
       if (findInput) {
         findInput.focus()
+        document.execCommand('selectAll')
+        document.execCommand('delete')
       }
 
+      document.execCommand('paste')
+      document.execCommand('selectAll')
+      document.execCommand('delete')
       document.execCommand('paste')
     }
   } else if (request.type === 'context-menu-address') {
