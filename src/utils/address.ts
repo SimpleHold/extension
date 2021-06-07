@@ -229,6 +229,9 @@ export const getAddressNetworkFee = async (
     }
 
     if (typeof outputs !== 'undefined') {
+      if (toLower(symbol) === 'ada') {
+        return cardano.getNetworkFee(outputs, amount)
+      }
       return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
     }
 
@@ -259,6 +262,10 @@ export const formatUnit = (
     }
     if (theta.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? theta.fromTheta(value) : theta.toTheta(value)
+    }
+
+    if (cardano.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
     }
     return 0
   } catch {

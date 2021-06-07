@@ -9,7 +9,9 @@ import('@emurgo/cardano-serialization-lib-browser').then((module) => {
 
 export const coins = ['ada']
 
-interface IUnspentTxOutput {
+import { getCardanoTransactionParams, IGetNetworkFeeResponse } from '@utils/api'
+
+export interface ICardanoUnspentTxOutput {
   ctaAddress: string
   ctaAmount: {
     getCoin: string
@@ -109,7 +111,11 @@ const getTxBuilder = () => {
   )
 }
 
-const calculateFee = (outputs: IUnspentTxOutput[], amount: number, ttl: number): number => {
+const calculateFee = (
+  outputs: ICardanoUnspentTxOutput[],
+  amount: number | string,
+  ttl: number
+): number => {
   try {
     const txBuilder = getTxBuilder()
 
@@ -155,28 +161,40 @@ const calculateFee = (outputs: IUnspentTxOutput[], amount: number, ttl: number):
   }
 }
 
-export const getNetworkFee = (outputs: IUnspentTxOutput[], amount: number, ttl: number) => {
-  const sortOutputs = outputs.sort(
-    (a: IUnspentTxOutput, b: IUnspentTxOutput) =>
-      Number(a.ctaAmount.getCoin) - Number(b.ctaAmount.getCoin)
-  )
+export const getNetworkFee = async (outputs: any[], amount: string | number) => {
+  try {
+    const transactionParams = await getCardanoTransactionParams()
 
-  const selectedOutputs: IUnspentTxOutput[] = []
+    if (transactionParams) {
+      const { ttl } = transactionParams
 
-  for (const output of sortOutputs) {
-    const getTotalValue = selectedOutputs.reduce((a, b) => a + Number(b.ctaAmount.getCoin), 0)
-    const fee = calculateFee([...selectedOutputs, output], amount, ttl)
+      const sortOutputs = outputs.sort(
+        (a: ICardanoUnspentTxOutput, b: ICardanoUnspentTxOutput) =>
+          Number(a.ctaAmount.getCoin) - Number(b.ctaAmount.getCoin)
+      )
 
-    if (getTotalValue >= fromAda(amount) + fee) {
-      break
+      const selectedOutputs: ICardanoUnspentTxOutput[] = []
+
+      for (const output of sortOutputs) {
+        const getTotalValue = selectedOutputs.reduce((a, b) => a + Number(b.ctaAmount.getCoin), 0)
+        const fee = calculateFee([...selectedOutputs, output], amount, ttl)
+
+        if (getTotalValue >= fromAda(amount) + fee) {
+          break
+        }
+
+        selectedOutputs.push(output)
+      }
+
+      return {
+        networkFee: calculateFee(selectedOutputs, amount, ttl),
+        selectedOutputs,
+      }
     }
 
-    selectedOutputs.push(output)
-  }
-
-  return {
-    networkFee: calculateFee(selectedOutputs, amount, ttl),
-    selectedOutputs,
+    return null
+  } catch {
+    return null
   }
 }
 
@@ -245,7 +263,7 @@ const addOutputs = (txBuilder: any, outputs: any[], signingKey: any) => {
 }
 
 export const createTransaction = (
-  outputs: IUnspentTxOutput[],
+  outputs: ICardanoUnspentTxOutput[],
   from: string,
   to: string,
   amount: number,

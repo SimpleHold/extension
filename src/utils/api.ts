@@ -3,10 +3,6 @@ import axios, { AxiosResponse } from 'axios'
 // Config
 import config from '@config/index'
 
-// Utils
-import { isEthereumLike } from '@utils/address'
-import bitcoinLike from '@utils/bitcoinLike'
-
 interface IGetBalance {
   balance: number
   balance_usd: number
@@ -42,6 +38,10 @@ export interface IGetNetworkFeeResponse {
   gasPrice?: string
   nonce?: number
   currencyBalance?: number
+}
+
+interface IAdaTrParams {
+  ttl: number
 }
 
 export const getBalance = async (
@@ -241,5 +241,19 @@ export const getThetaNetworkFee = async (address: string): Promise<IGetNetworkFe
     return {
       networkFee: 0.000001,
     }
+  }
+}
+
+export const getCardanoTransactionParams = async (): Promise<IAdaTrParams | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/cardano/params`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return null
   }
 }
