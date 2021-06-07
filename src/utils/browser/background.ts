@@ -46,10 +46,17 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   }
 
   if (request.type === 'set_address') {
-    const tabs = await browser.tabs.query({ active: true })
+    const getAllWindows = await browser.windows.getAll({ windowTypes: ['normal'] })
 
-    if (tabs[0]?.id) {
-      browser.tabs.sendMessage(tabs[0].id, request)
+    if (getAllWindows.length) {
+      const tabs = await browser.tabs.query({
+        active: true,
+        windowId: getAllWindows[0].id,
+      })
+
+      if (tabs[0]?.id) {
+        browser.tabs.sendMessage(tabs[0].id, request)
+      }
     }
   }
 
@@ -168,41 +175,48 @@ browser.runtime.onInstalled.addListener(() => {
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-  const tabs = await browser.tabs.query({ active: true })
+  const getAllWindows = await browser.windows.getAll({ windowTypes: ['normal'] })
 
-  if (tabs[0]?.id) {
-    if (info.menuItemId !== 'sh-other-wallets') {
-      const [, address] = `${info.menuItemId}`.split('_')
+  if (getAllWindows.length) {
+    const tabs = await browser.tabs.query({
+      active: true,
+      windowId: getAllWindows[0].id,
+    })
 
-      await browser.tabs.sendMessage(tabs[0].id, {
-        type: 'context-menu-address',
-        data: {
-          address,
-        },
-      })
-    } else {
-      localStorage.setItem('tab', JSON.stringify(tab))
+    if (tabs[0]?.id) {
+      if (info.menuItemId !== 'sh-other-wallets') {
+        const [, address] = `${info.menuItemId}`.split('_')
 
-      const { screenX, screenY, outerWidth } = window
+        await browser.tabs.sendMessage(tabs[0].id, {
+          type: 'context-menu-address',
+          data: {
+            address,
+          },
+        })
+      } else {
+        localStorage.setItem('tab', JSON.stringify(tab))
 
-      const tabs = await browser.tabs.query({ active: true })
+        const { screenX, screenY, outerWidth } = window
 
-      const checkExist: Tabs.Tab | undefined = tabs.find(
-        (tab: Tabs.Tab) => tab.title === 'SimpleHold Wallet | Select address'
-      )
+        const tabs = await browser.tabs.query({ active: true })
 
-      if (checkExist?.id) {
-        await browser.tabs.remove(checkExist.id)
+        const checkExist: Tabs.Tab | undefined = tabs.find(
+          (tab: Tabs.Tab) => tab.title === 'SimpleHold Wallet | Select address'
+        )
+
+        if (checkExist?.id) {
+          await browser.tabs.remove(checkExist.id)
+        }
+
+        await browser.windows.create({
+          url: `select-address.html`,
+          type: 'popup',
+          width: 375,
+          height: 728,
+          left: Math.max(screenX + (outerWidth - 375), 0),
+          top: screenY,
+        })
       }
-
-      await browser.windows.create({
-        url: `select-address.html`,
-        type: 'popup',
-        width: 375,
-        height: 728,
-        left: Math.max(screenX + (outerWidth - 375), 0),
-        top: screenY,
-      })
     }
   }
 })
