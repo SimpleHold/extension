@@ -1,8 +1,22 @@
 import * as bip39 from 'bip39'
-import * as CardanoWasm from '@emurgo/cardano-serialization-lib-asmjs'
 import { BigNumber } from 'bignumber.js'
 
+let CardanoWasm: any = null
+
+import('@emurgo/cardano-serialization-lib-browser').then((module) => {
+  CardanoWasm = module
+})
+
 export const coins = ['ada']
+
+interface IUnspentTxOutput {
+  ctaAddress: string
+  ctaAmount: {
+    getCoin: string
+  }
+  ctaTxHash: string
+  ctaTxIndex: number
+}
 
 // Do not send money to this address!
 const testWallet = {
@@ -83,16 +97,7 @@ export const fromAda = (value: string | number): number => {
   return Number(new BigNumber(value).multipliedBy(ten6))
 }
 
-interface IUnspentTxOutput {
-  ctaAddress: string
-  ctaAmount: {
-    getCoin: string
-  }
-  ctaTxHash: string
-  ctaTxIndex: number
-}
-
-const getTxBuilder = (): CardanoWasm.TransactionBuilder => {
+const getTxBuilder = () => {
   return CardanoWasm.TransactionBuilder.new(
     CardanoWasm.LinearFee.new(
       CardanoWasm.BigNum.from_str('44'),
@@ -203,18 +208,14 @@ export const validateAddress = (address: string) => {
   return validateByronAddress(address) || validateShelleyAddress(address)
 }
 
-const prepareAddress = (address: string): CardanoWasm.Address | null => {
+const prepareAddress = (address: string) => {
   if (validateShelleyAddress(address)) {
     return CardanoWasm.Address.from_bech32(address)
   }
   return null
 }
 
-const addOutputs = (
-  txBuilder: CardanoWasm.TransactionBuilder,
-  outputs: IUnspentTxOutput[],
-  signingKey: CardanoWasm.PrivateKey
-) => {
+const addOutputs = (txBuilder: any, outputs: any[], signingKey: any) => {
   for (const output of outputs) {
     const {
       ctaAmount: { getCoin: inputAmount },

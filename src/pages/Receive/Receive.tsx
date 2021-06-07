@@ -283,7 +283,7 @@ const Receive: React.FC = () => {
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />
             <CopyToClipboard value={address} onCopy={onCopyAddress}>
-              <Styles.Address>{address}</Styles.Address>
+              <Styles.Address>{short(address, 55)}</Styles.Address>
             </CopyToClipboard>
             <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} isSmall mt={30} />
           </Styles.ReceiveBlock>

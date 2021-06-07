@@ -956,10 +956,10 @@
   resolved "https://registry.yarnpkg.com/@emotion/unitless/-/unitless-0.7.5.tgz#77211291c1900a700b8a78cfafda3160d76949ed"
   integrity sha512-OWORNpfjMsSSUBVrRBVGECkhWcULOAJz9ZW8uK9qgxD+87M7jHRcvh/A96XXNhXTLmKcoYSQtBEX7lHMO7YRwg==
 
-"@emurgo/cardano-serialization-lib-asmjs@^7.0.0":
+"@emurgo/cardano-serialization-lib-browser@^7.0.0":
   version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@emurgo/cardano-serialization-lib-asmjs/-/cardano-serialization-lib-asmjs-7.0.0.tgz#d10affdb50c518d6c844fae1660c0d4f3ad5d1b9"
-  integrity sha512-Vk60Inb3YZRWT5wQhcfhy7C/ruG+MiXMAtLI4xMOrrv8cOGQFsweN5lJNA7QyPwK6DxRD6FqWlwmHRJuv5nI7w==
+  resolved "https://registry.yarnpkg.com/@emurgo/cardano-serialization-lib-browser/-/cardano-serialization-lib-browser-7.0.0.tgz#d5f0f036b4a59f77a48f8bdeb45119755ce00476"
+  integrity sha512-4/xgSE7u4BKdBsDOk54zMuTJl3IAHTldCkSiZvS/s6XSxNcoVnPKs0wfZb/swwSqyNKukTodz8GE1K7JhuVW9Q==
 
 "@eslint/eslintrc@^0.3.0":
   version "0.3.0"
@@ -2594,6 +2594,13 @@ bip39@^3.0.4:
     create-hash "^1.1.0"
     pbkdf2 "^3.0.9"
     randombytes "^2.0.1"
+
+bip66@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/bip66/-/bip66-1.1.5.tgz#01fa8748785ca70955d5011217d1b3139969ca22"
+  integrity sha1-AfqHSHhcpwlV1QESF9GzE5lpyiI=
+  dependencies:
+    safe-buffer "^5.0.1"
 
 bl@^4.0.3:
   version "4.1.0"
