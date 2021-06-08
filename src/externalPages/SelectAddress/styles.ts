@@ -109,6 +109,7 @@ const AddressesList = styled.div`
   position: relative;
   max-height: 440px;
   overflow-y: scroll;
+  overflow-x: hidden;
 `
 
 const FiltersRow = styled.div`
