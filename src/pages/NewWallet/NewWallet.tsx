@@ -17,13 +17,13 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
-import { generate, importPrivateKey } from '@utils/address'
+import { generate, importPrivateKey, importRecoveryPhrase } from '@utils/address'
 import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
-import { getCurrencyByChain, ICurrency } from '@config/currencies'
+import { getCurrencyByChain, ICurrency, checkWithPhrase } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -108,7 +108,16 @@ const NewWallet: React.FC = () => {
         const decryptBackup = decrypt(backup, password)
 
         if (decryptBackup) {
-          const address = importPrivateKey(symbol, privateKey, chain)
+          let address
+
+          if (mnemonic) {
+            const tryImportPhrase = importRecoveryPhrase(symbol, mnemonic)
+            if (tryImportPhrase) {
+              address = tryImportPhrase.address
+            }
+          } else {
+            address = importPrivateKey(symbol, privateKey, chain)
+          }
 
           if (address) {
             const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
@@ -159,6 +168,12 @@ const NewWallet: React.FC = () => {
     })
   }
 
+  const onImportPhrase = (): void => {
+    history.push('/import-recovery-phrase', {
+      symbol,
+    })
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -174,18 +189,33 @@ const NewWallet: React.FC = () => {
           {warning ? <Warning text={warning} /> : null}
 
           <Styles.Actions mt={warning ? 26 : 32}>
-            <Styles.Action onClick={onImportPrivateKey} size={warning ? 'small' : 'big'}>
-              <Styles.ActionIcon>
-                <SVG
-                  src="../../assets/icons/import.svg"
-                  width={18}
-                  height={18}
-                  title="Import a private key"
-                />
-              </Styles.ActionIcon>
-              <Styles.ActionName>Import a private key</Styles.ActionName>
-            </Styles.Action>
-            <Styles.Action onClick={onGenerateAddress} size={warning ? 'small' : 'big'}>
+            {checkWithPhrase(symbol) ? (
+              <Styles.Action onClick={onImportPhrase}>
+                <Styles.ActionIcon>
+                  <SVG
+                    src="../../assets/icons/phrase.svg"
+                    width={16}
+                    height={16}
+                    title="Import a recovery phrase"
+                  />
+                </Styles.ActionIcon>
+                <Styles.ActionName>Import a recovery phrase</Styles.ActionName>
+              </Styles.Action>
+            ) : (
+              <Styles.Action onClick={onImportPrivateKey}>
+                <Styles.ActionIcon>
+                  <SVG
+                    src="../../assets/icons/import.svg"
+                    width={18}
+                    height={18}
+                    title="Import a private key"
+                  />
+                </Styles.ActionIcon>
+                <Styles.ActionName>Import a private key</Styles.ActionName>
+              </Styles.Action>
+            )}
+
+            <Styles.Action onClick={onGenerateAddress}>
               <Styles.ActionIcon>
                 <SVG
                   src="../../assets/icons/plusCircle.svg"
