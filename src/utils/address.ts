@@ -1,6 +1,3 @@
-import * as web3 from '@utils/web3'
-import bitcoinLike from '@utils/bitcoinLike'
-
 // Config
 import addressValidate from '@config/addressValidate'
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -9,6 +6,10 @@ import { getToken, IToken } from '@config/tokens'
 // Utils
 import { getEtherNetworkFee, IGetNetworkFeeResponse, getThetaNetworkFee } from '@utils/api'
 import { toLower } from '@utils/format'
+
+// Currencies
+import * as web3 from '@utils/web3'
+import bitcoinLike from '@utils/bitcoinLike'
 import * as theta from '@utils/currencies/theta'
 import * as cardano from '@utils/currencies/cardano'
 
@@ -54,9 +55,6 @@ export const importPrivateKey = (
   privateKey: string,
   chain?: string
 ): string | null => {
-  if (cardano.coins.indexOf(symbol) !== -1) {
-    return cardano.importPrivateKey(privateKey)
-  }
   if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
   } else if (theta.coins.indexOf(symbol) !== -1) {
@@ -73,7 +71,9 @@ export const validateAddress = (
   tokenChain?: string
 ): boolean => {
   try {
-    if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
+    if (cardano.coins.indexOf(symbol) !== -1) {
+      return cardano.validateAddress(address)
+    } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
       return new bitcoinLike(symbol).isAddressValid(address)
     }
     // @ts-ignore
@@ -97,8 +97,11 @@ export const createTransaction = async ({
   gasPrice,
   nonce,
   contractAddress,
-}: TCreateTransactionProps): Promise<TCreatedTransaction | null> => {
+}: TCreateTransactionProps): Promise<string | null> => {
   try {
+    if (cardano.coins.indexOf(symbol) !== -1 && outputs) {
+      return await cardano.createTransaction(outputs, from, to, amount, privateKey)
+    }
     if (isEthereumLike(symbol, tokenChain)) {
       const getContractAddress = contractAddress
         ? contractAddress
@@ -249,24 +252,21 @@ export const formatUnit = (
   unit?: web3.Unit
 ): number => {
   try {
-    if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
+    if (cardano.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
+    } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
       return type === 'from'
         ? new bitcoinLike(symbol).fromSat(Number(value))
         : new bitcoinLike(symbol).toSat(Number(value))
-    }
-    if (isEthereumLike(symbol, chain)) {
+    } else if (isEthereumLike(symbol, chain)) {
       if (unit) {
         return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
       }
       return Number(value)
-    }
-    if (theta.coins.indexOf(symbol) !== -1) {
+    } else if (theta.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? theta.fromTheta(value) : theta.toTheta(value)
     }
 
-    if (cardano.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
-    }
     return 0
   } catch {
     return 0
@@ -346,5 +346,19 @@ export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string
     return getCurrency(symbol)?.symbol || symbol
   } catch {
     return symbol
+  }
+}
+
+export const importRecoveryPhrase = (
+  symbol: string,
+  recoveryPhrase: string
+): TGenerateAddress | null => {
+  try {
+    if (cardano.coins.indexOf(symbol) !== -1) {
+      return cardano.importRecoveryPhrase(recoveryPhrase)
+    }
+    return null
+  } catch {
+    return null
   }
 }

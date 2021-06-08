@@ -3,6 +3,9 @@ import axios, { AxiosResponse } from 'axios'
 // Config
 import config from '@config/index'
 
+// Utils
+import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
+
 interface IGetBalance {
   balance: number
   balance_usd: number
@@ -32,7 +35,7 @@ interface Web3TxParams {
 export interface IGetNetworkFeeResponse {
   networkFee?: number
   networkFeeLabel?: string
-  utxos?: UnspentOutput[]
+  utxos?: UnspentOutput[] | ICardanoUnspentTxOutput[]
   chainId?: number
   gas?: number
   gasPrice?: string
@@ -252,7 +255,7 @@ export const getCardanoTransactionParams = async (): Promise<IAdaTrParams | null
       },
     })
 
-    return data.data
+    return data
   } catch {
     return null
   }

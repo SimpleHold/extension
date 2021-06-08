@@ -126,12 +126,12 @@ class GenerateAddress {
     fee: number,
     changeAddress: string,
     privateKey: string
-  ): TCreatedTransaction | null => {
+  ): string | null => {
     try {
       const provider = this.getProvider()
 
       if (provider) {
-        return provider.createTransaction(outputs, to, amount, fee, changeAddress, privateKey)
+        return provider.createTransaction(outputs, to, amount, fee, changeAddress, privateKey).raw
       }
 
       return null

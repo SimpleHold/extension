@@ -22,6 +22,7 @@ export interface IWallet {
   decimals?: number
   createdAt?: Date
   isHidden?: boolean
+  mnemonic?: string
 }
 
 type TSelectedWalletFilter = {
