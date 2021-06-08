@@ -35,7 +35,7 @@ import { getItem } from '@utils/storage'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
-import { getCurrency } from '@config/currencies'
+import { getCurrency, checkWithPhrase } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
 // Icons
@@ -46,6 +46,7 @@ import eyeIcon from '@assets/icons/eye.svg'
 import eyeVisibleIcon from '@assets/icons/eyeVisible.svg'
 import refreshIcon from '@assets/icons/refresh.svg'
 import moreIcon from '@assets/icons/more.svg'
+import phraseIcon from '@assets/icons/phrase.svg'
 
 // Styles
 import Styles from './styles'
@@ -77,6 +78,7 @@ const Receive: React.FC = () => {
 
   const history = useHistory()
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+  const isCurrencyWithPhrase = checkWithPhrase(symbol)
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false)
@@ -108,8 +110,14 @@ const Receive: React.FC = () => {
   const getDropDownList = (): void => {
     const list = [
       {
-        icon: { source: privateKeyIcon, width: 18, height: 18 },
-        title: 'Show Private key',
+        icon: isCurrencyWithPhrase
+          ? {
+              source: phraseIcon,
+              width: 16,
+              height: 16,
+            }
+          : { source: privateKeyIcon, width: 18, height: 18 },
+        title: isCurrencyWithPhrase ? 'Show recovery phrase' : 'Show Private key',
       },
       { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
     ]
@@ -204,7 +212,11 @@ const Receive: React.FC = () => {
           )
 
           if (findWallet) {
-            setPrivateKey(findWallet.privateKey)
+            if (findWallet.mnemonic) {
+              setPrivateKey(findWallet.mnemonic)
+            } else {
+              setPrivateKey(findWallet.privateKey)
+            }
             return setActiveDrawer('privateKey')
           }
         }
@@ -283,7 +295,7 @@ const Receive: React.FC = () => {
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />
             <CopyToClipboard value={address} onCopy={onCopyAddress}>
-              <Styles.Address>{short(address, 55)}</Styles.Address>
+              <Styles.Address>{short(address, 70)}</Styles.Address>
             </CopyToClipboard>
             <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} isSmall mt={30} />
           </Styles.ReceiveBlock>
@@ -292,7 +304,9 @@ const Receive: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
-        title="Please enter your password to see the private key"
+        title={`Please enter your password to see the ${
+          isCurrencyWithPhrase ? 'recovery phrase' : 'private key'
+        }`}
         isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirmModal}
         textInputValue={password}
@@ -302,6 +316,7 @@ const Receive: React.FC = () => {
         inputErrorLabel={passwordErrorLabel}
       />
       <PrivateKeyDrawer
+        isMnemonic={isCurrencyWithPhrase}
         isActive={activeDrawer === 'privateKey'}
         onClose={() => {
           setActiveDrawer(null)
