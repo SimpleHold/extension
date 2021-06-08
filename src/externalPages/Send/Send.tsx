@@ -30,6 +30,7 @@ import useDebounce from '@hooks/useDebounce'
 
 // Styles
 import Styles from './styles'
+import { ICardanoUnspentTxOutput } from 'utils/currencies/cardano'
 
 type TabInfo = {
   favIconUrl: string
@@ -60,7 +61,7 @@ const Send: React.FC = () => {
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
   const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
-  const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | ICardanoUnspentTxOutput[]>([])
   const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
 
   const debounced = useDebounce(amount, 1000)

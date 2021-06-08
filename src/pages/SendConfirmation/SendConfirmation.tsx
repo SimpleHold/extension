@@ -143,11 +143,11 @@ const SendConfirmation: React.FC = () => {
 
           setButtonLoading(false)
 
-          if (transaction?.hash && transaction?.raw) {
-            const sendTransaction = await sendRawTransaction(transaction.raw, chain || tokenChain)
+          if (transaction) {
+            const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
 
-            if (sendTransaction === transaction.hash) {
-              const link = getTransactionLink(transaction.hash, symbol, chain, tokenChain)
+            if (sendTransaction) {
+              const link = getTransactionLink(sendTransaction, symbol, chain, tokenChain)
 
               if (link) {
                 setTransactionLink(link)

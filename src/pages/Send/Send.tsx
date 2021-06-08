@@ -34,6 +34,7 @@ import useDebounce from '@hooks/useDebounce'
 
 // Styles
 import Styles from './styles'
+import { ICardanoUnspentTxOutput } from 'utils/currencies/cardano'
 
 interface LocationState {
   symbol: TSymbols
@@ -71,7 +72,7 @@ const Send: React.FC = () => {
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
-  const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | ICardanoUnspentTxOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
   const [currencyBalance, setCurrencyBalance] = React.useState<number | null>(null)
   const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
