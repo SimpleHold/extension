@@ -12,6 +12,7 @@ import * as web3 from '@utils/web3'
 import bitcoinLike from '@utils/bitcoinLike'
 import * as theta from '@utils/currencies/theta'
 import * as cardano from '@utils/currencies/cardano'
+import * as ripple from '@utils/currencies/ripple'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
@@ -36,10 +37,11 @@ export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boole
 }
 
 export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
-  if (cardano.coins.indexOf(symbol) !== -1) {
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return ripple.generateWallet()
+  } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.generateWallet()
-  }
-  if (isEthereumLike(symbol, chain)) {
+  } else if (isEthereumLike(symbol, chain)) {
     return web3.generateAddress()
   } else if (theta.coins.indexOf(symbol) !== -1) {
     return theta.generateWallet()
@@ -55,7 +57,9 @@ export const importPrivateKey = (
   privateKey: string,
   chain?: string
 ): string | null => {
-  if (isEthereumLike(symbol, chain)) {
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return ripple.importPrivateKey(privateKey)
+  } else if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
   } else if (theta.coins.indexOf(symbol) !== -1) {
     return theta.importPrivateKey(privateKey)
@@ -252,7 +256,9 @@ export const formatUnit = (
   unit?: web3.Unit
 ): number => {
   try {
-    if (cardano.coins.indexOf(symbol) !== -1) {
+    if (ripple.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
+    } else if (cardano.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
     } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
       return type === 'from'
@@ -280,7 +286,9 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
-  if (cardano.coins.indexOf(symbol) !== -1) {
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return ripple.getExplorerLink(address)
+  } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.getExplorerLink(address)
   } else if (theta.coins.indexOf(symbol) !== -1) {
     return `https://explorer.thetatoken.org/account/${address}`
@@ -316,11 +324,11 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string | null => {
-  if (cardano.coins.indexOf(symbol) !== -1) {
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return ripple.getTransactionLink(hash)
+  } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.getTransactionLink(hash)
-  }
-
-  if (isEthereumLike(symbol, tokenChain)) {
+  } else if (isEthereumLike(symbol, tokenChain)) {
     const parseChain = tokenChain ? toLower(tokenChain) : toLower(chain)
 
     if (parseChain === 'eth') {

@@ -11,6 +11,7 @@ import binanceLogo from '@assets/currencies/bnb.svg'
 import thetaLogo from '@assets/currencies/theta.svg'
 import tfuelLogo from '@assets/currencies/theta.svg'
 import cardanoLogo from '@assets/currencies/ada.svg'
+import rippleLogo from '@assets/currencies/xrp.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -120,6 +121,14 @@ const currencies: ICurrency[] = [
     background: '#2B55BB',
     chain: 'cardano',
     minSendAmount: 1000000,
+  },
+  {
+    name: 'Ripple',
+    symbol: 'xrp',
+    logo: rippleLogo,
+    background: '#5088BC',
+    chain: 'ripple',
+    minSendAmount: 1000,
   },
 ]
 
