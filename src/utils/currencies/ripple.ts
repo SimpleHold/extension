@@ -86,19 +86,20 @@ export const createTransaction = async (
 ): Promise<string | null> => {
   try {
     const { fee, sequence, maxLedgerVersion } = txParams
+    const parseValue = fromXrp(value)
 
     const payment: IPayment = {
       source: {
         address: from,
         maxAmount: {
-          value: `${value}`,
+          value: `${parseValue}`,
           currency: 'XRP',
         },
       },
       destination: {
         address: to,
         amount: {
-          value: `${value}`,
+          value: `${parseValue}`,
           currency: 'XRP',
         },
       },

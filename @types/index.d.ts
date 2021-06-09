@@ -63,3 +63,5 @@ type TSymbols =
   | 'bnb'
   | 'theta'
   | 'tfuel'
+  | 'ada'
+  | 'xrp'

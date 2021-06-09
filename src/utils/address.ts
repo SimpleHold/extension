@@ -4,7 +4,12 @@ import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
 import { getToken, IToken } from '@config/tokens'
 
 // Utils
-import { getEtherNetworkFee, IGetNetworkFeeResponse, getThetaNetworkFee } from '@utils/api'
+import {
+  getEtherNetworkFee,
+  IGetNetworkFeeResponse,
+  getThetaNetworkFee,
+  getNetworkFee,
+} from '@utils/api'
 import { toLower } from '@utils/format'
 
 // Currencies
@@ -30,6 +35,11 @@ type TCreateTransactionProps = {
   gasPrice?: string
   nonce?: number
   contractAddress?: string
+  xrpTxData?: {
+    fee: string
+    sequence: number
+    maxLedgerVersion: number
+  }
 }
 
 export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boolean => {
@@ -101,8 +111,12 @@ export const createTransaction = async ({
   gasPrice,
   nonce,
   contractAddress,
+  xrpTxData,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
+    if (ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
+      return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData)
+    }
     if (cardano.coins.indexOf(symbol) !== -1 && outputs) {
       return await cardano.createTransaction(outputs, from, to, amount, privateKey)
     }
@@ -229,6 +243,10 @@ export const getAddressNetworkFee = async (
       )
 
       return data
+    }
+
+    if (ripple.coins.indexOf(symbol) !== -1) {
+      return await getNetworkFee('ripple')
     }
 
     if (theta.coins.indexOf(symbol) !== -1) {

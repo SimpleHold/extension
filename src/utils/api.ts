@@ -260,3 +260,34 @@ export const getCardanoTransactionParams = async (): Promise<IAdaTrParams | null
     return null
   }
 }
+
+export const getNetworkFee = async (type: string): Promise<IGetNetworkFeeResponse | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/${type}/network-fee`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const getXrpTxParams = async (from: string) => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/ripple/params`, {
+      params: {
+        from,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data
+  } catch {
+    return null
+  }
+}
