@@ -17,7 +17,8 @@ import Tooltip from '@components/Tooltip'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
-import PrivateKeyDrawer from 'drawers/PrivateKey'
+import PrivateKeyDrawer from '@drawers/PrivateKey'
+import ExtraIdDrawer from '@drawers/ExtraId'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
@@ -29,7 +30,7 @@ import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet, toggleVisibleWallet, updateBalance } from '@utils/wallet'
-import { getExplorerLink } from '@utils/address'
+import { getExplorerLink, getExtraIdName } from '@utils/address'
 import { openWebPage } from '@utils/extension'
 import { getItem } from '@utils/storage'
 
@@ -85,12 +86,15 @@ const Receive: React.FC = () => {
   const [balance, setBalance] = React.useState<null | number>(null)
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'privateKey'>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<
+    null | 'confirm' | 'privateKey' | 'extraId'
+  >(null)
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
   const [pendingBalance, setPendingBalance] = React.useState<number>(0)
   const [dropDownList, setDropDownList] = React.useState<any[]>([])
   const [isHiddenWallet, setIsHiddenWallet] = React.useState<boolean>(isHidden)
+  const [extraIdName, setExtraIdName] = React.useState<string>('')
 
   React.useEffect(() => {
     logEvent({
@@ -126,6 +130,17 @@ const Receive: React.FC = () => {
       list.push({
         icon: { source: plusCircleIcon, width: 18, height: 18 },
         title: 'Add token',
+      })
+    }
+
+    const name = getExtraIdName(symbol)
+
+    if (name) {
+      setExtraIdName(name)
+
+      list.push({
+        icon: { source: plusCircleIcon, width: 18, height: 18 },
+        title: 'Generate destination tag',
       })
     }
 
@@ -170,10 +185,14 @@ const Receive: React.FC = () => {
     } else if (index === 1) {
       openWebPage(getExplorerLink(address, symbol, currency, chain, contractAddress))
     } else if (index === 2) {
-      history.push('/select-token', {
-        currency,
-        address,
-      })
+      if (extraIdName?.length) {
+        setActiveDrawer('extraId')
+      } else {
+        history.push('/select-token', {
+          currency,
+          address,
+        })
+      }
     }
   }
 
@@ -281,7 +300,7 @@ const Receive: React.FC = () => {
 
             <Skeleton width={130} height={23} mt={10} type="gray" isLoading={estimated === null}>
               {estimated !== null ? (
-                <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
+                <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
               ) : null}
             </Skeleton>
 
@@ -323,6 +342,12 @@ const Receive: React.FC = () => {
           setPrivateKey(null)
         }}
         privateKey={privateKey}
+      />
+      <ExtraIdDrawer
+        isActive={activeDrawer === 'extraId'}
+        onClose={() => setActiveDrawer(null)}
+        title={extraIdName}
+        symbol={symbol}
       />
     </>
   )

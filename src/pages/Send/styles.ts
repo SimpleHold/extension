@@ -9,10 +9,14 @@ const Container = styled.div`
   border-radius: 5px 5px 0 0;
   height: 540px;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `
 
 const Row = styled.div`
   padding: 20px 30px 40px 30px;
+  flex: 1;
 `
 
 const PageTitle = styled.p`

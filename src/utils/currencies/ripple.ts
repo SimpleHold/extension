@@ -4,6 +4,7 @@ import keypairs from 'ripple-keypairs'
 const api = new RippleAPI()
 
 export const coins = ['xrp']
+export const extraIdName = 'Destination tag'
 
 export const fromXrp = (value: string | number): number => {
   return +api.dropsToXrp(value)
@@ -121,4 +122,13 @@ export const createTransaction = async (
   } catch {
     return null
   }
+}
+
+export const generateTag = (): string => {
+  const num = (Date.now() * (1 + Math.random())).toFixed(0).slice(-9).split('')
+  const firstSign = +num[0]
+  if (firstSign === 0) {
+    num[0] = Math.floor(1 + Math.random() * (9 + 1 - 1)).toString()
+  }
+  return num.join('')
 }

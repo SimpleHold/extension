@@ -40,6 +40,7 @@ type TCreateTransactionProps = {
     sequence: number
     maxLedgerVersion: number
   }
+  extraId?: string
 }
 
 export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boolean => {
@@ -112,10 +113,11 @@ export const createTransaction = async ({
   nonce,
   contractAddress,
   xrpTxData,
+  extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
     if (ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
-      return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData)
+      return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData, extraId)
     }
     if (cardano.coins.indexOf(symbol) !== -1 && outputs) {
       return await cardano.createTransaction(outputs, from, to, amount, privateKey)
@@ -387,4 +389,18 @@ export const importRecoveryPhrase = (
   } catch {
     return null
   }
+}
+
+export const getExtraIdName = (symbol: string): null | string => {
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return ripple.extraIdName
+  }
+  return null
+}
+
+export const generateExtraId = (symbol: string): null | string => {
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return ripple.generateTag()
+  }
+  return null
 }

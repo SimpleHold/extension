@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import numeral from 'numeral'
+import { BigNumber } from 'bignumber.js'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -11,6 +12,7 @@ import Button from '@components/Button'
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
+import FailDrawer from '@drawers/Fail'
 
 // Utils
 import { toLower, toUpper } from '@utils/format'
@@ -19,7 +21,7 @@ import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { convertDecimals } from '@utils/web3'
 import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
-import { sendRawTransaction, getWeb3TxParams } from '@utils/api'
+import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, removeItem } from '@utils/storage'
 
@@ -42,15 +44,19 @@ interface Props {
   contractAddress?: string
   outputs?: UnspentOutput[]
   networkFeeSymbol?: string
+  extraId?: string
 }
 
 const SendConfirmation: React.FC = () => {
   const [props, setProps] = React.useState<Props>({})
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success' | 'fail'>(
+    null
+  )
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
   const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
   const [transactionLink, setTransactionLink] = React.useState<string>('')
+  const [failText, setFailText] = React.useState<string>('')
 
   React.useEffect(() => {
     checkProps()
@@ -118,6 +124,7 @@ const SendConfirmation: React.FC = () => {
         addressTo,
         contractAddress,
         outputs,
+        extraId,
       } = props
 
       const decryptBackup = decrypt(backup, password)
@@ -145,6 +152,8 @@ const SendConfirmation: React.FC = () => {
                 contractAddress
               )
             : {}
+
+          const xrpTxData = symbol === 'xrp' ? await getXrpTxParams(addressFrom) : {}
 
           const transactionData = {
             from: addressFrom,
@@ -175,7 +184,12 @@ const SendConfirmation: React.FC = () => {
             return setInputErrorLabel('Error while creating transaction')
           }
 
-          const transaction = await createTransaction({ ...transactionData, ...ethTxData })
+          const transaction = await createTransaction({
+            ...transactionData,
+            ...ethTxData,
+            xrpTxData,
+            extraId,
+          })
 
           setButtonLoading(false)
 
@@ -183,12 +197,7 @@ const SendConfirmation: React.FC = () => {
             const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
 
             if (sendTransaction) {
-              const link = getTransactionLink(sendTransaction, symbol, chain, tokenChain)
-
-              if (link) {
-                setTransactionLink(link)
-              }
-              return setActiveDrawer('success')
+              return checkTransaction(sendTransaction)
             }
           }
 
@@ -198,6 +207,35 @@ const SendConfirmation: React.FC = () => {
     }
 
     return setInputErrorLabel('Password is not valid')
+  }
+
+  const checkTransaction = async (transaction: any) => {
+    const { tokenChain, symbol, chain } = props
+
+    if (symbol && chain) {
+      if (symbol === 'xrp' && transaction?.engine_result_code === 125) {
+        setFailText(
+          'You are sending funds to an inactive address. Due to the Network rules, you must transfer at least 20 XRP to activate it.'
+        )
+        return setActiveDrawer('fail')
+      }
+
+      let txHash = transaction
+
+      if (symbol === 'xrp') {
+        if (transaction?.engine_result !== 'tesSUCCESS') {
+          return setInputErrorLabel('Error while creating transaction')
+        }
+        txHash = transaction?.tx_json?.hash
+      }
+
+      const link = getTransactionLink(txHash, symbol, chain, tokenChain)
+
+      if (link) {
+        setTransactionLink(link)
+      }
+      return setActiveDrawer('success')
+    }
   }
 
   return (
@@ -266,9 +304,13 @@ const SendConfirmation: React.FC = () => {
                           <Styles.TableTitle>Total:</Styles.TableTitle>
                         </Styles.TableTd>
                         <Styles.TableTd>
-                          <Styles.TableAmount>
-                            {Number(props?.amount) + Number(props.networkFee)}
-                          </Styles.TableAmount>
+                          {props?.amount && props?.networkFee ? (
+                            <Styles.TableAmount>
+                              {numeral(
+                                new BigNumber(props.amount).plus(props.networkFee).toNumber()
+                              ).format('0.[00000000]')}
+                            </Styles.TableAmount>
+                          ) : null}
                         </Styles.TableTd>
                         <Styles.TableTd>
                           <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
@@ -317,6 +359,11 @@ const SendConfirmation: React.FC = () => {
           link={transactionLink}
           openFrom="browser"
           isCloseOnLinkClick
+        />
+        <FailDrawer
+          isActive={activeDrawer === 'fail'}
+          onClose={() => setActiveDrawer(null)}
+          text={failText}
         />
       </>
     </ExternalPageContainer>

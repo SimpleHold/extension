@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import numeral from 'numeral'
+import { BigNumber } from 'bignumber.js'
 
 // Components
 import Cover from '@components/Cover'
@@ -76,6 +77,7 @@ const Send: React.FC = () => {
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
   const [currencyBalance, setCurrencyBalance] = React.useState<number | null>(null)
   const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
+  const [extraId, setExtraId] = React.useState<string>('')
 
   const debounced = useDebounce(amount, 1000)
 
@@ -200,6 +202,7 @@ const Send: React.FC = () => {
       contractAddress: tokenContractAddress || contractAddress,
       tokenChain,
       decimals: getTokenDecimals || decimals,
+      extraId,
     })
   }
 
@@ -217,12 +220,24 @@ const Send: React.FC = () => {
     }
   }
 
+  const getAvailableBalance = (): number => {
+    if (balance) {
+      if (toLower(symbol) === 'xrp') {
+        return new BigNumber(balance).minus(20).toNumber()
+      }
+      return Number(balance)
+    }
+    return 0
+  }
+
   const onBlurAmountInput = (): void => {
     if (amountErrorLabel) {
       setAmountErrorLabel(null)
     }
 
-    if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
+    const availableBalance = getAvailableBalance()
+
+    if (amount.length && Number(amount) + Number(networkFee) >= Number(availableBalance)) {
       return setAmountErrorLabel('Insufficient funds')
     }
 
@@ -318,7 +333,7 @@ const Send: React.FC = () => {
             </Styles.Balance>
           </Skeleton>
           <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
-            <Styles.USDEstimated>{`$${price(estimated, 2)} USD`}</Styles.USDEstimated>
+            <Styles.USDEstimated>{`$${price(estimated, 2)}`}</Styles.USDEstimated>
           </Skeleton>
         </Styles.Row>
         <Styles.Form onSubmit={onSubmitForm}>
@@ -377,8 +392,8 @@ const Send: React.FC = () => {
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-            <Button label="Send" onClick={onSend} disabled={isButtonDisabled()} ml={7.5} />
+            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} isSmall />
+            <Button label="Send" onClick={onSend} disabled={isButtonDisabled()} ml={7.5} isSmall />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Container>

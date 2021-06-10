@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import numeral from 'numeral'
+import { BigNumber } from 'bignumber.js'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -43,6 +44,7 @@ interface Props {
   amount?: number
   recipientAddress?: string
   chain?: string
+  extraId?: string
 }
 
 const Send: React.FC = () => {
@@ -63,6 +65,7 @@ const Send: React.FC = () => {
   const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
   const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | ICardanoUnspentTxOutput[]>([])
   const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
+  const [extraId, setExtraId] = React.useState<string>('')
 
   const debounced = useDebounce(amount, 1000)
 
@@ -174,6 +177,10 @@ const Send: React.FC = () => {
 
       if (recipientAddress?.length) {
         setAddress(recipientAddress)
+      }
+
+      if (props?.extraId) {
+        setExtraId(props.extraId)
       }
     }
   }
@@ -307,6 +314,7 @@ const Send: React.FC = () => {
         contractAddress: selectedWallet?.contractAddress,
         tokenChain: selectedWallet?.chain,
         decimals: selectedWallet?.decimals,
+        extraId,
       }
 
       setItem('sendConfirmationData', JSON.stringify(data))
@@ -379,12 +387,24 @@ const Send: React.FC = () => {
     }
   }
 
+  const getAvailableBalance = (): number => {
+    if (balance && selectedWallet) {
+      if (toLower(selectedWallet?.symbol) === 'xrp') {
+        return new BigNumber(balance).minus(20).toNumber()
+      }
+      return Number(balance)
+    }
+    return 0
+  }
+
   const onBlurAmountInput = (): void => {
     if (amountErrorLabel) {
       setAmountErrorLabel(null)
     }
 
-    if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
+    const availableBalance = getAvailableBalance()
+
+    if (amount.length && Number(amount) + Number(networkFee) >= Number(availableBalance)) {
       return setAmountErrorLabel('Insufficient funds')
     }
 
@@ -481,7 +501,7 @@ const Send: React.FC = () => {
             type="gray"
             isLoading={estimated === null || !selectedWallet}
           >
-            <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
+            <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
           </Skeleton>
         </Styles.Heading>
         <Styles.Form>

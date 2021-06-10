@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import numeral from 'numeral'
+import { BigNumber } from 'bignumber.js'
 
 // Components
 import Cover from '@components/Cover'
@@ -47,6 +48,7 @@ interface LocationState {
   contractAddress?: string
   tokenChain?: string
   decimals?: number
+  extraId?: string
 }
 
 const SendConfirmation: React.FC = () => {
@@ -64,6 +66,7 @@ const SendConfirmation: React.FC = () => {
       contractAddress = undefined,
       tokenChain = undefined,
       decimals = undefined,
+      extraId = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -149,6 +152,7 @@ const SendConfirmation: React.FC = () => {
             ...transactionData,
             ...ethTxData,
             xrpTxData,
+            extraId,
           })
 
           setButtonLoading(false)
@@ -180,6 +184,9 @@ const SendConfirmation: React.FC = () => {
     let txHash = transaction
 
     if (symbol === 'xrp') {
+      if (transaction?.engine_result !== 'tesSUCCESS') {
+        return setInputErrorLabel('Error while creating transaction')
+      }
       txHash = transaction?.tx_json?.hash
     }
 
@@ -279,7 +286,9 @@ const SendConfirmation: React.FC = () => {
                         </Styles.TableTd>
                         <Styles.TableTd>
                           <Styles.TableAmount>
-                            {numeral(amount + networkFee).format('0.[00000000]')}
+                            {numeral(new BigNumber(amount).plus(networkFee).toNumber()).format(
+                              '0.[00000000]'
+                            )}
                           </Styles.TableAmount>
                         </Styles.TableTd>
                         <Styles.TableTd>

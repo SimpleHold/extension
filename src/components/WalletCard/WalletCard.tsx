@@ -126,7 +126,7 @@ const WalletCard: React.FC<Props> = (props) => {
             </Styles.BalanceRow>
           </Skeleton>
           <Skeleton width={80} height={14} type="gray" mt={9} br={4} isLoading={estimated === null}>
-            <Styles.Estimated>{`$${numberFriendly(estimated)} USD`}</Styles.Estimated>
+            <Styles.Estimated>{`$${numberFriendly(estimated)}`}</Styles.Estimated>
           </Skeleton>
         </Styles.Balances>
       </Styles.Row>
