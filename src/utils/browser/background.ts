@@ -12,6 +12,20 @@ import { getCurrency } from '@config/currencies'
 
 let activeRequest: string | null
 
+let currentWindowId: number
+
+browser.windows.onFocusChanged.addListener(async (windowId) => {
+  if (windowId !== -1) {
+    const getAllWindows = await browser.windows.getAll()
+
+    const checkIsNonPopup = getAllWindows.find((window) => window.id === windowId)
+
+    if (checkIsNonPopup?.type !== 'popup') {
+      currentWindowId = windowId
+    }
+  }
+})
+
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
     if (activeRequest === request.type) {
@@ -47,7 +61,10 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   }
 
   if (request.type === 'set_address') {
-    const tabs = await browser.tabs.query({ active: true })
+    const tabs = await browser.tabs.query({
+      active: true,
+      windowId: currentWindowId,
+    })
 
     if (tabs[0]?.id) {
       browser.tabs.sendMessage(tabs[0].id, request)
@@ -110,6 +127,11 @@ const generateContextMenu = async () => {
       title: 'SimpleHold',
       id: 'sh-parent',
       contexts: ['editable'],
+      documentUrlPatterns: [
+        'https://simpleswap.io/*',
+        'https://simplehold.io/*',
+        'http://localhost/*',
+      ],
     })
 
     const allowedSymbols = ['btc', 'eth', 'ltc', 'bnb', 'dash']
@@ -164,7 +186,10 @@ browser.runtime.onInstalled.addListener(() => {
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-  const tabs = await browser.tabs.query({ active: true })
+  const tabs = await browser.tabs.query({
+    active: true,
+    windowId: currentWindowId,
+  })
 
   if (tabs[0]?.id) {
     if (info.menuItemId !== 'sh-other-wallets') {

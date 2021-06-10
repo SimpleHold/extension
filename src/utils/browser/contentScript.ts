@@ -1,10 +1,12 @@
 import { browser } from 'webextension-polyfill-ts'
 import copy from 'copy-to-clipboard'
 
-// utils
+// Utils
 import { IRequest } from '@utils/browser/types'
 
-const setSHAttribute = () => {
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+const setSHAttribute = async () => {
   document.documentElement.setAttribute('sh-ex-status', 'installed')
 }
 
@@ -21,7 +23,7 @@ setSHAttribute()
 
 let activeRequest: string | null
 
-browser.runtime.onMessage.addListener((request: IRequest) => {
+browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'set_address') {
     const { data } = request
 
@@ -30,18 +32,18 @@ browser.runtime.onMessage.addListener((request: IRequest) => {
     ) as HTMLInputElement
 
     if (data?.address) {
+      copy(data.address)
+
       if (findInput) {
-        document.dispatchEvent(
-          new CustomEvent('sh-select-address', {
-            detail: {
-              address: data.address,
-            },
-          })
-        )
-      } else {
-        copy(data.address)
-        document.execCommand('paste')
+        findInput.focus()
+        document.execCommand('selectAll')
+        document.execCommand('delete')
       }
+
+      document.execCommand('paste')
+      document.execCommand('selectAll')
+      document.execCommand('delete')
+      document.execCommand('paste')
     }
   } else if (request.type === 'context-menu-address') {
     const { data } = request
