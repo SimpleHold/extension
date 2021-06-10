@@ -108,6 +108,8 @@ const Wallets: React.FC = () => {
   }
 
   const getWalletsList = () => {
+    setWallets(null)
+
     const walletsList = getWallets()
 
     if (walletsList) {
@@ -164,25 +166,35 @@ const Wallets: React.FC = () => {
         />
         {wallets !== null ? (
           <Styles.WalletsList>
-            {wallets?.map((wallet: IWallet, index: number) => {
-              const { address, symbol, chain, name, contractAddress, decimals, isHidden } = wallet
+            {wallets?.length
+              ? wallets.map((wallet: IWallet) => {
+                  const {
+                    address,
+                    symbol,
+                    chain,
+                    name,
+                    contractAddress,
+                    decimals,
+                    isHidden,
+                  } = wallet
 
-              return (
-                <WalletCard
-                  key={`${address}/${index}`}
-                  address={address}
-                  chain={chain}
-                  symbol={symbol.toLowerCase()}
-                  name={name}
-                  contractAddress={contractAddress}
-                  decimals={decimals}
-                  isHidden={isHidden}
-                  sumBalance={sumBalance}
-                  sumEstimated={sumEstimated}
-                  sumPending={sumPending}
-                />
-              )
-            })}
+                  return (
+                    <WalletCard
+                      key={`${symbol}/${address}/${chain}`}
+                      address={address}
+                      chain={chain}
+                      symbol={symbol.toLowerCase()}
+                      name={name}
+                      contractAddress={contractAddress}
+                      decimals={decimals}
+                      isHidden={isHidden}
+                      sumBalance={sumBalance}
+                      sumEstimated={sumEstimated}
+                      sumPending={sumPending}
+                    />
+                  )
+                })
+              : null}
             {wallets.length === 0 ? (
               <Styles.NotFound>Nothing was found for the specified parameters</Styles.NotFound>
             ) : null}

@@ -51,7 +51,7 @@ const DownloadBackup: React.FC = () => {
 
   const downloadFile = () => {
     if (isDownloadManually) {
-      return openWebPage(getUrl('download-backup.html'), { removeCurrent: true })
+      return openWebPage(getUrl('download-backup.html'))
     }
     if (state?.from) {
       logEvent({

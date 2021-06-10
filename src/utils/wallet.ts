@@ -63,10 +63,8 @@ export const sortWallets = (a: IWallet, b: IWallet) => {
       return sortByName(a, b, isAscending)
     }
   }
-
-  return b?.createdAt && a?.createdAt
-    ? new Date(b?.createdAt).getTime() - new Date(a?.createdAt).getTime()
-    : -1
+  // @ts-ignore
+  return a - b
 }
 
 export const filterWallets = (wallet: IWallet) => {
@@ -80,7 +78,8 @@ export const filterWallets = (wallet: IWallet) => {
 
   const filterByZeroBalance =
     zeroBalances === 'false' ? typeof wallet.balance !== 'undefined' && wallet.balance > 0 : wallet
-  const filterByHidden = hiddenWallets === 'true' ? wallet.isHidden !== true : wallet
+  const filterByHidden =
+    hiddenWallets === 'false' && hiddenWallets !== null ? wallet.isHidden !== true : wallet
   const filterByCurrency = selectedCurrencies
     ? JSON.parse(selectedCurrencies).some(
         (i: TSelectedWalletFilter) =>

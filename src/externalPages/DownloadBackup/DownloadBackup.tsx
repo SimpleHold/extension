@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import SVG from 'react-inlinesvg'
+import { browser } from 'webextension-polyfill-ts'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -14,6 +15,7 @@ import Styles from './styles'
 
 const DownloadBackup: React.FC = () => {
   React.useEffect(() => {
+    checkExistPage()
     if (getItem('isLocked')) {
       return
     }
@@ -22,6 +24,17 @@ const DownloadBackup: React.FC = () => {
       onDownload()
     }, 2000)
   }, [])
+
+  const checkExistPage = async () => {
+    const tabs = await browser.tabs.query({
+      active: false,
+      url: browser.extension.getURL('download-backup.html'),
+    })
+
+    if (tabs[0]?.id) {
+      await browser.tabs.remove(tabs[0].id)
+    }
+  }
 
   const onDownload = (): void => {
     const backup = getItem('backup')
