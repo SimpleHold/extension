@@ -112,6 +112,8 @@ const NetworksList = styled.div`
   top: 62px;
   max-height: 255px;
   overflow-y: scroll;
+  border: 1px solid #3fbb7d;
+  border-top: none;
 `
 
 const ListItem = styled.div`
@@ -120,24 +122,12 @@ const ListItem = styled.div`
   align-items: center;
   padding: ${({ pv }: TListItemProps) => (pv ? `${pv}px 10px` : '10px')};
   overflow: hidden;
-  border: 1px solid #3fbb7d;
   position: relative;
   background-color: #ffffff;
 
   &:not(:last-child) {
     border-bottom: none;
-  }
-
-  &:first-child {
-    &:after {
-      content: '';
-      width: calc(100% + 20px);
-      margin: 0 0 0 -20px;
-      position: absolute;
-      height: 1px;
-      background-color: #eaeaea;
-      bottom: 0;
-    }
+    border-bottom: 1px solid #eaeaea;
   }
 
   &:last-child {
@@ -156,7 +146,6 @@ const ListItem = styled.div`
 
 const ListItemValue = styled.p`
   margin: 0;
-  font-weight: 500;
   font-size: 16px;
   line-height: 23px;
   color: #1d1d22;

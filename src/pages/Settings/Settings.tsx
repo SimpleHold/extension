@@ -74,7 +74,7 @@ const Settings: React.FC = () => {
     }
   }
 
-  const onDownloadBackup = () => {
+  const onDownloadBackup = async () => {
     if (isDownloadManually) {
       openWebPage(getUrl('download-backup.html'))
     } else {
@@ -131,7 +131,15 @@ const Settings: React.FC = () => {
   }
 
   const onConfirmLogout = (): void => {
-    removeMany(['wallets', 'backup'])
+    removeMany([
+      'wallets',
+      'backup',
+      'activeSortKey',
+      'activeSortType',
+      'zeroBalancesFilter',
+      'hiddenWalletsFilter',
+      'selectedCurrenciesFilter',
+    ])
     history.push('/welcome')
   }
 

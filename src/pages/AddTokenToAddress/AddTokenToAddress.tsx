@@ -179,7 +179,13 @@ const AddTokenToAddress: React.FC = () => {
 
           <Styles.Actions>
             <Button label="Skip" isLight isSmall mr={7.5} onClick={onSkip} />
-            <Button label="Confirm" isSmall ml={7.5} onClick={onConfirm} />
+            <Button
+              label="Confirm"
+              disabled={!chainAddresses.length}
+              isSmall
+              ml={7.5}
+              onClick={onConfirm}
+            />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>

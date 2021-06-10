@@ -57,7 +57,7 @@ const SelectCurrency: React.FC = () => {
     return undefined
   }
 
-  const onAddAddress = (symbol: string): void => {
+  const onAddAddress = (symbol: string) => (): void => {
     const warning = getWarning(symbol)
 
     history.push('/new-wallet', {
@@ -66,11 +66,12 @@ const SelectCurrency: React.FC = () => {
     })
   }
 
-  const onAddToken = (symbol: string, chain: string, tokenName: string): void => {
+  const onAddToken = (symbol: string, chain: string, tokenName: string) => (): void => {
     const walletsList = getWallets()
 
     if (walletsList) {
       const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
+
       const getNetwork = networks.find(
         (network: IEthNetwork) => toLower(network.chain) === toLower(chain)
       )
@@ -81,7 +82,7 @@ const SelectCurrency: React.FC = () => {
           chain,
           chainName: getNetwork.name,
           tokenName,
-          tokenStandart: toLower(getNetwork.name) === 'bsc' ? 'BEP20' : 'ERC20',
+          tokenStandart: toLower(getNetwork.chain) === 'bsc' ? 'BEP20' : 'ERC20',
         })
       }
 
@@ -121,7 +122,7 @@ const SelectCurrency: React.FC = () => {
               const { name, symbol } = currency
 
               return (
-                <Styles.CurrencyBlock key={symbol} onClick={() => onAddAddress(symbol)}>
+                <Styles.CurrencyBlock key={symbol} onClick={onAddAddress(symbol)}>
                   <CurrencyLogo symbol={symbol} width={40} height={40} br={10} />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>
                   <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
@@ -135,7 +136,7 @@ const SelectCurrency: React.FC = () => {
               return (
                 <Styles.CurrencyBlock
                   key={`${symbol}/${chain}`}
-                  onClick={() => onAddToken(symbol, chain, name)}
+                  onClick={onAddToken(symbol, chain, name)}
                 >
                   <CurrencyLogo symbol={symbol} width={40} height={40} br={10} chain={chain} />
                   <Styles.CurrencyName>{name}</Styles.CurrencyName>

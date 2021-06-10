@@ -282,7 +282,6 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
             label={isShowResetButton() ? 'Reset' : 'Apply'}
             isSmall
             isDanger={isShowResetButton()}
-            disabled={isShowResetButton() ? false : isButtonDisabled()}
             onClick={isShowResetButton() ? onReset : onApplyFilters}
           />
         </Styles.Actions>
