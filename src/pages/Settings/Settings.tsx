@@ -74,9 +74,9 @@ const Settings: React.FC = () => {
     }
   }
 
-  const onDownloadBackup = () => {
+  const onDownloadBackup = async () => {
     if (isDownloadManually) {
-      openWebPage(getUrl('download-backup.html'))
+      openWebPage(getUrl('download-backup.html'), { removeCurrent: true })
     } else {
       const backup = getItem('backup')
 
