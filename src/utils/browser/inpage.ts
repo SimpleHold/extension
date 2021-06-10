@@ -38,6 +38,7 @@ addCustomEventListener('#sh-send-button', 'click', () => {
         amount: button.getAttribute('sh-amount'),
         recipientAddress: button.getAttribute('sh-recipient-address'),
         chain: button.getAttribute('sh-chain'),
+        extraId: button.getAttribute('sh-extra-id'),
       },
     })
   )

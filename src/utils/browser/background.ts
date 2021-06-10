@@ -6,6 +6,7 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 import { getUrl } from '@utils/extension'
 import { setItem } from '@utils/storage'
+import { generateTag } from '@utils/currencies/ripple'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -86,6 +87,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       amount,
       recipientAddress,
       chain,
+      extraId,
     } = request.data
 
     const tabs = await browser.tabs.query({ active: true })
@@ -94,7 +96,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     setItem('tab', JSON.stringify(currentTab[0]))
     setItem(
       'sendPageProps',
-      JSON.stringify({ readOnly, currency, amount, recipientAddress, chain })
+      JSON.stringify({ readOnly, currency, amount, recipientAddress, chain, extraId })
     )
 
     const checkExist: Tabs.Tab | undefined = tabs.find(
@@ -134,7 +136,7 @@ const generateContextMenu = async () => {
       ],
     })
 
-    const allowedSymbols = ['btc', 'eth', 'ltc', 'bnb', 'dash']
+    const allowedSymbols = ['btc', 'eth', 'ltc', 'bnb', 'dash', 'xrp']
 
     for (const [index, item] of allowedSymbols.entries()) {
       const getSymbolWallets = wallets.filter(
@@ -154,7 +156,7 @@ const generateContextMenu = async () => {
 
           const latestWallets = getSymbolWallets.slice(-5)
 
-          for (const latestWallet of latestWallets) {
+          for (const [indexWallet, latestWallet] of latestWallets.entries()) {
             const { address } = latestWallet
 
             browser.contextMenus.create({
@@ -163,6 +165,19 @@ const generateContextMenu = async () => {
               contexts: ['editable'],
               parentId: currencyMenu,
             })
+
+            if (indexWallet === latestWallets.length - 1 && item === 'xrp') {
+              const tag = generateTag()
+
+              if (tag?.length) {
+                browser.contextMenus.create({
+                  title: 'Generate Destination tag…',
+                  id: `${toLower(item)}_${tag}`,
+                  contexts: ['editable'],
+                  parentId: currencyMenu,
+                })
+              }
+            }
           }
         }
       }

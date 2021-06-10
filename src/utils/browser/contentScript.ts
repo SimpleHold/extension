@@ -86,7 +86,7 @@ document.addEventListener('request_send', async (request: IRequest) => {
   }
   activeRequest = request.type
 
-  const { readOnly, currency, amount, recipientAddress, chain } = request.detail
+  const { readOnly, currency, amount, recipientAddress, chain, extraId } = request.detail
   const { screenX, screenY, outerWidth } = window
 
   await browser.runtime.sendMessage({
@@ -100,6 +100,7 @@ document.addEventListener('request_send', async (request: IRequest) => {
       amount,
       recipientAddress,
       chain,
+      extraId,
     },
   })
 
