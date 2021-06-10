@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import numeral from 'numeral'
 import { BigNumber } from 'bignumber.js'
+import SVG from 'react-inlinesvg'
 
 // Components
 import Cover from '@components/Cover'
@@ -11,6 +12,7 @@ import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
 import Spinner from '@components/Spinner'
 import CurrenciesDropdown from '@components/CurrenciesDropdown'
+import Tooltip from '@components/Tooltip'
 
 // Utils
 import { getWallets, IWallet, updateBalance } from '@utils/wallet'
@@ -22,6 +24,8 @@ import {
   getAddressNetworkFee,
   formatUnit,
   getNetworkFeeSymbol,
+  getExtraIdName,
+  generateExtraId,
 } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
 
@@ -78,12 +82,14 @@ const Send: React.FC = () => {
   const [currencyBalance, setCurrencyBalance] = React.useState<number | null>(null)
   const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
   const [extraId, setExtraId] = React.useState<string>('')
+  const [extraIdName, setExtraIdName] = React.useState<string>('')
 
   const debounced = useDebounce(amount, 1000)
 
   React.useEffect(() => {
     getWalletsList()
     onGetNetworkFeeSymbol()
+    getExtraId()
   }, [])
 
   React.useEffect(() => {
@@ -106,7 +112,15 @@ const Send: React.FC = () => {
     }
   }, [networkFee])
 
-  const onGetNetworkFeeSymbol = () => {
+  const getExtraId = (): void => {
+    const name = getExtraIdName(symbol)
+
+    if (name) {
+      setExtraIdName(name)
+    }
+  }
+
+  const onGetNetworkFeeSymbol = (): void => {
     const data = getNetworkFeeSymbol(symbol, tokenChain)
     setNetworkFeeSymbol(data)
   }
@@ -320,13 +334,31 @@ const Send: React.FC = () => {
     e.preventDefault()
   }
 
+  const createExtraId = (): void => {
+    const newExtraId = generateExtraId(symbol)
+
+    if (newExtraId) {
+      setExtraId(newExtraId)
+    }
+  }
+
+  const extraIdInputButton = () => (
+    <Tooltip text="Generate destination tag" direction="right">
+      <Styles.InputButton onClick={createExtraId}>
+        <SVG src="../../assets/icons/generateExtraid.svg" width={16} height={16} />
+      </Styles.InputButton>
+    </Tooltip>
+  )
+
+  const withExtraid = extraIdName?.length > 0
+
   return (
     <Styles.Wrapper>
       <Cover />
       <Header withBack backTitle="Wallet" onBack={history.goBack} />
       <Styles.Container>
-        <Styles.Row>
-          <Styles.PageTitle>Send</Styles.PageTitle>
+        <Styles.Row withExtraid={withExtraid}>
+          {!extraIdName?.length ? <Styles.PageTitle>Send</Styles.PageTitle> : null}
           <Skeleton width={250} height={42} type="gray" mt={21} isLoading={balance === null}>
             <Styles.Balance>
               {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
@@ -336,7 +368,7 @@ const Send: React.FC = () => {
             <Styles.USDEstimated>{`$${price(estimated, 2)}`}</Styles.USDEstimated>
           </Skeleton>
         </Styles.Row>
-        <Styles.Form onSubmit={onSubmitForm}>
+        <Styles.Form onSubmit={onSubmitForm} withExtraid={withExtraid}>
           {addresses?.length ? (
             <CurrenciesDropdown
               label={currency?.name}
@@ -359,6 +391,15 @@ const Send: React.FC = () => {
             onBlurInput={onBlurAddressInput}
             disabled={balance === null}
           />
+          {extraIdName?.length ? (
+            <TextInput
+              label={`${extraIdName} (optional)`}
+              value={extraId}
+              onChange={setExtraId}
+              disabled={balance === null}
+              button={extraIdInputButton()}
+            />
+          ) : null}
           <TextInput
             label={`Amount (${toUpper(symbol)})`}
             value={amount}
@@ -369,19 +410,13 @@ const Send: React.FC = () => {
             disabled={balance === null}
           />
           <Styles.NetworkFeeBlock>
-            <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
+            <Styles.NetworkFeeLabel withExtraid={withExtraid}>Network fee:</Styles.NetworkFeeLabel>
             {isNetworkFeeLoading ? (
               <Spinner ml={10} size={16} />
             ) : (
-              <>
-                {networkFee === 0 ? (
-                  <Styles.NetworkFee>-</Styles.NetworkFee>
-                ) : (
-                  <Styles.NetworkFee>
-                    {networkFee} {toUpper(networkFeeSymbol)}
-                  </Styles.NetworkFee>
-                )}
-              </>
+              <Styles.NetworkFee withExtraid={withExtraid}>
+                {networkFee === 0 ? '-' : `${networkFee} ${toUpper(networkFeeSymbol)}`}
+              </Styles.NetworkFee>
             )}
             {isCurrencyBalanceError && currencyBalance !== null ? (
               <Styles.NetworkFeeError>

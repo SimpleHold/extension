@@ -14,6 +14,7 @@ interface Props {
   inputRef?: React.RefObject<HTMLInputElement>
   disabled?: boolean
   openFrom?: string
+  button?: React.ReactElement<any, any> | null
 }
 
 const TextInput: React.FC<Props> = (props) => {
@@ -28,6 +29,7 @@ const TextInput: React.FC<Props> = (props) => {
     inputRef,
     disabled,
     openFrom,
+    button,
   } = props
 
   const textInputRef = inputRef || React.useRef<HTMLInputElement>(null)
@@ -100,6 +102,7 @@ const TextInput: React.FC<Props> = (props) => {
       isFocused={isFocused}
       isError={errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0}
       disabled={disabled}
+      withButton={typeof button !== 'undefined'}
     >
       <Styles.Row isActive={isFocused || value?.length > 0} openFrom={openFrom}>
         <Styles.Label>
@@ -115,6 +118,7 @@ const TextInput: React.FC<Props> = (props) => {
           <Styles.EyeIcon isVisible={isPasswordVisible} />
         </Styles.VisibleInput>
       ) : null}
+      {button || null}
     </Styles.Container>
   )
 }

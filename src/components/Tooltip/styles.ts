@@ -6,6 +6,10 @@ type TContainerProps = {
   mt?: number
 }
 
+type TTooltipProps = {
+  direction?: 'left' | 'right'
+}
+
 const scale = keyframes`
   0% {
     transform: scale(.5) translateY(-100%);
@@ -42,6 +46,7 @@ const Tooltip = styled.div`
   background-color: #ffffff;
   border-radius: 5px;
   transform: scale(0);
+  right: ${({ direction }: TTooltipProps) => (direction === 'right' ? '-13px' : 'initial')};
 
   &:after {
     content: '';
@@ -50,7 +55,9 @@ const Tooltip = styled.div`
     width: 18px;
     height: 9px;
     background-image: url(${tooltipArrowIcon});
-    left: calc(100% / 2 - 9px);
+    left: ${({ direction }: TTooltipProps) =>
+      direction === 'right' ? 'initial' : 'calc(100% / 2 - 9px)'};
+    right: ${({ direction }: TTooltipProps) => (direction === 'right' ? '20px' : 'initial')};
     bottom: 100%;
   }
 `

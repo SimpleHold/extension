@@ -8,6 +8,7 @@ type TContainerProps = {
   isFocused: boolean
   isError: boolean
   disabled?: boolean
+  withButton: boolean
 }
 
 type TRowProps = {
@@ -30,7 +31,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: 0 0 10px 0;
-  padding: 0 19px;
+  padding: ${({ withButton }: TContainerProps) => (withButton ? '0 12px 0 20px' : '0 20px')};
 
   label {
     color: ${({ isFocused, isError }: TContainerProps) =>

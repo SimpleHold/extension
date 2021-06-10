@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+type TExtraIdProps = {
+  withExtraid: boolean
+}
+
 const Wrapper = styled.div`
   height: 600px;
 `
@@ -15,36 +19,41 @@ const Container = styled.div`
 `
 
 const Row = styled.div`
-  padding: 20px 30px 40px 30px;
-  flex: 1;
+  padding: ${({ withExtraid }: TExtraIdProps) =>
+    withExtraid ? '30px 30px 25px 30px' : '20px 30px 40px 30px'};
 `
 
 const PageTitle = styled.p`
-  margin: 0;
+  margin: 0 0 20px 0;
   font-size: 16px;
   line-height: 19px;
   color: #c3c3c3;
 `
 
 const Balance = styled.p`
-  margin: 21px 0 0 0;
+  margin: 0;
   font-weight: 500;
   font-size: 36px;
-  line-height: 42px;
+  line-height: 36px;
   color: #1d1d22;
 `
 
 const USDEstimated = styled.p`
-  margin: 5px 0 0 0;
+  margin: 10px 0 0 0;
   font-size: 20px;
   line-height: 23px;
   color: #7d7e8d;
 `
 
 const Form = styled.form`
-  padding: 20px 30px 30px 30px;
+  padding: ${({ withExtraid }: TExtraIdProps) =>
+    withExtraid ? '20px 30px' : '20px 30px 30px 30px'};
   background-color: #f8f8f8;
   border-top: 1px solid #eaeaea;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 `
 
 const NetworkFeeBlock = styled.div`
@@ -57,7 +66,7 @@ const NetworkFeeBlock = styled.div`
 const NetworkFeeLabel = styled.p`
   margin: 0;
   font-size: 14px;
-  line-height: 25px;
+  line-height: ${({ withExtraid }: TExtraIdProps) => (withExtraid ? '20px' : '25px')};
   color: #7d7e8d;
 `
 
@@ -65,7 +74,7 @@ const NetworkFee = styled.p`
   margin: 0 0 0 5px;
   font-weight: bold;
   font-size: 14px;
-  line-height: 25px;
+  line-height: ${({ withExtraid }: TExtraIdProps) => (withExtraid ? '20px' : '25px')};
   color: #7d7e8d;
 `
 
@@ -84,6 +93,18 @@ const NetworkFeeError = styled.p`
   top: 12px;
 `
 
+const InputButton = styled.div`
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    cursor: pointer;
+  }
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -97,6 +118,7 @@ const Styles = {
   NetworkFee,
   Actions,
   NetworkFeeError,
+  InputButton,
 }
 
 export default Styles
