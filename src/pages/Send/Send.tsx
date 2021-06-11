@@ -409,7 +409,7 @@ const Send: React.FC = () => {
             onBlurInput={onBlurAddressInput}
             disabled={balance === null}
           />
-          {extraIdName?.length ? (
+          {withExtraid ? (
             <TextInput
               label={`${extraIdName} (optional)`}
               value={extraId}

@@ -1,5 +1,13 @@
 import styled from 'styled-components'
 
+type THeadingProps = {
+  withExtraid: boolean
+}
+
+type TInputButtonProps = {
+  disabled?: boolean
+}
+
 const Body = styled.div`
   height: 640px;
   background-color: #ffffff;
@@ -10,7 +18,7 @@ const Body = styled.div`
 const Heading = styled.div`
   padding: 30px 30px 0 30px;
   border-bottom: 1px solid #eaeaea;
-  height: 220px;
+  height: ${({ withExtraid }: THeadingProps) => (withExtraid ? '200px' : '220px')};
 `
 
 const TitleRow = styled.div`
@@ -109,6 +117,18 @@ const NetworkFeeError = styled.p`
   top: 12px;
 `
 
+const InputButton = styled.div`
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    cursor: ${({ disabled }: TInputButtonProps) => (disabled ? 'default' : 'pointer')};
+  }
+`
+
 const Styles = {
   Body,
   Heading,
@@ -125,6 +145,7 @@ const Styles = {
   NetworkFee,
   Actions,
   NetworkFeeError,
+  InputButton,
 }
 
 export default Styles

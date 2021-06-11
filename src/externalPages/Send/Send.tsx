@@ -2,6 +2,7 @@ import * as React from 'react'
 import { render } from 'react-dom'
 import numeral from 'numeral'
 import { BigNumber } from 'bignumber.js'
+import SVG from 'react-inlinesvg'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -12,13 +13,21 @@ import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
 import Spinner from '@components/Spinner'
+import Tooltip from '@components/Tooltip'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
-import { validateAddress, getNewNetworkFee, formatUnit, getNetworkFeeSymbol } from '@utils/address'
+import {
+  validateAddress,
+  getNewNetworkFee,
+  formatUnit,
+  getNetworkFeeSymbol,
+  getExtraIdName,
+  generateExtraId,
+} from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
 import { getItem, setItem, removeItem } from '@utils/storage'
 
@@ -66,6 +75,7 @@ const Send: React.FC = () => {
   const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | ICardanoUnspentTxOutput[]>([])
   const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
   const [extraId, setExtraId] = React.useState<string>('')
+  const [extraIdName, setExtraIdName] = React.useState<string>('')
 
   const debounced = useDebounce(amount, 1000)
 
@@ -80,6 +90,7 @@ const Send: React.FC = () => {
       getCurrencyBalance()
       checkValidAddress()
       onGetNetworkFeeSymbol()
+      getExtraId()
     }
   }, [selectedWallet])
 
@@ -105,6 +116,16 @@ const Send: React.FC = () => {
       setNetworkFeeLoading(false)
     }
   }, [isNetworkFeeLoading, amountErrorLabel])
+
+  const getExtraId = (): void => {
+    if (selectedWallet) {
+      const name = getExtraIdName(selectedWallet.symbol)
+
+      if (name) {
+        setExtraIdName(name)
+      }
+    }
+  }
 
   const getOutputs = async (info: ICurrency): Promise<void> => {
     if (selectedWallet) {
@@ -470,10 +491,51 @@ const Send: React.FC = () => {
     return true
   }
 
+  const createExtraId = (): void => {
+    if (selectedWallet) {
+      const newExtraId = generateExtraId(selectedWallet.symbol)
+
+      if (newExtraId) {
+        setExtraId(newExtraId)
+      }
+    }
+  }
+
+  const extraIdInputButton = () => (
+    <Tooltip text="Generate destination tag" direction="right">
+      <Styles.InputButton onClick={createExtraId}>
+        <SVG src="../../assets/icons/generateExtraid.svg" width={16} height={16} />
+      </Styles.InputButton>
+    </Tooltip>
+  )
+
+  const amountInputButton = () => {
+    if (selectedWallet) {
+      if (toLower(selectedWallet.symbol) === 'xrp' && amountErrorLabel === 'Insufficient funds') {
+        return (
+          <Tooltip
+            text="The network requires at least 20 XRP balance at all times."
+            direction="right"
+            maxWidth={195}
+            textSpace="pre-wrap"
+          >
+            <Styles.InputButton disabled>
+              <SVG src="../../assets/icons/info.svg" width={16} height={16} />
+            </Styles.InputButton>
+          </Tooltip>
+        )
+      }
+    }
+
+    return null
+  }
+
+  const withExtraid = extraIdName.length > 0
+
   return (
     <ExternalPageContainer onClose={onClose} headerStyle="green">
       <Styles.Body>
-        <Styles.Heading>
+        <Styles.Heading withExtraid={withExtraid}>
           <Styles.TitleRow>
             <Styles.Title>Send it on</Styles.Title>
             {tabInfo ? (
@@ -527,6 +589,15 @@ const Send: React.FC = () => {
             onBlurInput={checkValidAddress}
             disabled={balance === null || props?.readOnly}
           />
+          {withExtraid ? (
+            <TextInput
+              label={`${extraIdName} (optional)`}
+              value={extraId}
+              onChange={setExtraId}
+              disabled={balance === null}
+              button={extraIdInputButton()}
+            />
+          ) : null}
           <TextInput
             label={`Amount (${toUpper(selectedWallet?.symbol)})`}
             value={amount}
@@ -536,6 +607,7 @@ const Send: React.FC = () => {
             errorLabel={amountErrorLabel}
             onBlurInput={onBlurAmountInput}
             disabled={props?.readOnly}
+            button={amountInputButton()}
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
