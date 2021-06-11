@@ -8,6 +8,8 @@ type TContainerProps = {
 
 type TTooltipProps = {
   direction?: 'left' | 'right'
+  maxWidth?: number
+  textSpace?: string
 }
 
 const scale = keyframes`
@@ -27,6 +29,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   filter: drop-shadow(0px 3px 15px rgba(125, 126, 141, 0.2));
+  z-index: 2;
 
   &:hover {
     cursor: pointer;
@@ -47,6 +50,11 @@ const Tooltip = styled.div`
   border-radius: 5px;
   transform: scale(0);
   right: ${({ direction }: TTooltipProps) => (direction === 'right' ? '-13px' : 'initial')};
+  width: ${({ maxWidth }: TTooltipProps) => (maxWidth ? `${maxWidth}px` : 'auto')};
+
+  span {
+    white-space: ${({ textSpace }: TTooltipProps) => textSpace || 'nowrap'};
+  }
 
   &:after {
     content: '';
@@ -66,7 +74,6 @@ const TooltipText = styled.span`
   font-size: 12px;
   line-height: 14px;
   color: #7d7e8d;
-  white-space: nowrap;
 `
 
 const Styles = {

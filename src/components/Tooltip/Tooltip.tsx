@@ -8,15 +8,22 @@ interface Props {
   text: string
   mt?: number
   direction?: 'left' | 'right'
+  maxWidth?: number
+  textSpace?: string
 }
 
 const Tooltip: React.FC<Props> = (props) => {
-  const { children, text, mt, direction } = props
+  const { children, text, mt, direction, maxWidth, textSpace } = props
 
   return (
     <Styles.Container mt={mt}>
       {children}
-      <Styles.Tooltip className="tooltip" direction={direction}>
+      <Styles.Tooltip
+        className="tooltip"
+        direction={direction}
+        maxWidth={maxWidth}
+        textSpace={textSpace}
+      >
         <Styles.TooltipText>{text}</Styles.TooltipText>
       </Styles.Tooltip>
     </Styles.Container>

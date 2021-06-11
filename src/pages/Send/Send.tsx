@@ -28,6 +28,7 @@ import {
   generateExtraId,
 } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
+import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -39,7 +40,6 @@ import useDebounce from '@hooks/useDebounce'
 
 // Styles
 import Styles from './styles'
-import { ICardanoUnspentTxOutput } from 'utils/currencies/cardano'
 
 interface LocationState {
   symbol: TSymbols
@@ -350,6 +350,24 @@ const Send: React.FC = () => {
     </Tooltip>
   )
 
+  const amountInputButton = () => {
+    if (toLower(symbol) === 'xrp' && amountErrorLabel === 'Insufficient funds') {
+      return (
+        <Tooltip
+          text="The network requires at least 20 XRP balance at all times."
+          direction="right"
+          maxWidth={195}
+          textSpace="pre-wrap"
+        >
+          <Styles.InputButton disabled>
+            <SVG src="../../assets/icons/info.svg" width={16} height={16} />
+          </Styles.InputButton>
+        </Tooltip>
+      )
+    }
+    return null
+  }
+
   const withExtraid = extraIdName?.length > 0
 
   return (
@@ -408,6 +426,7 @@ const Send: React.FC = () => {
             errorLabel={amountErrorLabel}
             onBlurInput={onBlurAmountInput}
             disabled={balance === null}
+            button={amountInputButton()}
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel withExtraid={withExtraid}>Network fee:</Styles.NetworkFeeLabel>

@@ -4,6 +4,10 @@ type TExtraIdProps = {
   withExtraid: boolean
 }
 
+type TInputButtonProps = {
+  disabled?: boolean
+}
+
 const Wrapper = styled.div`
   height: 600px;
 `
@@ -101,7 +105,7 @@ const InputButton = styled.div`
   justify-content: center;
 
   &:hover {
-    cursor: pointer;
+    cursor: ${({ disabled }: TInputButtonProps) => (disabled ? 'default' : 'pointer')};
   }
 `
 
