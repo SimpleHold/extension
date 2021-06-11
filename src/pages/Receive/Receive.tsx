@@ -14,6 +14,7 @@ import QRCode from '@components/QRCode'
 import CopyToClipboard from '@components/CopyToClipboard'
 import PendingBalance from '@components/PendingBalance'
 import Tooltip from '@components/Tooltip'
+import Warning from '@components/Warning'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -308,6 +309,17 @@ const Receive: React.FC = () => {
               <Styles.PendingRow>
                 <PendingBalance pending={pendingBalance} type="gray" symbol={symbol} />
               </Styles.PendingRow>
+            ) : null}
+
+            {balance !== null && balance < 20 && toLower(symbol) === 'xrp' ? (
+              <Warning
+                text="You need 20 XRP minimum to activate your XRP address."
+                color="#3FBB7D"
+                br={5}
+                mt={10}
+                padding="8px 10px"
+                background="rgba(211, 236, 221, 0.3)"
+              />
             ) : null}
           </Styles.Row>
 

@@ -1,10 +1,29 @@
 import styled from 'styled-components'
 
+type TContainerProps = {
+  color?: string
+  br?: number
+  mt?: number
+  padding?: string
+  background?: string
+}
+
 const Container = styled.div`
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  margin: 20px 0 0 0;
+  margin-top: ${({ mt }: TContainerProps) => (mt ? `${mt}px` : '20px')};
+  border-radius: ${({ br }: TContainerProps) => (br ? `${br}px` : '0')};
+  background: ${({ background }: TContainerProps) => background || 'none'};
+  padding: ${({ padding }: TContainerProps) => padding || '0'};
+
+  path {
+    fill: ${({ color }: TContainerProps) => color || '#C3C3C3'};
+  }
+
+  p {
+    color: ${({ color }: TContainerProps) => color || '#C3C3C3'};
+  }
 `
 
 const IconRow = styled.div`
@@ -20,7 +39,6 @@ const Text = styled.p`
   flex: 1;
   font-size: 14px;
   line-height: 19px;
-  color: #c3c3c3;
 `
 
 const Styles = {
