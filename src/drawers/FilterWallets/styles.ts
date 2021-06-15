@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+type TDropdownCurrencyProps = {
+  withChain: boolean
+}
+
 const Row = styled.div``
 
 const SelectCurrencyRow = styled.div`
@@ -74,6 +78,56 @@ const Actions = styled.div`
   margin: 30px 0 0 0;
 `
 
+const Dropdown = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1;
+`
+
+const DropdownRow = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+`
+
+const ArrowIconRow = styled.div`
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  svg {
+    transform: rotate(270deg);
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
+`
+
+const DropdownCurrenciesList = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+`
+
+const ThreeDots = styled.p`
+  margin: 0;
+  font-size: 16px;
+  line-height: 19px;
+  color: #7d7e8d;
+  margin: 0 0 0 6px;
+`
+
+const DropdownCurrency = styled.div`
+  &:not(:last-child) {
+    margin-right: ${({ withChain }: TDropdownCurrencyProps) => (withChain ? '1px' : '6px')};
+  }
+`
+
 const Styles = {
   Row,
   SelectCurrencyRow,
@@ -86,6 +140,12 @@ const Styles = {
   FilterBadgeText,
   SwitchRow,
   Actions,
+  Dropdown,
+  DropdownRow,
+  ArrowIconRow,
+  DropdownCurrenciesList,
+  ThreeDots,
+  DropdownCurrency,
 }
 
 export default Styles

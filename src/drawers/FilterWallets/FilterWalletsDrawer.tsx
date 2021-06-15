@@ -1,10 +1,12 @@
 import * as React from 'react'
+import SVG from 'react-inlinesvg'
 
 // Components
 import DrawerWrapper from '@components/DrawerWrapper'
 import CurrenciesDropdown, { TList } from '@components/CurrenciesDropdown/CurrenciesDropdown'
 import Button from '@components/Button'
 import Switch from '@components/Switch'
+import CurrencyLogo from '@components/CurrencyLogo'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
@@ -28,6 +30,7 @@ type TSelectedCurrency = {
   symbol?: string
   chain?: string
   type?: string
+  name?: string
 }
 
 const FilterWalletsDrawer: React.FC<Props> = (props) => {
@@ -67,12 +70,30 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
 
   const getSelectedCurrencies = (): void => {
     const getSelectedCurrenciesFilter = getItem('selectedCurrenciesFilter')
-    const parseData = getSelectedCurrenciesFilter
-      ? JSON.parse(getSelectedCurrenciesFilter)
-      : [{ type: 'All' }]
 
-    setSelectedCurrencies(parseData)
-    setPrevSelectedCurrencies(parseData)
+    let data
+
+    if (getSelectedCurrenciesFilter) {
+      data = JSON.parse(getSelectedCurrenciesFilter)
+    } else {
+      data = [{ type: 'All' }]
+
+      const currencies = getFilteredCurrencies()
+
+      if (currencies) {
+        const mapCurrencies = currencies.map((item: TList) => {
+          return {
+            symbol: item.logo?.symbol,
+            chain: item.logo?.chain,
+            name: item.logo?.name,
+          }
+        })
+        data = [...data, ...mapCurrencies]
+      }
+    }
+
+    setSelectedCurrencies(data)
+    setPrevSelectedCurrencies(data)
   }
 
   const checkFilters = (): void => {
@@ -90,7 +111,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
     }
   }
 
-  const getFiltersData = (): void => {
+  const getFilteredCurrencies = (): TList[] | null => {
     const wallets = getWallets()
 
     if (wallets?.length) {
@@ -102,7 +123,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       setTotalZeroBalancesWallets(getZeroBalances)
       setTotalHiddenWallet(getHiddenWallets)
 
-      const mapDropDownList: TList[] = wallets
+      return wallets
         .filter(
           (v, i, a) =>
             a.findIndex(
@@ -128,13 +149,20 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
             withRadioButton: true,
           }
         })
+    }
+    return null
+  }
 
-      mapDropDownList.unshift({
+  const getFiltersData = (): void => {
+    const currencies = getFilteredCurrencies()
+
+    if (currencies) {
+      currencies.unshift({
         withRadioButton: true,
         value: 'All',
       })
 
-      setDropDownList(mapDropDownList)
+      setDropDownList(currencies)
     }
   }
 
@@ -169,6 +197,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
               return {
                 symbol: list.logo?.symbol,
                 chain: list.logo?.chain,
+                name: list.logo?.name,
               }
             }),
           ])
@@ -224,6 +253,35 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
     onApply()
   }
 
+  const dropdownRowList = selectedCurrencies.filter(
+    (item: TSelectedCurrency) => item.type === undefined
+  )
+
+  const renderDropdownRow = (
+    <Styles.Dropdown>
+      <Styles.DropdownRow>
+        <Styles.DropdownCurrenciesList>
+          {dropdownRowList.map((item: TSelectedCurrency, index: number) => {
+            const { symbol, chain, name } = item
+
+            if (symbol && index < 5) {
+              return (
+                <Styles.DropdownCurrency key={`${symbol}/${chain}`} withChain={chain !== undefined}>
+                  <CurrencyLogo symbol={symbol} chain={chain} width={40} height={40} name={name} />
+                </Styles.DropdownCurrency>
+              )
+            }
+            return null
+          })}
+        </Styles.DropdownCurrenciesList>
+        {dropdownRowList.length > 5 ? <Styles.ThreeDots>...</Styles.ThreeDots> : null}
+      </Styles.DropdownRow>
+      <Styles.ArrowIconRow>
+        <SVG src="../../assets/icons/arrow.svg" width={8} height={14} />
+      </Styles.ArrowIconRow>
+    </Styles.Dropdown>
+  )
+
   return (
     <DrawerWrapper title="Filters" isActive={isActive} onClose={onClose} withCloseIcon>
       <Styles.Row>
@@ -233,6 +291,8 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
             label="Select currency"
             toggleRadioButton={toggleRadioButton}
             selectedCurrencies={selectedCurrencies}
+            renderRow={renderDropdownRow}
+            padding="10px"
           />
           <Styles.SelectedAmount>
             Selected{' '}
