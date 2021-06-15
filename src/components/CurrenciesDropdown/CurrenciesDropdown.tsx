@@ -51,6 +51,8 @@ interface Props {
   tokenName?: string
   toggleRadioButton?: (value: string) => void
   selectedCurrencies?: TSelectedCurrency[]
+  renderRow?: React.ReactElement<any, any> | null
+  padding?: string
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
@@ -67,6 +69,8 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     tokenName,
     toggleRadioButton,
     selectedCurrencies,
+    renderRow,
+    padding,
   } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
@@ -87,6 +91,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
         isVisible={isVisible}
         disabled={disabled}
         isNotSelected={!currencySymbol && !value}
+        padding={padding}
       >
         {currencySymbol ? (
           <CurrencyLogo
@@ -99,24 +104,21 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
             name={tokenName}
           />
         ) : null}
-        <Styles.Row isNotSelected={!currencySymbol && !value}>
-          <Styles.Info>
-            {label?.length ? (
-              <Styles.Label isNotSelected={!currencySymbol && !value}>{label}</Styles.Label>
+        {renderRow || (
+          <Styles.Row isNotSelected={!currencySymbol && !value}>
+            <Styles.Info>
+              {label?.length ? (
+                <Styles.Label isNotSelected={!currencySymbol && !value}>{label}</Styles.Label>
+              ) : null}
+              {value?.length ? <Styles.Value>{value}</Styles.Value> : null}
+            </Styles.Info>
+            {!disabled ? (
+              <Styles.ArrowIconRow>
+                <SVG src="../../assets/icons/arrow.svg" width={8} height={14} />
+              </Styles.ArrowIconRow>
             ) : null}
-            {value?.length ? <Styles.Value>{value}</Styles.Value> : null}
-          </Styles.Info>
-          {!disabled ? (
-            <Styles.ArrowIconRow>
-              <SVG
-                src="../../assets/icons/arrow.svg"
-                width={8}
-                height={14}
-                title="Select network"
-              />
-            </Styles.ArrowIconRow>
-          ) : null}
-        </Styles.Row>
+          </Styles.Row>
+        )}
       </Styles.Container>
 
       {!disabled ? (

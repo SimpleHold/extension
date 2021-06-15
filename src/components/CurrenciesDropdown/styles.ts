@@ -8,6 +8,7 @@ type TContainerProps = {
   disabled?: boolean
   isVisible: boolean
   isNotSelected: boolean
+  padding?: string
 }
 
 type TRowProps = {
@@ -36,8 +37,8 @@ const Wrapper = styled.div`
 `
 
 const Container = styled.div`
-  padding: ${({ isNotSelected }: TContainerProps) =>
-    isNotSelected ? '15px 10px 15px 20px' : '10px'};
+  padding: ${({ isNotSelected, padding }: TContainerProps) =>
+    isNotSelected ? padding || '15px 10px 15px 20px' : '10px'};
   background-color: #ffffff;
   border: ${({ isVisible }: TContainerProps) => `1px solid ${isVisible ? '#3fbb7d' : '#eaeaea'}`};
   border-radius: ${({ isVisible }: TContainerProps) => (isVisible ? '5px 5px 0px 0px' : '5px')};
