@@ -23,7 +23,11 @@ addCustomEventListener('#sh-button', 'click', () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
   if (findInput) {
-    document.dispatchEvent(new CustomEvent('request_addresses'))
+    if (!window.screenTop && !window.screenY) {
+      return
+    } else {
+      document.dispatchEvent(new CustomEvent('request_addresses'))
+    }
   }
 })
 

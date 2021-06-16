@@ -41,5 +41,9 @@
       "js": ["js/contentScript.bundle.js"]
     }
   ],
-  "web_accessible_resources": ["js/inpage.bundle.js"]
+  "web_accessible_resources": [
+    "js/inpage.bundle.js",
+    "js/selectAddress.bundle.js",
+    "select-address.html"
+  ]
 }
