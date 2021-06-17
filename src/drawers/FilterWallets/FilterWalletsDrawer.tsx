@@ -47,6 +47,18 @@ interface IState {
   prevSelectedCurrencies: TSelectedCurrency[]
 }
 
+const initialState = {
+  isShowHiddenAddress: false,
+  isShowZeroBalances: true,
+  totalHiddenWallets: 0,
+  totalZeroBalancesWallets: 0,
+  dropDownList: [],
+  isShowPrevHiddenAddress: false,
+  isShowPrevZeroBalances: true,
+  selectedCurrencies: [],
+  prevSelectedCurrencies: [],
+}
+
 const FilterWalletsDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive, onApply } = props
 
@@ -63,20 +75,11 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       prevSelectedCurrencies,
     },
     updateState,
-  } = useState<IState>({
-    isShowHiddenAddress: false,
-    isShowZeroBalances: true,
-    totalHiddenWallets: 0,
-    totalZeroBalancesWallets: 0,
-    dropDownList: [],
-    isShowPrevHiddenAddress: false,
-    isShowPrevZeroBalances: true,
-    selectedCurrencies: [],
-    prevSelectedCurrencies: [],
-  })
+  } = useState<IState>(initialState)
 
   React.useEffect(() => {
     if (isActive) {
+      updateState(initialState)
       checkFilters()
       getFiltersData()
       getSelectedCurrencies()
