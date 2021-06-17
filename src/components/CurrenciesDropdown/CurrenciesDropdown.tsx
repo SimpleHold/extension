@@ -54,7 +54,6 @@ interface Props {
   padding?: string
   withActions?: boolean
   onResetDropdown?: () => void
-  onApplyDropdown?: () => void
   onClose?: () => void
 }
 
@@ -76,7 +75,6 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     padding,
     withActions,
     onResetDropdown,
-    onApplyDropdown,
     onClose,
   } = props
 
@@ -93,10 +91,6 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
   React.useEffect(() => {
     if (isApplied) {
       setIsVisible(false)
-
-      if (onApplyDropdown) {
-        onApplyDropdown()
-      }
     }
   }, [isApplied])
 

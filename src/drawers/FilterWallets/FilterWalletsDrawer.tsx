@@ -79,7 +79,6 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
 
   React.useEffect(() => {
     if (isActive) {
-      updateState(initialState)
       checkFilters()
       getFiltersData()
       getSelectedCurrencies()
@@ -252,12 +251,6 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
     updateState({ selectedCurrencies: [] })
   }
 
-  const onApplyDropdown = (): void => {
-    if (selectedCurrencies.length) {
-      setItem('selectedCurrenciesFilter', JSON.stringify(selectedCurrencies))
-    }
-  }
-
   const renderDropdownRow = (
     <Styles.Dropdown isEmpty={!selectedCurrencies.length}>
       {selectedCurrencies.length ? (
@@ -307,7 +300,6 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
             withActions
             onClose={onResetDropdown}
             onResetDropdown={onResetDropdown}
-            onApplyDropdown={onApplyDropdown}
           />
           {selectedCurrencies.length ? (
             <Styles.SelectedAmount>
