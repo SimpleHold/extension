@@ -9,26 +9,14 @@ import Button from '@components/Button'
 import { toLower } from '@utils/format'
 import { getItem, setItem, removeItem } from '@utils/storage'
 
+// Hooks
+import useState from '@hooks/useState'
+
 // Assets
 import sortArrow from '@assets/icons/sortArrow.svg'
 
 // Styles
 import Styles from './styles'
-
-interface Props {
-  onClose: () => void
-  onApply: () => void
-  isActive: boolean
-}
-
-type ListItem = {
-  title: string
-  key: string
-  types: {
-    asc: string
-    desc: string
-  }
-}
 
 const list: ListItem[] = [
   {
@@ -57,11 +45,36 @@ const list: ListItem[] = [
   },
 ]
 
+interface Props {
+  onClose: () => void
+  onApply: () => void
+  isActive: boolean
+}
+
+type ListItem = {
+  title: string
+  key: string
+  types: {
+    asc: string
+    desc: string
+  }
+}
+
+interface IState {
+  activeSortKey: string | null
+  activeSortType: 'asc' | 'desc' | null
+}
+
 const SortWalletsDrawer: React.FC<Props> = (props) => {
   const { onClose, onApply, isActive } = props
 
-  const [activeSortKey, setActiveSortKey] = React.useState<string | null>(null)
-  const [activeSortType, setActiveSortType] = React.useState<'asc' | 'desc' | null>(null)
+  const {
+    state: { activeSortKey, activeSortType },
+    updateState,
+  } = useState<IState>({
+    activeSortKey: null,
+    activeSortType: null,
+  })
 
   React.useEffect(() => {
     checkActiveSortType()
@@ -77,8 +90,10 @@ const SortWalletsDrawer: React.FC<Props> = (props) => {
         : undefined
 
       if ((findListItem && getSortType === 'asc') || getSortType === 'desc') {
-        setActiveSortKey(getSortKey)
-        setActiveSortType(getSortType)
+        updateState({
+          activeSortKey: getSortKey,
+          activeSortType: getSortType,
+        })
       } else {
         removeItem('activeSortKey')
         removeItem('activeSortType')
@@ -106,14 +121,20 @@ const SortWalletsDrawer: React.FC<Props> = (props) => {
 
     if (findListItem) {
       if (activeSortKey === key) {
-        setActiveSortType(activeSortType === 'asc' ? 'desc' : null)
+        updateState({
+          activeSortType: activeSortType === 'asc' ? 'desc' : null,
+        })
 
         if (activeSortType === 'desc') {
-          setActiveSortKey(null)
+          updateState({
+            activeSortKey: null,
+          })
         }
       } else {
-        setActiveSortKey(key)
-        setActiveSortType('asc')
+        updateState({
+          activeSortKey: key,
+          activeSortType: 'asc',
+        })
       }
     }
   }

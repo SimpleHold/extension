@@ -46,6 +46,7 @@ interface IState {
   isShowPrevZeroBalances: boolean
   selectedCurrencies: TSelectedCurrency[]
   isInitialSetup: boolean
+  prevSelectedCurrencies: TSelectedCurrency[]
 }
 
 const FilterWalletsDrawer: React.FC<Props> = (props) => {
@@ -62,6 +63,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       isShowPrevZeroBalances,
       selectedCurrencies,
       isInitialSetup,
+      prevSelectedCurrencies,
     },
     updateState,
   } = useState<IState>({
@@ -74,6 +76,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
     isShowPrevZeroBalances: true,
     selectedCurrencies: [],
     isInitialSetup: true,
+    prevSelectedCurrencies: [],
   })
 
   React.useEffect(() => {
@@ -107,10 +110,12 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
 
       updateState({
         selectedCurrencies: data,
+        prevSelectedCurrencies: data,
       })
     } else {
       updateState({
         selectedCurrencies: [],
+        prevSelectedCurrencies: [],
       })
     }
   }
@@ -261,7 +266,8 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
   const isButtonDisabled = (): boolean => {
     return (
       isShowPrevHiddenAddress === isShowHiddenAddress &&
-      isShowPrevZeroBalances === isShowZeroBalances
+      isShowPrevZeroBalances === isShowZeroBalances &&
+      prevSelectedCurrencies.length === selectedCurrencies.length
     )
   }
 
@@ -288,14 +294,13 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
   )
 
   const onResetDropdown = (): void => {
-    getSelectedCurrencies()
+    updateState({ selectedCurrencies: [] })
   }
 
   const onApplyDropdown = (): void => {
     const filterSelectedCurrencies = selectedCurrencies.filter(
       (item: TSelectedCurrency) => item.type !== 'All'
     )
-
     if (filterSelectedCurrencies.length) {
       setItem('selectedCurrenciesFilter', JSON.stringify(filterSelectedCurrencies))
     }

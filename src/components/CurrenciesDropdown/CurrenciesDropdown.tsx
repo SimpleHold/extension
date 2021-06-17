@@ -55,8 +55,8 @@ interface Props {
   padding?: string
   withActions?: boolean
   onResetDropdown?: () => void
-  onClose?: () => void
   onApplyDropdown?: () => void
+  onClose?: () => void
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
@@ -77,17 +77,29 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     padding,
     withActions,
     onResetDropdown,
-    onClose,
     onApplyDropdown,
+    onClose,
   } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
+  const [isApplied, setApplied] = React.useState<boolean>(false)
+
   React.useEffect(() => {
-    if (!isVisible && onClose) {
+    if (!isVisible && !isApplied && onClose) {
       onClose()
     }
   }, [isVisible])
+
+  React.useEffect(() => {
+    if (isApplied) {
+      setIsVisible(false)
+
+      if (onApplyDropdown) {
+        onApplyDropdown()
+      }
+    }
+  }, [isApplied])
 
   const getTokenBackground =
     tokenChain && tokenName ? getCurrencyByChain(tokenChain)?.background : '#1D1D22'
@@ -96,19 +108,11 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     if (onSelect) {
       onSelect(index)
       setIsVisible(false)
-
-      if (onClose) {
-        onClose()
-      }
     }
   }
 
   const onApply = (): void => {
-    setIsVisible(false)
-
-    if (onApplyDropdown) {
-      onApplyDropdown()
-    }
+    setApplied(true)
   }
 
   return (
