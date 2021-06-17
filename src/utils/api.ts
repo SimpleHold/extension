@@ -239,7 +239,7 @@ export const getThetaNetworkFee = async (address: string): Promise<IGetNetworkFe
     return data.data
   } catch {
     return {
-      networkFee: 0.000001,
+      networkFee: 0.3,
     }
   }
 }

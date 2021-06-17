@@ -41,8 +41,8 @@ const TokenRow = styled.div`
     #1d1d22;
   border-radius: 10px;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -6px;
+  right: -6px;
   display: flex;
   align-items: center;
   justify-content: center;

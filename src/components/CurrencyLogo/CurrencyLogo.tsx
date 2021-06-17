@@ -26,11 +26,8 @@ const CurrencyLogo: React.FC<Props> = (props) => {
   const getChainogo = chain ? getCurrencyByChain(chain) : null
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
-  const containerWidth = typeof chain !== 'undefined' ? width + 5 : width
-  const containerHeight = typeof chain !== 'undefined' ? height + 5 : height
-
   return (
-    <Styles.Container width={containerWidth} height={containerHeight}>
+    <Styles.Container width={width} height={height}>
       <Styles.LogoRow
         width={width}
         height={height}

@@ -7,7 +7,8 @@ import { encrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
-import { getCurrencyByChain } from '@config/currencies'
+import { getCurrency, getCurrencyByChain } from '@config/currencies'
+import { getToken } from 'config/tokens'
 
 export interface IWallet {
   symbol: string
@@ -44,8 +45,17 @@ const sortByDate = (a: IWallet, b: IWallet, isAscending: boolean) => {
   return -1
 }
 
-const sortByName = (a: IWallet, b: IWallet, isAscending: boolean) => {
-  return isAscending ? a.symbol.localeCompare(b.symbol) : b.symbol.localeCompare(a.symbol)
+const sortByName = (a: IWallet, b: IWallet, isAscending: boolean): number => {
+  const currencyA = a.chain ? getToken(a.symbol, a.chain) : getCurrency(a.symbol)
+  const currencyB = b.chain ? getToken(b.symbol, b.chain) : getCurrency(b.symbol)
+
+  const nameA = a.name || currencyA?.name
+  const nameB = b.name || currencyB?.name
+
+  if (nameA && nameB) {
+    return isAscending ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA)
+  }
+  return -1
 }
 
 export const sortWallets = (a: IWallet, b: IWallet) => {

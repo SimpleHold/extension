@@ -53,6 +53,10 @@ interface Props {
   selectedCurrencies?: TSelectedCurrency[]
   renderRow?: React.ReactElement<any, any> | null
   padding?: string
+  withActions?: boolean
+  onResetDropdown?: () => void
+  onClose?: () => void
+  onApplyDropdown?: () => void
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
@@ -71,9 +75,20 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     selectedCurrencies,
     renderRow,
     padding,
+    withActions,
+    onResetDropdown,
+    onClose,
+    onApplyDropdown,
   } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
+
+  React.useEffect(() => {
+    if (!isVisible && onClose) {
+      onClose()
+    }
+  }, [isVisible])
+
   const getTokenBackground =
     tokenChain && tokenName ? getCurrencyByChain(tokenChain)?.background : '#1D1D22'
 
@@ -81,6 +96,18 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     if (onSelect) {
       onSelect(index)
       setIsVisible(false)
+
+      if (onClose) {
+        onClose()
+      }
+    }
+  }
+
+  const onApply = (): void => {
+    setIsVisible(false)
+
+    if (onApplyDropdown) {
+      onApplyDropdown()
     }
   }
 
@@ -122,55 +149,69 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
       </Styles.Container>
 
       {!disabled ? (
-        <Styles.NetworksList isVisible={isVisible}>
-          {list.map((item: TList, index: number) => {
-            const { logo, value, label, withRadioButton } = item
+        <Styles.DropdownRow isVisible={isVisible}>
+          <Styles.List maxHeight={withActions ? 180 : 240}>
+            {list.map((item: TList, index: number) => {
+              const { logo, value, label, withRadioButton } = item
 
-            const showRadioButton =
-              withRadioButton === true && typeof toggleRadioButton !== 'undefined'
-            const isRadioButtonActive = logo
-              ? selectedCurrencies?.find(
-                  (currency: TSelectedCurrency) =>
-                    toLower(currency.symbol) === toLower(logo.symbol) &&
-                    toLower(currency?.chain) === toLower(logo?.chain)
-                ) !== undefined
-              : selectedCurrencies?.find(
-                  (currency: TSelectedCurrency) => toLower(currency.type) === toLower(value)
-                ) !== undefined
+              const showRadioButton =
+                withRadioButton === true && typeof toggleRadioButton !== 'undefined'
+              const isRadioButtonActive = logo
+                ? selectedCurrencies?.find(
+                    (currency: TSelectedCurrency) =>
+                      toLower(currency.symbol) === toLower(logo.symbol) &&
+                      toLower(currency?.chain) === toLower(logo?.chain)
+                  ) !== undefined
+                : selectedCurrencies?.find(
+                    (currency: TSelectedCurrency) => toLower(currency.type) === toLower(value)
+                  ) !== undefined
 
-            return (
-              <Styles.ListItem
-                key={`${value}/${index}`}
-                onClick={() => (toggleRadioButton ? toggleRadioButton(value) : onSelectItem(index))}
-                disabled={false}
-                pv={showRadioButton && !logo ? 18 : 10}
-              >
-                {logo ? (
-                  <CurrencyLogo
-                    symbol={logo.symbol}
-                    width={logo.width}
-                    height={logo.height}
-                    br={logo.br}
-                    background={logo.background}
-                    chain={logo?.chain}
-                    name={logo?.name || tokenName}
-                  />
-                ) : null}
-                <Styles.ListItemRow withLogo={typeof logo !== 'undefined'}>
-                  {label?.length ? <Styles.ListItemLabel>{label}</Styles.ListItemLabel> : null}
-                  <Styles.ListItemValue>{value}</Styles.ListItemValue>
-                </Styles.ListItemRow>
+              return (
+                <Styles.ListItem
+                  key={`${value}/${index}`}
+                  onClick={() =>
+                    toggleRadioButton ? toggleRadioButton(value) : onSelectItem(index)
+                  }
+                  disabled={false}
+                  pv={showRadioButton && !logo ? 18 : 10}
+                >
+                  {logo ? (
+                    <CurrencyLogo
+                      symbol={logo.symbol}
+                      width={logo.width}
+                      height={logo.height}
+                      br={logo.br}
+                      background={logo.background}
+                      chain={logo?.chain}
+                      name={logo?.name || tokenName}
+                    />
+                  ) : null}
+                  <Styles.ListItemRow withLogo={typeof logo !== 'undefined'}>
+                    {label?.length ? <Styles.ListItemLabel>{label}</Styles.ListItemLabel> : null}
+                    <Styles.ListItemValue>{value}</Styles.ListItemValue>
+                  </Styles.ListItemRow>
 
-                {withRadioButton && typeof toggleRadioButton !== 'undefined' ? (
-                  <RadioButton
-                    isActive={isRadioButtonActive}
-                    onToggle={() => toggleRadioButton(value)}
-                  />
-                ) : null}
-              </Styles.ListItem>
-            )
-          })}
-        </Styles.NetworksList>
+                  {withRadioButton && typeof toggleRadioButton !== 'undefined' ? (
+                    <RadioButton
+                      isActive={isRadioButtonActive}
+                      onToggle={() => toggleRadioButton(value)}
+                    />
+                  ) : null}
+                </Styles.ListItem>
+              )
+            })}
+          </Styles.List>
+          {withActions ? (
+            <Styles.DropdownActions>
+              <Styles.DropdownButton color="#EB5757" onClick={onResetDropdown}>
+                <Styles.DropdownButtonLabel>Reset</Styles.DropdownButtonLabel>
+              </Styles.DropdownButton>
+              <Styles.DropdownButton color="#3FBB7D" onClick={onApply}>
+                <Styles.DropdownButtonLabel>Apply</Styles.DropdownButtonLabel>
+              </Styles.DropdownButton>
+            </Styles.DropdownActions>
+          ) : null}
+        </Styles.DropdownRow>
       ) : null}
     </Styles.Wrapper>
   )
