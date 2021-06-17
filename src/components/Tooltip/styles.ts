@@ -74,6 +74,7 @@ const TooltipText = styled.span`
   font-size: 12px;
   line-height: 14px;
   color: #7d7e8d;
+  user-select: none;
 `
 
 const Styles = {
