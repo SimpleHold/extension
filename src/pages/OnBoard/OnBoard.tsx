@@ -14,6 +14,8 @@ import arrowIcon from '@assets/icons/arrow.svg'
 // Utils
 import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
+import { getAllCookies, Cookie } from '@utils/extension'
+import { toLower } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -22,12 +24,40 @@ const OnBoard: React.FC = () => {
   const history = useHistory()
 
   const [currentStep, setCurrentStep] = React.useState<number>(0)
+  const [theme, setTheme] = React.useState<'simplehold' | 'swapspace'>('simplehold')
+
+  React.useEffect(() => {
+    getCookies()
+  }, [])
 
   React.useEffect(() => {
     logEvent({
       name: `ONBOARDING_${currentStep + 1}`,
     })
   }, [currentStep])
+
+  const getCookies = async () => {
+    const cookies = await getAllCookies('https://simplehold.io')
+
+    const getRef = cookies.find((cookie: Cookie) => cookie.name === 'ref')
+
+    if (getRef) {
+      const { value } = getRef
+
+      if (toLower(value) === 'swapspace') {
+        setTheme('swapspace')
+      }
+    }
+  }
+
+  const onNext = (): void => {
+    if (currentStep !== 2) {
+      setCurrentStep(currentStep + 1)
+    } else {
+      setItem('onBoard', 'passed')
+      history.push('/analytics-data')
+    }
+  }
 
   const steps = [
     {
@@ -49,15 +79,6 @@ const OnBoard: React.FC = () => {
         'Our support team is always glad to help you. Share your feedback or ask questions here. Besides that you can read more about us at our knowledge base.',
     },
   ]
-
-  const onNext = (): void => {
-    if (currentStep !== 2) {
-      setCurrentStep(currentStep + 1)
-    } else {
-      setItem('onBoard', 'passed')
-      history.push('/analytics-data')
-    }
-  }
 
   return (
     <Styles.Wrapper>

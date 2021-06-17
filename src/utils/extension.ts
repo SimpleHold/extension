@@ -1,4 +1,6 @@
-import { browser, Tabs } from 'webextension-polyfill-ts'
+import { browser, Tabs, Cookies } from 'webextension-polyfill-ts'
+
+export type Cookie = Cookies.Cookie
 
 export const getId = (): string => {
   return browser.runtime.id
@@ -37,4 +39,8 @@ export const updateTab = async (
   props: Tabs.UpdateUpdatePropertiesType
 ): Promise<Tabs.Tab> => {
   return await browser.tabs.update(tabId, props)
+}
+
+export const getAllCookies = async (url: string): Promise<Cookie[]> => {
+  return browser.cookies.getAll({ url })
 }
