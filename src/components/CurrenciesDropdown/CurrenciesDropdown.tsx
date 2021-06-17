@@ -35,7 +35,6 @@ export type TList = {
 type TSelectedCurrency = {
   symbol?: string
   chain?: string
-  type?: string
 }
 
 interface Props {
@@ -115,6 +114,14 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     setApplied(true)
   }
 
+  const onReset = (): void => {
+    setIsVisible(false)
+
+    if (onResetDropdown) {
+      onResetDropdown()
+    }
+  }
+
   return (
     <Styles.Wrapper ref={ref} isVisible={isVisible}>
       <Styles.Container
@@ -166,9 +173,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
                       toLower(currency.symbol) === toLower(logo.symbol) &&
                       toLower(currency?.chain) === toLower(logo?.chain)
                   ) !== undefined
-                : selectedCurrencies?.find(
-                    (currency: TSelectedCurrency) => toLower(currency.type) === toLower(value)
-                  ) !== undefined
+                : false
 
               return (
                 <Styles.ListItem
@@ -207,7 +212,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
           </Styles.List>
           {withActions ? (
             <Styles.DropdownActions>
-              <Styles.DropdownButton color="#EB5757" onClick={onResetDropdown}>
+              <Styles.DropdownButton color="#EB5757" onClick={onReset}>
                 <Styles.DropdownButtonLabel>Reset</Styles.DropdownButtonLabel>
               </Styles.DropdownButton>
               <Styles.DropdownButton color="#3FBB7D" onClick={onApply}>
