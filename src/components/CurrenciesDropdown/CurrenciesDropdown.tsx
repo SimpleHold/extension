@@ -35,7 +35,6 @@ export type TList = {
 type TSelectedCurrency = {
   symbol?: string
   chain?: string
-  type?: string
 }
 
 interface Props {
@@ -56,7 +55,6 @@ interface Props {
   withActions?: boolean
   onResetDropdown?: () => void
   onClose?: () => void
-  onApplyDropdown?: () => void
 }
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
@@ -78,16 +76,23 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     withActions,
     onResetDropdown,
     onClose,
-    onApplyDropdown,
   } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
+  const [isApplied, setApplied] = React.useState<boolean>(false)
+
   React.useEffect(() => {
-    if (!isVisible && onClose) {
+    if (!isVisible && !isApplied && onClose) {
       onClose()
     }
   }, [isVisible])
+
+  React.useEffect(() => {
+    if (isApplied) {
+      setIsVisible(false)
+    }
+  }, [isApplied])
 
   const getTokenBackground =
     tokenChain && tokenName ? getCurrencyByChain(tokenChain)?.background : '#1D1D22'
@@ -96,18 +101,18 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     if (onSelect) {
       onSelect(index)
       setIsVisible(false)
-
-      if (onClose) {
-        onClose()
-      }
     }
   }
 
   const onApply = (): void => {
+    setApplied(true)
+  }
+
+  const onReset = (): void => {
     setIsVisible(false)
 
-    if (onApplyDropdown) {
-      onApplyDropdown()
+    if (onResetDropdown) {
+      onResetDropdown()
     }
   }
 
@@ -162,9 +167,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
                       toLower(currency.symbol) === toLower(logo.symbol) &&
                       toLower(currency?.chain) === toLower(logo?.chain)
                   ) !== undefined
-                : selectedCurrencies?.find(
-                    (currency: TSelectedCurrency) => toLower(currency.type) === toLower(value)
-                  ) !== undefined
+                : false
 
               return (
                 <Styles.ListItem
@@ -203,7 +206,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
           </Styles.List>
           {withActions ? (
             <Styles.DropdownActions>
-              <Styles.DropdownButton color="#EB5757" onClick={onResetDropdown}>
+              <Styles.DropdownButton color="#EB5757" onClick={onReset}>
                 <Styles.DropdownButtonLabel>Reset</Styles.DropdownButtonLabel>
               </Styles.DropdownButton>
               <Styles.DropdownButton color="#3FBB7D" onClick={onApply}>
