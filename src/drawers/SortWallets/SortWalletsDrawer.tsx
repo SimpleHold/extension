@@ -32,7 +32,7 @@ type ListItem = {
 
 const list: ListItem[] = [
   {
-    title: 'Balances',
+    title: 'Balance',
     key: 'balances',
     types: {
       asc: 'Ascending',

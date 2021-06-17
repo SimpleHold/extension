@@ -1,13 +1,14 @@
 import styled from 'styled-components'
 
-type TDropdownCurrencyProps = {
-  withChain: boolean
+type TDropdownProps = {
+  isEmpty: boolean
 }
 
 const Row = styled.div``
 
 const SelectCurrencyRow = styled.div`
-  padding: 20px 0;
+  padding: 20px 0 45px 0;
+  position: relative;
 `
 
 const SelectedAmount = styled.p`
@@ -15,6 +16,8 @@ const SelectedAmount = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: #c3c3c3;
+  position: absolute;
+  bottom: 20px;
 `
 
 const DividerLine = styled.div`
@@ -83,6 +86,7 @@ const Dropdown = styled.div`
   flex-direction: row;
   align-items: center;
   flex: 1;
+  padding: ${({ isEmpty }: TDropdownProps) => (isEmpty ? '4px 0 4px 10px' : '0')};
 `
 
 const DropdownRow = styled.div`
@@ -124,8 +128,16 @@ const ThreeDots = styled.p`
 
 const DropdownCurrency = styled.div`
   &:not(:last-child) {
-    margin-right: ${({ withChain }: TDropdownCurrencyProps) => (withChain ? '1px' : '6px')};
+    margin-right: 6px;
   }
+`
+
+const DropdownLabel = styled.p`
+  margin: 0;
+  font-size: 16px;
+  line-height: 19px;
+  color: #7d7e8d;
+  flex: 1;
 `
 
 const Styles = {
@@ -146,6 +158,7 @@ const Styles = {
   DropdownCurrenciesList,
   ThreeDots,
   DropdownCurrency,
+  DropdownLabel,
 }
 
 export default Styles
