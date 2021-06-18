@@ -3,34 +3,49 @@ import { v4 } from 'uuid'
 import { IWallet } from '@utils/wallet'
 import { validateWallet } from '@utils/validate'
 
-export const generate = (address: string, privateKey: string): { [key: string]: string } => {
-  const walletUuid = v4()
-  const backup = JSON.stringify({
-    wallets: [
-      {
-        symbol: 'btc',
-        address,
-        uuid: walletUuid,
-        privateKey,
-        createdAt: new Date(),
-      },
-    ],
+type TGenerateCurrency = {
+  symbol: string
+  chain?: string
+  data: TGenerateAddress
+}
+
+type TBackup = {
+  wallets: IWallet[]
+  version: number
+  uuid: string
+}
+
+export const generate = (currencies: TGenerateCurrency[]): { [key: string]: string } => {
+  const wallets: IWallet[] = []
+
+  const backup: TBackup = {
+    wallets: [],
     version: 1.7,
     uuid: v4(),
-  })
+  }
 
-  const wallets = JSON.stringify([
-    {
-      symbol: 'btc',
+  for (const currency of currencies) {
+    const {
+      symbol,
+      chain,
+      data: { address, privateKey, mnemonic },
+    } = currency
+
+    const data = {
+      symbol,
+      chain,
       address,
-      uuid: walletUuid,
+      uuid: v4(),
       createdAt: new Date(),
-    },
-  ])
+    }
+
+    wallets.push(data)
+    backup.wallets.push({ ...data, ...{ privateKey, mnemonic } })
+  }
 
   return {
-    backup,
-    wallets,
+    backup: JSON.stringify(backup),
+    wallets: JSON.stringify(wallets),
   }
 }
 
