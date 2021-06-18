@@ -1,3 +1,6 @@
+import currencies, { ICurrency } from '@config/currencies'
+import tokens, { IToken } from '@config/tokens'
+
 const addCustomEventListener = (selector: string, event: any, handler: Function) => {
   const rootElement = document.querySelector<HTMLBodyElement>('body')
   if (rootElement) {
@@ -43,5 +46,35 @@ addCustomEventListener('#sh-send-button', 'click', () => {
     })
   )
 })
+
+const mapCurrencies = currencies.map((currency: ICurrency) => {
+  const { symbol, background } = currency
+
+  return {
+    symbol,
+    background,
+    type: 'currency',
+    logo: `https://simplehold.io/static/currencies/${symbol}.svg`,
+  }
+})
+
+const mapTokens = tokens.map((token: IToken) => {
+  const { symbol, background, chain } = token
+
+  return {
+    symbol,
+    background,
+    type: 'token',
+    chain,
+    logo: `https://simplehold.io/static/tokens/${symbol}.svg`,
+  }
+})
+
+const actualCode = `var shCurrencies = ${JSON.stringify([...mapCurrencies, ...mapTokens])};
+`
+
+const script = document.createElement('script')
+script.textContent = actualCode
+document.body.appendChild(script)
 
 export {}
