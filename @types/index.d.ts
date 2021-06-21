@@ -1,7 +1,31 @@
 declare module '*.png'
 declare module '*.svg'
 declare module '@thetalabs/theta-js'
-declare module 'nuls-sdk-js'
+
+declare module 'nuls-sdk-js' {
+  function newAddress(
+    chainId: number,
+    passWord: string,
+    prefix: string
+  ): {
+    address: string
+    pri: string
+  }
+  function importByKey(
+    chainId: number,
+    pri: string,
+    passWord: string,
+    prefix: string
+  ): {
+    address: string
+  }
+  function verifyAddress(
+    address: string
+  ): {
+    chainId: number
+    right: boolean
+  }
+}
 
 type TGenerateAddress = {
   address: string
