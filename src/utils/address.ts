@@ -18,6 +18,7 @@ import bitcoinLike from '@utils/bitcoinLike'
 import * as theta from '@utils/currencies/theta'
 import * as cardano from '@utils/currencies/cardano'
 import * as ripple from '@utils/currencies/ripple'
+import * as nuls from '@utils/currencies/nuls'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
@@ -48,7 +49,9 @@ export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boole
 }
 
 export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.generateWallet()
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.generateWallet()
   } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.generateWallet()
@@ -68,7 +71,9 @@ export const importPrivateKey = (
   privateKey: string,
   chain?: string
 ): string | null => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.importPrivateKey(privateKey)
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.importPrivateKey(privateKey)
   } else if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)

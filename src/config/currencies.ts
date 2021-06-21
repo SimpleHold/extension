@@ -12,6 +12,7 @@ import thetaLogo from '@assets/currencies/theta.svg'
 import tfuelLogo from '@assets/currencies/theta.svg'
 import cardanoLogo from '@assets/currencies/ada.svg'
 import rippleLogo from '@assets/currencies/xrp.svg'
+import nulsLogo from '@assets/currencies/nuls.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -129,6 +130,14 @@ const currencies: ICurrency[] = [
     background: '#5088BC',
     chain: 'ripple',
     minSendAmount: 1000,
+  },
+  {
+    name: 'Nuls',
+    symbol: 'nuls',
+    logo: nulsLogo,
+    background: '#69E291',
+    chain: 'nuls',
+    minSendAmount: 1, // Fix me
   },
 ]
 
