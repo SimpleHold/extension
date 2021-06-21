@@ -190,6 +190,12 @@ export const getNewNetworkFee = async (
 ): Promise<IGetNetworkFeeResponse | null> => {
   const { address, symbol, amount, from, to, chain, web3Params, outputs } = params
 
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return {
+      networkFee: 0.001,
+    }
+  }
+
   if (
     web3Params?.contractAddress ||
     web3Params?.decimals ||
@@ -237,6 +243,11 @@ export const getAddressNetworkFee = async (
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
   try {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return {
+        networkFee: 0.001,
+      }
+    }
     if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
       const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
       const data = await getEtherNetworkFee(
@@ -281,7 +292,9 @@ export const formatUnit = (
   unit?: web3.Unit
 ): number => {
   try {
-    if (ripple.coins.indexOf(symbol) !== -1) {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? nuls.fromNuls(value) : nuls.toNuls(value)
+    } else if (ripple.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
     } else if (cardano.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
@@ -311,7 +324,9 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.getExplorerLink(address)
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getExplorerLink(address)
   } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.getExplorerLink(address)
@@ -349,7 +364,9 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string | null => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.getTransactionLink(hash)
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getTransactionLink(hash)
   } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.getTransactionLink(hash)

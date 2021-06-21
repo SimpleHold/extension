@@ -137,7 +137,7 @@ const currencies: ICurrency[] = [
     logo: nulsLogo,
     background: '#69E291',
     chain: 'nuls',
-    minSendAmount: 1, // Fix me
+    minSendAmount: 100000,
   },
 ]
 
