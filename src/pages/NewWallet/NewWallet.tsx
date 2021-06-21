@@ -182,8 +182,9 @@ const NewWallet: React.FC = () => {
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
-            You can generate a new address or import a private key to add the address you already
-            use. Enter your password to keep your backup up-to-date and encrypted.
+            You can generate a new address or import a{' '}
+            {checkWithPhrase(symbol) ? 'recovery phrase' : 'private key'} to add the address you
+            already use. Enter your password to keep your backup up-to-date and encrypted.
           </Styles.Description>
 
           {warning ? <Warning text={warning} /> : null}

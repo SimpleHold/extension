@@ -481,7 +481,10 @@ const Send: React.FC = () => {
         !isCurrencyBalanceError
       ) {
         if (!outputs.length) {
-          if (bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1) {
+          if (
+            bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1 ||
+            toLower(selectedWallet.symbol) === 'ada'
+          ) {
             return true
           }
         }

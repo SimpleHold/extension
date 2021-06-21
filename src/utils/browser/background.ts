@@ -208,7 +208,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 
   if (tabs[0]?.id) {
     if (info.menuItemId !== 'sh-other-wallets') {
-      const [, address] = `${info.menuItemId}`.split('_')
+      const address = `${info.menuItemId}`.split('_')[1]
 
       await browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',
