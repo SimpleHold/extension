@@ -8,8 +8,8 @@ export const getUrl = (path: string): string => {
   return browser.extension.getURL(path)
 }
 
-export const openWebPage = (url: string): Promise<Tabs.Tab> => {
-  return browser.tabs.create({ url })
+export const openWebPage = async (url: string): Promise<void> => {
+  await browser.tabs.create({ url })
 }
 
 export const setBadgeBackgroundColor = (color: string) => {

@@ -1,19 +1,22 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import SVG from 'react-inlinesvg'
+import { browser } from 'webextension-polyfill-ts'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
 
 // Utils
 import { download } from '@utils/backup'
+import { getItem, removeItem } from '@utils/storage'
 
 // Styles
 import Styles from './styles'
 
 const DownloadBackup: React.FC = () => {
   React.useEffect(() => {
-    if (localStorage.getItem('isLocked')) {
+    checkExistPage()
+    if (getItem('isLocked')) {
       return
     }
 
@@ -22,12 +25,23 @@ const DownloadBackup: React.FC = () => {
     }, 2000)
   }, [])
 
+  const checkExistPage = async () => {
+    const tabs = await browser.tabs.query({
+      active: false,
+      url: browser.extension.getURL('download-backup.html'),
+    })
+
+    if (tabs[0]?.id) {
+      await browser.tabs.remove(tabs[0].id)
+    }
+  }
+
   const onDownload = (): void => {
-    const backup = localStorage.getItem('backup')
+    const backup = getItem('backup')
 
     if (backup) {
       download(backup)
-      localStorage.removeItem('backupStatus')
+      removeItem('backupStatus')
     }
   }
 
@@ -35,7 +49,7 @@ const DownloadBackup: React.FC = () => {
     window.close()
   }
 
-  if (localStorage.getItem('isLocked')) {
+  if (getItem('isLocked')) {
     return null
   }
 

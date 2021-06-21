@@ -8,6 +8,8 @@ import dashLogo from '@assets/currencies/dash.svg'
 import ethereumLogo from '@assets/currencies/eth.svg'
 import ethereumClassicLogo from '@assets/currencies/etc.svg'
 import binanceLogo from '@assets/currencies/bnb.svg'
+import thetaLogo from '@assets/currencies/theta.svg'
+import tfuelLogo from '@assets/currencies/theta.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -68,7 +70,7 @@ const currencies: ICurrency[] = [
     logo: dashLogo,
     background: '#008DE4',
     chain: 'dash',
-    minSendAmount: 200000,
+    minSendAmount: 100000,
   },
   {
     name: 'Ethereum',
@@ -92,6 +94,22 @@ const currencies: ICurrency[] = [
     logo: binanceLogo,
     background: '#EBBB4E',
     chain: 'bsc',
+    minSendAmount: 1000000000000000,
+  },
+  {
+    name: 'Theta',
+    symbol: 'theta',
+    logo: thetaLogo,
+    background: '#76CCD3',
+    chain: 'theta',
+    minSendAmount: 1000000000000000,
+  },
+  {
+    name: 'Theta Fuel',
+    symbol: 'tfuel',
+    logo: tfuelLogo,
+    background: '#EF8053',
+    chain: 'tfuel',
     minSendAmount: 1000000000000000,
   },
 ]

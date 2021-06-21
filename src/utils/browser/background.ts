@@ -5,6 +5,7 @@ import { IRequest } from '@utils/browser/types'
 import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 import { getUrl } from '@utils/extension'
+import { setItem } from '@utils/storage'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -36,7 +37,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
 
     const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
 
-    localStorage.setItem('tab', JSON.stringify(currentTab[0]))
+    setItem('tab', JSON.stringify(currentTab[0]))
 
     const tabs = await browser.tabs.query({ active: true })
 
@@ -90,8 +91,8 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     const tabs = await browser.tabs.query({ active: true })
     const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
 
-    localStorage.setItem('tab', JSON.stringify(currentTab[0]))
-    localStorage.setItem(
+    setItem('tab', JSON.stringify(currentTab[0]))
+    setItem(
       'sendPageProps',
       JSON.stringify({ readOnly, currency, amount, recipientAddress, chain })
     )
@@ -201,7 +202,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         },
       })
     } else {
-      localStorage.setItem('tab', JSON.stringify(tab))
+      setItem('tab', JSON.stringify(tab))
 
       const { screenX, screenY, outerWidth } = window
 

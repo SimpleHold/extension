@@ -41,8 +41,8 @@ const TokenRow = styled.div`
     #1d1d22;
   border-radius: 10px;
   position: absolute;
-  top: 0;
-  right: 0;
+  top: -6px;
+  right: -6px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,8 +53,7 @@ const TokenLogo = styled.img`
   height: 10px;
 `
 
-const LetterLogo = styled.p`
-  margin: 0;
+const LetterLogo = styled.span`
   font-size: 23px;
   line-height: 27px;
   text-transform: capitalize;

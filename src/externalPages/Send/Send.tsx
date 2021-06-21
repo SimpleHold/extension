@@ -17,8 +17,9 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
-import { validateAddress, getNewNetworkFee, isEthereumLike, formatUnit } from '@utils/address'
+import { validateAddress, getNewNetworkFee, formatUnit, getNetworkFeeSymbol } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
+import { getItem, setItem, removeItem } from '@utils/storage'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -65,7 +66,7 @@ const Send: React.FC = () => {
   const debounced = useDebounce(amount, 1000)
 
   React.useEffect(() => {
-    getWalletsList(localStorage.getItem('sendPageProps'))
+    getWalletsList(getItem('sendPageProps'))
     getStorageData()
   }, [])
 
@@ -74,7 +75,7 @@ const Send: React.FC = () => {
       getCurrencyInfo()
       getCurrencyBalance()
       checkValidAddress()
-      getNetworkFeeSymbol()
+      onGetNetworkFeeSymbol()
     }
   }, [selectedWallet])
 
@@ -110,14 +111,12 @@ const Send: React.FC = () => {
     }
   }
 
-  const getNetworkFeeSymbol = (): void => {
+  const onGetNetworkFeeSymbol = () => {
     if (selectedWallet) {
       const { chain, symbol } = selectedWallet
-      const currency = chain ? getCurrencyByChain(chain) : getCurrency(symbol)
 
-      if (currency) {
-        setNetworkFeeSymbol(currency.symbol)
-      }
+      const data = getNetworkFeeSymbol(symbol, chain)
+      setNetworkFeeSymbol(data)
     }
   }
 
@@ -156,7 +155,7 @@ const Send: React.FC = () => {
             setNetworkFee(data.networkFee)
           }
 
-          if (data.currencyBalance) {
+          if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
             setCurrencyBalance(data.currencyBalance)
           }
         }
@@ -179,8 +178,8 @@ const Send: React.FC = () => {
   }
 
   const getStorageData = (): void => {
-    const tabInfo = localStorage.getItem('tab')
-    const getProps = localStorage.getItem('sendPageProps')
+    const tabInfo = getItem('tab')
+    const getProps = getItem('sendPageProps')
 
     if (tabInfo) {
       const { favIconUrl = undefined, url = undefined } = JSON.parse(tabInfo)
@@ -191,7 +190,7 @@ const Send: React.FC = () => {
           url: new URL(url).host,
         })
       }
-      localStorage.removeItem('tab')
+      removeItem('tab')
     }
 
     if (getProps) {
@@ -277,8 +276,8 @@ const Send: React.FC = () => {
   }
 
   const onClose = (): void => {
-    if (localStorage.getItem('sendPageProps')) {
-      localStorage.removeItem('sendPageProps')
+    if (getItem('sendPageProps')) {
+      removeItem('sendPageProps')
     }
 
     window.close()
@@ -309,7 +308,7 @@ const Send: React.FC = () => {
         decimals: selectedWallet?.decimals,
       }
 
-      localStorage.setItem('sendConfirmationData', JSON.stringify(data))
+      setItem('sendConfirmationData', JSON.stringify(data))
       await updateTab(currenctTab.id, {
         url,
       })
@@ -361,11 +360,10 @@ const Send: React.FC = () => {
       setAddressErrorLabel(null)
     }
 
-    if (selectedWallet) {
+    if (selectedWallet && currencyInfo) {
       if (
         address.length &&
-        // @ts-ignore
-        !validateAddress(selectedWallet.symbol, address, selectedWallet?.chain)
+        !validateAddress(selectedWallet.symbol, currencyInfo.chain, address, selectedWallet?.chain)
       ) {
         return setAddressErrorLabel('Address is not valid')
       }
@@ -414,17 +412,31 @@ const Send: React.FC = () => {
     }
   }
 
+  const isCurrencyBalanceError =
+    selectedWallet &&
+    (selectedWallet?.chain || toLower(selectedWallet.symbol) === 'theta') &&
+    currencyBalance !== null &&
+    !isNetworkFeeLoading &&
+    networkFee &&
+    networkFee > currencyBalance
+
   const isButtonDisabled = (): boolean => {
     if (selectedWallet && currencyInfo) {
       if (
-        validateAddress(selectedWallet.symbol, address, selectedWallet?.chain) &&
+        validateAddress(
+          selectedWallet.symbol,
+          currencyInfo.chain,
+          address,
+          selectedWallet?.chain
+        ) &&
         amount.length &&
         Number(amount) > 0 &&
         addressErrorLabel === null &&
         amountErrorLabel === null &&
         Number(balance) > 0 &&
         networkFee > 0 &&
-        !isNetworkFeeLoading
+        !isNetworkFeeLoading &&
+        !isCurrencyBalanceError
       ) {
         if (!outputs.length) {
           if (bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1) {
@@ -519,11 +531,11 @@ const Send: React.FC = () => {
                 )}
               </>
             )}
-            {selectedWallet?.chain &&
-            !isNetworkFeeLoading &&
-            networkFee &&
-            networkFee > currencyBalance ? (
-              <Styles.NetworkFeeError>Insufficient funds</Styles.NetworkFeeError>
+            {isCurrencyBalanceError ? (
+              <Styles.NetworkFeeError>
+                Insufficient funds {Number(networkFee - currencyBalance)}{' '}
+                {toUpper(networkFeeSymbol)}
+              </Styles.NetworkFeeError>
             ) : null}
           </Styles.NetworkFeeBlock>
 

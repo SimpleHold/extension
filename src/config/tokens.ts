@@ -264,7 +264,8 @@ export const checkExistWallet = (
         const findExist = walletsList.find(
           (walletItem: IWallet) =>
             toLower(walletItem.address) === toLower(wallet.address) &&
-            toLower(walletItem.symbol) === toLower(symbol)
+            toLower(walletItem.symbol) === toLower(symbol) &&
+            toLower(walletItem?.chain) === toLower(chain)
         )
 
         if (!findExist) {
@@ -287,18 +288,19 @@ export const getUnusedAddressesForToken = (
   const getCurrencyInfo = getCurrencyByChain(chain)
 
   if (getCurrencyInfo) {
-    const filterWallets = walletsList
-      .filter((wallet) => toLower(wallet.symbol) === toLower(getCurrencyInfo.symbol))
-      .filter((wallet) => toLower(wallet.symbol) !== toLower(symbol))
+    const filterWallets = walletsList.filter(
+      (wallet: IWallet) => toLower(wallet.symbol) === toLower(getCurrencyInfo.symbol)
+    )
 
     for (const wallet of filterWallets) {
-      if (
-        !walletsList.find(
-          (walletItem) =>
-            toLower(walletItem.symbol) === toLower(symbol) &&
-            toLower(walletItem.address) === toLower(wallet.address)
-        )
-      ) {
+      const findExist = walletsList.find(
+        (walletItem: IWallet) =>
+          toLower(walletItem.address) === toLower(wallet.address) &&
+          toLower(walletItem.symbol) === toLower(symbol) &&
+          toLower(walletItem.chain) === toLower(getCurrencyInfo.chain)
+      )
+
+      if (!findExist) {
         addresses.push(wallet.address)
       }
     }

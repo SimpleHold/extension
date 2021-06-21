@@ -10,9 +10,38 @@ const WalletsList = styled.div`
   top: 290px;
 `
 
+const AddWalletButton = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  background-color: #3fbb7d;
+  filter: drop-shadow(0px 2px 10px rgba(125, 126, 141, 0.3));
+  position: fixed;
+  bottom: 20px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #31a76c;
+  }
+`
+
+const NotFound = styled.p`
+  margin: 0;
+  font-size: 16px;
+  line-height: 23px;
+  color: #7d7e8d;
+`
+
 const Styles = {
   Wrapper,
   WalletsList,
+  AddWalletButton,
+  NotFound,
 }
 
 export default Styles
