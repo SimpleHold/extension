@@ -119,6 +119,14 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     if (findIframe) {
       findIframe.parentNode?.removeChild(findIframe)
     }
+  } else if (request.type === 'drag') {
+    const { currentX, currentY } = request.data
+
+    const findIframe = document.getElementById('sh-iframe')
+
+    if (findIframe) {
+      findIframe.style.transform = 'translate3d(' + currentX + 'px, ' + currentY + 'px, 0)'
+    }
   }
 })
 

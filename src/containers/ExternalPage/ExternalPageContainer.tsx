@@ -1,5 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
+import { browser } from 'webextension-polyfill-ts'
 
 // Components
 import Cover from '@components/Cover'
@@ -47,6 +48,9 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
 
   React.useEffect(() => {
     if (isDraggable) {
+      setTimeout(() => {
+        makeDraggable()
+      }, 0)
     }
   }, [isDraggable])
 
@@ -72,6 +76,62 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
       checkPasscode()
     }
   }, [passcode])
+
+  const makeDraggable = () => {
+    const getHeader = document.querySelector('.sh-header')
+    const container = document.querySelector('body')
+
+    if (getHeader && container) {
+      var active = false
+      var currentX: number
+      var currentY: number
+      var initialX: number
+      var initialY: number
+      var xOffset: number = 0
+      var yOffset: number = 0
+
+      const dragStart = (event: MouseEvent) => {
+        initialX = event.clientX - xOffset
+        initialY = event.clientY - yOffset
+
+        // @ts-ignore
+        if (getHeader.contains(event.target)) {
+          active = true
+        }
+      }
+
+      const dragEnd = () => {
+        initialX = currentX
+        initialY = currentY
+
+        active = false
+      }
+
+      const drag = (event: MouseEvent) => {
+        if (active) {
+          event.preventDefault()
+
+          currentX = event.clientX - initialX
+          currentY = event.clientY - initialY
+
+          xOffset = currentX
+          yOffset = currentY
+
+          browser.runtime.sendMessage({
+            type: 'drag',
+            data: {
+              currentX,
+              currentY,
+            },
+          })
+        }
+      }
+
+      container.addEventListener('mousedown', dragStart, false)
+      container.addEventListener('mouseup', dragEnd, false)
+      container.addEventListener('mousemove', drag, false)
+    }
+  }
 
   const checkPasscode = (): void => {
     const getPasscodeHash = getItem('passcode')

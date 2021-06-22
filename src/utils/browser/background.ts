@@ -59,20 +59,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       top: screenY,
     })
     activeRequest = null
-  }
-
-  if (request.type === 'set_address' || request.type === 'close_select_address_window') {
-    const tabs = await browser.tabs.query({
-      active: true,
-      windowId: currentWindowId,
-    })
-
-    if (tabs[0]?.id) {
-      browser.tabs.sendMessage(tabs[0].id, request)
-    }
-  }
-
-  if (request.type === 'request_send') {
+  } else if (request.type === 'request_send') {
     if (activeRequest === request.type) {
       return
     }
@@ -116,6 +103,15 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       top: screenY,
     })
     activeRequest = null
+  } else {
+    const tabs = await browser.tabs.query({
+      active: true,
+      windowId: currentWindowId,
+    })
+
+    if (tabs[0]?.id) {
+      browser.tabs.sendMessage(tabs[0].id, request)
+    }
   }
 })
 
