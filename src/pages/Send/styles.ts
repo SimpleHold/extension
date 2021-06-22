@@ -6,6 +6,7 @@ type TExtraIdProps = {
 
 type TInputButtonProps = {
   disabled?: boolean
+  withHover?: boolean
 }
 
 const Wrapper = styled.div`
@@ -106,6 +107,9 @@ const InputButton = styled.div`
 
   &:hover {
     cursor: ${({ disabled }: TInputButtonProps) => (disabled ? 'default' : 'pointer')};
+    background-color: ${({ withHover }: TInputButtonProps) =>
+      withHover ? 'rgba(234, 234, 234, 0.5)' : 'none'};
+    border-radius: ${({ withHover }: TInputButtonProps) => (withHover ? '15px' : 'none')};
   }
 `
 
