@@ -506,7 +506,7 @@ const Send: React.FC = () => {
 
   const extraIdInputButton = () => (
     <Tooltip text="Generate destination tag" direction="right">
-      <Styles.InputButton onClick={createExtraId}>
+      <Styles.InputButton onClick={createExtraId} withHover>
         <SVG src="../../assets/icons/generateExtraid.svg" width={16} height={16} />
       </Styles.InputButton>
     </Tooltip>
