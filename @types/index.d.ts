@@ -18,6 +18,8 @@ declare module 'nuls-sdk-js' {
     prefix: string
   ): {
     address: string
+    pub: string
+    pri: string
   }
   function verifyAddress(
     address: string
@@ -25,6 +27,8 @@ declare module 'nuls-sdk-js' {
     chainId: number
     right: boolean
   }
+  function transactionAssemble(inputs: any, outputs: any, remark: string, type: number): any
+  function transactionSerialize(pri: string, pub: string, assembleTx: any): string
 }
 
 type TGenerateAddress = {

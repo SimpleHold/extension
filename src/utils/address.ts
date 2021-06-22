@@ -121,6 +121,9 @@ export const createTransaction = async ({
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return await nuls.createTransaction(from, to, amount, privateKey)
+    }
     if (ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
       return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData, extraId)
     }
