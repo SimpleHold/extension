@@ -33,23 +33,37 @@ addCustomEventListener('#sh-button', 'click', () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
   if (findInput && !window.screenTop && !window.screenY) {
+    const currency = document.getElementById('sh-button')?.getAttribute('sh-currency')
+    const chain = document.getElementById('sh-button')?.getAttribute('sh-currency-chain')
+
+    const iframeContainer = document.createElement('div')
     const iframe = document.createElement('iframe')
 
-    iframe.id = 'sh-iframe'
+    iframeContainer.id = 'sh-iframe'
 
     const { screenX, outerWidth } = window
 
+    iframeContainer.style.width = '375px'
+    iframeContainer.style.height = '700px'
+    iframeContainer.style.position = 'fixed'
+    iframeContainer.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
+    iframeContainer.style.top = '0'
+    iframeContainer.style.zIndex = '100'
+    iframeContainer.style.borderRadius = '16px'
+    iframeContainer.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
+
     iframe.style.width = '375px'
     iframe.style.height = '700px'
-    iframe.style.position = 'absolute'
-    iframe.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
-    iframe.style.top = '0'
-    iframe.style.zIndex = '100'
     iframe.style.border = 'none'
+    iframe.style.borderRadius = '16px'
 
-    iframe.src = browser.extension.getURL('select-address.html')
+    iframe.src = browser.extension.getURL(
+      `select-address.html?currency=${currency}&chain=${chain}&isDraggable=true`
+    )
 
-    document.body.insertBefore(iframe, document.body.firstChild)
+    iframeContainer.appendChild(iframe)
+
+    document.body.insertBefore(iframeContainer, document.body.firstChild)
   }
 })
 
@@ -99,6 +113,12 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
 
     copy(data.address)
     document.execCommand('paste')
+  } else if (request.type === 'close_select_address_window') {
+    const findIframe = document.getElementById('sh-iframe')
+
+    if (findIframe) {
+      findIframe.parentNode?.removeChild(findIframe)
+    }
   }
 })
 

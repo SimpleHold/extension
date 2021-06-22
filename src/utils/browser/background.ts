@@ -61,7 +61,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     activeRequest = null
   }
 
-  if (request.type === 'set_address') {
+  if (request.type === 'set_address' || request.type === 'close_select_address_window') {
     const tabs = await browser.tabs.query({
       active: true,
       windowId: currentWindowId,

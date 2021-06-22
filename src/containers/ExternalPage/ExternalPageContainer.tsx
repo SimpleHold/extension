@@ -23,10 +23,11 @@ interface Props {
   backPageUrl?: string
   height?: string
   headerStyle: 'white' | 'green'
+  isDraggable?: boolean
 }
 
 const ExternalPageContainer: React.FC<Props> = (props) => {
-  const { onClose, children, backPageTitle, backPageUrl, height, headerStyle } = props
+  const { onClose, children, backPageTitle, backPageUrl, height, headerStyle, isDraggable } = props
 
   const [isLocked, setIsLocked] = React.useState<boolean>(getItem('isLocked') !== null)
   const [passcode, setPasscode] = React.useState<string>('')
@@ -43,6 +44,11 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
       window.removeEventListener('storage', localStorageUpdated)
     }
   }, [])
+
+  React.useEffect(() => {
+    if (isDraggable) {
+    }
+  }, [isDraggable])
 
   React.useEffect(() => {
     if (getItem('isLocked') && !getItem('passcode')) {
@@ -161,7 +167,7 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
       />
       <Styles.Extension height={height}>
         {headerStyle === 'green' ? <Cover /> : null}
-        <Styles.Header>
+        <Styles.Header className="sh-header" isDraggable={isDraggable}>
           <Styles.Logo headerStyle={headerStyle}>
             <SVG src="../../assets/logo.svg" width={30} height={24} />
           </Styles.Logo>

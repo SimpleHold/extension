@@ -39,10 +39,11 @@ const SelectAddress: React.FC = () => {
   const [isFiltersActive, setFiltersActive] = React.useState<boolean>(false)
   const [selectedCurrency, setSelectedCurrency] = React.useState<TSelectedCurrency | null>(null)
   const [tabInfo, setTabInfo] = React.useState<TabInfo | null>(null)
+  const [isDraggable, setIsDraggable] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     getWalletsList()
-    getInitialCurrency()
+    getQueryParams()
     checkActiveTab()
 
     document.body.style.overflow = 'hidden'
@@ -65,11 +66,12 @@ const SelectAddress: React.FC = () => {
     }
   }
 
-  const getInitialCurrency = (): void => {
+  const getQueryParams = (): void => {
     const searchParams = new URLSearchParams(location.search)
 
     const queryCurrency = searchParams.get('currency')
     const queryChain = searchParams.get('chain')
+    const queryDraggable = searchParams.get('isDraggable')
 
     const parseChain = queryChain !== 'null' && queryChain !== null ? queryChain : null
 
@@ -89,6 +91,10 @@ const SelectAddress: React.FC = () => {
         })
       }
     }
+
+    if (queryDraggable === 'true') {
+      setIsDraggable(true)
+    }
   }
 
   const getWalletsList = () => {
@@ -101,9 +107,13 @@ const SelectAddress: React.FC = () => {
 
   const onClose = (): void => {
     window.close()
+
+    browser.runtime.sendMessage({
+      type: 'close_select_address_window',
+    })
   }
 
-  const handleClick = (address: string) => {
+  const handleClick = (address: string) => (): void => {
     browser.runtime.sendMessage({
       type: 'set_address',
       data: {
@@ -184,7 +194,7 @@ const SelectAddress: React.FC = () => {
   })
 
   return (
-    <ExternalPageContainer onClose={onClose} headerStyle="green">
+    <ExternalPageContainer onClose={onClose} headerStyle="green" isDraggable={isDraggable}>
       <Styles.Body>
         <Styles.Row>
           <Styles.Title>Select Address</Styles.Title>
@@ -243,7 +253,7 @@ const SelectAddress: React.FC = () => {
                     name={name}
                     contractAddress={contractAddress}
                     decimals={decimals}
-                    handleClick={() => handleClick(address)}
+                    handleClick={handleClick(address)}
                   />
                 )
               })}
