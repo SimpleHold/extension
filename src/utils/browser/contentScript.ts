@@ -4,6 +4,14 @@ import copy from 'copy-to-clipboard'
 // Utils
 import { IRequest } from '@utils/browser/types'
 
+let currentXPosition: number = 0
+let currentYPosition: number = 0
+let initialXPosition: number = 0
+let initialYPosition: number = 0
+let xOffset: number = 0
+let yOffset: number = 0
+let isDraggableActive: boolean = false
+
 const setSHAttribute = async () => {
   document.documentElement.setAttribute('sh-ex-status', 'installed')
 }
@@ -29,41 +37,48 @@ const addCustomEventListener = (selector: string, event: any, handler: Function)
   }
 }
 
-addCustomEventListener('#sh-button', 'click', () => {
+const removeIframe = () => {
+  const findIframe = document.getElementById('sh-iframe')
+
+  if (findIframe) {
+    findIframe.parentNode?.removeChild(findIframe)
+  }
+}
+
+addCustomEventListener('#sh-button', 'click', async () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
   if (findInput && !window.screenTop && !window.screenY) {
+    removeIframe()
+
+    await browser.runtime.sendMessage({
+      type: 'save_tab_info',
+    })
+
     const currency = document.getElementById('sh-button')?.getAttribute('sh-currency')
     const chain = document.getElementById('sh-button')?.getAttribute('sh-currency-chain')
 
-    const iframeContainer = document.createElement('div')
     const iframe = document.createElement('iframe')
 
-    iframeContainer.id = 'sh-iframe'
+    iframe.id = 'sh-iframe'
 
     const { screenX, outerWidth } = window
 
-    iframeContainer.style.width = '375px'
-    iframeContainer.style.height = '700px'
-    iframeContainer.style.position = 'fixed'
-    iframeContainer.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
-    iframeContainer.style.top = '0'
-    iframeContainer.style.zIndex = '100'
-    iframeContainer.style.borderRadius = '16px'
-    iframeContainer.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
-
     iframe.style.width = '375px'
     iframe.style.height = '700px'
-    iframe.style.border = 'none'
+    iframe.style.position = 'absolute'
+    iframe.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
+    iframe.style.top = '0'
+    iframe.style.zIndex = '100'
     iframe.style.borderRadius = '16px'
+    iframe.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
+    iframe.style.border = 'none'
 
     iframe.src = browser.extension.getURL(
       `select-address.html?currency=${currency}&chain=${chain}&isDraggable=true`
     )
 
-    iframeContainer.appendChild(iframe)
-
-    document.body.insertBefore(iframeContainer, document.body.firstChild)
+    document.body.insertBefore(iframe, document.body.firstChild)
   }
 })
 
@@ -102,11 +117,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       document.execCommand('delete')
       document.execCommand('paste')
 
-      const findIframe = document.getElementById('sh-iframe')
-
-      if (findIframe) {
-        findIframe.parentNode?.removeChild(findIframe)
-      }
+      removeIframe()
     }
   } else if (request.type === 'context-menu-address') {
     const { data } = request
@@ -114,18 +125,37 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     copy(data.address)
     document.execCommand('paste')
   } else if (request.type === 'close_select_address_window') {
-    const findIframe = document.getElementById('sh-iframe')
+    removeIframe()
+  } else if (request.type === 'initial_drag_positions') {
+    const { clientX, clientY } = request.data
 
-    if (findIframe) {
-      findIframe.parentNode?.removeChild(findIframe)
+    initialXPosition = clientX - xOffset
+    initialYPosition = clientY - yOffset
+  } else if (request.type === 'set_drag_active') {
+    const { isActive } = request.data
+
+    isDraggableActive = isActive
+
+    if (!isActive) {
+      initialXPosition = currentXPosition
+      initialYPosition = currentYPosition
     }
   } else if (request.type === 'drag') {
-    const { currentX, currentY } = request.data
+    const { clientX, clientY } = request.data
 
-    const findIframe = document.getElementById('sh-iframe')
+    if (isDraggableActive) {
+      currentXPosition = clientX - initialXPosition
+      currentYPosition = clientY - initialYPosition
 
-    if (findIframe) {
-      findIframe.style.transform = 'translate3d(' + currentX + 'px, ' + currentY + 'px, 0)'
+      xOffset = clientX
+      yOffset = clientY
+
+      const findIframe = document.getElementById('sh-iframe')
+
+      if (findIframe) {
+        findIframe.style.transform =
+          'translate3d(' + currentXPosition + 'px, ' + currentYPosition + 'px, 0)'
+      }
     }
   }
 })

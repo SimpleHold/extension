@@ -103,6 +103,9 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       top: screenY,
     })
     activeRequest = null
+  } else if (request.type === 'save_tab_info') {
+    const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
+    setItem('tab', JSON.stringify(currentTab[0]))
   } else {
     const tabs = await browser.tabs.query({
       active: true,
@@ -207,7 +210,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
       await browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',
         data: {
-          address: data
+          address: data,
         },
       })
     } else {
