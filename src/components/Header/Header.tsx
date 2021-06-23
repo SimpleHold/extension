@@ -20,6 +20,8 @@ interface Props {
   onBack?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   withBorder?: boolean
   activePage?: string
+  borderColor?: string
+  isAbsolute?: boolean
 }
 
 const Header: React.FC<Props> = (props) => {
@@ -31,6 +33,8 @@ const Header: React.FC<Props> = (props) => {
     onBack,
     withBorder,
     activePage,
+    borderColor,
+    isAbsolute,
   } = props
 
   const history = useHistory()
@@ -51,7 +55,7 @@ const Header: React.FC<Props> = (props) => {
   }
 
   return (
-    <Styles.Container withBorder={withBorder}>
+    <Styles.Container withBorder={withBorder} borderColor={borderColor} isAbsolute={isAbsolute}>
       <Styles.LogoRow>
         <Styles.Logo color={logoColor}>
           <SVG src="../../assets/logo.svg" width={30} height={30} title="SimleHold" />
