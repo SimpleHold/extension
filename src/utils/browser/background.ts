@@ -167,16 +167,12 @@ const generateContextMenu = async () => {
             })
 
             if (indexWallet === latestWallets.length - 1 && item === 'xrp') {
-              const tag = generateTag()
-
-              if (tag?.length) {
-                browser.contextMenus.create({
-                  title: 'Generate Destination tag…',
-                  id: `${toLower(item)}_${tag}`,
-                  contexts: ['editable'],
-                  parentId: currencyMenu,
-                })
-              }
+              browser.contextMenus.create({
+                title: 'Generate Destination tag…',
+                id: `${toLower(item)}_extraId`,
+                contexts: ['editable'],
+                parentId: currencyMenu,
+              })
             }
           }
         }
@@ -208,12 +204,14 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 
   if (tabs[0]?.id) {
     if (info.menuItemId !== 'sh-other-wallets') {
-      const address = `${info.menuItemId}`.split('_')[1]
+      const menuItemId = `${info.menuItemId}`.split('_')[1]
+
+      const data = menuItemId === 'extraId' ? generateTag() : menuItemId
 
       await browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',
         data: {
-          address,
+          address: data
         },
       })
     } else {
