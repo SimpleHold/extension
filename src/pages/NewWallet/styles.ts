@@ -4,10 +4,6 @@ type TActionsProps = {
   mt: number
 }
 
-type TActionProps = {
-  size: 'small' | 'big'
-}
-
 const Wrapper = styled.div`
   height: 600px;
   overflow: hidden;
@@ -44,13 +40,13 @@ const Action = styled.div`
   border: 1px solid #dfdfdf;
   box-sizing: border-box;
   border-radius: 5px;
-  padding: ${({ size }: TActionProps) => (size === 'big' ? '38px 0' : '29px 0')};
+  padding: 29px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
 
   &:not(:last-child) {
-    margin-bottom: ${({ size }: TActionProps) => (size === 'big' ? '20px' : '15px')};
+    margin-bottom: 15px;
   }
 
   &:hover {
@@ -60,17 +56,17 @@ const Action = styled.div`
 `
 
 const ActionIcon = styled.div`
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
 `
 
 const ActionName = styled.p`
-  margin: 10px 0 0 0;
+  margin: 5px 0 0 0;
   font-size: 16px;
-  line-height: 19px;
+  line-height: 23px;
   color: #3fbb7d;
 `
 

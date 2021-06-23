@@ -23,6 +23,7 @@ export interface IWallet {
   decimals?: number
   createdAt?: Date
   isHidden?: boolean
+  mnemonic?: string
 }
 
 type TSelectedWalletFilter = {
@@ -189,7 +190,8 @@ export const addNew = (
   chain?: string,
   tokenName?: string,
   contractAddress?: string,
-  decimals?: number
+  decimals?: number,
+  mnemonic?: string | null
 ): string | null => {
   const parseBackup = JSON.parse(decryptBackup)
 
@@ -224,7 +226,7 @@ export const addNew = (
       }
 
       parseWallets.push(data)
-      parseBackup.wallets.push({ ...data, ...{ privateKey } })
+      parseBackup.wallets.push({ ...data, ...{ privateKey, mnemonic } })
 
       setItem('backup', encrypt(JSON.stringify(parseBackup), password))
       setItem('wallets', JSON.stringify(parseWallets))

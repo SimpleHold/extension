@@ -17,13 +17,13 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
-import { generate, importPrivateKey } from '@utils/address'
+import { generate, importPrivateKey, importRecoveryPhrase } from '@utils/address'
 import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
-import { getCurrencyByChain, ICurrency } from '@config/currencies'
+import { getCurrencyByChain, ICurrency, checkWithPhrase } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -43,6 +43,7 @@ const NewWallet: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
+  const [mnemonic, setMnemonic] = React.useState<null | string>(null)
 
   const history = useHistory()
   const {
@@ -65,7 +66,11 @@ const NewWallet: React.FC = () => {
     const generateAddress = generate(symbol, chain)
 
     if (generateAddress) {
-      const { privateKey: walletPrivateKey } = generateAddress
+      const { privateKey: walletPrivateKey, mnemonic: walletMnemonic } = generateAddress
+
+      if (walletMnemonic) {
+        setMnemonic(walletMnemonic)
+      }
 
       setPrivateKey(walletPrivateKey)
       setActiveDrawer('confirm')
@@ -103,7 +108,16 @@ const NewWallet: React.FC = () => {
         const decryptBackup = decrypt(backup, password)
 
         if (decryptBackup) {
-          const address = importPrivateKey(symbol, privateKey, chain)
+          let address
+
+          if (mnemonic) {
+            const tryImportPhrase = importRecoveryPhrase(symbol, mnemonic)
+            if (tryImportPhrase) {
+              address = tryImportPhrase.address
+            }
+          } else {
+            address = importPrivateKey(symbol, privateKey, chain)
+          }
 
           if (address) {
             const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
@@ -119,7 +133,8 @@ const NewWallet: React.FC = () => {
               chain,
               tokenName,
               contractAddress,
-              decimals
+              decimals,
+              mnemonic
             )
 
             if (walletsList) {
@@ -153,6 +168,12 @@ const NewWallet: React.FC = () => {
     })
   }
 
+  const onImportPhrase = (): void => {
+    history.push('/import-recovery-phrase', {
+      symbol,
+    })
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -161,25 +182,41 @@ const NewWallet: React.FC = () => {
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
-            You can generate a new address or import a private key to add the address you already
-            use. Enter your password to keep your backup up-to-date and encrypted.
+            You can generate a new address or import a{' '}
+            {checkWithPhrase(symbol) ? 'recovery phrase' : 'private key'} to add the address you
+            already use. Enter your password to keep your backup up-to-date and encrypted.
           </Styles.Description>
 
           {warning ? <Warning text={warning} /> : null}
 
           <Styles.Actions mt={warning ? 26 : 32}>
-            <Styles.Action onClick={onImportPrivateKey} size={warning ? 'small' : 'big'}>
-              <Styles.ActionIcon>
-                <SVG
-                  src="../../assets/icons/import.svg"
-                  width={18}
-                  height={18}
-                  title="Import a private key"
-                />
-              </Styles.ActionIcon>
-              <Styles.ActionName>Import a private key</Styles.ActionName>
-            </Styles.Action>
-            <Styles.Action onClick={onGenerateAddress} size={warning ? 'small' : 'big'}>
+            {checkWithPhrase(symbol) ? (
+              <Styles.Action onClick={onImportPhrase}>
+                <Styles.ActionIcon>
+                  <SVG
+                    src="../../assets/icons/phrase.svg"
+                    width={16}
+                    height={16}
+                    title="Import a recovery phrase"
+                  />
+                </Styles.ActionIcon>
+                <Styles.ActionName>Import a recovery phrase</Styles.ActionName>
+              </Styles.Action>
+            ) : (
+              <Styles.Action onClick={onImportPrivateKey}>
+                <Styles.ActionIcon>
+                  <SVG
+                    src="../../assets/icons/import.svg"
+                    width={18}
+                    height={18}
+                    title="Import a private key"
+                  />
+                </Styles.ActionIcon>
+                <Styles.ActionName>Import a private key</Styles.ActionName>
+              </Styles.Action>
+            )}
+
+            <Styles.Action onClick={onGenerateAddress}>
               <Styles.ActionIcon>
                 <SVG
                   src="../../assets/icons/plusCircle.svg"

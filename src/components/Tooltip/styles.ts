@@ -6,6 +6,12 @@ type TContainerProps = {
   mt?: number
 }
 
+type TTooltipProps = {
+  direction?: 'left' | 'right'
+  maxWidth?: number
+  textSpace?: string
+}
+
 const scale = keyframes`
   0% {
     transform: scale(.5) translateY(-100%);
@@ -23,6 +29,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   filter: drop-shadow(0px 3px 15px rgba(125, 126, 141, 0.2));
+  z-index: 2;
 
   &:hover {
     cursor: pointer;
@@ -42,6 +49,12 @@ const Tooltip = styled.div`
   background-color: #ffffff;
   border-radius: 5px;
   transform: scale(0);
+  right: ${({ direction }: TTooltipProps) => (direction === 'right' ? '-13px' : 'initial')};
+  width: ${({ maxWidth }: TTooltipProps) => (maxWidth ? `${maxWidth}px` : 'auto')};
+
+  span {
+    white-space: ${({ textSpace }: TTooltipProps) => textSpace || 'nowrap'};
+  }
 
   &:after {
     content: '';
@@ -50,7 +63,9 @@ const Tooltip = styled.div`
     width: 18px;
     height: 9px;
     background-image: url(${tooltipArrowIcon});
-    left: calc(100% / 2 - 9px);
+    left: ${({ direction }: TTooltipProps) =>
+      direction === 'right' ? 'initial' : 'calc(100% / 2 - 9px)'};
+    right: ${({ direction }: TTooltipProps) => (direction === 'right' ? '20px' : 'initial')};
     bottom: 100%;
   }
 `
@@ -59,7 +74,7 @@ const TooltipText = styled.span`
   font-size: 12px;
   line-height: 14px;
   color: #7d7e8d;
-  white-space: nowrap;
+  user-select: none;
 `
 
 const Styles = {

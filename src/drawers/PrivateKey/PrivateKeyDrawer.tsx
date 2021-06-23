@@ -12,13 +12,18 @@ interface Props {
   onClose: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   isActive: boolean
   privateKey: string | null
+  isMnemonic?: boolean
 }
 
 const PrivateKeyDrawer: React.FC<Props> = (props) => {
-  const { onClose, isActive, privateKey } = props
+  const { onClose, isActive, privateKey, isMnemonic } = props
 
   return (
-    <DrawerWrapper title="Private key" isActive={isActive} onClose={onClose}>
+    <DrawerWrapper
+      title={isMnemonic ? 'Recovery phrase' : 'Private key'}
+      isActive={isActive}
+      onClose={onClose}
+    >
       <Styles.Row>
         {privateKey ? (
           <CopyToClipboard value={privateKey}>

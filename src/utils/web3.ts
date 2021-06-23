@@ -96,9 +96,9 @@ export const createTransaction = async (
   gasPrice: string,
   nonce: number,
   privateKey: string
-): Promise<TCreatedTransaction | null> => {
+): Promise<string | null> => {
   try {
-    const { rawTransaction, transactionHash } = await web3.eth.accounts.signTransaction(
+    const { rawTransaction } = await web3.eth.accounts.signTransaction(
       {
         to,
         value,
@@ -110,11 +110,8 @@ export const createTransaction = async (
       privateKey
     )
 
-    if (rawTransaction && transactionHash) {
-      return {
-        raw: rawTransaction,
-        hash: transactionHash,
-      }
+    if (rawTransaction) {
+      return rawTransaction
     }
 
     return null
@@ -133,12 +130,12 @@ export const transferToken = async ({
   nonce,
   chainId,
   contractAddress,
-}: TransferTokenOptions): Promise<TCreatedTransaction | null> => {
+}: TransferTokenOptions): Promise<string | null> => {
   try {
     const contract = new web3.eth.Contract(contractABI, contractAddress, { from })
     const data = contract.methods.transfer(to, value)
 
-    const { rawTransaction, transactionHash } = await web3.eth.accounts.signTransaction(
+    const { rawTransaction } = await web3.eth.accounts.signTransaction(
       {
         to: contractAddress,
         gasPrice,
@@ -150,11 +147,8 @@ export const transferToken = async ({
       privateKey
     )
 
-    if (rawTransaction && transactionHash) {
-      return {
-        raw: rawTransaction,
-        hash: transactionHash,
-      }
+    if (rawTransaction) {
+      return rawTransaction
     }
 
     return null

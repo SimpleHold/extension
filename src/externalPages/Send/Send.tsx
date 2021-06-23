@@ -1,6 +1,8 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import numeral from 'numeral'
+import { BigNumber } from 'bignumber.js'
+import SVG from 'react-inlinesvg'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -11,13 +13,21 @@ import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
 import Spinner from '@components/Spinner'
+import Tooltip from '@components/Tooltip'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper } from '@utils/format'
-import { validateAddress, getNewNetworkFee, formatUnit, getNetworkFeeSymbol } from '@utils/address'
+import {
+  validateAddress,
+  getNewNetworkFee,
+  formatUnit,
+  getNetworkFeeSymbol,
+  getExtraIdName,
+  generateExtraId,
+} from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
 import { getItem, setItem, removeItem } from '@utils/storage'
 
@@ -30,6 +40,7 @@ import useDebounce from '@hooks/useDebounce'
 
 // Styles
 import Styles from './styles'
+import { ICardanoUnspentTxOutput } from 'utils/currencies/cardano'
 
 type TabInfo = {
   favIconUrl: string
@@ -42,6 +53,7 @@ interface Props {
   amount?: number
   recipientAddress?: string
   chain?: string
+  extraId?: string
 }
 
 const Send: React.FC = () => {
@@ -60,8 +72,10 @@ const Send: React.FC = () => {
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
   const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
-  const [utxosList, setUtxosList] = React.useState<UnspentOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | ICardanoUnspentTxOutput[]>([])
   const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
+  const [extraId, setExtraId] = React.useState<string>('')
+  const [extraIdName, setExtraIdName] = React.useState<string>('')
 
   const debounced = useDebounce(amount, 1000)
 
@@ -76,6 +90,7 @@ const Send: React.FC = () => {
       getCurrencyBalance()
       checkValidAddress()
       onGetNetworkFeeSymbol()
+      getExtraId()
     }
   }, [selectedWallet])
 
@@ -101,6 +116,16 @@ const Send: React.FC = () => {
       setNetworkFeeLoading(false)
     }
   }, [isNetworkFeeLoading, amountErrorLabel])
+
+  const getExtraId = (): void => {
+    if (selectedWallet) {
+      const name = getExtraIdName(selectedWallet.symbol)
+
+      if (name) {
+        setExtraIdName(name)
+      }
+    }
+  }
 
   const getOutputs = async (info: ICurrency): Promise<void> => {
     if (selectedWallet) {
@@ -173,6 +198,10 @@ const Send: React.FC = () => {
 
       if (recipientAddress?.length) {
         setAddress(recipientAddress)
+      }
+
+      if (props?.extraId) {
+        setExtraId(props.extraId)
       }
     }
   }
@@ -306,6 +335,7 @@ const Send: React.FC = () => {
         contractAddress: selectedWallet?.contractAddress,
         tokenChain: selectedWallet?.chain,
         decimals: selectedWallet?.decimals,
+        extraId,
       }
 
       setItem('sendConfirmationData', JSON.stringify(data))
@@ -378,12 +408,24 @@ const Send: React.FC = () => {
     }
   }
 
+  const getAvailableBalance = (): number => {
+    if (balance && selectedWallet) {
+      if (toLower(selectedWallet?.symbol) === 'xrp') {
+        return new BigNumber(balance).minus(20).toNumber()
+      }
+      return Number(balance)
+    }
+    return 0
+  }
+
   const onBlurAmountInput = (): void => {
     if (amountErrorLabel) {
       setAmountErrorLabel(null)
     }
 
-    if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
+    const availableBalance = getAvailableBalance()
+
+    if (amount.length && Number(amount) + Number(networkFee) >= Number(availableBalance)) {
       return setAmountErrorLabel('Insufficient funds')
     }
 
@@ -439,7 +481,10 @@ const Send: React.FC = () => {
         !isCurrencyBalanceError
       ) {
         if (!outputs.length) {
-          if (bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1) {
+          if (
+            bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1 ||
+            toLower(selectedWallet.symbol) === 'ada'
+          ) {
             return true
           }
         }
@@ -449,10 +494,51 @@ const Send: React.FC = () => {
     return true
   }
 
+  const createExtraId = (): void => {
+    if (selectedWallet) {
+      const newExtraId = generateExtraId(selectedWallet.symbol)
+
+      if (newExtraId) {
+        setExtraId(newExtraId)
+      }
+    }
+  }
+
+  const extraIdInputButton = () => (
+    <Tooltip text="Generate destination tag" direction="right">
+      <Styles.InputButton onClick={createExtraId} withHover>
+        <SVG src="../../assets/icons/generateExtraid.svg" width={16} height={16} />
+      </Styles.InputButton>
+    </Tooltip>
+  )
+
+  const amountInputButton = () => {
+    if (selectedWallet) {
+      if (toLower(selectedWallet.symbol) === 'xrp' && amountErrorLabel === 'Insufficient funds') {
+        return (
+          <Tooltip
+            text="The network requires at least 20 XRP balance at all times."
+            direction="right"
+            maxWidth={195}
+            textSpace="pre-wrap"
+          >
+            <Styles.InputButton disabled>
+              <SVG src="../../assets/icons/info.svg" width={16} height={16} />
+            </Styles.InputButton>
+          </Tooltip>
+        )
+      }
+    }
+
+    return null
+  }
+
+  const withExtraid = extraIdName.length > 0
+
   return (
     <ExternalPageContainer onClose={onClose} headerStyle="green">
       <Styles.Body>
-        <Styles.Heading>
+        <Styles.Heading withExtraid={withExtraid}>
           <Styles.TitleRow>
             <Styles.Title>Send it on</Styles.Title>
             {tabInfo ? (
@@ -480,7 +566,7 @@ const Send: React.FC = () => {
             type="gray"
             isLoading={estimated === null || !selectedWallet}
           >
-            <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
+            <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
           </Skeleton>
         </Styles.Heading>
         <Styles.Form>
@@ -506,6 +592,15 @@ const Send: React.FC = () => {
             onBlurInput={checkValidAddress}
             disabled={balance === null || props?.readOnly}
           />
+          {withExtraid ? (
+            <TextInput
+              label={`${extraIdName} (optional)`}
+              value={extraId}
+              onChange={setExtraId}
+              disabled={balance === null}
+              button={extraIdInputButton()}
+            />
+          ) : null}
           <TextInput
             label={`Amount (${toUpper(selectedWallet?.symbol)})`}
             value={amount}
@@ -515,6 +610,7 @@ const Send: React.FC = () => {
             errorLabel={amountErrorLabel}
             onBlurInput={onBlurAmountInput}
             disabled={props?.readOnly}
+            button={amountInputButton()}
           />
           <Styles.NetworkFeeBlock>
             <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>

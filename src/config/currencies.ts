@@ -10,6 +10,8 @@ import ethereumClassicLogo from '@assets/currencies/etc.svg'
 import binanceLogo from '@assets/currencies/bnb.svg'
 import thetaLogo from '@assets/currencies/theta.svg'
 import tfuelLogo from '@assets/currencies/theta.svg'
+import cardanoLogo from '@assets/currencies/ada.svg'
+import rippleLogo from '@assets/currencies/xrp.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -112,6 +114,22 @@ const currencies: ICurrency[] = [
     chain: 'tfuel',
     minSendAmount: 1000000000000000,
   },
+  {
+    name: 'Cardano Shelley',
+    symbol: 'ada',
+    logo: cardanoLogo,
+    background: '#2B55BB',
+    chain: 'cardano',
+    minSendAmount: 1000000,
+  },
+  {
+    name: 'XRP',
+    symbol: 'xrp',
+    logo: rippleLogo,
+    background: '#5088BC',
+    chain: 'ripple',
+    minSendAmount: 1000,
+  },
 ]
 
 export const getCurrency = (symbol: string): ICurrency | undefined => {
@@ -120,6 +138,12 @@ export const getCurrency = (symbol: string): ICurrency | undefined => {
 
 export const getCurrencyByChain = (chain: string): ICurrency | undefined => {
   return currencies.find((currency: ICurrency) => toLower(currency.chain) === toLower(chain))
+}
+
+export const checkWithPhrase = (symbol: string): boolean => {
+  const list: string[] = ['ada']
+
+  return list.indexOf(symbol) !== -1
 }
 
 export default currencies

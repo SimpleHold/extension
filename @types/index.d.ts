@@ -5,6 +5,7 @@ declare module '@thetalabs/theta-js'
 type TGenerateAddress = {
   address: string
   privateKey: string
+  mnemonic?: string
 }
 
 type TCreatedTransaction = {
@@ -62,3 +63,5 @@ type TSymbols =
   | 'bnb'
   | 'theta'
   | 'tfuel'
+  | 'ada'
+  | 'xrp'

@@ -21,6 +21,7 @@ import AddCustomToken from '@pages/AddCustomToken'
 import AddTokenToAddress from '@pages/AddTokenToAddress'
 import FoundTokens from '@pages/FoundTokens'
 import SelectToken from '@pages/SelectToken'
+import ImportRecoveryPhrase from '@pages/ImportRecoveryPhrase'
 
 const routers: RouteProps[] = [
   {
@@ -102,6 +103,10 @@ const routers: RouteProps[] = [
   {
     path: '/select-token',
     component: SelectToken,
+  },
+  {
+    path: '/import-recovery-phrase',
+    component: ImportRecoveryPhrase,
   },
 ]
 

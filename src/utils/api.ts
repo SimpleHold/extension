@@ -4,8 +4,7 @@ import axios, { AxiosResponse } from 'axios'
 import config from '@config/index'
 
 // Utils
-import { isEthereumLike } from '@utils/address'
-import bitcoinLike from '@utils/bitcoinLike'
+import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
 
 interface IGetBalance {
   balance: number
@@ -36,12 +35,16 @@ interface Web3TxParams {
 export interface IGetNetworkFeeResponse {
   networkFee?: number
   networkFeeLabel?: string
-  utxos?: UnspentOutput[]
+  utxos?: UnspentOutput[] | ICardanoUnspentTxOutput[]
   chainId?: number
   gas?: number
   gasPrice?: string
   nonce?: number
   currencyBalance?: number
+}
+
+interface IAdaTrParams {
+  ttl: number
 }
 
 export const getBalance = async (
@@ -241,5 +244,50 @@ export const getThetaNetworkFee = async (address: string): Promise<IGetNetworkFe
     return {
       networkFee: 0.3,
     }
+  }
+}
+
+export const getCardanoTransactionParams = async (): Promise<IAdaTrParams | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/cardano/params`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data
+  } catch {
+    return null
+  }
+}
+
+export const getNetworkFee = async (type: string): Promise<IGetNetworkFeeResponse | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/${type}/network-fee`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const getXrpTxParams = async (from: string) => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/ripple/params`, {
+      params: {
+        from,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data
+  } catch {
+    return null
   }
 }

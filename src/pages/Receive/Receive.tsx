@@ -14,28 +14,30 @@ import QRCode from '@components/QRCode'
 import CopyToClipboard from '@components/CopyToClipboard'
 import PendingBalance from '@components/PendingBalance'
 import Tooltip from '@components/Tooltip'
+import Warning from '@components/Warning'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
-import PrivateKeyDrawer from 'drawers/PrivateKey'
+import PrivateKeyDrawer from '@drawers/PrivateKey'
+import ExtraIdDrawer from '@drawers/ExtraId'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { price, toUpper, toLower } from '@utils/format'
+import { price, toUpper, toLower, short } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet, toggleVisibleWallet, updateBalance } from '@utils/wallet'
-import { getExplorerLink } from '@utils/address'
+import { getExplorerLink, getExtraIdName } from '@utils/address'
 import { openWebPage } from '@utils/extension'
 import { getItem } from '@utils/storage'
 
 // Config
 import { ADDRESS_RECEIVE, ADDRESS_COPY, ADDRESS_RECEIVE_SEND } from '@config/events'
-import { getCurrency } from '@config/currencies'
+import { getCurrency, checkWithPhrase } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
 // Icons
@@ -46,6 +48,7 @@ import eyeIcon from '@assets/icons/eye.svg'
 import eyeVisibleIcon from '@assets/icons/eyeVisible.svg'
 import refreshIcon from '@assets/icons/refresh.svg'
 import moreIcon from '@assets/icons/more.svg'
+import phraseIcon from '@assets/icons/phrase.svg'
 
 // Styles
 import Styles from './styles'
@@ -77,18 +80,22 @@ const Receive: React.FC = () => {
 
   const history = useHistory()
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+  const isCurrencyWithPhrase = checkWithPhrase(symbol)
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
   const [isRefreshing, setIsRefreshing] = React.useState<boolean>(false)
   const [balance, setBalance] = React.useState<null | number>(null)
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'privateKey'>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<
+    null | 'confirm' | 'privateKey' | 'extraId'
+  >(null)
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
   const [pendingBalance, setPendingBalance] = React.useState<number>(0)
   const [dropDownList, setDropDownList] = React.useState<any[]>([])
   const [isHiddenWallet, setIsHiddenWallet] = React.useState<boolean>(isHidden)
+  const [extraIdName, setExtraIdName] = React.useState<string>('')
 
   React.useEffect(() => {
     logEvent({
@@ -108,8 +115,14 @@ const Receive: React.FC = () => {
   const getDropDownList = (): void => {
     const list = [
       {
-        icon: { source: privateKeyIcon, width: 18, height: 18 },
-        title: 'Show Private key',
+        icon: isCurrencyWithPhrase
+          ? {
+              source: phraseIcon,
+              width: 16,
+              height: 16,
+            }
+          : { source: privateKeyIcon, width: 18, height: 18 },
+        title: isCurrencyWithPhrase ? 'Show recovery phrase' : 'Show Private key',
       },
       { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
     ]
@@ -118,6 +131,17 @@ const Receive: React.FC = () => {
       list.push({
         icon: { source: plusCircleIcon, width: 18, height: 18 },
         title: 'Add token',
+      })
+    }
+
+    const name = getExtraIdName(symbol)
+
+    if (name) {
+      setExtraIdName(name)
+
+      list.push({
+        icon: { source: plusCircleIcon, width: 18, height: 18 },
+        title: 'Generate destination tag',
       })
     }
 
@@ -162,10 +186,14 @@ const Receive: React.FC = () => {
     } else if (index === 1) {
       openWebPage(getExplorerLink(address, symbol, currency, chain, contractAddress))
     } else if (index === 2) {
-      history.push('/select-token', {
-        currency,
-        address,
-      })
+      if (extraIdName?.length) {
+        setActiveDrawer('extraId')
+      } else {
+        history.push('/select-token', {
+          currency,
+          address,
+        })
+      }
     }
   }
 
@@ -204,7 +232,11 @@ const Receive: React.FC = () => {
           )
 
           if (findWallet) {
-            setPrivateKey(findWallet.privateKey)
+            if (findWallet.mnemonic) {
+              setPrivateKey(findWallet.mnemonic)
+            } else {
+              setPrivateKey(findWallet.privateKey)
+            }
             return setActiveDrawer('privateKey')
           }
         }
@@ -269,7 +301,7 @@ const Receive: React.FC = () => {
 
             <Skeleton width={130} height={23} mt={10} type="gray" isLoading={estimated === null}>
               {estimated !== null ? (
-                <Styles.Estimated>{`$${price(estimated, 2)} USD`}</Styles.Estimated>
+                <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
               ) : null}
             </Skeleton>
 
@@ -278,12 +310,23 @@ const Receive: React.FC = () => {
                 <PendingBalance pending={pendingBalance} type="gray" symbol={symbol} />
               </Styles.PendingRow>
             ) : null}
+
+            {balance !== null && balance < 20 && toLower(symbol) === 'xrp' ? (
+              <Warning
+                text="You need 20 XRP minimum to activate your XRP address."
+                color="#3FBB7D"
+                br={5}
+                mt={10}
+                padding="8px 10px"
+                background="rgba(211, 236, 221, 0.3)"
+              />
+            ) : null}
           </Styles.Row>
 
           <Styles.ReceiveBlock>
             <QRCode size={120} value={address} />
             <CopyToClipboard value={address} onCopy={onCopyAddress}>
-              <Styles.Address>{address}</Styles.Address>
+              <Styles.Address>{short(address, 70)}</Styles.Address>
             </CopyToClipboard>
             <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} isSmall mt={30} />
           </Styles.ReceiveBlock>
@@ -292,7 +335,9 @@ const Receive: React.FC = () => {
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
         onClose={() => setActiveDrawer(null)}
-        title="Please enter your password to see the private key"
+        title={`Please enter your password to see the ${
+          isCurrencyWithPhrase ? 'recovery phrase' : 'private key'
+        }`}
         isButtonDisabled={!validatePassword(password)}
         onConfirm={onConfirmModal}
         textInputValue={password}
@@ -302,12 +347,19 @@ const Receive: React.FC = () => {
         inputErrorLabel={passwordErrorLabel}
       />
       <PrivateKeyDrawer
+        isMnemonic={isCurrencyWithPhrase}
         isActive={activeDrawer === 'privateKey'}
         onClose={() => {
           setActiveDrawer(null)
           setPrivateKey(null)
         }}
         privateKey={privateKey}
+      />
+      <ExtraIdDrawer
+        isActive={activeDrawer === 'extraId'}
+        onClose={() => setActiveDrawer(null)}
+        title={extraIdName}
+        symbol={symbol}
       />
     </>
   )

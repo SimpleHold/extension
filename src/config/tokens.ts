@@ -17,6 +17,7 @@ import bnbLogo from '@assets/tokens/bnb.svg'
 import cakeLogo from '@assets/tokens/cake.svg'
 import inchLogo from '@assets/tokens/inch.svg'
 import shibLogo from '@assets/tokens/shib.svg'
+import adaLogo from '@assets/tokens/ada.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -223,6 +224,16 @@ const tokens: IToken[] = [
     symbol: '1inch',
     decimals: 18,
     logo: inchLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
+    minSendAmount: 0.001,
+  },
+  {
+    address: '0x3ee2200efb3400fabb9aacf31297cbdd1d435d47',
+    name: 'Cardano Token',
+    symbol: 'ada',
+    decimals: 18,
+    logo: adaLogo,
     background: '#EBBB4E',
     chain: 'bsc',
     minSendAmount: 0.001,
