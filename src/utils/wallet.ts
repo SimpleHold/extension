@@ -84,7 +84,7 @@ export const filterWallets = (wallet: IWallet) => {
   const selectedCurrencies = getItem('selectedCurrenciesFilter')
 
   if (!zeroBalances && !hiddenWallets && !selectedCurrencies) {
-    return wallet
+    return wallet.isHidden !== true
   }
 
   const filterByZeroBalance =
