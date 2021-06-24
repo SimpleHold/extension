@@ -5,8 +5,10 @@ import copy from 'copy-to-clipboard'
 import { IRequest } from '@utils/browser/types'
 import { setItem } from '@utils/storage'
 
-let initialX: number = 0
-let initialY: number = 0
+let initialScreenX: number = 0
+let initialScreenY: number = 0
+let initialLeft: number = 0
+let initialTop: number = 0
 let isDraggableActive: boolean = false
 
 const setSHAttribute = async () => {
@@ -148,9 +150,16 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   } else if (request.type === 'close_select_address_window') {
     removeIframe()
   } else if (request.type === 'initial_drag_positions') {
-    const { pageX, pageY } = request.data
-    initialX = pageX
-    initialY = pageY
+    const { screenX, screenY } = request.data
+    const findIframe = document.getElementById('sh-iframe')
+
+    if (findIframe) {
+      initialScreenX = screenX
+      initialScreenY = screenY
+
+      initialLeft = parseInt(findIframe.style.left)
+      initialTop = parseInt(findIframe.style.top)
+    }
   } else if (request.type === 'set_drag_active') {
     const { isActive } = request.data
     isDraggableActive = isActive
@@ -158,11 +167,13 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     if (!isDraggableActive) return
 
     const { screenX, screenY } = request.data
+    const deltaX = screenX - initialScreenX
+    const deltaY = screenY - initialScreenY
 
     const findIframe = document.getElementById('sh-iframe')
     if (findIframe) {
-      findIframe.style.left = screenX - initialX + 'px'
-      findIframe.style.top = screenY - initialY + 'px'
+      findIframe.style.left = initialLeft + deltaX + 'px'
+      findIframe.style.top = initialTop + deltaY + 'px'
     }
   }
 })
