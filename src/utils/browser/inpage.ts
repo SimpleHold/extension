@@ -37,18 +37,22 @@ addCustomEventListener('#sh-button', 'click', () => {
 addCustomEventListener('#sh-send-button', 'click', () => {
   const button = <HTMLDivElement>document.getElementById('sh-send-button')
 
-  document.dispatchEvent(
-    new CustomEvent('request_send', {
-      detail: {
-        readOnly: button.getAttribute('sh-read-only'),
-        currency: button.getAttribute('sh-currency'),
-        amount: button.getAttribute('sh-amount'),
-        recipientAddress: button.getAttribute('sh-recipient-address'),
-        chain: button.getAttribute('sh-chain'),
-        extraId: button.getAttribute('sh-extra-id'),
-      },
-    })
-  )
+  if (!window.screenTop && !window.screenY) {
+    return
+  } else {
+    document.dispatchEvent(
+      new CustomEvent('request_send', {
+        detail: {
+          readOnly: button.getAttribute('sh-read-only'),
+          currency: button.getAttribute('sh-currency'),
+          amount: button.getAttribute('sh-amount'),
+          recipientAddress: button.getAttribute('sh-recipient-address'),
+          chain: button.getAttribute('sh-chain'),
+          extraId: button.getAttribute('sh-extra-id'),
+        },
+      })
+    )
+  }
 })
 
 const mapCurrencies = currencies.map((currency: ICurrency) => {

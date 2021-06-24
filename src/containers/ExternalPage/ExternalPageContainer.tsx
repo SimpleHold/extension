@@ -49,13 +49,15 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
   React.useEffect(() => {
     if (isDraggable) {
       const dragStart = (event: MouseEvent) => {
-        const { clientX, clientY } = event
+        const { pageX, pageY, screenX, screenY } = event
 
         browser.runtime.sendMessage({
           type: 'initial_drag_positions',
           data: {
-            clientX,
-            clientY,
+            pageX,
+            pageY,
+            screenX,
+            screenY,
           },
         })
 
@@ -82,13 +84,15 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
       }
 
       const drag = (event: MouseEvent) => {
-        const { clientX, clientY } = event
+        const { pageX, pageY, screenX, screenY } = event
 
         browser.runtime.sendMessage({
           type: 'drag',
           data: {
-            clientX,
-            clientY,
+            pageX,
+            pageY,
+            screenX,
+            screenY,
           },
         })
       }

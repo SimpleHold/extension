@@ -3,6 +3,7 @@ import { render } from 'react-dom'
 import numeral from 'numeral'
 import { BigNumber } from 'bignumber.js'
 import SVG from 'react-inlinesvg'
+import { browser } from 'webextension-polyfill-ts'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -76,12 +77,14 @@ const Send: React.FC = () => {
   const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
   const [extraId, setExtraId] = React.useState<string>('')
   const [extraIdName, setExtraIdName] = React.useState<string>('')
+  const [isDraggable, setIsDraggable] = React.useState<boolean>(false)
 
   const debounced = useDebounce(amount, 1000)
 
   React.useEffect(() => {
     getWalletsList(getItem('sendPageProps'))
     getStorageData()
+    getQueryParams()
   }, [])
 
   React.useEffect(() => {
@@ -117,6 +120,16 @@ const Send: React.FC = () => {
     }
   }, [isNetworkFeeLoading, amountErrorLabel])
 
+  const getQueryParams = (): void => {
+    const searchParams = new URLSearchParams(location.search)
+
+    const queryDraggable = searchParams.get('isDraggable')
+
+    if (queryDraggable === 'true') {
+      setIsDraggable(true)
+    }
+  }
+
   const getExtraId = (): void => {
     if (selectedWallet) {
       const name = getExtraIdName(selectedWallet.symbol)
@@ -129,7 +142,10 @@ const Send: React.FC = () => {
 
   const getOutputs = async (info: ICurrency): Promise<void> => {
     if (selectedWallet) {
-      if (bitcoinLike.coins().indexOf(info.chain) !== -1) {
+      if (
+        bitcoinLike.coins().indexOf(info.chain) !== -1 ||
+        toLower(selectedWallet?.symbol) === 'ada'
+      ) {
         const unspentOutputs = await getUnspentOutputs(selectedWallet.address, info.chain)
         setOutputs(unspentOutputs)
       }
@@ -308,6 +324,10 @@ const Send: React.FC = () => {
     if (getItem('sendPageProps')) {
       removeItem('sendPageProps')
     }
+
+    browser.runtime.sendMessage({
+      type: 'close_select_address_window',
+    })
 
     window.close()
   }
@@ -536,7 +556,7 @@ const Send: React.FC = () => {
   const withExtraid = extraIdName.length > 0
 
   return (
-    <ExternalPageContainer onClose={onClose} headerStyle="green">
+    <ExternalPageContainer onClose={onClose} headerStyle="green" isDraggable={isDraggable}>
       <Styles.Body>
         <Styles.Heading withExtraid={withExtraid}>
           <Styles.TitleRow>

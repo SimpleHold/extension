@@ -3,13 +3,10 @@ import copy from 'copy-to-clipboard'
 
 // Utils
 import { IRequest } from '@utils/browser/types'
+import { setItem } from '@utils/storage'
 
-let currentXPosition: number = 0
-let currentYPosition: number = 0
-let initialXPosition: number = 0
-let initialYPosition: number = 0
-let xOffset: number = 0
-let yOffset: number = 0
+let initialX: number = 0
+let initialY: number = 0
 let isDraggableActive: boolean = false
 
 const setSHAttribute = async () => {
@@ -45,40 +42,64 @@ const removeIframe = () => {
   }
 }
 
+const createIframe = async (src: string) => {
+  removeIframe()
+
+  await browser.runtime.sendMessage({
+    type: 'save_tab_info',
+  })
+
+  const iframe = document.createElement('iframe')
+
+  iframe.id = 'sh-iframe'
+
+  const { screenX, outerWidth } = window
+
+  iframe.style.width = '375px'
+  iframe.style.height = '700px'
+  iframe.style.position = 'absolute'
+  iframe.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
+  iframe.style.top = '0'
+  iframe.style.zIndex = '100'
+  iframe.style.borderRadius = '16px'
+  iframe.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
+  iframe.style.border = 'none'
+
+  iframe.src = browser.extension.getURL(src)
+
+  document.body.insertBefore(iframe, document.body.firstChild)
+}
+
 addCustomEventListener('#sh-button', 'click', async () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
   if (findInput && !window.screenTop && !window.screenY) {
-    removeIframe()
+    const getButton = document.getElementById('sh-button')
 
-    await browser.runtime.sendMessage({
-      type: 'save_tab_info',
-    })
+    const currency = getButton?.getAttribute('sh-currency')
+    const chain = getButton?.getAttribute('sh-currency-chain')
 
-    const currency = document.getElementById('sh-button')?.getAttribute('sh-currency')
-    const chain = document.getElementById('sh-button')?.getAttribute('sh-currency-chain')
+    await createIframe(`select-address.html?currency=${currency}&chain=${chain}&isDraggable=true`)
+  }
+})
 
-    const iframe = document.createElement('iframe')
+addCustomEventListener('#sh-send-button', 'click', async () => {
+  if (!window.screenTop && !window.screenY) {
+    const getButton = document.getElementById('sh-send-button')
 
-    iframe.id = 'sh-iframe'
+    const readOnly = getButton?.getAttribute('sh-read-only')
+    const currency = getButton?.getAttribute('sh-currency')
+    const amount = getButton?.getAttribute('sh-amount')
+    const recipientAddress = getButton?.getAttribute('sh-recipient-address')
+    const chain = getButton?.getAttribute('sh-chain')
+    const extraId = getButton?.getAttribute('sh-extra-id')
 
-    const { screenX, outerWidth } = window
-
-    iframe.style.width = '375px'
-    iframe.style.height = '700px'
-    iframe.style.position = 'absolute'
-    iframe.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
-    iframe.style.top = '0'
-    iframe.style.zIndex = '100'
-    iframe.style.borderRadius = '16px'
-    iframe.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
-    iframe.style.border = 'none'
-
-    iframe.src = browser.extension.getURL(
-      `select-address.html?currency=${currency}&chain=${chain}&isDraggable=true`
+    setItem(
+      'sendPageProps',
+      JSON.stringify({ readOnly, currency, amount, recipientAddress, chain, extraId })
     )
 
-    document.body.insertBefore(iframe, document.body.firstChild)
+    await createIframe('send.html?isDraggable=true')
   }
 })
 
@@ -127,35 +148,21 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   } else if (request.type === 'close_select_address_window') {
     removeIframe()
   } else if (request.type === 'initial_drag_positions') {
-    const { clientX, clientY } = request.data
-
-    initialXPosition = clientX - xOffset
-    initialYPosition = clientY - yOffset
+    const { pageX, pageY } = request.data
+    initialX = pageX
+    initialY = pageY
   } else if (request.type === 'set_drag_active') {
     const { isActive } = request.data
-
     isDraggableActive = isActive
-
-    if (!isActive) {
-      initialXPosition = currentXPosition
-      initialYPosition = currentYPosition
-    }
   } else if (request.type === 'drag') {
-    const { clientX, clientY } = request.data
+    if (!isDraggableActive) return
 
-    if (isDraggableActive) {
-      currentXPosition = clientX - initialXPosition
-      currentYPosition = clientY - initialYPosition
+    const { screenX, screenY } = request.data
 
-      xOffset = clientX
-      yOffset = clientY
-
-      const findIframe = document.getElementById('sh-iframe')
-
-      if (findIframe) {
-        findIframe.style.transform =
-          'translate3d(' + currentXPosition + 'px, ' + currentYPosition + 'px, 0)'
-      }
+    const findIframe = document.getElementById('sh-iframe')
+    if (findIframe) {
+      findIframe.style.left = screenX - initialX + 'px'
+      findIframe.style.top = screenY - initialY + 'px'
     }
   }
 })
