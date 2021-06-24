@@ -120,6 +120,22 @@ const Send: React.FC = () => {
     }
   }, [isNetworkFeeLoading, amountErrorLabel])
 
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const { key } = event
+
+      if (key === 'Escape' || key === 'Esc') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
   const getQueryParams = (): void => {
     const searchParams = new URLSearchParams(location.search)
 

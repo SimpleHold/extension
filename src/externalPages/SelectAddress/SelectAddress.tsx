@@ -49,6 +49,22 @@ const SelectAddress: React.FC = () => {
     document.body.style.overflow = 'hidden'
   }, [])
 
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const { key } = event
+
+      if (key === 'Escape' || key === 'Esc') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
   const checkActiveTab = () => {
     const tabInfo: string | null = getItem('tab')
 
