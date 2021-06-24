@@ -13,7 +13,7 @@ import { validatePassword } from '@utils/validate'
 import { logEvent, setUserProperties } from '@utils/amplitude'
 import { generate } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
-import { generate as generateAddress } from '@utils/address'
+import { generateWallet } from '@utils/currencies'
 import { setItem } from '@utils/storage'
 import { getAllCookies, Cookie } from '@utils/extension'
 import * as theta from '@utils/currencies/theta'
@@ -110,7 +110,7 @@ const Wallets: React.FC = () => {
 
     for (const currency of initialCurrencies) {
       const { symbol, chain } = currency
-      const generate = generateAddress(symbol, chain)
+      const generate = generateWallet(symbol, chain)
 
       if (generate) {
         data.push({

@@ -17,8 +17,8 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
-import { generate, importPrivateKey, importRecoveryPhrase } from '@utils/address'
-import * as theta from '@utils/currencies/theta'
+import { generateWallet, importPrivateKey, importRecoveryPhrase } from '@utils/currencies'
+import * as theta from 'utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
@@ -63,7 +63,7 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const generateAddress = generate(symbol, chain)
+    const generateAddress = generateWallet(symbol, chain)
 
     if (generateAddress) {
       const { privateKey: walletPrivateKey, mnemonic: walletMnemonic } = generateAddress

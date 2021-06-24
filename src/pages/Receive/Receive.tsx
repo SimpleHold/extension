@@ -31,7 +31,7 @@ import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet, toggleVisibleWallet, updateBalance } from '@utils/wallet'
-import { getExplorerLink, getExtraIdName } from '@utils/address'
+import { getExplorerLink, getExtraIdName } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
 import { getItem } from '@utils/storage'
 

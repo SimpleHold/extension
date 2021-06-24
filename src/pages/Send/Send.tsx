@@ -26,9 +26,11 @@ import {
   getNetworkFeeSymbol,
   getExtraIdName,
   generateExtraId,
-} from '@utils/address'
-import bitcoinLike from '@utils/bitcoinLike'
-import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
+} from '@utils/currencies'
+import * as bitcoinLike from '@utils/currencies/bitcoinLike'
+
+// Types
+import { TCardanoUnspentTxOutput } from '@utils/currencies/cardano/types'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -77,7 +79,7 @@ const Send: React.FC = () => {
   const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
-  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | ICardanoUnspentTxOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | TCardanoUnspentTxOutput[]>([])
   const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
   const [currencyBalance, setCurrencyBalance] = React.useState<number | null>(null)
   const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
@@ -126,7 +128,7 @@ const Send: React.FC = () => {
   }
 
   const getOutputs = async (): Promise<void> => {
-    if (bitcoinLike.coins().indexOf(chain) !== -1 || toLower(symbol) === 'ada') {
+    if (bitcoinLike.chains.indexOf(chain) !== -1 || toLower(symbol) === 'ada') {
       const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
       setOutputs(unspentOutputs)
     }
@@ -292,7 +294,7 @@ const Send: React.FC = () => {
       !isCurrencyBalanceError
     ) {
       if (!outputs.length) {
-        if (bitcoinLike.coins().indexOf(chain) !== -1 || toLower(symbol) === 'ada') {
+        if (bitcoinLike.chains.indexOf(chain) !== -1 || toLower(symbol) === 'ada') {
           return true
         }
       }

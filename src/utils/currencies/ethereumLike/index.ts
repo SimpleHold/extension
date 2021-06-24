@@ -1,51 +1,16 @@
 import Web3 from 'web3'
 
+// Config
 import contractABI from '@config/contractABI'
+
+// Types
+import { TUnit, TTransferTokenOptions } from './types'
 
 const web3 = new Web3()
 
-export type Unit =
-  | 'noether'
-  | 'wei'
-  | 'kwei'
-  | 'Kwei'
-  | 'babbage'
-  | 'femtoether'
-  | 'mwei'
-  | 'Mwei'
-  | 'lovelace'
-  | 'picoether'
-  | 'gwei'
-  | 'Gwei'
-  | 'shannon'
-  | 'nanoether'
-  | 'nano'
-  | 'szabo'
-  | 'microether'
-  | 'micro'
-  | 'finney'
-  | 'milliether'
-  | 'milli'
-  | 'ether'
-  | 'kether'
-  | 'grand'
-  | 'mether'
-  | 'gether'
-  | 'tether'
+export const coins: string[] = ['eth', 'etc', 'bnb']
 
-interface TransferTokenOptions {
-  value: string
-  from: string
-  to: string
-  privateKey: string
-  gasPrice: string
-  gas: number
-  nonce: number
-  chainId: number
-  contractAddress?: string
-}
-
-export const generateAddress = (): TGenerateAddress | null => {
+export const generateWallet = (): TGenerateAddress | null => {
   try {
     const item = web3.eth.accounts.create()
 
@@ -66,11 +31,11 @@ export const importPrivateKey = (privateKey: string): string | null => {
   }
 }
 
-export const fromWei = (value: string, unit: Unit): number => {
+export const fromWei = (value: string, unit: TUnit): number => {
   return +web3.utils.fromWei(value, unit)
 }
 
-export const toWei = (value: string, unit: Unit): number => {
+export const toWei = (value: string, unit: TUnit): number => {
   return +web3.utils.toWei(value, unit)
 }
 
@@ -130,7 +95,7 @@ export const transferToken = async ({
   nonce,
   chainId,
   contractAddress,
-}: TransferTokenOptions): Promise<string | null> => {
+}: TTransferTokenOptions): Promise<string | null> => {
   try {
     const contract = new web3.eth.Contract(contractABI, contractAddress, { from })
     const data = contract.methods.transfer(to, value)

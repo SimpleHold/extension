@@ -2,7 +2,7 @@ import * as thetajs from '@thetalabs/theta-js'
 import { BigNumber } from 'bignumber.js'
 
 // Utils
-import { fromWei } from '@utils/web3'
+import { fromWei } from '@utils/currencies/ethereumLike'
 
 export const coins = ['theta', 'tfuel']
 

@@ -1,6 +1,9 @@
 import { RippleAPI } from 'ripple-lib'
 import keypairs from 'ripple-keypairs'
 
+// Types
+import { TTxParams, TPayment } from './types'
+
 const api = new RippleAPI()
 
 export const coins = ['xrp']
@@ -53,43 +56,19 @@ export const getTransactionLink = (hash: string): string => {
   return `https://xrpscan.com/tx/${hash}`
 }
 
-interface ITxParams {
-  fee: string
-  sequence: number
-  maxLedgerVersion: number
-}
-
-interface IPayment {
-  source: {
-    address: string
-    maxAmount: {
-      value: string
-      currency: string
-    }
-  }
-  destination: {
-    address: string
-    amount: {
-      value: string
-      currency: string
-    }
-    tag?: number
-  }
-}
-
 export const createTransaction = async (
   from: string,
   to: string,
   value: string | number,
   privateKey: string,
-  txParams: ITxParams,
+  txParams: TTxParams,
   extraTo?: string
 ): Promise<string | null> => {
   try {
     const { fee, sequence, maxLedgerVersion } = txParams
     const parseValue = fromXrp(value)
 
-    const payment: IPayment = {
+    const payment: TPayment = {
       source: {
         address: from,
         maxAmount: {

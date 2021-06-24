@@ -4,7 +4,7 @@ import axios, { AxiosResponse } from 'axios'
 import config from '@config/index'
 
 // Utils
-import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
+import { TCardanoUnspentTxOutput } from '@utils/currencies/cardano/types'
 
 interface IGetBalance {
   balance: number
@@ -35,7 +35,7 @@ interface Web3TxParams {
 export interface IGetNetworkFeeResponse {
   networkFee?: number
   networkFeeLabel?: string
-  utxos?: UnspentOutput[] | ICardanoUnspentTxOutput[]
+  utxos?: UnspentOutput[] | TCardanoUnspentTxOutput[]
   chainId?: number
   gas?: number
   gasPrice?: string

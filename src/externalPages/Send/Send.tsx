@@ -28,8 +28,8 @@ import {
   getNetworkFeeSymbol,
   getExtraIdName,
   generateExtraId,
-} from '@utils/address'
-import bitcoinLike from '@utils/bitcoinLike'
+} from '@utils/currencies'
+import * as bitcoinLike from '@utils/currencies/bitcoinLike'
 import { getItem, setItem, removeItem } from '@utils/storage'
 
 // Config
@@ -39,9 +39,11 @@ import { getToken } from '@config/tokens'
 // Hooks
 import useDebounce from '@hooks/useDebounce'
 
+// Types
+import { TCardanoUnspentTxOutput } from '@utils/currencies/cardano/types'
+
 // Styles
 import Styles from './styles'
-import { ICardanoUnspentTxOutput } from 'utils/currencies/cardano'
 
 type TabInfo = {
   favIconUrl: string
@@ -73,7 +75,7 @@ const Send: React.FC = () => {
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
   const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
-  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | ICardanoUnspentTxOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | TCardanoUnspentTxOutput[]>([])
   const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
   const [extraId, setExtraId] = React.useState<string>('')
   const [extraIdName, setExtraIdName] = React.useState<string>('')
@@ -159,7 +161,7 @@ const Send: React.FC = () => {
   const getOutputs = async (info: ICurrency): Promise<void> => {
     if (selectedWallet) {
       if (
-        bitcoinLike.coins().indexOf(info.chain) !== -1 ||
+        bitcoinLike.chains.indexOf(info.chain) !== -1 ||
         toLower(selectedWallet?.symbol) === 'ada'
       ) {
         const unspentOutputs = await getUnspentOutputs(selectedWallet.address, info.chain)
@@ -518,7 +520,7 @@ const Send: React.FC = () => {
       ) {
         if (!outputs.length) {
           if (
-            bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1 ||
+            bitcoinLike.chains.indexOf(currencyInfo.chain) !== -1 ||
             toLower(selectedWallet.symbol) === 'ada'
           ) {
             return true

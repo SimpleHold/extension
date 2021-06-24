@@ -1,3 +1,10 @@
+import * as Nuls from '@utils/currencies/nuls'
+import * as Ripple from '@utils/currencies/ripple'
+import * as Cardano from '@utils/currencies/cardano'
+import * as Theta from '@utils/currencies/theta'
+import * as BitcoinLike from '@utils/currencies/bitcoinLike'
+import * as EthereumLike from '@utils/currencies/ethereumLike'
+
 // Config
 import addressValidate from '@config/addressValidate'
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -12,89 +19,81 @@ import {
 } from '@utils/api'
 import { toLower } from '@utils/format'
 
-// Currencies
-import * as web3 from '@utils/web3'
-import bitcoinLike from '@utils/bitcoinLike'
-import * as theta from '@utils/currencies/theta'
-import * as cardano from '@utils/currencies/cardano'
-import * as ripple from '@utils/currencies/ripple'
-import * as nuls from '@utils/currencies/nuls'
+// Types
+import { TCreateTransactionProps, TGetNetworkFeeParams } from './types'
+import { TUnit } from './ethereumLike/types'
 
-const web3Symbols = ['eth', 'etc', 'bnb']
-
-type TCreateTransactionProps = {
-  from: string
-  to: string
-  amount: number
-  privateKey: string
-  symbol: string
-  tokenChain?: string
-  outputs?: UnspentOutput[]
-  networkFee?: number
-  gas?: number
-  chainId?: number
-  gasPrice?: string
-  nonce?: number
-  contractAddress?: string
-  xrpTxData?: {
-    fee: string
-    sequence: number
-    maxLedgerVersion: number
-  }
-  extraId?: string
+interface IProvider {
+  coins: string[]
+  generateWallet: (symbol: string, chain?: string) => TGenerateAddress | null
+  importPrivateKey?: (privateKey: string, symbol: string) => string | null
+  importRecoveryPhrase?: (recoveryPhrase: string) => TGenerateAddress | null
+  validateAddress?: (address: string, symbol: string) => boolean
 }
 
 export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boolean => {
-  return web3Symbols.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
+  return EthereumLike.coins.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
 }
 
-export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
-    return nuls.generateWallet()
-  } else if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.generateWallet()
-  } else if (cardano.coins.indexOf(symbol) !== -1) {
-    return cardano.generateWallet()
-  } else if (isEthereumLike(symbol, chain)) {
-    return web3.generateAddress()
-  } else if (theta.coins.indexOf(symbol) !== -1) {
-    return theta.generateWallet()
-  } else {
-    const generateBTCLikeAddress = new bitcoinLike(symbol).generate()
-
-    return generateBTCLikeAddress
+const getProvider = (symbol: string, chain?: string): IProvider => {
+  if (Nuls.coins.indexOf(symbol) !== -1) {
+    return Nuls
   }
+
+  if (Ripple.coins.indexOf(symbol) !== -1) {
+    return Ripple
+  }
+
+  if (Cardano.coins.indexOf(symbol) !== -1) {
+    return Cardano
+  }
+
+  if (Theta.coins.indexOf(symbol) !== -1) {
+    return Theta
+  }
+
+  if (isEthereumLike(symbol, chain)) {
+    return EthereumLike
+  }
+
+  return BitcoinLike
+}
+
+export const generateWallet = (symbol: string, chain?: string): TGenerateAddress | null => {
+  const provider = getProvider(symbol, chain)
+
+  if (provider) {
+    return provider.generateWallet(symbol)
+  }
+
+  return null
 }
 
 export const importPrivateKey = (
-  symbol: TSymbols | string,
+  symbol: string,
   privateKey: string,
   chain?: string
 ): string | null => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
-    return nuls.importPrivateKey(privateKey)
-  } else if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.importPrivateKey(privateKey)
-  } else if (isEthereumLike(symbol, chain)) {
-    return web3.importPrivateKey(privateKey)
-  } else if (theta.coins.indexOf(symbol) !== -1) {
-    return theta.importPrivateKey(privateKey)
-  } else {
-    return new bitcoinLike(symbol).import(privateKey)
+  const provider = getProvider(symbol, chain)
+
+  if (provider?.importPrivateKey) {
+    return provider.importPrivateKey(privateKey, symbol)
   }
+
+  return null
 }
 
 export const validateAddress = (
-  symbol: TSymbols | string,
+  symbol: string,
   chain: string,
   address: string,
   tokenChain?: string
 ): boolean => {
   try {
-    if (cardano.coins.indexOf(symbol) !== -1) {
-      return cardano.validateAddress(address)
-    } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
-      return new bitcoinLike(symbol).isAddressValid(address)
+    if (Cardano.coins.indexOf(symbol) !== -1) {
+      return Cardano.validateAddress(address)
+    } else if (chain && BitcoinLike.chains.indexOf(chain) !== -1) {
+      return BitcoinLike.validateAddress(address, symbol)
     }
     // @ts-ignore
     return new RegExp(tokenChain ? addressValidate.eth : addressValidate[symbol])?.test(address)
@@ -121,14 +120,14 @@ export const createTransaction = async ({
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
-    if (nuls.coins.indexOf(symbol) !== -1) {
-      return await nuls.createTransaction(from, to, amount, privateKey)
+    if (Nuls.coins.indexOf(symbol) !== -1) {
+      return await Nuls.createTransaction(from, to, amount, privateKey)
     }
-    if (ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
-      return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData, extraId)
+    if (Ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
+      return await Ripple.createTransaction(from, to, amount, privateKey, xrpTxData, extraId)
     }
-    if (cardano.coins.indexOf(symbol) !== -1 && outputs) {
-      return await cardano.createTransaction(outputs, from, to, amount, privateKey)
+    if (Cardano.coins.indexOf(symbol) !== -1 && outputs) {
+      return await Cardano.createTransaction(outputs, from, to, amount, privateKey)
     }
     if (isEthereumLike(symbol, tokenChain)) {
       const getContractAddress = contractAddress
@@ -139,7 +138,7 @@ export const createTransaction = async ({
 
       if (gas && chainId && gasPrice && typeof nonce === 'number') {
         if (tokenChain && getContractAddress) {
-          return await web3.transferToken({
+          return await EthereumLike.transferToken({
             value: `${amount}`,
             from,
             to,
@@ -151,19 +150,28 @@ export const createTransaction = async ({
             contractAddress: getContractAddress,
           })
         }
-        return await web3.createTransaction(to, amount, gas, chainId, gasPrice, nonce, privateKey)
+        return await EthereumLike.createTransaction(
+          to,
+          amount,
+          gas,
+          chainId,
+          gasPrice,
+          nonce,
+          privateKey
+        )
       }
       return null
     }
 
     if (outputs?.length && networkFee) {
-      return new bitcoinLike(symbol).createTransaction(
+      return BitcoinLike.createTransaction(
         outputs,
         to,
         amount,
         networkFee,
         from,
-        privateKey
+        privateKey,
+        symbol
       )
     }
 
@@ -173,27 +181,12 @@ export const createTransaction = async ({
   }
 }
 
-interface IGetNetworkFeeParams {
-  address: string
-  symbol: string
-  amount: string
-  from: string
-  to: string
-  chain: string
-  web3Params: {
-    tokenChain?: string
-    contractAddress?: string
-    decimals?: number
-  }
-  outputs?: UnspentOutput[]
-}
-
 export const getNewNetworkFee = async (
-  params: IGetNetworkFeeParams
+  params: TGetNetworkFeeParams
 ): Promise<IGetNetworkFeeResponse | null> => {
   const { address, symbol, amount, from, to, chain, web3Params, outputs } = params
 
-  if (nuls.coins.indexOf(symbol) !== -1) {
+  if (Nuls.coins.indexOf(symbol) !== -1) {
     return {
       networkFee: 0.001,
     }
@@ -206,8 +199,8 @@ export const getNewNetworkFee = async (
     isEthereumLike(symbol)
   ) {
     const value = web3Params?.decimals
-      ? web3.convertDecimals(amount, web3Params.decimals)
-      : web3.toWei(amount, 'ether')
+      ? EthereumLike.convertDecimals(amount, web3Params.decimals)
+      : EthereumLike.toWei(amount, 'ether')
     const web3Chain = web3Params?.tokenChain || chain
     const web3TokenChain = web3Params?.tokenChain ? symbol : undefined
 
@@ -223,10 +216,10 @@ export const getNewNetworkFee = async (
   }
 
   if (outputs?.length) {
-    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+    return BitcoinLike.getNetworkFee(address, outputs, amount, symbol)
   }
 
-  if (theta.coins.indexOf(symbol) !== -1) {
+  if (Theta.coins.indexOf(symbol) !== -1) {
     return await getThetaNetworkFee(address)
   }
 
@@ -246,13 +239,15 @@ export const getAddressNetworkFee = async (
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
   try {
-    if (nuls.coins.indexOf(symbol) !== -1) {
+    if (Nuls.coins.indexOf(symbol) !== -1) {
       return {
         networkFee: 0.001,
       }
     }
     if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
-      const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
+      const value = decimals
+        ? EthereumLike.convertDecimals(amount, decimals)
+        : EthereumLike.toWei(amount, 'ether')
       const data = await getEtherNetworkFee(
         from,
         to,
@@ -266,19 +261,19 @@ export const getAddressNetworkFee = async (
       return data
     }
 
-    if (ripple.coins.indexOf(symbol) !== -1) {
+    if (Ripple.coins.indexOf(symbol) !== -1) {
       return await getNetworkFee('ripple')
     }
 
-    if (theta.coins.indexOf(symbol) !== -1) {
+    if (Theta.coins.indexOf(symbol) !== -1) {
       return await getThetaNetworkFee(address)
     }
 
     if (typeof outputs !== 'undefined') {
       if (toLower(symbol) === 'ada') {
-        return cardano.getNetworkFee(outputs, amount)
+        return Cardano.getNetworkFee(outputs, amount)
       }
-      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+      return BitcoinLike.getNetworkFee(address, outputs, amount, symbol)
     }
 
     return null
@@ -292,26 +287,26 @@ export const formatUnit = (
   value: string | number,
   type: 'from' | 'to',
   chain?: string,
-  unit?: web3.Unit
+  unit?: TUnit
 ): number => {
   try {
-    if (nuls.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? nuls.fromNuls(value) : nuls.toNuls(value)
-    } else if (ripple.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
-    } else if (cardano.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
-    } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
-      return type === 'from'
-        ? new bitcoinLike(symbol).fromSat(Number(value))
-        : new bitcoinLike(symbol).toSat(Number(value))
+    if (Nuls.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? Nuls.fromNuls(value) : Nuls.toNuls(value)
+    } else if (Ripple.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? Ripple.fromXrp(value) : Ripple.toXrp(value)
+    } else if (Cardano.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? Cardano.fromAda(value) : Cardano.toAda(value)
+    } else if (chain && BitcoinLike.chains.indexOf(chain) !== -1) {
+      return type === 'from' ? BitcoinLike.fromSat(Number(value)) : BitcoinLike.toSat(Number(value))
     } else if (isEthereumLike(symbol, chain)) {
       if (unit) {
-        return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
+        return type === 'from'
+          ? EthereumLike.fromWei(`${value}`, unit)
+          : EthereumLike.toWei(`${value}`, unit)
       }
       return Number(value)
-    } else if (theta.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? theta.fromTheta(value) : theta.toTheta(value)
+    } else if (Theta.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? Theta.fromTheta(value) : Theta.toTheta(value)
     }
 
     return 0
@@ -327,13 +322,13 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
-    return nuls.getExplorerLink(address)
-  } else if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.getExplorerLink(address)
-  } else if (cardano.coins.indexOf(symbol) !== -1) {
-    return cardano.getExplorerLink(address)
-  } else if (theta.coins.indexOf(symbol) !== -1) {
+  if (Nuls.coins.indexOf(symbol) !== -1) {
+    return Nuls.getExplorerLink(address)
+  } else if (Ripple.coins.indexOf(symbol) !== -1) {
+    return Ripple.getExplorerLink(address)
+  } else if (Cardano.coins.indexOf(symbol) !== -1) {
+    return Cardano.getExplorerLink(address)
+  } else if (Theta.coins.indexOf(symbol) !== -1) {
     return `https://explorer.thetatoken.org/account/${address}`
   } else if (isEthereumLike(symbol, chain)) {
     const parseSymbol = toLower(symbol)
@@ -367,12 +362,12 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string | null => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
-    return nuls.getTransactionLink(hash)
-  } else if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.getTransactionLink(hash)
-  } else if (cardano.coins.indexOf(symbol) !== -1) {
-    return cardano.getTransactionLink(hash)
+  if (Nuls.coins.indexOf(symbol) !== -1) {
+    return Nuls.getTransactionLink(hash)
+  } else if (Ripple.coins.indexOf(symbol) !== -1) {
+    return Ripple.getTransactionLink(hash)
+  } else if (Cardano.coins.indexOf(symbol) !== -1) {
+    return Cardano.getTransactionLink(hash)
   } else if (isEthereumLike(symbol, tokenChain)) {
     const parseChain = tokenChain ? toLower(tokenChain) : toLower(chain)
 
@@ -391,7 +386,7 @@ export const getTransactionLink = (
 
 export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string => {
   try {
-    if (theta.coins.indexOf(symbol) !== -1) {
+    if (Theta.coins.indexOf(symbol) !== -1) {
       return 'tfuel'
     } else if (tokenChain) {
       return getCurrencyByChain(tokenChain)?.symbol || symbol
@@ -407,8 +402,8 @@ export const importRecoveryPhrase = (
   recoveryPhrase: string
 ): TGenerateAddress | null => {
   try {
-    if (cardano.coins.indexOf(symbol) !== -1) {
-      return cardano.importRecoveryPhrase(recoveryPhrase)
+    if (Cardano.coins.indexOf(symbol) !== -1) {
+      return Cardano.importRecoveryPhrase(recoveryPhrase)
     }
     return null
   } catch {
@@ -417,15 +412,15 @@ export const importRecoveryPhrase = (
 }
 
 export const getExtraIdName = (symbol: string): null | string => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.extraIdName
+  if (Ripple.coins.indexOf(symbol) !== -1) {
+    return Ripple.extraIdName
   }
   return null
 }
 
 export const generateExtraId = (symbol: string): null | string => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.generateTag()
+  if (Ripple.coins.indexOf(symbol) !== -1) {
+    return Ripple.generateTag()
   }
   return null
 }

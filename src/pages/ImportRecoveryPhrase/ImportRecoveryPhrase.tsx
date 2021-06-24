@@ -13,7 +13,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 
 // Utils
-import { importRecoveryPhrase } from '@utils/address'
+import { importRecoveryPhrase } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { getItem, setItem } from '@utils/storage'
@@ -36,11 +36,9 @@ const ImportRecoveryPhrase: React.FC = () => {
   const [drawerErrorLabel, setDrawerErrorLabel] = React.useState<null | string>(null)
 
   const history = useHistory()
-  // const {
-  //   state: { symbol },
-  // } = useLocation<LocationState>()
-
-  const symbol = 'ada'
+  const {
+    state: { symbol },
+  } = useLocation<LocationState>()
 
   const textareaInputRef = React.useRef<HTMLTextAreaElement>(null)
 

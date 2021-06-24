@@ -4,23 +4,8 @@ import BigNumber from 'bignumber.js'
 // Utils
 import { getNulsTxParams } from '@utils/api'
 
-export const coins: string[] = ['nuls']
-
-type TTransferInfo = {
-  fromAddress: string
-  toAddress: string
-  amount: number
-}
-
-type TBalanceInfo = {
-  totalBalance: number
-  balance: number
-  timeLock: number
-  consensusLock: number
-  freeze: number
-  nonce: string
-  nonceType: number
-}
+// Types
+import { TTransferInfo, TBalanceInfo } from './types'
 
 const chainId = 1
 
@@ -33,6 +18,8 @@ export const toNuls = (value: string | number): number => {
 export const fromNuls = (value: string | number): number => {
   return Number(new BigNumber(value).div(ten8))
 }
+
+export const coins: string[] = ['nuls']
 
 export const generateWallet = (): TGenerateAddress | null => {
   try {
@@ -90,36 +77,40 @@ export const getPubKeyFromPriv = (privateKey: string): string | null => {
       return importByKey.pub
     }
 
-      return null
+    return null
   } catch {
     return null
   }
 }
 
 const Plus = (nu: number, arg: number) => {
-  let newPlus = new BigNumber(nu);
-  return newPlus.plus(arg);
+  let newPlus = new BigNumber(nu)
+  return newPlus.plus(arg)
 }
 
 const getInputsOutputs = (transferInfo: TTransferInfo, balanceInfo: TBalanceInfo) => {
-  const newAmount = Number(Plus(transferInfo.amount, 100000));
+  const newAmount = Number(Plus(transferInfo.amount, 100000))
 
-  const inputs = [{
-    address: transferInfo.fromAddress,
-    assetsChainId: 1,
-    assetsId: 1,
-    amount: newAmount,
-    locked: 0,
-    nonce: balanceInfo.nonce
-  }];
+  const inputs = [
+    {
+      address: transferInfo.fromAddress,
+      assetsChainId: 1,
+      assetsId: 1,
+      amount: newAmount,
+      locked: 0,
+      nonce: balanceInfo.nonce,
+    },
+  ]
 
-  const outputs = [{
-    address: transferInfo.toAddress ? transferInfo.toAddress : transferInfo.fromAddress,
-    assetsChainId: 1,
-    assetsId: 1,
-    amount: transferInfo.amount,
-    lockTime: 0
-  }];
+  const outputs = [
+    {
+      address: transferInfo.toAddress ? transferInfo.toAddress : transferInfo.fromAddress,
+      assetsChainId: 1,
+      assetsId: 1,
+      amount: transferInfo.amount,
+      lockTime: 0,
+    },
+  ]
 
   return {
     inputs,
@@ -127,22 +118,27 @@ const getInputsOutputs = (transferInfo: TTransferInfo, balanceInfo: TBalanceInfo
   }
 }
 
-export const createTransaction = async (fromAddress: string, toAddress: string, amount: number, privateKey: string): Promise<string | null> => {
+export const createTransaction = async (
+  fromAddress: string,
+  toAddress: string,
+  amount: number,
+  privateKey: string
+): Promise<string | null> => {
   try {
     const getPubKey = getPubKeyFromPriv(privateKey)
 
     if (getPubKey) {
       const params = await getNulsTxParams(fromAddress)
-      
-      const {
-        inputs,
-        outputs
-      } = getInputsOutputs({
+
+      const { inputs, outputs } = getInputsOutputs(
+        {
           fromAddress,
           toAddress,
-          amount
-        }, params)
-        
+          amount,
+        },
+        params
+      )
+
       const assembleTx = nuls.transactionAssemble(inputs, outputs, '', 2)
       return nuls.transactionSerialize(privateKey, getPubKey, assembleTx)
     }
@@ -150,4 +146,4 @@ export const createTransaction = async (fromAddress: string, toAddress: string, 
   } catch {
     return null
   }
-  }
+}

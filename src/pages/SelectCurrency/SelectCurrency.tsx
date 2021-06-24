@@ -11,7 +11,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 // Utils
 import { toUpper, toLower } from '@utils/format'
 import { getWallets } from '@utils/wallet'
-import * as theta from '@utils/currencies/theta'
+import * as theta from 'utils/currencies/theta'
 
 // Config
 import currencies, { ICurrency } from '@config/currencies'
