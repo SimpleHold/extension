@@ -124,7 +124,7 @@ const currencies: ICurrency[] = [
     minSendAmount: 1000000,
   },
   {
-    name: 'Ripple',
+    name: 'XRP',
     symbol: 'xrp',
     logo: rippleLogo,
     background: '#5088BC',

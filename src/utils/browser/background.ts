@@ -59,20 +59,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       top: screenY,
     })
     activeRequest = null
-  }
-
-  if (request.type === 'set_address') {
-    const tabs = await browser.tabs.query({
-      active: true,
-      windowId: currentWindowId,
-    })
-
-    if (tabs[0]?.id) {
-      browser.tabs.sendMessage(tabs[0].id, request)
-    }
-  }
-
-  if (request.type === 'request_send') {
+  } else if (request.type === 'request_send') {
     if (activeRequest === request.type) {
       return
     }
@@ -116,6 +103,18 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       top: screenY,
     })
     activeRequest = null
+  } else if (request.type === 'save_tab_info') {
+    const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
+    setItem('tab', JSON.stringify(currentTab[0]))
+  } else {
+    const tabs = await browser.tabs.query({
+      active: true,
+      windowId: currentWindowId,
+    })
+
+    if (tabs[0]?.id) {
+      browser.tabs.sendMessage(tabs[0].id, request)
+    }
   }
 })
 
@@ -167,16 +166,12 @@ const generateContextMenu = async () => {
             })
 
             if (indexWallet === latestWallets.length - 1 && item === 'xrp') {
-              const tag = generateTag()
-
-              if (tag?.length) {
-                browser.contextMenus.create({
-                  title: 'Generate Destination tag…',
-                  id: `${toLower(item)}_${tag}`,
-                  contexts: ['editable'],
-                  parentId: currencyMenu,
-                })
-              }
+              browser.contextMenus.create({
+                title: 'Generate Destination tag…',
+                id: `${toLower(item)}_extraId`,
+                contexts: ['editable'],
+                parentId: currencyMenu,
+              })
             }
           }
         }
@@ -208,12 +203,14 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 
   if (tabs[0]?.id) {
     if (info.menuItemId !== 'sh-other-wallets') {
-      const [, address] = `${info.menuItemId}`.split('_')
+      const menuItemId = `${info.menuItemId}`.split('_')[1]
+
+      const data = menuItemId === 'extraId' ? generateTag() : menuItemId
 
       await browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',
         data: {
-          address,
+          address: data,
         },
       })
     } else {

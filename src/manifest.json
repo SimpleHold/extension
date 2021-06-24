@@ -51,6 +51,8 @@
   "web_accessible_resources": [
     "js/inpage.bundle.js",
     "js/selectAddress.bundle.js",
-    "select-address.html"
+    "select-address.html",
+    "js/send.bundle.js",
+    "send.html"
   ]
 }

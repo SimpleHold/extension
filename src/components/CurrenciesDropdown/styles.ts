@@ -28,6 +28,18 @@ type TListItemRowProps = {
   withLogo: boolean
 }
 
+type TDropdownRowProps = {
+  isVisible: boolean
+}
+
+type TListProps = {
+  maxHeight: number
+}
+
+type TDropdownButtonProps = {
+  color: string
+}
+
 const Wrapper = styled.div`
   margin: 0 0 10px 0;
   position: relative;
@@ -45,6 +57,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  max-height: 60px;
 
   &:hover {
     cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
@@ -100,21 +113,22 @@ const ArrowIconRow = styled.div`
   }
 `
 
-const NetworksList = styled.div`
-  border-top: none;
-  background-color: #ffffff;
-  width: 100%;
-  border-radius: 0 0 5px 5px;
+const DropdownRow = styled.div`
   position: absolute;
-  opacity: ${({ isVisible }: TVisibleProps) => (isVisible ? '1' : '0')};
-  visibility: ${({ isVisible }: TVisibleProps) => (isVisible ? 'visible' : 'hidden')};
-  transform: ${({ isVisible }: TVisibleProps) => `translateY(${isVisible ? '0' : '-20px'})`};
+  width: 100%;
+  opacity: ${({ isVisible }: TDropdownRowProps) => (isVisible ? '1' : '0')};
+  visibility: ${({ isVisible }: TDropdownRowProps) => (isVisible ? 'visible' : 'hidden')};
+  transform: ${({ isVisible }: TDropdownRowProps) => `translateY(${isVisible ? '0' : '-20px'})`};
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
-  top: 62px;
-  max-height: 255px;
-  overflow-y: scroll;
+  background-color: #ffffff;
+  border-radius: 0 0 5px 5px;
   border: 1px solid #3fbb7d;
   border-top: none;
+`
+
+const List = styled.div`
+  max-height: ${({ maxHeight }: TListProps) => `${maxHeight}px`};
+  overflow-y: scroll;
 `
 
 const ListItem = styled.div`
@@ -125,6 +139,7 @@ const ListItem = styled.div`
   overflow: hidden;
   position: relative;
   background-color: #ffffff;
+  max-height: 60px;
 
   &:not(:last-child) {
     border-bottom: none;
@@ -145,15 +160,6 @@ const ListItem = styled.div`
   }
 `
 
-const ListItemValue = styled.p`
-  margin: 0;
-  font-size: 16px;
-  line-height: 23px;
-  color: #1d1d22;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
-
 const ListItemRow = styled.div`
   margin: ${({ withLogo }: TListItemRowProps) => (withLogo ? '0 0 0 10px' : '0')};
   overflow: hidden;
@@ -167,6 +173,57 @@ const ListItemLabel = styled.p`
   color: #7d7e8d;
 `
 
+const ListItemValue = styled.p`
+  margin: 0;
+  font-size: 16px;
+  line-height: 23px;
+  color: #1d1d22;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
+
+const DropdownActions = styled.div`
+  padding: 10.5px 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-top: 1px solid #eaeaea;
+`
+
+const DropdownButton = styled.div`
+  height: 36px;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
+
+  p {
+    color: ${({ color }: TDropdownButtonProps) => color};
+  }
+
+  &:first-child {
+    margin: 0 7.5px 0 0;
+  }
+
+  &:last-child {
+    margin: 0 0 0 7.5px;
+  }
+
+  &:hover {
+    cursor: pointer;
+    border: ${({ color }: TDropdownButtonProps) => `1px solid ${color}`};
+  }
+`
+
+const DropdownButtonLabel = styled.p`
+  margin: 0;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -175,11 +232,15 @@ const Styles = {
   Label,
   Value,
   ArrowIconRow,
-  NetworksList,
+  DropdownRow,
+  List,
   ListItem,
   ListItemRow,
-  ListItemValue,
   ListItemLabel,
+  ListItemValue,
+  DropdownActions,
+  DropdownButton,
+  DropdownButtonLabel,
 }
 
 export default Styles

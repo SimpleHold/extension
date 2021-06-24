@@ -3,6 +3,13 @@ import copy from 'copy-to-clipboard'
 
 // Utils
 import { IRequest } from '@utils/browser/types'
+import { setItem } from '@utils/storage'
+
+let initialScreenX: number = 0
+let initialScreenY: number = 0
+let initialLeft: number = 0
+let initialTop: number = 0
+let isDraggableActive: boolean = false
 
 const setSHAttribute = async () => {
   document.documentElement.setAttribute('sh-ex-status', 'installed')
@@ -29,27 +36,72 @@ const addCustomEventListener = (selector: string, event: any, handler: Function)
   }
 }
 
-addCustomEventListener('#sh-button', 'click', () => {
+const removeIframe = () => {
+  const findIframe = document.getElementById('sh-iframe')
+
+  if (findIframe) {
+    findIframe.parentNode?.removeChild(findIframe)
+  }
+}
+
+const createIframe = async (src: string) => {
+  removeIframe()
+
+  await browser.runtime.sendMessage({
+    type: 'save_tab_info',
+  })
+
+  const iframe = document.createElement('iframe')
+
+  iframe.id = 'sh-iframe'
+
+  const { screenX, outerWidth } = window
+
+  iframe.style.width = '375px'
+  iframe.style.height = '700px'
+  iframe.style.position = 'absolute'
+  iframe.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
+  iframe.style.top = '0'
+  iframe.style.zIndex = '100'
+  iframe.style.borderRadius = '16px'
+  iframe.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
+  iframe.style.border = 'none'
+
+  iframe.src = browser.extension.getURL(src)
+
+  document.body.insertBefore(iframe, document.body.firstChild)
+}
+
+addCustomEventListener('#sh-button', 'click', async () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
   if (findInput && !window.screenTop && !window.screenY) {
-    const iframe = document.createElement('iframe')
+    const getButton = document.getElementById('sh-button')
 
-    iframe.id = 'sh-iframe'
+    const currency = getButton?.getAttribute('sh-currency')
+    const chain = getButton?.getAttribute('sh-currency-chain')
 
-    const { screenX, outerWidth } = window
+    await createIframe(`select-address.html?currency=${currency}&chain=${chain}&isDraggable=true`)
+  }
+})
 
-    iframe.style.width = '375px'
-    iframe.style.height = '700px'
-    iframe.style.position = 'absolute'
-    iframe.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
-    iframe.style.top = '0'
-    iframe.style.zIndex = '100'
-    iframe.style.border = 'none'
+addCustomEventListener('#sh-send-button', 'click', async () => {
+  if (!window.screenTop && !window.screenY) {
+    const getButton = document.getElementById('sh-send-button')
 
-    iframe.src = browser.extension.getURL('select-address.html')
+    const readOnly = getButton?.getAttribute('sh-read-only')
+    const currency = getButton?.getAttribute('sh-currency')
+    const amount = getButton?.getAttribute('sh-amount')
+    const recipientAddress = getButton?.getAttribute('sh-recipient-address')
+    const chain = getButton?.getAttribute('sh-chain')
+    const extraId = getButton?.getAttribute('sh-extra-id')
 
-    document.body.insertBefore(iframe, document.body.firstChild)
+    setItem(
+      'sendPageProps',
+      JSON.stringify({ readOnly, currency, amount, recipientAddress, chain, extraId })
+    )
+
+    await createIframe('send.html?isDraggable=true')
   }
 })
 
@@ -88,17 +140,41 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       document.execCommand('delete')
       document.execCommand('paste')
 
-      const findIframe = document.getElementById('sh-iframe')
-
-      if (findIframe) {
-        findIframe.parentNode?.removeChild(findIframe)
-      }
+      removeIframe()
     }
   } else if (request.type === 'context-menu-address') {
     const { data } = request
 
     copy(data.address)
     document.execCommand('paste')
+  } else if (request.type === 'close_select_address_window') {
+    removeIframe()
+  } else if (request.type === 'initial_drag_positions') {
+    const { screenX, screenY } = request.data
+    const findIframe = document.getElementById('sh-iframe')
+
+    if (findIframe) {
+      initialScreenX = screenX
+      initialScreenY = screenY
+
+      initialLeft = parseInt(findIframe.style.left)
+      initialTop = parseInt(findIframe.style.top)
+    }
+  } else if (request.type === 'set_drag_active') {
+    const { isActive } = request.data
+    isDraggableActive = isActive
+  } else if (request.type === 'drag') {
+    if (!isDraggableActive) return
+
+    const { screenX, screenY } = request.data
+    const deltaX = screenX - initialScreenX
+    const deltaY = screenY - initialScreenY
+
+    const findIframe = document.getElementById('sh-iframe')
+    if (findIframe) {
+      findIframe.style.left = initialLeft + deltaX + 'px'
+      findIframe.style.top = initialTop + deltaY + 'px'
+    }
   }
 })
 
