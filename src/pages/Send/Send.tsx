@@ -1,47 +1,36 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import numeral from 'numeral'
-import { BigNumber } from 'bignumber.js'
-import SVG from 'react-inlinesvg'
 
 // Components
-import Cover from '@components/Cover'
-import Header from '@components/Header'
-import TextInput from '@components/TextInput'
-import Button from '@components/Button'
 import Skeleton from '@components/Skeleton'
-import Spinner from '@components/Spinner'
-import CurrenciesDropdown from '@components/CurrenciesDropdown'
-import Tooltip from '@components/Tooltip'
+
+// Container
+import SendPageContainer from '@containers/SendPage'
 
 // Utils
+import { toUpper, price } from '@utils/format'
+import { getBalance } from '@utils/api'
 import { getWallets, IWallet, updateBalance } from '@utils/wallet'
-import { toUpper, price, toLower } from '@utils/format'
-import { getBalance, getUnspentOutputs } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import {
-  validateAddress,
-  getAddressNetworkFee,
-  formatUnit,
-  getNetworkFeeSymbol,
-  getExtraIdName,
-  generateExtraId,
-} from '@utils/currencies'
-import * as bitcoinLike from '@utils/currencies/bitcoinLike'
-
-// Types
-import { TCardanoUnspentTxOutput } from '@utils/currencies/cardano/types'
+import { getExtraIdName, validateAddress } from '@utils/currencies'
 
 // Config
-import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
-import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
+import { getCurrency } from '@config/currencies'
+import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
 
-// Hooks
-import useDebounce from '@hooks/useDebounce'
+// Types
+import { TConfirmParams } from '@containers/SendPage/SendPageContainer'
 
 // Styles
 import Styles from './styles'
+
+type TStyles = {
+  wrapper: React.CSSProperties
+  container: React.CSSProperties
+  form: React.CSSProperties
+}
 
 interface LocationState {
   symbol: TSymbols
@@ -51,6 +40,32 @@ interface LocationState {
   contractAddress?: string
   tokenName?: string
   decimals?: number
+}
+
+const getStyles = (withExtraid: boolean): TStyles => {
+  return {
+    wrapper: {
+      height: '600px',
+    },
+    container: {
+      backgroundColor: '#ffffff',
+      borderRadius: '5px 5px 0 0',
+      height: '540px',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'space-between',
+    },
+    form: {
+      padding: withExtraid ? '20px 30px' : '20px 30px 30px 30px',
+      backgroundColor: '#f8f8f8',
+      borderTop: '1px solid #eaeaea',
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-end',
+    },
+  }
 }
 
 const Send: React.FC = () => {
@@ -69,24 +84,12 @@ const Send: React.FC = () => {
 
   const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
 
-  const [address, setAddress] = React.useState<string>('')
-  const [amount, setAmount] = React.useState<string>('')
-  const [addresses, setAddresses] = React.useState<string[]>([])
-  const [selectedAddress, setSelectedAddress] = React.useState<string>(locationAddress)
-  const [networkFee, setNetworkFee] = React.useState<number>(0)
   const [balance, setBalance] = React.useState<null | number>(null)
   const [estimated, setEstimated] = React.useState<null | number>(null)
-  const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
-  const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
-  const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
-  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | TCardanoUnspentTxOutput[]>([])
-  const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
-  const [currencyBalance, setCurrencyBalance] = React.useState<number | null>(null)
-  const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
-  const [extraId, setExtraId] = React.useState<string>('')
   const [extraIdName, setExtraIdName] = React.useState<string>('')
-
-  const debounced = useDebounce(amount, 1000)
+  const [selectedAddress, setSelectedAddress] = React.useState<string>(locationAddress)
+  const [addresses, setAddresses] = React.useState<string[]>([])
+  const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
 
   React.useEffect(() => {
     getWalletsList()
@@ -95,90 +98,8 @@ const Send: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
-    getOutputs()
     loadBalance()
   }, [selectedAddress])
-
-  React.useEffect(() => {
-    if (amount.length && Number(balance) > 0 && !amountErrorLabel) {
-      setNetworkFeeLoading(true)
-      getNetworkFee()
-    }
-  }, [debounced])
-
-  React.useEffect(() => {
-    if (networkFee > 0 && !amountErrorLabel) {
-      if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
-        setAmountErrorLabel('Insufficient funds')
-      }
-    }
-  }, [networkFee])
-
-  const getExtraId = (): void => {
-    const name = getExtraIdName(symbol)
-
-    if (name) {
-      setExtraIdName(name)
-    }
-  }
-
-  const onGetNetworkFeeSymbol = (): void => {
-    const data = getNetworkFeeSymbol(symbol, tokenChain)
-    setNetworkFeeSymbol(data)
-  }
-
-  const getOutputs = async (): Promise<void> => {
-    if (bitcoinLike.chains.indexOf(chain) !== -1 || toLower(symbol) === 'ada') {
-      const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
-      setOutputs(unspentOutputs)
-    }
-  }
-
-  const getNetworkFee = async (): Promise<void> => {
-    setUtxosList([])
-
-    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
-
-    const data = await getAddressNetworkFee(
-      selectedAddress,
-      symbol,
-      amount,
-      selectedAddress,
-      address,
-      chain,
-      outputs,
-      tokenChain,
-      contractAddress,
-      getTokenDecimals || decimals
-    )
-
-    setNetworkFeeLoading(false)
-
-    if (data) {
-      if (data.utxos) {
-        setUtxosList(data?.utxos)
-      }
-
-      if (data.networkFee) {
-        setNetworkFee(data.networkFee)
-      }
-
-      if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
-        setCurrencyBalance(data.currencyBalance)
-      }
-    }
-  }
-
-  const getWalletsList = (): void => {
-    const walletsList = getWallets()
-
-    if (walletsList) {
-      const filterWallets = walletsList
-        .filter((wallet: IWallet) => wallet.symbol === symbol)
-        .map((wallet: IWallet) => wallet.address)
-      setAddresses(filterWallets)
-    }
-  }
 
   const loadBalance = async (): Promise<void> => {
     setBalance(null)
@@ -193,114 +114,30 @@ const Send: React.FC = () => {
       )
 
       setBalance(balance)
-      updateBalance(address, symbol, balance, balance_btc)
+      updateBalance(selectedAddress, symbol, balance, balance_btc)
       setEstimated(balance_usd)
     }
   }
 
-  const onSend = (): void => {
-    logEvent({
-      name: ADDRESS_SEND,
-    })
+  const getWalletsList = (): void => {
+    const walletsList = getWallets()
 
-    const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
-    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
-
-    history.push('/send-confirm', {
-      amount: Number(amount),
-      symbol,
-      networkFee,
-      networkFeeSymbol,
-      addressFrom: selectedAddress,
-      addressTo: address,
-      outputs: utxosList,
-      chain,
-      contractAddress: tokenContractAddress || contractAddress,
-      tokenChain,
-      decimals: getTokenDecimals || decimals,
-      extraId,
-    })
-  }
-
-  const onBlurAddressInput = (): void => {
-    if (addressErrorLabel) {
-      setAddressErrorLabel(null)
-    }
-
-    if (address.length && !validateAddress(symbol, chain, address, tokenChain)) {
-      setAddressErrorLabel('Address is not valid')
-    }
-
-    if (address === selectedAddress) {
-      setAddressErrorLabel('Address same as sender')
+    if (walletsList) {
+      const filterWallets = walletsList
+        .filter((wallet: IWallet) => wallet.symbol === symbol)
+        .map((wallet: IWallet) => wallet.address)
+      setAddresses(filterWallets)
     }
   }
 
-  const getAvailableBalance = (): number => {
-    if (balance) {
-      if (toLower(symbol) === 'xrp') {
-        return new BigNumber(balance).minus(20).toNumber()
-      }
-      return Number(balance)
+  const onGetNetworkFeeSymbol = (): void => {}
+
+  const getExtraId = (): void => {
+    const name = getExtraIdName(symbol)
+
+    if (name) {
+      setExtraIdName(name)
     }
-    return 0
-  }
-
-  const onBlurAmountInput = (): void => {
-    if (amountErrorLabel) {
-      setAmountErrorLabel(null)
-    }
-
-    const availableBalance = getAvailableBalance()
-
-    if (amount.length && Number(amount) + Number(networkFee) >= Number(availableBalance)) {
-      return setAmountErrorLabel('Insufficient funds')
-    }
-
-    if (currency) {
-      let parseAmount: number = Number(amount)
-      let parseMinAmount: number = 0
-
-      if (tokenChain) {
-        parseMinAmount = currency.minSendAmount || 0.001
-      } else {
-        parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
-        parseMinAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
-      }
-
-      if (parseAmount < currency.minSendAmount) {
-        return setAmountErrorLabel(`Min amount is ${parseMinAmount} ${toUpper(symbol)}`)
-      }
-    }
-  }
-
-  const isCurrencyBalanceError =
-    (tokenChain || toLower(symbol) === 'theta') &&
-    currencyBalance !== null &&
-    !isNetworkFeeLoading &&
-    networkFee &&
-    networkFee > currencyBalance
-
-  const isButtonDisabled = (): boolean => {
-    if (
-      validateAddress(symbol, chain, address, tokenChain) &&
-      amount.length &&
-      Number(amount) > 0 &&
-      addressErrorLabel === null &&
-      amountErrorLabel === null &&
-      Number(balance) > 0 &&
-      networkFee > 0 &&
-      !isNetworkFeeLoading &&
-      !isCurrencyBalanceError
-    ) {
-      if (!outputs.length) {
-        if (bitcoinLike.chains.indexOf(chain) !== -1 || toLower(symbol) === 'ada') {
-          return true
-        }
-      }
-      return false
-    }
-    return true
   }
 
   const onCancel = (): void => {
@@ -310,6 +147,42 @@ const Send: React.FC = () => {
 
     history.goBack()
   }
+
+  const onConfirm = (params: TConfirmParams): void => {
+    logEvent({
+      name: ADDRESS_SEND,
+    })
+
+    const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
+    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
+
+    history.push('/send-confirm', {
+      ...params,
+      symbol,
+      addressFrom: selectedAddress,
+      chain,
+      contractAddress: tokenContractAddress || contractAddress,
+      tokenChain,
+      decimals: getTokenDecimals || decimals,
+    })
+  }
+
+  const withExtraid = extraIdName?.length > 0
+  const styles = getStyles(withExtraid)
+
+  const renderRow = (
+    <Styles.Row withExtraid={withExtraid}>
+      {!extraIdName?.length ? <Styles.PageTitle>Send</Styles.PageTitle> : null}
+      <Skeleton width={250} height={42} type="gray" mt={21} isLoading={balance === null}>
+        <Styles.Balance>
+          {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
+        </Styles.Balance>
+      </Skeleton>
+      <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
+        <Styles.USDEstimated>{`$${price(estimated, 2)}`}</Styles.USDEstimated>
+      </Skeleton>
+    </Styles.Row>
+  )
 
   const mapDropDownList = addresses
     .filter((address: string) => address !== selectedAddress)
@@ -332,128 +205,51 @@ const Send: React.FC = () => {
     setSelectedAddress(mapDropDownList[index].value)
   }
 
-  const onSubmitForm = (e: React.FormEvent) => {
-    e.preventDefault()
-  }
+  const onBlurAddressInput = (address: string): void => {
+    if (addressErrorLabel) {
+      setAddressErrorLabel(null)
+    }
 
-  const createExtraId = (): void => {
-    const newExtraId = generateExtraId(symbol)
+    if (address.length && !validateAddress(symbol, chain, address, tokenChain)) {
+      setAddressErrorLabel('Address is not valid')
+    }
 
-    if (newExtraId) {
-      setExtraId(newExtraId)
+    if (address === selectedAddress) {
+      setAddressErrorLabel('Address same as sender')
     }
   }
 
-  const extraIdInputButton = () => (
-    <Tooltip text="Generate destination tag" direction="right">
-      <Styles.InputButton onClick={createExtraId} withHover>
-        <SVG src="../../assets/icons/generateExtraid.svg" width={16} height={16} />
-      </Styles.InputButton>
-    </Tooltip>
-  )
-
-  const amountInputButton = () => {
-    if (toLower(symbol) === 'xrp' && amountErrorLabel === 'Insufficient funds') {
-      return (
-        <Tooltip
-          text="The network requires at least 20 XRP balance at all times."
-          direction="right"
-          maxWidth={195}
-          textSpace="pre-wrap"
-        >
-          <Styles.InputButton disabled>
-            <SVG src="../../assets/icons/info.svg" width={16} height={16} />
-          </Styles.InputButton>
-        </Tooltip>
-      )
-    }
-    return null
+  const dropDownProps = {
+    label: currency?.name,
+    value: selectedAddress,
+    currencySymbol: symbol,
+    background: currency?.background,
+    list: mapDropDownList,
+    onSelect: onSelectDropDown,
+    disabled: addresses.length < 2,
+    tokenChain,
+    tokenName,
   }
-
-  const withExtraid = extraIdName?.length > 0
 
   return (
-    <Styles.Wrapper>
-      <Cover />
-      <Header withBack backTitle="Wallet" onBack={history.goBack} />
-      <Styles.Container>
-        <Styles.Row withExtraid={withExtraid}>
-          {!extraIdName?.length ? <Styles.PageTitle>Send</Styles.PageTitle> : null}
-          <Skeleton width={250} height={42} type="gray" mt={21} isLoading={balance === null}>
-            <Styles.Balance>
-              {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
-            </Styles.Balance>
-          </Skeleton>
-          <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
-            <Styles.USDEstimated>{`$${price(estimated, 2)}`}</Styles.USDEstimated>
-          </Skeleton>
-        </Styles.Row>
-        <Styles.Form onSubmit={onSubmitForm} withExtraid={withExtraid}>
-          {addresses?.length ? (
-            <CurrenciesDropdown
-              label={currency?.name}
-              value={selectedAddress}
-              currencySymbol={symbol}
-              currencyBr={10}
-              background={currency?.background}
-              list={mapDropDownList}
-              onSelect={onSelectDropDown}
-              disabled={addresses.length < 2}
-              tokenChain={tokenChain}
-              tokenName={tokenName}
-            />
-          ) : null}
-          <TextInput
-            label="Recipient Address"
-            value={address}
-            onChange={setAddress}
-            errorLabel={addressErrorLabel}
-            onBlurInput={onBlurAddressInput}
-            disabled={balance === null}
-          />
-          {withExtraid ? (
-            <TextInput
-              label={`${extraIdName} (optional)`}
-              value={extraId}
-              onChange={setExtraId}
-              disabled={balance === null}
-              button={extraIdInputButton()}
-            />
-          ) : null}
-          <TextInput
-            label={`Amount (${toUpper(symbol)})`}
-            value={amount}
-            onChange={setAmount}
-            type="number"
-            errorLabel={amountErrorLabel}
-            onBlurInput={onBlurAmountInput}
-            disabled={balance === null}
-            button={amountInputButton()}
-          />
-          <Styles.NetworkFeeBlock>
-            <Styles.NetworkFeeLabel withExtraid={withExtraid}>Network fee:</Styles.NetworkFeeLabel>
-            {isNetworkFeeLoading ? (
-              <Spinner ml={10} size={16} />
-            ) : (
-              <Styles.NetworkFee withExtraid={withExtraid}>
-                {networkFee === 0 ? '-' : `${networkFee} ${toUpper(networkFeeSymbol)}`}
-              </Styles.NetworkFee>
-            )}
-            {isCurrencyBalanceError && currencyBalance !== null ? (
-              <Styles.NetworkFeeError>
-                Insufficient funds {Number(networkFee - currencyBalance)}{' '}
-                {toUpper(networkFeeSymbol)}
-              </Styles.NetworkFeeError>
-            ) : null}
-          </Styles.NetworkFeeBlock>
-
-          <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} isSmall />
-            <Button label="Send" onClick={onSend} disabled={isButtonDisabled()} ml={7.5} isSmall />
-          </Styles.Actions>
-        </Styles.Form>
-      </Styles.Container>
-    </Styles.Wrapper>
+    <SendPageContainer
+      styles={styles}
+      renderRow={renderRow}
+      withCover
+      withHeader
+      goBack={history.goBack}
+      currency={currency}
+      balance={balance}
+      withExtraid={withExtraid}
+      extraIdName={extraIdName}
+      selectedAddress={selectedAddress}
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      chain={chain}
+      dropDown={dropDownProps}
+      onBlurAddressInput={onBlurAddressInput}
+      addressErrorLabel={addressErrorLabel}
+    />
   )
 }
 
