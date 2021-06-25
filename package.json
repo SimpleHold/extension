@@ -31,6 +31,7 @@
     "copy-to-clipboard": "^3.3.1",
     "crypto-js": "^4.0.0",
     "detect-browser": "^5.2.0",
+    "neblio-lib": "https://github.com/NeblioTeam/bitcore-lib#neblcore-lib",
     "nuls-sdk-js": "^2.5.0",
     "numeral": "^2.0.6",
     "qrcode.react": "^1.0.1",

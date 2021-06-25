@@ -1,6 +1,7 @@
 declare module '*.png'
 declare module '*.svg'
 declare module '@thetalabs/theta-js'
+declare module 'neblio-lib'
 
 declare module 'nuls-sdk-js' {
   function newAddress(
