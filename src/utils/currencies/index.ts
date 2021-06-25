@@ -90,9 +90,19 @@ export const validateAddress = (
   tokenChain?: string
 ): boolean => {
   try {
+    if (Ripple.coins.indexOf(symbol) !== -1) {
+      return Ripple.validateAddress(address)
+    }
+
+    if (Nuls.coins.indexOf(symbol) !== -1) {
+      return Nuls.validateAddress(address)
+    }
+
     if (Cardano.coins.indexOf(symbol) !== -1) {
       return Cardano.validateAddress(address)
-    } else if (chain && BitcoinLike.chains.indexOf(chain) !== -1) {
+    }
+
+    if (chain && BitcoinLike.chains.indexOf(chain) !== -1) {
       return BitcoinLike.validateAddress(address, symbol)
     }
     // @ts-ignore
