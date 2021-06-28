@@ -14,6 +14,7 @@ import { getCurrency } from '@config/currencies'
 let activeRequest: string | null
 
 let currentWindowId: number
+let currentPopupWindow: number
 
 browser.windows.onFocusChanged.addListener(async (windowId) => {
   if (windowId !== -1) {
@@ -23,6 +24,8 @@ browser.windows.onFocusChanged.addListener(async (windowId) => {
 
     if (checkIsNonPopup?.type !== 'popup') {
       currentWindowId = windowId
+    } else {
+      currentPopupWindow = windowId
     }
   }
 })
@@ -106,6 +109,8 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   } else if (request.type === 'save_tab_info') {
     const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
     setItem('tab', JSON.stringify(currentTab[0]))
+  } else if (request.type === 'remove_window') {
+    await browser.windows.remove(currentPopupWindow)
   } else {
     const tabs = await browser.tabs.query({
       active: true,

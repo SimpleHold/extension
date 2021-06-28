@@ -48,6 +48,10 @@ const createIframe = async (src: string) => {
   removeIframe()
 
   await browser.runtime.sendMessage({
+    type: 'remove_window',
+  })
+
+  await browser.runtime.sendMessage({
     type: 'save_tab_info',
   })
 
