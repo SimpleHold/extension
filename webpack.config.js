@@ -154,6 +154,13 @@ module.exports = {
       filename: 'restore-backup.html',
     }),
     new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'phishing.html'),
+      inject: 'body',
+      chunks: [],
+      hash: true,
+      filename: 'phishing.html',
+    }),
+    new HtmlWebpackPlugin({
       template: path.join(viewsPath, 'select-address.html'),
       inject: 'body',
       chunks: ['selectAddress'],

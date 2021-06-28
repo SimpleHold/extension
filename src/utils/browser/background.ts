@@ -4,16 +4,44 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 import { IRequest } from '@utils/browser/types'
 import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
-import { getUrl } from '@utils/extension'
-import { setItem } from '@utils/storage'
+import { getUrl, openWebPage } from '@utils/extension'
+import { setItem, getItem } from '@utils/storage'
 import { generateTag } from '@utils/currencies/ripple'
+import { validateUrl } from '@utils/validate'
 
 // Config
 import { getCurrency } from '@config/currencies'
+import { getPhishingUrls } from 'utils/api'
 
-let activeRequest: string | null
-
+let activeRequest: string | undefined
 let currentWindowId: number
+let activeTabUrl: string | undefined
+
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  alert(tab.url)
+  if (tab?.url) {
+    const { url } = tab
+
+    if (validateUrl(url) && activeTabUrl !== url) {
+      activeTabUrl = url
+
+      checkPhishing(tab)
+    }
+  }
+})
+
+const checkPhishing = async (tab: Tabs.Tab): Promise<void> => {
+  const getPhishingUrls = getItem('phishingUrls')
+
+  if (tab?.url && getPhishingUrls) {
+    const { url } = tab
+    const parsetPhishingUrls = JSON.parse(getPhishingUrls)
+
+    if (parsetPhishingUrls.indexOf(url) !== -1) {
+      await openWebPage(getUrl('phishing.html'))
+    }
+  }
+}
 
 browser.windows.onFocusChanged.addListener(async (windowId) => {
   if (windowId !== -1) {
@@ -58,7 +86,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       left: Math.max(screenX + (outerWidth - 375), 0),
       top: screenY,
     })
-    activeRequest = null
+    activeRequest = undefined
   }
 
   if (request.type === 'set_address') {
@@ -115,7 +143,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       left: Math.max(screenX + (outerWidth - 375), 0),
       top: screenY,
     })
-    activeRequest = null
+    activeRequest = undefined
   }
 })
 
@@ -190,10 +218,24 @@ const generateContextMenu = async () => {
   }
 }
 
+const onGetPhishingUrls = async () => {
+  const data = await getPhishingUrls()
+
+  if (data?.length) {
+    setItem('phishingUrls', JSON.stringify(data))
+  }
+
+  setTimeout(() => {
+    onGetPhishingUrls()
+  }, 900000)
+}
+
 browser.runtime.onInstalled.addListener(() => {
   setInterval(() => {
     generateContextMenu()
   }, 5000)
+
+  onGetPhishingUrls()
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
@@ -211,7 +253,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
       await browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',
         data: {
-          address: data
+          address: data,
         },
       })
     } else {

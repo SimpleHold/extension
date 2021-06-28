@@ -291,3 +291,17 @@ export const getXrpTxParams = async (from: string) => {
     return null
   }
 }
+
+export const getPhishingUrls = async (): Promise<string[] | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/phishing-sites`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return null
+  }
+}
