@@ -146,7 +146,7 @@ const currencies: ICurrency[] = [
     logo: neblioLogo,
     background: '#9172CE',
     chain: 'neblio',
-    minSendAmount: 1000,
+    minSendAmount: 100000,
   },
 ]
 

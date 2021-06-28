@@ -108,5 +108,8 @@
     "webpack-extension-reloader": "^1.1.4",
     "wext-manifest-loader": "^2.2.1",
     "wext-manifest-webpack-plugin": "^1.2.1"
+  },
+  "resolutions": {
+    "neblio-lib/**/bn.js": "=2.0.4"
   }
 }

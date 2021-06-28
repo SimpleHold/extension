@@ -100,6 +100,8 @@ export const validateAddress = (
       return cardano.validateAddress(address)
     } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
       return new bitcoinLike(symbol).isAddressValid(address)
+    } else if (neblio.coins.indexOf(symbol) !== -1) {
+      return neblio.validateAddress(address)
     }
     // @ts-ignore
     return new RegExp(tokenChain ? addressValidate.eth : addressValidate[symbol])?.test(address)
@@ -162,6 +164,9 @@ export const createTransaction = async ({
     }
 
     if (outputs?.length && networkFee) {
+      if (neblio.coins.indexOf(symbol) !== -1) {
+        return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
+      }
       return new bitcoinLike(symbol).createTransaction(
         outputs,
         to,
@@ -228,6 +233,12 @@ export const getNewNetworkFee = async (
   }
 
   if (outputs?.length) {
+    if (cardano.coins.indexOf(symbol) !== -1) {
+      return cardano.getNetworkFee(outputs, amount)
+    }
+    if (neblio.coins.indexOf(symbol) !== -1) {
+      return neblio.getNetworkFee(address, outputs, amount)
+    }
     return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
   }
 
@@ -280,8 +291,11 @@ export const getAddressNetworkFee = async (
     }
 
     if (typeof outputs !== 'undefined') {
-      if (toLower(symbol) === 'ada') {
+      if (cardano.coins.indexOf(symbol) !== -1) {
         return cardano.getNetworkFee(outputs, amount)
+      }
+      if (neblio.coins.indexOf(symbol) !== -1) {
+        return neblio.getNetworkFee(address, outputs, amount)
       }
       return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
     }
@@ -300,7 +314,9 @@ export const formatUnit = (
   unit?: web3.Unit
 ): number => {
   try {
-    if (nuls.coins.indexOf(symbol) !== -1) {
+    if (neblio.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? neblio.fromSat(Number(value)) : neblio.toSat(Number(value))
+    } else if (nuls.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? nuls.fromNuls(value) : nuls.toNuls(value)
     } else if (ripple.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
@@ -332,7 +348,9 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.getExplorerLink(address)
+  } else if (nuls.coins.indexOf(symbol) !== -1) {
     return nuls.getExplorerLink(address)
   } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getExplorerLink(address)
@@ -372,7 +390,9 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string | null => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.getTransactionLink(hash)
+  } else if (nuls.coins.indexOf(symbol) !== -1) {
     return nuls.getTransactionLink(hash)
   } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getTransactionLink(hash)

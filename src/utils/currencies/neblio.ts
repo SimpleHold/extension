@@ -28,7 +28,11 @@ export const importPrivateKey = (privateKey: string): string | null => {
 
 export const getFee = (address: string, outputs: UnspentOutput[], amount: string): number => {
   try {
-    return new neblioLib.Transaction().from(outputs).to(address, amount).change(address).getFee()
+    return new neblioLib.Transaction()
+      .from(outputs)
+      .to(address, toSat(Number(amount)))
+      .change(address)
+      .getFee()
   } catch {
     return 0
   }
@@ -50,12 +54,7 @@ export const fromSat = (value: number): number => {
   }
 }
 
-export const getNetworkFee = (
-  address: string,
-  unspentOutputs: UnspentOutput[],
-  amount: string,
-  symbol: string
-) => {
+export const getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], amount: string) => {
   const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
   const utxos: UnspentOutput[] = []
 
@@ -75,6 +74,16 @@ export const getNetworkFee = (
   return {
     networkFee,
     utxos,
+  }
+}
+
+export const validateAddress = (address: string) => {
+  try {
+    const getAddress = new neblioLib.Address.fromString(address)
+
+    return toLower(getAddress.toString()) === toLower(address)
+  } catch {
+    return false
   }
 }
 
@@ -98,4 +107,12 @@ export const createTransaction = (
   } catch {
     return null
   }
+}
+
+export const getExplorerLink = (address: string): string => {
+  return `https://explorer.nebl.io/address/${address}`
+}
+
+export const getTransactionLink = (hash: string): string => {
+  return `https://explorer.nebl.io/tx/${hash}`
 }
