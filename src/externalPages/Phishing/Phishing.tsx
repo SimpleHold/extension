@@ -1,6 +1,9 @@
 import * as React from 'react'
 import { render } from 'react-dom'
-import { browser } from 'webextension-polyfill-ts'
+
+// Utils
+import { removeItem } from '@utils/storage'
+import { getUrl, getTabs, removeTabs } from '@utils/extension'
 
 // Styles
 import Styles from './styles'
@@ -14,18 +17,20 @@ const Phishing: React.FC = () => {
     const urls = localStorage.getItem('phishingUrls')
 
     if (urls) {
-      const tabs = await browser.tabs.query({
+      const tabs = await getTabs({
         active: false,
-        url: JSON.parse(urls),
+        url: [...JSON.parse(urls), getUrl('phishing.html')],
       })
 
       const mapTabIds = tabs.map((tab) => tab.id)
 
       if (mapTabIds.length) {
         // @ts-ignore
-        await browser.tabs.remove(mapTabIds)
+        await removeTabs(mapTabIds)
       }
     }
+
+    removeItem('latestPhishingSite')
   }
 
   return (

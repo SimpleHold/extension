@@ -38,3 +38,11 @@ export const updateTab = async (
 ): Promise<Tabs.Tab> => {
   return await browser.tabs.update(tabId, props)
 }
+
+export const getTabs = async (query: Tabs.QueryQueryInfoType): Promise<Tabs.Tab[]> => {
+  return await browser.tabs.query(query)
+}
+
+export const removeTabs = async (tabIds: number | number[]): Promise<void> => {
+  return await browser.tabs.remove(tabIds)
+}

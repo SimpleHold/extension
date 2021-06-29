@@ -15,14 +15,13 @@ import { getPhishingUrls } from '@utils/api'
 
 let activeRequest: string | undefined
 let currentWindowId: number
-let activeTabUrl: string | undefined
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (tab?.url) {
     const { url } = tab
 
-    if (validateUrl(url) && activeTabUrl !== url) {
-      activeTabUrl = url
+    if (validateUrl(url) && getItem('latestPhishingSite') !== url) {
+      setItem('latestPhishingSite', url)
 
       checkPhishing(tab)
     }
@@ -34,7 +33,7 @@ const checkPhishing = async (tab: Tabs.Tab): Promise<void> => {
 
   if (tab?.url && getPhishingUrls) {
     const { origin } = new URL(tab.url)
-    const parsetPhishingUrls = JSON.parse(getPhishingUrls)
+    const parsetPhishingUrls = JSON.parse(getPhishingUrls).map((i: string) => new URL(i).origin)
 
     if (parsetPhishingUrls.indexOf(origin) !== -1) {
       await openWebPage(getUrl('phishing.html'))
@@ -223,10 +222,6 @@ const onGetPhishingUrls = async () => {
   if (data?.length) {
     setItem('phishingUrls', JSON.stringify(data))
   }
-
-  setTimeout(() => {
-    onGetPhishingUrls()
-  }, 900000)
 }
 
 browser.runtime.onInstalled.addListener(() => {
@@ -234,7 +229,9 @@ browser.runtime.onInstalled.addListener(() => {
     generateContextMenu()
   }, 5000)
 
-  onGetPhishingUrls()
+  setInterval(() => {
+    onGetPhishingUrls()
+  }, 600000)
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
