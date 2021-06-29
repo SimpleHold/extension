@@ -11,14 +11,13 @@ import { validateUrl } from '@utils/validate'
 
 // Config
 import { getCurrency } from '@config/currencies'
-import { getPhishingUrls } from 'utils/api'
+import { getPhishingUrls } from '@utils/api'
 
 let activeRequest: string | undefined
 let currentWindowId: number
 let activeTabUrl: string | undefined
 
 browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  alert(tab.url)
   if (tab?.url) {
     const { url } = tab
 
@@ -34,10 +33,10 @@ const checkPhishing = async (tab: Tabs.Tab): Promise<void> => {
   const getPhishingUrls = getItem('phishingUrls')
 
   if (tab?.url && getPhishingUrls) {
-    const { url } = tab
+    const { origin } = new URL(tab.url)
     const parsetPhishingUrls = JSON.parse(getPhishingUrls)
 
-    if (parsetPhishingUrls.indexOf(url) !== -1) {
+    if (parsetPhishingUrls.indexOf(origin) !== -1) {
       await openWebPage(getUrl('phishing.html'))
     }
   }
