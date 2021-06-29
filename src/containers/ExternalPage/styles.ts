@@ -14,6 +14,10 @@ type TLogoProps = {
   headerStyle: 'white' | 'green'
 }
 
+type THeaderProps = {
+  isDraggable?: boolean
+}
+
 const Wrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -39,6 +43,7 @@ const Header = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
+  cursor: ${({ isDraggable }: THeaderProps) => (isDraggable ? 'move' : 'default')};
 `
 
 const HeaderRow = styled.div`

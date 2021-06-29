@@ -1,5 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
+import { browser } from 'webextension-polyfill-ts'
 
 // Components
 import Cover from '@components/Cover'
@@ -23,10 +24,11 @@ interface Props {
   backPageUrl?: string
   height?: string
   headerStyle: 'white' | 'green'
+  isDraggable?: boolean
 }
 
 const ExternalPageContainer: React.FC<Props> = (props) => {
-  const { onClose, children, backPageTitle, backPageUrl, height, headerStyle } = props
+  const { onClose, children, backPageTitle, backPageUrl, height, headerStyle, isDraggable } = props
 
   const [isLocked, setIsLocked] = React.useState<boolean>(getItem('isLocked') !== null)
   const [passcode, setPasscode] = React.useState<string>('')
@@ -43,6 +45,66 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
       window.removeEventListener('storage', localStorageUpdated)
     }
   }, [])
+
+  const sendRuntimeMessage = (type: string, data: any = {}): void => {
+    browser.runtime.sendMessage({
+      type,
+      data,
+    })
+  }
+
+  React.useEffect(() => {
+    if (isDraggable) {
+      sendRuntimeMessage('set_iframe_focus')
+
+      const dragStart = (event: MouseEvent) => {
+        const { pageX, pageY, screenX, screenY } = event
+
+        sendRuntimeMessage('initial_drag_positions', {
+          pageX,
+          pageY,
+          screenX,
+          screenY,
+        })
+
+        const getHeader = document.querySelector('.sh-header')
+
+        // @ts-ignore
+        if (getHeader?.contains(event.target)) {
+          sendRuntimeMessage('set_drag_active', {
+            isActive: true,
+          })
+        }
+      }
+
+      const dragEnd = () => {
+        sendRuntimeMessage('set_drag_active', {
+          isActive: false,
+        })
+      }
+
+      const drag = (event: MouseEvent) => {
+        const { pageX, pageY, screenX, screenY } = event
+
+        sendRuntimeMessage('drag', {
+          pageX,
+          pageY,
+          screenX,
+          screenY,
+        })
+      }
+
+      document.addEventListener('mousedown', dragStart)
+      document.addEventListener('mousemove', drag)
+      document.addEventListener('mouseup', dragEnd)
+
+      return () => {
+        document.removeEventListener('mousedown', dragStart)
+        document.removeEventListener('mousemove', drag)
+        document.removeEventListener('mouseup', dragEnd)
+      }
+    }
+  }, [isDraggable])
 
   React.useEffect(() => {
     if (getItem('isLocked') && !getItem('passcode')) {
@@ -161,7 +223,7 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
       />
       <Styles.Extension height={height}>
         {headerStyle === 'green' ? <Cover /> : null}
-        <Styles.Header>
+        <Styles.Header className="sh-header" isDraggable={isDraggable}>
           <Styles.Logo headerStyle={headerStyle}>
             <SVG src="../../assets/logo.svg" width={30} height={24} />
           </Styles.Logo>

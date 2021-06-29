@@ -2,20 +2,87 @@ import styled from 'styled-components'
 
 type TProgressDotProps = {
   isCurrent: boolean
+  theme: 'simplehold' | 'swapspace'
+}
+
+type TThemeProps = {
+  theme: 'simplehold' | 'swapspace'
+}
+
+type TThemeConfig = {
+  [key: string]: {
+    background: string
+    textColor: string
+    descriptionColor: string
+    nextColor: string
+    currentDotColor: string
+    nextDotColor: string
+  }
+}
+
+const themes: TThemeConfig = {
+  simplehold: {
+    background: '#ffffff',
+    textColor: '#1d1d22',
+    descriptionColor: '#7D7E8D',
+    nextColor: '#3fbb7d',
+    currentDotColor: '#3FBB7D',
+    nextDotColor: '#D3ECDD',
+  },
+  swapspace: {
+    background: 'linear-gradient(180deg, #201F21 0%, #4D374D 100%)',
+    textColor: '#FFFFFF',
+    descriptionColor: '#FFFFFF',
+    nextColor: '#E35760',
+    currentDotColor: '#E35760',
+    nextDotColor: 'rgba(227, 87, 96, 0.3)',
+  },
 }
 
 const Wrapper = styled.div`
   height: 600px;
-  background-color: #ffffff;
+  background: ${({ theme }: TThemeProps) => themes[theme].background};
   overflow: hidden;
+
+  .title {
+    color: ${({ theme }: TThemeProps) => themes[theme].textColor};
+  }
+
+  .description {
+    color: ${({ theme }: TThemeProps) => themes[theme].descriptionColor};
+  }
+
+  .next {
+    color: ${({ theme }: TThemeProps) => themes[theme].nextColor};
+  }
+
+  .arrow {
+    svg {
+      path {
+        fill: ${({ theme }: TThemeProps) => themes[theme].nextColor};
+      }
+    }
+  }
+
+  .container {
+    padding: ${({ theme }: TThemeProps) =>
+      theme === 'swapspace' ? '240px 30px 0 30px' : '40px 30px 0 30px'};
+  }
+
+  .slide {
+    width: ${({ theme }: TThemeProps) => (theme === 'swapspace' ? '375px' : '315px')};
+    height: ${({ theme }: TThemeProps) => (theme === 'swapspace' ? '315px' : '180px')};
+    position: ${({ theme }: TThemeProps) => (theme === 'swapspace' ? 'absolute' : 'relative')};
+    top: ${({ theme }: TThemeProps) => (theme === 'swapspace' ? '0' : 'initial')};
+  }
 `
 
 const Container = styled.div`
-  padding: 40px 30px 0 30px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 540px;
+  margin: 60px 0 0 0;
 `
 
 const Row = styled.div`
@@ -24,10 +91,7 @@ const Row = styled.div`
   align-items: center;
 `
 
-const Illustrate = styled.img`
-  width: 315px;
-  height: 180px;
-`
+const Illustrate = styled.img``
 
 const Title = styled.p`
   margin: 40px 0 0 0;
@@ -35,7 +99,6 @@ const Title = styled.p`
   font-size: 23px;
   line-height: 27px;
   text-transform: capitalize;
-  color: #1d1d22;
   text-align: center;
 `
 
@@ -79,7 +142,6 @@ const NextLabel = styled.p`
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
-  color: #3fbb7d;
 `
 
 const ArrowIconRow = styled.div`
@@ -87,17 +149,14 @@ const ArrowIconRow = styled.div`
 
   svg {
     transform: rotate(180deg);
-
-    path {
-      fill: #3fbb7d;
-    }
   }
 `
 
 const ProgressDot = styled.div`
   width: ${({ isCurrent }: TProgressDotProps) => (isCurrent ? '20px' : '6px')};
   height: 6px;
-  background-color: ${({ isCurrent }: TProgressDotProps) => (isCurrent ? '#3FBB7D' : '#D3ECDD')};
+  background-color: ${({ isCurrent, theme }: TProgressDotProps) =>
+    isCurrent ? themes[theme].currentDotColor : themes[theme].nextDotColor};
   border-radius: 5px;
 `
 

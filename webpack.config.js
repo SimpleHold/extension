@@ -157,7 +157,7 @@ module.exports = {
       template: path.join(viewsPath, 'select-address.html'),
       inject: 'body',
       chunks: ['selectAddress'],
-      hash: true,
+      hash: false,
       filename: 'select-address.html',
     }),
     new HtmlWebpackPlugin({
