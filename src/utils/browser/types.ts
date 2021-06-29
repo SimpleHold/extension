@@ -3,3 +3,8 @@ export interface IRequest {
   data?: any
   detail?: any
 }
+
+export type TPopupPosition = {
+  top: number
+  left: number
+}

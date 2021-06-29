@@ -48,6 +48,10 @@ const createIframe = async (src: string) => {
   removeIframe()
 
   await browser.runtime.sendMessage({
+    type: 'remove_window',
+  })
+
+  await browser.runtime.sendMessage({
     type: 'save_tab_info',
   })
 
@@ -175,6 +179,8 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       findIframe.style.left = initialLeft + deltaX + 'px'
       findIframe.style.top = initialTop + deltaY + 'px'
     }
+  } else if (request.type === 'set_iframe_focus') {
+    document.getElementById('sh-iframe')?.focus()
   }
 })
 

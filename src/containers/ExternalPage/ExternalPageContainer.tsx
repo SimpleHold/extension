@@ -46,54 +46,51 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
     }
   }, [])
 
+  const sendRuntimeMessage = (type: string, data: any = {}): void => {
+    browser.runtime.sendMessage({
+      type,
+      data,
+    })
+  }
+
   React.useEffect(() => {
     if (isDraggable) {
+      sendRuntimeMessage('set_iframe_focus')
+
       const dragStart = (event: MouseEvent) => {
         const { pageX, pageY, screenX, screenY } = event
 
-        browser.runtime.sendMessage({
-          type: 'initial_drag_positions',
-          data: {
-            pageX,
-            pageY,
-            screenX,
-            screenY,
-          },
+        sendRuntimeMessage('initial_drag_positions', {
+          pageX,
+          pageY,
+          screenX,
+          screenY,
         })
 
         const getHeader = document.querySelector('.sh-header')
 
         // @ts-ignore
         if (getHeader?.contains(event.target)) {
-          browser.runtime.sendMessage({
-            type: 'set_drag_active',
-            data: {
-              isActive: true,
-            },
+          sendRuntimeMessage('set_drag_active', {
+            isActive: true,
           })
         }
       }
 
       const dragEnd = () => {
-        browser.runtime.sendMessage({
-          type: 'set_drag_active',
-          data: {
-            isActive: false,
-          },
+        sendRuntimeMessage('set_drag_active', {
+          isActive: false,
         })
       }
 
       const drag = (event: MouseEvent) => {
         const { pageX, pageY, screenX, screenY } = event
 
-        browser.runtime.sendMessage({
-          type: 'drag',
-          data: {
-            pageX,
-            pageY,
-            screenX,
-            screenY,
-          },
+        sendRuntimeMessage('drag', {
+          pageX,
+          pageY,
+          screenX,
+          screenY,
         })
       }
 

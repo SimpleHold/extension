@@ -22,6 +22,14 @@ const addCustomEventListener = (selector: string, event: any, handler: Function)
   }
 }
 
+const removeIframe = () => {
+  const findIframe = document.getElementById('sh-iframe')
+
+  if (findIframe) {
+    findIframe.parentNode?.removeChild(findIframe)
+  }
+}
+
 addCustomEventListener('#sh-button', 'click', () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
@@ -29,6 +37,7 @@ addCustomEventListener('#sh-button', 'click', () => {
     if (!window.screenTop && !window.screenY) {
       return
     } else {
+      removeIframe()
       document.dispatchEvent(new CustomEvent('request_addresses'))
     }
   }
@@ -40,6 +49,7 @@ addCustomEventListener('#sh-send-button', 'click', () => {
   if (!window.screenTop && !window.screenY) {
     return
   } else {
+    removeIframe()
     document.dispatchEvent(
       new CustomEvent('request_send', {
         detail: {

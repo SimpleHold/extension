@@ -44,7 +44,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://simpleswap.io/*", "https://simplehold.io/*", "http://localhost/*"],
+      "matches": [
+        "https://simpleswap.io/*",
+        "https://simplehold.io/*",
+        "https://swapspace.co/*",
+        "http://localhost/*"
+      ],
       "js": ["js/contentScript.bundle.js"]
     }
   ],
