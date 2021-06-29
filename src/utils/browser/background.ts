@@ -4,7 +4,7 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 import { IRequest } from '@utils/browser/types'
 import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
-import { getUrl } from '@utils/extension'
+import { getUrl, getManifest } from '@utils/extension'
 import { setItem } from '@utils/storage'
 import { generateTag } from '@utils/currencies/ripple'
 
@@ -110,7 +110,9 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
     setItem('tab', JSON.stringify(currentTab[0]))
   } else if (request.type === 'remove_window') {
-    await browser.windows.remove(currentPopupWindow)
+    try {
+      await browser.windows.remove(currentPopupWindow)
+    } catch {}
   } else {
     const tabs = await browser.tabs.query({
       active: true,
@@ -127,17 +129,15 @@ const generateContextMenu = async () => {
   const wallets = getWallets()
 
   await browser.contextMenus.removeAll()
+  const manifest = getManifest()
 
-  if (wallets?.length) {
+  if (wallets?.length && manifest) {
     const parent = browser.contextMenus.create({
       title: 'SimpleHold',
       id: 'sh-parent',
       contexts: ['editable'],
-      documentUrlPatterns: [
-        'https://simpleswap.io/*',
-        'https://simplehold.io/*',
-        'http://localhost/*',
-      ],
+      // @ts-ignore
+      documentUrlPatterns: manifest.content_scripts[0].matches,
     })
 
     const allowedSymbols = ['btc', 'eth', 'ltc', 'bnb', 'dash', 'xrp']
