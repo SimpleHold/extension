@@ -71,6 +71,10 @@ module.exports = {
     selectAddress: path.join(sourcePath, 'externalPages/SelectAddress/SelectAddress.tsx'),
     send: path.join(sourcePath, 'externalPages/Send/Send.tsx'),
     sendConfirmation: path.join(sourcePath, 'externalPages/SendConfirmation/SendConfirmation.tsx'),
+    connectHardwareWallet: path.join(
+      sourcePath,
+      'externalPages/ConnectHardwareWallet/ConnectHardwareWallet.tsx'
+    ),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -173,6 +177,13 @@ module.exports = {
       chunks: ['sendConfirmation'],
       hash: true,
       filename: 'send-confirmation.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'connect-hardware-wallet.html'),
+      inject: 'body',
+      chunks: ['connectHardwareWallet'],
+      hash: true,
+      filename: 'connect-hardware-wallet.html',
     }),
     new CopyWebpackPlugin({
       patterns: [

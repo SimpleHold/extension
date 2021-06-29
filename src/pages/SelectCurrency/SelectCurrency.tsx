@@ -12,6 +12,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import { toUpper, toLower } from '@utils/format'
 import { getWallets } from '@utils/wallet'
 import * as theta from '@utils/currencies/theta'
+import { getUrl, openWebPage } from '@utils/extension'
 
 // Config
 import currencies, { ICurrency } from '@config/currencies'
@@ -97,6 +98,10 @@ const SelectCurrency: React.FC = () => {
     history.push('/add-custom-token')
   }
 
+  const onConnectHardwareWallet = async () => {
+    openWebPage(getUrl('connect-hardware-wallet.html'))
+  }
+
   return (
     <Styles.Wrapper>
       <Cover />
@@ -110,6 +115,8 @@ const SelectCurrency: React.FC = () => {
             label="Type a currency or a ticker"
             onChange={setSearchValue}
           />
+
+          <p onClick={onConnectHardwareWallet}>Connect hardware wallet</p>
 
           {!filterCurrenciesList.length && !filterTokensList.length ? (
             <Styles.NotFoundMessage>
