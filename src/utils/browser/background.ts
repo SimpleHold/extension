@@ -8,6 +8,9 @@ import { getUrl, getManifest } from '@utils/extension'
 import { setItem } from '@utils/storage'
 import { generateTag } from '@utils/currencies/ripple'
 
+// Types
+import { TPopupPosition } from './types'
+
 // Config
 import { getCurrency } from '@config/currencies'
 
@@ -29,6 +32,30 @@ browser.windows.onFocusChanged.addListener(async (windowId) => {
     }
   }
 })
+
+const getPopupPosition = async (
+  screenX: number,
+  screenY: number,
+  outerWidth: number
+): Promise<TPopupPosition> => {
+  let left = 0
+  let top = 0
+
+  const lastFocused = await browser.windows.getLastFocused()
+
+  if (lastFocused?.top && lastFocused?.left && lastFocused.width) {
+    top = lastFocused.top
+    left = lastFocused.left + (lastFocused.width - 375)
+  } else {
+    top = Math.max(screenY, 0)
+    left = Math.max(screenX + (outerWidth - 375), 0)
+  }
+
+  return {
+    top,
+    left,
+  }
+}
 
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
@@ -53,13 +80,15 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       await browser.tabs.remove(checkExist.id)
     }
 
+    const { top, left } = await getPopupPosition(screenX, screenY, outerWidth)
+
     await browser.windows.create({
       url: `select-address.html?currency=${currency}&chain=${chain}`,
       type: 'popup',
       width: 375,
       height: 728,
-      left: Math.max(screenX + (outerWidth - 375), 0),
-      top: screenY,
+      top,
+      left,
     })
     activeRequest = null
   } else if (request.type === 'request_send') {
@@ -97,13 +126,15 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       await browser.tabs.remove(checkExist.id)
     }
 
+    const { top, left } = await getPopupPosition(screenX, screenY, outerWidth)
+
     await browser.windows.create({
       url: 'send.html',
       type: 'popup',
       width: 375,
       height: 728,
-      left: Math.max(screenX + (outerWidth - 375), 0),
-      top: screenY,
+      top,
+      left,
     })
     activeRequest = null
   } else if (request.type === 'save_tab_info') {
@@ -233,13 +264,15 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         await browser.tabs.remove(checkExist.id)
       }
 
+      const { top, left } = await getPopupPosition(screenX, screenY, outerWidth)
+
       await browser.windows.create({
         url: `select-address.html`,
         type: 'popup',
         width: 375,
         height: 728,
-        left: Math.max(screenX + (outerWidth - 375), 0),
-        top: screenY,
+        top,
+        left,
       })
     }
   }
