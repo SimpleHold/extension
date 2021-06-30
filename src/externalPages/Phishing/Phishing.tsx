@@ -53,9 +53,24 @@ const Phishing: React.FC = () => {
 
   return (
     <Styles.Wrapper>
-      <p>Phishing</p>
+      <Styles.Logo />
 
-      <p onClick={onVisit}>Visit site</p>
+      <Styles.Warning>
+        <Styles.WarningRow>
+          <Styles.Image />
+          <Styles.Title>Be careful</Styles.Title>
+          <Styles.Description>
+            It looks like the website you're going to visit is not what it seems to be. This page is
+            marked as a phishing scam by our partners SimpleSwap. Tap this button to find the
+            original SimpleHold you're looking for.
+          </Styles.Description>
+        </Styles.WarningRow>
+        <Styles.WarningFooter>
+          <Styles.AdvancedButton>
+            <Styles.AdvancedButtonTitle>Advanced</Styles.AdvancedButtonTitle>
+          </Styles.AdvancedButton>
+        </Styles.WarningFooter>
+      </Styles.Warning>
     </Styles.Wrapper>
   )
 }
