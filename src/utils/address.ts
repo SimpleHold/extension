@@ -18,6 +18,8 @@ import bitcoinLike from '@utils/bitcoinLike'
 import * as theta from '@utils/currencies/theta'
 import * as cardano from '@utils/currencies/cardano'
 import * as ripple from '@utils/currencies/ripple'
+import * as nuls from '@utils/currencies/nuls'
+import * as neblio from '@utils/currencies/neblio'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
@@ -48,7 +50,11 @@ export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boole
 }
 
 export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.generateWallet()
+  } else if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.generateWallet()
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.generateWallet()
   } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.generateWallet()
@@ -68,7 +74,11 @@ export const importPrivateKey = (
   privateKey: string,
   chain?: string
 ): string | null => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.importPrivateKey(privateKey)
+  } else if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.importPrivateKey(privateKey)
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.importPrivateKey(privateKey)
   } else if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
@@ -90,6 +100,8 @@ export const validateAddress = (
       return cardano.validateAddress(address)
     } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
       return new bitcoinLike(symbol).isAddressValid(address)
+    } else if (neblio.coins.indexOf(symbol) !== -1) {
+      return neblio.validateAddress(address)
     }
     // @ts-ignore
     return new RegExp(tokenChain ? addressValidate.eth : addressValidate[symbol])?.test(address)
@@ -116,6 +128,9 @@ export const createTransaction = async ({
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return await nuls.createTransaction(from, to, amount, privateKey)
+    }
     if (ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
       return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData, extraId)
     }
@@ -149,6 +164,9 @@ export const createTransaction = async ({
     }
 
     if (outputs?.length && networkFee) {
+      if (neblio.coins.indexOf(symbol) !== -1) {
+        return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
+      }
       return new bitcoinLike(symbol).createTransaction(
         outputs,
         to,
@@ -185,6 +203,12 @@ export const getNewNetworkFee = async (
 ): Promise<IGetNetworkFeeResponse | null> => {
   const { address, symbol, amount, from, to, chain, web3Params, outputs } = params
 
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return {
+      networkFee: 0.001,
+    }
+  }
+
   if (
     web3Params?.contractAddress ||
     web3Params?.decimals ||
@@ -209,6 +233,12 @@ export const getNewNetworkFee = async (
   }
 
   if (outputs?.length) {
+    if (cardano.coins.indexOf(symbol) !== -1) {
+      return cardano.getNetworkFee(outputs, amount)
+    }
+    if (neblio.coins.indexOf(symbol) !== -1) {
+      return neblio.getNetworkFee(address, outputs, amount)
+    }
     return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
   }
 
@@ -232,6 +262,11 @@ export const getAddressNetworkFee = async (
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
   try {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return {
+        networkFee: 0.001,
+      }
+    }
     if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
       const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
       const data = await getEtherNetworkFee(
@@ -256,8 +291,11 @@ export const getAddressNetworkFee = async (
     }
 
     if (typeof outputs !== 'undefined') {
-      if (toLower(symbol) === 'ada') {
+      if (cardano.coins.indexOf(symbol) !== -1) {
         return cardano.getNetworkFee(outputs, amount)
+      }
+      if (neblio.coins.indexOf(symbol) !== -1) {
+        return neblio.getNetworkFee(address, outputs, amount)
       }
       return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
     }
@@ -276,7 +314,11 @@ export const formatUnit = (
   unit?: web3.Unit
 ): number => {
   try {
-    if (ripple.coins.indexOf(symbol) !== -1) {
+    if (neblio.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? neblio.fromSat(Number(value)) : neblio.toSat(Number(value))
+    } else if (nuls.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? nuls.fromNuls(value) : nuls.toNuls(value)
+    } else if (ripple.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
     } else if (cardano.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
@@ -306,7 +348,11 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.getExplorerLink(address)
+  } else if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.getExplorerLink(address)
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getExplorerLink(address)
   } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.getExplorerLink(address)
@@ -344,7 +390,11 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string | null => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.getTransactionLink(hash)
+  } else if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.getTransactionLink(hash)
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getTransactionLink(hash)
   } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.getTransactionLink(hash)
