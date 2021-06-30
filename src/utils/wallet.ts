@@ -8,7 +8,7 @@ import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken } from 'config/tokens'
+import { getToken } from '@config/tokens'
 
 export interface IWallet {
   symbol: string

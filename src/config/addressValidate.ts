@@ -14,4 +14,5 @@ export default {
   theta: '^(0x)[0-9A-Fa-f]{40}$',
   tfuel: '^(0x)[0-9A-Fa-f]{40}$',
   xrp: '^r[1-9A-HJ-NP-Za-km-z]{25,34}$',
+  nebl: '^N[A-Za-z0-9]{33}$',
 }
