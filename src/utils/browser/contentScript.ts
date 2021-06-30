@@ -4,6 +4,7 @@ import copy from 'copy-to-clipboard'
 // Utils
 import { IRequest } from '@utils/browser/types'
 import { setItem } from '@utils/storage'
+import { detectBrowser } from '@utils/detect'
 
 let initialScreenX: number = 0
 let initialScreenY: number = 0
@@ -61,10 +62,12 @@ const createIframe = async (src: string) => {
 
   const { screenX, outerWidth } = window
 
+  const leftDif = detectBrowser() === 'opera' ? 40 : 0
+
   iframe.style.width = '375px'
   iframe.style.height = '700px'
   iframe.style.position = 'absolute'
-  iframe.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
+  iframe.style.left = `${Math.max(screenX + (outerWidth - leftDif - 375), 0)}px`
   iframe.style.top = '0'
   iframe.style.zIndex = '100'
   iframe.style.borderRadius = '16px'
