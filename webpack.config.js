@@ -65,7 +65,7 @@ module.exports = {
     background: path.join(sourcePath, 'utils', 'browser', 'background.ts'),
     contentScript: path.join(sourcePath, 'utils', 'browser', 'contentScript.ts'),
     inpage: path.join(sourcePath, 'utils', 'browser', 'inpage.ts'),
-    popup: path.join(sourcePath, 'app.tsx'),
+    popup: path.join(sourcePath, 'index.tsx'),
     downloadBackup: path.join(sourcePath, 'externalPages/DownloadBackup/DownloadBackup.tsx'),
     restoreBackup: path.join(sourcePath, 'externalPages/RestoreBackup/RestoreBackup.tsx'),
     selectAddress: path.join(sourcePath, 'externalPages/SelectAddress/SelectAddress.tsx'),

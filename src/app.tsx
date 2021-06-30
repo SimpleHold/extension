@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { render } from 'react-dom'
 import { Route, RouteProps, MemoryRouter as Router, Switch } from 'react-router-dom'
 import { v4 } from 'uuid'
 
@@ -75,4 +74,4 @@ const App: React.FC = () => {
   )
 }
 
-render(<App />, document.getElementById('popup-root'))
+export default App
