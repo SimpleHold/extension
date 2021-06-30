@@ -2,8 +2,9 @@ import * as React from 'react'
 import { render } from 'react-dom'
 
 // Utils
-import { removeItem } from '@utils/storage'
+import { removeItem, getItem } from '@utils/storage'
 import { getUrl, getTabs, removeTabs } from '@utils/extension'
+import { openWebPage } from '@utils/extension'
 
 // Styles
 import Styles from './styles'
@@ -33,9 +34,28 @@ const Phishing: React.FC = () => {
     removeItem('latestPhishingSite')
   }
 
+  const onVisit = async (): Promise<void> => {
+    const siteUrl = getItem('phishingSite')
+
+    if (siteUrl) {
+      const tab = await getTabs({
+        active: true,
+        url: getUrl('phishing.html'),
+      })
+
+      openWebPage(siteUrl)
+
+      if (tab[0]?.id) {
+        await removeTabs(tab[0].id)
+      }
+    }
+  }
+
   return (
     <Styles.Wrapper>
       <p>Phishing</p>
+
+      <p onClick={onVisit}>Visit site</p>
     </Styles.Wrapper>
   )
 }

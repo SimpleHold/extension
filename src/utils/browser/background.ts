@@ -5,7 +5,7 @@ import { IRequest } from '@utils/browser/types'
 import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 import { getUrl, openWebPage } from '@utils/extension'
-import { setItem, getItem } from '@utils/storage'
+import { setItem, getItem, removeItem } from '@utils/storage'
 import { generateTag } from '@utils/currencies/ripple'
 import { validateUrl } from '@utils/validate'
 
@@ -32,11 +32,16 @@ const checkPhishing = async (tab: Tabs.Tab): Promise<void> => {
   const getPhishingUrls = getItem('phishingUrls')
 
   if (tab?.url && getPhishingUrls) {
-    const { origin } = new URL(tab.url)
-    const parsetPhishingUrls = JSON.parse(getPhishingUrls).map((i: string) => new URL(i).origin)
+    if (getItem('phishingSite') !== tab?.url) {
+      const { origin } = new URL(tab.url)
+      const parsetPhishingUrls = JSON.parse(getPhishingUrls).map((i: string) => new URL(i).origin)
 
-    if (parsetPhishingUrls.indexOf(origin) !== -1) {
-      await openWebPage(getUrl('phishing.html'))
+      if (parsetPhishingUrls.indexOf(origin) !== -1) {
+        setItem('phishingSite', tab.url)
+        await openWebPage(getUrl('phishing.html'))
+      }
+    } else {
+      removeItem('phishingSite')
     }
   }
 }
