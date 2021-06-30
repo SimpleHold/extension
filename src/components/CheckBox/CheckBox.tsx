@@ -7,13 +7,14 @@ import Styles from './styles'
 interface Props {
   value: boolean
   onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+  color?: string
 }
 
 const CheckBox: React.FC<Props> = (props) => {
-  const { value, onClick } = props
+  const { value, onClick, color } = props
 
   return (
-    <Styles.Container onClick={onClick}>
+    <Styles.Container onClick={onClick} color={color}>
       {value ? (
         <SVG src="../../assets/icons/check.svg" width={9.5} height={7.5} title="check" />
       ) : null}
