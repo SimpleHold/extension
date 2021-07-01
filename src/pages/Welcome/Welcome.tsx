@@ -12,7 +12,7 @@ import { init, logEvent } from '@utils/amplitude'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getItem, setItem, removeItem } from '@utils/storage'
-import { getPhishingUrls } from '@utils/api'
+import { getPhishingSites } from '@utils/api'
 
 // Config
 import config from '@config/index'
@@ -31,14 +31,14 @@ const Wallets: React.FC = () => {
   React.useEffect(() => {
     checkManualRestore()
     initAmplitude()
-    getPhishingSites()
+    onGetPhishingSites()
   }, [])
 
-  const getPhishingSites = async (): Promise<void> => {
-    const data = await getPhishingUrls()
+  const onGetPhishingSites = async (): Promise<void> => {
+    const data = await getPhishingSites()
 
     if (data?.length) {
-      setItem('phishingUrls', JSON.stringify(data))
+      setItem('phishingSites', JSON.stringify(data))
     }
   }
 

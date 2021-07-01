@@ -5,9 +5,10 @@ import { render } from 'react-dom'
 import CheckBox from '@components/CheckBox'
 
 // Utils
-import { removeItem, getItem } from '@utils/storage'
+import { getItem, getJSON, removeItem, setItem } from '@utils/storage'
 import { getUrl, getTabs, removeTabs } from '@utils/extension'
 import { openWebPage } from '@utils/extension'
+import { TPhishingSite } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -15,26 +16,31 @@ import Styles from './styles'
 const Phishing: React.FC = () => {
   const [isAgreedVisible, setAgreedVisible] = React.useState<boolean>(false)
   const [isAgreed, setIsAgreed] = React.useState<boolean>(false)
-  const [rightUrl, setRightUrl] = React.useState<string | null>(null)
-  const [rightSiteName, setRightSiteName] = React.useState<string | null>(null)
+  const [phishingSite, setPhishingSite] = React.useState<TPhishingSite | null>(null)
 
   React.useEffect(() => {
-    closePhishingSite()
-    getRightSite()
+    getInfo()
   }, [])
 
-  const getRightSite = (): void => {
-    setRightUrl('https://www.myetherwallet.com/')
-    setRightSiteName('SimpleSwap')
+  React.useEffect(() => {
+    if (phishingSite) {
+      closePhishingSite()
+    }
+  }, [phishingSite])
+
+  const getInfo = (): void => {
+    const data = getJSON('phishingSite')
+
+    if (data) {
+      setPhishingSite(data)
+    }
   }
 
   const closePhishingSite = async (): Promise<void> => {
-    const urls = localStorage.getItem('phishingUrls')
-
-    if (urls) {
+    if (phishingSite) {
       const tabs = await getTabs({
         active: false,
-        url: [...JSON.parse(urls), getUrl('phishing.html')],
+        url: [phishingSite.url, getUrl('phishing.html')],
       })
 
       const mapTabIds = tabs.map((tab) => tab.id)
@@ -44,8 +50,6 @@ const Phishing: React.FC = () => {
         await removeTabs(mapTabIds)
       }
     }
-
-    removeItem('latestPhishingSite')
   }
 
   const onVisit = async (siteUrl: null | string): Promise<void> => {
@@ -55,7 +59,27 @@ const Phishing: React.FC = () => {
         url: getUrl('phishing.html'),
       })
 
-      openWebPage(siteUrl)
+      if (siteUrl === phishingSite?.url) {
+        const data = getJSON('phishingSites')
+
+        if (data) {
+          const siteIndex = data.findIndex((i: TPhishingSite) => i.url === siteUrl)
+
+          if (siteIndex !== -1) {
+            data[siteIndex].latestVisit = new Date().getTime()
+            setItem('phishingSites', JSON.stringify(data))
+
+            const url = getItem('phishingSiteUrl')
+
+            if (url) {
+              openWebPage(url)
+              removeItem('phishingSiteUrl')
+            }
+          }
+        }
+      } else {
+        openWebPage(siteUrl)
+      }
 
       if (tab[0]?.id) {
         await removeTabs(tab[0].id)
@@ -67,10 +91,8 @@ const Phishing: React.FC = () => {
     if (!isAgreedVisible) {
       setAgreedVisible(true)
     } else {
-      if (isAgreed) {
-        const siteUrl = getItem('phishingSite')
-
-        onVisit(siteUrl)
+      if (isAgreed && phishingSite) {
+        onVisit(phishingSite.url)
       }
     }
   }
@@ -82,9 +104,13 @@ const Phishing: React.FC = () => {
   }
 
   const onVisitRightSite = (): void => {
-    if (rightUrl) {
-      onVisit(rightUrl)
+    if (phishingSite) {
+      onVisit(phishingSite.rightUrl)
     }
+  }
+
+  if (!getItem('phishingSite')) {
+    return null
   }
 
   return (
@@ -95,22 +121,22 @@ const Phishing: React.FC = () => {
         <Styles.WarningRow>
           <Styles.Image />
           <Styles.Title>Be careful</Styles.Title>
-          {rightSiteName ? (
+          {phishingSite ? (
             <Styles.Description>
               It looks like the website you're going to visit is not what it seems to be. This page
-              is marked as a phishing scam by our partners {rightSiteName}. Tap this button to find
-              the original SimpleHold you're looking for.
+              is marked as a phishing scam by our partners {phishingSite.name}. Tap this button to
+              find the original SimpleHold you're looking for.
             </Styles.Description>
           ) : null}
 
-          {rightUrl ? (
+          {phishingSite ? (
             <Styles.RightSiteBlock onClick={onVisitRightSite}>
               <Styles.RightSiteIconRow>
                 <Styles.RightBlockIcon />
               </Styles.RightSiteIconRow>
               <Styles.RightSiteBlockRow>
                 <Styles.RightSiteBlockTitle>Go to right site:</Styles.RightSiteBlockTitle>
-                <Styles.RightSiteUrl>{rightUrl}</Styles.RightSiteUrl>
+                <Styles.RightSiteUrl>{phishingSite.rightUrl}</Styles.RightSiteUrl>
               </Styles.RightSiteBlockRow>
             </Styles.RightSiteBlock>
           ) : null}

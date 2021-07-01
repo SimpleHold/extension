@@ -4,12 +4,8 @@ import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
 import { getToken, IToken } from '@config/tokens'
 
 // Utils
-import {
-  getEtherNetworkFee,
-  IGetNetworkFeeResponse,
-  getThetaNetworkFee,
-  getNetworkFee,
-} from '@utils/api'
+import { getEtherNetworkFee, getThetaNetworkFee, getNetworkFee } from '@utils/api'
+import { IGetNetworkFeeResponse } from '@utils/api/types'
 import { toLower } from '@utils/format'
 
 // Currencies

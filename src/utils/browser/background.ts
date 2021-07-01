@@ -5,43 +5,47 @@ import { IRequest } from '@utils/browser/types'
 import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 import { getUrl, openWebPage } from '@utils/extension'
-import { setItem, getItem, removeItem } from '@utils/storage'
+import { setItem, getJSON } from '@utils/storage'
 import { generateTag } from '@utils/currencies/ripple'
+import { getPhishingSites } from '@utils/api'
+import { TPhishingSite } from '@utils/api/types'
+import { msToMin } from '@utils/dates'
 import { validateUrl } from '@utils/validate'
 
 // Config
 import { getCurrency } from '@config/currencies'
-import { getPhishingUrls } from '@utils/api'
 
 let activeRequest: string | undefined
 let currentWindowId: number
+let currentPhishingSite: string | undefined
 
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (tab?.url) {
-    const { url } = tab
-
-    if (validateUrl(url) && getItem('latestPhishingSite') !== url) {
-      setItem('latestPhishingSite', url)
-
-      checkPhishing(tab)
-    }
-  }
+browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  checkPhishing(tab)
 })
 
 const checkPhishing = async (tab: Tabs.Tab): Promise<void> => {
-  const getPhishingUrls = getItem('phishingUrls')
+  const sites = getJSON('phishingSites')
 
-  if (tab?.url && getPhishingUrls) {
-    if (getItem('phishingSite') !== tab?.url) {
-      const { origin } = new URL(tab.url)
-      const parsetPhishingUrls = JSON.parse(getPhishingUrls).map((i: string) => new URL(i).origin)
+  if (tab.url && sites?.length && validateUrl(tab.url) && currentPhishingSite !== tab.url) {
+    const { origin } = new URL(tab.url)
 
-      if (parsetPhishingUrls.indexOf(origin) !== -1) {
-        setItem('phishingSite', tab.url)
-        await openWebPage(getUrl('phishing.html'))
+    currentPhishingSite = tab.url
+
+    const findPhishingSite = sites.find(
+      (site: TPhishingSite) => new URL(site.url).origin === origin
+    )
+
+    if (findPhishingSite) {
+      if (
+        findPhishingSite?.latestVisit &&
+        msToMin(new Date().getTime() - findPhishingSite.latestVisit) < 15
+      ) {
+        return
       }
-    } else {
-      removeItem('phishingSite')
+
+      setItem('phishingSite', JSON.stringify(findPhishingSite))
+      setItem('phishingSiteUrl', tab.url)
+      await openWebPage(getUrl('phishing.html'))
     }
   }
 }
@@ -221,11 +225,11 @@ const generateContextMenu = async () => {
   }
 }
 
-const onGetPhishingUrls = async () => {
-  const data = await getPhishingUrls()
+const onGetPhishingSites = async () => {
+  const data = await getPhishingSites()
 
   if (data?.length) {
-    setItem('phishingUrls', JSON.stringify(data))
+    setItem('phishingSites', JSON.stringify(data))
   }
 }
 
@@ -235,8 +239,8 @@ browser.runtime.onInstalled.addListener(() => {
   }, 5000)
 
   setInterval(() => {
-    onGetPhishingUrls()
-  }, 600000)
+    onGetPhishingSites()
+  }, 900000)
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
