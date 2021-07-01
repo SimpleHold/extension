@@ -2,6 +2,8 @@ import styled from 'styled-components'
 
 type TContainerProps = {
   withBorder?: boolean
+  borderColor?: string
+  isAbsolute?: boolean
 }
 
 type TLogoProps = {
@@ -17,8 +19,11 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  border-bottom: ${({ withBorder }: TContainerProps) =>
-    withBorder ? '0.5px solid #EAEAEA' : 'none'};
+  width: 100%;
+  border-bottom: ${({ withBorder, borderColor }: TContainerProps) =>
+    withBorder ? `0.5px solid ${borderColor || '#EAEAEA'}` : 'none'};
+  z-index: 100;
+  position:  ${({isAbsolute}: TContainerProps) => isAbsolute ? 'absolute' : 'relative'};
 `
 
 const Row = styled.div`

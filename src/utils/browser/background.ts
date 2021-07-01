@@ -4,7 +4,7 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 import { IRequest } from '@utils/browser/types'
 import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
-import { getUrl, openWebPage } from '@utils/extension'
+import { getManifest, getUrl, openWebPage } from '@utils/extension'
 import { setItem, getJSON } from '@utils/storage'
 import { generateTag } from '@utils/currencies/ripple'
 import { getPhishingSites } from '@utils/api'
@@ -12,12 +12,16 @@ import { TPhishingSite } from '@utils/api/types'
 import { msToMin } from '@utils/dates'
 import { validateUrl } from '@utils/validate'
 
+// Types
+import { TPopupPosition } from './types'
+
 // Config
 import { getCurrency } from '@config/currencies'
 
 let activeRequest: string | undefined
 let currentWindowId: number
 let currentPhishingSite: string | undefined
+let currentPopupWindow: number
 
 browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
   checkPhishing(tab)
@@ -58,9 +62,35 @@ browser.windows.onFocusChanged.addListener(async (windowId) => {
 
     if (checkIsNonPopup?.type !== 'popup') {
       currentWindowId = windowId
+    } else {
+      currentPopupWindow = windowId
     }
   }
 })
+
+const getPopupPosition = async (
+  screenX: number,
+  screenY: number,
+  outerWidth: number
+): Promise<TPopupPosition> => {
+  let left = 0
+  let top = 0
+
+  const lastFocused = await browser.windows.getLastFocused()
+
+  if (lastFocused?.top && lastFocused?.left && lastFocused.width) {
+    top = lastFocused.top
+    left = lastFocused.left + (lastFocused.width - 375)
+  } else {
+    top = Math.max(screenY, 0)
+    left = Math.max(screenX + (outerWidth - 375), 0)
+  }
+
+  return {
+    top,
+    left,
+  }
+}
 
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'request_addresses') {
@@ -85,29 +115,18 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       await browser.tabs.remove(checkExist.id)
     }
 
+    const { top, left } = await getPopupPosition(screenX, screenY, outerWidth)
+
     await browser.windows.create({
       url: `select-address.html?currency=${currency}&chain=${chain}`,
       type: 'popup',
       width: 375,
       height: 728,
-      left: Math.max(screenX + (outerWidth - 375), 0),
-      top: screenY,
+      top,
+      left,
     })
     activeRequest = undefined
-  }
-
-  if (request.type === 'set_address') {
-    const tabs = await browser.tabs.query({
-      active: true,
-      windowId: currentWindowId,
-    })
-
-    if (tabs[0]?.id) {
-      browser.tabs.sendMessage(tabs[0].id, request)
-    }
-  }
-
-  if (request.type === 'request_send') {
+  } else if (request.type === 'request_send') {
     if (activeRequest === request.type) {
       return
     }
@@ -142,15 +161,33 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       await browser.tabs.remove(checkExist.id)
     }
 
+    const { top, left } = await getPopupPosition(screenX, screenY, outerWidth)
+
     await browser.windows.create({
       url: 'send.html',
       type: 'popup',
       width: 375,
       height: 728,
-      left: Math.max(screenX + (outerWidth - 375), 0),
-      top: screenY,
+      top,
+      left,
     })
     activeRequest = undefined
+  } else if (request.type === 'save_tab_info') {
+    const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
+    setItem('tab', JSON.stringify(currentTab[0]))
+  } else if (request.type === 'remove_window') {
+    try {
+      await browser.windows.remove(currentPopupWindow)
+    } catch {}
+  } else {
+    const tabs = await browser.tabs.query({
+      active: true,
+      windowId: currentWindowId,
+    })
+
+    if (tabs[0]?.id) {
+      browser.tabs.sendMessage(tabs[0].id, request)
+    }
   }
 })
 
@@ -158,17 +195,15 @@ const generateContextMenu = async () => {
   const wallets = getWallets()
 
   await browser.contextMenus.removeAll()
+  const manifest = getManifest()
 
-  if (wallets?.length) {
+  if (wallets?.length && manifest) {
     const parent = browser.contextMenus.create({
       title: 'SimpleHold',
       id: 'sh-parent',
       contexts: ['editable'],
-      documentUrlPatterns: [
-        'https://simpleswap.io/*',
-        'https://simplehold.io/*',
-        'http://localhost/*',
-      ],
+      // @ts-ignore
+      documentUrlPatterns: manifest.content_scripts[0].matches,
     })
 
     const allowedSymbols = ['btc', 'eth', 'ltc', 'bnb', 'dash', 'xrp']
@@ -276,13 +311,15 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
         await browser.tabs.remove(checkExist.id)
       }
 
+      const { top, left } = await getPopupPosition(screenX, screenY, outerWidth)
+
       await browser.windows.create({
         url: `select-address.html`,
         type: 'popup',
         width: 375,
         height: 728,
-        left: Math.max(screenX + (outerWidth - 375), 0),
-        top: screenY,
+        top,
+        left,
       })
     }
   }

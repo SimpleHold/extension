@@ -22,29 +22,47 @@ const addCustomEventListener = (selector: string, event: any, handler: Function)
   }
 }
 
+const removeIframe = () => {
+  const findIframe = document.getElementById('sh-iframe')
+
+  if (findIframe) {
+    findIframe.parentNode?.removeChild(findIframe)
+  }
+}
+
 addCustomEventListener('#sh-button', 'click', () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
   if (findInput) {
-    document.dispatchEvent(new CustomEvent('request_addresses'))
+    if (!window.screenTop && !window.screenY) {
+      return
+    } else {
+      removeIframe()
+      document.dispatchEvent(new CustomEvent('request_addresses'))
+    }
   }
 })
 
 addCustomEventListener('#sh-send-button', 'click', () => {
   const button = <HTMLDivElement>document.getElementById('sh-send-button')
 
-  document.dispatchEvent(
-    new CustomEvent('request_send', {
-      detail: {
-        readOnly: button.getAttribute('sh-read-only'),
-        currency: button.getAttribute('sh-currency'),
-        amount: button.getAttribute('sh-amount'),
-        recipientAddress: button.getAttribute('sh-recipient-address'),
-        chain: button.getAttribute('sh-chain'),
-        extraId: button.getAttribute('sh-extra-id'),
-      },
-    })
-  )
+  if (!window.screenTop && !window.screenY) {
+    return
+  } else {
+    removeIframe()
+    document.dispatchEvent(
+      new CustomEvent('request_send', {
+        detail: {
+          readOnly: button.getAttribute('sh-read-only'),
+          currency: button.getAttribute('sh-currency'),
+          amount: button.getAttribute('sh-amount'),
+          recipientAddress: button.getAttribute('sh-recipient-address'),
+          chain: button.getAttribute('sh-chain'),
+          extraId: button.getAttribute('sh-extra-id'),
+        },
+      })
+    )
+  }
 })
 
 const mapCurrencies = currencies.map((currency: ICurrency) => {

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "SimpleHold",
-  "version": "1.6.0",
+  "version": "1.7.1",
   "icons": {
     "16": "assets/logo/favicon-16.png",
     "32": "assets/logo/favicon-32.png",
@@ -11,7 +11,14 @@
   "description": "Light wallet for Bitcoin and other cryptocurrencies.",
   "homepage_url": "https://simplehold.io",
   "short_name": "SimpleHold",
-  "permissions": ["tabs", "contextMenus", "clipboardWrite", "clipboardRead"],
+  "permissions": [
+    "tabs",
+    "contextMenus",
+    "clipboardWrite",
+    "clipboardRead",
+    "cookies",
+    "*://*.simplehold.io/*"
+  ],
   "content_security_policy": "script-src 'self' 'wasm-eval'; object-src 'self'",
   "__chrome|firefox__author": "SimpleHold",
   "__opera__developer": {
@@ -37,9 +44,20 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://simpleswap.io/*", "https://simplehold.io/*", "http://localhost/*"],
+      "matches": [
+        "https://simpleswap.io/*",
+        "https://simplehold.io/*",
+        "https://swapspace.co/*",
+        "http://localhost/*"
+      ],
       "js": ["js/contentScript.bundle.js"]
     }
   ],
-  "web_accessible_resources": ["js/inpage.bundle.js"]
+  "web_accessible_resources": [
+    "js/inpage.bundle.js",
+    "js/selectAddress.bundle.js",
+    "select-address.html",
+    "js/send.bundle.js",
+    "send.html"
+  ]
 }

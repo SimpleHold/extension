@@ -15,12 +15,21 @@ import { generate } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
 import { generate as generateAddress } from '@utils/address'
 import { setItem } from '@utils/storage'
+import { getAllCookies, Cookie } from '@utils/extension'
+import * as theta from '@utils/currencies/theta'
 
 // Config
 import { START_PASSWORD } from '@config/events'
+import { getCurrency, getCurrencyByChain } from '@config/currencies'
+import { getToken } from '@config/tokens'
 
 // Styles
 import Styles from './styles'
+
+type TInitialCurrency = {
+  symbol: string
+  chain?: string
+}
 
 const Wallets: React.FC = () => {
   const history = useHistory()
@@ -32,12 +41,63 @@ const Wallets: React.FC = () => {
   const [confirmPasswordErrorLabel, setConfirmPasswordErrorLabel] = React.useState<null | string>(
     null
   )
+  const [initialCurrencies, setInitialCurrencies] = React.useState<TInitialCurrency[]>([
+    {
+      symbol: 'btc',
+    },
+  ])
 
   const passwordInputRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
     passwordInputRef.current?.focus()
+
+    getCookies()
   }, [])
+
+  const getCookies = async () => {
+    const cookies = await getAllCookies('https://simplehold.io')
+    const getCookieCurrency = cookies.find((cookie: Cookie) => cookie.name === 'currency')
+
+    if (getCookieCurrency) {
+      const { value } = getCookieCurrency
+
+      if (value.indexOf('_') !== -1) {
+        const [tokenSymbol, tokenChain] = value.split('_')
+
+        const findCurrency = getCurrencyByChain(tokenChain)
+        const findToken = getToken(tokenSymbol, tokenChain)
+
+        if (findCurrency && findToken) {
+          setInitialCurrencies([
+            {
+              symbol: findToken.symbol,
+              chain: findToken.chain,
+            },
+            {
+              symbol: findCurrency.symbol,
+            },
+          ])
+        }
+      } else {
+        const findCurrency = getCurrency(value)
+
+        if (findCurrency) {
+          const { symbol } = findCurrency
+
+          if (theta.coins.indexOf(symbol) !== -1) {
+            setInitialCurrencies([{ symbol: 'theta' }, { symbol: 'tfuel' }])
+          } else {
+            setInitialCurrencies([
+              {
+                symbol,
+              },
+            ])
+          }
+        }
+      }
+    }
+  }
 
   const isButtonDisabled = password.length < 7 || password !== confirmPassword || !isAgreed
 
@@ -46,22 +106,32 @@ const Wallets: React.FC = () => {
       name: START_PASSWORD,
     })
 
-    const geneateAddress = generateAddress('btc')
+    let data = []
 
-    if (geneateAddress) {
-      const { address, privateKey } = geneateAddress
-      const { backup, wallets } = generate(address, privateKey)
+    for (const currency of initialCurrencies) {
+      const { symbol, chain } = currency
+      const generate = generateAddress(symbol, chain)
 
-      setItem('backup', encrypt(backup, password))
-      setItem('wallets', wallets)
-      setItem('backupStatus', 'notDownloaded')
-
-      setUserProperties({
-        NUMBER_WALLET_BTC: '1',
-      })
-
-      history.replace('/download-backup')
+      if (generate) {
+        data.push({
+          symbol,
+          chain,
+          data: generate,
+        })
+      }
     }
+
+    const { backup, wallets } = generate(data)
+
+    setItem('backup', encrypt(backup, password))
+    setItem('wallets', wallets)
+    setItem('backupStatus', 'notDownloaded')
+
+    setUserProperties({
+      NUMBER_WALLET_BTC: '1',
+    })
+
+    history.replace('/download-backup')
   }
 
   const onBlurPassword = (): void => {
