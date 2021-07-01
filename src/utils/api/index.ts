@@ -3,49 +3,15 @@ import axios, { AxiosResponse } from 'axios'
 // Config
 import config from '@config/index'
 
-// Utils
-import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
-
-interface IGetBalance {
-  balance: number
-  balance_usd: number
-  balance_btc: number
-  pending: number
-  pending_btc: number
-}
-
-interface IGetContractInfo {
-  decimals: number
-  name: string
-  symbol: string
-}
-
-export interface ITokensBalance {
-  address: string
-  symbol: string
-}
-
-interface Web3TxParams {
-  chainId: number
-  nonce: number
-  gas: number
-  gasPrice: string
-}
-
-export interface IGetNetworkFeeResponse {
-  networkFee?: number
-  networkFeeLabel?: string
-  utxos?: UnspentOutput[] | ICardanoUnspentTxOutput[]
-  chainId?: number
-  gas?: number
-  gasPrice?: string
-  nonce?: number
-  currencyBalance?: number
-}
-
-interface IAdaTrParams {
-  ttl: number
-}
+import {
+  IGetBalance,
+  IGetContractInfo,
+  ITokensBalance,
+  Web3TxParams,
+  IGetNetworkFeeResponse,
+  IAdaTrParams,
+  TPhishingSite,
+} from './types'
 
 export const getBalance = async (
   address: string,
@@ -292,7 +258,7 @@ export const getXrpTxParams = async (from: string) => {
   }
 }
 
-export const getPhishingUrls = async (): Promise<string[] | null> => {
+export const getPhishingSites = async (): Promise<TPhishingSite[] | null> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/phishing-sites`, {
       headers: {
