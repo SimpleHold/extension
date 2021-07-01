@@ -50,6 +50,8 @@ const checkPhishing = async (tab: Tabs.Tab): Promise<void> => {
       setItem('phishingSite', JSON.stringify(findPhishingSite))
       setItem('phishingSiteUrl', tab.url)
       await openWebPage(getUrl('phishing.html'))
+    } else {
+      currentPhishingSite = undefined
     }
   }
 }
