@@ -122,11 +122,21 @@ const Phishing: React.FC = () => {
           <Styles.Image />
           <Styles.Title>Be careful</Styles.Title>
           {phishingSite ? (
-            <Styles.Description>
-              It looks like the website you're going to visit is not what it seems to be. This page
-              is marked as a phishing scam by our partners {phishingSite.name}. Tap this button to
-              find the original SimpleHold you're looking for.
-            </Styles.Description>
+            <>
+              <Styles.Description>
+                It looks like the website you're going to visit is not what it seems to be.
+              </Styles.Description>
+              <Styles.Description>
+                This page is marked as a phishing scam by our partners{' '}
+                <Styles.SiteName favicon={phishingSite.favicon}>
+                  {phishingSite.name}
+                </Styles.SiteName>
+                .
+              </Styles.Description>
+              <Styles.Description>
+                Tap this button to find the original SimpleHold you're looking for.
+              </Styles.Description>
+            </>
           ) : null}
 
           {phishingSite ? (

@@ -13,6 +13,10 @@ type TAdvancedButtonProps = {
   isAgreed: boolean
 }
 
+type TSiteNameProps = {
+  favicon: string
+}
+
 const Wrapper = styled.div`
   padding: 40px 0 0 0;
   display: flex;
@@ -36,7 +40,7 @@ const Warning = styled.div`
 `
 
 const WarningRow = styled.div`
-  padding: 50px 150px 60px 150px;
+  padding: 50px 140px 60px 140px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,7 +55,7 @@ const Image = styled.div`
 `
 
 const Title = styled.h1`
-  margin: 30px 0 0 0;
+  margin: 30px 0 6px 0;
   font-weight: bold;
   font-size: 30px;
   line-height: 35px;
@@ -60,11 +64,15 @@ const Title = styled.h1`
 `
 
 const Description = styled.p`
-  margin: 10px 0 0 0;
+  margin: 7px 0 0 0;
   font-size: 16px;
-  line-height: 26px;
+  line-height: 19px;
   text-align: center;
   color: #1d1d22;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  white-space: nowrap;
 `
 
 const WarningFooter = styled.div`
@@ -195,6 +203,24 @@ const AgreedText = styled.p`
   flex: 1;
 `
 
+const SiteName = styled.span`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &:before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    display: inline-flex;
+    margin: 0 4px;
+    border-radius: 8px;
+    position: relative;
+    background: ${({ favicon }: TSiteNameProps) => `url(${favicon}) no-repeat`};
+    background-size: cover;
+  }
+`
+
 const Styles = {
   Wrapper,
   Logo,
@@ -215,6 +241,7 @@ const Styles = {
   AdvancedRow,
   AgreedBlock,
   AgreedText,
+  SiteName,
 }
 
 export default Styles

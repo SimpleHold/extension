@@ -46,4 +46,5 @@ export type TPhishingSite = {
   url: string
   rightUrl: string
   name: string
+  favicon: string
 }
