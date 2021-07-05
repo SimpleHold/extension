@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "SimpleHold",
   "version": "1.7.1",
   "icons": {
@@ -11,22 +11,15 @@
   "description": "Light wallet for Bitcoin and other cryptocurrencies.",
   "homepage_url": "https://simplehold.io",
   "short_name": "SimpleHold",
-  "permissions": [
-    "tabs",
-    "contextMenus",
-    "clipboardWrite",
-    "clipboardRead",
-    "cookies",
-    "*://*.simplehold.io/*"
-  ],
-  "content_security_policy": "script-src 'self' 'wasm-eval'; object-src 'self'",
+  "permissions": ["tabs", "contextMenus", "clipboardWrite", "clipboardRead", "cookies"],
+  "host_permissions": ["https://simplehold.io/*"],
   "__chrome|firefox__author": "SimpleHold",
   "__opera__developer": {
     "name": "SimpleHold"
   },
   "__chrome__minimum_chrome_version": "49",
   "__opera__minimum_opera_version": "36",
-  "browser_action": {
+  "action": {
     "default_popup": "popup.html",
     "default_icon": {
       "16": "assets/logo/favicon-16.png",
@@ -38,10 +31,7 @@
     "__chrome|opera__chrome_style": false,
     "__firefox__browser_style": false
   },
-  "background": {
-    "scripts": ["js/background.bundle.js"],
-    "__chrome|opera__persistent": false
-  },
+  "background": { "service_worker": "background.bundle.js" },
   "content_scripts": [
     {
       "matches": [
@@ -50,14 +40,24 @@
         "https://swapspace.co/*",
         "http://localhost/*"
       ],
-      "js": ["js/contentScript.bundle.js"]
+      "js": ["contentScript.bundle.js"]
     }
   ],
   "web_accessible_resources": [
-    "js/inpage.bundle.js",
-    "js/selectAddress.bundle.js",
-    "select-address.html",
-    "js/send.bundle.js",
-    "send.html"
+    {
+      "resources": [
+        "inpage.bundle.js",
+        "selectAddress.bundle.js",
+        "select-address.html",
+        "send.bundle.js",
+        "send.html"
+      ],
+      "matches": [
+        "https://simpleswap.io/*",
+        "https://simplehold.io/*",
+        "https://swapspace.co/*",
+        "http://localhost/*"
+      ]
+    }
   ]
 }

@@ -74,7 +74,7 @@ module.exports = {
   },
   output: {
     path: path.join(destPath, targetBrowser),
-    filename: 'js/[name].bundle.js',
+    filename: '[name].bundle.js',
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.json'],
