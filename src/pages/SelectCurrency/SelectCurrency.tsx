@@ -7,6 +7,7 @@ import Cover from '@components/Cover'
 import Header from '@components/Header'
 import TextInput from '@components/TextInput'
 import CurrencyLogo from '@components/CurrencyLogo'
+import Tabs from '@components/Tabs'
 
 // Utils
 import { toUpper, toLower } from '@utils/format'
@@ -22,10 +23,26 @@ import networks, { IEthNetwork } from '@config/ethLikeNetworks'
 // Styles
 import Styles from './styles'
 
+const tabs = [
+  {
+    title: 'Currencies',
+    key: 'currencies',
+  },
+  {
+    title: 'Tokens',
+    key: 'tokens',
+  },
+  {
+    title: 'Hardware wallets',
+    key: 'hardware',
+  },
+]
+
 const SelectCurrency: React.FC = () => {
   const history = useHistory()
 
   const [searchValue, setSearchValue] = React.useState<string>('')
+  const [activeTabKey, setActiveTabKey] = React.useState<string>('currencies')
 
   const filterCurrenciesList = currencies.filter((currency: ICurrency) => {
     if (searchValue.length) {
@@ -98,8 +115,12 @@ const SelectCurrency: React.FC = () => {
     history.push('/add-custom-token')
   }
 
-  const onConnectHardwareWallet = async () => {
-    openWebPage(getUrl('connect-hardware-wallet.html'))
+  const onConnectTrezor = async () => {
+    openWebPage(getUrl('connect-trezor.html'))
+  }
+
+  const onSelectTab = (tabKey: string) => (): void => {
+    setActiveTabKey(tabKey)
   }
 
   return (
@@ -110,13 +131,15 @@ const SelectCurrency: React.FC = () => {
         <Styles.Row>
           <Styles.Title>Select currency</Styles.Title>
 
+          <Tabs tabs={tabs} activeTabKey={activeTabKey} onSelectTab={onSelectTab} />
+
           <TextInput
             value={searchValue}
             label="Type a currency or a ticker"
             onChange={setSearchValue}
           />
 
-          <p onClick={onConnectHardwareWallet}>Connect hardware wallet</p>
+          <p onClick={onConnectTrezor}>Connect Trezor</p>
 
           {!filterCurrenciesList.length && !filterTokensList.length ? (
             <Styles.NotFoundMessage>

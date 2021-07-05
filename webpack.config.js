@@ -25,6 +25,7 @@ const extensionReloaderPlugin =
           contentScript: 'contentScript',
           background: 'background',
           inpage: 'inpage',
+          trezor: 'trezor',
           extensionPage: [
             'popup',
             'downloadBackup',
@@ -65,16 +66,14 @@ module.exports = {
     background: path.join(sourcePath, 'utils', 'browser', 'background.ts'),
     contentScript: path.join(sourcePath, 'utils', 'browser', 'contentScript.ts'),
     inpage: path.join(sourcePath, 'utils', 'browser', 'inpage.ts'),
+    trezor: path.join(sourcePath, 'utils', 'trezor', 'trezor-content-script.ts'),
     popup: path.join(sourcePath, 'app.tsx'),
     downloadBackup: path.join(sourcePath, 'externalPages/DownloadBackup/DownloadBackup.tsx'),
     restoreBackup: path.join(sourcePath, 'externalPages/RestoreBackup/RestoreBackup.tsx'),
     selectAddress: path.join(sourcePath, 'externalPages/SelectAddress/SelectAddress.tsx'),
     send: path.join(sourcePath, 'externalPages/Send/Send.tsx'),
     sendConfirmation: path.join(sourcePath, 'externalPages/SendConfirmation/SendConfirmation.tsx'),
-    connectHardwareWallet: path.join(
-      sourcePath,
-      'externalPages/ConnectHardwareWallet/ConnectHardwareWallet.tsx'
-    ),
+    connectTrezor: path.join(sourcePath, 'externalPages/ConnectTrezor/ConnectTrezor.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -179,11 +178,11 @@ module.exports = {
       filename: 'send-confirmation.html',
     }),
     new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'connect-hardware-wallet.html'),
+      template: path.join(viewsPath, 'connect-trezor.html'),
       inject: 'body',
-      chunks: ['connectHardwareWallet'],
+      chunks: ['connectTrezor'],
       hash: true,
-      filename: 'connect-hardware-wallet.html',
+      filename: 'connect-trezor.html',
     }),
     new CopyWebpackPlugin({
       patterns: [

@@ -8,7 +8,7 @@ import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken } from 'config/tokens'
+import { getToken } from '@config/tokens'
 
 export interface IWallet {
   symbol: string
@@ -24,6 +24,10 @@ export interface IWallet {
   createdAt?: Date
   isHidden?: boolean
   mnemonic?: string
+  hardware?: {
+    path: string
+    name: 'trezor' | 'ledger'
+  }
 }
 
 type TSelectedWalletFilter = {
