@@ -446,8 +446,8 @@ const Send: React.FC = () => {
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} isSmall />
-            <Button label="Send" onClick={onSend} disabled={isButtonDisabled()} ml={7.5} isSmall />
+            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
+            <Button label="Send" onClick={onSend} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Container>

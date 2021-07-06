@@ -334,8 +334,8 @@ const SendConfirmation: React.FC = () => {
             </Styles.DestinationsList>
           </Styles.Row>
           <Styles.Actions>
-            <Button label="Cancel" isSmall isLight onClick={onClose} mr={7.5} />
-            <Button label="Confirm" isSmall onClick={onConfirm} ml={7.5} />
+            <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
+            <Button label="Confirm" onClick={onConfirm} ml={7.5} />
           </Styles.Actions>
         </Styles.Body>
         <ConfirmDrawer

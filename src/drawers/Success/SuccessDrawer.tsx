@@ -46,7 +46,7 @@ const SuccessDrawer: React.FC<Props> = (props) => {
 
         {!disableClose ? (
           <Styles.Actions>
-            <Button label="Ok" onClick={onClose} isSmall />
+            <Button label="Ok" onClick={onClose} />
           </Styles.Actions>
         ) : null}
       </Styles.Row>
