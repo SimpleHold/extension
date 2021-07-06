@@ -40,6 +40,11 @@ const TokensTab: React.FC<Props> = (props) => {
         value={searchValue}
         label="Type a currency or a ticker"
         onChange={setSearchValue}
+        icon={{
+          src: '../../../assets/icons/search.svg',
+          width: 16,
+          height: 16,
+        }}
       />
 
       {!filterTokensList.length ? (
@@ -51,12 +56,7 @@ const TokensTab: React.FC<Props> = (props) => {
       <Styles.CurrenciesList>
         <Styles.CurrencyBlock onClick={onAddCustomToken}>
           <Styles.CustomTokenLogo>
-            <SVG
-              src="../../assets/icons/plusCircle.svg"
-              width={20}
-              height={20}
-              title="Create new wallet"
-            />
+            <SVG src="../../../assets/icons/plusCircle.svg" width={20} height={20} />
           </Styles.CustomTokenLogo>
           <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
         </Styles.CurrencyBlock>

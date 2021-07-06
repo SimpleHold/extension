@@ -38,6 +38,11 @@ const CurrenciesTab: React.FC<Props> = (props) => {
         value={searchValue}
         label="Type a currency or a ticker"
         onChange={setSearchValue}
+        icon={{
+          src: '../../../assets/icons/search.svg',
+          width: 16,
+          height: 16,
+        }}
       />
 
       {!filterCurrenciesList.length ? (
