@@ -6,6 +6,7 @@ import Styles from './styles'
 type TTab = {
   title: string
   key: string
+  renderItem: React.ReactElement<any, any> | null
 }
 
 interface Props {
@@ -19,16 +20,19 @@ const Tabs: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container>
-      {tabs.map((tab: TTab) => {
-        const { title, key } = tab
-        const isActive = activeTabKey === key
+      <Styles.Tabs>
+        {tabs.map((tab: TTab) => {
+          const { title, key } = tab
+          const isActive = activeTabKey === key
 
-        return (
-          <Styles.Tab key={key} isActive={isActive} onClick={onSelectTab(key)}>
-            <Styles.TabTitle>{title}</Styles.TabTitle>
-          </Styles.Tab>
-        )
-      })}
+          return (
+            <Styles.Tab key={key} onClick={onSelectTab(key)} isActive={isActive}>
+              <Styles.TabTitle>{title}</Styles.TabTitle>
+            </Styles.Tab>
+          )
+        })}
+      </Styles.Tabs>
+      {tabs.find((tab: TTab) => tab.key === activeTabKey)?.renderItem}
     </Styles.Container>
   )
 }
