@@ -8,6 +8,7 @@ import CheckBox from '@components/CheckBox'
 // Utils
 import { short, toUpper } from '@utils/format'
 import { getBalance } from '@utils/api'
+import { getCurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -17,11 +18,11 @@ interface Props {
   address: string
   isSelected: boolean
   onToggle: () => void
-  chain: string
 }
 
 const CurrencyAddress: React.FC<Props> = (props) => {
-  const { symbol, address, isSelected, onToggle, chain } = props
+  const { symbol, address, isSelected, onToggle } = props
+  const currency = getCurrency(symbol)
 
   const [balance, setBalance] = React.useState<null | number>(null)
 
@@ -30,7 +31,7 @@ const CurrencyAddress: React.FC<Props> = (props) => {
   }, [])
 
   const onGetBalance = async (): Promise<void> => {
-    const request = await getBalance(address, chain)
+    const request = await getBalance(address, currency?.chain)
 
     setBalance(request.balance)
   }
