@@ -1,7 +1,11 @@
 import styled from 'styled-components'
 
 type TCurrencyHeadingProps = {
-  withCurrencies: boolean
+  isActive: boolean
+}
+
+type TRowProps = {
+  pt: number
 }
 
 const Wrapper = styled.div`
@@ -10,6 +14,7 @@ const Wrapper = styled.div`
 
 const Row = styled.div`
   padding: 30px;
+  padding-top: ${({ pt }: TRowProps) => `${pt}px`};
 `
 
 const Title = styled.h1`
@@ -27,34 +32,43 @@ const Description = styled.p`
   color: #7d7e8d;
 `
 
-const AddressesList = styled.div`
+const CurrenciesList = styled.div`
+  background-color: #ffffff;
+  border: 1px solid #eaeaea;
+  border-radius: 16px;
   width: 100%;
   height: 385px;
-  border: 1px solid #eaeaea;
-  border-radius: 14px;
-  margin: 20px 0 0 0;
   overflow-y: scroll;
+  margin: 20px 0 0 0;
 `
 
 const Actions = styled.div`
   margin: 20px 0 0 0;
   display: flex;
-  flex-direction: row;
   align-items: center;
 `
 
-const Currency = styled.div`
+const CurrencyItem = styled.div`
   &:not(:first-child) {
     border-top: 1px solid #eaeaea;
   }
 `
 
 const CurrencyHeading = styled.div`
+  padding: 10px 10px 10px 15px;
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: ${({ withCurrencies }: TCurrencyHeadingProps) =>
-    withCurrencies ? '15px 15px 10px 15px' : '15px'};
+  background-color: ${({ isActive }: TCurrencyHeadingProps) => (isActive ? '#f8f8f8' : '#ffffff')};
+
+  &:hover {
+    cursor: ${({ isActive }: TCurrencyHeadingProps) => (isActive ? 'default' : 'pointer')};
+    background-color: #f8f8f8;
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
 `
 
 const CurrencyHeadingRow = styled.div`
@@ -67,52 +81,43 @@ const CurrencyHeadingRow = styled.div`
 
 const CurrencyName = styled.p`
   flex: 1;
-  margin: 0;
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
   color: #1d1d22;
+  margin: 0;
 `
 
-const CurrencyButton = styled.div`
-  padding: 8px 14px;
-  background-color: #f8f8f8;
-  border-radius: 5px;
+const AddAddressButton = styled.div`
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  &:hover {
-    cursor: pointer;
+  path {
+    fill: #dddddd;
   }
 `
 
-const CurrencyButtonTitle = styled.p`
-  margin: 0;
-  font-weight: 500;
-  font-size: 12px;
-  line-height: 14px;
-  color: #3fbb7d;
-`
-
-const CurrencyAddresses = styled.div`
-  padding: 0 15px 15px 15px;
-`
-
-const CurrencyAddress = styled.div`
+const AddressBlock = styled.div`
+  padding: 12px 25px 12px 15px;
   display: flex;
   flex-direction: row;
   align-items: center;
 `
 
-const CurrencyAddressRow = styled.div`
+const CheckBoxRow = styled.div`
+  width: 30px;
+  height: 30px;
   display: flex;
-  flex-direction: row;
   align-items: center;
+  justify-content: center;
+`
+
+const AddressBlockRow = styled.div`
   margin: 0 0 0 15px;
-  flex: 1;
-`
-
-const AddressInfo = styled.div`
-  flex: 1;
-  margin: 0 20px 0 0;
+  overflow: hidden;
 `
 
 const Address = styled.p`
@@ -122,30 +127,50 @@ const Address = styled.p`
   color: #1d1d22;
 `
 
-const AddressBalance = styled.p`
+const Balance = styled.p`
   margin: 2px 0 0 0;
   font-size: 12px;
   line-height: 14px;
   color: #7d7e8d;
 `
 
-const RadioButtonRow = styled.div`
-  width: 30px;
-  height: 30px;
+const NextAddressRow = styled.div`
+  padding: 0 0 15px 60px;
   display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+
+  svg {
+    margin: 0 0 0 5px;
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    p {
+      color: #31a76c;
+
+      path {
+        fill: #31a76c;
+      }
+    }
+  }
 `
 
-const ErrorRow = styled.div`
-  padding: 40px 30px 30px 30px;
-  display: flex;
-  flex-direction: column;
-  height: 570px;
+const NextAddressLabel = styled.p`
+  margin: 0;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+  color: #3fbb7d;
 `
 
-const ErrorContentRow = styled.div`
-  flex: 1;
+const ConnectRow = styled.div`
+  height: 520px;
 `
 
 const Image = styled.div`
@@ -154,16 +179,15 @@ const Image = styled.div`
   background-color: gray;
 `
 
-const ErrorTitle = styled.h1`
+const ConnectTitle = styled.h1`
   margin: 40px 0 0 0;
-  font-weight: bold;
   font-size: 23px;
   line-height: 27px;
   text-align: center;
   color: #1d1d22;
 `
 
-const ErrorDescription = styled.p`
+const ConnectDescription = styled.p`
   margin: 10px 0 0 0;
   font-size: 16px;
   line-height: 23px;
@@ -171,31 +195,32 @@ const ErrorDescription = styled.p`
   color: #7d7e8d;
 `
 
+const CurrencyBody = styled.div``
+
 const Styles = {
   Wrapper,
   Row,
   Title,
   Description,
-  AddressesList,
+  CurrenciesList,
   Actions,
-  Currency,
+  CurrencyItem,
   CurrencyHeading,
   CurrencyHeadingRow,
   CurrencyName,
-  CurrencyButton,
-  CurrencyButtonTitle,
-  CurrencyAddresses,
-  CurrencyAddress,
-  CurrencyAddressRow,
-  AddressInfo,
+  AddAddressButton,
+  AddressBlock,
+  CheckBoxRow,
+  AddressBlockRow,
   Address,
-  AddressBalance,
-  RadioButtonRow,
-  ErrorRow,
+  Balance,
+  NextAddressRow,
+  NextAddressLabel,
+  ConnectRow,
   Image,
-  ErrorContentRow,
-  ErrorTitle,
-  ErrorDescription,
+  ConnectTitle,
+  ConnectDescription,
+  CurrencyBody,
 }
 
 export default Styles
