@@ -62,6 +62,10 @@ interface LocationState {
   tokenName?: string
   decimals?: number
   isHidden?: boolean
+  hardware?: {
+    label: string
+    type: 'trezor' | 'ledger'
+  }
 }
 
 const Receive: React.FC = () => {
@@ -75,6 +79,7 @@ const Receive: React.FC = () => {
       tokenName = undefined,
       decimals = undefined,
       isHidden = false,
+      hardware = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -113,8 +118,10 @@ const Receive: React.FC = () => {
   }, [balance, estimated, isRefreshing])
 
   const getDropDownList = (): void => {
-    const list = [
-      {
+    const list = []
+
+    if (!hardware) {
+      list.push({
         icon: isCurrencyWithPhrase
           ? {
               source: phraseIcon,
@@ -123,9 +130,10 @@ const Receive: React.FC = () => {
             }
           : { source: privateKeyIcon, width: 18, height: 18 },
         title: isCurrencyWithPhrase ? 'Show recovery phrase' : 'Show Private key',
-      },
-      { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
-    ]
+      })
+    }
+
+    list.push({ icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' })
 
     if (['eth', 'bnb'].indexOf(symbol) !== -1) {
       list.push({
@@ -181,9 +189,9 @@ const Receive: React.FC = () => {
   const onClickDropDown = (index: number) => {
     setIsVisible(false)
 
-    if (index === 0) {
+    if (index === 0 && !hardware) {
       setActiveDrawer('confirm')
-    } else if (index === 1) {
+    } else if (index === 1 || hardware) {
       openWebPage(getExplorerLink(address, symbol, currency, chain, contractAddress))
     } else if (index === 2) {
       if (extraIdName?.length) {
@@ -268,7 +276,17 @@ const Receive: React.FC = () => {
                   chain={chain}
                   name={tokenName}
                 />
-                <Styles.CurrencyName>{name}</Styles.CurrencyName>
+                <Styles.HeadingRow>
+                  {hardware ? (
+                    <Styles.HardwareBlock>
+                      <Styles.HardwareLabel>{hardware.label}</Styles.HardwareLabel>
+                      <SVG src="../../assets/icons/trezor.svg" width={8.9} height={13} />
+                    </Styles.HardwareBlock>
+                  ) : null}
+                  <Styles.CurrencyName size={hardware ? 'small' : 'normal'}>
+                    {name}
+                  </Styles.CurrencyName>
+                </Styles.HeadingRow>
               </Styles.Currency>
               <Styles.Actions>
                 <Tooltip text={`${isHiddenWallet ? 'Show' : 'Hide'} address`} mt={5}>
