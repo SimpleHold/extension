@@ -18,10 +18,12 @@ interface Props {
   address: string
   isSelected: boolean
   onToggle: () => void
+  isDisabled?: boolean
 }
 
 const CurrencyAddress: React.FC<Props> = (props) => {
-  const { symbol, address, isSelected, onToggle } = props
+  const { symbol, address, isSelected, onToggle, isDisabled } = props
+
   const currency = getCurrency(symbol)
 
   const [balance, setBalance] = React.useState<null | number>(null)
@@ -39,7 +41,13 @@ const CurrencyAddress: React.FC<Props> = (props) => {
   return (
     <Styles.AddressBlock>
       <Styles.CheckBoxRow>
-        <CheckBox value={isSelected} onClick={onToggle} />
+        <CheckBox
+          isDisabled={isDisabled}
+          value={isSelected}
+          onClick={onToggle}
+          iconWidth={10}
+          iconHeight={8}
+        />
       </Styles.CheckBoxRow>
       <Styles.AddressBlockRow>
         <Styles.Address>{short(address, 25)}</Styles.Address>

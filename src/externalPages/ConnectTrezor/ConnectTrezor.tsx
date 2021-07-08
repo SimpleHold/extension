@@ -1,9 +1,10 @@
 import * as React from 'react'
 import { render } from 'react-dom'
+import TrezorConnect, { DEVICE_EVENT, DEVICE } from 'trezor-connect'
 
 // Components
 import Button from '@components/Button'
-import Currency from './Currency'
+import Currency, { TSelectedAddress } from './Currency'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -16,10 +17,10 @@ import ExternalPageContainer from '@containers/ExternalPage'
 import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { getUrl, openWebPage } from '@utils/extension'
-import { getItem, setItem } from '@utils/storage'
+import { getItem, getJSON, setItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
-import { addHardwareWallet } from '@utils/wallet'
-import { init, getLabel, getAddresses } from '@utils/trezor'
+import { addHardwareWallet, IWallet } from '@utils/wallet'
+import { init, getAddresses, TTrezorBundle } from '@utils/trezor'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -38,16 +39,9 @@ type TTrezorCurrency = {
   index: number
 }
 
-type TTrezorBundle = {
-  path: string
-  coin: string
-  showOnTrezor: boolean
-}
-
-type TSelectedAddress = {
-  address: string
-  symbol: string
-  path: string
+type TTrezorInfo = {
+  device_id: string
+  label: string
 }
 
 const trezorCurrencies = [
@@ -58,7 +52,7 @@ const trezorCurrencies = [
   },
   {
     symbol: 'ltc',
-    path: "m/44'/2'/0'/0/",
+    path: "m/49'/2'/0'/0/",
     index: 0,
   },
   {
@@ -68,7 +62,7 @@ const trezorCurrencies = [
   },
   {
     symbol: 'dash',
-    path: "m/44'/5'/0'/",
+    path: "m/44'/5'/0'/0/",
     index: 0,
   },
   {
@@ -83,17 +77,61 @@ const ConnectTrezor: React.FC = () => {
   const [currencies, setCurrencies] = React.useState<TCurrency[]>([])
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [currencyIndexes, setCurrencyIndexex] = React.useState<TTrezorCurrency[]>(trezorCurrencies)
-  const [trezorLabel, setTrezorLabel] = React.useState<string>('Trezor')
+  const [trezorInfo, setTrezorInfo] = React.useState<TTrezorInfo>({
+    label: 'Trezor',
+    device_id: '-1',
+  })
   const [selectedAddresses, setSelectedAddresses] = React.useState<TSelectedAddress[]>([])
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
+  const [isTrezorInit, setIsTrezorInit] = React.useState<boolean>(false)
+  const [existWallets, setExistWallets] = React.useState<TSelectedAddress[]>([])
+
+  React.useEffect(() => {
+    TrezorConnect.on(DEVICE_EVENT, (event) => {
+      if (event.type === DEVICE.CONNECT) {
+        const {
+          payload: { features },
+        } = event
+
+        if (features?.label && features.device_id) {
+          setTrezorInfo({
+            label: features?.label,
+            device_id: features?.device_id,
+          })
+        }
+      }
+    })
+
+    getWalletsList()
+  }, [])
+
+  const getWalletsList = (): void => {
+    const list: IWallet[] | null = getJSON('wallets')
+
+    if (list?.length) {
+      const getTrezorWallets = list.filter((wallet: IWallet) => wallet.hardware?.type === 'trezor')
+
+      if (getTrezorWallets.length) {
+        const mapAddresses = getTrezorWallets.map((wallet: IWallet) => {
+          return {
+            symbol: wallet.symbol,
+            address: wallet.address,
+            path: wallet.hardware?.path || '0',
+          }
+        })
+
+        setExistWallets(mapAddresses)
+      }
+    }
+  }
 
   const onClose = (): void => {
     window.close()
   }
 
-  const onConfirm = async (): Promise<void> => {
+  const onConfirm = (): void => {
     setActiveDrawer('confirm')
   }
 
@@ -117,7 +155,11 @@ const ConnectTrezor: React.FC = () => {
 
       getCurrency.index += 5
 
-      setCurrencyIndexex([...currencyIndexes, getCurrency])
+      const findCurrencyCurrency = currencyIndexes.filter(
+        (i: TTrezorCurrency) => toLower(i.symbol) !== toLower(symbol)
+      )
+
+      setCurrencyIndexex([...findCurrencyCurrency, getCurrency])
 
       return data
     }
@@ -129,30 +171,19 @@ const ConnectTrezor: React.FC = () => {
     try {
       setIsLoading(true)
 
-      await init()
-
-      const label = await getLabel()
-
-      if (label) {
-        setTrezorLabel(label)
+      if (!isTrezorInit) {
+        await init()
+        setIsTrezorInit(true)
       }
 
-      await onConnectCurrency('btc')
-    } catch {
-      setIsError(true)
-    }
-  }
+      const bundle = getTrezorBundle('btc')
 
-  const onGetNextAddress = (symbol: string) => (): void => {}
+      if (bundle) {
+        const addresses = await getAddresses(bundle)
 
-  const onConnectCurrency = async (symbol: string): Promise<void> => {
-    const bundle = getTrezorBundle(symbol)
+        setIsLoading(false)
 
-    if (bundle) {
-      const addresses = await getAddresses(bundle)
-
-      if (addresses) {
-        if (!currencies.length) {
+        if (addresses?.length) {
           setCurrencies([
             { symbol: 'btc', addresses },
             { symbol: 'ltc', addresses: [] },
@@ -161,22 +192,53 @@ const ConnectTrezor: React.FC = () => {
             { symbol: 'eth', addresses: [] },
           ])
 
-          setSelectedAddresses([
-            {
+          const mapAddresses = addresses.map((address: string, index: number) => {
+            return {
+              address,
               symbol: 'btc',
-              path: "m/49'/0'/0'/0/0",
-              address: addresses[0],
-            },
-          ])
-        } else {
-          const getCurrency = currencies.find(
-            (currency: TCurrency) => toLower(currency.symbol) === toLower(symbol)
-          )
+              path: `m/49'/0'/0'/0/${index}`,
+            }
+          })
 
-          if (getCurrency) {
-            getCurrency.addresses = [...getCurrency.addresses, ...addresses]
-            setCurrencies(currencies)
+          const findUnusedAddresses = mapAddresses.filter((currency: TSelectedAddress) => {
+            const findExist = existWallets.find(
+              (wallet: TSelectedAddress) =>
+                toLower(wallet.address) === toLower(currency.address) &&
+                toLower(wallet.symbol) === toLower(currency.symbol)
+            )
+
+            if (!findExist) {
+              return currency
+            }
+          })
+
+          if (findUnusedAddresses.length) {
+            setSelectedAddresses([findUnusedAddresses[0]])
           }
+        } else {
+          setIsLoading(false)
+          setIsError(true)
+        }
+      }
+    } catch {
+      setIsError(true)
+    }
+  }
+
+  const onConnectCurrency = async (symbol: string): Promise<void> => {
+    const bundle = getTrezorBundle(symbol)
+
+    if (bundle) {
+      const addresses = await getAddresses(bundle)
+
+      if (addresses) {
+        const getCurrency = currencies.find(
+          (currency: TCurrency) => toLower(currency.symbol) === toLower(symbol)
+        )
+
+        if (getCurrency) {
+          getCurrency.addresses.push(...addresses)
+          setCurrencies([...currencies])
         }
       }
     }
@@ -190,7 +252,39 @@ const ConnectTrezor: React.FC = () => {
     }
   }
 
-  const onToggleSelectAddress = (isSelected: boolean, symbol: string, address: string) => () => {}
+  const onToggleSelectAddress = (
+    isSelected: boolean,
+    symbol: string,
+    address: string,
+    index: number
+  ) => () => {
+    const getCurrency = currencyIndexes.find(
+      (currency: TTrezorCurrency) => toLower(currency.symbol) === toLower(symbol)
+    )
+
+    if (getCurrency) {
+      const { path } = getCurrency
+
+      if (!isSelected) {
+        const newAddress = {
+          address,
+          symbol,
+          path: `${path}${index}`,
+        }
+
+        setSelectedAddresses([...selectedAddresses, newAddress])
+      } else {
+        const removeExist = selectedAddresses.filter(
+          (currency: TSelectedAddress) =>
+            toLower(currency.address) !== toLower(address) ||
+            toLower(currency.symbol) !== toLower(symbol) ||
+            toLower(currency.path) !== toLower(`${path}${index}`)
+        )
+
+        setSelectedAddresses(removeExist)
+      }
+    }
+  }
 
   const onDownloadBackup = (): void => {
     openWebPage(getUrl('download-backup.html'))
@@ -214,7 +308,8 @@ const ConnectTrezor: React.FC = () => {
         const walletsList = addHardwareWallet(
           'trezor',
           selectedAddresses,
-          trezorLabel,
+          trezorInfo.label,
+          trezorInfo.device_id,
           decryptBackup,
           password
         )
@@ -270,9 +365,9 @@ const ConnectTrezor: React.FC = () => {
                       name={currencyInfo?.name}
                       addresses={addresses}
                       onConnect={onConnectCurrency}
-                      onGetNextAddress={onGetNextAddress(symbol)}
                       selectedAddresses={selectedAddresses}
                       onToggleSelect={onToggleSelectAddress}
+                      existWallets={existWallets}
                     />
                   )
                 })}
@@ -280,7 +375,12 @@ const ConnectTrezor: React.FC = () => {
 
               <Styles.Actions>
                 <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
-                <Button label="Confirm" onClick={onConfirm} ml={7.5} />
+                <Button
+                  label="Confirm"
+                  onClick={onConfirm}
+                  ml={7.5}
+                  disabled={!selectedAddresses.length}
+                />
               </Styles.Actions>
             </Styles.Row>
           )}
