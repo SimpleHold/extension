@@ -28,6 +28,7 @@ export interface IWallet {
     path: string
     label: string
     type: 'trezor' | 'ledger'
+    deviceId: string
   }
 }
 
@@ -264,6 +265,7 @@ export const addHardwareWallet = (
   type: 'trezor' | 'ledger',
   currencies: THardwareCurrency[],
   hardwareLabel: string,
+  deviceId: string,
   backup: string,
   password: string
 ): string | null => {
@@ -287,6 +289,7 @@ export const addHardwareWallet = (
             path,
             label: hardwareLabel,
             type,
+            deviceId,
           },
         }
 
