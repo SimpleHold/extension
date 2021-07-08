@@ -1,24 +1,30 @@
 import styled from 'styled-components'
 
+type TContainerProps = {
+  isDisabled?: boolean
+}
+
 const Container = styled.div`
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid #7d7e8d;
+  width: 13px;
+  height: 13px;
+  border: ${({ isDisabled }: TContainerProps) =>
+    `1.5px solid ${isDisabled ? '#C3C3C3' : '#7d7e8d'}`};
   border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
 
   path {
-    fill: #7d7e8d;
+    fill: ${({ isDisabled }: TContainerProps) => (isDisabled ? '#C3C3C3' : '#7d7e8d')};
   }
 
   &:hover {
-    border: 1.5px solid #3fbb7d;
-    cursor: pointer;
+    cursor: ${({ isDisabled }: TContainerProps) => (isDisabled ? 'default' : 'pointer')};
+    border: ${({ isDisabled }: TContainerProps) =>
+      `1.5px solid ${isDisabled ? '#C3C3C3' : '#3fbb7d'}`};
 
     path {
-      fill: #3fbb7d;
+      fill: ${({ isDisabled }: TContainerProps) => (isDisabled ? '#C3C3C3' : '#3fbb7d')};
     }
   }
 `

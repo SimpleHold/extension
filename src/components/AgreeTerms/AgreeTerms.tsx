@@ -9,7 +9,7 @@ import Styles from './styles'
 
 interface Props {
   isAgreed: boolean
-  setIsAgreed: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+  setIsAgreed: () => void
   mt?: number
 }
 
