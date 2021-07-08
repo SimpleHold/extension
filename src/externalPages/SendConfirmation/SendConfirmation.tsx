@@ -24,6 +24,7 @@ import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } fro
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, removeItem } from '@utils/storage'
+import { composeTransaction } from '@utils/trezor'
 
 // Styles
 import Styles from './styles'
@@ -45,6 +46,10 @@ interface Props {
   outputs?: UnspentOutput[]
   networkFeeSymbol?: string
   extraId?: string
+  hardware?: {
+    label: string
+    type: 'trezor' | 'ledger'
+  }
 }
 
 const SendConfirmation: React.FC = () => {
@@ -94,7 +99,35 @@ const SendConfirmation: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    setActiveDrawer('confirm')
+    if (activeDrawer === 'fail') {
+      setActiveDrawer(null)
+    }
+
+    if (props?.hardware) {
+      onSendHardwareTx()
+    } else {
+      setActiveDrawer('confirm')
+    }
+  }
+
+  const onSendHardwareTx = async (): Promise<void> => {
+    const { symbol, addressTo, amount, chain } = props
+
+    if (symbol && addressTo && amount && chain) {
+      const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+
+      const getTxId = await composeTransaction(`${parseAmount}`, addressTo, symbol)
+
+      if (getTxId) {
+        const link = getTransactionLink(getTxId, symbol, chain)
+
+        if (link) {
+          setTransactionLink(link)
+        }
+        return setActiveDrawer('success')
+      }
+      return setActiveDrawer('fail')
+    }
   }
 
   const onConfirmSend = async (): Promise<void> => {
@@ -242,22 +275,24 @@ const SendConfirmation: React.FC = () => {
     <ExternalPageContainer
       onClose={onClose}
       headerStyle="green"
-      backPageTitle="Send"
-      backPageUrl="send.html"
+      backPageTitle={props?.hardware ? undefined : 'Send'}
+      backPageUrl={props?.hardware ? undefined : 'send.html'}
     >
       <>
         <Styles.Body>
           <Styles.Row>
             <Styles.Title>Confirm the sending</Styles.Title>
-            <Styles.SiteInfo>
-              <Styles.SiteInfoLabel>Confirm sending on</Styles.SiteInfoLabel>
-              {props?.tabInfo ? (
-                <Styles.SiteInfoRow>
-                  <Styles.SiteFavicon src={props.tabInfo.favIconUrl} />
-                  <Styles.SiteUrl>{props.tabInfo.url}</Styles.SiteUrl>
-                </Styles.SiteInfoRow>
-              ) : null}
-            </Styles.SiteInfo>
+            {!props?.hardware ? (
+              <Styles.SiteInfo>
+                <Styles.SiteInfoLabel>Confirm sending on</Styles.SiteInfoLabel>
+                {props?.tabInfo ? (
+                  <Styles.SiteInfoRow>
+                    <Styles.SiteFavicon src={props.tabInfo.favIconUrl} />
+                    <Styles.SiteUrl>{props.tabInfo.url}</Styles.SiteUrl>
+                  </Styles.SiteInfoRow>
+                ) : null}
+              </Styles.SiteInfo>
+            ) : null}
 
             <Styles.OrderCheck>
               <Styles.Table>
@@ -364,6 +399,7 @@ const SendConfirmation: React.FC = () => {
           isActive={activeDrawer === 'fail'}
           onClose={() => setActiveDrawer(null)}
           text={failText}
+          openFrom="browser"
         />
       </>
     </ExternalPageContainer>

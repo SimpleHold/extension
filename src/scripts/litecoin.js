@@ -34,7 +34,11 @@ const litecoin = (function () {
   }
 
   const getFee = (outputs, to, amount, changeAddress) => {
-    return new litecore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
+    try {
+      return new litecore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
+    } catch (err) {
+      return 10000
+    }
   }
 
   const isAddressValid = (address) => {

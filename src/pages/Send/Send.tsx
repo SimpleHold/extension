@@ -29,6 +29,8 @@ import {
 } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
 import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
+import { getUrl, openWebPage } from '@utils/extension'
+import { setItem } from '@utils/storage'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -49,6 +51,10 @@ interface LocationState {
   contractAddress?: string
   tokenName?: string
   decimals?: number
+  hardware?: {
+    label: string
+    type: 'trezor' | 'ledger'
+  }
 }
 
 const Send: React.FC = () => {
@@ -62,6 +68,7 @@ const Send: React.FC = () => {
       contractAddress = undefined,
       tokenName = undefined,
       decimals = undefined,
+      hardware = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -196,28 +203,47 @@ const Send: React.FC = () => {
     }
   }
 
-  const onSend = (): void => {
+  const onSend = async (): Promise<void> => {
     logEvent({
       name: ADDRESS_SEND,
     })
 
-    const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
-    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
+    if (hardware) {
+      openWebPage(getUrl('send-confirmation.html'))
 
-    history.push('/send-confirm', {
-      amount: Number(amount),
-      symbol,
-      networkFee,
-      networkFeeSymbol,
-      addressFrom: selectedAddress,
-      addressTo: address,
-      outputs: utxosList,
-      chain,
-      contractAddress: tokenContractAddress || contractAddress,
-      tokenChain,
-      decimals: getTokenDecimals || decimals,
-      extraId,
-    })
+      setItem(
+        'sendConfirmationData',
+        JSON.stringify({
+          amount: Number(amount),
+          symbol,
+          networkFee,
+          networkFeeSymbol,
+          addressFrom: selectedAddress,
+          addressTo: address,
+          outputs: utxosList,
+          chain,
+          hardware,
+        })
+      )
+    } else {
+      const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
+      const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
+
+      history.push('/send-confirm', {
+        amount: Number(amount),
+        symbol,
+        networkFee,
+        networkFeeSymbol,
+        addressFrom: selectedAddress,
+        addressTo: address,
+        outputs: utxosList,
+        chain,
+        contractAddress: tokenContractAddress || contractAddress,
+        tokenChain,
+        decimals: getTokenDecimals || decimals,
+        extraId,
+      })
+    }
   }
 
   const onBlurAddressInput = (): void => {

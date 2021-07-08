@@ -179,7 +179,7 @@ const ConnectTrezor: React.FC = () => {
       const bundle = getTrezorBundle('btc')
 
       if (bundle) {
-        const addresses = await getAddresses(bundle)
+        const addresses = await getAddresses(bundle, 'btc')
 
         setIsLoading(false)
 
@@ -229,7 +229,7 @@ const ConnectTrezor: React.FC = () => {
     const bundle = getTrezorBundle(symbol)
 
     if (bundle) {
-      const addresses = await getAddresses(bundle)
+      const addresses = await getAddresses(bundle, symbol)
 
       if (addresses) {
         const getCurrency = currencies.find(

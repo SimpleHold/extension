@@ -1,4 +1,4 @@
-import TrezorConnect, { TxInputType, TxOutputType } from 'trezor-connect'
+import TrezorConnect from 'trezor-connect'
 
 export type TTrezorBundle = {
   path: string
@@ -15,11 +15,22 @@ export const init = async (): Promise<void> => {
   })
 }
 
-export const getAddresses = async (bundle: TTrezorBundle[]): Promise<string[] | null> => {
+export const getAddresses = async (
+  bundle: TTrezorBundle[],
+  symbol: string
+): Promise<string[] | null> => {
   try {
-    const request = await TrezorConnect.getAddress({
-      bundle,
-    })
+    let request
+
+    if (symbol === 'eth') {
+      request = await TrezorConnect.ethereumGetAddress({
+        bundle,
+      })
+    } else {
+      request = await TrezorConnect.getAddress({
+        bundle,
+      })
+    }
 
     if (request.success) {
       return request.payload.map((item) => item.address)
@@ -31,36 +42,32 @@ export const getAddresses = async (bundle: TTrezorBundle[]): Promise<string[] | 
   }
 }
 
-export const signTransaction = async (
-  inputs: TxInputType[],
-  outputs: TxOutputType[],
+export const composeTransaction = async (
+  amount: string,
+  address: string,
   coin: string
 ): Promise<null | string> => {
   try {
-    const request = await TrezorConnect.signTransaction({
-      inputs,
-      outputs,
+    try {
+      await init()
+    } catch {}
+
+    const request = await TrezorConnect.composeTransaction({
+      outputs: [
+        {
+          amount,
+          address,
+        },
+      ],
       coin,
+      push: true,
     })
 
     if (request.success) {
-      return request.payload.serializedTx
-    }
-    return null
-  } catch {
-    return null
-  }
-}
-
-export const pushTx = async (tx: string, coin: string): Promise<null | string> => {
-  try {
-    const request = await TrezorConnect.pushTransaction({
-      tx,
-      coin,
-    })
-
-    if (request.success) {
-      return request.payload.txid
+      if (request.payload.txid) {
+        return request.payload.txid
+      }
+      return null
     }
 
     return null

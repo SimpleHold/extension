@@ -169,6 +169,7 @@ const Receive: React.FC = () => {
       contractAddress,
       tokenName,
       decimals,
+      hardware,
     })
   }
 
