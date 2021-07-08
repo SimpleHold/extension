@@ -9,6 +9,7 @@ import ExternalPageContainer from '@containers/ExternalPage'
 // Utils
 import { download } from '@utils/backup'
 import { getItem, removeItem } from '@utils/storage'
+import { getUrl } from '@utils/extension'
 
 // Styles
 import Styles from './styles'
@@ -28,11 +29,13 @@ const DownloadBackup: React.FC = () => {
   const checkExistPage = async () => {
     const tabs = await browser.tabs.query({
       active: false,
-      url: browser.extension.getURL('download-backup.html'),
+      url: [getUrl('download-backup.html'), getUrl('connect-trezor.html')],
     })
 
-    if (tabs[0]?.id) {
-      await browser.tabs.remove(tabs[0].id)
+    if (tabs.length) {
+      const mapTabIds = tabs.map((i) => i.id)
+      // @ts-ignore
+      await browser.tabs.remove(mapTabIds)
     }
   }
 
