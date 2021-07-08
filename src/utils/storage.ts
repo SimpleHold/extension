@@ -19,3 +19,16 @@ export const removeMany = (keys: string[]): void => {
 export const clear = (): void => {
   localStorage.clear()
 }
+
+export const getJSON = (key: string): any => {
+  try {
+    const item = getItem(key)
+
+    if (item) {
+      return JSON.parse(item)
+    }
+    return null
+  } catch {
+    return null
+  }
+}
