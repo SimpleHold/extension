@@ -119,7 +119,7 @@ const WalletCard: React.FC<Props> = (props) => {
             <Styles.Address>{address}</Styles.Address>
           </Styles.AddressInfo>
           <Styles.Balances>
-            <Skeleton width={106} height={16} type="gray" br={4} isLoading={balance === null}>
+            <Skeleton width={106} height={19} type="gray" br={4} isLoading={balance === null}>
               <Styles.BalanceRow>
                 {pendingBalance !== 0 ? (
                   <Styles.PendingIcon>
@@ -134,9 +134,9 @@ const WalletCard: React.FC<Props> = (props) => {
             </Skeleton>
             <Skeleton
               width={80}
-              height={14}
+              height={16}
               type="gray"
-              mt={9}
+              mt={4}
               br={4}
               isLoading={estimated === null}
             >

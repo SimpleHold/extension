@@ -79,6 +79,10 @@ const Address = styled.p`
 `
 
 const Balances = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+
   p {
     text-align: right;
   }
