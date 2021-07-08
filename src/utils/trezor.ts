@@ -1,4 +1,4 @@
-import TrezorConnect from 'trezor-connect'
+import TrezorConnect, { TxInputType, TxOutputType } from 'trezor-connect'
 
 export type TTrezorBundle = {
   path: string
@@ -15,23 +15,6 @@ export const init = async (): Promise<void> => {
   })
 }
 
-export const getLabel = async (): Promise<string | null> => {
-  try {
-    const getFeatures = await TrezorConnect.getFeatures({ keepSession: true })
-
-    if (getFeatures.success) {
-      const {
-        payload: { label = null },
-      } = getFeatures
-
-      return label
-    }
-    return null
-  } catch {
-    return null
-  }
-}
-
 export const getAddresses = async (bundle: TTrezorBundle[]): Promise<string[] | null> => {
   try {
     const request = await TrezorConnect.getAddress({
@@ -42,6 +25,27 @@ export const getAddresses = async (bundle: TTrezorBundle[]): Promise<string[] | 
       return request.payload.map((item) => item.address)
     }
 
+    return null
+  } catch {
+    return null
+  }
+}
+
+export const signTransaction = async (
+  inputs: TxInputType[],
+  outputs: TxOutputType[],
+  coin: string
+): Promise<null | string> => {
+  try {
+    const request = await TrezorConnect.signTransaction({
+      inputs,
+      outputs,
+      coin,
+    })
+
+    if (request.success) {
+      return request.payload.serializedTx
+    }
     return null
   } catch {
     return null
