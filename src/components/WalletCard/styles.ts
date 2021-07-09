@@ -7,12 +7,12 @@ type TBodyProps = {
 const Container = styled.div`
   background-color: #ffffff;
   border-radius: 16px;
-  margin: 0 0 10px 0;
+  margin: 0 0 6px 0;
   transition: all 0.2s ease-in-out;
 
   &:hover {
     cursor: pointer;
-    margin: 0 -10px 10px 10px;
+    margin: 0 -10px 6px 10px;
   }
 `
 

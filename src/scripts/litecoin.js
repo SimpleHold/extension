@@ -33,11 +33,15 @@ const litecoin = (function () {
     }
   }
 
+  const getTransactionSize = (outputs) => {
+    return new litecore.Transaction().from(outputs).toString().length
+  }
+
   const getFee = (outputs, to, amount, changeAddress) => {
     try {
       return new litecore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
     } catch (err) {
-      return 10000
+      return getTransactionSize(outputs) * 3
     }
   }
 

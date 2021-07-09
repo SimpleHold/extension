@@ -22,6 +22,10 @@ import { decrypt } from '@utils/crypto'
 import { addHardwareWallet, IWallet } from '@utils/wallet'
 import { init, getAddresses, TTrezorBundle } from '@utils/trezor'
 
+// Assets
+import connectTrezorImage from '@assets/illustrate/connectTrezor.svg'
+import errorConnectTrezorImage from '@assets/illustrate/errorConnectTrezor.svg'
+
 // Config
 import { getCurrency } from '@config/currencies'
 
@@ -331,7 +335,7 @@ const ConnectTrezor: React.FC = () => {
           {!currencies.length || isError ? (
             <Styles.Row pt={40}>
               <Styles.ConnectRow>
-                <Styles.Image />
+                <Styles.Image src={isError ? errorConnectTrezorImage : connectTrezorImage} />
                 <Styles.ConnectTitle>{isError ? 'Fail' : 'Connect Trezor'}</Styles.ConnectTitle>
                 <Styles.ConnectDescription>
                   {isError

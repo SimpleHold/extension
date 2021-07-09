@@ -22,6 +22,7 @@
   "dependencies": {
     "@babel/runtime": "^7.12.5",
     "@emurgo/cardano-serialization-lib-browser": "^7.0.0",
+    "@ethereumjs/tx": "^3.3.0",
     "@thetalabs/theta-js": "^0.0.53",
     "advanced-css-reset": "^1.2.2",
     "amplitude-js": "^7.4.4",

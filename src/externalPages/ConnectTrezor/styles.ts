@@ -173,10 +173,9 @@ const ConnectRow = styled.div`
   height: 520px;
 `
 
-const Image = styled.div`
+const Image = styled.img`
   width: 100%;
   height: 180px;
-  background-color: gray;
 `
 
 const ConnectTitle = styled.h1`

@@ -45,6 +45,10 @@ interface TransferTokenOptions {
   contractAddress?: string
 }
 
+export const toHex = (value: number): string => {
+  return web3.utils.toHex(value)
+}
+
 export const generateAddress = (): TGenerateAddress | null => {
   try {
     const item = web3.eth.accounts.create()

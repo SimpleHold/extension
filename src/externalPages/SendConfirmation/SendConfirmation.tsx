@@ -24,7 +24,7 @@ import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } fro
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, removeItem } from '@utils/storage'
-import { composeTransaction } from '@utils/trezor'
+import { composeTransaction, ethereumSignTransaction } from '@utils/trezor'
 
 // Styles
 import Styles from './styles'
@@ -49,6 +49,7 @@ interface Props {
   hardware?: {
     label: string
     type: 'trezor' | 'ledger'
+    path: string
   }
 }
 
@@ -59,9 +60,10 @@ const SendConfirmation: React.FC = () => {
   )
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
-  const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
+  const [isDrawerButtonLoading, setDrawerButtonLoading] = React.useState<boolean>(false)
   const [transactionLink, setTransactionLink] = React.useState<string>('')
   const [failText, setFailText] = React.useState<string>('')
+  const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     checkProps()
@@ -111,12 +113,35 @@ const SendConfirmation: React.FC = () => {
   }
 
   const onSendHardwareTx = async (): Promise<void> => {
-    const { symbol, addressTo, amount, chain } = props
+    const { symbol, addressTo, amount, chain, addressFrom, hardware } = props
 
-    if (symbol && addressTo && amount && chain) {
+    if (symbol && addressTo && amount && chain && addressFrom && hardware) {
+      setButtonLoading(true)
+      const { path } = hardware
+
       const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
 
-      const getTxId = await composeTransaction(`${parseAmount}`, addressTo, symbol)
+      let getTxId
+
+      if (toLower(symbol) === 'eth') {
+        const ethParams = await getWeb3TxParams(addressFrom, addressTo, parseAmount, chain)
+
+        if (ethParams) {
+          const { chainId, nonce, gas, gasPrice } = ethParams
+
+          getTxId = await ethereumSignTransaction(
+            path,
+            addressTo,
+            parseAmount,
+            chainId,
+            nonce,
+            gas,
+            gasPrice
+          )
+        }
+      } else {
+        getTxId = await composeTransaction(`${parseAmount}`, addressTo, symbol)
+      }
 
       if (getTxId) {
         const link = getTransactionLink(getTxId, symbol, chain)
@@ -124,8 +149,10 @@ const SendConfirmation: React.FC = () => {
         if (link) {
           setTransactionLink(link)
         }
+        setButtonLoading(false)
         return setActiveDrawer('success')
       }
+      setButtonLoading(false)
       return setActiveDrawer('fail')
     }
   }
@@ -168,7 +195,7 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
-          setButtonLoading(true)
+          setDrawerButtonLoading(true)
 
           const parseAmount =
             tokenChain && decimals
@@ -211,7 +238,7 @@ const SendConfirmation: React.FC = () => {
 
             if (transaction) {
               setTransactionLink(theta.getTransactionLink(transaction))
-              setButtonLoading(false)
+              setDrawerButtonLoading(false)
               return setActiveDrawer('success')
             }
             return setInputErrorLabel('Error while creating transaction')
@@ -224,7 +251,7 @@ const SendConfirmation: React.FC = () => {
             extraId,
           })
 
-          setButtonLoading(false)
+          setDrawerButtonLoading(false)
 
           if (transaction) {
             const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
@@ -370,7 +397,7 @@ const SendConfirmation: React.FC = () => {
           </Styles.Row>
           <Styles.Actions>
             <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
-            <Button label="Confirm" onClick={onConfirm} ml={7.5} />
+            <Button label="Confirm" onClick={onConfirm} isLoading={isButtonLoading} ml={7.5} />
           </Styles.Actions>
         </Styles.Body>
         <ConfirmDrawer
@@ -384,7 +411,7 @@ const SendConfirmation: React.FC = () => {
           onChangeText={setPassword}
           isButtonDisabled={!validatePassword(password)}
           onConfirm={onConfirmSend}
-          isButtonLoading={isButtonLoading}
+          isButtonLoading={isDrawerButtonLoading}
           openFrom="browser"
         />
         <SuccessDrawer
