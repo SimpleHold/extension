@@ -20,7 +20,13 @@ import { getUrl, openWebPage } from '@utils/extension'
 import { getItem, getJSON, setItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { addHardwareWallet, IWallet } from '@utils/wallet'
-import { init, getAddresses, TTrezorBundle } from '@utils/trezor'
+import {
+  init,
+  getAddresses,
+  TTrezorBundle,
+  currencies as trezorCurrencies,
+  TTrezorCurrency,
+} from '@utils/trezor'
 
 // Assets
 import connectTrezorImage from '@assets/illustrate/connectTrezor.svg'
@@ -37,44 +43,10 @@ type TCurrency = {
   addresses: string[]
 }
 
-type TTrezorCurrency = {
-  symbol: string
-  path: string
-  index: number
-}
-
 type TTrezorInfo = {
   device_id: string
   label: string
 }
-
-const trezorCurrencies = [
-  {
-    symbol: 'btc',
-    path: "m/49'/0'/0'/0/",
-    index: 0,
-  },
-  {
-    symbol: 'ltc',
-    path: "m/49'/2'/0'/0/",
-    index: 0,
-  },
-  {
-    symbol: 'bch',
-    path: "m/44'/145'/0'/0/",
-    index: 0,
-  },
-  {
-    symbol: 'dash',
-    path: "m/44'/5'/0'/0/",
-    index: 0,
-  },
-  {
-    symbol: 'eth',
-    path: "m/44'/60'/0'/0/",
-    index: 0,
-  },
-]
 
 const ConnectTrezor: React.FC = () => {
   const [isError, setIsError] = React.useState<boolean>(false)

@@ -1,4 +1,4 @@
-import TrezorConnect from 'trezor-connect'
+import TrezorConnect, { TxInputType, TxOutputType } from 'trezor-connect'
 import { Transaction } from '@ethereumjs/tx'
 
 // Utils
@@ -10,6 +10,46 @@ export type TTrezorBundle = {
   coin: string
   showOnTrezor: boolean
 }
+
+export type TTrezorCurrency = {
+  symbol: string
+  path: string
+  numberPath: number[]
+  index: number
+}
+
+export const currencies: TTrezorCurrency[] = [
+  {
+    symbol: 'btc',
+    path: "m/49'/0'/0'/0/",
+    numberPath: [2147483697, 2147483648, 2147483648, 0],
+    index: 0,
+  },
+  {
+    symbol: 'ltc',
+    path: "m/49'/2'/0'/0/",
+    numberPath: [2147483697, 2147483650, 2147483648, 0],
+    index: 0,
+  },
+  {
+    symbol: 'bch',
+    path: "m/44'/145'/0'/0/",
+    numberPath: [2147483692, 2147483793, 2147483648, 0],
+    index: 0,
+  },
+  {
+    symbol: 'dash',
+    path: "m/44'/5'/0'/0/",
+    numberPath: [2147483692, 2147483653, 2147483648, 0],
+    index: 0,
+  },
+  {
+    symbol: 'eth',
+    path: "m/44'/60'/0'/0/",
+    numberPath: [2147483692, 2147483708, 2147483648, 0],
+    index: 0,
+  },
+]
 
 export const init = async (): Promise<void> => {
   try {
@@ -49,30 +89,84 @@ export const getAddresses = async (
   }
 }
 
-export const composeTransaction = async (
-  amount: string,
-  address: string,
-  coin: string
-): Promise<null | string> => {
+export const pushTransaction = async (tx: string, coin: string): Promise<string | null> => {
   try {
-    await init()
-
-    const request = await TrezorConnect.composeTransaction({
-      outputs: [
-        {
-          amount,
-          address,
-        },
-      ],
+    const request = await TrezorConnect.pushTransaction({
+      tx,
       coin,
-      push: true,
     })
 
     if (request.success) {
-      if (request.payload.txid) {
-        return request.payload.txid
+      return request.payload.txid
+    }
+    return null
+  } catch {
+    return null
+  }
+}
+
+const getNumberPath = (path: string): number[] => {
+  const findCurrency = currencies.find(
+    (currency: TTrezorCurrency) => path.indexOf(currency.path) !== -1
+  )
+  const getLastPathIndex = Number(path.split('/')[path.split('/').length - 1])
+
+  if (findCurrency) {
+    const numberPath = findCurrency.numberPath
+    numberPath.push(getLastPathIndex)
+    return numberPath
+  }
+  return [0]
+}
+
+export const signTransaction = async (
+  amount: string,
+  addressFrom: string,
+  addressTo: string,
+  coin: string,
+  outputs: UnspentOutput[],
+  path: string,
+  fee: number
+): Promise<string | null> => {
+  try {
+    await init()
+
+    const mapInputs: TxInputType[] = outputs.map((output: UnspentOutput) => {
+      return {
+        address_n: getNumberPath(path),
+        prev_index: 1,
+        prev_hash: output.txId,
+        amount: `${output.satoshis}`,
       }
-      return null
+    })
+
+    const getTotalOutputsSats = outputs.reduce(
+      (a: number, b: UnspentOutput) => Number(b.satoshis) + a,
+      0
+    )
+    const getReturnAmount = getTotalOutputsSats - Number(amount) - fee
+
+    const getOutputs: TxOutputType[] = [
+      {
+        address: addressTo,
+        amount,
+        script_type: 'PAYTOADDRESS',
+      },
+      {
+        address: addressFrom,
+        amount: `${getReturnAmount}`,
+        script_type: 'PAYTOADDRESS',
+      },
+    ]
+
+    const request = await TrezorConnect.signTransaction({
+      inputs: mapInputs,
+      outputs: getOutputs,
+      coin,
+    })
+
+    if (request.success) {
+      return request.payload.serializedTx
     }
 
     return null
@@ -82,11 +176,11 @@ export const composeTransaction = async (
 }
 
 const getEthereumRawTx = (
-  nonce: string,
-  gasPrice: string,
-  gasLimit: string,
   to: string,
   value: string,
+  nonce: string,
+  gasLimit: string,
+  gasPrice: string,
   v: string,
   r: string,
   s: string
@@ -116,36 +210,41 @@ export const ethereumSignTransaction = async (
   chainId: number,
   nonce: number,
   gasLimit: number,
-  gasPrice: string
+  gasPrice: number
 ): Promise<string | null> => {
   try {
     await init()
 
-    const getNonce = toHex(nonce)
-    const getGasPrice = toHex(Number(gasPrice))
-    const getGasLimit = toHex(gasLimit)
-    const getValue = toHex(value)
+    const transaction = {
+      to,
+      value: toHex(value),
+      chainId,
+      nonce: toHex(nonce),
+      gasLimit: toHex(gasLimit),
+      gasPrice: toHex(gasPrice),
+    }
 
     const request = await TrezorConnect.ethereumSignTransaction({
       path,
-      transaction: {
-        to,
-        value: getValue,
-        chainId,
-        nonce: getNonce,
-        gasLimit: getGasLimit,
-        gasPrice: getGasPrice,
-      },
+      transaction,
     })
 
     if (request.success) {
       const { v, r, s } = request.payload
 
-      const rawTx = getEthereumRawTx(getNonce, getGasPrice, getGasLimit, to, getValue, v, r, s)
+      const rawTx = getEthereumRawTx(
+        to,
+        toHex(value),
+        toHex(nonce),
+        toHex(gasLimit),
+        toHex(gasPrice),
+        v,
+        r,
+        s
+      )
 
       if (rawTx) {
-        const send = await sendRawTransaction(rawTx, 'eth')
-        return send
+        return await sendRawTransaction(rawTx, 'eth', 'trezor')
       }
     }
 

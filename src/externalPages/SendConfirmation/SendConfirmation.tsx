@@ -24,7 +24,7 @@ import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } fro
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, removeItem } from '@utils/storage'
-import { composeTransaction, ethereumSignTransaction } from '@utils/trezor'
+import { ethereumSignTransaction, signTransaction } from '@utils/trezor'
 
 // Styles
 import Styles from './styles'
@@ -113,13 +113,23 @@ const SendConfirmation: React.FC = () => {
   }
 
   const onSendHardwareTx = async (): Promise<void> => {
-    const { symbol, addressTo, amount, chain, addressFrom, hardware } = props
+    const { symbol, addressTo, amount, chain, addressFrom, hardware, outputs, networkFee } = props
 
-    if (symbol && addressTo && amount && chain && addressFrom && hardware) {
+    if (
+      symbol &&
+      addressTo &&
+      amount &&
+      chain &&
+      addressFrom &&
+      hardware &&
+      outputs?.length &&
+      networkFee
+    ) {
       setButtonLoading(true)
       const { path } = hardware
 
       const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+      const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
       let getTxId
 
@@ -136,11 +146,23 @@ const SendConfirmation: React.FC = () => {
             chainId,
             nonce,
             gas,
-            gasPrice
+            +gasPrice
           )
         }
       } else {
-        getTxId = await composeTransaction(`${parseAmount}`, addressTo, symbol)
+        const getTxHash = await signTransaction(
+          `${parseAmount}`,
+          addressFrom,
+          addressTo,
+          symbol,
+          outputs,
+          hardware.path,
+          parseNetworkFee
+        )
+
+        if (getTxHash) {
+          getTxId = await sendRawTransaction(getTxHash, chain)
+        }
       }
 
       if (getTxId) {

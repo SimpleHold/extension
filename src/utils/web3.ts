@@ -114,11 +114,7 @@ export const createTransaction = async (
       privateKey
     )
 
-    if (rawTransaction) {
-      return rawTransaction
-    }
-
-    return null
+    return rawTransaction || null
   } catch {
     return null
   }
