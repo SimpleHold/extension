@@ -150,19 +150,14 @@ const SendConfirmation: React.FC = () => {
           )
         }
       } else {
-        const getTxHash = await signTransaction(
+        getTxId = await signTransaction(
           `${parseAmount}`,
-          addressFrom,
           addressTo,
           symbol,
           outputs,
           hardware.path,
           parseNetworkFee
         )
-
-        if (getTxHash) {
-          getTxId = await sendRawTransaction(getTxHash, chain)
-        }
       }
 
       if (getTxId) {

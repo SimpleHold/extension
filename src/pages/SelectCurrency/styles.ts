@@ -122,14 +122,6 @@ const HardwareWallet = styled.div`
       fill: #3fbb7d;
     }
   }
-
-  &:first-child {
-    margin: 0 7.5px 0 0;
-  }
-
-  &:last-child {
-    margin: 0 0 0 7.5px;
-  }
 `
 
 const Styles = {

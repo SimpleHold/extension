@@ -17,9 +17,6 @@ const HardwareTab: React.FC<Props> = (props) => {
         <Styles.HardwareWallet>
           <SVG src="../../../assets/hardware/trezor.svg" width={80} height={22} />
         </Styles.HardwareWallet>
-        <Styles.HardwareWallet onClick={onConnect('ledger')}>
-          <SVG src="../../../assets/hardware/ledger.svg" width={80} height={22} />
-        </Styles.HardwareWallet>
       </Styles.HardwareWallets>
     </Styles.Tab>
   )

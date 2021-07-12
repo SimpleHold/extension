@@ -112,16 +112,13 @@ const getNumberPath = (path: string): number[] => {
   const getLastPathIndex = Number(path.split('/')[path.split('/').length - 1])
 
   if (findCurrency) {
-    const numberPath = findCurrency.numberPath
-    numberPath.push(getLastPathIndex)
-    return numberPath
+    return [...findCurrency.numberPath, getLastPathIndex]
   }
-  return [0]
+  return []
 }
 
 export const signTransaction = async (
   amount: string,
-  addressFrom: string,
   addressTo: string,
   coin: string,
   outputs: UnspentOutput[],
@@ -131,12 +128,15 @@ export const signTransaction = async (
   try {
     await init()
 
+    const addressFromPath = getNumberPath(path)
+
     const mapInputs: TxInputType[] = outputs.map((output: UnspentOutput) => {
       return {
-        address_n: getNumberPath(path),
-        prev_index: 1,
+        address_n: addressFromPath,
+        prev_index: output.outputIndex,
         prev_hash: output.txId,
         amount: `${output.satoshis}`,
+        script_type: 'SPENDP2SHWITNESS',
       }
     })
 
@@ -144,17 +144,18 @@ export const signTransaction = async (
       (a: number, b: UnspentOutput) => Number(b.satoshis) + a,
       0
     )
+
     const getReturnAmount = getTotalOutputsSats - Number(amount) - fee
 
     const getOutputs: TxOutputType[] = [
       {
-        address: addressTo,
-        amount,
-        script_type: 'PAYTOADDRESS',
+        address_n: addressFromPath,
+        amount: `${getReturnAmount}`,
+        script_type: 'PAYTOP2SHWITNESS',
       },
       {
-        address: addressFrom,
-        amount: `${getReturnAmount}`,
+        address: addressTo,
+        amount,
         script_type: 'PAYTOADDRESS',
       },
     ]
@@ -163,10 +164,11 @@ export const signTransaction = async (
       inputs: mapInputs,
       outputs: getOutputs,
       coin,
+      push: true,
     })
 
     if (request.success) {
-      return request.payload.serializedTx
+      return request.payload.txid || null
     }
 
     return null
