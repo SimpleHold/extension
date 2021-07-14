@@ -59,19 +59,19 @@ const themes: TTheme = {
       image: swapSpaceStep1,
       title: 'Hello!',
       description:
-        'Welcome to the SimpleHold crypto wallet! We are glad that you come here from Swapspace as it is our reliable partner.',
+        'Welcome to the SimpleHold crypto wallet! We are glad that you come here from SwapSpace as it is our reliable partner.',
     },
     {
       image: swapSpaceStep2,
       title: 'Simple',
       description:
-        'Use our crypto wallet on Swapspace to make fast and simple exchanges. Please remember it is crucial that you keep your backup in a safe place.',
+        'Use our crypto wallet on SwapSpace to make fast and simple exchanges. Please remember it is crucial that you keep your backup in a safe place.',
     },
     {
       image: swapSpaceStep3,
       title: 'Support',
       description:
-        'Our support team is always ready to help you with the SimpleHold wallet. Please contact Swapspace if any issues with your exchange arise.',
+        'Our support team is always ready to help you with the SimpleHold wallet. Please contact SwapSpace if any issues with your exchange arise.',
     },
   ],
 }
