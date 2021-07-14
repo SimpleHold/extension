@@ -74,6 +74,7 @@ module.exports = {
     send: path.join(sourcePath, 'externalPages/Send/Send.tsx'),
     sendConfirmation: path.join(sourcePath, 'externalPages/SendConfirmation/SendConfirmation.tsx'),
     connectTrezor: path.join(sourcePath, 'externalPages/ConnectTrezor/ConnectTrezor.tsx'),
+    connectLedger: path.join(sourcePath, 'externalPages/connectLedger/connectLedger.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -183,6 +184,13 @@ module.exports = {
       chunks: ['connectTrezor'],
       hash: true,
       filename: 'connect-trezor.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'connect-ledger.html'),
+      inject: 'body',
+      chunks: ['connectLedger'],
+      hash: true,
+      filename: 'connect-ledger.html',
     }),
     new CopyWebpackPlugin({
       patterns: [

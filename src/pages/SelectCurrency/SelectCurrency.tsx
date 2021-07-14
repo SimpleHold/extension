@@ -86,6 +86,8 @@ const SelectCurrency: React.FC = () => {
   const onConnectHardware = (type: 'trezor' | 'ledger') => (): void => {
     if (type === 'trezor') {
       openWebPage(getUrl('connect-trezor.html'))
+    } else {
+      openWebPage(getUrl('connect-ledger.html'))
     }
   }
 
