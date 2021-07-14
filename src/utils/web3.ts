@@ -132,6 +132,7 @@ export const transferToken = async ({
   contractAddress,
 }: TransferTokenOptions): Promise<string | null> => {
   try {
+    // @ts-ignore
     const contract = new web3.eth.Contract(contractABI, contractAddress, { from })
     const data = contract.methods.transfer(to, value)
 
