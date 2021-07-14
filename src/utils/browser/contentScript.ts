@@ -69,7 +69,7 @@ const createIframe = async (src: string) => {
   iframe.style.position = 'absolute'
   iframe.style.left = `${Math.max(screenX + (outerWidth - leftDif - 375), 0)}px`
   iframe.style.top = '0'
-  iframe.style.zIndex = '100'
+  iframe.style.zIndex = '9999999999'
   iframe.style.borderRadius = '16px'
   iframe.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
   iframe.style.border = 'none'
