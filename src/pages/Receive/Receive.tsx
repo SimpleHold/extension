@@ -281,7 +281,11 @@ const Receive: React.FC = () => {
                   {hardware ? (
                     <Styles.HardwareBlock>
                       <Styles.HardwareLabel>{hardware.label}</Styles.HardwareLabel>
-                      <SVG src="../../assets/icons/trezor.svg" width={8.9} height={13} />
+                      {hardware.type === 'ledger' ? (
+                        <SVG src="../../assets/icons/ledger.svg" width={10} height={12} />
+                      ) : (
+                        <SVG src="../../assets/icons/trezor.svg" width={8.9} height={13} />
+                      )}
                     </Styles.HardwareBlock>
                   ) : null}
                   <Styles.CurrencyName size={hardware ? 'small' : 'normal'}>

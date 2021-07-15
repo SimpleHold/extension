@@ -3,7 +3,7 @@ import SVG from 'react-inlinesvg'
 
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
-import CurrencyAddress from './CurrencyAddress'
+import CurrencyAddress from '@components/CurrencyAddress'
 
 // Utils
 import { toLower } from '@utils/format'

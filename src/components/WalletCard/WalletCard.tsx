@@ -148,7 +148,12 @@ const WalletCard: React.FC<Props> = (props) => {
       {hardware ? (
         <Styles.Footer>
           <Styles.HardwareBlock>
-            <SVG src="../../assets/icons/trezor.svg" width={8.22} height={12} />
+            {hardware.type === 'ledger' ? (
+              <SVG src="../../assets/icons/ledger.svg" width={10} height={12} />
+            ) : (
+              <SVG src="../../assets/icons/trezor.svg" width={8.22} height={12} />
+            )}
+
             <Styles.HardwareLabel>{hardware.label}</Styles.HardwareLabel>
           </Styles.HardwareBlock>
         </Styles.Footer>

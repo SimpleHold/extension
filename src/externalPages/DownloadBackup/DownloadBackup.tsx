@@ -29,7 +29,11 @@ const DownloadBackup: React.FC = () => {
   const checkExistPage = async () => {
     const tabs = await browser.tabs.query({
       active: false,
-      url: [getUrl('download-backup.html'), getUrl('connect-trezor.html')],
+      url: [
+        getUrl('download-backup.html'),
+        getUrl('connect-trezor.html'),
+        getUrl('connect-ledger.html'),
+      ],
     })
 
     if (tabs.length) {
