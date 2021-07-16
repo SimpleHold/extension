@@ -113,7 +113,7 @@ const Currency: React.FC<Props> = (props) => {
       </Styles.CurrencyHeading>
       {addresses.length ? (
         <Styles.Addresses>
-          {addresses.map((address: string) => {
+          {addresses.map((address: string, addressIndex: number) => {
             const isSelected =
               selectedAddresses.find(
                 (item: TSelectedAddress) =>
@@ -129,11 +129,12 @@ const Currency: React.FC<Props> = (props) => {
 
             return (
               <CurrencyAddress
+                key={`${symbol}/${address}`}
                 address={address}
                 symbol={symbol}
                 isSelected={isSelected || isDisabled}
                 isDisabled={isDisabled}
-                onToggle={onToggleSelect(isSelected, symbol, address, index)}
+                onToggle={onToggleSelect(isSelected, symbol, address, addressIndex)}
               />
             )
           })}

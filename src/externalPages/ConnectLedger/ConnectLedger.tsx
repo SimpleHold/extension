@@ -34,7 +34,7 @@ type TSelectedAddress = {
 const ConnectLedger: React.FC = () => {
   const [ledgerTransport, setLedgerTransport] = React.useState<Transport | null>(null)
   const [ledgerName, setLedgerName] = React.useState<string>('Ledger')
-  const [productId, setProductId] = React.useState<string>('0')
+  const [productId, setProductId] = React.useState<string>('-1')
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
@@ -49,10 +49,10 @@ const ConnectLedger: React.FC = () => {
     const list: IWallet[] | null = getJSON('wallets')
 
     if (list?.length) {
-      const getTrezorWallets = list.filter((wallet: IWallet) => wallet.hardware?.type === 'trezor')
+      const getLedgerWallets = list.filter((wallet: IWallet) => wallet.hardware?.type === 'ledger')
 
-      if (getTrezorWallets.length) {
-        const mapAddresses = getTrezorWallets.map((wallet: IWallet) => {
+      if (getLedgerWallets.length) {
+        const mapAddresses = getLedgerWallets.map((wallet: IWallet) => {
           return {
             symbol: wallet.symbol,
             address: wallet.address,

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { render } from 'react-dom'
 import numeral from 'numeral'
 import { BigNumber } from 'bignumber.js'
+import type Transport from '@ledgerhq/hw-transport-webusb'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -13,6 +14,13 @@ import Button from '@components/Button'
 import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 import FailDrawer from '@drawers/Fail'
+import BasicDrawer from '@drawers/Basic'
+
+// Assets
+import ErrorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
+import ConnectionErrorIcon from '@assets/drawer/connectionError.svg'
+import ErrorCurrencyIcon from '@assets/drawer/errorCurrency.svg'
+import LedgerTxReviewIcon from '@assets/drawer/ledgerTxReview.svg'
 
 // Utils
 import { toLower, toUpper } from '@utils/format'
@@ -25,6 +33,7 @@ import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, removeItem } from '@utils/storage'
 import { ethereumSignTransaction, signTransaction } from '@utils/trezor'
+import { ethLedgerSignTx, requestTransport } from '@utils/ledger'
 
 // Styles
 import Styles from './styles'
@@ -50,24 +59,89 @@ interface Props {
     label: string
     type: 'trezor' | 'ledger'
     path: string
+    deviceId: string
   }
+}
+
+type TBasicDrawer = {
+  title: string
+  text: string
+  icon: string
+  buttonLabel?: string
 }
 
 const SendConfirmation: React.FC = () => {
   const [props, setProps] = React.useState<Props>({})
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success' | 'fail'>(
-    null
-  )
+  const [activeDrawer, setActiveDrawer] = React.useState<
+    null | 'confirm' | 'success' | 'fail' | 'basic'
+  >(null)
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
   const [isDrawerButtonLoading, setDrawerButtonLoading] = React.useState<boolean>(false)
   const [transactionLink, setTransactionLink] = React.useState<string>('')
   const [failText, setFailText] = React.useState<string>('')
   const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
+  const [ledgerTransport, setLedgerTransport] = React.useState<Transport | null>(null)
+  const [basicDrawer, setBasicDrawer] = React.useState<TBasicDrawer | null>(null)
 
   React.useEffect(() => {
     checkProps()
   }, [])
+
+  React.useEffect(() => {
+    if (ledgerTransport) {
+      createLedgerTx()
+    }
+  }, [ledgerTransport])
+
+  const createLedgerTx = async (): Promise<void> => {
+    if (props.symbol === 'eth' && ledgerTransport) {
+      const { symbol, addressTo, amount, chain, addressFrom, hardware, networkFee } = props
+
+      if (symbol && addressTo && amount && chain && addressFrom && hardware && networkFee) {
+        const { path } = hardware
+        const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+
+        const ethParams = await getWeb3TxParams(addressFrom, addressTo, parseAmount, chain)
+
+        if (ethParams) {
+          const { nonce, gas, gasPrice, chainId } = ethParams
+
+          setBasicDrawer({
+            title: 'Transaction review',
+            text: 'Review transaction, open your Ledger',
+            icon: LedgerTxReviewIcon,
+          })
+
+          const getRawTx = await ethLedgerSignTx(
+            ledgerTransport,
+            path,
+            gasPrice,
+            gas,
+            addressTo,
+            parseAmount,
+            nonce,
+            chainId
+          )
+
+          if (getRawTx) {
+            const txHash = await sendRawTransaction(getRawTx, 'eth')
+
+            if (txHash) {
+              const link = getTransactionLink(txHash, symbol, chain)
+
+              if (link) {
+                setTransactionLink(link)
+              }
+              return setActiveDrawer('success')
+            }
+          }
+        }
+      }
+    }
+
+    return setActiveDrawer('fail')
+  }
 
   const parseJson = (value: string): { [key: string]: any } | null => {
     try {
@@ -106,25 +180,55 @@ const SendConfirmation: React.FC = () => {
     }
 
     if (props?.hardware) {
-      onSendHardwareTx()
+      if (props.hardware.type === 'ledger') {
+        onConnectLedger()
+      } else {
+        onSendHardwareTx()
+      }
     } else {
       setActiveDrawer('confirm')
+    }
+  }
+
+  const onConnectLedger = async (): Promise<void> => {
+    if (activeDrawer === 'basic') {
+      setActiveDrawer(null)
+    }
+
+    if (basicDrawer) {
+      setBasicDrawer(null)
+    }
+
+    const transport = await requestTransport()
+
+    if (transport && props.hardware) {
+      const {
+        hardware: { deviceId },
+      } = props
+
+      const getProductId = transport?.device?.productId
+
+      if (getProductId) {
+        if (`${getProductId}` !== `${deviceId}`) {
+          setActiveDrawer('basic')
+
+          setBasicDrawer({
+            title: 'Error',
+            text: 'You have connected the wrong wallet, check your device',
+            buttonLabel: 'Try again',
+            icon: ErrorHardwareConnectIcon,
+          })
+        } else {
+          setLedgerTransport(transport)
+        }
+      }
     }
   }
 
   const onSendHardwareTx = async (): Promise<void> => {
     const { symbol, addressTo, amount, chain, addressFrom, hardware, outputs, networkFee } = props
 
-    if (
-      symbol &&
-      addressTo &&
-      amount &&
-      chain &&
-      addressFrom &&
-      hardware &&
-      outputs?.length &&
-      networkFee
-    ) {
+    if (symbol && addressTo && amount && chain && addressFrom && hardware && networkFee) {
       setButtonLoading(true)
       const { path } = hardware
 
@@ -149,7 +253,7 @@ const SendConfirmation: React.FC = () => {
             +gasPrice
           )
         }
-      } else {
+      } else if (outputs?.length) {
         getTxId = await signTransaction(
           `${parseAmount}`,
           addressTo,
@@ -315,6 +419,16 @@ const SendConfirmation: React.FC = () => {
     }
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
+  const onClickBasicDrawer = (): void => {
+    if (props?.hardware?.type === 'ledger') {
+      onConnectLedger()
+    }
+  }
+
   return (
     <ExternalPageContainer
       onClose={onClose}
@@ -419,7 +533,7 @@ const SendConfirmation: React.FC = () => {
         </Styles.Body>
         <ConfirmDrawer
           isActive={activeDrawer === 'confirm'}
-          onClose={() => setActiveDrawer(null)}
+          onClose={onCloseDrawer}
           title="Confirm the sending"
           inputLabel="Enter password"
           textInputType="password"
@@ -441,10 +555,22 @@ const SendConfirmation: React.FC = () => {
         />
         <FailDrawer
           isActive={activeDrawer === 'fail'}
-          onClose={() => setActiveDrawer(null)}
+          onClose={onCloseDrawer}
           text={failText}
           openFrom="browser"
         />
+        {basicDrawer ? (
+          <BasicDrawer
+            isActive={activeDrawer === 'basic'}
+            onClose={onCloseDrawer}
+            title={basicDrawer.title}
+            text={basicDrawer.text}
+            icon={basicDrawer.icon}
+            buttonLabel={basicDrawer.buttonLabel}
+            buttonOnClick={onClickBasicDrawer}
+            openFrom="browser"
+          />
+        ) : null}
       </>
     </ExternalPageContainer>
   )
