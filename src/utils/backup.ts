@@ -20,7 +20,7 @@ export const generate = (currencies: TGenerateCurrency[]): { [key: string]: stri
 
   const backup: TBackup = {
     wallets: [],
-    version: 1.71,
+    version: 1.8,
     uuid: v4(),
   }
 
