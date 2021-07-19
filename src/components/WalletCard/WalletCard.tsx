@@ -11,7 +11,7 @@ import Skeleton from '@components/Skeleton'
 import { getCurrency } from '@config/currencies'
 import { getBalance } from '@utils/api'
 import { toUpper, numberFriendly } from '@utils/format'
-import { updateBalance } from '@utils/wallet'
+import { updateBalance, THardware } from '@utils/wallet'
 
 // Config
 import { getToken } from '@config/tokens'
@@ -31,10 +31,7 @@ interface Props {
   sumEstimated?: (estimated: number) => void
   sumPending?: (pending: number) => void
   handleClick?: () => void
-  hardware?: {
-    label: string
-    type: 'trezor' | 'ledger'
-  }
+  hardware?: THardware
 }
 
 const WalletCard: React.FC<Props> = (props) => {

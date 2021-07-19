@@ -10,6 +10,13 @@ import { getItem, setItem } from '@utils/storage'
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
+export type THardware = {
+  path: string
+  label: string
+  type: 'trezor' | 'ledger'
+  deviceId: string
+}
+
 export interface IWallet {
   symbol: string
   balance?: number
@@ -24,12 +31,7 @@ export interface IWallet {
   createdAt?: Date
   isHidden?: boolean
   mnemonic?: string
-  hardware?: {
-    path: string
-    label: string
-    type: 'trezor' | 'ledger'
-    deviceId: string
-  }
+  hardware?: THardware
 }
 
 type TSelectedWalletFilter = {

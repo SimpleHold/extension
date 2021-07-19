@@ -30,7 +30,7 @@ import { price, toUpper, toLower, short } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet, toggleVisibleWallet, updateBalance } from '@utils/wallet'
+import { IWallet, toggleVisibleWallet, updateBalance, THardware } from '@utils/wallet'
 import { getExplorerLink, getExtraIdName } from '@utils/address'
 import { openWebPage } from '@utils/extension'
 import { getItem } from '@utils/storage'
@@ -62,10 +62,7 @@ interface LocationState {
   tokenName?: string
   decimals?: number
   isHidden?: boolean
-  hardware?: {
-    label: string
-    type: 'trezor' | 'ledger'
-  }
+  hardware?: THardware
 }
 
 const Receive: React.FC = () => {

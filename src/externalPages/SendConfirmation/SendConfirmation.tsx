@@ -14,24 +14,18 @@ import Button from '@components/Button'
 import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 import FailDrawer from '@drawers/Fail'
-import BasicDrawer from '@drawers/Basic'
-
-// Assets
-import ErrorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
-import ConnectionErrorIcon from '@assets/drawer/connectionError.svg'
-import ErrorCurrencyIcon from '@assets/drawer/errorCurrency.svg'
-import LedgerTxReviewIcon from '@assets/drawer/ledgerTxReview.svg'
+import LedgerDrawer from '@drawers/Ledger'
 
 // Utils
 import { toLower, toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet } from '@utils/wallet'
+import { IWallet, THardware } from '@utils/wallet'
 import { convertDecimals } from '@utils/web3'
 import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
-import { getItem, removeItem } from '@utils/storage'
+import { getItem, getJSON, removeItem } from '@utils/storage'
 import { ethereumSignTransaction, signTransaction } from '@utils/trezor'
 import { ethLedgerSignTx, requestTransport } from '@utils/ledger'
 
@@ -55,25 +49,13 @@ interface Props {
   outputs?: UnspentOutput[]
   networkFeeSymbol?: string
   extraId?: string
-  hardware?: {
-    label: string
-    type: 'trezor' | 'ledger'
-    path: string
-    deviceId: string
-  }
-}
-
-type TBasicDrawer = {
-  title: string
-  text: string
-  icon: string
-  buttonLabel?: string
+  hardware?: THardware
 }
 
 const SendConfirmation: React.FC = () => {
   const [props, setProps] = React.useState<Props>({})
   const [activeDrawer, setActiveDrawer] = React.useState<
-    null | 'confirm' | 'success' | 'fail' | 'basic'
+    null | 'confirm' | 'success' | 'fail' | 'ledger'
   >(null)
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
@@ -82,7 +64,9 @@ const SendConfirmation: React.FC = () => {
   const [failText, setFailText] = React.useState<string>('')
   const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
   const [ledgerTransport, setLedgerTransport] = React.useState<Transport | null>(null)
-  const [basicDrawer, setBasicDrawer] = React.useState<TBasicDrawer | null>(null)
+  const [ledgerDrawerState, setLedgerDrawerState] = React.useState<
+    'wrongDevice' | 'wrongApp' | 'connectionFailed' | 'reviewTx' | null
+  >(null)
 
   React.useEffect(() => {
     checkProps()
@@ -93,6 +77,12 @@ const SendConfirmation: React.FC = () => {
       createLedgerTx()
     }
   }, [ledgerTransport])
+
+  React.useEffect(() => {
+    if (ledgerDrawerState && !activeDrawer) {
+      setActiveDrawer('ledger')
+    }
+  }, [ledgerDrawerState, activeDrawer])
 
   const createLedgerTx = async (): Promise<void> => {
     if (props.symbol === 'eth' && ledgerTransport) {
@@ -107,11 +97,7 @@ const SendConfirmation: React.FC = () => {
         if (ethParams) {
           const { nonce, gas, gasPrice, chainId } = ethParams
 
-          setBasicDrawer({
-            title: 'Transaction review',
-            text: 'Review transaction, open your Ledger',
-            icon: LedgerTxReviewIcon,
-          })
+          setLedgerDrawerState('reviewTx')
 
           const getRawTx = await ethLedgerSignTx(
             ledgerTransport,
@@ -123,6 +109,17 @@ const SendConfirmation: React.FC = () => {
             nonce,
             chainId
           )
+
+          if (typeof getRawTx === 'object' && getRawTx !== null) {
+            const { name } = getRawTx
+
+            if (name === 'TransportStatusError') {
+              setLedgerDrawerState('wrongApp')
+            } else if (name === 'DisconnectedDeviceDuringOperation') {
+              setLedgerDrawerState('connectionFailed')
+            }
+            return
+          }
 
           if (getRawTx) {
             const txHash = await sendRawTransaction(getRawTx, 'eth')
@@ -143,27 +140,15 @@ const SendConfirmation: React.FC = () => {
     return setActiveDrawer('fail')
   }
 
-  const parseJson = (value: string): { [key: string]: any } | null => {
-    try {
-      return JSON.parse(value)
-    } catch {
-      return null
-    }
-  }
-
   const checkProps = async (): Promise<void> => {
-    const data = getItem('sendConfirmationData')
+    const data = getJSON('sendConfirmationData')
 
     if (data) {
-      const parseData = parseJson(data)
-
-      if (parseData) {
-        removeItem('sendConfirmationData')
-        return setProps(parseData)
-      }
+      removeItem('sendConfirmationData')
+      setProps(data)
+    } else {
+      onClose()
     }
-
-    onClose()
   }
 
   const onClose = (): void => {
@@ -191,12 +176,9 @@ const SendConfirmation: React.FC = () => {
   }
 
   const onConnectLedger = async (): Promise<void> => {
-    if (activeDrawer === 'basic') {
+    if (ledgerDrawerState) {
+      setLedgerDrawerState(null)
       setActiveDrawer(null)
-    }
-
-    if (basicDrawer) {
-      setBasicDrawer(null)
     }
 
     const transport = await requestTransport()
@@ -210,14 +192,7 @@ const SendConfirmation: React.FC = () => {
 
       if (getProductId) {
         if (`${getProductId}` !== `${deviceId}`) {
-          setActiveDrawer('basic')
-
-          setBasicDrawer({
-            title: 'Error',
-            text: 'You have connected the wrong wallet, check your device',
-            buttonLabel: 'Try again',
-            icon: ErrorHardwareConnectIcon,
-          })
+          setLedgerDrawerState('wrongDevice')
         } else {
           setLedgerTransport(transport)
         }
@@ -421,11 +396,17 @@ const SendConfirmation: React.FC = () => {
 
   const onCloseDrawer = (): void => {
     setActiveDrawer(null)
+
+    if (ledgerDrawerState) {
+      setLedgerDrawerState(null)
+    }
   }
 
-  const onClickBasicDrawer = (): void => {
+  const onClickLedgerDrawer = (): void => {
     if (props?.hardware?.type === 'ledger') {
-      onConnectLedger()
+      if (ledgerDrawerState !== 'wrongDevice') {
+        onConnectLedger()
+      }
     }
   }
 
@@ -559,18 +540,14 @@ const SendConfirmation: React.FC = () => {
           text={failText}
           openFrom="browser"
         />
-        {basicDrawer ? (
-          <BasicDrawer
-            isActive={activeDrawer === 'basic'}
-            onClose={onCloseDrawer}
-            title={basicDrawer.title}
-            text={basicDrawer.text}
-            icon={basicDrawer.icon}
-            buttonLabel={basicDrawer.buttonLabel}
-            buttonOnClick={onClickBasicDrawer}
-            openFrom="browser"
-          />
-        ) : null}
+        <LedgerDrawer
+          isActive={activeDrawer === 'ledger'}
+          onClose={onCloseDrawer}
+          openFrom="browser"
+          state={ledgerDrawerState}
+          buttonOnClick={onClickLedgerDrawer}
+          symbol={props?.symbol}
+        />
       </>
     </ExternalPageContainer>
   )

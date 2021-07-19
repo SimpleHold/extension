@@ -15,7 +15,7 @@ import CurrenciesDropdown from '@components/CurrenciesDropdown'
 import Tooltip from '@components/Tooltip'
 
 // Utils
-import { getWallets, IWallet, updateBalance } from '@utils/wallet'
+import { getWallets, IWallet, updateBalance, THardware } from '@utils/wallet'
 import { toUpper, price, toLower } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
@@ -51,10 +51,7 @@ interface LocationState {
   contractAddress?: string
   tokenName?: string
   decimals?: number
-  hardware?: {
-    label: string
-    type: 'trezor' | 'ledger'
-  }
+  hardware?: THardware
 }
 
 const Send: React.FC = () => {
