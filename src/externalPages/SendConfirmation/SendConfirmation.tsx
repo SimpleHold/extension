@@ -27,7 +27,13 @@ import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, getJSON, removeItem } from '@utils/storage'
 import { ethereumSignTransaction, signTransaction } from '@utils/trezor'
-import { ethLedgerSignTx, requestTransport } from '@utils/ledger'
+import {
+  ethLedgerSignTx,
+  requestTransport,
+  createXrpTx,
+  ILedgerError,
+  createBtcTx,
+} from '@utils/ledger'
 
 // Styles
 import Styles from './styles'
@@ -84,34 +90,78 @@ const SendConfirmation: React.FC = () => {
     }
   }, [ledgerDrawerState, activeDrawer])
 
+  const signLedgerTx = async (
+    transport: Transport,
+    symbol: string,
+    path: string,
+    addressFrom: string,
+    addressTo: string,
+    amount: number,
+    chain: string,
+    fee: number,
+    outputs?: UnspentOutput[]
+  ): Promise<string | null | ILedgerError> => {
+    if (symbol === 'eth') {
+      const ethParams = await getWeb3TxParams(addressFrom, addressTo, amount, chain)
+
+      if (ethParams) {
+        const { nonce, gas, gasPrice, chainId } = ethParams
+
+        return await ethLedgerSignTx(
+          transport,
+          path,
+          gasPrice,
+          gas,
+          addressTo,
+          amount,
+          nonce,
+          chainId
+        )
+      }
+    } else if (symbol === 'xrp') {
+      return await createXrpTx(transport, path, addressFrom, addressTo, amount)
+    } else if (symbol === 'btc' && outputs) {
+      return await createBtcTx(transport, path, outputs, addressFrom, addressTo, amount, fee)
+    }
+
+    return null
+  }
+
   const createLedgerTx = async (): Promise<void> => {
-    if (props.symbol === 'eth' && ledgerTransport) {
-      const { symbol, addressTo, amount, chain, addressFrom, hardware, networkFee } = props
+    try {
+      if (ledgerTransport) {
+        const {
+          symbol,
+          addressTo,
+          amount,
+          chain,
+          addressFrom,
+          hardware,
+          outputs,
+          networkFee,
+        } = props
 
-      if (symbol && addressTo && amount && chain && addressFrom && hardware && networkFee) {
-        const { path } = hardware
-        const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
-
-        const ethParams = await getWeb3TxParams(addressFrom, addressTo, parseAmount, chain)
-
-        if (ethParams) {
-          const { nonce, gas, gasPrice, chainId } = ethParams
+        if (symbol && amount && hardware && addressFrom && addressTo && chain && networkFee) {
+          const { path } = hardware
+          const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+          const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           setLedgerDrawerState('reviewTx')
 
-          const getRawTx = await ethLedgerSignTx(
+          const request = await signLedgerTx(
             ledgerTransport,
+            symbol,
             path,
-            gasPrice,
-            gas,
+            addressFrom,
             addressTo,
             parseAmount,
-            nonce,
-            chainId
+            chain,
+            parseNetworkFee,
+            outputs
           )
 
-          if (typeof getRawTx === 'object' && getRawTx !== null) {
-            const { name } = getRawTx
+          if (typeof request === 'object' && request !== null) {
+            const { name } = request
 
             if (name === 'TransportStatusError') {
               setLedgerDrawerState('wrongApp')
@@ -121,8 +171,8 @@ const SendConfirmation: React.FC = () => {
             return
           }
 
-          if (getRawTx) {
-            const txHash = await sendRawTransaction(getRawTx, 'eth')
+          if (request) {
+            const txHash = await sendRawTransaction(request, chain)
 
             if (txHash) {
               const link = getTransactionLink(txHash, symbol, chain)
@@ -135,9 +185,11 @@ const SendConfirmation: React.FC = () => {
           }
         }
       }
-    }
 
-    return setActiveDrawer('fail')
+      return setActiveDrawer('fail')
+    } catch {
+      setActiveDrawer('fail')
+    }
   }
 
   const checkProps = async (): Promise<void> => {

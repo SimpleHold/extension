@@ -10,13 +10,15 @@ import XRPApp from '@ledgerhq/hw-app-xrp'
 // Utils
 import { toHex } from '@utils/web3'
 import { toUpper } from '@utils/format'
+import { getXrpTxParams } from '@utils/api'
+import { toXrp } from '@utils/currencies/ripple'
 
 export type TCurrency = {
   symbol: string
   path: string
 }
 
-interface ILedgerError {
+export interface ILedgerError {
   message: string
   name: string
   statusCode: number
@@ -131,25 +133,35 @@ export const ethLedgerSignTx = async (
   }
 }
 
-export const createBtcTx = async (transport: Transport) => {
+export const createBtcTx = async (
+  transport: Transport,
+  path: string,
+  outputs: UnspentOutput[],
+  addressFrom: string,
+  addressTo: string,
+  amount: number,
+  fee: number
+): Promise<string | null | ILedgerError> => {
   try {
     const btc = new BTCApp(transport)
 
     const tx1 = btc.splitTransaction(
-      '01000000014ea60aeac5252c14291d428915bd7ccd1bfc4af009f4d4dc57ae597ed0420b71010000008a47304402201f36a12c240dbf9e566bc04321050b1984cd6eaf6caee8f02bb0bfec08e3354b022012ee2aeadcbbfd1e92959f57c15c1c6debb757b798451b104665aa3010569b49014104090b15bde569386734abf2a2b99f9ca6a50656627e77de663ca7325702769986cf26cc9dd7fdea0af432c8e2becc867c932e1b9dd742f2a108997c2252e2bdebffffffff0281b72e00000000001976a91472a5d75c8d2d0565b656a5232703b167d50d5a2b88aca0860100000000001976a9144533f5fb9b4817f713c48f0bfe96b9f50c476c9b88ac00000000'
+      '0200000001ea5bf693d7a9f2d80453cda13bff4f881bd9e8cdcdff0397c9f236f66800ca99010000006a473044022073da72fd4d3ec719a55d39ed9264a1c6f6b94bd13e1e4b0c108835da9171aec102204aabd799618aa35be5ee05d505fff5ca8bfcee6863beed8b59c0a71a88ab69a80121035236db538da0722dfa3c08d5e515ab4b94634275f29a4d36847382231130b203ffffffff0250c30000000000001976a914c1fada15b3b0c23c1df16275ee00687a59ac729988ac96450100000000001976a91429f07c264f890aeeb6abb54885965dff87330af188ac00000000'
     )
 
-    const result = await btc.createPaymentTransactionNew({
-      inputs: [[tx1, 1, undefined, undefined]],
-      associatedKeysets: ["0'/0/0"],
-      outputScriptHex: '01905f0100000000001976a91472a5d75c8d2d0565b656a5232703b167d50d5a2b88ac',
+    const newTx = bitcoin.createUnsignedTx(outputs, addressTo, amount, fee, addressFrom)
+
+    const splitNewTx = btc.splitTransaction(newTx)
+    const outputScriptHex = btc.serializeTransactionOutputs(splitNewTx).toString('hex')
+
+    return await btc.createPaymentTransactionNew({
+      inputs: [[tx1, 0, undefined, undefined]],
+      associatedKeysets: [path],
+      outputScriptHex,
       additionals: [],
     })
-
-    console.log('result', result)
   } catch (err) {
-    console.log('er', err)
-    return null
+    return err
   }
 }
 
@@ -158,10 +170,8 @@ export const createXrpTx = async (
   path: string,
   addressFrom: string,
   addressTo: string,
-  amount: string,
-  fee: string,
-  sequence: number
-) => {
+  amount: number
+): Promise<string | null | ILedgerError> => {
   try {
     const xrp = new XRPApp(transport)
 
@@ -170,24 +180,27 @@ export const createXrpTx = async (
     if (getAddress) {
       const { publicKey } = getAddress
 
-      const tx = {
-        TransactionType: 'Payment',
-        Account: addressFrom,
-        Destination: addressTo,
-        Amount: amount,
-        Fee: fee,
-        Flags: 0,
-        Sequence: sequence,
-        SigningPubKey: toUpper(publicKey),
+      const txParams = await getXrpTxParams(addressFrom)
+
+      if (txParams) {
+        const { fee, sequence } = txParams
+
+        const tx = {
+          TransactionType: 'Payment',
+          Account: addressFrom,
+          Destination: addressTo,
+          Amount: `${amount}`,
+          Fee: `${toXrp(fee)}`,
+          Sequence: sequence,
+          SigningPubKey: toUpper(publicKey),
+        }
+
+        return await xrp.signTransaction(path, encode(tx))
       }
-
-      const txBlob = encode(tx)
-
-      const result = await xrp.signTransaction(path, txBlob)
-
-      console.log('result', result)
     }
-  } catch {
+
     return null
+  } catch (err) {
+    return err
   }
 }
