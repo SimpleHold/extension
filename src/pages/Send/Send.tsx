@@ -400,7 +400,7 @@ const Send: React.FC = () => {
       <Styles.Container>
         <Styles.Row withExtraid={withExtraid}>
           {!extraIdName?.length ? <Styles.PageTitle>Send</Styles.PageTitle> : null}
-          <Skeleton width={250} height={42} type="gray" mt={21} isLoading={balance === null}>
+          <Skeleton width={250} height={42} type="gray" isLoading={balance === null}>
             <Styles.Balance>
               {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
             </Styles.Balance>
