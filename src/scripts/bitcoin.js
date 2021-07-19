@@ -41,6 +41,16 @@ const bitcoin = (function () {
     }
   }
 
+  const createUnsignedTx = (outputs, to, amount, fee, changeAddress) => {
+    const transaction = new bitcore.Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .fee(fee)
+      .change(changeAddress)
+
+    return transaction.toString()
+  }
+
   const getFee = (outputs, to, amount, changeAddress) => {
     return new bitcore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
   }
