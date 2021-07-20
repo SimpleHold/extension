@@ -18,6 +18,17 @@ export type TCurrency = {
   path: string
 }
 
+type TRippleTx = {
+  TransactionType: string
+  Account: string
+  Destination: string
+  Amount: string
+  Fee: string
+  Sequence: number
+  SigningPubKey?: string
+  DestinationTag?: string
+}
+
 export interface ILedgerError {
   message: string
   name: string
@@ -145,7 +156,8 @@ export const createBtcTx = async (
   try {
     const btc = new BTCApp(transport)
 
-    const inputs = []
+    const inputs: any[] = []
+    const associatedKeysets: string[] = []
 
     for (const output of outputs) {
       const { outputIndex, txId } = output
@@ -154,6 +166,7 @@ export const createBtcTx = async (
       if (txHex) {
         const split = btc.splitTransaction(txHex)
         inputs.push([split, outputIndex, undefined, undefined])
+        associatedKeysets.push(path)
       }
     }
 
@@ -167,9 +180,8 @@ export const createBtcTx = async (
     const outputScriptHex = btc.serializeTransactionOutputs(splitNewTx).toString('hex')
 
     return await btc.createPaymentTransactionNew({
-      // @ts-ignore
       inputs,
-      associatedKeysets: [path],
+      associatedKeysets,
       outputScriptHex,
       additionals: [],
     })
@@ -199,7 +211,7 @@ export const createXrpTx = async (
       if (txParams) {
         const { fee, sequence } = txParams
 
-        const tx = {
+        const tx: TRippleTx = {
           TransactionType: 'Payment',
           Account: addressFrom,
           Destination: addressTo,
@@ -210,7 +222,6 @@ export const createXrpTx = async (
         }
 
         if (extraId?.length) {
-          // @ts-ignore
           tx.DestinationTag = extraId
         }
 
