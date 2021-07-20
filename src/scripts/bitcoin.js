@@ -72,5 +72,6 @@ const bitcoin = (function () {
     createTransaction,
     getFee,
     isAddressValid,
+    createUnsignedTx,
   }
 })()
