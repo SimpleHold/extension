@@ -10,7 +10,7 @@ import XRPApp from '@ledgerhq/hw-app-xrp'
 // Utils
 import { toHex } from '@utils/web3'
 import { toUpper } from '@utils/format'
-import { getXrpTxParams } from '@utils/api'
+import { getXrpTxParams, getTxHex } from '@utils/api'
 import { toXrp } from '@utils/currencies/ripple'
 
 export type TCurrency = {
@@ -145,9 +145,21 @@ export const createBtcTx = async (
   try {
     const btc = new BTCApp(transport)
 
-    const tx1 = btc.splitTransaction(
-      '0200000001ea5bf693d7a9f2d80453cda13bff4f881bd9e8cdcdff0397c9f236f66800ca99010000006a473044022073da72fd4d3ec719a55d39ed9264a1c6f6b94bd13e1e4b0c108835da9171aec102204aabd799618aa35be5ee05d505fff5ca8bfcee6863beed8b59c0a71a88ab69a80121035236db538da0722dfa3c08d5e515ab4b94634275f29a4d36847382231130b203ffffffff0250c30000000000001976a914c1fada15b3b0c23c1df16275ee00687a59ac729988ac96450100000000001976a91429f07c264f890aeeb6abb54885965dff87330af188ac00000000'
-    )
+    const inputs = []
+
+    for (const output of outputs) {
+      const { outputIndex, txId } = output
+      const txHex = await getTxHex('bitcoin', txId)
+
+      if (txHex) {
+        const split = btc.splitTransaction(txHex)
+        inputs.push([split, outputIndex, undefined, undefined])
+      }
+    }
+
+    if (inputs.length !== outputs.length) {
+      return null
+    }
 
     const newTx = bitcoin.createUnsignedTx(outputs, addressTo, amount, fee, addressFrom)
 
@@ -155,7 +167,8 @@ export const createBtcTx = async (
     const outputScriptHex = btc.serializeTransactionOutputs(splitNewTx).toString('hex')
 
     return await btc.createPaymentTransactionNew({
-      inputs: [[tx1, 0, undefined, undefined]],
+      // @ts-ignore
+      inputs,
       associatedKeysets: [path],
       outputScriptHex,
       additionals: [],
@@ -170,7 +183,8 @@ export const createXrpTx = async (
   path: string,
   addressFrom: string,
   addressTo: string,
-  amount: number
+  amount: number,
+  extraId?: string
 ): Promise<string | null | ILedgerError> => {
   try {
     const xrp = new XRPApp(transport)
@@ -195,7 +209,21 @@ export const createXrpTx = async (
           SigningPubKey: toUpper(publicKey),
         }
 
-        return await xrp.signTransaction(path, encode(tx))
+        if (extraId?.length) {
+          // @ts-ignore
+          tx.DestinationTag = extraId
+        }
+
+        const signature = await xrp.signTransaction(path, encode(tx))
+
+        if (signature) {
+          return encode({
+            ...tx,
+            TxnSignature: signature,
+          })
+        }
+
+        return null
       }
     }
 

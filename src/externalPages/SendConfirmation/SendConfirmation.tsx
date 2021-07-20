@@ -99,7 +99,8 @@ const SendConfirmation: React.FC = () => {
     amount: number,
     chain: string,
     fee: number,
-    outputs?: UnspentOutput[]
+    outputs?: UnspentOutput[],
+    extraId?: string
   ): Promise<string | null | ILedgerError> => {
     if (symbol === 'eth') {
       const ethParams = await getWeb3TxParams(addressFrom, addressTo, amount, chain)
@@ -119,7 +120,7 @@ const SendConfirmation: React.FC = () => {
         )
       }
     } else if (symbol === 'xrp') {
-      return await createXrpTx(transport, path, addressFrom, addressTo, amount)
+      return await createXrpTx(transport, path, addressFrom, addressTo, amount, extraId)
     } else if (symbol === 'btc' && outputs) {
       return await createBtcTx(transport, path, outputs, addressFrom, addressTo, amount, fee)
     }
@@ -139,6 +140,7 @@ const SendConfirmation: React.FC = () => {
           hardware,
           outputs,
           networkFee,
+          extraId,
         } = props
 
         if (symbol && amount && hardware && addressFrom && addressTo && chain && networkFee) {
@@ -157,7 +159,8 @@ const SendConfirmation: React.FC = () => {
             parseAmount,
             chain,
             parseNetworkFee,
-            outputs
+            outputs,
+            extraId
           )
 
           if (typeof request === 'object' && request !== null) {
@@ -175,12 +178,7 @@ const SendConfirmation: React.FC = () => {
             const txHash = await sendRawTransaction(request, chain)
 
             if (txHash) {
-              const link = getTransactionLink(txHash, symbol, chain)
-
-              if (link) {
-                setTransactionLink(link)
-              }
-              return setActiveDrawer('success')
+              return checkTransaction(txHash)
             }
           }
         }
@@ -456,9 +454,7 @@ const SendConfirmation: React.FC = () => {
 
   const onClickLedgerDrawer = (): void => {
     if (props?.hardware?.type === 'ledger') {
-      if (ledgerDrawerState !== 'wrongDevice') {
-        onConnectLedger()
-      }
+      onConnectLedger()
     }
   }
 

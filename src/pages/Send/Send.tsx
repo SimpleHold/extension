@@ -220,6 +220,7 @@ const Send: React.FC = () => {
           outputs: utxosList,
           chain,
           hardware,
+          extraId,
         })
       )
     } else {

@@ -295,3 +295,17 @@ export const getXrpTxParams = async (from: string) => {
     return null
   }
 }
+
+export const getTxHex = async (chain: string, txId: string): Promise<null | string> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/tx-hex/${chain}/${txId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return null
+  }
+}
