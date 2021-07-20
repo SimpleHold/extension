@@ -309,3 +309,17 @@ export const getTxHex = async (chain: string, txId: string): Promise<null | stri
     return null
   }
 }
+
+export const getFeePerByte = async (chain: string): Promise<number> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/wallet/fee/${chain}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return 0
+  }
+}

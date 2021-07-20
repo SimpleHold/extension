@@ -9,6 +9,7 @@ import {
   IGetNetworkFeeResponse,
   getThetaNetworkFee,
   getNetworkFee,
+  getFeePerByte,
 } from '@utils/api'
 import { toLower } from '@utils/format'
 
@@ -209,11 +210,21 @@ export const getNewNetworkFee = async (
   }
 
   if (outputs?.length) {
-    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+    if (toLower(symbol) === 'ada') {
+      return cardano.getNetworkFee(outputs, amount)
+    }
+
+    const btcFeePerByte = await getFeePerByte(chain)
+
+    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount, btcFeePerByte)
   }
 
   if (theta.coins.indexOf(symbol) !== -1) {
     return await getThetaNetworkFee(address)
+  }
+
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return await getNetworkFee('ripple')
   }
 
   return null
@@ -259,7 +270,8 @@ export const getAddressNetworkFee = async (
       if (toLower(symbol) === 'ada') {
         return cardano.getNetworkFee(outputs, amount)
       }
-      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+      const btcFeePerByte = await getFeePerByte(chain)
+      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount, btcFeePerByte)
     }
 
     return null
