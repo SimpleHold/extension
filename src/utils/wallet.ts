@@ -298,6 +298,33 @@ export const addHardwareWallet = (
         parseWallets.push(data)
         parseBackup.wallets.push(data)
 
+        const getHardwareWalelts = parseWallets.filter(
+          (wallet: IWallet) =>
+            wallet.hardware?.type === type &&
+            toLower(wallet?.hardware?.deviceId) === toLower(deviceId)
+        )
+        const getBackupHardwareWalelts: IWallet[] = parseBackup.wallets.filter(
+          (wallet: IWallet) =>
+            wallet.hardware?.type === type &&
+            toLower(wallet?.hardware?.deviceId) === toLower(deviceId)
+        )
+
+        if (getHardwareWalelts.length) {
+          getHardwareWalelts.forEach((wallet: IWallet) => {
+            if (wallet?.hardware) {
+              wallet.hardware.label = hardwareLabel
+            }
+          })
+        }
+
+        if (getBackupHardwareWalelts.length) {
+          getBackupHardwareWalelts.forEach((wallet: IWallet) => {
+            if (wallet?.hardware) {
+              wallet.hardware.label = hardwareLabel
+            }
+          })
+        }
+
         setItem('backup', encrypt(JSON.stringify(parseBackup), password))
         setItem('wallets', JSON.stringify(parseWallets))
       }
