@@ -33,6 +33,7 @@
     "detect-browser": "^5.2.0",
     "numeral": "^2.0.6",
     "qrcode.react": "^1.0.1",
+    "query-string": "^7.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-dropzone": "^11.3.1",
