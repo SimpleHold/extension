@@ -38,7 +38,7 @@ const LedgerDrawer: React.FC<Props> = (props) => {
     wrongDevice: {
       title: 'Wrong device',
       icon: ErrorHardwareConnectIcon,
-      text: 'Connected Trezor is wrong. Please connect correct device to confirm transaction',
+      text: 'Connected Ledger is wrong. Please connect correct device to confirm transaction',
     },
     wrongApp: {
       title: 'Wrong Ledger app',
