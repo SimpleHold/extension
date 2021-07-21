@@ -181,6 +181,13 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     try {
       await browser.windows.remove(currentPopupWindow)
     } catch {}
+  } else if (request.type === 'save_send_params') {
+    const { readOnly, currency, amount, recipientAddress, chain, extraId } = request.data
+
+    setItem(
+      'sendPageProps',
+      JSON.stringify({ readOnly, currency, amount, recipientAddress, extraId })
+    )
   } else {
     const tabs = await browser.tabs.query({
       active: true,

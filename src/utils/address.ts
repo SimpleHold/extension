@@ -205,7 +205,15 @@ export const getNewNetworkFee = async (
   }
 
   if (outputs?.length) {
+    if (toLower(symbol) === 'ada') {
+      return cardano.getNetworkFee(outputs, amount)
+    }
+
     return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+  }
+
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return await getNetworkFee('ripple')
   }
 
   if (theta.coins.indexOf(symbol) !== -1) {

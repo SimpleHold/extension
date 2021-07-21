@@ -177,9 +177,13 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
       if (currenctTab?.id) {
         const url = getUrl(backPageUrl)
 
-        await updateTab(currenctTab.id, {
-          url,
-        })
+        if (isDraggable) {
+          location.href = `${url}?isDraggable=true`
+        } else {
+          await updateTab(currenctTab.id, {
+            url,
+          })
+        }
       }
     }
   }
