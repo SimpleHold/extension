@@ -15,6 +15,10 @@ import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 import FailDrawer from '@drawers/Fail'
 import LedgerDrawer from '@drawers/Ledger'
+import BasicDrawer from '@drawers/Basic'
+
+// Assets
+import ErrorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
 
 // Utils
 import { toLower, toUpper } from '@utils/format'
@@ -26,7 +30,7 @@ import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } fro
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, getJSON, removeItem } from '@utils/storage'
-import { ethereumSignTransaction, signTransaction } from '@utils/trezor'
+import { ethereumSignTransaction, signTransaction, getFeatures } from '@utils/trezor'
 import {
   ethLedgerSignTx,
   requestTransport,
@@ -61,7 +65,7 @@ interface Props {
 const SendConfirmation: React.FC = () => {
   const [props, setProps] = React.useState<Props>({})
   const [activeDrawer, setActiveDrawer] = React.useState<
-    null | 'confirm' | 'success' | 'fail' | 'ledger'
+    null | 'confirm' | 'success' | 'fail' | 'ledger' | 'wrongDevice'
   >(null)
   const [password, setPassword] = React.useState<string>('')
   const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
@@ -218,6 +222,10 @@ const SendConfirmation: React.FC = () => {
       if (props.hardware.type === 'ledger') {
         onConnectLedger()
       } else {
+        if (activeDrawer === 'wrongDevice') {
+          setActiveDrawer(null)
+        }
+
         onSendHardwareTx()
       }
     } else {
@@ -254,6 +262,12 @@ const SendConfirmation: React.FC = () => {
     const { symbol, addressTo, amount, chain, addressFrom, hardware, outputs, networkFee } = props
 
     if (symbol && addressTo && amount && chain && addressFrom && hardware && networkFee) {
+      const trezorFeatures = await getFeatures()
+
+      if (trezorFeatures?.device_id !== hardware.deviceId) {
+        return setActiveDrawer('wrongDevice')
+      }
+
       setButtonLoading(true)
       const { path } = hardware
 
@@ -595,6 +609,18 @@ const SendConfirmation: React.FC = () => {
           state={ledgerDrawerState}
           buttonOnClick={onClickLedgerDrawer}
           symbol={props?.symbol}
+        />
+        <BasicDrawer
+          isActive={activeDrawer === 'wrongDevice'}
+          onClose={onCloseDrawer}
+          openFrom="browser"
+          title="Wrong device"
+          text="Connected Trezor is wrong. Please connect correct device to confirm transaction"
+          icon={ErrorHardwareConnectIcon}
+          button={{
+            label: 'Try again',
+            onClick: onConfirm,
+          }}
         />
       </>
     </ExternalPageContainer>

@@ -1,4 +1,4 @@
-import TrezorConnect, { TxInputType, TxOutputType } from 'trezor-connect'
+import TrezorConnect, { TxInputType, TxOutputType, Features } from 'trezor-connect'
 import { Transaction } from '@ethereumjs/tx'
 
 // Utils
@@ -248,6 +248,22 @@ export const ethereumSignTransaction = async (
       if (rawTx) {
         return await sendRawTransaction(rawTx, 'eth', 'trezor')
       }
+    }
+
+    return null
+  } catch {
+    return null
+  }
+}
+
+export const getFeatures = async (): Promise<Features | null> => {
+  try {
+    await init()
+
+    const features = await TrezorConnect.getFeatures()
+
+    if (features.success) {
+      return features.payload
     }
 
     return null
