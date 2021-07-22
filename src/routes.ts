@@ -22,6 +22,7 @@ import AddTokenToAddress from '@pages/AddTokenToAddress'
 import FoundTokens from '@pages/FoundTokens'
 import SelectToken from '@pages/SelectToken'
 import ImportRecoveryPhrase from '@pages/ImportRecoveryPhrase'
+import WalletPage from '@pages/Wallet'
 
 const routers: RouteProps[] = [
   {
@@ -107,6 +108,10 @@ const routers: RouteProps[] = [
   {
     path: '/import-recovery-phrase',
     component: ImportRecoveryPhrase,
+  },
+  {
+    path: '/wallet',
+    component: WalletPage,
   },
 ]
 

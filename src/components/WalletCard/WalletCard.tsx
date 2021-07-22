@@ -91,7 +91,7 @@ const WalletCard: React.FC<Props> = (props) => {
     if (handleClick) {
       return handleClick()
     }
-    history.push('/receive', {
+    history.push('/wallet', {
       name: currency?.name || name,
       symbol,
       address,
