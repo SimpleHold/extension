@@ -4,12 +4,8 @@ import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
 import { getToken, IToken } from '@config/tokens'
 
 // Utils
-import {
-  getEtherNetworkFee,
-  IGetNetworkFeeResponse,
-  getThetaNetworkFee,
-  getNetworkFee,
-} from '@utils/api'
+import { getEtherNetworkFee, getThetaNetworkFee, getNetworkFee } from '@utils/api'
+import { IGetNetworkFeeResponse } from '@utils/api/types'
 import { toLower } from '@utils/format'
 
 // Currencies
@@ -209,7 +205,15 @@ export const getNewNetworkFee = async (
   }
 
   if (outputs?.length) {
+    if (toLower(symbol) === 'ada') {
+      return cardano.getNetworkFee(outputs, amount)
+    }
+
     return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+  }
+
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return await getNetworkFee('ripple')
   }
 
   if (theta.coins.indexOf(symbol) !== -1) {

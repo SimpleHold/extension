@@ -4,9 +4,13 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 import { IRequest } from '@utils/browser/types'
 import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
-import { getUrl, getManifest } from '@utils/extension'
-import { setItem } from '@utils/storage'
+import { getManifest, getUrl, openWebPage } from '@utils/extension'
+import { setItem, getJSON } from '@utils/storage'
 import { generateTag } from '@utils/currencies/ripple'
+import { getPhishingSites } from '@utils/api'
+import { TPhishingSite } from '@utils/api/types'
+import { msToMin } from '@utils/dates'
+import { validateUrl } from '@utils/validate'
 
 // Types
 import { TPopupPosition } from './types'
@@ -14,10 +18,43 @@ import { TPopupPosition } from './types'
 // Config
 import { getCurrency } from '@config/currencies'
 
-let activeRequest: string | null
-
+let activeRequest: string | undefined
 let currentWindowId: number
+let currentPhishingSite: string | undefined
 let currentPopupWindow: number
+
+browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+  checkPhishing(tab)
+})
+
+const checkPhishing = async (tab: Tabs.Tab): Promise<void> => {
+  const sites = getJSON('phishingSites')
+
+  if (tab.url && sites?.length && validateUrl(tab.url) && currentPhishingSite !== tab.url) {
+    const { origin } = new URL(tab.url)
+
+    currentPhishingSite = tab.url
+
+    const findPhishingSite = sites.find(
+      (site: TPhishingSite) => new URL(site.url).origin === origin
+    )
+
+    if (findPhishingSite) {
+      if (
+        findPhishingSite?.latestVisit &&
+        msToMin(new Date().getTime() - findPhishingSite.latestVisit) < 15
+      ) {
+        return
+      }
+
+      setItem('phishingSite', JSON.stringify(findPhishingSite))
+      setItem('phishingSiteUrl', tab.url)
+      await openWebPage(getUrl('phishing.html'))
+    } else {
+      currentPhishingSite = undefined
+    }
+  }
+}
 
 browser.windows.onFocusChanged.addListener(async (windowId) => {
   if (windowId !== -1) {
@@ -90,7 +127,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       top,
       left,
     })
-    activeRequest = null
+    activeRequest = undefined
   } else if (request.type === 'request_send') {
     if (activeRequest === request.type) {
       return
@@ -136,7 +173,7 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
       top,
       left,
     })
-    activeRequest = null
+    activeRequest = undefined
   } else if (request.type === 'save_tab_info') {
     const currentTab = await browser.tabs.query({ active: true, currentWindow: true })
     setItem('tab', JSON.stringify(currentTab[0]))
@@ -144,6 +181,13 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
     try {
       await browser.windows.remove(currentPopupWindow)
     } catch {}
+  } else if (request.type === 'save_send_params') {
+    const { readOnly, currency, amount, recipientAddress, chain, extraId } = request.data
+
+    setItem(
+      'sendPageProps',
+      JSON.stringify({ readOnly, currency, amount, recipientAddress, extraId })
+    )
   } else {
     const tabs = await browser.tabs.query({
       active: true,
@@ -161,6 +205,10 @@ const generateContextMenu = async () => {
 
   await browser.contextMenus.removeAll()
   const manifest = getManifest()
+
+  setTimeout(() => {
+    generateContextMenu()
+  }, 5000)
 
   if (wallets?.length && manifest) {
     const parent = browser.contextMenus.create({
@@ -225,10 +273,26 @@ const generateContextMenu = async () => {
   }
 }
 
+const onGetPhishingSites = async () => {
+  const data = await getPhishingSites()
+
+  setTimeout(() => {
+    onGetPhishingSites()
+  }, 900000)
+
+  if (data?.length) {
+    setItem('phishingSites', JSON.stringify(data))
+  }
+}
+
 browser.runtime.onInstalled.addListener(() => {
-  setInterval(() => {
+  setTimeout(() => {
     generateContextMenu()
   }, 5000)
+
+  setTimeout(() => {
+    onGetPhishingSites()
+  }, 900000)
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {

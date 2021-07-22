@@ -71,6 +71,7 @@ module.exports = {
     selectAddress: path.join(sourcePath, 'externalPages/SelectAddress/SelectAddress.tsx'),
     send: path.join(sourcePath, 'externalPages/Send/Send.tsx'),
     sendConfirmation: path.join(sourcePath, 'externalPages/SendConfirmation/SendConfirmation.tsx'),
+    phishing: path.join(sourcePath, 'externalPages/Phishing/Phishing.tsx'),
   },
   output: {
     path: path.join(destPath, targetBrowser),
@@ -152,6 +153,13 @@ module.exports = {
       chunks: ['restoreBackup'],
       hash: true,
       filename: 'restore-backup.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'phishing.html'),
+      inject: 'body',
+      chunks: ['phishing'],
+      hash: true,
+      filename: 'phishing.html',
     }),
     new HtmlWebpackPlugin({
       template: path.join(viewsPath, 'select-address.html'),
