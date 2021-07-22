@@ -206,6 +206,10 @@ const generateContextMenu = async () => {
   await browser.contextMenus.removeAll()
   const manifest = getManifest()
 
+  setTimeout(() => {
+    generateContextMenu()
+  }, 5000)
+
   if (wallets?.length && manifest) {
     const parent = browser.contextMenus.create({
       title: 'SimpleHold',
@@ -272,17 +276,21 @@ const generateContextMenu = async () => {
 const onGetPhishingSites = async () => {
   const data = await getPhishingSites()
 
+  setTimeout(() => {
+    onGetPhishingSites()
+  }, 900000)
+
   if (data?.length) {
     setItem('phishingSites', JSON.stringify(data))
   }
 }
 
 browser.runtime.onInstalled.addListener(() => {
-  setInterval(() => {
+  setTimeout(() => {
     generateContextMenu()
   }, 5000)
 
-  setInterval(() => {
+  setTimeout(() => {
     onGetPhishingSites()
   }, 900000)
 })
