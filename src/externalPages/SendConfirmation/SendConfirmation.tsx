@@ -2,6 +2,7 @@ import * as React from 'react'
 import { render } from 'react-dom'
 import numeral from 'numeral'
 import { BigNumber } from 'bignumber.js'
+import { browser } from 'webextension-polyfill-ts'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -57,10 +58,22 @@ const SendConfirmation: React.FC = () => {
   const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
   const [transactionLink, setTransactionLink] = React.useState<string>('')
   const [failText, setFailText] = React.useState<string>('')
+  const [isDraggable, setIsDraggable] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     checkProps()
+    getQueryParams()
   }, [])
+
+  const getQueryParams = (): void => {
+    const searchParams = new URLSearchParams(location.search)
+
+    const queryDraggable = searchParams.get('isDraggable')
+
+    if (queryDraggable === 'true') {
+      setIsDraggable(true)
+    }
+  }
 
   const parseJson = (value: string): { [key: string]: any } | null => {
     try {
@@ -89,6 +102,10 @@ const SendConfirmation: React.FC = () => {
     if (getItem('sendPageProps')) {
       removeItem('sendPageProps')
     }
+
+    browser.runtime.sendMessage({
+      type: 'close_select_address_window',
+    })
 
     window.close()
   }
@@ -244,6 +261,7 @@ const SendConfirmation: React.FC = () => {
       headerStyle="green"
       backPageTitle="Send"
       backPageUrl="send.html"
+      isDraggable={isDraggable}
     >
       <>
         <Styles.Body>

@@ -44,3 +44,11 @@ export const updateTab = async (
 export const getAllCookies = async (url: string): Promise<Cookie[]> => {
   return browser.cookies.getAll({ url })
 }
+
+export const getTabs = async (query: Tabs.QueryQueryInfoType): Promise<Tabs.Tab[]> => {
+  return await browser.tabs.query(query)
+}
+
+export const removeTabs = async (tabIds: number | number[]): Promise<void> => {
+  return await browser.tabs.remove(tabIds)
+}

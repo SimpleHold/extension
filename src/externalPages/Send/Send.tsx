@@ -376,9 +376,14 @@ const Send: React.FC = () => {
       }
 
       setItem('sendConfirmationData', JSON.stringify(data))
-      await updateTab(currenctTab.id, {
-        url,
-      })
+
+      if (isDraggable) {
+        location.href = `${url}?isDraggable=true`
+      } else {
+        await updateTab(currenctTab.id, {
+          url,
+        })
+      }
     }
   }
 
@@ -639,7 +644,7 @@ const Send: React.FC = () => {
             />
           ) : null}
           <TextInput
-            label={`Amount (${toUpper(selectedWallet?.symbol)})`}
+            label={`Amount ${selectedWallet ? `(${toUpper(selectedWallet?.symbol)})` : ''}`}
             value={amount}
             onChange={setAmount}
             type="number"
