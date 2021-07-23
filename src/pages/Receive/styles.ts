@@ -2,24 +2,29 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   height: 600px;
+  overflow: hidden;
 `
 
 const Container = styled.div`
-  background: #f2f4f8;
+  background-color: #f2f4f8;
   border-radius: 5px 5px 0px 0px;
   height: 540px;
   padding: 0 30px;
+  overflow: hidden;
 `
 
 const Row = styled.div`
   padding: 20px 0 30px 0;
+  position: relative;
 `
 
 const Heading = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  position: relative;
+  height: 30px;
 `
 
 const Title = styled.p`
@@ -59,17 +64,16 @@ const Warning = styled.p`
   color: #7d7e8d;
 `
 
-const Button = styled.div`
+const MoreButton = styled.div`
   width: 30px;
   height: 30px;
-`
-
-const MoreButton = styled(Button)`
   background: rgba(222, 225, 233, 0.6);
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: absolute;
+  right: 0;
 
   path {
     fill: #7d7e8d;
@@ -94,7 +98,6 @@ const Styles = {
   Receive,
   Address,
   Warning,
-  Button,
   MoreButton,
 }
 
