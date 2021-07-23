@@ -48,3 +48,11 @@ export type TPhishingSite = {
   name: string
   favicon: string
 }
+
+export type TAddressTx = {
+  type: 'spend' | 'received'
+  date: string
+  destination: string
+  amount: number
+  estimated: number
+}
