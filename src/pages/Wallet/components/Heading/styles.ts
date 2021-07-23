@@ -5,6 +5,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: 0 0 20px 0;
+  position: relative;
 `
 
 const WalletName = styled.p`

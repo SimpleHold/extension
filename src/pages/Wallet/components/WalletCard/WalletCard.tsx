@@ -1,10 +1,16 @@
 import * as React from 'react'
+import numeral from 'numeral'
+import SVG from 'react-inlinesvg'
 
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
+import Skeleton from '@components/Skeleton'
 
 // Utils
-import { toUpper } from '@utils/format'
+import { toUpper, price } from '@utils/format'
+
+// Assets
+import refreshIcon from '@assets/icons/refresh.svg'
 
 // Styles
 import Styles from './styles'
@@ -13,10 +19,22 @@ interface Props {
   openPage: (url: string) => () => void
   symbol: string
   chain?: string
+  balance: null | number
+  estimated: null | number
+  onRefreshBalance: () => void
+  isBalanceRefreshing: boolean
 }
 
 const WalletCard: React.FC<Props> = (props) => {
-  const { openPage, symbol, chain } = props
+  const {
+    openPage,
+    symbol,
+    chain,
+    balance,
+    estimated,
+    onRefreshBalance,
+    isBalanceRefreshing,
+  } = props
 
   return (
     <Styles.Container>
@@ -24,10 +42,20 @@ const WalletCard: React.FC<Props> = (props) => {
         <CurrencyLogo width={60} height={60} br={18} symbol={symbol} chain={chain} />
         <Styles.WalletInfo>
           <Styles.BalanceRow>
-            <Styles.Balance>0.16823857 {toUpper(symbol)}</Styles.Balance>
-            <Styles.RefreshIcon />
+            <Skeleton width={170} height={27} type="gray" isLoading={balance === null}>
+              <Styles.Balance>
+                {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
+              </Styles.Balance>
+            </Skeleton>
+            <Styles.RefreshButton onClick={onRefreshBalance} isRefreshing={isBalanceRefreshing}>
+              <SVG src={refreshIcon} width={16} height={16} />
+            </Styles.RefreshButton>
           </Styles.BalanceRow>
-          <Styles.Estimated>$ 5,712.75</Styles.Estimated>
+          <Skeleton width={100} height={19} mt={4} type="gray" isLoading={estimated === null}>
+            {estimated !== null ? (
+              <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
+            ) : null}
+          </Skeleton>
         </Styles.WalletInfo>
       </Styles.Body>
       <Styles.Actions>

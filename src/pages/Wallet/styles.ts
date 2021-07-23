@@ -2,12 +2,14 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   height: 600px;
+  overflow: hidden;
 `
 
 const Container = styled.div`
   background-color: #f2f4f8;
   border-radius: 5px 5px 0 0;
   height: 540px;
+  overflow: scroll;
 `
 
 const Row = styled.div`

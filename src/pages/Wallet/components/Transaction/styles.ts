@@ -13,6 +13,7 @@ const Container = styled.div`
 const Info = styled.div`
   display: flex;
   align-items: center;
+  overflow: hidden;
 `
 
 const DestinationType = styled.div`
@@ -24,6 +25,8 @@ const DestinationType = styled.div`
 
 const InfoRow = styled.div`
   margin: 0 0 0 10px;
+  overflow: hidden;
+  flex: 1;
 `
 
 const DestinationAddress = styled.p`
@@ -31,6 +34,8 @@ const DestinationAddress = styled.p`
   font-size: 16px;
   line-height: 20px;
   color: #1d1d22;
+  text-overflow: ellipsis;
+  overflow: hidden;
 `
 
 const Date = styled.p`
@@ -38,6 +43,9 @@ const Date = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: #bdc4d4;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: pre;
 `
 
 const Amounts = styled.div``

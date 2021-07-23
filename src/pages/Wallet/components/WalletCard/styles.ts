@@ -1,4 +1,17 @@
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
+
+const rotating = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`
+
+type TRefreshButtonProps = {
+  isRefreshing: boolean
+}
 
 const Container = styled.div``
 
@@ -67,13 +80,7 @@ const Balance = styled.p`
   font-size: 23px;
   line-height: 27px;
   color: #1d1d22;
-  margin: 0 8px 0 0;
-`
-
-const RefreshIcon = styled.div`
-  width: 16px;
-  height: 16px;
-  background-color: red;
+  margin: 0;
 `
 
 const Estimated = styled.p`
@@ -81,6 +88,30 @@ const Estimated = styled.p`
   font-size: 16px;
   line-height: 19px;
   color: #7d7e8d;
+`
+
+const RefreshButton = styled.div`
+  width: 16px;
+  height: 16px;
+  margin: 0 0 0 8px;
+
+  path {
+    fill: ${({ isRefreshing }: TRefreshButtonProps) => (isRefreshing ? '#3fbb7d' : '#c3c3c3')};
+  }
+
+  svg {
+    animation: ${rotating} 2s infinite linear;
+    animation-duration: ${({ isRefreshing }: TRefreshButtonProps) =>
+      isRefreshing ? '2s' : 'inherit'};
+  }
+
+  &:hover {
+    cursor: ${({ isRefreshing }: TRefreshButtonProps) => (isRefreshing ? 'default' : 'pointer')};
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
 `
 
 const Styles = {
@@ -92,8 +123,8 @@ const Styles = {
   WalletInfo,
   BalanceRow,
   Balance,
-  RefreshIcon,
   Estimated,
+  RefreshButton,
 }
 
 export default Styles
