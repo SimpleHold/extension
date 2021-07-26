@@ -9,7 +9,7 @@ const Container = styled.div`
 `
 
 const WalletName = styled.p`
-  margin: 0;
+  margin: 0 10px 0 0;
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
@@ -39,10 +39,29 @@ const MoreButton = styled.div`
   }
 `
 
+const RenameBlock = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+
+    path {
+      fill: #3fbb7d;
+    }
+
+    p {
+      color: #3fbb7d;
+    }
+  }
+`
+
 const Styles = {
   Container,
   WalletName,
   MoreButton,
+  RenameBlock,
 }
 
 export default Styles

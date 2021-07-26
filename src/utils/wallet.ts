@@ -24,6 +24,7 @@ export interface IWallet {
   createdAt?: Date
   isHidden?: boolean
   mnemonic?: string
+  walletName?: string
 }
 
 type TSelectedWalletFilter = {
@@ -245,6 +246,41 @@ export const toggleVisibleWallet = (address: string, symbol: string, isHidden: b
 
   if (findWallet) {
     findWallet.isHidden = isHidden
+    setItem('wallets', JSON.stringify(wallets))
+  }
+}
+
+export const getWalletName = (
+  wallets: IWallet[],
+  symbol: string,
+  uuid: string,
+  chain?: string,
+  name?: string
+): string => {
+  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+
+  const getWalletPosition = wallets
+    .filter((wallet: IWallet) => toLower(wallet.symbol) === toLower(symbol))
+    .findIndex((wallet) => toLower(wallet.uuid) === toLower(uuid))
+
+  if (currency) {
+    return `${currency.name}-${getWalletPosition + 1}`
+  } else if (name) {
+    return `${name}-${getWalletPosition + 1}`
+  }
+
+  return symbol
+}
+
+export const renameWallet = (uuid: string, name: string) => {
+  const wallets = getWallets()
+
+  if (wallets) {
+    const findWalletIndex = wallets.findIndex(
+      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+    )
+    wallets[findWalletIndex].walletName = name
+
     setItem('wallets', JSON.stringify(wallets))
   }
 }

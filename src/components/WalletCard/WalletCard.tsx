@@ -8,13 +8,13 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { getCurrency } from '@config/currencies'
 import { getBalance } from '@utils/api'
 import { toUpper, numberFriendly } from '@utils/format'
 import { updateBalance } from '@utils/wallet'
 
 // Config
 import { getToken } from '@config/tokens'
+import { getCurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -31,6 +31,7 @@ interface Props {
   sumEstimated?: (estimated: number) => void
   sumPending?: (pending: number) => void
   handleClick?: () => void
+  walletName: string
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -46,6 +47,7 @@ const WalletCard: React.FC<Props> = (props) => {
     sumEstimated,
     sumPending,
     handleClick,
+    walletName,
   } = props
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
@@ -100,6 +102,7 @@ const WalletCard: React.FC<Props> = (props) => {
       tokenName: name,
       decimals,
       isHidden,
+      walletName,
     })
   }
 
@@ -108,7 +111,7 @@ const WalletCard: React.FC<Props> = (props) => {
       <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} name={name} />
       <Styles.Row>
         <Styles.AddressInfo>
-          {currency || name ? <Styles.Currency>{currency?.name || name}</Styles.Currency> : null}
+          <Styles.Currency>{walletName}</Styles.Currency>
           <Styles.Address>{address}</Styles.Address>
         </Styles.AddressInfo>
         <Styles.Balances>

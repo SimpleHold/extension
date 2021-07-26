@@ -15,7 +15,7 @@ import useScroll from '@hooks/useScroll'
 import useToastContext from '@hooks/useToastContext'
 
 // Utils
-import { IWallet, getWallets, sortWallets, filterWallets } from '@utils/wallet'
+import { IWallet, getWallets, sortWallets, filterWallets, getWalletName } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import { setBadgeText, getBadgeText } from '@utils/extension'
 import { clear } from '@utils/storage'
@@ -176,7 +176,11 @@ const Wallets: React.FC = () => {
                     contractAddress,
                     decimals,
                     isHidden,
+                    uuid,
                   } = wallet
+
+                  const walletName =
+                    wallet.walletName || getWalletName(wallets, symbol, uuid, chain, name)
 
                   return (
                     <WalletCard
@@ -191,6 +195,7 @@ const Wallets: React.FC = () => {
                       sumBalance={sumBalance}
                       sumEstimated={sumEstimated}
                       sumPending={sumPending}
+                      walletName={walletName}
                     />
                   )
                 })

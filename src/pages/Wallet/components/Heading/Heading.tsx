@@ -13,6 +13,7 @@ import privateKeyIcon from '@assets/icons/privateKey.svg'
 import plusCircleIcon from '@assets/icons/plusCircle.svg'
 import phraseIcon from '@assets/icons/phrase.svg'
 import linkIcon from '@assets/icons/link.svg'
+import renameIcon from '@assets/icons/rename.svg'
 
 // Types
 import { TDropdowbList } from '@components/DropDown/DropDown'
@@ -24,10 +25,12 @@ interface Props {
   symbol: string
   onSelectDropdown: (index: number) => void
   withPhrase: boolean
+  walletName: string
+  onRenameWallet: () => void
 }
 
 const WalletHeading: React.FC<Props> = (props) => {
-  const { symbol, onSelectDropdown, withPhrase } = props
+  const { symbol, onSelectDropdown, withPhrase, walletName, onRenameWallet } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
@@ -83,7 +86,10 @@ const WalletHeading: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container>
-      <Styles.WalletName>Wallet name</Styles.WalletName>
+      <Styles.RenameBlock onClick={onRenameWallet}>
+        <Styles.WalletName>{walletName}</Styles.WalletName>
+        <SVG src={renameIcon} width={9} height={11} />
+      </Styles.RenameBlock>
       <Styles.MoreButton onClick={toggleDropdownVisible}>
         <SVG src={moreIcon} width={16} height={3.36} />
       </Styles.MoreButton>

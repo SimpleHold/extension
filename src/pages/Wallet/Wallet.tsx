@@ -11,10 +11,11 @@ import TransactionHistory from './components/TransactionHistory'
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
 import PrivateKeyDrawer from '@drawers/PrivateKey'
+import RenameWalletDrawer from '@drawers/RenameWallet'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { IWallet, updateBalance } from '@utils/wallet'
+import { IWallet, updateBalance, renameWallet } from '@utils/wallet'
 import { getTransactionHistory } from '@utils/api'
 import { openWebPage } from '@utils/extension'
 import { getExplorerLink } from '@utils/address'
@@ -34,28 +35,31 @@ import { TAddressTx } from '@utils/api/types'
 import Styles from './styles'
 
 interface LocationState {
-  name: string
+  name?: string
   symbol: string
   address: string
+  uuid: string
   chain?: string
   contractAddress?: string
   tokenName?: string
   decimals?: number
   isHidden?: boolean
+  walletName: string
 }
 
 const WalletPage: React.FC = () => {
   const {
     state,
     state: {
-      name,
       symbol,
       address,
+      uuid,
       chain = undefined,
       contractAddress = undefined,
       tokenName = undefined,
       decimals = undefined,
       isHidden = false,
+      name,
     },
   } = useLocation<LocationState>()
   const history = useHistory()
@@ -63,11 +67,14 @@ const WalletPage: React.FC = () => {
   const [balance, setBalance] = React.useState<null | number>(null)
   const [estimated, setEstimated] = React.useState<null | number>(null)
   const [txHistory, setTxHistory] = React.useState<TAddressTx[] | null>(null)
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'privateKey'>(null)
+  const [activeDrawer, setActiveDrawer] = React.useState<
+    null | 'confirm' | 'privateKey' | 'renameWallet'
+  >(null)
   const [isBalanceRefreshing, setBalanceRefreshing] = React.useState<boolean>(false)
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
+  const [walletName, setWalletName] = React.useState<string>(state.walletName)
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const withPhrase = checkWithPhrase(symbol)
@@ -163,6 +170,20 @@ const WalletPage: React.FC = () => {
     return setPasswordErrorLabel('Password is not valid')
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
+  const openRenameDrawer = (): void => {
+    setActiveDrawer('renameWallet')
+  }
+
+  const onRenameWallet = (name: string) => (): void => {
+    setActiveDrawer(null)
+    setWalletName(name)
+    renameWallet(uuid, name)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -170,7 +191,13 @@ const WalletPage: React.FC = () => {
         <Header withBack onBack={history.goBack} backTitle="Home" />
         <Styles.Container>
           <Styles.Row>
-            <Heading symbol={symbol} withPhrase={withPhrase} onSelectDropdown={onSelectDropdown} />
+            <Heading
+              symbol={symbol}
+              withPhrase={withPhrase}
+              onSelectDropdown={onSelectDropdown}
+              walletName={walletName}
+              onRenameWallet={openRenameDrawer}
+            />
             <WalletCard
               openPage={openPage}
               symbol={symbol}
@@ -186,7 +213,7 @@ const WalletPage: React.FC = () => {
       </Styles.Wrapper>
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         title={`Please enter your password to see the ${
           withPhrase ? 'recovery phrase' : 'private key'
         }`}
@@ -206,6 +233,11 @@ const WalletPage: React.FC = () => {
           setPrivateKey(null)
         }}
         privateKey={privateKey}
+      />
+      <RenameWalletDrawer
+        isActive={activeDrawer === 'renameWallet'}
+        onClose={onCloseDrawer}
+        onRename={onRenameWallet}
       />
     </>
   )

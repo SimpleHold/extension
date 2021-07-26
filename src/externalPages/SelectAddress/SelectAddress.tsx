@@ -11,7 +11,7 @@ import WalletCard from '@components/WalletCard'
 import CurrenciesDropdown from '@components/CurrenciesDropdown'
 
 // Utils
-import { getWallets, IWallet } from '@utils/wallet'
+import { getWalletName, getWallets, IWallet } from '@utils/wallet'
 import { toLower, toUpper } from '@utils/format'
 import { getItem, removeItem } from '@utils/storage'
 
@@ -258,7 +258,9 @@ const SelectAddress: React.FC = () => {
           {filterWallets?.length ? (
             <Styles.AddressesList>
               {filterWallets.map((wallet: IWallet, index: number) => {
-                const { address, symbol, chain, name, contractAddress, decimals } = wallet
+                const { address, symbol, chain, name, contractAddress, decimals, uuid } = wallet
+
+                const walletName = getWalletName(filterWallets, symbol, uuid, chain, name)
 
                 return (
                   <WalletCard
@@ -270,6 +272,7 @@ const SelectAddress: React.FC = () => {
                     contractAddress={contractAddress}
                     decimals={decimals}
                     handleClick={handleClick(address)}
+                    walletName={walletName}
                   />
                 )
               })}
