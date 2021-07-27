@@ -11,6 +11,8 @@ const Container = styled.div`
   height: 540px;
   overflow: hidden;
   padding: 23px 30px 30px 30px;
+  display: flex;
+  flex-direction: column;
 `
 
 const Title = styled.p`
