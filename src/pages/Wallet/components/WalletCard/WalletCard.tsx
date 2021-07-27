@@ -23,6 +23,7 @@ interface Props {
   estimated: null | number
   onRefreshBalance: () => void
   isBalanceRefreshing: boolean
+  tokenName?: string
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -34,12 +35,20 @@ const WalletCard: React.FC<Props> = (props) => {
     estimated,
     onRefreshBalance,
     isBalanceRefreshing,
+    tokenName,
   } = props
 
   return (
     <Styles.Container>
       <Styles.Body>
-        <CurrencyLogo width={60} height={60} br={18} symbol={symbol} chain={chain} />
+        <CurrencyLogo
+          width={60}
+          height={60}
+          br={18}
+          symbol={symbol}
+          chain={chain}
+          name={tokenName}
+        />
         <Styles.WalletInfo>
           <Styles.BalanceRow>
             <Skeleton width={170} height={27} type="gray" isLoading={balance === null}>

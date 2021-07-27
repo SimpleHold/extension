@@ -11,7 +11,7 @@ import {
   IGetNetworkFeeResponse,
   IAdaTrParams,
   TPhishingSite,
-  TAddressTx,
+  TAddressTxGroup,
 } from './types'
 
 export const getBalance = async (
@@ -276,7 +276,7 @@ export const getPhishingSites = async (): Promise<TPhishingSite[] | null> => {
 export const getTransactionHistory = async (
   chain: string,
   address: string
-): Promise<TAddressTx[]> => {
+): Promise<TAddressTxGroup[]> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/${chain}/history`, {
       headers: {

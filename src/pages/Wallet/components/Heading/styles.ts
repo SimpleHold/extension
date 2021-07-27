@@ -14,6 +14,9 @@ const WalletName = styled.p`
   font-size: 16px;
   line-height: 19px;
   color: #1d1d22;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `
 
 const MoreButton = styled.div`
@@ -43,6 +46,14 @@ const RenameBlock = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  overflow: hidden;
+  flex: 1;
+  margin: 0 20px 0 0;
+
+  svg {
+    min-width: 9px;
+    min-height: 11px;
+  }
 
   &:hover {
     cursor: pointer;

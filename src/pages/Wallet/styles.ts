@@ -10,6 +10,8 @@ const Container = styled.div`
   border-radius: 5px 5px 0 0;
   height: 540px;
   overflow: scroll;
+  display: flex;
+  flex-direction: column;
 `
 
 const Row = styled.div`

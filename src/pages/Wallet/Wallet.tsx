@@ -29,7 +29,7 @@ import { getCurrency, checkWithPhrase } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
 // Types
-import { TAddressTx } from '@utils/api/types'
+import { TAddressTxGroup } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -66,7 +66,7 @@ const WalletPage: React.FC = () => {
 
   const [balance, setBalance] = React.useState<null | number>(null)
   const [estimated, setEstimated] = React.useState<null | number>(null)
-  const [txHistory, setTxHistory] = React.useState<TAddressTx[] | null>(null)
+  const [txHistory, setTxHistory] = React.useState<TAddressTxGroup[] | null>(null)
   const [activeDrawer, setActiveDrawer] = React.useState<
     null | 'confirm' | 'privateKey' | 'renameWallet'
   >(null)
@@ -151,14 +151,14 @@ const WalletPage: React.FC = () => {
 
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
-          const findWallet = parseBackup?.wallets?.find(
+          const findWallet: IWallet | undefined = parseBackup?.wallets?.find(
             (wallet: IWallet) => toLower(wallet.address) === toLower(address)
           )
 
           if (findWallet) {
             if (findWallet.mnemonic) {
               setPrivateKey(findWallet.mnemonic)
-            } else {
+            } else if (findWallet.privateKey) {
               setPrivateKey(findWallet.privateKey)
             }
             return setActiveDrawer('privateKey')
@@ -206,6 +206,7 @@ const WalletPage: React.FC = () => {
               estimated={estimated}
               onRefreshBalance={onRefreshBalance}
               isBalanceRefreshing={isBalanceRefreshing}
+              tokenName={tokenName}
             />
           </Styles.Row>
           <TransactionHistory data={txHistory} symbol={symbol} />
