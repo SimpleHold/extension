@@ -1,9 +1,10 @@
 import { browser } from 'webextension-polyfill-ts'
 import copy from 'copy-to-clipboard'
+import qs from 'query-string'
 
 // Utils
 import { IRequest } from '@utils/browser/types'
-import { setItem } from '@utils/storage'
+import { detectBrowser } from '@utils/detect'
 
 let initialScreenX: number = 0
 let initialScreenY: number = 0
@@ -61,12 +62,14 @@ const createIframe = async (src: string) => {
 
   const { screenX, outerWidth } = window
 
+  const leftDif = detectBrowser() === 'opera' ? 40 : 0
+
   iframe.style.width = '375px'
   iframe.style.height = '700px'
   iframe.style.position = 'absolute'
-  iframe.style.left = `${Math.max(screenX + (outerWidth - 375), 0)}px`
+  iframe.style.left = `${Math.max(screenX + (outerWidth - leftDif - 375), 0)}px`
   iframe.style.top = '0'
-  iframe.style.zIndex = '100'
+  iframe.style.zIndex = '9999999999'
   iframe.style.borderRadius = '16px'
   iframe.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
   iframe.style.border = 'none'
@@ -85,7 +88,13 @@ addCustomEventListener('#sh-button', 'click', async () => {
     const currency = getButton?.getAttribute('sh-currency')
     const chain = getButton?.getAttribute('sh-currency-chain')
 
-    await createIframe(`select-address.html?currency=${currency}&chain=${chain}&isDraggable=true`)
+    const params = qs.stringify({
+      currency,
+      chain,
+      isDraggable: true,
+    })
+
+    await createIframe(`select-address.html?${params}`)
   }
 })
 
@@ -100,12 +109,19 @@ addCustomEventListener('#sh-send-button', 'click', async () => {
     const chain = getButton?.getAttribute('sh-chain')
     const extraId = getButton?.getAttribute('sh-extra-id')
 
-    setItem(
-      'sendPageProps',
-      JSON.stringify({ readOnly, currency, amount, recipientAddress, chain, extraId })
-    )
+    await browser.runtime.sendMessage({
+      type: 'save_send_params',
+      data: {
+        readOnly,
+        currency,
+        amount,
+        recipientAddress,
+        chain,
+        extraId,
+      },
+    })
 
-    await createIframe('send.html?isDraggable=true')
+    await createIframe(`send.html?isDraggable=true`)
   }
 })
 

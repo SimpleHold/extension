@@ -2,20 +2,22 @@ import styled from 'styled-components'
 
 type TContainerProps = {
   isDisabled?: boolean
+  color?: string
 }
 
 const Container = styled.div`
   width: 13px;
   height: 13px;
-  border: ${({ isDisabled }: TContainerProps) =>
-    `1.5px solid ${isDisabled ? '#C3C3C3' : '#7d7e8d'}`};
+  border: ${({ color, isDisabled }: TContainerProps) =>
+    `1.5px solid ${color || isDisabled ? '#C3C3C3' : '#7d7e8d'}`};
   border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
 
   path {
-    fill: ${({ isDisabled }: TContainerProps) => (isDisabled ? '#C3C3C3' : '#7d7e8d')};
+    fill: ${({ color, isDisabled }: TContainerProps) =>
+      color || isDisabled ? '#C3C3C3' : '#7d7e8d'};
   }
 
   &:hover {

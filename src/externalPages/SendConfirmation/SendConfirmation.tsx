@@ -3,6 +3,7 @@ import { render } from 'react-dom'
 import numeral from 'numeral'
 import { BigNumber } from 'bignumber.js'
 import type Transport from '@ledgerhq/hw-transport-webusb'
+import { browser } from 'webextension-polyfill-ts'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -77,10 +78,24 @@ const SendConfirmation: React.FC = () => {
   const [ledgerDrawerState, setLedgerDrawerState] = React.useState<
     'wrongDevice' | 'wrongApp' | 'connectionFailed' | 'reviewTx' | null
   >(null)
+  const [isDraggable, setIsDraggable] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     checkProps()
+    getQueryParams()
   }, [])
+
+  React.useEffect(() => {
+    if (ledgerTransport) {
+      createLedgerTx()
+    }
+  }, [ledgerTransport])
+
+  React.useEffect(() => {
+    if (ledgerDrawerState && !activeDrawer) {
+      setActiveDrawer('ledger')
+    }
+  }, [ledgerDrawerState, activeDrawer])
 
   React.useEffect(() => {
     if (ledgerTransport) {
@@ -130,6 +145,16 @@ const SendConfirmation: React.FC = () => {
     }
 
     return null
+  }
+
+  const getQueryParams = (): void => {
+    const searchParams = new URLSearchParams(location.search)
+
+    const queryDraggable = searchParams.get('isDraggable')
+
+    if (queryDraggable === 'true') {
+      setIsDraggable(true)
+    }
   }
 
   const createLedgerTx = async (): Promise<void> => {
@@ -209,6 +234,10 @@ const SendConfirmation: React.FC = () => {
     if (getItem('sendPageProps')) {
       removeItem('sendPageProps')
     }
+
+    browser.runtime.sendMessage({
+      type: 'close_select_address_window',
+    })
 
     window.close()
   }
@@ -478,6 +507,7 @@ const SendConfirmation: React.FC = () => {
       headerStyle="green"
       backPageTitle={props?.hardware ? undefined : 'Send'}
       backPageUrl={props?.hardware ? undefined : 'send.html'}
+      isDraggable={isDraggable}
     >
       <>
         <Styles.Body>

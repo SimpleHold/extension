@@ -160,7 +160,8 @@ const Send: React.FC = () => {
     if (selectedWallet) {
       if (
         bitcoinLike.coins().indexOf(info.chain) !== -1 ||
-        toLower(selectedWallet?.symbol) === 'ada'
+        toLower(selectedWallet?.symbol) === 'ada' ||
+        toLower(selectedWallet?.symbol) === 'nebl'
       ) {
         const unspentOutputs = await getUnspentOutputs(selectedWallet.address, info.chain)
         setOutputs(unspentOutputs)
@@ -375,9 +376,14 @@ const Send: React.FC = () => {
       }
 
       setItem('sendConfirmationData', JSON.stringify(data))
-      await updateTab(currenctTab.id, {
-        url,
-      })
+
+      if (isDraggable) {
+        location.href = `${url}?isDraggable=true`
+      } else {
+        await updateTab(currenctTab.id, {
+          url,
+        })
+      }
     }
   }
 
@@ -638,7 +644,7 @@ const Send: React.FC = () => {
             />
           ) : null}
           <TextInput
-            label={`Amount (${toUpper(selectedWallet?.symbol)})`}
+            label={`Amount ${selectedWallet ? `(${toUpper(selectedWallet?.symbol)})` : ''}`}
             value={amount}
             onChange={setAmount}
             type="number"
