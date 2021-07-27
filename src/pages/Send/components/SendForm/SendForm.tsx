@@ -24,10 +24,13 @@ const SendForm: React.FC<Props> = (props) => {
     <Styles.Container>
       <Styles.Form onSubmit={onSubmitForm}>
         <WalletCard />
+        <Styles.FormRow>
+          <p>FORM</p>
+        </Styles.FormRow>
       </Styles.Form>
       <Styles.Actions>
-        <Button label="Cancel" isLight isSmall onClick={onCancel} mr={7.5} />
-        <Button label="Send" disabled isSmall onClick={onConfirm} ml={7.5} />
+        <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
+        <Button label="Send" disabled onClick={onConfirm} ml={7.5} />
       </Styles.Actions>
     </Styles.Container>
   )

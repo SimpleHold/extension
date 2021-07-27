@@ -328,7 +328,7 @@ const Receive: React.FC = () => {
             <CopyToClipboard value={address} onCopy={onCopyAddress}>
               <Styles.Address>{short(address, 70)}</Styles.Address>
             </CopyToClipboard>
-            <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} isSmall mt={30} />
+            <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} mt={30} />
           </Styles.ReceiveBlock>
         </Styles.Container>
       </Styles.Wrapper>

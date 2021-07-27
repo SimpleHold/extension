@@ -143,7 +143,7 @@ const ReceivePage: React.FC = () => {
               permanent loss.
             </Styles.Warning>
           </Styles.Row>
-          <Button label={isCopied ? 'Copied!' : 'Copy address'} onClick={onCopyAddress} isSmall />
+          <Button label={isCopied ? 'Copied!' : 'Copy address'} onClick={onCopyAddress} />
         </Styles.Container>
       </Styles.Wrapper>
       <ExtraIdDrawer

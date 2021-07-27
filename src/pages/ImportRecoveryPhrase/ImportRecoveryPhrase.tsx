@@ -137,11 +137,10 @@ const ImportRecoveryPhrase: React.FC = () => {
             />
 
             <Styles.Actions>
-              <Button label="Back" isSmall isLight onClick={history.goBack} mr={7.5} />
+              <Button label="Back" isLight onClick={history.goBack} mr={7.5} />
               <Button
                 label="Import"
                 disabled={!recoveryPhrase.length}
-                isSmall
                 onClick={onImport}
                 ml={7.5}
               />

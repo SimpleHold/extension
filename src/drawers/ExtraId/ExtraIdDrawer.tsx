@@ -41,7 +41,7 @@ const ExtraIdDrawer: React.FC<Props> = (props) => {
         </CopyToClipboard>
 
         <Styles.Actions>
-          <Button label="Done" onClick={onClose} isSmall />
+          <Button label="Done" onClick={onClose} />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>

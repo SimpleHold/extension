@@ -68,13 +68,8 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
         </Styles.Form>
 
         <Styles.Actions>
-          <Button label="Cancel" isLight onClick={onClose} mr={7.5} isSmall />
-          <Button
-            label="Ok"
-            disabled={passcode.length !== 6}
-            onClick={() => onConfirm(passcode)}
-            isSmall
-          />
+          <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
+          <Button label="Ok" disabled={passcode.length !== 6} onClick={() => onConfirm(passcode)} />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>

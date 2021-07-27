@@ -76,11 +76,10 @@ const ConfirmDrawer: React.FC<Props> = (props) => {
           />
         </Styles.Form>
         <Styles.Actions>
-          <Button label="Cancel" isLight isSmall mr={7.5} onClick={onClose} />
+          <Button label="Cancel" isLight mr={7.5} onClick={onClose} />
           <Button
             label="Ok"
             disabled={isButtonDisabled}
-            isSmall
             mr={7.5}
             onClick={onConfirm}
             isLoading={isButtonLoading}

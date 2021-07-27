@@ -25,8 +25,8 @@ const LogoutDrawer: React.FC<Props> = (props) => {
         </Styles.Text>
 
         <Styles.Actions>
-          <Button label="Cancel" isLight isSmall onClick={onClose} mr={7.5} />
-          <Button label="Log out" isSmall onClick={onConfirm} ml={7.5} />
+          <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
+          <Button label="Log out" onClick={onConfirm} ml={7.5} />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>

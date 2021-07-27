@@ -28,7 +28,7 @@ const FailDrawer: React.FC<Props> = (props) => {
       <Styles.Row>
         <Styles.Text>{text}</Styles.Text>
         <Styles.Actions>
-          <Button label="Ok" isSmall onClick={onClose} />
+          <Button label="Ok" onClick={onClose} />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>
