@@ -279,8 +279,10 @@ export const renameWallet = (uuid: string, name: string) => {
     const findWalletIndex = wallets.findIndex(
       (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
     )
-    wallets[findWalletIndex].walletName = name
 
-    setItem('wallets', JSON.stringify(wallets))
+    if (findWalletIndex !== -1) {
+      wallets[findWalletIndex].walletName = name
+      setItem('wallets', JSON.stringify(wallets))
+    }
   }
 }

@@ -32,6 +32,7 @@ interface Props {
   sumPending?: (pending: number) => void
   handleClick?: () => void
   walletName: string
+  uuid: string
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -48,6 +49,7 @@ const WalletCard: React.FC<Props> = (props) => {
     sumPending,
     handleClick,
     walletName,
+    uuid,
   } = props
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
@@ -103,6 +105,7 @@ const WalletCard: React.FC<Props> = (props) => {
       decimals,
       isHidden,
       walletName,
+      uuid,
     })
   }
 

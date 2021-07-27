@@ -273,6 +273,7 @@ const SelectAddress: React.FC = () => {
                     decimals={decimals}
                     handleClick={handleClick(address)}
                     walletName={walletName}
+                    uuid={uuid}
                   />
                 )
               })}

@@ -196,6 +196,7 @@ const Wallets: React.FC = () => {
                       sumEstimated={sumEstimated}
                       sumPending={sumPending}
                       walletName={walletName}
+                      uuid={uuid}
                     />
                   )
                 })
