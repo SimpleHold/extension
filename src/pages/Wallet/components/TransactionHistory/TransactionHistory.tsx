@@ -42,9 +42,9 @@ const TransactionHistory: React.FC<Props> = (props) => {
 
       {data === null ? (
         <Styles.TxGroup>
-          <Skeleton width={50} height={16} type="gray" isLoading>
-            <div />
-          </Skeleton>
+          <Styles.DateRow>
+            <Skeleton width={50} height={16} type="gray" isLoading />
+          </Styles.DateRow>
           <Transaction isLoading />
           <Transaction isLoading />
         </Styles.TxGroup>
@@ -66,7 +66,9 @@ const TransactionHistory: React.FC<Props> = (props) => {
 
             return (
               <Styles.TxGroup key={date}>
-                <Styles.TxDate>{dayjs(date).format('MMM D')}</Styles.TxDate>
+                <Styles.DateRow>
+                  <Styles.TxDate>{dayjs(date).format('MMM D')}</Styles.TxDate>
+                </Styles.DateRow>
                 {data.map((tx: TAddressTx) => {
                   const { type, date, destination, amount, estimated } = tx
 

@@ -48,7 +48,11 @@ const Date = styled.p`
   white-space: pre;
 `
 
-const Amounts = styled.div``
+const Amounts = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`
 
 const CurrencyAmount = styled.p`
   margin: 0;

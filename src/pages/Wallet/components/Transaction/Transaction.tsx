@@ -2,6 +2,9 @@ import * as React from 'react'
 import numeral from 'numeral'
 import dayjs from 'dayjs'
 
+// Components
+import Skeleton from '@components/Skeleton'
+
 // Utils
 import { toUpper, price } from '@utils/format'
 
@@ -26,7 +29,17 @@ const Transaction: React.FC<Props> = (props) => {
   if (isLoading) {
     return (
       <Styles.Container>
-        <p>23123</p>
+        <Styles.Info>
+          <Skeleton width={40} height={40} br={14} type="gray" isLoading />
+          <Styles.InfoRow>
+            <Skeleton width={80} height={20} type="gray" isLoading />
+            <Skeleton width={50} height={17} mt={3} type="gray" isLoading />
+          </Styles.InfoRow>
+        </Styles.Info>
+        <Styles.Amounts>
+          <Skeleton width={100} height={19} type="gray" isLoading />
+          <Skeleton width={70} height={17} mt={4} type="gray" isLoading />
+        </Styles.Amounts>
       </Styles.Container>
     )
   }

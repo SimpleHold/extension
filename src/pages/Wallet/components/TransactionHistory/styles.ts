@@ -95,8 +95,12 @@ const TxGroup = styled.div`
   margin: 20px 0 0 0;
 `
 
-const TxDate = styled.p`
+const DateRow = styled.div`
   margin: 0 0 0 30px;
+`
+
+const TxDate = styled.p`
+  margin: 0;
   font-weight: 500;
   font-size: 14px;
   line-height: 16px;
@@ -117,6 +121,7 @@ const Styles = {
   HeadingButton,
   TxGroup,
   TxDate,
+  DateRow,
 }
 
 export default Styles
