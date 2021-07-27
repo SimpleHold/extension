@@ -2,6 +2,7 @@ import * as React from 'react'
 import { render } from 'react-dom'
 import { Route, RouteProps, MemoryRouter as Router, Switch } from 'react-router-dom'
 import { v4 } from 'uuid'
+import Loadable from 'react-loadable'
 
 import routes from './routes'
 import GlobalStyles from './styles/global'
@@ -19,7 +20,12 @@ import { ToastContextProvider } from '@contexts/Toast/Toast'
 const App: React.FC = () => {
   React.useEffect(() => {
     initAmplitude()
+    preloadPages()
   }, [])
+
+  const preloadPages = async (): Promise<void> => {
+    await Loadable.preloadAll()
+  }
 
   const initAmplitude = (): void => {
     const clientId = getItem('clientId') || v4()
