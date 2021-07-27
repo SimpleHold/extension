@@ -126,7 +126,11 @@ const Send: React.FC = () => {
   }
 
   const getOutputs = async (): Promise<void> => {
-    if (bitcoinLike.coins().indexOf(chain) !== -1 || toLower(symbol) === 'ada') {
+    if (
+      bitcoinLike.coins().indexOf(chain) !== -1 ||
+      toLower(symbol) === 'ada' ||
+      toLower(symbol) === 'nebl'
+    ) {
       const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
       setOutputs(unspentOutputs)
     }

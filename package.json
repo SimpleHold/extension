@@ -1,6 +1,6 @@
 {
   "name": "extension",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "extension",
   "private": false,
   "repository": "https://github.com/SimpleHold/extension.git",
@@ -31,6 +31,7 @@
     "copy-to-clipboard": "^3.3.1",
     "crypto-js": "^4.0.0",
     "detect-browser": "^5.2.0",
+    "neblio-lib": "https://github.com/NeblioTeam/bitcore-lib#neblcore-lib",
     "numeral": "^2.0.6",
     "qrcode.react": "^1.0.1",
     "query-string": "^7.0.1",
@@ -107,5 +108,8 @@
     "webpack-extension-reloader": "^1.1.4",
     "wext-manifest-loader": "^2.2.1",
     "wext-manifest-webpack-plugin": "^1.2.1"
+  },
+  "resolutions": {
+    "neblio-lib/**/bn.js": "=2.0.4"
   }
 }

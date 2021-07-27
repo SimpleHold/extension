@@ -1,6 +1,7 @@
 declare module '*.png'
 declare module '*.svg'
 declare module '@thetalabs/theta-js'
+declare module 'neblio-lib'
 
 type TGenerateAddress = {
   address: string
@@ -65,3 +66,4 @@ type TSymbols =
   | 'tfuel'
   | 'ada'
   | 'xrp'
+  | 'nebl'
