@@ -17,7 +17,7 @@ const getBackgroundColor = (props: TContainerProps) => {
   }
 
   if (disabled) {
-    return '#EAEAEA'
+    return '#DEE1E9'
   }
 
   if (isLight) {
@@ -41,7 +41,7 @@ const getBorderColor = (props: TContainerProps) => {
   const { isLight, disabled, isDanger } = props
 
   if (isLight || disabled || isDanger) {
-    return '#EAEAEA'
+    return '#F2F4F8'
   }
 
   return '#3FBB7D'
@@ -90,7 +90,7 @@ const Container = styled.button`
   background-color: ${(props: TContainerProps) => getBackgroundColor(props)};
   border: ${(props: TContainerProps) => `1px solid ${getBorderColor(props)}`};
   height: 50px;
-  border-radius: 5px;
+  border-radius: 8px;
   transition: all 0.3s;
   margin-left: ${({ ml }: TContainerProps) => (ml ? `${ml}px` : '0')};
   margin-right: ${({ mr }: TContainerProps) => (mr ? `${mr}px` : '0')};
