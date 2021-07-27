@@ -10,7 +10,6 @@ const Container = styled.div`
 const Form = styled.form`
   background-color: #ffffff;
   border-radius: 16px;
-  padding: 50px;
 `
 
 const Actions = styled.div`
@@ -19,10 +18,15 @@ const Actions = styled.div`
   align-items: center;
 `
 
+const FormRow = styled.div`
+  border-top: 1px solid #f2f4f8;
+`
+
 const Styles = {
   Container,
   Form,
   Actions,
+  FormRow,
 }
 
 export default Styles

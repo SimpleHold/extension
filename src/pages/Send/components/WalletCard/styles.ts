@@ -2,23 +2,65 @@ import styled from 'styled-components'
 
 const Container = styled.div``
 
-const Row = styled.div``
+const Row = styled.div`
+  padding: 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
 
-const WalletNameRow = styled.div``
+const Info = styled.div`
+  flex: 1;
+  margin: 0 0 0 15px;
+`
 
-const WalletName = styled.p``
+const WalletNameRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
 
-const ArrowIcon = styled.div``
+const WalletName = styled.p`
+  margin: 0 6px 0 0;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  color: #3fbb7d;
+`
 
-const Balances = styled.div``
+const ArrowIcon = styled.div`
+  width: 10px;
+  height: 6px;
+  background-color: red;
+`
 
-const Balance = styled.p``
+const Balances = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 5px 0 0 0;
+`
 
-const Estimated = styled.p``
+const Balance = styled.p`
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
+  margin: 0;
+`
+
+const Estimated = styled.p`
+  margin: 0;
+  font-size: 14px;
+  line-height: 16px;
+  color: #1d1d22;
+`
 
 const Styles = {
   Container,
   Row,
+  Info,
   WalletNameRow,
   WalletName,
   ArrowIcon,
