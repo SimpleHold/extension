@@ -31,15 +31,20 @@ type TSelectedAddress = {
   symbol: string
 }
 
+type TFirstAddress = {
+  symbol: string
+  address: string
+}
+
 const ConnectLedger: React.FC = () => {
   const [ledgerTransport, setLedgerTransport] = React.useState<Transport | null>(null)
   const [ledgerName, setLedgerName] = React.useState<string>('Ledger')
-  const [productId, setProductId] = React.useState<string>('-1')
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
   const [selectedAddresses, setSelectedAddresses] = React.useState<TSelectedAddress[]>([])
   const [existWallets, setExistWallets] = React.useState<TSelectedAddress[]>([])
+  const [firstAddresses, setFirstAddresses] = React.useState<TFirstAddress[]>([])
 
   React.useEffect(() => {
     getWalletsList()
@@ -76,14 +81,9 @@ const ConnectLedger: React.FC = () => {
       setLedgerTransport(transport)
 
       const getProductName = transport.deviceModel?.productName
-      const getProductId = transport?.device?.productId
 
       if (getProductName) {
         setLedgerName(getProductName)
-      }
-
-      if (getProductId) {
-        setProductId(`${getProductId}`)
       }
     }
   }
@@ -111,9 +111,10 @@ const ConnectLedger: React.FC = () => {
           'ledger',
           selectedAddresses,
           ledgerName,
-          productId,
+          'ledger',
           decryptBackup,
-          password
+          password,
+          firstAddresses
         )
 
         if (walletsList) {
@@ -164,6 +165,10 @@ const ConnectLedger: React.FC = () => {
     }
   }
 
+  const saveFirstAddress = (symbol: string, address: string) => {
+    setFirstAddresses((firstAddresses: TFirstAddress[]) => [...firstAddresses, { symbol, address }])
+  }
+
   const renderConnect = () => (
     <Styles.Container pt={40}>
       <Styles.Row>
@@ -199,6 +204,7 @@ const ConnectLedger: React.FC = () => {
                   selectedAddresses={selectedAddresses}
                   existWallets={existWallets}
                   onToggleSelect={onToggleSelectAddress}
+                  saveFirstAddress={saveFirstAddress}
                 />
               )
             })}

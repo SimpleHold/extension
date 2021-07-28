@@ -45,6 +45,11 @@ type THardwareCurrency = {
   path: string
 }
 
+type THardwareFirstAddress = {
+  symbol: string
+  address: string
+}
+
 const sortByBalance = (a: IWallet, b: IWallet, isAscending: boolean) => {
   return isAscending
     ? Number(a.balance_btc || 0) - Number(b.balance_btc || 0)
@@ -269,10 +274,29 @@ export const addHardwareWallet = (
   hardwareLabel: string,
   deviceId: string,
   backup: string,
-  password: string
+  password: string,
+  firstAddresses?: THardwareFirstAddress[]
 ): string | null => {
   try {
     const parseBackup = JSON.parse(backup)
+
+    const getDeviceId = (symbol: string): string => {
+      if (type === 'trezor') {
+        return deviceId
+      }
+
+      if (firstAddresses?.length) {
+        const findFirstAddress = firstAddresses.find(
+          (address: THardwareFirstAddress) => toLower(address.symbol) === toLower(symbol)
+        )
+
+        if (findFirstAddress) {
+          return findFirstAddress.address
+        }
+      }
+
+      return deviceId
+    }
 
     for (const currency of currencies) {
       const { symbol, address, path } = currency
@@ -291,7 +315,7 @@ export const addHardwareWallet = (
             path,
             label: hardwareLabel,
             type,
-            deviceId,
+            deviceId: getDeviceId(symbol),
           },
         }
 
