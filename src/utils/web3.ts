@@ -45,6 +45,10 @@ interface TransferTokenOptions {
   contractAddress?: string
 }
 
+export const toHex = (value: number): string => {
+  return web3.utils.toHex(value)
+}
+
 export const generateAddress = (): TGenerateAddress | null => {
   try {
     const item = web3.eth.accounts.create()
@@ -110,11 +114,7 @@ export const createTransaction = async (
       privateKey
     )
 
-    if (rawTransaction) {
-      return rawTransaction
-    }
-
-    return null
+    return rawTransaction || null
   } catch {
     return null
   }
@@ -132,6 +132,7 @@ export const transferToken = async ({
   contractAddress,
 }: TransferTokenOptions): Promise<string | null> => {
   try {
+    // @ts-ignore
     const contract = new web3.eth.Contract(contractABI, contractAddress, { from })
     const data = contract.methods.transfer(to, value)
 

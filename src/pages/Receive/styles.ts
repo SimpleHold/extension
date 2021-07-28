@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+type TCurrencyNameProps = {
+  size: 'small' | 'normal'
+}
+
 const Wrapper = styled.div`
   height: 600px;
   overflow: hidden;

@@ -5,7 +5,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 import Button from '@components/Button'
-import CurrenciesDropdown from 'components/CurrenciesDropdown'
+import CurrenciesDropdown from '@components/CurrenciesDropdown'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'

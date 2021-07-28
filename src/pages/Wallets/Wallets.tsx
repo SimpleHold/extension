@@ -177,6 +177,7 @@ const Wallets: React.FC = () => {
                     decimals,
                     isHidden,
                     uuid,
+                    hardware,
                   } = wallet
 
                   const walletName =
@@ -197,6 +198,7 @@ const Wallets: React.FC = () => {
                       sumPending={sumPending}
                       walletName={walletName}
                       uuid={uuid}
+                      hardware={hardware}
                     />
                   )
                 })

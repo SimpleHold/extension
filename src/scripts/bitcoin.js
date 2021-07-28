@@ -41,8 +41,24 @@ const bitcoin = (function () {
     }
   }
 
-  const getFee = (outputs, to, amount, changeAddress) => {
-    return new bitcore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
+  const createUnsignedTx = (outputs, to, amount, fee, changeAddress) => {
+    const transaction = new bitcore.Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .fee(fee)
+      .change(changeAddress)
+
+    return transaction.toString()
+  }
+
+  const getFee = (outputs, to, amount, changeAddress, feePerByte) => {
+    const txSize = new bitcore.Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .change(changeAddress)
+      .toString().length
+
+    return txSize * 2 * feePerByte
   }
 
   const isAddressValid = (address) => {
@@ -62,5 +78,6 @@ const bitcoin = (function () {
     createTransaction,
     getFee,
     isAddressValid,
+    createUnsignedTx,
   }
 })()

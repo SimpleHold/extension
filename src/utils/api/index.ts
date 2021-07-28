@@ -76,7 +76,8 @@ export const getUnspentOutputs = async (address: string, chain: string): Promise
 
 export const sendRawTransaction = async (
   transaction: string,
-  currency?: string
+  currency?: string,
+  from?: string
 ): Promise<string | null> => {
   try {
     if (currency) {
@@ -89,6 +90,9 @@ export const sendRawTransaction = async (
         {
           headers: {
             'Content-Type': 'application/json',
+          },
+          params: {
+            from,
           },
         }
       )
@@ -256,6 +260,34 @@ export const getXrpTxParams = async (from: string) => {
     return data
   } catch {
     return null
+  }
+}
+
+export const getTxHex = async (chain: string, txId: string): Promise<null | string> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/tx-hex/${chain}/${txId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const getFeePerByte = async (chain: string): Promise<number> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/wallet/fee/${chain}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return 0
   }
 }
 

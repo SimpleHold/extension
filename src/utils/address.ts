@@ -4,7 +4,7 @@ import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
 import { getToken, IToken } from '@config/tokens'
 
 // Utils
-import { getEtherNetworkFee, getThetaNetworkFee, getNetworkFee } from '@utils/api'
+import { getEtherNetworkFee, getThetaNetworkFee, getNetworkFee, getFeePerByte } from '@utils/api'
 import { IGetNetworkFeeResponse } from '@utils/api/types'
 import { toLower } from '@utils/format'
 
@@ -14,6 +14,7 @@ import bitcoinLike from '@utils/bitcoinLike'
 import * as theta from '@utils/currencies/theta'
 import * as cardano from '@utils/currencies/cardano'
 import * as ripple from '@utils/currencies/ripple'
+import * as neblio from '@utils/currencies/neblio'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
@@ -44,7 +45,9 @@ export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boole
 }
 
 export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.generateWallet()
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.generateWallet()
   } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.generateWallet()
@@ -64,7 +67,9 @@ export const importPrivateKey = (
   privateKey: string,
   chain?: string
 ): string | null => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.importPrivateKey(privateKey)
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.importPrivateKey(privateKey)
   } else if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
@@ -86,6 +91,8 @@ export const validateAddress = (
       return cardano.validateAddress(address)
     } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
       return new bitcoinLike(symbol).isAddressValid(address)
+    } else if (neblio.coins.indexOf(symbol) !== -1) {
+      return neblio.validateAddress(address)
     }
     // @ts-ignore
     return new RegExp(tokenChain ? addressValidate.eth : addressValidate[symbol])?.test(address)
@@ -145,6 +152,9 @@ export const createTransaction = async ({
     }
 
     if (outputs?.length && networkFee) {
+      if (neblio.coins.indexOf(symbol) !== -1) {
+        return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
+      }
       return new bitcoinLike(symbol).createTransaction(
         outputs,
         to,
@@ -205,11 +215,14 @@ export const getNewNetworkFee = async (
   }
 
   if (outputs?.length) {
-    if (toLower(symbol) === 'ada') {
+    if (cardano.coins.indexOf(symbol) !== -1) {
       return cardano.getNetworkFee(outputs, amount)
     }
-
-    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+    if (neblio.coins.indexOf(symbol) !== -1) {
+      return neblio.getNetworkFee(address, outputs, amount)
+    }
+    const btcFeePerByte = await getFeePerByte(chain)
+    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount, btcFeePerByte)
   }
 
   if (ripple.coins.indexOf(symbol) !== -1) {
@@ -218,6 +231,10 @@ export const getNewNetworkFee = async (
 
   if (theta.coins.indexOf(symbol) !== -1) {
     return await getThetaNetworkFee(address)
+  }
+
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return await getNetworkFee('ripple')
   }
 
   return null
@@ -260,10 +277,15 @@ export const getAddressNetworkFee = async (
     }
 
     if (typeof outputs !== 'undefined') {
-      if (toLower(symbol) === 'ada') {
+      if (cardano.coins.indexOf(symbol) !== -1) {
         return cardano.getNetworkFee(outputs, amount)
       }
-      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+      if (neblio.coins.indexOf(symbol) !== -1) {
+        return neblio.getNetworkFee(address, outputs, amount)
+      }
+
+      const btcFeePerByte = await getFeePerByte(chain)
+      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount, btcFeePerByte)
     }
 
     return null
@@ -280,7 +302,9 @@ export const formatUnit = (
   unit?: web3.Unit
 ): number => {
   try {
-    if (ripple.coins.indexOf(symbol) !== -1) {
+    if (neblio.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? neblio.fromSat(Number(value)) : neblio.toSat(Number(value))
+    } else if (ripple.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
     } else if (cardano.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
@@ -310,7 +334,9 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.getExplorerLink(address)
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getExplorerLink(address)
   } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.getExplorerLink(address)
@@ -348,7 +374,9 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string | null => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
+  if (neblio.coins.indexOf(symbol) !== -1) {
+    return neblio.getTransactionLink(hash)
+  } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getTransactionLink(hash)
   } else if (cardano.coins.indexOf(symbol) !== -1) {
     return cardano.getTransactionLink(hash)

@@ -24,7 +24,7 @@ const PendingBalance: React.FC<Props> = (props) => {
   const [USDValue, setUSDValue] = React.useState<number>(0)
 
   React.useEffect(() => {
-    if (pending > 0) {
+    if (pending !== 0) {
       getUSDEstimated()
     }
   }, [pending])

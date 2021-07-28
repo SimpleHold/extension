@@ -31,6 +31,7 @@ import {
 } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
 import { getItem, setItem, removeItem } from '@utils/storage'
+import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -41,7 +42,6 @@ import useDebounce from '@hooks/useDebounce'
 
 // Styles
 import Styles from './styles'
-import { ICardanoUnspentTxOutput } from 'utils/currencies/cardano'
 
 type TabInfo = {
   favIconUrl: string
@@ -160,7 +160,8 @@ const Send: React.FC = () => {
     if (selectedWallet) {
       if (
         bitcoinLike.coins().indexOf(info.chain) !== -1 ||
-        toLower(selectedWallet?.symbol) === 'ada'
+        toLower(selectedWallet?.symbol) === 'ada' ||
+        toLower(selectedWallet?.symbol) === 'nebl'
       ) {
         const unspentOutputs = await getUnspentOutputs(selectedWallet.address, info.chain)
         setOutputs(unspentOutputs)

@@ -33,8 +33,14 @@ const dogecoin = (function () {
     }
   }
 
-  const getFee = (outputs, to, amount, changeAddress) => {
-    return new dogecore.Transaction().from(outputs).to(to, amount).change(changeAddress).getFee()
+  const getFee = (outputs, to, amount, changeAddress, feePerByte) => {
+    const txSize = new dogecore.Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .change(changeAddress)
+      .toString().length
+
+    return txSize * 2 * feePerByte
   }
 
   const isAddressValid = (address) => {
