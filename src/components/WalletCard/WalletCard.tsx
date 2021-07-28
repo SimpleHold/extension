@@ -16,6 +16,11 @@ import { updateBalance, THardware } from '@utils/wallet'
 import { getToken } from '@config/tokens'
 import { getCurrency } from '@config/currencies'
 
+// Assets
+import ledgerLogo from '@assets/icons/ledger.svg'
+import trezorLogo from '@assets/icons/trezor.svg'
+import clockIcon from '@assets/icons/clock.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -114,53 +119,41 @@ const WalletCard: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container onClick={openWallet}>
-      <Styles.Body pb={typeof hardware !== 'undefined' ? 10 : 20}>
-        <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} name={name} />
-        <Styles.Row>
-          <Styles.AddressInfo>
-            <Styles.Currency>{walletName}</Styles.Currency>
-            <Styles.Address>{address}</Styles.Address>
-          </Styles.AddressInfo>
-          <Styles.Balances>
-            <Skeleton width={106} height={19} type="gray" br={4} isLoading={balance === null}>
-              <Styles.BalanceRow>
-                {pendingBalance !== 0 ? (
-                  <Styles.PendingIcon>
-                    <SVG src="../../assets/icons/clock.svg" width={12} height={12} />
-                  </Styles.PendingIcon>
-                ) : null}
-
-                <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
-                  symbol
-                )}`}</Styles.Balance>
-              </Styles.BalanceRow>
-            </Skeleton>
-            <Skeleton
-              width={80}
-              height={16}
-              type="gray"
-              mt={4}
-              br={4}
-              isLoading={estimated === null}
-            >
-              <Styles.Estimated>{`$${numberFriendly(estimated)}`}</Styles.Estimated>
-            </Skeleton>
-          </Styles.Balances>
-        </Styles.Row>
-      </Styles.Body>
-      {hardware ? (
-        <Styles.Footer>
-          <Styles.HardwareBlock>
-            {hardware.type === 'ledger' ? (
-              <SVG src="../../assets/icons/ledger.svg" width={10} height={12} />
-            ) : (
-              <SVG src="../../assets/icons/trezor.svg" width={8.22} height={12} />
-            )}
-
-            <Styles.HardwareLabel>{hardware.label}</Styles.HardwareLabel>
-          </Styles.HardwareBlock>
-        </Styles.Footer>
-      ) : null}
+      <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} name={name} />
+      <Styles.Row>
+        <Styles.AddressInfo>
+          <Styles.CurrencyInfo>
+            {hardware ? (
+              <Styles.HardwareIconRow className="hardware-icon">
+                <SVG
+                  src={hardware.type === 'ledger' ? ledgerLogo : trezorLogo}
+                  width={12}
+                  height={12}
+                />
+              </Styles.HardwareIconRow>
+            ) : null}
+            <Styles.AddressName className="wallet-name">{walletName}</Styles.AddressName>
+          </Styles.CurrencyInfo>
+          <Styles.Address>{address}</Styles.Address>
+        </Styles.AddressInfo>
+        <Styles.Balances>
+          <Skeleton width={110} height={16} type="gray" br={4} isLoading={balance === null}>
+            <Styles.BalanceRow>
+              {pendingBalance !== 0 ? (
+                <Styles.PendingIcon>
+                  <SVG src={clockIcon} width={12} height={12} />
+                </Styles.PendingIcon>
+              ) : null}
+              <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
+                symbol
+              )}`}</Styles.Balance>
+            </Styles.BalanceRow>
+          </Skeleton>
+          <Skeleton width={80} height={17} type="gray" mt={7} br={4} isLoading={estimated === null}>
+            <Styles.Estimated>{`$${numberFriendly(estimated)}`}</Styles.Estimated>
+          </Skeleton>
+        </Styles.Balances>
+      </Styles.Row>
     </Styles.Container>
   )
 }
