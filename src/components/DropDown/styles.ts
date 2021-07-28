@@ -12,7 +12,7 @@ const Container = styled.div`
   transform: ${({ isVisible }: TContainerProps) => `translateY(${isVisible ? '0' : '-20px'})`};
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
   width: 100%;
-  top: 30px;
+  top: 50px;
   z-index: 2;
   box-shadow: 0px 5px 30px rgba(125, 126, 141, 0.15);
   border-radius: 16px;

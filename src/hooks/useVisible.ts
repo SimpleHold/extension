@@ -10,6 +10,10 @@ const useVisible = (initialIsVisible: boolean) => {
     }
   }
 
+  const toggle = (): void => {
+    setIsVisible((prevValue: boolean) => !prevValue)
+  }
+
   React.useEffect(() => {
     if (isVisible) {
       document.addEventListener('click', handleClickOutside)
@@ -22,7 +26,7 @@ const useVisible = (initialIsVisible: boolean) => {
     }
   }, [isVisible])
 
-  return { ref, isVisible, setIsVisible }
+  return { ref, isVisible, setIsVisible, toggle }
 }
 
 export default useVisible

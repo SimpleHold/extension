@@ -109,7 +109,7 @@ const ImportRecoveryPhrase = Loadable({
 
 const WalletPage = Loadable({
   loader: () => import('@pages/Wallet'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const routers: RouteProps[] = [

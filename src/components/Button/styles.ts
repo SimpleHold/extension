@@ -41,7 +41,7 @@ const getBorderColor = (props: TContainerProps) => {
   const { isLight, disabled, isDanger } = props
 
   if (isLight || disabled || isDanger) {
-    return '#F2F4F8'
+    return '#DEE1E9'
   }
 
   return '#3FBB7D'

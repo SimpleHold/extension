@@ -1,12 +1,20 @@
 import styled from 'styled-components'
 
-const Container = styled.div``
+type TVisibleProps = {
+  isVisible: boolean
+}
+
+const Container = styled.div`
+  position: relative;
+`
 
 const Row = styled.div`
-  padding: 20px;
+  padding: 19px 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
+  border-radius: 16px 16px 0 0;
+  border: ${({ isVisible }: TVisibleProps) => `1px solid ${isVisible ? '#3fbb7d' : '#ffffff'}`};
 `
 
 const Info = styled.div`
@@ -18,6 +26,10 @@ const WalletNameRow = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 const WalletName = styled.p`
@@ -26,12 +38,6 @@ const WalletName = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: #3fbb7d;
-`
-
-const ArrowIcon = styled.div`
-  width: 10px;
-  height: 6px;
-  background-color: red;
 `
 
 const Balances = styled.div`
@@ -57,16 +63,33 @@ const Estimated = styled.p`
   color: #1d1d22;
 `
 
+const WalletsDropdown = styled.div`
+  position: absolute;
+  top: 80px;
+  border: 1px solid #3fbb7d;
+  border-top: none;
+  filter: drop-shadow(0px 5px 30px rgba(125, 126, 141, 0.15));
+  border-radius: 0 0 16px 16px;
+  width: 100%;
+  max-height: 290px;
+  background-color: #ffffff;
+  overflow: scroll;
+  opacity: ${({ isVisible }: TVisibleProps) => (isVisible ? '1' : '0')};
+  visibility: ${({ isVisible }: TVisibleProps) => (isVisible ? 'visible' : 'hidden')};
+  transform: ${({ isVisible }: TVisibleProps) => `translateY(${isVisible ? '0' : '-20px'})`};
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+`
+
 const Styles = {
   Container,
   Row,
   Info,
   WalletNameRow,
   WalletName,
-  ArrowIcon,
   Balances,
   Balance,
   Estimated,
+  WalletsDropdown,
 }
 
 export default Styles
