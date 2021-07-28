@@ -7,6 +7,7 @@ import Header from '@components/Header'
 import Heading from './components/Heading'
 import WalletCard from './components/WalletCard'
 import TransactionHistory from './components/TransactionHistory'
+import Warning from '@components/Warning'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -208,6 +209,16 @@ const WalletPage: React.FC = () => {
               isBalanceRefreshing={isBalanceRefreshing}
               tokenName={tokenName}
             />
+            {balance !== null && balance < 20 && toLower(symbol) === 'xrp' ? (
+              <Warning
+                text="You need 20 XRP minimum to activate your XRP address."
+                color="#7D7E8D"
+                br={8}
+                mt={10}
+                padding="8px 10px"
+                background="rgba(189, 196, 212, 0.2)"
+              />
+            ) : null}
           </Styles.Row>
           <TransactionHistory data={txHistory} symbol={symbol} />
         </Styles.Container>
