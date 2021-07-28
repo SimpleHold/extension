@@ -1,113 +1,110 @@
 import { RouteProps } from 'react-router-dom'
 import Loadable from 'react-loadable'
 
-// Components
-import LoadableLoading from '@components/LoadableLoading'
-
 // Pages
 const WalletsPage = Loadable({
   loader: () => import('@pages/Wallets'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const ReceivePage = Loadable({
   loader: () => import('@pages/Receive'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const SendPage = Loadable({
   loader: () => import('@pages/Send'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const SendConfirmationPage = Loadable({
   loader: () => import('@pages/SendConfirmation'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const AnalyticsDataPage = Loadable({
   loader: () => import('@pages/AnalyticsData'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const WelcomePage = Loadable({
   loader: () => import('@pages/Welcome'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const CreateWalletPage = Loadable({
   loader: () => import('@pages/CreateWallet'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const DownloadBackupPage = Loadable({
   loader: () => import('@pages/DownloadBackup'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const RestoreWalletPage = Loadable({
   loader: () => import('@pages/RestoreWallet'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const SettingsPage = Loadable({
   loader: () => import('@pages/Settings'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const NewWalletPage = Loadable({
   loader: () => import('@pages/NewWallet'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const ImportPrivateKeyPage = Loadable({
   loader: () => import('@pages/ImportPrivateKey'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const OnBoardPage = Loadable({
   loader: () => import('@pages/OnBoard'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const LockPage = Loadable({
   loader: () => import('@pages/Lock'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const SelectCurrency = Loadable({
   loader: () => import('@pages/SelectCurrency'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const EnterPasscode = Loadable({
   loader: () => import('@pages/EnterPasscode'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const AddCustomToken = Loadable({
   loader: () => import('@pages/AddCustomToken'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const AddTokenToAddress = Loadable({
   loader: () => import('@pages/AddTokenToAddress'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const FoundTokens = Loadable({
   loader: () => import('@pages/FoundTokens'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const SelectToken = Loadable({
   loader: () => import('@pages/SelectToken'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const ImportRecoveryPhrase = Loadable({
   loader: () => import('@pages/ImportRecoveryPhrase'),
-  loading: LoadableLoading,
+  loading: () => null,
 })
 
 const WalletPage = Loadable({
