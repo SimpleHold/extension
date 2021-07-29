@@ -237,19 +237,23 @@ const config = {
         },
       }),
     ],
-  },
-}
-
-if (nodeEnv === 'production') {
-  config.optimization.splitChunks = {
-    cacheGroups: {
-      vendors: {
-        test: /[\\/]node_modules[\\/]/,
-        name: 'vendors',
-        chunks: 'all',
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks(chunk) {
+            return (
+              chunk.name !== 'background' &&
+              chunk.name !== 'contentScript' &&
+              chunk.name !== 'trezor' &&
+              chunk.name !== 'inpage'
+            )
+          },
+        },
       },
     },
-  }
+  },
 }
 
 module.exports = config
