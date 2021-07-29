@@ -16,7 +16,7 @@ import RenameWalletDrawer from '@drawers/RenameWallet'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { IWallet, updateBalance, renameWallet } from '@utils/wallet'
+import { IWallet, updateBalance, renameWallet, THardware } from '@utils/wallet'
 import { getTransactionHistory } from '@utils/api'
 import { openWebPage } from '@utils/extension'
 import { getExplorerLink } from '@utils/address'
@@ -46,6 +46,7 @@ interface LocationState {
   decimals?: number
   isHidden?: boolean
   walletName: string
+  hardware: THardware
 }
 
 const WalletPage: React.FC = () => {
@@ -61,6 +62,7 @@ const WalletPage: React.FC = () => {
       decimals = undefined,
       isHidden = false,
       name,
+      hardware,
     },
   } = useLocation<LocationState>()
   const history = useHistory()
@@ -113,7 +115,10 @@ const WalletPage: React.FC = () => {
   }
 
   const openPage = (url: string) => () => {
-    history.push(url, state)
+    history.push(url, {
+      ...state,
+      walletName,
+    })
   }
 
   const onSelectDropdown = (index: number) => {
@@ -198,6 +203,7 @@ const WalletPage: React.FC = () => {
               onSelectDropdown={onSelectDropdown}
               walletName={walletName}
               onRenameWallet={openRenameDrawer}
+              hardware={hardware}
             />
             <WalletCard
               openPage={openPage}
@@ -207,6 +213,7 @@ const WalletPage: React.FC = () => {
               estimated={estimated}
               onRefreshBalance={onRefreshBalance}
               isBalanceRefreshing={isBalanceRefreshing}
+              address={address}
               tokenName={tokenName}
             />
             {balance !== null && balance < 20 && toLower(symbol) === 'xrp' ? (

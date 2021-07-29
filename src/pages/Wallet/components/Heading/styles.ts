@@ -68,11 +68,23 @@ const RenameBlock = styled.div`
   }
 `
 
+const HardwareIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 8px 0 0;
+
+  path {
+    fill: #1d1d22;
+  }
+`
+
 const Styles = {
   Container,
   WalletName,
   MoreButton,
   RenameBlock,
+  HardwareIcon,
 }
 
 export default Styles

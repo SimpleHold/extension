@@ -1,5 +1,4 @@
 import * as React from 'react'
-import SVG from 'react-inlinesvg'
 import dayjs from 'dayjs'
 
 // Components
@@ -8,9 +7,6 @@ import Skeleton from '@components/Skeleton'
 
 // Types
 import { TAddressTxGroup, TAddressTx } from '@utils/api/types'
-
-// Assets
-import txArrowIcon from '@assets/icons/txArrow.svg'
 
 // Styles
 import Styles from './styles'
@@ -25,20 +21,7 @@ const TransactionHistory: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container>
-      {data === null || data.length > 0 ? (
-        <Styles.Heading>
-          <Styles.HeadingRow>
-            <Styles.Title>Transaction history</Styles.Title>
-            <Styles.SubTitleRow>
-              <Styles.SubTitle>Last 30 days</Styles.SubTitle>
-              <Styles.Icon />
-            </Styles.SubTitleRow>
-          </Styles.HeadingRow>
-          <Styles.HeadingButton>
-            <SVG src={txArrowIcon} width={7.47} height={14} />
-          </Styles.HeadingButton>
-        </Styles.Heading>
-      ) : null}
+      <Styles.Title>Last transactions</Styles.Title>
 
       {data === null ? (
         <Styles.TxGroup>
@@ -50,7 +33,7 @@ const TransactionHistory: React.FC<Props> = (props) => {
         </Styles.TxGroup>
       ) : null}
 
-      {data?.length === 0 ? (
+      {data !== null && data.length === 0 ? (
         <Styles.EmptyHistory>
           <Styles.EmptyHistoryIcon />
           <Styles.EmptyHistoryText>
@@ -59,9 +42,8 @@ const TransactionHistory: React.FC<Props> = (props) => {
         </Styles.EmptyHistory>
       ) : null}
 
-      {data && data?.length > 0 ? (
-        <>
-          {data.map((group: TAddressTxGroup) => {
+      {data !== null && data.length > 0
+        ? data.map((group: TAddressTxGroup) => {
             const { date, data } = group
 
             return (
@@ -88,9 +70,8 @@ const TransactionHistory: React.FC<Props> = (props) => {
                 })}
               </Styles.TxGroup>
             )
-          })}
-        </>
-      ) : null}
+          })
+        : null}
     </Styles.Container>
   )
 }

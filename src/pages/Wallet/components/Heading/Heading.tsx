@@ -14,9 +14,12 @@ import plusCircleIcon from '@assets/icons/plusCircle.svg'
 import phraseIcon from '@assets/icons/phrase.svg'
 import linkIcon from '@assets/icons/link.svg'
 import renameIcon from '@assets/icons/rename.svg'
+import ledgerLogo from '@assets/icons/ledger.svg'
+import trezorLogo from '@assets/icons/trezor.svg'
 
 // Types
 import { TDropdowbList } from '@components/DropDown/DropDown'
+import { THardware } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -27,10 +30,11 @@ interface Props {
   withPhrase: boolean
   walletName: string
   onRenameWallet: () => void
+  hardware?: THardware
 }
 
 const WalletHeading: React.FC<Props> = (props) => {
-  const { symbol, onSelectDropdown, withPhrase, walletName, onRenameWallet } = props
+  const { symbol, onSelectDropdown, withPhrase, walletName, onRenameWallet, hardware } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
@@ -87,6 +91,16 @@ const WalletHeading: React.FC<Props> = (props) => {
   return (
     <Styles.Container>
       <Styles.RenameBlock onClick={onRenameWallet}>
+        {hardware ? (
+          <Styles.HardwareIcon>
+            <SVG
+              src={hardware.type === 'ledger' ? ledgerLogo : trezorLogo}
+              width={14}
+              height={14}
+            />
+          </Styles.HardwareIcon>
+        ) : null}
+
         <Styles.WalletName>{walletName}</Styles.WalletName>
         <SVG src={renameIcon} width={9} height={11} />
       </Styles.RenameBlock>
