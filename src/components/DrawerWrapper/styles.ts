@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 type TDrawerProps = {
   openFrom?: string
+  padding?: string
 }
 
 type TBackgroundProps = {
@@ -25,8 +26,8 @@ const Background = styled.div`
 
 const Drawer = styled.div`
   background-color: #ffffff;
-  border-radius: 5px 5px 0 0;
-  padding: 30px;
+  border-radius: 8px 8px 0px 0px;
+  padding: ${({ padding }: TDrawerProps) => padding || '30px'};
   word-break: break-word;
   position: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
   z-index: 11;
