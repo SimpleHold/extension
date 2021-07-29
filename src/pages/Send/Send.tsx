@@ -16,7 +16,7 @@ import Tooltip from '@components/Tooltip'
 
 // Utils
 import { getWallets, IWallet, updateBalance, THardware } from '@utils/wallet'
-import { toUpper, price, toLower } from '@utils/format'
+import { toUpper, toLower } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
 import {
@@ -411,7 +411,9 @@ const Send: React.FC = () => {
             </Styles.Balance>
           </Skeleton>
           <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
-            <Styles.USDEstimated>{`$${price(estimated, 2)}`}</Styles.USDEstimated>
+            <Styles.USDEstimated>{`$${numeral(estimated).format(
+              '0.[00000000]'
+            )}`}</Styles.USDEstimated>
           </Skeleton>
         </Styles.Row>
         <Styles.Form onSubmit={onSubmitForm} withExtraid={withExtraid}>

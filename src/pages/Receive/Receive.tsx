@@ -26,7 +26,7 @@ import useVisible from '@hooks/useVisible'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { price, toUpper, toLower, short } from '@utils/format'
+import { toUpper, toLower, short } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
@@ -321,7 +321,9 @@ const Receive: React.FC = () => {
 
             <Skeleton width={130} height={23} mt={10} type="gray" isLoading={estimated === null}>
               {estimated !== null ? (
-                <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
+                <Styles.Estimated>{`$${numeral(estimated).format(
+                  '0.[00000000]'
+                )}`}</Styles.Estimated>
               ) : null}
             </Skeleton>
 
