@@ -32,7 +32,8 @@ interface Props {
     isSelected: boolean,
     symbol: string,
     address: string,
-    index: number
+    index: number,
+    isDisabled: boolean
   ) => () => void
   saveFirstAddress: (symbol: string, address: string) => void
 }
@@ -146,7 +147,7 @@ const Currency: React.FC<Props> = (props) => {
                 symbol={symbol}
                 isSelected={isSelected || isDisabled}
                 isDisabled={isDisabled}
-                onToggle={onToggleSelect(isSelected, symbol, address, addressIndex)}
+                onToggle={onToggleSelect(isSelected, symbol, address, addressIndex, isDisabled)}
               />
             )
           })}

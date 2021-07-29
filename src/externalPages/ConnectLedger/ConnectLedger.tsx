@@ -135,8 +135,13 @@ const ConnectLedger: React.FC = () => {
     isSelected: boolean,
     symbol: string,
     address: string,
-    index: number
+    index: number,
+    isDisabled: boolean
   ) => () => {
+    if (isDisabled) {
+      return
+    }
+
     const getCurrency = currencies.find(
       (currency: TCurrency) => toLower(currency.symbol) === toLower(symbol)
     )
