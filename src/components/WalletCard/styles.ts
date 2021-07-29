@@ -49,12 +49,15 @@ const HardwareIconRow = styled.div`
   margin: 0 4px 0 0;
 `
 
-const AddressName = styled.p`
+const WalletName = styled.p`
   margin: 0;
   font-weight: 500;
   font-size: 14px;
   line-height: 16px;
   color: #1d1d22;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `
 
 const Address = styled.div`
@@ -110,7 +113,7 @@ const Styles = {
   AddressInfo,
   CurrencyInfo,
   HardwareIconRow,
-  AddressName,
+  WalletName,
   Address,
   Balances,
   BalanceRow,

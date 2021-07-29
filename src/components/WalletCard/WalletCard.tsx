@@ -132,7 +132,7 @@ const WalletCard: React.FC<Props> = (props) => {
                 />
               </Styles.HardwareIconRow>
             ) : null}
-            <Styles.AddressName className="wallet-name">{walletName}</Styles.AddressName>
+            <Styles.WalletName className="wallet-name">{walletName}</Styles.WalletName>
           </Styles.CurrencyInfo>
           <Styles.Address>{address}</Styles.Address>
         </Styles.AddressInfo>
