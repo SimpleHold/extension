@@ -232,8 +232,13 @@ const ConnectTrezor: React.FC = () => {
     isSelected: boolean,
     symbol: string,
     address: string,
-    index: number
+    index: number,
+    isDisabled: boolean
   ) => () => {
+    if (isDisabled) {
+      return
+    }
+
     const getCurrency = currencyIndexes.find(
       (currency: TTrezorCurrency) => toLower(currency.symbol) === toLower(symbol)
     )

@@ -21,7 +21,8 @@ interface Props {
     isSelected: boolean,
     symbol: string,
     address: string,
-    index: number
+    index: number,
+    isDisabled: boolean
   ) => () => void
   existWallets: TSelectedAddress[]
 }
@@ -92,7 +93,7 @@ const Currency: React.FC<Props> = (props) => {
                 address={address}
                 symbol={symbol}
                 isSelected={isSelected || isDisabled}
-                onToggle={onToggleSelect(isSelected, symbol, address, index)}
+                onToggle={onToggleSelect(isSelected, symbol, address, index, isDisabled)}
                 isDisabled={isDisabled}
               />
             )

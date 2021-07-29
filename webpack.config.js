@@ -67,6 +67,7 @@ const config = {
     contentScript: path.join(sourcePath, 'utils', 'browser', 'contentScript.ts'),
     inpage: path.join(sourcePath, 'utils', 'browser', 'inpage.ts'),
     trezor: path.join(sourcePath, 'utils', 'trezor', 'trezor-content-script.ts'),
+    trezorUsbPermissions: path.join(sourcePath, 'utils', 'trezor', 'trezor-usb-permissions.ts'),
     popup: path.join(sourcePath, 'app.tsx'),
     downloadBackup: path.join(sourcePath, 'externalPages/DownloadBackup/DownloadBackup.tsx'),
     restoreBackup: path.join(sourcePath, 'externalPages/RestoreBackup/RestoreBackup.tsx'),
@@ -200,6 +201,13 @@ const config = {
       hash: true,
       filename: 'connect-ledger.html',
     }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'trezor-usb-permissions.html'),
+      inject: 'body',
+      chunks: [],
+      hash: true,
+      filename: 'trezor-usb-permissions.html',
+    }),
     new CopyWebpackPlugin({
       patterns: [
         { from: 'src/assets', to: 'assets' },
@@ -237,19 +245,24 @@ const config = {
         },
       }),
     ],
-  },
-}
-
-if (nodeEnv === 'production') {
-  config.optimization.splitChunks = {
-    cacheGroups: {
-      vendors: {
-        test: /[\\/]node_modules[\\/]/,
-        name: 'vendors',
-        chunks: 'all',
+    splitChunks: {
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks(chunk) {
+            return (
+              chunk.name !== 'background' &&
+              chunk.name !== 'contentScript' &&
+              chunk.name !== 'trezor' &&
+              chunk.name !== 'inpage' &&
+              chunk.name !== 'trezorUsbPermissions'
+            )
+          },
+        },
       },
     },
-  }
+  },
 }
 
 module.exports = config
