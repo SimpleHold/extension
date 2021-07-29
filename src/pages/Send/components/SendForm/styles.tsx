@@ -50,6 +50,32 @@ const NetworkFee = styled.p`
   color: #1d1d22;
 `
 
+const SendToMyWalletButton = styled.div`
+  padding: 6px 10px;
+  background-color: #e9f5ee;
+  border-radius: 5px;
+  margin: 20px 0 0 0;
+
+  &:hover {
+    cursor: pointer;
+    background: #3fbb7d;
+
+    p {
+      color: #ffffff;
+    }
+  }
+`
+
+const SendToMyWalletLabel = styled.p`
+  margin: 0;
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #3fbb7d;
+`
+
 const Styles = {
   Container,
   Form,
@@ -59,6 +85,8 @@ const Styles = {
   NetworkFeeRow,
   NetworkFeeLabel,
   NetworkFee,
+  SendToMyWalletButton,
+  SendToMyWalletLabel,
 }
 
 export default Styles

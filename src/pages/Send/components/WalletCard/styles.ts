@@ -18,7 +18,9 @@ const Row = styled.div`
 `
 
 const Info = styled.div`
-  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
   margin: 0 0 0 15px;
 `
 
@@ -38,29 +40,30 @@ const WalletName = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: #3fbb7d;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 `
 
 const Balances = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin: 5px 0 0 0;
+  flex-direction: column;
+  align-items: flex-end;
 `
 
 const Balance = styled.p`
+  margin: 0;
   font-weight: 500;
-  font-size: 16px;
-  line-height: 19px;
-  color: #1d1d22;
-  margin: 0;
-`
-
-const Estimated = styled.p`
-  margin: 0;
   font-size: 14px;
   line-height: 16px;
   color: #1d1d22;
+`
+
+const Estimated = styled.p`
+  margin: 7px 0 0 0;
+  font-size: 14px;
+  line-height: 16px;
+  color: #7d7e8d;
 `
 
 const WalletsDropdown = styled.div`
@@ -80,6 +83,35 @@ const WalletsDropdown = styled.div`
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
 `
 
+const HardwareIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px 0 0;
+
+  path {
+    fill: #3fbb7d;
+  }
+`
+
+const Wallet = styled.div`
+  overflow: hidden;
+`
+
+const Address = styled.p`
+  margin: 7px 0 0 0;
+  font-size: 14px;
+  line-height: 16px;
+  color: #7d7e8d;
+  text-overflow: ellipsis;
+  overflow: hidden;
+`
+
+const DropdownArrow = styled.div`
+  min-width: 8px;
+  min-height: 5px;
+`
+
 const Styles = {
   Container,
   Row,
@@ -90,6 +122,10 @@ const Styles = {
   Balance,
   Estimated,
   WalletsDropdown,
+  HardwareIcon,
+  Wallet,
+  Address,
+  DropdownArrow,
 }
 
 export default Styles

@@ -9,7 +9,7 @@ import SendForm from './components/SendForm'
 // Utils
 import { toUpper } from '@utils/format'
 import { getBalance } from '@utils/api'
-import { updateBalance } from '@utils/wallet'
+import { THardware, updateBalance } from '@utils/wallet'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -21,13 +21,15 @@ import Styles from './styles'
 interface LocationState {
   symbol: string
   address: string
+  walletName: string
   chain?: string
   contractAddress?: string
+  hardware?: THardware
 }
 
 const SendPage: React.FC = () => {
   const {
-    state: { symbol, address, chain, contractAddress },
+    state: { symbol, address, walletName, chain, contractAddress, hardware },
   } = useLocation<LocationState>()
   const history = useHistory()
 
@@ -63,7 +65,15 @@ const SendPage: React.FC = () => {
       <Header withBack onBack={history.goBack} backTitle={`${currency?.name} wallet`} />
       <Styles.Container>
         <Styles.Title>Send {toUpper(symbol)}</Styles.Title>
-        <SendForm symbol={symbol} onCancel={onCancel} balance={balance} estimated={estimated} />
+        <SendForm
+          symbol={symbol}
+          onCancel={onCancel}
+          balance={balance}
+          estimated={estimated}
+          hardware={hardware}
+          walletName={walletName}
+          address={address}
+        />
       </Styles.Container>
     </Styles.Wrapper>
   )
