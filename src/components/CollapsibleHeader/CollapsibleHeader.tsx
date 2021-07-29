@@ -8,7 +8,6 @@ import Skeleton from '@components/Skeleton'
 import PendingBalance from '@components/PendingBalance'
 
 // Utils
-import { price } from '@utils/format'
 import { getItem } from '@utils/storage'
 
 // Styles
@@ -139,7 +138,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
                 lineHeight: `${estimatedLineHeight}px`,
               }}
             >
-              {`$ ${price(estimated)}`}
+              {`$ ${numeral(estimated).format('0.[00000000]')}`}
             </Styles.Estimated>
           ) : null}
         </Skeleton>

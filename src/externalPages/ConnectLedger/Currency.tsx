@@ -34,10 +34,18 @@ interface Props {
     address: string,
     index: number
   ) => () => void
+  saveFirstAddress: (symbol: string, address: string) => void
 }
 
 const Currency: React.FC<Props> = (props) => {
-  const { symbol, transport, selectedAddresses, existWallets, onToggleSelect } = props
+  const {
+    symbol,
+    transport,
+    selectedAddresses,
+    existWallets,
+    onToggleSelect,
+    saveFirstAddress,
+  } = props
 
   const [addresses, setAddresses] = React.useState<string[]>([])
   const [index, setIndex] = React.useState<number>(0)
@@ -71,6 +79,10 @@ const Currency: React.FC<Props> = (props) => {
     if (typeof request === 'string') {
       setAddresses([...addresses, request])
       setIndex((prevValue: number) => prevValue + 1)
+
+      if (index === 0) {
+        saveFirstAddress(symbol, request)
+      }
     } else {
       const { name } = request
 

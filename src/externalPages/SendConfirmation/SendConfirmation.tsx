@@ -38,6 +38,7 @@ import {
   createXrpTx,
   ILedgerError,
   createBtcTx,
+  getFirstAddress,
 } from '@utils/ledger'
 
 // Styles
@@ -270,19 +271,21 @@ const SendConfirmation: React.FC = () => {
 
     const transport = await requestTransport()
 
-    if (transport && props.hardware) {
+    if (transport && props.hardware && props.symbol) {
       const {
         hardware: { deviceId },
       } = props
 
-      const getProductId = transport?.device?.productId
+      const getFirstLedgerAddress = await getFirstAddress(transport, props.symbol)
 
-      if (getProductId) {
-        if (`${getProductId}` !== `${deviceId}`) {
+      if (typeof getFirstLedgerAddress === 'string') {
+        if (toLower(getFirstLedgerAddress) !== toLower(deviceId)) {
           setLedgerDrawerState('wrongDevice')
         } else {
           setLedgerTransport(transport)
         }
+      } else {
+        setLedgerDrawerState('wrongDevice')
       }
     }
   }

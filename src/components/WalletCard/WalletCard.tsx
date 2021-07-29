@@ -150,7 +150,11 @@ const WalletCard: React.FC<Props> = (props) => {
             </Styles.BalanceRow>
           </Skeleton>
           <Skeleton width={80} height={17} type="gray" mt={7} br={4} isLoading={estimated === null}>
-            <Styles.Estimated>{`$${numberFriendly(estimated)}`}</Styles.Estimated>
+            <Styles.Estimated>{`$${
+              Number(estimated) < 0.01
+                ? numeral(estimated).format('0.[00000000]')
+                : numberFriendly(estimated)
+            }`}</Styles.Estimated>
           </Skeleton>
         </Styles.Balances>
       </Styles.Row>

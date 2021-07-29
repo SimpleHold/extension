@@ -243,3 +243,20 @@ export const createXrpTx = async (
     return err
   }
 }
+
+export const getFirstAddress = async (
+  transport: Transport,
+  symbol: string
+): Promise<string | ILedgerError> => {
+  try {
+    if (symbol === 'btc') {
+      return await getBTCAddress(0, transport)
+    } else if (symbol === 'eth') {
+      return await getETHAddress(0, transport)
+    } else {
+      return await getXRPAddress(0, transport)
+    }
+  } catch (err) {
+    return err
+  }
+}
