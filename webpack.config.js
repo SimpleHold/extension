@@ -52,7 +52,7 @@ const getExtensionFileType = (browser) => {
   return 'zip'
 }
 
-module.exports = {
+const config = {
   devtool: false,
   stats: {
     all: false,
@@ -239,3 +239,17 @@ module.exports = {
     ],
   },
 }
+
+if (nodeEnv === 'production') {
+  config.optimization.splitChunks = {
+    cacheGroups: {
+      vendors: {
+        test: /[\\/]node_modules[\\/]/,
+        name: 'vendors',
+        chunks: 'all',
+      },
+    },
+  }
+}
+
+module.exports = config
