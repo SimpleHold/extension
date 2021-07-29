@@ -24,8 +24,8 @@ const Container = styled.div`
   height: 60px;
   background: #ffffff;
   border: ${({ isFocused, isError }: TContainerProps) =>
-    isFocused || isError ? `1px solid ${isFocused ? '#3FBB7D' : '#EB5757'}` : '1px solid #eaeaea'};
-  border-radius: 5px;
+    isFocused || isError ? `1px solid ${isFocused ? '#3FBB7D' : '#EB5757'}` : '1px solid #DEE1E9'};
+  border-radius: 8px;
   display: flex;
   flex-direction: row;
   align-items: center;
