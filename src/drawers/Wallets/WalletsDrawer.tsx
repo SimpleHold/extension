@@ -5,7 +5,8 @@ import DrawerWrapper from '@components/DrawerWrapper'
 import Wallet from './components/Wallet'
 
 // Utils
-import { IWallet, getWallets, getWalletName } from '@utils/wallet'
+import { IWallet, getWalletName } from '@utils/wallet'
+import { toLower } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -13,24 +14,17 @@ import Styles from './styles'
 interface Props {
   onClose: () => void
   isActive: boolean
+  selectedAddress: string
+  wallets: IWallet[]
+  onClickWallet: (address: string) => () => void
 }
 
 const WalletsDrawer: React.FC<Props> = (props) => {
-  const { onClose, isActive } = props
+  const { onClose, isActive, selectedAddress, wallets, onClickWallet } = props
 
-  const [wallets, setWallets] = React.useState<IWallet[]>([])
-
-  React.useEffect(() => {
-    getWalletsList()
-  }, [])
-
-  const getWalletsList = (): void => {
-    const walletsList = getWallets()
-
-    if (walletsList) {
-      setWallets(walletsList)
-    }
-  }
+  const filterWallets = wallets.filter(
+    (wallet: IWallet) => toLower(wallet.address) !== toLower(selectedAddress)
+  )
 
   return (
     <DrawerWrapper
@@ -41,7 +35,7 @@ const WalletsDrawer: React.FC<Props> = (props) => {
       withCloseIcon
     >
       <Styles.Row>
-        {wallets.map((wallet: IWallet) => {
+        {filterWallets.map((wallet: IWallet) => {
           const { symbol, chain, name, address, hardware, uuid, contractAddress } = wallet
 
           const walletName = wallet.walletName || getWalletName(wallets, symbol, uuid, chain, name)
@@ -56,6 +50,7 @@ const WalletsDrawer: React.FC<Props> = (props) => {
               hardware={hardware}
               walletName={walletName}
               contractAddress={contractAddress}
+              onClickWallet={onClickWallet(address)}
             />
           )
         })}

@@ -31,10 +31,20 @@ interface Props {
   name?: string
   hardware?: THardware
   contractAddress?: string
+  onClickWallet: () => void
 }
 
 const Wallet: React.FC<Props> = (props) => {
-  const { symbol, address, walletName, chain, name, hardware, contractAddress } = props
+  const {
+    symbol,
+    address,
+    walletName,
+    chain,
+    name,
+    hardware,
+    contractAddress,
+    onClickWallet,
+  } = props
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
@@ -63,7 +73,7 @@ const Wallet: React.FC<Props> = (props) => {
   }
 
   return (
-    <Styles.Container>
+    <Styles.Container onClick={onClickWallet}>
       <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} name={name} />
       <Styles.Row>
         <Styles.WalletInfo>

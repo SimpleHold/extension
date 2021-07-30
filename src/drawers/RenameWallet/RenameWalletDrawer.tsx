@@ -25,6 +25,10 @@ const RenameWalletDrawer: React.FC<Props> = (props) => {
       setTimeout(() => {
         textInputRef.current?.focus()
       }, 100)
+
+      if (name.length) {
+        setName('')
+      }
     }
   }, [isActive])
 
