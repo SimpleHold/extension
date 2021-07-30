@@ -52,18 +52,19 @@ const TransactionHistory: React.FC<Props> = (props) => {
                   <Styles.TxDate>{dayjs(date).format('MMM D')}</Styles.TxDate>
                 </Styles.DateRow>
                 {data.map((tx: TAddressTx) => {
-                  const { type, date, destination, amount, estimated } = tx
+                  const { type, date, hash, amount, estimated, isPending } = tx
 
                   return (
                     <Transaction
-                      key={date}
+                      key={hash}
                       data={{
                         type,
                         date,
-                        destination,
+                        hash,
                         amount,
                         estimated,
                         symbol,
+                        isPending,
                       }}
                     />
                   )

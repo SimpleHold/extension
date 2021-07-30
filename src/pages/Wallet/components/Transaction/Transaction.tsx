@@ -1,12 +1,13 @@
 import * as React from 'react'
 import numeral from 'numeral'
 import dayjs from 'dayjs'
+import SVG from 'react-inlinesvg'
 
 // Components
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { toUpper, price } from '@utils/format'
+import { toUpper, price, short } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -15,10 +16,11 @@ interface Props {
   data?: {
     type: 'spend' | 'received'
     date: string
-    destination: string
+    hash: string
     amount: number
     estimated: number
     symbol: string
+    isPending: boolean
   }
   isLoading?: boolean
 }
@@ -28,7 +30,7 @@ const Transaction: React.FC<Props> = (props) => {
 
   if (isLoading) {
     return (
-      <Styles.Container>
+      <Styles.Container disabled={isLoading}>
         <Styles.Info>
           <Skeleton width={40} height={40} br={14} type="gray" isLoading />
           <Styles.InfoRow>
@@ -45,23 +47,30 @@ const Transaction: React.FC<Props> = (props) => {
   }
 
   if (data) {
-    const { type, date, destination, amount, estimated, symbol } = data
+    const { type, date, hash, amount, estimated, symbol, isPending } = data
 
     return (
       <Styles.Container>
-        <Styles.Info>
-          <Styles.DestinationType />
-          <Styles.InfoRow>
-            <Styles.DestinationAddress>{destination}</Styles.DestinationAddress>
-            <Styles.Date>{dayjs(date).format('MMM D')}</Styles.Date>
-          </Styles.InfoRow>
-        </Styles.Info>
-        <Styles.Amounts>
-          <Styles.CurrencyAmount>{`${numeral(amount).format('0.[000000]')} ${toUpper(
-            symbol
-          )}`}</Styles.CurrencyAmount>
-          <Styles.USDAmount>{`$${price(estimated, 2)}`}</Styles.USDAmount>
-        </Styles.Amounts>
+        <Styles.Row>
+          <Styles.Info>
+            <Styles.TypeRow>
+              <Styles.DestinationType isPending={isPending} type={type}>
+                <SVG src="../../../assets/icons/txArrow.svg" width={12} height={16} />
+              </Styles.DestinationType>
+              {isPending ? <Styles.PendingIcon /> : null}
+            </Styles.TypeRow>
+            <Styles.InfoRow>
+              <Styles.DestinationAddress>{short(hash, 15)}</Styles.DestinationAddress>
+              <Styles.Date>{dayjs(date).format('MMM D')}</Styles.Date>
+            </Styles.InfoRow>
+          </Styles.Info>
+          <Styles.Amounts>
+            <Styles.CurrencyAmount>{`${numeral(amount).format('0.[000000]')} ${toUpper(
+              symbol
+            )}`}</Styles.CurrencyAmount>
+            <Styles.USDAmount>{`$${price(estimated, 2)}`}</Styles.USDAmount>
+          </Styles.Amounts>
+        </Styles.Row>
       </Styles.Container>
     )
   }
