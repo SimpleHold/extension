@@ -5,13 +5,12 @@ import Button from '@components/Button'
 import TextInput from '@components/TextInput'
 import WalletCard from '../WalletCard'
 import FeeButton from '../FeeButton'
-
-// Drawers
-import WalletsDrawer from '@drawers/Wallets'
+import Spinner from '@components/Spinner'
 
 // Utils
 import { toUpper } from '@utils/format'
-import { THardware } from '@utils/wallet'
+import { IWallet, THardware } from '@utils/wallet'
+import { getNetworkFeeSymbol } from '@utils/address'
 
 // Styles
 import Styles from './styles'
@@ -26,15 +25,47 @@ interface Props {
   hardware?: THardware
   chain?: string
   name?: string
+  openWalletsDrawer: () => void
+  wallets: IWallet[]
+  selectedAddress: string
+  changeWallet: (address: string, name: string, hardware?: THardware) => void
+  destination: {
+    value: string
+    onChange: (value: string) => void
+  }
 }
 
 const SendForm: React.FC<Props> = (props) => {
-  const { symbol, onCancel, balance, estimated, walletName, address, hardware, chain, name } = props
+  const {
+    symbol,
+    onCancel,
+    balance,
+    estimated,
+    walletName,
+    address,
+    hardware,
+    chain,
+    name,
+    openWalletsDrawer,
+    wallets,
+    selectedAddress,
+    changeWallet,
+    destination,
+  } = props
 
-  const [destinationAddress, setDestinationAddress] = React.useState<string>('')
   const [amount, setAmount] = React.useState<string>('')
   const [feeType, setFeeType] = React.useState<'Slow' | 'Average' | 'Fast'>('Average')
-  const [activeDrawer, setActiveDrawer] = React.useState<'wallets' | null>(null)
+  const [fee, setFee] = React.useState<number>(0)
+  const [feeSymbol, setFeeSymbol] = React.useState<string>('')
+  const [isFeeLoading, setFeeLoading] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    getFeeSymbol()
+  }, [])
+
+  const getFeeSymbol = (): void => {
+    setFeeSymbol(getNetworkFeeSymbol(symbol, chain))
+  }
 
   const onConfirm = (): void => {}
 
@@ -42,58 +73,49 @@ const SendForm: React.FC<Props> = (props) => {
     e.preventDefault()
   }
 
-  const openWalletsDrawer = (): void => {
-    setActiveDrawer('wallets')
-  }
-
-  const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
-  }
-
-  const renderAddressButton = destinationAddress?.length ? (
-    <Styles.SendToMyWalletButton onClick={openWalletsDrawer}>
-      <Styles.SendToMyWalletLabel>To my wallet</Styles.SendToMyWalletLabel>
-    </Styles.SendToMyWalletButton>
-  ) : null
-
   return (
-    <>
-      <Styles.Container>
-        <Styles.Form onSubmit={onSubmitForm}>
-          <WalletCard
-            balance={balance}
-            estimated={estimated}
-            symbol={symbol}
-            hardware={hardware}
-            walletName={walletName}
-            address={address}
-            chain={chain}
-            name={name}
+    <Styles.Container>
+      <Styles.Form onSubmit={onSubmitForm}>
+        <WalletCard
+          balance={balance}
+          estimated={estimated}
+          symbol={symbol}
+          hardware={hardware}
+          walletName={walletName}
+          address={address}
+          chain={chain}
+          name={name}
+          wallets={wallets}
+          selectedAddress={selectedAddress}
+          changeWallet={changeWallet}
+        />
+        <Styles.FormRow>
+          <TextInput
+            label="Recipient Address"
+            value={destination.value}
+            onChange={destination.onChange}
           />
-          <Styles.FormRow>
-            <TextInput
-              label="Recipient Address"
-              value={destinationAddress}
-              onChange={setDestinationAddress}
-              button={renderAddressButton}
-            />
-            <TextInput label={`Amount (${toUpper(symbol)})`} value={amount} onChange={setAmount} />
-            <Styles.NetworkFeeBlock>
-              <Styles.NetworkFeeRow>
-                <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
-                <Styles.NetworkFee>0.0007632 BTC</Styles.NetworkFee>
-              </Styles.NetworkFeeRow>
-              <FeeButton type={feeType} onChange={setFeeType} />
-            </Styles.NetworkFeeBlock>
-          </Styles.FormRow>
-        </Styles.Form>
-        <Styles.Actions>
-          <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-          <Button label="Send" disabled onClick={onConfirm} ml={7.5} />
-        </Styles.Actions>
-      </Styles.Container>
-      <WalletsDrawer isActive={activeDrawer === 'wallets'} onClose={onCloseDrawer} />
-    </>
+          <TextInput label={`Amount (${toUpper(symbol)})`} value={amount} onChange={setAmount} />
+          <Styles.NetworkFeeBlock>
+            <Styles.NetworkFeeRow>
+              <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
+              {isFeeLoading ? (
+                <Spinner size={16} />
+              ) : (
+                <Styles.NetworkFee>
+                  {fee === 0 ? '-' : `${fee} ${toUpper(feeSymbol)}`}
+                </Styles.NetworkFee>
+              )}
+            </Styles.NetworkFeeRow>
+            <FeeButton type={feeType} onChange={setFeeType} />
+          </Styles.NetworkFeeBlock>
+        </Styles.FormRow>
+      </Styles.Form>
+      <Styles.Actions>
+        <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
+        <Button label="Send" disabled onClick={onConfirm} ml={7.5} />
+      </Styles.Actions>
+    </Styles.Container>
   )
 }
 

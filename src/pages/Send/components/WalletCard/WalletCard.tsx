@@ -5,13 +5,14 @@ import numeral from 'numeral'
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
+import Wallet from '@drawers/Wallets/components/Wallet'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
 
 // Utils
-import { toUpper, price } from '@utils/format'
-import { THardware } from '@utils/wallet'
+import { toUpper, price, toLower } from '@utils/format'
+import { getWalletName, IWallet, THardware } from '@utils/wallet'
 
 // Assets
 import ledgerLogo from '@assets/icons/ledger.svg'
@@ -29,20 +30,50 @@ interface Props {
   hardware?: THardware
   chain?: string
   name?: string
+  wallets: IWallet[]
+  selectedAddress: string
+  changeWallet: (address: string, name: string, hardware?: THardware) => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
-  const { balance, estimated, symbol, walletName, address, hardware, chain, name } = props
+  const {
+    balance,
+    estimated,
+    symbol,
+    walletName,
+    address,
+    hardware,
+    chain,
+    name,
+    wallets,
+    selectedAddress,
+    changeWallet,
+  } = props
+
+  const filterWallets = wallets.filter(
+    (wallet: IWallet) => toLower(wallet.address) !== toLower(selectedAddress)
+  )
 
   const { ref, isVisible, toggle } = useVisible(false)
 
+  const onToggleDropdown = (): void => {
+    if (wallets.length > 1) {
+      toggle()
+    }
+  }
+
+  const onClickWallet = (address: string, walletName: string, hardware?: THardware) => (): void => {
+    toggle()
+    changeWallet(address, walletName, hardware)
+  }
+
   return (
     <Styles.Container ref={ref}>
-      <Styles.Row isVisible={isVisible}>
+      <Styles.Row isVisible={isVisible} onClick={onToggleDropdown} disabled={wallets.length < 2}>
         <CurrencyLogo width={40} height={40} br={13} symbol={symbol} chain={chain} name={name} />
         <Styles.Info>
           <Styles.Wallet>
-            <Styles.WalletNameRow onClick={toggle}>
+            <Styles.WalletNameRow>
               {hardware ? (
                 <Styles.HardwareIcon>
                   <SVG
@@ -54,9 +85,11 @@ const WalletCard: React.FC<Props> = (props) => {
               ) : null}
 
               <Styles.WalletName>{walletName}</Styles.WalletName>
-              <Styles.DropdownArrow>
-                <SVG src="../../../assets/icons/dropdownArrow.svg" width={8} height={6} />
-              </Styles.DropdownArrow>
+              {wallets.length > 1 ? (
+                <Styles.DropdownArrow>
+                  <SVG src="../../../assets/icons/dropdownArrow.svg" width={8} height={6} />
+                </Styles.DropdownArrow>
+              ) : null}
             </Styles.WalletNameRow>
             <Styles.Address>{address}</Styles.Address>
           </Styles.Wallet>
@@ -73,7 +106,25 @@ const WalletCard: React.FC<Props> = (props) => {
         </Styles.Info>
       </Styles.Row>
       <Styles.WalletsDropdown isVisible={isVisible}>
-        <p>123</p>
+        {filterWallets.map((wallet: IWallet) => {
+          const { symbol, chain, name, address, hardware, uuid, contractAddress } = wallet
+
+          const walletName = wallet.walletName || getWalletName(wallets, symbol, uuid, chain, name)
+
+          return (
+            <Wallet
+              key={`${symbol}/${address}`}
+              symbol={symbol}
+              chain={chain}
+              name={name}
+              address={address}
+              hardware={hardware}
+              walletName={walletName}
+              contractAddress={contractAddress}
+              onClickWallet={onClickWallet(address, walletName, hardware)}
+            />
+          )
+        })}
       </Styles.WalletsDropdown>
     </Styles.Container>
   )

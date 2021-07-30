@@ -1,5 +1,10 @@
 import styled from 'styled-components'
 
+type TRowProps = {
+  isVisible: boolean
+  disabled: boolean
+}
+
 type TVisibleProps = {
   isVisible: boolean
 }
@@ -14,7 +19,13 @@ const Row = styled.div`
   flex-direction: row;
   align-items: center;
   border-radius: 16px 16px 0 0;
+  background-color: #ffffff;
   border: ${({ isVisible }: TVisibleProps) => `1px solid ${isVisible ? '#3fbb7d' : '#ffffff'}`};
+
+  &:hover {
+    cursor: ${({ disabled }: TRowProps) => (disabled ? 'default' : 'pointer')};
+    background-color: ${({ disabled }: TRowProps) => (disabled ? '#FFFFFF' : '#F9FAFC')};
+  }
 `
 
 const Info = styled.div`
@@ -28,10 +39,6 @@ const WalletNameRow = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-
-  &:hover {
-    cursor: pointer;
-  }
 `
 
 const WalletName = styled.p`
@@ -77,6 +84,7 @@ const WalletsDropdown = styled.div`
   max-height: 290px;
   background-color: #ffffff;
   overflow: scroll;
+  z-index: 2;
   opacity: ${({ isVisible }: TVisibleProps) => (isVisible ? '1' : '0')};
   visibility: ${({ isVisible }: TVisibleProps) => (isVisible ? 'visible' : 'hidden')};
   transform: ${({ isVisible }: TVisibleProps) => `translateY(${isVisible ? '0' : '-20px'})`};

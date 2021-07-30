@@ -24,8 +24,7 @@ const FeeButton: React.FC<Props> = (props) => {
 
   const { ref, isVisible, toggle } = useVisible(false)
 
-  const onClickItem = (item: string) => (): void => {
-    // @ts-ignore
+  const onClickItem = (item: TFeeTypes) => (): void => {
     onChange(item)
     toggle()
   }
@@ -38,8 +37,8 @@ const FeeButton: React.FC<Props> = (props) => {
       </Styles.Row>
       <Styles.List isVisible={isVisible}>
         {feeTypes
-          .filter((feeType: string) => toLower(feeType) !== toLower(type))
-          .map((item: string) => (
+          .filter((feeType: TFeeTypes) => toLower(feeType) !== toLower(type))
+          .map((item: TFeeTypes) => (
             <Styles.ListItem key={item} onClick={onClickItem(item)}>
               <Styles.ListItemLabel>{item}</Styles.ListItemLabel>
             </Styles.ListItem>
