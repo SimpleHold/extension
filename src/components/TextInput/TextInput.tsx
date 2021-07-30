@@ -21,6 +21,7 @@ interface Props {
     width: number
     height: number
   }
+  onFocus?: () => void
 }
 
 const TextInput: React.FC<Props> = (props) => {
@@ -37,6 +38,7 @@ const TextInput: React.FC<Props> = (props) => {
     openFrom,
     button,
     icon,
+    onFocus: onFocusInput,
   } = props
 
   const textInputRef = inputRef || React.useRef<HTMLInputElement>(null)
@@ -63,6 +65,9 @@ const TextInput: React.FC<Props> = (props) => {
 
   const onFocus = (): void => {
     setIsFocused(true)
+    if (onFocusInput) {
+      onFocusInput()
+    }
   }
 
   const onBlur = (): void => {

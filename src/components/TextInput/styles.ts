@@ -32,6 +32,7 @@ const Container = styled.div`
   justify-content: space-between;
   margin: 0 0 10px 0;
   padding: ${({ withButton }: TContainerProps) => (withButton ? '0 12px 0 20px' : '0 20px')};
+  position: relative;
 
   label {
     color: ${({ isFocused, isError }: TContainerProps) =>
