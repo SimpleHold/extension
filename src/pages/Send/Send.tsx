@@ -4,6 +4,8 @@ import { useLocation, useHistory } from 'react-router-dom'
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
+import Button from '@components/Button'
+import WalletCard from './components/WalletCard'
 import SendForm from './components/SendForm'
 
 // Drawers
@@ -13,6 +15,7 @@ import WalletsDrawer from '@drawers/Wallets'
 import { toLower, toUpper } from '@utils/format'
 import { getBalance } from '@utils/api'
 import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
+import { getExtraIdName } from '@utils/address'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -28,12 +31,13 @@ interface LocationState {
   chain?: string
   contractAddress?: string
   hardware?: THardware
+  name?: string
 }
 
 const SendPage: React.FC = () => {
   const {
     state,
-    state: { symbol, chain, contractAddress },
+    state: { symbol, chain, contractAddress, name },
   } = useLocation<LocationState>()
   const history = useHistory()
 
@@ -45,16 +49,29 @@ const SendPage: React.FC = () => {
   const [walletName, setWalletName] = React.useState<string>(state.walletName)
   const [hardware, setHardware] = React.useState<THardware | undefined>(state.hardware)
   const [destination, setDestination] = React.useState<string>('')
+  const [amount, setAmount] = React.useState<string>('')
+  const [isSendDisable, setSendDisable] = React.useState<boolean>(true)
+  const [extraIdName, setExtraIdName] = React.useState<string | null>(null)
+  const [extraId, setExtraId] = React.useState<string>('')
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
   React.useEffect(() => {
     getWalletsList()
+    getExtraId()
   }, [])
 
   React.useEffect(() => {
     loadBalance()
   }, [selectedAddress])
+
+  const getExtraId = (): void => {
+    const name = getExtraIdName(symbol)
+
+    if (name) {
+      setExtraIdName(name)
+    }
+  }
 
   const loadBalance = async (): Promise<void> => {
     const { balance, balance_usd, balance_btc } = await getBalance(
@@ -104,6 +121,8 @@ const SendPage: React.FC = () => {
     setHardware(hardware)
   }
 
+  const onConfirm = (): void => {}
+
   return (
     <>
       <Styles.Wrapper>
@@ -111,23 +130,50 @@ const SendPage: React.FC = () => {
         <Header withBack onBack={history.goBack} backTitle={`${currency?.name} wallet`} />
         <Styles.Container>
           <Styles.Title>Send {toUpper(symbol)}</Styles.Title>
-          <SendForm
-            symbol={symbol}
-            onCancel={onCancel}
-            balance={balance}
-            estimated={estimated}
-            hardware={hardware}
-            walletName={walletName}
-            address={selectedAddress}
-            openWalletsDrawer={openWalletsDrawer}
-            wallets={wallets}
-            selectedAddress={selectedAddress}
-            changeWallet={changeWallet}
-            destination={{
-              value: destination,
-              onChange: setDestination,
-            }}
-          />
+          <Styles.Body>
+            <Styles.Row>
+              <WalletCard
+                balance={balance}
+                estimated={estimated}
+                symbol={symbol}
+                hardware={hardware}
+                walletName={walletName}
+                address={selectedAddress}
+                chain={chain}
+                name={name}
+                wallets={wallets}
+                selectedAddress={selectedAddress}
+                changeWallet={changeWallet}
+              />
+              <SendForm
+                symbol={symbol}
+                chain={chain}
+                extraIdName={extraIdName}
+                destination={{
+                  value: destination,
+                  onChange: setDestination,
+                  errorLabel: null,
+                }}
+                amount={{
+                  value: amount,
+                  onChange: setAmount,
+                  errorLabel: null,
+                }}
+                extraId={{
+                  value: extraId,
+                  onChange: setExtraId,
+                  errorLabel: null,
+                }}
+                isDisabled={balance === null}
+                balance={balance}
+                openWalletsDrawer={openWalletsDrawer}
+              />
+            </Styles.Row>
+          </Styles.Body>
+          <Styles.Actions>
+            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
+            <Button label="Send" disabled={isSendDisable} onClick={onConfirm} ml={7.5} />
+          </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>
       <WalletsDrawer

@@ -11,7 +11,7 @@ import Wallet from '@drawers/Wallets/components/Wallet'
 import useVisible from '@hooks/useVisible'
 
 // Utils
-import { toUpper, price, toLower } from '@utils/format'
+import { toUpper, price, toLower, short } from '@utils/format'
 import { getWalletName, IWallet, THardware } from '@utils/wallet'
 
 // Assets
@@ -72,7 +72,7 @@ const WalletCard: React.FC<Props> = (props) => {
       <Styles.Row isVisible={isVisible} onClick={onToggleDropdown} disabled={wallets.length < 2}>
         <CurrencyLogo width={40} height={40} br={13} symbol={symbol} chain={chain} name={name} />
         <Styles.Info>
-          <Styles.Wallet>
+          <Styles.Wallet isVisible={isVisible}>
             <Styles.WalletNameRow>
               {hardware ? (
                 <Styles.HardwareIcon>
@@ -91,7 +91,7 @@ const WalletCard: React.FC<Props> = (props) => {
                 </Styles.DropdownArrow>
               ) : null}
             </Styles.WalletNameRow>
-            <Styles.Address>{address}</Styles.Address>
+            <Styles.Address>{short(address, 12)}</Styles.Address>
           </Styles.Wallet>
           <Styles.Balances>
             <Skeleton width={120} height={19} type="gray" br={4} isLoading={balance === null}>

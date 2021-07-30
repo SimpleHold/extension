@@ -16,7 +16,7 @@ const Container = styled.div`
 `
 
 const Title = styled.p`
-  margin: 0 0 23px 0;
+  margin: 0;
   font-size: 20px;
   line-height: 23px;
   text-align: center;
@@ -24,10 +24,32 @@ const Title = styled.p`
   font-weight: bold;
 `
 
+const Body = styled.div`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 13px 0 0 0;
+`
+
+const Row = styled.form`
+  background-color: #ffffff;
+  border-radius: 16px;
+`
+
+const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
 const Styles = {
   Wrapper,
   Container,
   Title,
+  Body,
+  Row,
+  Actions,
 }
 
 export default Styles

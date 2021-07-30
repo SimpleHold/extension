@@ -23,8 +23,10 @@ const Row = styled.div`
   border: ${({ isVisible }: TVisibleProps) => `1px solid ${isVisible ? '#3fbb7d' : '#ffffff'}`};
 
   &:hover {
-    cursor: ${({ disabled }: TRowProps) => (disabled ? 'default' : 'pointer')};
-    background-color: ${({ disabled }: TRowProps) => (disabled ? '#FFFFFF' : '#F9FAFC')};
+    cursor: ${({ disabled, isVisible }: TRowProps) =>
+      disabled || isVisible ? 'default' : 'pointer'};
+    background-color: ${({ disabled, isVisible }: TRowProps) =>
+      disabled || isVisible ? '#FFFFFF' : '#F9FAFC'};
   }
 `
 
@@ -33,6 +35,7 @@ const Info = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 18px;
   margin: 0 0 0 15px;
+  flex: 1;
 `
 
 const WalletNameRow = styled.div`
@@ -104,6 +107,11 @@ const HardwareIcon = styled.div`
 
 const Wallet = styled.div`
   overflow: hidden;
+
+  svg {
+    transition: all 0.3s;
+    transform: ${({ isVisible }: TVisibleProps) => `rotate(${isVisible ? 180 : 0}deg)`};
+  }
 `
 
 const Address = styled.p`

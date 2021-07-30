@@ -26,8 +26,13 @@ const Row = styled.div`
     color: ${({ isVisible }: TVisibleProps) => (isVisible ? '#3fbb7d' : '#7d7e8d')};
   }
 
-  path {
-    fill: ${({ isVisible }: TVisibleProps) => (isVisible ? '#3fbb7d' : '#bdc4d4')};
+  svg {
+    transition: all 0.3s;
+    transform: ${({ isVisible }: TVisibleProps) => `rotate(${isVisible ? 180 : 0}deg)`};
+
+    path {
+      fill: ${({ isVisible }: TVisibleProps) => (isVisible ? '#3fbb7d' : '#bdc4d4')};
+    }
   }
 
   &:hover {
