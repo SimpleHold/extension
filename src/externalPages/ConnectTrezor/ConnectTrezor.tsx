@@ -107,6 +107,10 @@ const ConnectTrezor: React.FC = () => {
 
   const onConfirm = (): void => {
     setActiveDrawer('confirm')
+
+    if (trezorInfo.device_id === '-1') {
+      setIsError(true)
+    }
   }
 
   const getTrezorBundle = (symbol: string): TTrezorBundle[] | null => {
