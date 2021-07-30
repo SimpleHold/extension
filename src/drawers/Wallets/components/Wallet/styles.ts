@@ -28,6 +28,7 @@ const Row = styled.div`
   grid-template-columns: repeat(2, 1fr);
   gap: 18px;
   margin: 0 0 0 15px;
+  flex: 1;
 `
 
 const WalletInfo = styled.div`

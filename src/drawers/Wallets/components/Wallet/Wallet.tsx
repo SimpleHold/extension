@@ -8,7 +8,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { toUpper, numberFriendly } from '@utils/format'
+import { toUpper, numberFriendly, short } from '@utils/format'
 import { updateBalance, THardware } from '@utils/wallet'
 
 // Config
@@ -89,7 +89,7 @@ const Wallet: React.FC<Props> = (props) => {
             ) : null}
             <Styles.WalletName className="wallet-name">{walletName}</Styles.WalletName>
           </Styles.WalletNameRow>
-          <Styles.Address>{address}</Styles.Address>
+          <Styles.Address>{short(address, 12)}</Styles.Address>
         </Styles.WalletInfo>
         <Styles.Balances>
           <Skeleton width={110} height={16} type="gray" br={4} isLoading={balance === null}>

@@ -1,8 +1,8 @@
 import styled from 'styled-components'
 
 const Row = styled.div`
-  margin: 20px 0 0 0;
-  max-height: 470px;
+  margin: 20px 0;
+  max-height: 450px;
   overflow: scroll;
 `
 

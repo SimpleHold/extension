@@ -56,8 +56,9 @@ export type TAddressTxGroup = {
 
 export type TAddressTx = {
   type: 'spend' | 'received'
+  isPending: boolean
   date: string
-  destination: string
+  hash: string
   amount: number
   estimated: number
 }
