@@ -248,7 +248,7 @@ const config = {
     splitChunks: {
       cacheGroups: {
         vendors: {
-          test: /[\\/]node_modules[\\/]/,
+          test: /[\\/]node_modules[\\/]((?!(@emurgo)).*)[\\/]/,
           name: 'vendors',
           chunks(chunk) {
             return (
