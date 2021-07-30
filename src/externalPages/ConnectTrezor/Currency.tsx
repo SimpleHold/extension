@@ -101,7 +101,7 @@ const Currency: React.FC<Props> = (props) => {
 
           {addresses.length < MAX_ADDRESSES_NUMBER ? (
             <Styles.NextAddressRow onClick={onGetNextAddress}>
-              <Styles.NextAddressLabel>Next address</Styles.NextAddressLabel>
+              <Styles.NextAddressLabel>Next addresses</Styles.NextAddressLabel>
               <SVG src="../../assets/icons/bottomArrow.svg" width={7} height={4} />
             </Styles.NextAddressRow>
           ) : null}

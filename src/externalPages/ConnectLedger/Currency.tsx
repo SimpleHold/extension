@@ -170,7 +170,7 @@ const Currency: React.FC<Props> = (props) => {
       {isTransportError ? (
         <Alert
           type="danger"
-          text={`Failed to get ${symbol} addresses, go to ${symbol} application`}
+          text={`Failed to fetch ${currencyInfo?.name} addresses. Please open the ${currencyInfo?.name} app in your Ledger`}
           refetchText="Try again"
           onClick={getAddress}
         />
