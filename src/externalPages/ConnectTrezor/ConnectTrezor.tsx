@@ -26,6 +26,7 @@ import {
   TTrezorBundle,
   currencies as trezorCurrencies,
   TTrezorCurrency,
+  getFeatures,
 } from '@utils/trezor'
 
 // Assets
@@ -65,19 +66,6 @@ const ConnectTrezor: React.FC = () => {
   const [existWallets, setExistWallets] = React.useState<TSelectedAddress[]>([])
 
   React.useEffect(() => {
-    TrezorConnect.on(DEVICE_EVENT, (event) => {
-      if (event.payload.features) {
-        const { label, device_id } = event.payload.features
-
-        if (label && device_id) {
-          setTrezorInfo({
-            label,
-            device_id,
-          })
-        }
-      }
-    })
-
     getWalletsList()
   }, [])
 
@@ -106,11 +94,10 @@ const ConnectTrezor: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    setActiveDrawer('confirm')
-
     if (trezorInfo.device_id === '-1') {
-      setIsError(true)
+      return setIsError(true)
     }
+    setActiveDrawer('confirm')
   }
 
   const getTrezorBundle = (symbol: string): TTrezorBundle[] | null => {
@@ -152,6 +139,21 @@ const ConnectTrezor: React.FC = () => {
       if (!isTrezorInit) {
         await init()
         setIsTrezorInit(true)
+      }
+
+      const trezorFeatures = await getFeatures()
+
+      if (!trezorFeatures) {
+        setIsError(true)
+      } else {
+        const { device_id, label } = trezorFeatures
+
+        if (device_id && label) {
+          setTrezorInfo({
+            device_id,
+            label,
+          })
+        }
       }
 
       const bundle = getTrezorBundle('btc')

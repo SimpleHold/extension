@@ -48,17 +48,26 @@ const Currency: React.FC<Props> = (props) => {
     saveFirstAddress,
   } = props
 
+  const [ledgerTransport, setLedgerTransport] = React.useState<Transport | null>(null)
+
   const [addresses, setAddresses] = React.useState<string[]>([])
   const [index, setIndex] = React.useState<number>(0)
   const [isTransportError, setTransportError] = React.useState<boolean>(false)
   const [isDisconnectError, setDisconnectError] = React.useState<boolean>(false)
-  const [ledgerTransport, setLedgerTransport] = React.useState<Transport>(transport)
+
+  React.useEffect(() => {
+    setLedgerTransport(transport)
+  }, [])
 
   const isActive = addresses.length > 0 || isTransportError || isDisconnectError
 
   const currencyInfo = getCurrency(symbol)
 
-  const getAddress = async (): Promise<void> => {
+  const getAddress = async (transport: Transport): Promise<void> => {
+    if (!ledgerTransport) {
+      return
+    }
+
     let request
 
     if (isTransportError) {
@@ -70,11 +79,11 @@ const Currency: React.FC<Props> = (props) => {
     }
 
     if (symbol === 'btc') {
-      request = await getBTCAddress(index, ledgerTransport)
+      request = await getBTCAddress(index, transport)
     } else if (symbol === 'eth') {
-      request = await getETHAddress(index, ledgerTransport)
+      request = await getETHAddress(index, transport)
     } else {
-      request = await getXRPAddress(index, ledgerTransport)
+      request = await getXRPAddress(index, transport)
     }
 
     if (typeof request === 'string') {
@@ -90,7 +99,7 @@ const Currency: React.FC<Props> = (props) => {
       if (name === 'TransportStatusError') {
         setTransportError(true)
       } else if (name === 'DisconnectedDeviceDuringOperation') {
-        setDisconnectError(true)
+        onReconnect()
       }
     }
   }
@@ -101,13 +110,21 @@ const Currency: React.FC<Props> = (props) => {
     if (getTransport) {
       setLedgerTransport(getTransport)
       setDisconnectError(false)
-      getAddress()
+      getAddress(getTransport)
+    } else {
+      setDisconnectError(true)
+    }
+  }
+
+  const onGetAddress = (): void => {
+    if (ledgerTransport) {
+      getAddress(ledgerTransport)
     }
   }
 
   const onClickHeading = (): void => {
     if (!isActive) {
-      getAddress()
+      onGetAddress()
     }
   }
 
@@ -152,7 +169,7 @@ const Currency: React.FC<Props> = (props) => {
             )
           })}
           {addresses.length < 100 ? (
-            <Styles.NextAddressRow onClick={getAddress}>
+            <Styles.NextAddressRow onClick={onGetAddress}>
               <Styles.NextAddressLabel>Next address</Styles.NextAddressLabel>
               <SVG src="../../assets/icons/bottomArrow.svg" width={7} height={4} />
             </Styles.NextAddressRow>
@@ -172,7 +189,7 @@ const Currency: React.FC<Props> = (props) => {
           type="danger"
           text={`Failed to fetch ${currencyInfo?.name} addresses. Please open the ${currencyInfo?.name} app in your Ledger`}
           refetchText="Try again"
-          onClick={getAddress}
+          onClick={onGetAddress}
         />
       ) : null}
     </Styles.Currency>

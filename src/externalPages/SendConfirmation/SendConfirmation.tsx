@@ -648,7 +648,7 @@ const SendConfirmation: React.FC = () => {
           onClose={onCloseDrawer}
           openFrom="browser"
           title="Wrong device"
-          text="Connected Trezor is wrong. Please connect correct device to confirm transaction"
+          text="Connected Trezor is wrong. Please connect the correct device to confirm the transaction."
           icon={ErrorHardwareConnectIcon}
           button={{
             label: 'Try again',
