@@ -167,6 +167,10 @@ const Send: React.FC = () => {
 
       if (data.networkFee) {
         setNetworkFee(data.networkFee)
+      } else {
+        if (Number(amount) > 0 && Number(balance) > 0) {
+          setAmountErrorLabel('Insufficient funds')
+        }
       }
 
       if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
