@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-dom'
-import TrezorConnect, { DEVICE_EVENT, DEVICE } from 'trezor-connect'
+import TrezorConnect, { DEVICE_EVENT } from 'trezor-connect'
 
 // Components
 import Button from '@components/Button'
@@ -66,15 +66,13 @@ const ConnectTrezor: React.FC = () => {
 
   React.useEffect(() => {
     TrezorConnect.on(DEVICE_EVENT, (event) => {
-      if (event.type === DEVICE.CONNECT) {
-        const {
-          payload: { features },
-        } = event
+      if (event.payload.features) {
+        const { label, device_id } = event.payload.features
 
-        if (features?.label && features.device_id) {
+        if (label && device_id) {
           setTrezorInfo({
-            label: features?.label,
-            device_id: features?.device_id,
+            label,
+            device_id,
           })
         }
       }
@@ -109,6 +107,10 @@ const ConnectTrezor: React.FC = () => {
 
   const onConfirm = (): void => {
     setActiveDrawer('confirm')
+
+    if (trezorInfo.device_id === '-1') {
+      setIsError(true)
+    }
   }
 
   const getTrezorBundle = (symbol: string): TTrezorBundle[] | null => {
@@ -313,11 +315,13 @@ const ConnectTrezor: React.FC = () => {
             <Styles.Row pt={40}>
               <Styles.ConnectRow>
                 <Styles.Image src={isError ? errorConnectTrezorImage : connectTrezorImage} />
-                <Styles.ConnectTitle>{isError ? 'Fail' : 'Connect Trezor'}</Styles.ConnectTitle>
+                <Styles.ConnectTitle>
+                  {isError ? 'Connection failed' : 'Connect Trezor'}
+                </Styles.ConnectTitle>
                 <Styles.ConnectDescription>
                   {isError
-                    ? 'Something went wrong, please try again. Please try again.'
-                    : 'Follow the instructions on the service page. Follow the instructions'}
+                    ? 'Something went wrong. Please reconnect your device and try again.'
+                    : 'Connect your Trezor wallet and follow the instructions on the service page.'}
                 </Styles.ConnectDescription>
               </Styles.ConnectRow>
               <Button

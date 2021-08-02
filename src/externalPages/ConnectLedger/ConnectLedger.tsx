@@ -180,7 +180,7 @@ const ConnectLedger: React.FC = () => {
         <Styles.ConnectImage />
         <Styles.Title>Connect ledger</Styles.Title>
         <Styles.Description>
-          Follow the instructions on the service page. Follow the instructions
+          Connect your Ledger and follow the instructions on the service popup
         </Styles.Description>
       </Styles.Row>
       <Button label="Connect" onClick={onConnect} />
