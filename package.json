@@ -37,6 +37,7 @@
     "crypto-js": "^4.0.0",
     "dayjs": "^1.10.6",
     "detect-browser": "^5.2.0",
+    "lodash": "^4.17.21",
     "neblio-lib": "https://github.com/NeblioTeam/bitcore-lib#neblcore-lib",
     "numeral": "^2.0.6",
     "qrcode.react": "^1.0.1",
