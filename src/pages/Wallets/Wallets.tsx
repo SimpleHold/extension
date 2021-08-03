@@ -181,7 +181,7 @@ const Wallets: React.FC = () => {
                   } = wallet
 
                   const walletName =
-                    wallet.walletName || getWalletName(wallets, symbol, uuid, chain, name)
+                    wallet.walletName || getWalletName(wallets, symbol, uuid, hardware, chain, name)
 
                   return (
                     <WalletCard

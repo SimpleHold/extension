@@ -38,7 +38,8 @@ const WalletsDrawer: React.FC<Props> = (props) => {
         {filterWallets.map((wallet: IWallet) => {
           const { symbol, chain, name, address, hardware, uuid, contractAddress } = wallet
 
-          const walletName = wallet.walletName || getWalletName(wallets, symbol, uuid, chain, name)
+          const walletName =
+            wallet.walletName || getWalletName(wallets, symbol, uuid, hardware, chain, name)
 
           return (
             <Wallet

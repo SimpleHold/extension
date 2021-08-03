@@ -365,9 +365,14 @@ export const getWalletName = (
   wallets: IWallet[],
   symbol: string,
   uuid: string,
+  hardware?: THardware,
   chain?: string,
   name?: string
 ): string => {
+  if (hardware) {
+    return hardware.label
+  }
+
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
   const getWalletPosition = wallets

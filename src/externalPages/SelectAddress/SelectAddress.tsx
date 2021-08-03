@@ -269,7 +269,9 @@ const SelectAddress: React.FC = () => {
                   hardware,
                 } = wallet
 
-                const walletName = getWalletName(filterWallets, symbol, uuid, chain, name)
+                const walletName =
+                  wallet.walletName ||
+                  getWalletName(filterWallets, symbol, uuid, hardware, chain, name)
 
                 return (
                   <WalletCard
