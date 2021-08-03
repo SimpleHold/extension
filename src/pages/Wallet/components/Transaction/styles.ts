@@ -15,6 +15,14 @@ const Container = styled.div`
   &:hover {
     cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
     background-color: ${({ disabled }: TContainerProps) => (disabled ? '#FFFFFF' : '#F8F9FB')};
+
+    .link-icon {
+      display: block;
+    }
+
+    .tx-hash {
+      color: #3fbb7d;
+    }
   }
 `
 
@@ -81,7 +89,7 @@ const InfoRow = styled.div`
   flex: 1;
 `
 
-const DestinationAddress = styled.p`
+const Hash = styled.p`
   margin: 0;
   font-size: 16px;
   line-height: 20px;
@@ -138,19 +146,34 @@ const PendingIcon = styled.div`
   background-color: #3fbb7d;
 `
 
+const HashRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const LinkIcon = styled.div`
+  width: 12px;
+  height: 12px;
+  margin: 0 0 0 6px;
+  display: none;
+`
+
 const Styles = {
   Container,
   Row,
   Info,
   DestinationType,
   InfoRow,
-  DestinationAddress,
+  Hash,
   Date,
   Amounts,
   CurrencyAmount,
   USDAmount,
   TypeRow,
   PendingIcon,
+  HashRow,
+  LinkIcon,
 }
 
 export default Styles

@@ -23,25 +23,28 @@ interface Props {
     isPending: boolean
   }
   isLoading?: boolean
+  openTx?: () => void
 }
 
 const Transaction: React.FC<Props> = (props) => {
-  const { data, isLoading } = props
+  const { data, isLoading, openTx } = props
 
   if (isLoading) {
     return (
       <Styles.Container disabled={isLoading}>
-        <Styles.Info>
-          <Skeleton width={40} height={40} br={14} type="gray" isLoading />
-          <Styles.InfoRow>
-            <Skeleton width={80} height={20} type="gray" isLoading />
-            <Skeleton width={50} height={17} mt={3} type="gray" isLoading />
-          </Styles.InfoRow>
-        </Styles.Info>
-        <Styles.Amounts>
-          <Skeleton width={100} height={19} type="gray" isLoading />
-          <Skeleton width={70} height={17} mt={4} type="gray" isLoading />
-        </Styles.Amounts>
+        <Styles.Row>
+          <Styles.Info>
+            <Skeleton width={40} height={40} br={14} type="gray" isLoading />
+            <Styles.InfoRow>
+              <Skeleton width={80} height={20} type="gray" isLoading />
+              <Skeleton width={50} height={17} mt={3} type="gray" isLoading />
+            </Styles.InfoRow>
+          </Styles.Info>
+          <Styles.Amounts>
+            <Skeleton width={100} height={19} type="gray" isLoading />
+            <Skeleton width={70} height={17} mt={4} type="gray" isLoading />
+          </Styles.Amounts>
+        </Styles.Row>
       </Styles.Container>
     )
   }
@@ -50,7 +53,7 @@ const Transaction: React.FC<Props> = (props) => {
     const { type, date, hash, amount, estimated, symbol, isPending } = data
 
     return (
-      <Styles.Container>
+      <Styles.Container onClick={openTx}>
         <Styles.Row>
           <Styles.Info>
             <Styles.TypeRow>
@@ -60,7 +63,12 @@ const Transaction: React.FC<Props> = (props) => {
               {isPending ? <Styles.PendingIcon /> : null}
             </Styles.TypeRow>
             <Styles.InfoRow>
-              <Styles.DestinationAddress>{short(hash, 15)}</Styles.DestinationAddress>
+              <Styles.HashRow>
+                <Styles.Hash className="tx-hash">{short(hash, 12)}</Styles.Hash>
+                <Styles.LinkIcon className="link-icon">
+                  <SVG src="../../../assets/icons/txLink.svg" width={12} height={12} />
+                </Styles.LinkIcon>
+              </Styles.HashRow>
               <Styles.Date>{dayjs(date).format('MMM D')}</Styles.Date>
             </Styles.InfoRow>
           </Styles.Info>

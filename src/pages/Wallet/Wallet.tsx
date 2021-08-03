@@ -15,11 +15,11 @@ import PrivateKeyDrawer from '@drawers/PrivateKey'
 import RenameWalletDrawer from '@drawers/RenameWallet'
 
 // Utils
-import { getBalance } from '@utils/api'
+import { getBalance, getTxsInfo } from '@utils/api'
 import { IWallet, updateBalance, renameWallet, THardware } from '@utils/wallet'
 import { getTransactionHistory } from '@utils/api'
 import { openWebPage } from '@utils/extension'
-import { getExplorerLink } from '@utils/address'
+import { getExplorerLink, getTransactionLink } from '@utils/address'
 import { validatePassword } from '@utils/validate'
 import { getItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
@@ -108,9 +108,15 @@ const WalletPage: React.FC = () => {
 
   const getTxHistory = async (): Promise<void> => {
     if (currency) {
-      const data = await getTransactionHistory(currency?.chain, address)
+      const data = await getTransactionHistory(currency.chain, address)
 
-      setTxHistory(data)
+      if (data.length) {
+        const getFullTxHistoryInfo = await getTxsInfo(currency.chain, address, data)
+
+        setTxHistory(getFullTxHistoryInfo)
+      } else {
+        setTxHistory([])
+      }
     }
   }
 
@@ -190,6 +196,16 @@ const WalletPage: React.FC = () => {
     renameWallet(uuid, name)
   }
 
+  const openTx = (hash: string) => async (): Promise<void> => {
+    if (currency) {
+      const url = getTransactionLink(hash, symbol, currency.chain, chain)
+
+      if (url) {
+        await openWebPage(url)
+      }
+    }
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -227,7 +243,7 @@ const WalletPage: React.FC = () => {
               />
             ) : null}
           </Styles.Row>
-          <TransactionHistory data={txHistory} symbol={symbol} />
+          <TransactionHistory data={txHistory} symbol={symbol} openTx={openTx} />
         </Styles.Container>
       </Styles.Wrapper>
       <ConfirmDrawer

@@ -14,10 +14,11 @@ import Styles from './styles'
 interface Props {
   data: TAddressTxGroup[] | null
   symbol: string
+  openTx: (hash: string) => () => void
 }
 
 const TransactionHistory: React.FC<Props> = (props) => {
-  const { data, symbol } = props
+  const { data, symbol, openTx } = props
 
   return (
     <Styles.Container>
@@ -66,6 +67,7 @@ const TransactionHistory: React.FC<Props> = (props) => {
                         symbol,
                         isPending,
                       }}
+                      openTx={openTx(hash)}
                     />
                   )
                 })}

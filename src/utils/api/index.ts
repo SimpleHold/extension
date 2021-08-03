@@ -305,10 +305,7 @@ export const getPhishingSites = async (): Promise<TPhishingSite[] | null> => {
   }
 }
 
-export const getTransactionHistory = async (
-  chain: string,
-  address: string
-): Promise<TAddressTxGroup[]> => {
+export const getTransactionHistory = async (chain: string, address: string): Promise<string[]> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/${chain}/history`, {
       headers: {
@@ -318,6 +315,31 @@ export const getTransactionHistory = async (
         address,
       },
     })
+
+    return data.data
+  } catch {
+    return []
+  }
+}
+
+export const getTxsInfo = async (
+  chain: string,
+  address: string,
+  txs: string[]
+): Promise<TAddressTxGroup[]> => {
+  try {
+    const { data } = await axios.post(
+      `${config.serverUrl}/transaction/${chain}/info`,
+      {
+        txs,
+        address,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
 
     return data.data
   } catch {
