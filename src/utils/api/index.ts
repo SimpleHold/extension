@@ -11,7 +11,7 @@ import {
   IGetNetworkFeeResponse,
   IAdaTrParams,
   TPhishingSite,
-  TAddressTxGroup,
+  TAddressTx,
 } from './types'
 
 export const getBalance = async (
@@ -333,7 +333,7 @@ export const getTxsInfo = async (
   chain: string,
   address: string,
   txs: string[]
-): Promise<TAddressTxGroup[]> => {
+): Promise<TAddressTx[]> => {
   try {
     const { data } = await axios.post(
       `${config.serverUrl}/transaction/${chain}/info`,

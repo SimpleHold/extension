@@ -49,11 +49,6 @@ export type TPhishingSite = {
   favicon: string
 }
 
-export type TAddressTxGroup = {
-  date: string
-  data: TAddressTx[]
-}
-
 export type TAddressTx = {
   type: 'spend' | 'received'
   isPending: boolean
