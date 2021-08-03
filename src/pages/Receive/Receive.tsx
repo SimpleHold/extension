@@ -132,7 +132,7 @@ const Receive: React.FC = () => {
 
     list.push({ icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' })
 
-    if (['eth', 'bnb'].indexOf(symbol) !== -1) {
+    if (['eth', 'bnb'].indexOf(symbol) !== -1 && !hardware) {
       list.push({
         icon: { source: plusCircleIcon, width: 18, height: 18 },
         title: 'Add token',
