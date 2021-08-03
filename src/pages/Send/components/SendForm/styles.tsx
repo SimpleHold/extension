@@ -2,6 +2,9 @@ import styled from 'styled-components'
 
 const Container = styled.form`
   border-top: 1px solid #f2f4f8;
+`
+
+const Body = styled.div`
   padding: 20px;
 `
 
@@ -9,7 +12,8 @@ const NetworkFeeBlock = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin: 20px 0 0 0;
+  padding: 15px 20px;
+  border-top: 1px solid #f2f4f8;
 `
 
 const NetworkFeeRow = styled.div`
@@ -86,6 +90,7 @@ const RemoveButton = styled.div`
 
 const Styles = {
   Container,
+  Body,
   NetworkFeeBlock,
   NetworkFeeRow,
   NetworkFeeLabel,

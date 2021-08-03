@@ -6,7 +6,8 @@ import Transaction from '../Transaction'
 import Skeleton from '@components/Skeleton'
 
 // Types
-import { TAddressTxGroup, TAddressTx } from '@utils/api/types'
+import { TAddressTx } from '@utils/api/types'
+import { TAddressTxGroup } from '@utils/txs'
 
 // Styles
 import Styles from './styles'

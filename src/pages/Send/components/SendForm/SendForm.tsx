@@ -196,33 +196,35 @@ const SendForm: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container onSubmit={onSubmitForm}>
-      <TextInput
-        label="Recipient Address"
-        value={destination.value}
-        onChange={destination.onChange}
-        disabled={isDisabled}
-        button={renderInputButton(destination, 'address', 'To my wallet', openWalletsDrawer)}
-        onFocus={onFocusInput('address')}
-        onBlurInput={onBlurAddressInput}
-      />
-      {extraIdName ? (
+      <Styles.Body>
         <TextInput
-          label={`${extraIdName} (optional)`}
-          value={extraId.value}
-          onChange={extraId.onChange}
+          label="Recipient Address"
+          value={destination.value}
+          onChange={destination.onChange}
           disabled={isDisabled}
-          button={renderInputButton(destination, 'extraId', 'Generate', onGenerateExtraId)}
-          onFocus={onFocusInput('extraId')}
+          button={renderInputButton(destination, 'address', 'To my wallet', openWalletsDrawer)}
+          onFocus={onFocusInput('address')}
+          onBlurInput={onBlurAddressInput}
         />
-      ) : null}
-      <TextInput
-        label={`Amount (${toUpper(symbol)})`}
-        value={amount.value}
-        onChange={amount.onChange}
-        disabled={isDisabled}
-        button={renderInputButton(destination, 'amount', 'Send all', onSendAll)}
-        onFocus={onFocusInput('amount')}
-      />
+        {extraIdName ? (
+          <TextInput
+            label={`${extraIdName} (optional)`}
+            value={extraId.value}
+            onChange={extraId.onChange}
+            disabled={isDisabled}
+            button={renderInputButton(destination, 'extraId', 'Generate', onGenerateExtraId)}
+            onFocus={onFocusInput('extraId')}
+          />
+        ) : null}
+        <TextInput
+          label={`Amount (${toUpper(symbol)})`}
+          value={amount.value}
+          onChange={amount.onChange}
+          disabled={isDisabled}
+          button={renderInputButton(destination, 'amount', 'Send all', onSendAll)}
+          onFocus={onFocusInput('amount')}
+        />
+      </Styles.Body>
 
       <Styles.NetworkFeeBlock>
         <Styles.NetworkFeeRow>
