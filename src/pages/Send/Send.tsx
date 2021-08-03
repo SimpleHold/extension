@@ -13,9 +13,9 @@ import WalletsDrawer from '@drawers/Wallets'
 
 // Utils
 import { toLower, toUpper } from '@utils/format'
-import { getBalance } from '@utils/api'
+import { getBalance, getUnspentOutputs } from '@utils/api'
 import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
-import { getExtraIdName } from '@utils/address'
+import { getExtraIdName, checkWithOuputs } from '@utils/address'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -28,7 +28,7 @@ interface LocationState {
   symbol: string
   address: string
   walletName: string
-  chain?: string
+  chain: string
   contractAddress?: string
   hardware?: THardware
   name?: string
@@ -53,6 +53,9 @@ const SendPage: React.FC = () => {
   const [isSendDisable, setSendDisable] = React.useState<boolean>(true)
   const [extraIdName, setExtraIdName] = React.useState<string | null>(null)
   const [extraId, setExtraId] = React.useState<string>('')
+  const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
+  const [destinationError, setDestinationError] = React.useState<string | null>(null)
+  const [amountError, setAmountError] = React.useState<string | null>(null)
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
@@ -63,7 +66,17 @@ const SendPage: React.FC = () => {
 
   React.useEffect(() => {
     loadBalance()
+    getOutputs()
   }, [selectedAddress])
+
+  const getOutputs = async (): Promise<void> => {
+    const withOutputs = checkWithOuputs(chain, symbol)
+
+    if (withOutputs) {
+      const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
+      setOutputs(unspentOutputs)
+    }
+  }
 
   const getExtraId = (): void => {
     const name = getExtraIdName(symbol)
@@ -152,21 +165,24 @@ const SendPage: React.FC = () => {
                 destination={{
                   value: destination,
                   onChange: setDestination,
-                  errorLabel: null,
+                  errorLabel: destinationError,
+                  setErrorLabel: setDestinationError,
                 }}
                 amount={{
                   value: amount,
                   onChange: setAmount,
-                  errorLabel: null,
+                  errorLabel: amountError,
+                  setErrorLabel: setAmountError,
                 }}
                 extraId={{
                   value: extraId,
                   onChange: setExtraId,
-                  errorLabel: null,
                 }}
                 isDisabled={balance === null}
                 balance={balance}
                 openWalletsDrawer={openWalletsDrawer}
+                selectedAddress={selectedAddress}
+                outputs={outputs}
               />
             </Styles.Row>
           </Styles.Body>

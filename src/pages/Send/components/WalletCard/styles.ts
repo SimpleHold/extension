@@ -11,6 +11,7 @@ type TVisibleProps = {
 
 const Container = styled.div`
   position: relative;
+  user-select: none;
 `
 
 const Row = styled.div`
@@ -108,9 +109,11 @@ const HardwareIcon = styled.div`
 const Wallet = styled.div`
   overflow: hidden;
 
-  svg {
-    transition: all 0.3s;
-    transform: ${({ isVisible }: TVisibleProps) => `rotate(${isVisible ? 180 : 0}deg)`};
+  .arrow {
+    svg {
+      transition: all 0.3s;
+      transform: ${({ isVisible }: TVisibleProps) => `rotate(${isVisible ? 180 : 0}deg)`};
+    }
   }
 `
 

@@ -6,8 +6,8 @@ type TVisibleProps = {
 
 const Container = styled.div`
   position: relative;
-  box-sizing: border-box;
   filter: drop-shadow(0px 5px 30px rgba(125, 126, 141, 0.15));
+  user-select: none;
 `
 
 const Row = styled.div`
@@ -53,6 +53,7 @@ const Title = styled.p`
   margin: 0;
   font-size: 14px;
   line-height: 16px;
+  text-transform: capitalize;
 `
 
 const List = styled.div`
@@ -86,6 +87,7 @@ const ListItemLabel = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: #7d7e8d;
+  text-transform: capitalize;
 `
 
 const Styles = {

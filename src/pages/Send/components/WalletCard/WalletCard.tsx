@@ -86,7 +86,7 @@ const WalletCard: React.FC<Props> = (props) => {
 
               <Styles.WalletName>{walletName}</Styles.WalletName>
               {wallets.length > 1 ? (
-                <Styles.DropdownArrow>
+                <Styles.DropdownArrow className="arrow">
                   <SVG src="../../../assets/icons/dropdownArrow.svg" width={8} height={6} />
                 </Styles.DropdownArrow>
               ) : null}
@@ -94,12 +94,19 @@ const WalletCard: React.FC<Props> = (props) => {
             <Styles.Address>{short(address, 12)}</Styles.Address>
           </Styles.Wallet>
           <Styles.Balances>
-            <Skeleton width={120} height={19} type="gray" br={4} isLoading={balance === null}>
+            <Skeleton width={120} height={16} type="gray" br={4} isLoading={balance === null}>
               <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
                 symbol
               )}`}</Styles.Balance>
             </Skeleton>
-            <Skeleton width={65} height={17} type="gray" br={4} isLoading={estimated === null}>
+            <Skeleton
+              width={65}
+              height={16}
+              type="gray"
+              br={4}
+              mt={7}
+              isLoading={estimated === null}
+            >
               <Styles.Estimated>{`$${price(estimated)}`}</Styles.Estimated>
             </Skeleton>
           </Styles.Balances>
@@ -109,7 +116,8 @@ const WalletCard: React.FC<Props> = (props) => {
         {filterWallets.map((wallet: IWallet) => {
           const { symbol, chain, name, address, hardware, uuid, contractAddress } = wallet
 
-          const walletName = wallet.walletName || getWalletName(wallets, symbol, uuid, chain, name)
+          const walletName =
+            wallet.walletName || getWalletName(wallets, symbol, uuid, hardware, chain, name)
 
           return (
             <Wallet

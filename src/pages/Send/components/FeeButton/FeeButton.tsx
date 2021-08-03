@@ -10,14 +10,14 @@ import { toLower } from '@utils/format'
 // Styles
 import Styles from './styles'
 
-type TFeeTypes = 'Slow' | 'Average' | 'Fast'
+type TFeeTypes = 'slow' | 'average' | 'fast'
 
 interface Props {
   type: TFeeTypes
   onChange: (value: TFeeTypes) => void
 }
 
-const feeTypes: TFeeTypes[] = ['Slow', 'Average', 'Fast']
+const feeTypes: TFeeTypes[] = ['slow', 'average', 'fast']
 
 const FeeButton: React.FC<Props> = (props) => {
   const { type, onChange } = props
