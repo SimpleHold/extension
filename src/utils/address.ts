@@ -436,3 +436,18 @@ export const generateExtraId = (symbol: string): null | string => {
   }
   return null
 }
+
+export const checkWithOuputs = (chain: string, symbol: string): boolean => {
+  try {
+    if (
+      bitcoinLike.coins().indexOf(chain) !== -1 ||
+      toLower(symbol) === 'ada' ||
+      toLower(symbol) === 'nebl'
+    ) {
+      return true
+    }
+    return false
+  } catch {
+    return false
+  }
+}

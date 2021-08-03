@@ -305,7 +305,12 @@ export const getPhishingSites = async (): Promise<TPhishingSite[] | null> => {
   }
 }
 
-export const getTransactionHistory = async (chain: string, address: string): Promise<string[]> => {
+export const getTransactionHistory = async (
+  chain: string,
+  address: string,
+  tokenSymbol?: string,
+  contractAddress?: string
+): Promise<string[]> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/${chain}/history`, {
       headers: {
@@ -313,6 +318,8 @@ export const getTransactionHistory = async (chain: string, address: string): Pro
       },
       params: {
         address,
+        tokenSymbol,
+        contractAddress,
       },
     })
 

@@ -81,6 +81,7 @@ const WalletPage: React.FC = () => {
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const withPhrase = checkWithPhrase(symbol)
+  const tokenSymbol = chain ? symbol : undefined
 
   React.useEffect(() => {
     loadBalance()
@@ -97,7 +98,7 @@ const WalletPage: React.FC = () => {
     const { balance, balance_usd, balance_btc } = await getBalance(
       address,
       currency?.chain || chain,
-      chain ? symbol : undefined,
+      tokenSymbol,
       contractAddress
     )
 
@@ -108,7 +109,12 @@ const WalletPage: React.FC = () => {
 
   const getTxHistory = async (): Promise<void> => {
     if (currency) {
-      const data = await getTransactionHistory(currency.chain, address)
+      const data = await getTransactionHistory(
+        currency.chain,
+        address,
+        tokenSymbol,
+        contractAddress
+      )
 
       if (data.length) {
         const getFullTxHistoryInfo = await getTxsInfo(currency.chain, address, data)

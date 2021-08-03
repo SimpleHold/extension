@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+type TRenameBlockProps = {
+  isDisabled: boolean
+}
+
 const Container = styled.div`
   display: flex;
   align-items: center;
@@ -56,14 +60,14 @@ const RenameBlock = styled.div`
   }
 
   &:hover {
-    cursor: pointer;
+    cursor: ${({ isDisabled }: TRenameBlockProps) => (isDisabled ? 'default' : 'pointer')};
 
     path {
-      fill: #3fbb7d;
+      fill: ${({ isDisabled }: TRenameBlockProps) => (isDisabled ? '#1d1d22' : '#3fbb7d')};
     }
 
     p {
-      color: #3fbb7d;
+      color: ${({ isDisabled }: TRenameBlockProps) => (isDisabled ? '#1d1d22' : '#3fbb7d')};
     }
   }
 `

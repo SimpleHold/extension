@@ -88,9 +88,15 @@ const WalletHeading: React.FC<Props> = (props) => {
     onSelectDropdown(index)
   }
 
+  const onRename = (): void => {
+    if (!hardware) {
+      onRenameWallet()
+    }
+  }
+
   return (
     <Styles.Container>
-      <Styles.RenameBlock onClick={onRenameWallet}>
+      <Styles.RenameBlock onClick={onRename} isDisabled={hardware !== undefined}>
         {hardware ? (
           <Styles.HardwareIcon>
             <SVG
@@ -102,7 +108,7 @@ const WalletHeading: React.FC<Props> = (props) => {
         ) : null}
 
         <Styles.WalletName>{walletName}</Styles.WalletName>
-        <SVG src={renameIcon} width={9} height={11} />
+        {!hardware ? <SVG src={renameIcon} width={9} height={11} /> : null}
       </Styles.RenameBlock>
       <Styles.MoreButton onClick={toggleDropdownVisible}>
         <SVG src={moreIcon} width={16} height={3.36} />
