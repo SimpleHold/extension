@@ -316,7 +316,7 @@ export const getUnusedAddressesForToken = (
       )
 
       if (!findExist && !hardware) {
-        addresses.push(wallet.address)
+        addresses.push(address)
       }
     }
   }
