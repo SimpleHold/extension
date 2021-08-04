@@ -612,7 +612,7 @@ const Send: React.FC = () => {
             type="gray"
             isLoading={estimated === null || !selectedWallet}
           >
-            <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
+            <Styles.Estimated>{`$ ${price(estimated, 2)}`}</Styles.Estimated>
           </Skeleton>
         </Styles.Heading>
         <Styles.Form>
@@ -637,6 +637,7 @@ const Send: React.FC = () => {
             errorLabel={addressErrorLabel}
             onBlurInput={checkValidAddress}
             disabled={balance === null || props?.readOnly}
+            type="text"
           />
           {withExtraid ? (
             <TextInput
@@ -645,6 +646,7 @@ const Send: React.FC = () => {
               onChange={setExtraId}
               disabled={balance === null}
               button={extraIdInputButton()}
+              type="text"
             />
           ) : null}
           <TextInput

@@ -213,6 +213,7 @@ const ImportPrivateKey: React.FC = () => {
               onChange={setPrivateKey}
               errorLabel={errorLabel}
               inputRef={textInputRef}
+              type="text"
             />
             <Styles.Actions>
               <Button label="Back" isLight onClick={history.goBack} mr={7.5} />

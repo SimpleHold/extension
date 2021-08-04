@@ -186,7 +186,6 @@ const Wallets: React.FC = () => {
             value={password}
             onChange={setPassword}
             type="password"
-            withPasswordVisible
             errorLabel={passwordErrorLabel}
             onBlurInput={onBlurPassword}
             inputRef={passwordInputRef}
@@ -196,7 +195,6 @@ const Wallets: React.FC = () => {
             value={confirmPassword}
             onChange={setConfirmPassword}
             type="password"
-            withPasswordVisible
             errorLabel={confirmPasswordErrorLabel}
             onBlurInput={onBlurConfirmPassword}
           />

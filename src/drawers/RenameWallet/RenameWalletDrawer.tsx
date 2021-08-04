@@ -43,6 +43,7 @@ const RenameWalletDrawer: React.FC<Props> = (props) => {
           onChange={setName}
           inputRef={textInputRef}
           errorLabel={errorLabel}
+          type="text"
         />
         <Button
           mt={15}
