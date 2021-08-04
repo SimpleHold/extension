@@ -8,20 +8,17 @@ interface Props {
   label: string
   value: string
   onChange: (value: string) => void
-  type?: string
+  type: 'text' | 'password' | 'number'
   errorLabel?: string | null
-  withPasswordVisible?: boolean
   onBlurInput?: Function
   inputRef?: React.RefObject<HTMLInputElement>
   disabled?: boolean
   openFrom?: string
   button?: React.ReactElement<any, any> | null
-  icon?: {
-    src: string
-    width: number
-    height: number
+  renderButton?: {
+    label: string
+    onClick: () => void
   }
-  onFocus?: () => void
 }
 
 const TextInput: React.FC<Props> = (props) => {
@@ -31,14 +28,12 @@ const TextInput: React.FC<Props> = (props) => {
     onChange,
     type,
     errorLabel,
-    withPasswordVisible,
     onBlurInput,
     inputRef,
     disabled,
     openFrom,
     button,
-    icon,
-    onFocus: onFocusInput,
+    renderButton,
   } = props
 
   const textInputRef = inputRef || React.useRef<HTMLInputElement>(null)
@@ -53,7 +48,7 @@ const TextInput: React.FC<Props> = (props) => {
       (!disabled &&
         visibleBlockRef.current &&
         !visibleBlockRef.current.contains(event.target as Node)) ||
-      !withPasswordVisible
+      type !== 'password'
     ) {
       if (type === 'number') {
         numberInputRef.focus()
@@ -63,11 +58,24 @@ const TextInput: React.FC<Props> = (props) => {
     }
   }
 
+  const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onChange(event.target.value)
+  }
+
+  const onClear = (): void => {
+    textInputRef.current?.focus()
+    onChange('')
+  }
+
+  const onClickButton = (): void => {
+    if (renderButton) {
+      renderButton.onClick()
+      textInputRef.current?.focus()
+    }
+  }
+
   const onFocus = (): void => {
     setIsFocused(true)
-    if (onFocusInput) {
-      onFocusInput()
-    }
   }
 
   const onBlur = (): void => {
@@ -77,35 +85,8 @@ const TextInput: React.FC<Props> = (props) => {
     }
   }
 
-  const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value)
-  }
-
-  const renderInput = () => {
-    if (type === 'number') {
-      return (
-        <Styles.NumberInput
-          getInputRef={(el: HTMLInputElement) => (numberInputRef = el)}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          value={value}
-          onChange={onChangeInput}
-          decimalScale={8}
-          disabled={disabled}
-        />
-      )
-    }
-    return (
-      <Styles.Input
-        ref={textInputRef}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        value={value}
-        onChange={onChangeInput}
-        type={type === 'password' && isPasswordVisible ? 'text' : type}
-        disabled={disabled}
-      />
-    )
+  const toggleVisible = (): void => {
+    setPasswordVisible((prev: boolean) => !prev)
   }
 
   return (
@@ -114,28 +95,51 @@ const TextInput: React.FC<Props> = (props) => {
       isFocused={isFocused}
       isError={errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0}
       disabled={disabled}
-      withButton={typeof button !== 'undefined'}
     >
       <Styles.Row isActive={isFocused || value?.length > 0} openFrom={openFrom}>
         <Styles.Label>
           {errorLabel && !isFocused && value.length > 0 ? errorLabel : label}
         </Styles.Label>
-        {renderInput()}
+        {type === 'number' ? (
+          <Styles.NumberInput
+            getInputRef={(el: HTMLInputElement) => (numberInputRef = el)}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            value={value}
+            onChange={onChangeInput}
+            decimalScale={8}
+            disabled={disabled}
+          />
+        ) : (
+          <Styles.Input
+            ref={textInputRef}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            value={value}
+            onChange={onChangeInput}
+            type={type === 'password' && isPasswordVisible ? 'text' : type}
+            disabled={disabled}
+          />
+        )}
       </Styles.Row>
-      {withPasswordVisible ? (
-        <Styles.VisibleInput
-          ref={visibleBlockRef}
-          onClick={() => setPasswordVisible(!isPasswordVisible)}
-        >
+      {type === 'password' ? (
+        <Styles.VisibleInput ref={visibleBlockRef} onClick={toggleVisible}>
           <Styles.EyeIcon isVisible={isPasswordVisible} />
         </Styles.VisibleInput>
       ) : null}
-      {button || null}
-      {icon ? (
-        <Styles.IconRow>
-          <SVG src={icon.src} width={icon.width} height={icon.height} />
-        </Styles.IconRow>
+      {value.length && type !== 'password' ? (
+        <Styles.ClearButton onClick={onClear} isFocused={isFocused}>
+          <SVG src="../../assets/icons/times.svg" width={10} height={10} />
+        </Styles.ClearButton>
       ) : null}
+
+      {renderButton && !value.length ? (
+        <Styles.Button isFocused={isFocused} onClick={onClickButton}>
+          <Styles.ButtonLabel>{renderButton.label}</Styles.ButtonLabel>
+        </Styles.Button>
+      ) : null}
+
+      {button || null}
     </Styles.Container>
   )
 }
