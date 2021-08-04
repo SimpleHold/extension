@@ -383,7 +383,7 @@ const Send: React.FC = () => {
             </Styles.Balance>
           </Skeleton>
           <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
-            <Styles.USDEstimated>{`$${price(estimated, 2)}`}</Styles.USDEstimated>
+            <Styles.USDEstimated>{`$ ${price(estimated, 2)}`}</Styles.USDEstimated>
           </Skeleton>
         </Styles.Row>
         <Styles.Form onSubmit={onSubmitForm} withExtraid={withExtraid}>
@@ -408,6 +408,7 @@ const Send: React.FC = () => {
             errorLabel={addressErrorLabel}
             onBlurInput={onBlurAddressInput}
             disabled={balance === null}
+            type="text"
           />
           {withExtraid ? (
             <TextInput
@@ -416,6 +417,7 @@ const Send: React.FC = () => {
               onChange={setExtraId}
               disabled={balance === null}
               button={extraIdInputButton()}
+              type="text"
             />
           ) : null}
           <TextInput

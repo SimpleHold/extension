@@ -28,11 +28,11 @@ interface Props {
   walletName: string
   address: string
   hardware?: THardware
-  chain?: string
   name?: string
   wallets: IWallet[]
   selectedAddress: string
   changeWallet: (address: string, name: string, hardware?: THardware) => void
+  tokenChain?: string
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -43,11 +43,11 @@ const WalletCard: React.FC<Props> = (props) => {
     walletName,
     address,
     hardware,
-    chain,
     name,
     wallets,
     selectedAddress,
     changeWallet,
+    tokenChain,
   } = props
 
   const filterWallets = wallets.filter(
@@ -70,7 +70,7 @@ const WalletCard: React.FC<Props> = (props) => {
   return (
     <Styles.Container ref={ref}>
       <Styles.Row isVisible={isVisible} onClick={onToggleDropdown} disabled={wallets.length < 2}>
-        <CurrencyLogo width={40} height={40} br={13} symbol={symbol} chain={chain} name={name} />
+        <CurrencyLogo size={40} br={13} symbol={symbol} chain={tokenChain} name={name} />
         <Styles.Info>
           <Styles.Wallet isVisible={isVisible}>
             <Styles.WalletNameRow>
@@ -107,7 +107,7 @@ const WalletCard: React.FC<Props> = (props) => {
               mt={7}
               isLoading={estimated === null}
             >
-              <Styles.Estimated>{`$${price(estimated)}`}</Styles.Estimated>
+              <Styles.Estimated>{`$ ${price(estimated)}`}</Styles.Estimated>
             </Skeleton>
           </Styles.Balances>
         </Styles.Info>

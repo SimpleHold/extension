@@ -1,12 +1,15 @@
 import * as React from 'react'
 import { useLocation, useHistory } from 'react-router-dom'
+import { BigNumber } from 'bignumber.js'
 
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 import Button from '@components/Button'
+import TextInput from '@components/TextInput'
+
 import WalletCard from './components/WalletCard'
-import SendForm from './components/SendForm'
+import NetworkFee from './components/NetworkFee'
 
 // Drawers
 import WalletsDrawer from '@drawers/Wallets'
@@ -15,188 +18,452 @@ import WalletsDrawer from '@drawers/Wallets'
 import { toLower, toUpper } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
-import { getExtraIdName, checkWithOuputs } from '@utils/address'
+import {
+  getExtraIdName,
+  checkWithOuputs,
+  getNetworkFeeSymbol,
+  validateAddress,
+  formatUnit,
+  getAddressNetworkFee,
+  generateExtraId,
+} from '@utils/address'
+import { logEvent } from '@utils/amplitude'
+
+// Hooks
+import useDebounce from '@hooks/useDebounce'
+import useState from '@hooks/useState'
 
 // Config
 import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
+import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
+
+// Types
+import { ILocationState, IState, TFees } from './types'
 
 // Styles
 import Styles from './styles'
 
-interface LocationState {
-  symbol: string
-  address: string
-  walletName: string
-  chain: string
-  contractAddress?: string
-  hardware?: THardware
-  name?: string
+const initialState: IState = {
+  balance: null,
+  estimated: null,
+  selectedAddress: '',
+  address: '',
+  wallets: [],
+  activeDrawer: null,
+  walletName: '',
+  hardware: undefined,
+  amount: '',
+  extraIdName: null,
+  extraId: '',
+  outputs: [],
+  isFeeLoading: false,
+  fee: 0,
+  feeSymbol: '',
+  feeType: 'average',
+  addressErrorLabel: null,
+  amountErrorLabel: null,
+  currencyBalance: null,
+  utxosList: [],
 }
 
 const SendPage: React.FC = () => {
   const {
-    state,
-    state: { symbol, chain, contractAddress, name },
-  } = useLocation<LocationState>()
+    state: locationState,
+    state: { symbol, chain, tokenChain, contractAddress, tokenName, decimals },
+  } = useLocation<ILocationState>()
   const history = useHistory()
 
-  const [balance, setBalance] = React.useState<number | null>(null)
-  const [estimated, setEstimated] = React.useState<number | null>(null)
-  const [selectedAddress, setSelectedAddress] = React.useState<string>(state.address)
-  const [wallets, setWallets] = React.useState<IWallet[]>([])
-  const [activeDrawer, setActiveDrawer] = React.useState<'wallets' | null>(null)
-  const [walletName, setWalletName] = React.useState<string>(state.walletName)
-  const [hardware, setHardware] = React.useState<THardware | undefined>(state.hardware)
-  const [destination, setDestination] = React.useState<string>('')
-  const [amount, setAmount] = React.useState<string>('')
-  const [isSendDisable, setSendDisable] = React.useState<boolean>(true)
-  const [extraIdName, setExtraIdName] = React.useState<string | null>(null)
-  const [extraId, setExtraId] = React.useState<string>('')
-  const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
-  const [destinationError, setDestinationError] = React.useState<string | null>(null)
-  const [amountError, setAmountError] = React.useState<string | null>(null)
+  const { state, updateState } = useState<IState>({
+    ...initialState,
+    selectedAddress: locationState.address,
+    walletName: locationState.walletName,
+    hardware: locationState.hardware,
+  })
 
-  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+  const debounced = useDebounce(state.amount, 1000)
+
+  const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
 
   React.useEffect(() => {
     getWalletsList()
     getExtraId()
+    getFeeSymbol()
   }, [])
 
   React.useEffect(() => {
     loadBalance()
     getOutputs()
-  }, [selectedAddress])
+    checkAddress()
+    checkAmount()
+  }, [state.selectedAddress])
+
+  React.useEffect(() => {
+    if (state.amount.length && Number(state.balance) > 0 && !state.amountErrorLabel) {
+      updateState({ isFeeLoading: true })
+      getNetworkFee()
+    }
+  }, [debounced])
+
+  React.useEffect(() => {
+    if (state.fee > 0 && !state.amountErrorLabel) {
+      if (
+        state.amount.length &&
+        Number(state.amount) + Number(state.fee) >= Number(state.balance)
+      ) {
+        updateState({ amountErrorLabel: 'Insufficient funds' })
+      }
+    }
+  }, [state.fee])
+
+  const getNetworkFee = async (): Promise<void> => {
+    updateState({ utxosList: [] })
+
+    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
+
+    const data = await getAddressNetworkFee(
+      state.selectedAddress,
+      symbol,
+      state.amount,
+      state.selectedAddress,
+      state.address,
+      chain,
+      state.outputs,
+      tokenChain,
+      contractAddress,
+      getTokenDecimals || decimals
+    )
+
+    updateState({ isFeeLoading: false })
+
+    if (data) {
+      if (data?.utxos) {
+        updateState({ utxosList: data.utxos })
+      }
+
+      if (data.networkFee) {
+        updateState({ fee: data.networkFee })
+      } else {
+        if (Number(state.amount) > 0 && Number(state.balance) > 0) {
+          updateState({ amountErrorLabel: 'Insufficient funds' })
+        }
+      }
+
+      if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
+        updateState({ currencyBalance: data.currencyBalance })
+      }
+    }
+  }
+
+  const getFeeSymbol = (): void => {
+    updateState({ feeSymbol: getNetworkFeeSymbol(symbol, chain) })
+  }
 
   const getOutputs = async (): Promise<void> => {
     const withOutputs = checkWithOuputs(chain, symbol)
 
     if (withOutputs) {
-      const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
-      setOutputs(unspentOutputs)
+      const outputs = await getUnspentOutputs(state.selectedAddress, chain)
+      updateState({ outputs })
     }
   }
 
   const getExtraId = (): void => {
-    const name = getExtraIdName(symbol)
-
-    if (name) {
-      setExtraIdName(name)
-    }
+    updateState({ extraIdName: getExtraIdName(symbol) })
   }
 
   const loadBalance = async (): Promise<void> => {
     const { balance, balance_usd, balance_btc } = await getBalance(
-      selectedAddress,
-      currency?.chain || chain,
-      chain ? symbol : undefined,
+      state.selectedAddress,
+      currency?.chain || tokenChain,
+      tokenChain ? symbol : undefined,
       contractAddress
     )
 
-    setBalance(balance)
-    updateBalance(selectedAddress, symbol, balance, balance_btc)
-    setEstimated(balance_usd)
+    updateState({
+      balance,
+      estimated: balance_usd,
+    })
+
+    updateBalance(state.selectedAddress, symbol, balance, balance_btc)
   }
 
   const getWalletsList = (): void => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      const filterWallets = walletsList.filter(
-        (wallet: IWallet) =>
-          toLower(wallet.symbol) === toLower(symbol) && toLower(wallet.chain) === toLower(chain)
-      )
-      setWallets(filterWallets)
+      const filterWallets = walletsList.filter((wallet: IWallet) => wallet.symbol === symbol)
+      updateState({ wallets: filterWallets })
     }
   }
 
   const onCancel = (): void => {
+    logEvent({
+      name: ADDRESS_SEND_CANCEL,
+    })
+
     history.goBack()
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
   }
 
   const openWalletsDrawer = (): void => {
-    setActiveDrawer('wallets')
+    updateState({ activeDrawer: 'wallets' })
   }
 
   const onClickDrawerWallet = (address: string) => (): void => {
-    setDestination(address)
-    setActiveDrawer(null)
+    updateState({ address })
+    onCloseDrawer()
   }
 
-  const changeWallet = (address: string, name: string, hardware?: THardware) => {
-    setSelectedAddress(address)
-    setWalletName(name)
-    setHardware(hardware)
+  const changeWallet = (selectedAddress: string, walletName: string, hardware?: THardware) => {
+    updateState({ selectedAddress, walletName, hardware })
   }
 
-  const onConfirm = (): void => {}
+  const onConfirm = (): void => {
+    logEvent({
+      name: ADDRESS_SEND,
+    })
+
+    const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
+    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
+
+    history.push('/send-confirm', {
+      amount: Number(state.amount),
+      symbol,
+      networkFee: state.fee,
+      networkFeeSymbol: state.feeSymbol,
+      addressFrom: state.selectedAddress,
+      addressTo: state.address,
+      outputs: state.utxosList,
+      chain,
+      contractAddress: tokenContractAddress || contractAddress,
+      tokenChain,
+      decimals: getTokenDecimals || decimals,
+      extraId: state.extraId,
+    })
+  }
+
+  const onGenerateExtraId = (): void => {
+    const newExtraId = generateExtraId(symbol)
+
+    if (newExtraId) {
+      updateState({ extraId: newExtraId })
+    }
+  }
+
+  const onSendAll = (): void => {
+    if (state.balance) {
+      updateState({ amount: `${state.balance}` })
+    }
+  }
+
+  const renderInputButton = (inputType: 'address' | 'extraId' | 'amount') => {
+    if (inputType === 'address' && state.wallets.length > 1) {
+      return {
+        label: 'To my wallet',
+        onClick: openWalletsDrawer,
+      }
+    }
+
+    if (inputType === 'extraId') {
+      return {
+        label: 'Generate',
+        onClick: onGenerateExtraId,
+      }
+    }
+
+    if (inputType === 'amount' && Number(state.balance) > 0) {
+      return {
+        label: 'Send all',
+        onClick: onSendAll,
+      }
+    }
+
+    return undefined
+  }
+
+  const checkAddress = (): void => {
+    if (state.addressErrorLabel) {
+      updateState({ addressErrorLabel: null })
+    }
+
+    if (state.address.length && !validateAddress(symbol, chain, state.address, tokenChain)) {
+      updateState({ addressErrorLabel: 'Address is not valid' })
+    }
+
+    if (toLower(state.address) === toLower(state.selectedAddress)) {
+      updateState({ addressErrorLabel: 'Address same as sender' })
+    }
+  }
+
+  const getAvailableBalance = (): number => {
+    if (state.balance) {
+      if (toLower(symbol) === 'xrp') {
+        return new BigNumber(state.balance).minus(20).toNumber()
+      }
+      return Number(state.balance)
+    }
+    return 0
+  }
+
+  const checkAmount = (): void => {
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+
+    const availableBalance = getAvailableBalance()
+
+    if (
+      state.amount.length &&
+      Number(state.amount) + Number(state.fee) >= Number(availableBalance)
+    ) {
+      return updateState({ amountErrorLabel: 'Insufficient funds' })
+    }
+
+    if (currency) {
+      let parseAmount: number = Number(state.amount)
+      let parseMinAmount: number = 0
+
+      if (tokenChain) {
+        parseMinAmount = currency.minSendAmount || 0.001
+      } else {
+        parseAmount = formatUnit(symbol, state.amount, 'to', chain, 'ether')
+        parseMinAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
+      }
+
+      if (parseAmount < currency.minSendAmount) {
+        return updateState({
+          amountErrorLabel: `Min amount is ${parseMinAmount} ${toUpper(symbol)}`,
+        })
+      }
+    }
+  }
+
+  const isButtonDisabled = (): boolean => {
+    if (
+      validateAddress(symbol, chain, state.address, tokenChain) &&
+      state.amount.length &&
+      Number(state.amount) > 0 &&
+      state.addressErrorLabel === null &&
+      state.amountErrorLabel === null &&
+      Number(state.balance) > 0 &&
+      state.fee > 0 &&
+      !state.isFeeLoading &&
+      !isCurrencyBalanceError
+    ) {
+      if (!state.outputs.length) {
+        const withOuputs = checkWithOuputs(chain, symbol)
+
+        return withOuputs
+      }
+      return false
+    }
+    return true
+  }
+
+  const setAddress = (address: string): void => {
+    updateState({ address })
+  }
+
+  const setAmount = (amount: string): void => {
+    updateState({ amount })
+  }
+
+  const setExtraId = (extraId: string): void => {
+    updateState({ extraId })
+  }
+
+  const setFeeType = (feeType: TFees): void => {
+    updateState({ feeType })
+  }
+
+  const isCurrencyBalanceError =
+    (tokenChain !== undefined || toLower(symbol) === 'theta') &&
+    state.currencyBalance !== null &&
+    !state.isFeeLoading &&
+    state.fee > 0 &&
+    state.fee > state.currencyBalance
 
   return (
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle={`${currency?.name} wallet`} />
+        <Header withBack onBack={history.goBack} backTitle={state.walletName} />
         <Styles.Container>
           <Styles.Title>Send {toUpper(symbol)}</Styles.Title>
           <Styles.Body>
             <Styles.Row>
               <WalletCard
-                balance={balance}
-                estimated={estimated}
+                balance={state.balance}
+                estimated={state.estimated}
                 symbol={symbol}
-                hardware={hardware}
-                walletName={walletName}
-                address={selectedAddress}
-                chain={chain}
-                name={name}
-                wallets={wallets}
-                selectedAddress={selectedAddress}
+                hardware={state.hardware}
+                walletName={state.walletName}
+                address={state.selectedAddress}
+                name={tokenName}
+                wallets={state.wallets}
+                selectedAddress={state.selectedAddress}
                 changeWallet={changeWallet}
+                tokenChain={tokenChain}
               />
-              <SendForm
-                symbol={symbol}
-                chain={chain}
-                extraIdName={extraIdName}
-                destination={{
-                  value: destination,
-                  onChange: setDestination,
-                  errorLabel: destinationError,
-                  setErrorLabel: setDestinationError,
-                }}
-                amount={{
-                  value: amount,
-                  onChange: setAmount,
-                  errorLabel: amountError,
-                  setErrorLabel: setAmountError,
-                }}
-                extraId={{
-                  value: extraId,
-                  onChange: setExtraId,
-                }}
-                isDisabled={balance === null}
-                balance={balance}
-                openWalletsDrawer={openWalletsDrawer}
-                selectedAddress={selectedAddress}
-                outputs={outputs}
-              />
+              <Styles.Form>
+                <Styles.FormBody>
+                  <TextInput
+                    label="Recipient Address"
+                    value={state.address}
+                    onChange={setAddress}
+                    disabled={state.balance === null}
+                    type="text"
+                    renderButton={renderInputButton('address')}
+                    errorLabel={state.addressErrorLabel}
+                    onBlurInput={checkAddress}
+                  />
+                  {state.extraIdName ? (
+                    <TextInput
+                      label={`${state.extraIdName} (optional)`}
+                      value={state.extraId}
+                      onChange={setExtraId}
+                      disabled={state.balance === null}
+                      type="text"
+                      renderButton={renderInputButton('extraId')}
+                    />
+                  ) : null}
+                  <TextInput
+                    label={`Amount (${toUpper(symbol)})`}
+                    value={state.amount}
+                    onChange={setAmount}
+                    disabled={state.balance === null}
+                    type="number"
+                    renderButton={renderInputButton('amount')}
+                    errorLabel={state.amountErrorLabel}
+                    onBlurInput={checkAmount}
+                  />
+                </Styles.FormBody>
+                <NetworkFee
+                  isLoading={state.isFeeLoading}
+                  fee={state.fee}
+                  symbol={state.feeSymbol}
+                  type={state.feeType}
+                  setType={setFeeType}
+                  isBalanceError={isCurrencyBalanceError && state.currencyBalance !== null}
+                />
+              </Styles.Form>
             </Styles.Row>
           </Styles.Body>
           <Styles.Actions>
             <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-            <Button label="Send" disabled={isSendDisable} onClick={onConfirm} ml={7.5} />
+            <Button label="Send" onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>
       <WalletsDrawer
-        isActive={activeDrawer === 'wallets'}
+        isActive={state.activeDrawer === 'wallets'}
         onClose={onCloseDrawer}
-        selectedAddress={selectedAddress}
-        wallets={wallets}
+        selectedAddress={state.selectedAddress}
+        wallets={state.wallets}
         onClickWallet={onClickDrawerWallet}
       />
     </>

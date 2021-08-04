@@ -43,6 +43,14 @@ const Actions = styled.div`
   align-items: center;
 `
 
+const Form = styled.div`
+  border-top: 1px solid #f2f4f8;
+`
+
+const FormBody = styled.div`
+  padding: 20px;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -50,6 +58,8 @@ const Styles = {
   Body,
   Row,
   Actions,
+  Form,
+  FormBody,
 }
 
 export default Styles
