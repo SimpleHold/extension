@@ -66,7 +66,7 @@ const ActionName = styled.p`
 `
 
 const WalletInfo = styled.div`
-  margin: 0 0 0 17px;
+  margin: 0 0 0 20px;
 `
 
 const BalanceRow = styled.div`

@@ -59,14 +59,7 @@ const WalletCard: React.FC<Props> = (props) => {
   return (
     <Styles.Container>
       <Styles.Body>
-        <CurrencyLogo
-          width={60}
-          height={60}
-          br={18}
-          symbol={symbol}
-          chain={chain}
-          name={tokenName}
-        />
+        <CurrencyLogo size={60} br={18} symbol={symbol} chain={chain} name={tokenName} />
         <Styles.WalletInfo>
           <Styles.BalanceRow>
             <Skeleton width={173} height={27} type="gray" isLoading={balance === null}>
@@ -80,7 +73,7 @@ const WalletCard: React.FC<Props> = (props) => {
           </Styles.BalanceRow>
           <Skeleton width={75} height={19} mt={4} type="gray" isLoading={estimated === null}>
             {estimated !== null ? (
-              <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
+              <Styles.Estimated>{`$ ${price(estimated, 2)}`}</Styles.Estimated>
             ) : null}
           </Skeleton>
         </Styles.WalletInfo>

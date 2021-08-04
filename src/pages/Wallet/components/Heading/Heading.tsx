@@ -16,6 +16,8 @@ import linkIcon from '@assets/icons/link.svg'
 import renameIcon from '@assets/icons/rename.svg'
 import ledgerLogo from '@assets/icons/ledger.svg'
 import trezorLogo from '@assets/icons/trezor.svg'
+import eyeIcon from '@assets/icons/eye.svg'
+import eyeVisibleIcon from '@assets/icons/eyeVisible.svg'
 
 // Types
 import { TDropdowbList } from '@components/DropDown/DropDown'
@@ -30,11 +32,20 @@ interface Props {
   withPhrase: boolean
   walletName: string
   onRenameWallet: () => void
+  isHidden: boolean
   hardware?: THardware
 }
 
 const WalletHeading: React.FC<Props> = (props) => {
-  const { symbol, onSelectDropdown, withPhrase, walletName, onRenameWallet, hardware } = props
+  const {
+    symbol,
+    onSelectDropdown,
+    withPhrase,
+    walletName,
+    onRenameWallet,
+    isHidden,
+    hardware,
+  } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
@@ -42,7 +53,7 @@ const WalletHeading: React.FC<Props> = (props) => {
 
   React.useEffect(() => {
     getDropdownList()
-  }, [])
+  }, [isHidden])
 
   const getDropdownList = (): void => {
     const list: TDropdowbList[] = []
@@ -67,7 +78,13 @@ const WalletHeading: React.FC<Props> = (props) => {
       })
     }
 
-    list.push({ icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' })
+    list.push(
+      { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
+      {
+        icon: { source: isHidden ? eyeVisibleIcon : eyeIcon, width: 30, height: 30 },
+        title: `${isHidden ? 'Show' : 'Hide'} address`,
+      }
+    )
 
     if (['eth', 'bnb'].indexOf(symbol) !== -1 && !hardware) {
       list.push({

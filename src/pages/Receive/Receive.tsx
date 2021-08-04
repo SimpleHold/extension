@@ -27,12 +27,13 @@ import Styles from './styles'
 interface LocationState {
   address: string
   symbol: string
+  walletName: string
   chain?: string
 }
 
 const ReceivePage: React.FC = () => {
   const {
-    state: { address, symbol, chain },
+    state: { address, symbol, walletName, chain },
   } = useLocation<LocationState>()
   const history = useHistory()
 
@@ -84,7 +85,7 @@ const ReceivePage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Wallet" />
+        <Header withBack onBack={history.goBack} backTitle={walletName} />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Receive {toUpper(symbol)}</Styles.Title>

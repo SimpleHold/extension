@@ -260,14 +260,7 @@ const Receive: React.FC = () => {
           <Styles.Row>
             <Styles.Heading>
               <Styles.Currency>
-                <CurrencyLogo
-                  symbol={symbol}
-                  width={30}
-                  height={30}
-                  br={8}
-                  chain={chain}
-                  name={tokenName}
-                />
+                <CurrencyLogo symbol={symbol} size={30} br={8} chain={chain} name={tokenName} />
                 <Styles.CurrencyName>{name}</Styles.CurrencyName>
               </Styles.Currency>
               <Styles.Actions>
@@ -301,7 +294,7 @@ const Receive: React.FC = () => {
 
             <Skeleton width={130} height={23} mt={10} type="gray" isLoading={estimated === null}>
               {estimated !== null ? (
-                <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
+                <Styles.Estimated>{`$ ${price(estimated, 2)}`}</Styles.Estimated>
               ) : null}
             </Skeleton>
 

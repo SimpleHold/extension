@@ -60,6 +60,7 @@ const WalletCard: React.FC<Props> = (props) => {
   } = props
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+  const tokenSymbol = chain ? symbol : undefined
 
   const history = useHistory()
 
@@ -75,7 +76,7 @@ const WalletCard: React.FC<Props> = (props) => {
     const tryGetBalance = await getBalance(
       address,
       currency?.chain || chain,
-      chain ? symbol : undefined,
+      tokenSymbol,
       contractAddress
     )
 
@@ -119,7 +120,7 @@ const WalletCard: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container onClick={openWallet}>
-      <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} name={name} />
+      <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
       <Styles.Row>
         <Styles.AddressInfo>
           <Styles.CurrencyInfo>
@@ -150,7 +151,7 @@ const WalletCard: React.FC<Props> = (props) => {
             </Styles.BalanceRow>
           </Skeleton>
           <Skeleton width={80} height={16} type="gray" mt={7} br={4} isLoading={estimated === null}>
-            <Styles.Estimated>{`$${
+            <Styles.Estimated>{`$ ${
               Number(estimated) < 0.01
                 ? numeral(estimated).format('0.[00000000]')
                 : numberFriendly(estimated)

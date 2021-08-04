@@ -16,7 +16,15 @@ import RenameWalletDrawer from '@drawers/RenameWallet'
 
 // Utils
 import { getBalance, getTxsInfo } from '@utils/api'
-import { IWallet, updateBalance, renameWallet, THardware } from '@utils/wallet'
+import {
+  IWallet,
+  updateBalance,
+  renameWallet,
+  THardware,
+  toggleVisibleWallet,
+  getWalletName,
+  getWallets,
+} from '@utils/wallet'
 import { getTransactionHistory } from '@utils/api'
 import { openWebPage } from '@utils/extension'
 import { getExplorerLink, getTransactionLink } from '@utils/address'
@@ -43,7 +51,6 @@ interface LocationState {
   tokenName?: string
   decimals?: number
   isHidden?: boolean
-  walletName: string
   hardware: THardware
 }
 
@@ -54,13 +61,12 @@ const WalletPage: React.FC = () => {
       symbol,
       address,
       uuid,
-      chain = undefined,
-      contractAddress = undefined,
-      tokenName = undefined,
-      decimals = undefined,
+      chain,
+      contractAddress,
+      tokenName,
+      hardware,
       isHidden = false,
       name,
-      hardware,
     },
   } = useLocation<LocationState>()
   const history = useHistory()
@@ -75,7 +81,8 @@ const WalletPage: React.FC = () => {
   const [password, setPassword] = React.useState<string>('')
   const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
   const [privateKey, setPrivateKey] = React.useState<null | string>(null)
-  const [walletName, setWalletName] = React.useState<string>(state.walletName)
+  const [walletName, setWalletName] = React.useState<string>('')
+  const [isHiddenWallet, setIsHiddenWallet] = React.useState<boolean>(isHidden)
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const withPhrase = checkWithPhrase(symbol)
@@ -84,7 +91,25 @@ const WalletPage: React.FC = () => {
   React.useEffect(() => {
     loadBalance()
     getTxHistory()
+    getName()
   }, [])
+
+  const getName = (): void => {
+    const walletsList = getWallets()
+
+    if (walletsList) {
+      const findWallet = walletsList.find(
+        (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+      )
+
+      if (findWallet) {
+        const walletName =
+          findWallet.walletName || getWalletName(walletsList, symbol, uuid, hardware, chain, name)
+
+        setWalletName(walletName)
+      }
+    }
+  }
 
   React.useEffect(() => {
     if (balance !== null && estimated !== null && isBalanceRefreshing) {
@@ -131,6 +156,8 @@ const WalletPage: React.FC = () => {
     history.push(url, {
       ...state,
       walletName,
+      tokenChain: chain,
+      chain: currency?.chain,
     })
   }
 
@@ -140,6 +167,9 @@ const WalletPage: React.FC = () => {
     } else if (index === 1) {
       openWebPage(getExplorerLink(address, symbol, currency, chain, contractAddress))
     } else if (index === 2) {
+      toggleVisibleWallet(address, symbol, !isHiddenWallet)
+      setIsHiddenWallet((prev: boolean) => !prev)
+    } else if (index === 3) {
       history.push('/select-token', {
         currency,
         address,
@@ -227,6 +257,7 @@ const WalletPage: React.FC = () => {
               walletName={walletName}
               onRenameWallet={openRenameDrawer}
               hardware={hardware}
+              isHidden={isHiddenWallet}
             />
             <WalletCard
               openPage={openPage}

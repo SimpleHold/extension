@@ -258,14 +258,17 @@ export const addNew = (
 
 export const toggleVisibleWallet = (address: string, symbol: string, isHidden: boolean): void => {
   const wallets = getWallets()
-  const findWallet = wallets?.find(
-    (wallet: IWallet) =>
-      toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol)
-  )
 
-  if (findWallet) {
-    findWallet.isHidden = isHidden
-    setItem('wallets', JSON.stringify(wallets))
+  if (wallets) {
+    const findWallet = wallets.find(
+      (wallet: IWallet) =>
+        toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol)
+    )
+
+    if (findWallet) {
+      findWallet.isHidden = isHidden
+      setItem('wallets', JSON.stringify(wallets))
+    }
   }
 }
 
