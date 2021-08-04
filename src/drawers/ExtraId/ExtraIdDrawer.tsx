@@ -1,4 +1,5 @@
 import * as React from 'react'
+import copy from 'copy-to-clipboard'
 
 // Components
 import DrawerWrapper from '@components/DrawerWrapper'
@@ -22,6 +23,15 @@ const ExtraIdDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive, title, symbol } = props
 
   const [extraId, setExtraId] = React.useState<string>('')
+  const [isCopied, setIsCopied] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    if (isCopied) {
+      setTimeout(() => {
+        setIsCopied(false)
+      }, 1000)
+    }
+  }, [isCopied])
 
   React.useEffect(() => {
     if (isActive) {
@@ -33,15 +43,19 @@ const ExtraIdDrawer: React.FC<Props> = (props) => {
     }
   }, [isActive])
 
+  const onCopy = (): void => {
+    copy(extraId)
+  }
+
   return (
-    <DrawerWrapper title={title} isActive={isActive} onClose={onClose}>
+    <DrawerWrapper title={title} isActive={isActive} onClose={onClose} withCloseIcon>
       <Styles.Row>
         <CopyToClipboard value={extraId}>
           <Styles.ExtraId>{extraId}</Styles.ExtraId>
         </CopyToClipboard>
 
         <Styles.Actions>
-          <Button label="Done" onClick={onClose} />
+          <Button label={isCopied ? 'Copied!' : 'Copy'} onClick={onCopy} />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>
