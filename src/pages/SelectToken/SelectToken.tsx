@@ -147,6 +147,7 @@ const SelectToken: React.FC = () => {
               value={searchValue}
               label="Type a currency or ticker"
               onChange={setSearchValue}
+              type="text"
             />
 
             {!filterTokensList.length && tokensList.length ? (
@@ -161,7 +162,7 @@ const SelectToken: React.FC = () => {
 
                 return (
                   <Styles.TokenBlock key={symbol} onClick={() => onAddToken(symbol)}>
-                    <CurrencyLogo symbol={symbol} width={40} height={40} br={10} chain={chain} />
+                    <CurrencyLogo symbol={symbol} size={40} br={10} chain={chain} />
                     <Styles.TokenName>{name}</Styles.TokenName>
                     <Styles.TokenSymbol>{toUpper(symbol)}</Styles.TokenSymbol>
                   </Styles.TokenBlock>

@@ -273,8 +273,7 @@ const AddCustomToken: React.FC = () => {
 
             <Styles.TokenCard>
               <CurrencyLogo
-                width={40}
-                height={40}
+                size={40}
                 symbol={logoSymbol}
                 chain={selectedNetwork.chain}
                 name={tokenInfo.name || 'T'}
@@ -315,6 +314,7 @@ const AddCustomToken: React.FC = () => {
               onChange={onChangeAddress}
               onBlurInput={onBlurInput}
               errorLabel={errorLabel}
+              type="text"
             />
             <Styles.ButtonRow>
               <Button

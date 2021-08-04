@@ -128,8 +128,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
         {currencySymbol ? (
           <CurrencyLogo
             symbol={currencySymbol}
-            width={40}
-            height={40}
+            size={40}
             br={currencyBr || 13}
             background={background || getTokenBackground}
             chain={tokenChain}
@@ -181,8 +180,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
                   {logo ? (
                     <CurrencyLogo
                       symbol={logo.symbol}
-                      width={logo.width}
-                      height={logo.height}
+                      size={logo.width}
                       br={logo.br}
                       background={logo.background}
                       chain={logo?.chain}

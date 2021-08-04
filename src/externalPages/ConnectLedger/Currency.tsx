@@ -131,7 +131,7 @@ const Currency: React.FC<Props> = (props) => {
   return (
     <Styles.Currency>
       <Styles.CurrencyHeading onClick={onClickHeading} isActive={isActive}>
-        <CurrencyLogo symbol={symbol} width={30} height={30} br={10} />
+        <CurrencyLogo symbol={symbol} size={30} br={10} />
         <Styles.CurrencyHeadingRow>
           {currencyInfo ? <Styles.CurrencyName>{currencyInfo.name}</Styles.CurrencyName> : null}
           {!isActive ? (

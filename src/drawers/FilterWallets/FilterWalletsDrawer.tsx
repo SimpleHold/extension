@@ -262,13 +262,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
               if (symbol && index < 5) {
                 return (
                   <Styles.DropdownCurrency key={`${symbol}/${chain}`}>
-                    <CurrencyLogo
-                      symbol={symbol}
-                      chain={chain}
-                      width={40}
-                      height={40}
-                      name={name}
-                    />
+                    <CurrencyLogo symbol={symbol} chain={chain} size={40} name={name} />
                   </Styles.DropdownCurrency>
                 )
               }
