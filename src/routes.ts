@@ -1,205 +1,160 @@
 import { RouteProps } from 'react-router-dom'
 import Loadable from 'react-loadable'
 
-// Pages
-const WalletsPage = Loadable({
-  loader: () => import('@pages/Wallets'),
-  loading: () => null,
-})
-
-const ReceivePage = Loadable({
-  loader: () => import('@pages/Receive'),
-  loading: () => null,
-})
-
-const SendPage = Loadable({
-  loader: () => import('@pages/Send'),
-  loading: () => null,
-})
-
-const SendConfirmationPage = Loadable({
-  loader: () => import('@pages/SendConfirmation'),
-  loading: () => null,
-})
-
-const AnalyticsDataPage = Loadable({
-  loader: () => import('@pages/AnalyticsData'),
-  loading: () => null,
-})
-
-const WelcomePage = Loadable({
-  loader: () => import('@pages/Welcome'),
-  loading: () => null,
-})
-
-const CreateWalletPage = Loadable({
-  loader: () => import('@pages/CreateWallet'),
-  loading: () => null,
-})
-
-const DownloadBackupPage = Loadable({
-  loader: () => import('@pages/DownloadBackup'),
-  loading: () => null,
-})
-
-const RestoreWalletPage = Loadable({
-  loader: () => import('@pages/RestoreWallet'),
-  loading: () => null,
-})
-
-const SettingsPage = Loadable({
-  loader: () => import('@pages/Settings'),
-  loading: () => null,
-})
-
-const NewWalletPage = Loadable({
-  loader: () => import('@pages/NewWallet'),
-  loading: () => null,
-})
-
-const ImportPrivateKeyPage = Loadable({
-  loader: () => import('@pages/ImportPrivateKey'),
-  loading: () => null,
-})
-
-const OnBoardPage = Loadable({
-  loader: () => import('@pages/OnBoard'),
-  loading: () => null,
-})
-
-const LockPage = Loadable({
-  loader: () => import('@pages/Lock'),
-  loading: () => null,
-})
-
-const SelectCurrency = Loadable({
-  loader: () => import('@pages/SelectCurrency'),
-  loading: () => null,
-})
-
-const EnterPasscode = Loadable({
-  loader: () => import('@pages/EnterPasscode'),
-  loading: () => null,
-})
-
-const AddCustomToken = Loadable({
-  loader: () => import('@pages/AddCustomToken'),
-  loading: () => null,
-})
-
-const AddTokenToAddress = Loadable({
-  loader: () => import('@pages/AddTokenToAddress'),
-  loading: () => null,
-})
-
-const FoundTokens = Loadable({
-  loader: () => import('@pages/FoundTokens'),
-  loading: () => null,
-})
-
-const SelectToken = Loadable({
-  loader: () => import('@pages/SelectToken'),
-  loading: () => null,
-})
-
-const ImportRecoveryPhrase = Loadable({
-  loader: () => import('@pages/ImportRecoveryPhrase'),
-  loading: () => null,
-})
-
-const WalletPage = Loadable({
-  loader: () => import('@pages/Wallet'),
-  loading: () => null,
-})
-
 const routers: RouteProps[] = [
   {
     path: '/wallets',
-    component: WalletsPage,
+    component: Loadable({
+      loader: () => import('@pages/Wallets'),
+      loading: () => null,
+    }),
   },
   {
     path: '/receive',
-    component: ReceivePage,
+    component: Loadable({
+      loader: () => import('@pages/Receive'),
+      loading: () => null,
+    }),
   },
   {
     path: '/send',
-    component: SendPage,
+    component: Loadable({
+      loader: () => import('@pages/Send'),
+      loading: () => null,
+    }),
   },
   {
     path: '/send-confirm',
-    component: SendConfirmationPage,
+    component: Loadable({
+      loader: () => import('@pages/SendConfirmation'),
+      loading: () => null,
+    }),
   },
   {
     path: '/analytics-data',
-    component: AnalyticsDataPage,
+    component: Loadable({
+      loader: () => import('@pages/AnalyticsData'),
+      loading: () => null,
+    }),
   },
   {
     path: '/welcome',
-    component: WelcomePage,
+    component: Loadable({
+      loader: () => import('@pages/Welcome'),
+      loading: () => null,
+    }),
   },
   {
     path: '/create-wallet',
-    component: CreateWalletPage,
+    component: Loadable({
+      loader: () => import('@pages/CreateWallet'),
+      loading: () => null,
+    }),
   },
   {
     path: '/download-backup',
-    component: DownloadBackupPage,
+    component: Loadable({
+      loader: () => import('@pages/DownloadBackup'),
+      loading: () => null,
+    }),
   },
   {
     path: '/restore-wallet',
-    component: RestoreWalletPage,
+    component: Loadable({
+      loader: () => import('@pages/RestoreWallet'),
+      loading: () => null,
+    }),
   },
   {
     path: '/settings',
-    component: SettingsPage,
+    component: Loadable({
+      loader: () => import('@pages/Settings'),
+      loading: () => null,
+    }),
   },
   {
     path: '/new-wallet',
-    component: NewWalletPage,
+    component: Loadable({
+      loader: () => import('@pages/NewWallet'),
+      loading: () => null,
+    }),
   },
   {
     path: '/import-private-key',
-    component: ImportPrivateKeyPage,
+    component: Loadable({
+      loader: () => import('@pages/ImportPrivateKey'),
+      loading: () => null,
+    }),
   },
   {
     path: '/onboard',
-    component: OnBoardPage,
+    component: Loadable({
+      loader: () => import('@pages/OnBoard'),
+      loading: () => null,
+    }),
   },
   {
     path: '/lock',
-    component: LockPage,
+    component: Loadable({
+      loader: () => import('@pages/Lock'),
+      loading: () => null,
+    }),
   },
   {
     path: '/select-currency',
-    component: SelectCurrency,
+    component: Loadable({
+      loader: () => import('@pages/SelectCurrency'),
+      loading: () => null,
+    }),
   },
   {
     path: '/enter-passcode',
-    component: EnterPasscode,
+    component: Loadable({
+      loader: () => import('@pages/EnterPasscode'),
+      loading: () => null,
+    }),
   },
   {
     path: '/add-custom-token',
-    component: AddCustomToken,
+    component: Loadable({
+      loader: () => import('@pages/AddCustomToken'),
+      loading: () => null,
+    }),
   },
   {
     path: '/add-token-to-address',
-    component: AddTokenToAddress,
+    component: Loadable({
+      loader: () => import('@pages/AddTokenToAddress'),
+      loading: () => null,
+    }),
   },
   {
     path: '/found-tokens',
-    component: FoundTokens,
+    component: Loadable({
+      loader: () => import('@pages/FoundTokens'),
+      loading: () => null,
+    }),
   },
   {
     path: '/select-token',
-    component: SelectToken,
+    component: Loadable({
+      loader: () => import('@pages/SelectToken'),
+      loading: () => null,
+    }),
   },
   {
     path: '/import-recovery-phrase',
-    component: ImportRecoveryPhrase,
+    component: Loadable({
+      loader: () => import('@pages/ImportRecoveryPhrase'),
+      loading: () => null,
+    }),
   },
   {
     path: '/wallet',
-    component: WalletPage,
+    component: Loadable({
+      loader: () => import('@pages/Wallet'),
+      loading: () => null,
+    }),
   },
 ]
 
