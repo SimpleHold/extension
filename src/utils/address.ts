@@ -233,10 +233,6 @@ export const getNewNetworkFee = async (
     return await getThetaNetworkFee(address)
   }
 
-  if (ripple.coins.indexOf(symbol) !== -1) {
-    return await getNetworkFee('ripple')
-  }
-
   return null
 }
 

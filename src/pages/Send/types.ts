@@ -37,4 +37,5 @@ export interface IState {
   amountErrorLabel: null | string
   currencyBalance: null | number
   utxosList: UnspentOutput[] | ICardanoUnspentTxOutput[]
+  backTitle: string
 }

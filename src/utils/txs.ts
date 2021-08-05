@@ -2,7 +2,8 @@ import dayjs from 'dayjs'
 import { groupBy } from 'lodash'
 
 // Utils
-import { getItem, getJSON } from '@utils/storage'
+import { getItem, getJSON, setItem } from '@utils/storage'
+import { toLower } from '@utils/format'
 
 // Types
 import { TAddressTx } from '@utils/api/types'
@@ -50,6 +51,30 @@ export const group = (txs: TAddressTx[]): TAddressTxGroup[] => {
   return data
 }
 
+export const compare = (
+  address: string,
+  chain: string,
+  txs: string[],
+  tokenSymbol?: string,
+  contractAddress?: string
+): string[] => {
+  const walletKey = getWalletKey(address, chain, tokenSymbol, contractAddress)
+
+  const findWalletStorage = getItem(walletKey)
+
+  if (findWalletStorage && txs.length) {
+    const getTxs = getJSON(findWalletStorage)
+
+    const getNewTxs = txs.filter((hash: string) => {
+      return !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(hash))
+    })
+
+    return getNewTxs
+  }
+
+  return []
+}
+
 export const getExist = (
   address: string,
   chain: string,
@@ -77,7 +102,28 @@ export const getExist = (
 export const save = (
   address: string,
   chain: string,
-  txs: TAddressTxGroup[],
+  txs: TAddressTx[],
   tokenSymbol?: string,
   contractAddress?: string
-) => {}
+) => {
+  const nonPendintTxs = txs.filter((tx: TAddressTx) => !tx.isPending)
+  const walletKey = getWalletKey(address, chain, tokenSymbol, contractAddress)
+
+  const findWalletStorage = getItem(walletKey)
+
+  if (findWalletStorage) {
+    const getTxs = getJSON(findWalletStorage)
+
+    if (getTxs) {
+      const getNewTxs = nonPendintTxs.filter((newTx: TAddressTx) => {
+        return !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(newTx.hash))
+      })
+
+      if (getNewTxs.length) {
+        setItem(walletKey, JSON.stringify([...getTxs, ...getNewTxs]))
+      }
+    }
+  } else {
+    setItem(walletKey, JSON.stringify(nonPendintTxs))
+  }
+}

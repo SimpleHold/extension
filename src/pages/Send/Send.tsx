@@ -60,11 +60,12 @@ const initialState: IState = {
   isFeeLoading: false,
   fee: 0,
   feeSymbol: '',
-  feeType: 'average',
+  feeType: 'slow',
   addressErrorLabel: null,
   amountErrorLabel: null,
   currencyBalance: null,
   utxosList: [],
+  backTitle: '',
 }
 
 const SendPage: React.FC = () => {
@@ -79,6 +80,7 @@ const SendPage: React.FC = () => {
     selectedAddress: locationState.address,
     walletName: locationState.walletName,
     hardware: locationState.hardware,
+    backTitle: locationState.walletName,
   })
 
   const debounced = useDebounce(state.amount, 1000)
@@ -316,10 +318,7 @@ const SendPage: React.FC = () => {
 
     const availableBalance = getAvailableBalance()
 
-    if (
-      state.amount.length &&
-      Number(state.amount) + Number(state.fee) >= Number(availableBalance)
-    ) {
+    if (state.amount.length && Number(state.amount) > availableBalance) {
       return updateState({ amountErrorLabel: 'Insufficient funds' })
     }
 
@@ -391,7 +390,7 @@ const SendPage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle={state.walletName} />
+        <Header withBack onBack={history.goBack} backTitle={state.backTitle} />
         <Styles.Container>
           <Styles.Title>Send {toUpper(symbol)}</Styles.Title>
           <Styles.Body>

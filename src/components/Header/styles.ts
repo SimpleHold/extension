@@ -23,7 +23,7 @@ const Container = styled.div`
   border-bottom: ${({ withBorder, borderColor }: TContainerProps) =>
     withBorder ? `0.5px solid ${borderColor || '#EAEAEA'}` : 'none'};
   z-index: 100;
-  position:  ${({isAbsolute}: TContainerProps) => isAbsolute ? 'absolute' : 'relative'};
+  position: ${({ isAbsolute }: TContainerProps) => (isAbsolute ? 'absolute' : 'relative')};
 `
 
 const Row = styled.div`
@@ -31,6 +31,7 @@ const Row = styled.div`
   flex-direction: row;
   align-items: center;
   flex: 1;
+  overflow: hidden;
 `
 
 const Logo = styled.div`
@@ -82,6 +83,7 @@ const Navigate = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  overflow: hidden;
 
   path {
     fill: #ffffff;
@@ -114,6 +116,8 @@ const NavigateTitle = styled.p`
   line-height: 16px;
   color: #ffffff;
   opacity: 0.6;
+  text-overflow: ellipsis;
+  overflow: hidden;
 `
 
 const LogoRow = styled.div`

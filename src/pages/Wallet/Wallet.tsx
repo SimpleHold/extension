@@ -32,7 +32,13 @@ import { validatePassword } from '@utils/validate'
 import { getItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { toLower } from '@utils/format'
-import { save as saveTxs, TAddressTxGroup, group as groupTxs } from '@utils/txs'
+import {
+  TAddressTxGroup,
+  save as saveTxs,
+  group as groupTxs,
+  compare as compareTxs,
+  getExist as getExistTxs,
+} from '@utils/txs'
 
 // Config
 import { getCurrency, checkWithPhrase } from '@config/currencies'
@@ -140,12 +146,15 @@ const WalletPage: React.FC = () => {
       )
 
       if (data.length) {
-        const getFullTxHistoryInfo = await getTxsInfo(currency.chain, address, data)
+        const compare = compareTxs(address, currency.chain, data, tokenSymbol, contractAddress)
 
-        const group = groupTxs(getFullTxHistoryInfo)
+        if (compare.length) {
+          const getFullTxHistoryInfo = await getTxsInfo(currency.chain, address, compare)
+          saveTxs(address, currency.chain, getFullTxHistoryInfo, tokenSymbol, contractAddress)
+        }
 
+        const group = groupTxs(getExistTxs(address, currency.chain, tokenSymbol, contractAddress))
         setTxHistory(group)
-        saveTxs(address, currency.chain, group, tokenSymbol, contractAddress)
       } else {
         setTxHistory([])
       }
