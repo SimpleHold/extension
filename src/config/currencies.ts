@@ -24,6 +24,7 @@ export interface ICurrency {
   background: string
   chain: string
   minSendAmount: number
+  isCustomFee: boolean
 }
 
 const currencies: ICurrency[] = [
@@ -34,6 +35,7 @@ const currencies: ICurrency[] = [
     background: '#F7931A',
     chain: 'bitcoin',
     minSendAmount: 1000,
+    isCustomFee: true,
   },
   {
     name: 'Bitcoin Cash',
@@ -42,6 +44,7 @@ const currencies: ICurrency[] = [
     background: '#57BD91',
     chain: 'bitcoin-cash',
     minSendAmount: 87000,
+    isCustomFee: true,
   },
   {
     name: 'Bitcoin SV',
@@ -50,6 +53,7 @@ const currencies: ICurrency[] = [
     background: '#EAB300',
     chain: 'bitcoin-sv',
     minSendAmount: 200000,
+    isCustomFee: true,
   },
   {
     name: 'Litecoin',
@@ -58,6 +62,7 @@ const currencies: ICurrency[] = [
     background: '#5EABE9',
     chain: 'litecoin',
     minSendAmount: 245000,
+    isCustomFee: true,
   },
   {
     name: 'Dogecoin',
@@ -66,6 +71,7 @@ const currencies: ICurrency[] = [
     background: '#C3A634',
     chain: 'dogecoin',
     minSendAmount: 100000000,
+    isCustomFee: true,
   },
   {
     name: 'Dash',
@@ -74,6 +80,7 @@ const currencies: ICurrency[] = [
     background: '#008DE4',
     chain: 'dash',
     minSendAmount: 100000,
+    isCustomFee: true,
   },
   {
     name: 'Ethereum',
@@ -82,6 +89,7 @@ const currencies: ICurrency[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 1000000000000000,
+    isCustomFee: true,
   },
   {
     name: 'Ethereum Classic',
@@ -90,6 +98,7 @@ const currencies: ICurrency[] = [
     background: '#49803D',
     chain: 'etc',
     minSendAmount: 1000000000000000,
+    isCustomFee: true,
   },
   {
     name: 'Binance Smart Chain',
@@ -98,6 +107,7 @@ const currencies: ICurrency[] = [
     background: '#EBBB4E',
     chain: 'bsc',
     minSendAmount: 1000000000000000,
+    isCustomFee: true,
   },
   {
     name: 'Theta',
@@ -106,6 +116,7 @@ const currencies: ICurrency[] = [
     background: '#76CCD3',
     chain: 'theta',
     minSendAmount: 1000000000000000,
+    isCustomFee: false,
   },
   {
     name: 'Theta Fuel',
@@ -114,6 +125,7 @@ const currencies: ICurrency[] = [
     background: '#EF8053',
     chain: 'tfuel',
     minSendAmount: 1000000000000000,
+    isCustomFee: false,
   },
   {
     name: 'Cardano Shelley',
@@ -122,6 +134,7 @@ const currencies: ICurrency[] = [
     background: '#2B55BB',
     chain: 'cardano',
     minSendAmount: 1000000,
+    isCustomFee: false,
   },
   {
     name: 'XRP',
@@ -130,6 +143,7 @@ const currencies: ICurrency[] = [
     background: '#5088BC',
     chain: 'ripple',
     minSendAmount: 1000,
+    isCustomFee: false,
   },
   {
     name: 'Neblio',
@@ -138,6 +152,7 @@ const currencies: ICurrency[] = [
     background: '#9172CE',
     chain: 'neblio',
     minSendAmount: 100000,
+    isCustomFee: false,
   },
 ]
 
