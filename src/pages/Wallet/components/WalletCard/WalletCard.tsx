@@ -9,9 +9,13 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { toUpper, price } from '@utils/format'
+import { logEvent } from '@utils/amplitude'
 
 // Assets
 import refreshIcon from '@assets/icons/refresh.svg'
+
+// Config
+import { ADDRESS_COPY } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -54,6 +58,10 @@ const WalletCard: React.FC<Props> = (props) => {
   const copyAddress = (): void => {
     copy(address)
     setIsCopied(true)
+
+    logEvent({
+      name: ADDRESS_COPY,
+    })
   }
 
   return (

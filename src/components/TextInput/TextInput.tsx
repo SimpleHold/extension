@@ -63,8 +63,6 @@ const TextInput: React.FC<Props> = (props) => {
   }
 
   const onClear = (): void => {
-    setIsFocused(false)
-    textInputRef.current?.focus()
     onChange('')
   }
 

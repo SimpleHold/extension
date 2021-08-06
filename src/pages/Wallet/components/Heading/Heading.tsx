@@ -28,7 +28,7 @@ import Styles from './styles'
 
 interface Props {
   symbol: string
-  onSelectDropdown: (index: number) => void
+  onSelectDropdown: (key: string) => void
   withPhrase: boolean
   walletName: string
   onRenameWallet: () => void
@@ -58,31 +58,40 @@ const WalletHeading: React.FC<Props> = (props) => {
   const getDropdownList = (): void => {
     const list: TDropdowbList[] = []
 
-    if (withPhrase) {
-      list.push({
-        icon: {
-          source: phraseIcon,
-          width: 16,
-          height: 16,
-        },
-        title: 'Show recovery phrase',
-      })
-    } else {
-      list.push({
-        icon: {
-          source: privateKeyIcon,
-          width: 18,
-          height: 18,
-        },
-        title: 'Show Private key',
-      })
+    if (!hardware) {
+      if (withPhrase) {
+        list.push({
+          icon: {
+            source: phraseIcon,
+            width: 16,
+            height: 16,
+          },
+          title: 'Show recovery phrase',
+          key: 'recoveryPhrase',
+        })
+      } else {
+        list.push({
+          icon: {
+            source: privateKeyIcon,
+            width: 18,
+            height: 18,
+          },
+          title: 'Show Private key',
+          key: 'privateKey',
+        })
+      }
     }
 
     list.push(
-      { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
+      {
+        icon: { source: linkIcon, width: 16, height: 16 },
+        title: 'View in Explorer',
+        key: 'explorer',
+      },
       {
         icon: { source: isHidden ? eyeVisibleIcon : eyeIcon, width: 30, height: 30 },
         title: `${isHidden ? 'Show' : 'Hide'} address`,
+        key: 'availability',
       }
     )
 
@@ -90,6 +99,7 @@ const WalletHeading: React.FC<Props> = (props) => {
       list.push({
         icon: { source: plusCircleIcon, width: 18, height: 18 },
         title: 'Add token',
+        key: 'addToken',
       })
     }
 
@@ -100,9 +110,9 @@ const WalletHeading: React.FC<Props> = (props) => {
     setIsVisible(!isVisible)
   }
 
-  const onClickDropDown = (index: number): void => {
+  const onClickDropDown = (key: string): void => {
     toggleDropdownVisible()
-    onSelectDropdown(index)
+    onSelectDropdown(key)
   }
 
   const onRename = (): void => {
