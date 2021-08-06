@@ -75,8 +75,7 @@ export const getUnspentOutputs = async (address: string, chain: string): Promise
 
 export const sendRawTransaction = async (
   transaction: string,
-  currency?: string,
-  from?: string
+  currency?: string
 ): Promise<string | null> => {
   try {
     if (currency) {
@@ -89,9 +88,6 @@ export const sendRawTransaction = async (
         {
           headers: {
             'Content-Type': 'application/json',
-          },
-          params: {
-            from,
           },
         }
       )
