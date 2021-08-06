@@ -246,7 +246,7 @@ export const ethereumSignTransaction = async (
       )
 
       if (rawTx) {
-        return await sendRawTransaction(rawTx, 'eth', 'trezor')
+        return await sendRawTransaction(rawTx, 'eth')
       }
     }
 

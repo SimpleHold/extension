@@ -161,6 +161,10 @@ const SendPage: React.FC = () => {
       if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
         updateState({ currencyBalance: data.currencyBalance })
       }
+    } else {
+      if (Number(state.amount) > 0 && Number(state.balance) > 0) {
+        updateState({ amountErrorLabel: 'Insufficient funds' })
+      }
     }
   }
 
@@ -323,10 +327,12 @@ const SendPage: React.FC = () => {
       updateState({ amountErrorLabel: null })
     }
 
-    const availableBalance = getAvailableBalance()
+    if (toLower(symbol) === 'xrp') {
+      const availableBalance = getAvailableBalance()
 
-    if (state.amount.length && Number(state.amount) > availableBalance) {
-      return updateState({ amountErrorLabel: 'Insufficient funds' })
+      if (state.amount.length && Number(state.amount) > availableBalance) {
+        return updateState({ amountErrorLabel: 'Insufficient funds' })
+      }
     }
 
     if (currency) {
