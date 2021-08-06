@@ -8,6 +8,9 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   height: 540px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 `
 
 const Row = styled.div`
@@ -33,13 +36,14 @@ const Form = styled.form`
   padding: 30px;
   border-top: 1px solid #eaeaea;
   background-color: #f8f8f8;
+  flex: 1;
 `
 
 const Actions = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin: 34px 0 0 0;
+  margin: 44px 0 0 0;
 `
 
 const Styles = {

@@ -258,7 +258,7 @@ const SelectAddress: React.FC = () => {
           {filterWallets?.length ? (
             <Styles.AddressesList>
               {filterWallets.map((wallet: IWallet, index: number) => {
-                const { address, symbol, chain, name, contractAddress, decimals } = wallet
+                const { address, symbol, chain, name, contractAddress, decimals, hardware } = wallet
 
                 return (
                   <WalletCard
@@ -270,6 +270,7 @@ const SelectAddress: React.FC = () => {
                     contractAddress={contractAddress}
                     decimals={decimals}
                     handleClick={handleClick(address)}
+                    hardware={hardware}
                   />
                 )
               })}

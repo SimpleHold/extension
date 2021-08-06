@@ -258,6 +258,34 @@ export const getXrpTxParams = async (from: string) => {
   }
 }
 
+export const getTxHex = async (chain: string, txId: string): Promise<null | string> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/tx-hex/${chain}/${txId}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const getFeePerByte = async (chain: string): Promise<number> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/wallet/fee/${chain}`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return 0
+  }
+}
+
 export const getPhishingSites = async (): Promise<TPhishingSite[] | null> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/phishing-sites`, {

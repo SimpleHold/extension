@@ -5,7 +5,6 @@ type TContainerProps = {
   isLight?: boolean
   ml?: number
   mr?: number
-  isSmall?: boolean
   isDanger?: boolean
   mt?: number
 }
@@ -90,7 +89,7 @@ const Container = styled.button`
   outline: none;
   background-color: ${(props: TContainerProps) => getBackgroundColor(props)};
   border: ${(props: TContainerProps) => `1px solid ${getBorderColor(props)}`};
-  height: ${({ isSmall }: TContainerProps) => (isSmall ? '50px' : '60px')};
+  height: 50px;
   border-radius: 5px;
   transition: all 0.3s;
   margin-left: ${({ ml }: TContainerProps) => (ml ? `${ml}px` : '0')};

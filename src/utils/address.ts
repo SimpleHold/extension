@@ -4,7 +4,7 @@ import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
 import { getToken, IToken } from '@config/tokens'
 
 // Utils
-import { getEtherNetworkFee, getThetaNetworkFee, getNetworkFee } from '@utils/api'
+import { getEtherNetworkFee, getThetaNetworkFee, getNetworkFee, getFeePerByte } from '@utils/api'
 import { IGetNetworkFeeResponse } from '@utils/api/types'
 import { toLower } from '@utils/format'
 
@@ -221,7 +221,8 @@ export const getNewNetworkFee = async (
     if (neblio.coins.indexOf(symbol) !== -1) {
       return neblio.getNetworkFee(address, outputs, amount)
     }
-    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+    const btcFeePerByte = await getFeePerByte(chain)
+    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount, btcFeePerByte)
   }
 
   if (ripple.coins.indexOf(symbol) !== -1) {
@@ -230,6 +231,10 @@ export const getNewNetworkFee = async (
 
   if (theta.coins.indexOf(symbol) !== -1) {
     return await getThetaNetworkFee(address)
+  }
+
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return await getNetworkFee('ripple')
   }
 
   return null
@@ -278,7 +283,9 @@ export const getAddressNetworkFee = async (
       if (neblio.coins.indexOf(symbol) !== -1) {
         return neblio.getNetworkFee(address, outputs, amount)
       }
-      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount)
+
+      const btcFeePerByte = await getFeePerByte(chain)
+      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount, btcFeePerByte)
     }
 
     return null

@@ -1,7 +1,6 @@
 import styled from 'styled-components'
 
 type TDrawerProps = {
-  withIcon: boolean
   openFrom?: string
 }
 
@@ -27,7 +26,7 @@ const Background = styled.div`
 const Drawer = styled.div`
   background-color: #ffffff;
   border-radius: 5px 5px 0 0;
-  padding: ${({ withIcon }: TDrawerProps) => (withIcon ? '20px 30px 30px 30px' : '30px')};
+  padding: 30px;
   word-break: break-word;
   position: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
   z-index: 11;

@@ -25,6 +25,7 @@ const extensionReloaderPlugin =
           contentScript: 'contentScript',
           background: 'background',
           inpage: 'inpage',
+          trezor: 'trezor',
           extensionPage: [
             'popup',
             'downloadBackup',
@@ -51,7 +52,7 @@ const getExtensionFileType = (browser) => {
   return 'zip'
 }
 
-module.exports = {
+const config = {
   devtool: false,
   stats: {
     all: false,
@@ -65,12 +66,16 @@ module.exports = {
     background: path.join(sourcePath, 'utils', 'browser', 'background.ts'),
     contentScript: path.join(sourcePath, 'utils', 'browser', 'contentScript.ts'),
     inpage: path.join(sourcePath, 'utils', 'browser', 'inpage.ts'),
+    trezor: path.join(sourcePath, 'utils', 'trezor', 'trezor-content-script.ts'),
+    trezorUsbPermissions: path.join(sourcePath, 'utils', 'trezor', 'trezor-usb-permissions.ts'),
     popup: path.join(sourcePath, 'app.tsx'),
     downloadBackup: path.join(sourcePath, 'externalPages/DownloadBackup/DownloadBackup.tsx'),
     restoreBackup: path.join(sourcePath, 'externalPages/RestoreBackup/RestoreBackup.tsx'),
     selectAddress: path.join(sourcePath, 'externalPages/SelectAddress/SelectAddress.tsx'),
     send: path.join(sourcePath, 'externalPages/Send/Send.tsx'),
     sendConfirmation: path.join(sourcePath, 'externalPages/SendConfirmation/SendConfirmation.tsx'),
+    connectTrezor: path.join(sourcePath, 'externalPages/ConnectTrezor/ConnectTrezor.tsx'),
+    connectLedger: path.join(sourcePath, 'externalPages/connectLedger/connectLedger.tsx'),
     phishing: path.join(sourcePath, 'externalPages/Phishing/Phishing.tsx'),
   },
   output: {
@@ -182,6 +187,27 @@ module.exports = {
       hash: true,
       filename: 'send-confirmation.html',
     }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'connect-trezor.html'),
+      inject: 'body',
+      chunks: ['connectTrezor'],
+      hash: true,
+      filename: 'connect-trezor.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'connect-ledger.html'),
+      inject: 'body',
+      chunks: ['connectLedger'],
+      hash: true,
+      filename: 'connect-ledger.html',
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(viewsPath, 'trezor-usb-permissions.html'),
+      inject: 'body',
+      chunks: [],
+      hash: true,
+      filename: 'trezor-usb-permissions.html',
+    }),
     new CopyWebpackPlugin({
       patterns: [
         { from: 'src/assets', to: 'assets' },
@@ -222,11 +248,21 @@ module.exports = {
     splitChunks: {
       cacheGroups: {
         vendors: {
-          test: /[\\/]node_modules[\\/]/,
+          test: /[\\/]node_modules[\\/]((?!(@emurgo)).*)[\\/]/,
           name: 'vendors',
-          chunks: 'all',
+          chunks(chunk) {
+            return (
+              chunk.name !== 'background' &&
+              chunk.name !== 'contentScript' &&
+              chunk.name !== 'trezor' &&
+              chunk.name !== 'inpage' &&
+              chunk.name !== 'trezorUsbPermissions'
+            )
+          },
         },
       },
     },
   },
 }
+
+module.exports = config

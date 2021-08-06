@@ -150,8 +150,8 @@ const FoundTokens: React.FC = () => {
           </Styles.Row>
 
           <Styles.Actions>
-            <Button label="Skip" isLight isSmall mr={7.5} onClick={() => onConfirm(false)} />
-            <Button label="Ok" isSmall ml={7.5} onClick={() => onConfirm(true)} />
+            <Button label="Skip" isLight mr={7.5} onClick={() => onConfirm(false)} />
+            <Button label="Ok" ml={7.5} onClick={() => onConfirm(true)} />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>

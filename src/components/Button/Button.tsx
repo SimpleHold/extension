@@ -14,7 +14,6 @@ interface Props {
   isLight?: boolean
   mr?: number
   ml?: number
-  isSmall?: boolean
   isDanger?: boolean
   isLoading?: boolean
   icon?: string
@@ -22,19 +21,7 @@ interface Props {
 }
 
 const Button: React.FC<Props> = (props) => {
-  const {
-    label,
-    disabled,
-    isLight,
-    mr,
-    ml,
-    isSmall,
-    isDanger,
-    onClick,
-    isLoading,
-    icon,
-    mt,
-  } = props
+  const { label, disabled, isLight, mr, ml, isDanger, onClick, isLoading, icon, mt } = props
 
   const buttonOnClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void => {
     event.preventDefault()
@@ -47,7 +34,6 @@ const Button: React.FC<Props> = (props) => {
       isLight={isLight}
       mr={mr}
       ml={ml}
-      isSmall={isSmall}
       isDanger={isDanger}
       onClick={buttonOnClick}
       mt={mt}

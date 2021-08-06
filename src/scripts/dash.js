@@ -32,12 +32,14 @@ const dash = (function () {
     }
   }
 
-  const getFee = (outputs, to, amount, changeAddress) => {
-    return new window.dashcore.Transaction()
+  const getFee = (outputs, to, amount, changeAddress, feePerByte) => {
+    const txSize = new window.dashcore.Transaction()
       .from(outputs)
       .to(to, amount)
       .change(changeAddress)
-      .getFee()
+      .toString().length
+
+    return txSize * 2 * feePerByte
   }
 
   const isAddressValid = (address) => {

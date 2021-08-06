@@ -41,8 +41,21 @@ interface BitcoinLikeProvider {
     changeAddress: string,
     privateKey: string
   ) => TCreatedTransaction
-  getFee: (outputs: UnspentOutput[], to: string, amount: number, changeAddress: string) => number
+  getFee: (
+    outputs: UnspentOutput[],
+    to: string,
+    amount: number,
+    changeAddress: string,
+    feePerByte: number
+  ) => number
   isAddressValid: (address: string) => boolean
+  createUnsignedTx: (
+    outputs: UnspentOutput[],
+    to: string,
+    amount: number,
+    fee: number,
+    changeAddress: string
+  ) => string
 }
 
 declare const bitcoin: BitcoinLikeProvider

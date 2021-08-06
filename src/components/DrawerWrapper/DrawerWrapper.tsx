@@ -55,7 +55,6 @@ const DrawerWrapper: React.FC<Props> = (props) => {
             openFrom={openFrom}
           />
           <Styles.Drawer
-            withIcon={icon !== undefined}
             openFrom={openFrom}
             style={{
               ...drawerStyle[state],

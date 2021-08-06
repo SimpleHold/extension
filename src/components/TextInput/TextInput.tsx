@@ -1,4 +1,5 @@
 import * as React from 'react'
+import SVG from 'react-inlinesvg'
 
 // Styles
 import Styles from './styles'
@@ -15,6 +16,11 @@ interface Props {
   disabled?: boolean
   openFrom?: string
   button?: React.ReactElement<any, any> | null
+  icon?: {
+    src: string
+    width: number
+    height: number
+  }
 }
 
 const TextInput: React.FC<Props> = (props) => {
@@ -30,6 +36,7 @@ const TextInput: React.FC<Props> = (props) => {
     disabled,
     openFrom,
     button,
+    icon,
   } = props
 
   const textInputRef = inputRef || React.useRef<HTMLInputElement>(null)
@@ -119,6 +126,11 @@ const TextInput: React.FC<Props> = (props) => {
         </Styles.VisibleInput>
       ) : null}
       {button || null}
+      {icon ? (
+        <Styles.IconRow>
+          <SVG src={icon.src} width={icon.width} height={icon.height} />
+        </Styles.IconRow>
+      ) : null}
     </Styles.Container>
   )
 }

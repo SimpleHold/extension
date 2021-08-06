@@ -157,11 +157,10 @@ const RestoreBackup: React.FC = () => {
           <AgreeTerms isAgreed={isAgreed} setIsAgreed={() => setIsAgreed(!isAgreed)} mt={20} />
 
           <Styles.Actions>
-            <Button label="Cancel" onClick={onClose} isSmall isLight mr={7.5} />
+            <Button label="Cancel" onClick={onClose} isLight mr={7.5} />
             <Button
               label="Confirm"
               onClick={onConfirm}
-              isSmall
               disabled={!backupData.length || !isAgreed}
               ml={7.5}
             />
