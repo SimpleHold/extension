@@ -87,12 +87,6 @@ const SendConfirmation: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
-    if (ledgerTransport) {
-      createLedgerTx()
-    }
-  }, [ledgerTransport])
-
-  React.useEffect(() => {
     if (ledgerDrawerState && !activeDrawer) {
       setActiveDrawer('ledger')
     }

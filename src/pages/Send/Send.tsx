@@ -142,6 +142,9 @@ const Send: React.FC = () => {
 
   const getNetworkFee = async (): Promise<void> => {
     setUtxosList([])
+    if (networkFee) {
+      setNetworkFee(0)
+    }
 
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
 
@@ -175,6 +178,10 @@ const Send: React.FC = () => {
 
       if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
         setCurrencyBalance(data.currencyBalance)
+      }
+    } else {
+      if (Number(amount) > 0 && Number(balance) > 0) {
+        setAmountErrorLabel('Insufficient funds')
       }
     }
   }
@@ -281,10 +288,12 @@ const Send: React.FC = () => {
       setAmountErrorLabel(null)
     }
 
-    const availableBalance = getAvailableBalance()
+    if (toLower(symbol) === 'xrp') {
+      const availableBalance = getAvailableBalance()
 
-    if (amount.length && Number(amount) + Number(networkFee) >= Number(availableBalance)) {
-      return setAmountErrorLabel('Insufficient funds')
+      if (amount.length && Number(amount) + Number(networkFee) >= Number(availableBalance)) {
+        return setAmountErrorLabel('Insufficient funds')
+      }
     }
 
     if (currency) {
