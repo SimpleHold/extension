@@ -1,6 +1,8 @@
 // Types
 import { THardware, IWallet } from '@utils/wallet'
 import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
+import { ICurrency } from '@config/currencies'
+import { IToken } from '@config/tokens'
 
 export type TFees = 'slow' | 'average' | 'fast'
 
@@ -14,6 +16,7 @@ export interface ILocationState {
   tokenName?: string
   decimals?: number
   hardware: THardware
+  currency: ICurrency | IToken
 }
 
 export interface IState {

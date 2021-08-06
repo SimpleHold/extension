@@ -34,7 +34,6 @@ import useDebounce from '@hooks/useDebounce'
 import useState from '@hooks/useState'
 
 // Config
-import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
 
@@ -70,22 +69,30 @@ const initialState: IState = {
 
 const SendPage: React.FC = () => {
   const {
-    state: locationState,
-    state: { symbol, chain, tokenChain, contractAddress, tokenName, decimals },
+    state: {
+      symbol,
+      chain,
+      tokenChain,
+      contractAddress,
+      tokenName,
+      decimals,
+      address,
+      walletName,
+      hardware,
+      currency,
+    },
   } = useLocation<ILocationState>()
   const history = useHistory()
 
   const { state, updateState } = useState<IState>({
     ...initialState,
-    selectedAddress: locationState.address,
-    walletName: locationState.walletName,
-    hardware: locationState.hardware,
-    backTitle: locationState.walletName,
+    selectedAddress: address,
+    walletName,
+    hardware,
+    backTitle: walletName,
   })
 
   const debounced = useDebounce(state.amount, 1000)
-
-  const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
 
   React.useEffect(() => {
     getWalletsList()
@@ -448,6 +455,7 @@ const SendPage: React.FC = () => {
                   type={state.feeType}
                   setType={setFeeType}
                   isBalanceError={isCurrencyBalanceError && state.currencyBalance !== null}
+                  withButton={currency.isCustomFee}
                 />
               </Styles.Form>
             </Styles.Row>

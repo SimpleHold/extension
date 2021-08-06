@@ -22,10 +22,11 @@ interface Props {
   type: TFeeTypes
   setType: (type: TFeeTypes) => void
   isBalanceError: boolean
+  withButton: boolean
 }
 
 const NetworkFee: React.FC<Props> = (props) => {
-  const { isLoading, fee, symbol, type, setType, isBalanceError } = props
+  const { isLoading, fee, symbol, type, setType, isBalanceError, withButton } = props
 
   return (
     <Styles.Container>
@@ -48,7 +49,7 @@ const NetworkFee: React.FC<Props> = (props) => {
           </Styles.FeeRow>
         )}
       </Styles.Row>
-      <FeeButton type={type} onChange={setType} />
+      {withButton ? <FeeButton type={type} onChange={setType} /> : null}
     </Styles.Container>
   )
 }
