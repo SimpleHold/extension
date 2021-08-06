@@ -4,8 +4,14 @@ import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
 import { getToken, IToken } from '@config/tokens'
 
 // Utils
-import { getEtherNetworkFee, getThetaNetworkFee, getNetworkFee, getFeePerByte } from '@utils/api'
-import { IGetNetworkFeeResponse } from '@utils/api/types'
+import {
+  getEtherNetworkFee,
+  getThetaNetworkFee,
+  getNetworkFee,
+  getFeePerByte,
+  getCustomFee,
+} from '@utils/api'
+import { IGetNetworkFeeResponse, TCustomFee } from '@utils/api/types'
 import { toLower } from '@utils/format'
 
 // Currencies
@@ -445,5 +451,20 @@ export const checkWithOuputs = (chain: string, symbol: string): boolean => {
     return false
   } catch {
     return false
+  }
+}
+
+export const getFee = async (
+  symbol: string,
+  chain: string,
+  tokenChain?: string
+): Promise<TCustomFee | null> => {
+  try {
+    if (bitcoinLike.coins().indexOf(chain) !== -1 || isEthereumLike(symbol, tokenChain)) {
+      return await getCustomFee(chain)
+    }
+    return null
+  } catch {
+    return null
   }
 }

@@ -57,3 +57,9 @@ export type TAddressTx = {
   amount: number
   estimated: number
 }
+
+export type TCustomFee = {
+  slow: number
+  average: number
+  fast: number
+}

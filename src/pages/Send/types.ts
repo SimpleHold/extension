@@ -3,6 +3,7 @@ import { THardware, IWallet } from '@utils/wallet'
 import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
 import { ICurrency } from '@config/currencies'
 import { IToken } from '@config/tokens'
+import { TCustomFee } from '@utils/api/types'
 
 export type TFees = 'slow' | 'average' | 'fast'
 
@@ -41,4 +42,6 @@ export interface IState {
   currencyBalance: null | number
   utxosList: UnspentOutput[] | ICardanoUnspentTxOutput[]
   backTitle: string
+  customFee: TCustomFee
+  selectedFee: number
 }

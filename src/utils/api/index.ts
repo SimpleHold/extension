@@ -12,6 +12,7 @@ import {
   IAdaTrParams,
   TPhishingSite,
   TAddressTx,
+  TCustomFee,
 } from './types'
 
 export const getBalance = async (
@@ -347,5 +348,15 @@ export const getTxsInfo = async (
     return data.data
   } catch {
     return []
+  }
+}
+
+export const getCustomFee = async (chain: string): Promise<TCustomFee | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/fee/${chain}`)
+
+    return data.data
+  } catch {
+    return null
   }
 }

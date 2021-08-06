@@ -26,6 +26,7 @@ import {
   formatUnit,
   getAddressNetworkFee,
   generateExtraId,
+  getFee,
 } from '@utils/address'
 import { logEvent } from '@utils/amplitude'
 
@@ -65,6 +66,12 @@ const initialState: IState = {
   currencyBalance: null,
   utxosList: [],
   backTitle: '',
+  customFee: {
+    slow: 0,
+    average: 0,
+    fast: 0,
+  },
+  selectedFee: 0,
 }
 
 const SendPage: React.FC = () => {
@@ -98,6 +105,7 @@ const SendPage: React.FC = () => {
     getWalletsList()
     getExtraId()
     getFeeSymbol()
+    getCustomFee()
   }, [])
 
   React.useEffect(() => {
@@ -124,6 +132,16 @@ const SendPage: React.FC = () => {
       }
     }
   }, [state.fee])
+
+  React.useEffect(() => {}, [state.feeType])
+
+  const getCustomFee = async (): Promise<void> => {
+    const customFee = await getFee(symbol, chain, tokenChain)
+
+    if (customFee) {
+      updateState({ customFee })
+    }
+  }
 
   const getNetworkFee = async (): Promise<void> => {
     updateState({ utxosList: [] })
@@ -389,7 +407,7 @@ const SendPage: React.FC = () => {
   }
 
   const setFeeType = (feeType: TFees): void => {
-    updateState({ feeType })
+    updateState({ feeType, selectedFee: state.customFee[feeType] })
   }
 
   const isCurrencyBalanceError =
