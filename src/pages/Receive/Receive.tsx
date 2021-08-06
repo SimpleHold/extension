@@ -18,66 +18,64 @@ import { logEvent } from '@utils/amplitude'
 
 // Config
 import { ADDRESS_RECEIVE } from '@config/events'
-import { getCurrency } from '@config/currencies'
-import { getToken } from '@config/tokens'
+
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
 
-interface LocationState {
-  address: string
-  symbol: string
-  walletName: string
-  chain?: string
+const initialState: IState = {
+  isCopied: false,
+  extraIdName: '',
+  activeDrawer: null,
 }
 
 const ReceivePage: React.FC = () => {
   const {
-    state: { address, symbol, walletName, chain },
-  } = useLocation<LocationState>()
+    state: { address, symbol, walletName, currency },
+  } = useLocation<ILocationState>()
   const history = useHistory()
 
-  const [isCopied, setIsCopied] = React.useState<boolean>(false)
-  const [extraIdName, setExtraIdName] = React.useState<string>('')
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'extraId'>(null)
-
-  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+  const { state, updateState } = useState<IState>(initialState)
 
   React.useEffect(() => {
-    if (isCopied) {
+    if (state.isCopied) {
       setTimeout(() => {
-        setIsCopied(false)
+        updateState({ isCopied: false })
       }, 1000)
     }
-  }, [isCopied])
+  }, [state.isCopied])
 
   React.useEffect(() => {
     logEvent({
       name: ADDRESS_RECEIVE,
     })
 
-    const name = getExtraIdName(symbol)
+    const extraIdName = getExtraIdName(symbol)
 
-    if (name) {
-      setExtraIdName(name)
+    if (extraIdName) {
+      updateState({ extraIdName })
     }
   }, [])
 
   const onCopyAddress = (): void => {
     copy(address)
-    setIsCopied(true)
+    updateState({ isCopied: true })
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
   }
 
   const onGenerateExtraId = (): void => {
-    const name = getExtraIdName(symbol)
+    const extraIdName = getExtraIdName(symbol)
 
-    if (name) {
-      setExtraIdName(name)
-      setActiveDrawer('extraId')
+    if (extraIdName) {
+      updateState({ extraIdName, activeDrawer: 'extraId' })
     }
   }
 
@@ -100,19 +98,19 @@ const ReceivePage: React.FC = () => {
               permanent loss.
             </Styles.Warning>
 
-            {extraIdName?.length ? (
+            {state.extraIdName?.length ? (
               <Styles.GenerateExtraId onClick={onGenerateExtraId}>
-                Generate {extraIdName}
+                Generate {state.extraIdName}
               </Styles.GenerateExtraId>
             ) : null}
           </Styles.Row>
-          <Button label={isCopied ? 'Copied!' : 'Copy address'} onClick={onCopyAddress} />
+          <Button label={state.isCopied ? 'Copied!' : 'Copy address'} onClick={onCopyAddress} />
         </Styles.Container>
       </Styles.Wrapper>
       <ExtraIdDrawer
-        isActive={activeDrawer === 'extraId'}
+        isActive={state.activeDrawer === 'extraId'}
         onClose={onCloseDrawer}
-        title={extraIdName}
+        title={state.extraIdName}
         symbol={symbol}
       />
     </>
