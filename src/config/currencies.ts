@@ -162,6 +162,7 @@ const currencies: ICurrency[] = [
     background: '#69E291',
     chain: 'nuls',
     minSendAmount: 100000,
+    isCustomFee: false,
   },
 ]
 
