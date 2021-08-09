@@ -5,6 +5,7 @@ import qs from 'query-string'
 // Utils
 import { IRequest } from '@utils/browser/types'
 import { detectBrowser } from '@utils/detect'
+import { isFullScreen } from '@utils/window'
 
 let initialScreenX: number = 0
 let initialScreenY: number = 0
@@ -13,7 +14,9 @@ let initialTop: number = 0
 let isDraggableActive: boolean = false
 
 const setSHAttribute = async () => {
-  document.documentElement.setAttribute('sh-ex-status', 'installed')
+  if (!browser.extension.inIncognitoContext) {
+    document.documentElement.setAttribute('sh-ex-status', 'installed')
+  }
 }
 
 const addCustomEventListener = (selector: string, event: any, handler: Function) => {
@@ -67,8 +70,11 @@ const createIframe = async (src: string) => {
   iframe.style.width = '375px'
   iframe.style.height = '700px'
   iframe.style.position = 'absolute'
-  iframe.style.left = `${Math.max(screenX + (outerWidth - leftDif - 375), 0)}px`
-  iframe.style.top = '0'
+  iframe.style.left =
+    screenX < 0
+      ? `${outerWidth - 375}px`
+      : `${Math.max(screenX + (outerWidth - leftDif - 375), 0)}px`
+  iframe.style.top = `${document.documentElement.scrollTop}px`
   iframe.style.zIndex = '9999999999'
   iframe.style.borderRadius = '16px'
   iframe.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
@@ -82,7 +88,7 @@ const createIframe = async (src: string) => {
 addCustomEventListener('#sh-button', 'click', async () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
-  if (findInput && !window.screenTop && !window.screenY) {
+  if (findInput && isFullScreen()) {
     const getButton = document.getElementById('sh-button')
 
     const currency = getButton?.getAttribute('sh-currency')
@@ -99,9 +105,9 @@ addCustomEventListener('#sh-button', 'click', async () => {
 })
 
 addCustomEventListener('#sh-send-button', 'click', async () => {
-  if (!window.screenTop && !window.screenY) {
-    const getButton = document.getElementById('sh-send-button')
+  const getButton = document.getElementById('sh-send-button')
 
+  if (getButton && isFullScreen()) {
     const readOnly = getButton?.getAttribute('sh-read-only')
     const currency = getButton?.getAttribute('sh-currency')
     const amount = getButton?.getAttribute('sh-amount')

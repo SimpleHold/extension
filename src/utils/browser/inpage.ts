@@ -1,5 +1,9 @@
+// Config
 import currencies, { ICurrency } from '@config/currencies'
 import tokens, { IToken } from '@config/tokens'
+
+// Utils
+import { isFullScreen } from '@utils/window'
 
 const addCustomEventListener = (selector: string, event: any, handler: Function) => {
   const rootElement = document.querySelector<HTMLBodyElement>('body')
@@ -33,22 +37,16 @@ const removeIframe = () => {
 addCustomEventListener('#sh-button', 'click', () => {
   const findInput = document.querySelector<HTMLInputElement>("[sh-input='address']")
 
-  if (findInput) {
-    if (!window.screenTop && !window.screenY) {
-      return
-    } else {
-      removeIframe()
-      document.dispatchEvent(new CustomEvent('request_addresses'))
-    }
+  if (findInput && !isFullScreen()) {
+    removeIframe()
+    document.dispatchEvent(new CustomEvent('request_addresses'))
   }
 })
 
 addCustomEventListener('#sh-send-button', 'click', () => {
   const button = <HTMLDivElement>document.getElementById('sh-send-button')
 
-  if (!window.screenTop && !window.screenY) {
-    return
-  } else {
+  if (button && !isFullScreen()) {
     removeIframe()
     document.dispatchEvent(
       new CustomEvent('request_send', {
