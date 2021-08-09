@@ -3,6 +3,7 @@ import { render } from 'react-dom'
 import { Route, RouteProps, MemoryRouter as Router, Switch } from 'react-router-dom'
 import { v4 } from 'uuid'
 import Loadable from 'react-loadable'
+import { browser } from 'webextension-polyfill-ts'
 
 import routes from './routes'
 import GlobalStyles from './styles/global'
@@ -21,7 +22,33 @@ const App: React.FC = () => {
   React.useEffect(() => {
     initAmplitude()
     preloadPages()
+    getPlatformInfo()
   }, [])
+
+  const getPlatformInfo = async (): Promise<void> => {
+    const info = await browser.runtime.getPlatformInfo()
+
+    if (info.os === 'mac') {
+      const fontFaceSheet = new CSSStyleSheet()
+      fontFaceSheet.insertRule(`
+        @keyframes redraw {
+          0% {
+            opacity: 1;
+          }
+          100% {
+            opacity: .99;
+          }
+        }
+      `)
+      fontFaceSheet.insertRule(`
+        html {
+          animation: redraw 1s linear infinite;
+        }
+      `)
+      // @ts-ignore
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, fontFaceSheet]
+    }
+  }
 
   const preloadPages = async (): Promise<void> => {
     await Loadable.preloadAll()

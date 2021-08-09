@@ -21,6 +21,7 @@ import * as theta from '@utils/currencies/theta'
 import * as cardano from '@utils/currencies/cardano'
 import * as ripple from '@utils/currencies/ripple'
 import * as neblio from '@utils/currencies/neblio'
+import * as nuls from '@utils/currencies/nuls'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
@@ -51,7 +52,9 @@ export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boole
 }
 
 export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
-  if (neblio.coins.indexOf(symbol) !== -1) {
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.generateWallet()
+  } else if (neblio.coins.indexOf(symbol) !== -1) {
     return neblio.generateWallet()
   } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.generateWallet()
@@ -73,7 +76,9 @@ export const importPrivateKey = (
   privateKey: string,
   chain?: string
 ): string | null => {
-  if (neblio.coins.indexOf(symbol) !== -1) {
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.importPrivateKey(privateKey)
+  } else if (neblio.coins.indexOf(symbol) !== -1) {
     return neblio.importPrivateKey(privateKey)
   } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.importPrivateKey(privateKey)
@@ -93,7 +98,9 @@ export const validateAddress = (
   tokenChain?: string
 ): boolean => {
   try {
-    if (cardano.coins.indexOf(symbol) !== -1) {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return nuls.validateAddress(address)
+    } else if (cardano.coins.indexOf(symbol) !== -1) {
       return cardano.validateAddress(address)
     } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
       return new bitcoinLike(symbol).isAddressValid(address)
@@ -125,6 +132,10 @@ export const createTransaction = async ({
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return await nuls.createTransaction(from, to, amount, privateKey)
+    }
+
     if (ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
       return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData, extraId)
     }
@@ -197,6 +208,12 @@ export const getNewNetworkFee = async (
 ): Promise<IGetNetworkFeeResponse | null> => {
   const { address, symbol, amount, from, to, chain, web3Params, outputs } = params
 
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return {
+      networkFee: 0.001,
+    }
+  }
+
   if (
     web3Params?.contractAddress ||
     web3Params?.decimals ||
@@ -255,6 +272,12 @@ export const getAddressNetworkFee = async (
   decimals?: number
 ): Promise<IGetNetworkFeeResponse | null> => {
   try {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return {
+        networkFee: 0.001,
+      }
+    }
+
     if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
       const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
       const data = await getEtherNetworkFee(
@@ -304,7 +327,9 @@ export const formatUnit = (
   unit?: web3.Unit
 ): number => {
   try {
-    if (neblio.coins.indexOf(symbol) !== -1) {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? nuls.fromNuls(value) : nuls.toNuls(value)
+    } else if (neblio.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? neblio.fromSat(Number(value)) : neblio.toSat(Number(value))
     } else if (ripple.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
@@ -336,7 +361,9 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
-  if (neblio.coins.indexOf(symbol) !== -1) {
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.getExplorerLink(address)
+  } else if (neblio.coins.indexOf(symbol) !== -1) {
     return neblio.getExplorerLink(address)
   } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getExplorerLink(address)
@@ -376,7 +403,9 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string | null => {
-  if (neblio.coins.indexOf(symbol) !== -1) {
+  if (nuls.coins.indexOf(symbol) !== -1) {
+    return nuls.getTransactionLink(hash)
+  } else if (neblio.coins.indexOf(symbol) !== -1) {
     return neblio.getTransactionLink(hash)
   } else if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.getTransactionLink(hash)

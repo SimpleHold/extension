@@ -16,29 +16,24 @@ const destPath = path.join(__dirname, 'extension')
 const nodeEnv = process.env.NODE_ENV || 'development'
 const targetBrowser = process.env.TARGET_BROWSER
 
-const extensionReloaderPlugin =
-  nodeEnv === 'development'
-    ? new ExtensionReloader({
-        port: 9090,
-        reloadPage: true,
-        entries: {
-          contentScript: 'contentScript',
-          background: 'background',
-          inpage: 'inpage',
-          trezor: 'trezor',
-          extensionPage: [
-            'popup',
-            'downloadBackup',
-            'restoreBackup',
-            'selectAddress',
-            'send',
-            'sendConfirmation',
-          ],
-        },
-      })
-    : () => {
-        this.apply = () => {}
-      }
+const extensionReloaderPlugin = new ExtensionReloader({
+  port: 9090,
+  reloadPage: true,
+  entries: {
+    contentScript: 'contentScript',
+    background: 'background',
+    inpage: 'inpage',
+    trezor: 'trezor',
+    extensionPage: [
+      'popup',
+      'downloadBackup',
+      'restoreBackup',
+      'selectAddress',
+      'send',
+      'sendConfirmation',
+    ],
+  },
+})
 
 const getExtensionFileType = (browser) => {
   if (browser === 'opera') {
@@ -51,6 +46,61 @@ const getExtensionFileType = (browser) => {
 
   return 'zip'
 }
+
+const externalPages = [
+  {
+    filename: 'popup.html',
+    chunks: ['popup'],
+  },
+  {
+    filename: 'download-backup.html',
+    chunks: ['downloadBackup'],
+  },
+  {
+    filename: 'restore-backup.html',
+    chunks: ['restoreBackup'],
+  },
+  {
+    filename: 'phishing.html',
+    chunks: ['phishing'],
+  },
+  {
+    chunks: ['selectAddress'],
+    filename: 'select-address.html',
+  },
+  {
+    chunks: ['send'],
+    filename: 'send.html',
+  },
+  {
+    chunks: ['sendConfirmation'],
+    filename: 'send-confirmation.html',
+  },
+  {
+    chunks: ['connectTrezor'],
+    filename: 'connect-trezor.html',
+  },
+  {
+    chunks: ['connectLedger'],
+    filename: 'connect-ledger.html',
+  },
+  {
+    chunks: [],
+    filename: 'trezor-usb-permissions.html',
+  },
+]
+
+const multipleHtmlPlugins = externalPages.map((page) => {
+  const { filename, chunks } = page
+
+  return new HtmlWebpackPlugin({
+    template: path.join(viewsPath, filename),
+    inject: 'body',
+    chunks,
+    hash: true,
+    filename,
+  })
+})
 
 const config = {
   devtool: false,
@@ -138,84 +188,13 @@ const config = {
       cleanStaleWebpackAssets: false,
       verbose: true,
     }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'popup.html'),
-      inject: 'body',
-      chunks: ['popup'],
-      hash: true,
-      filename: 'popup.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'download-backup.html'),
-      inject: 'body',
-      chunks: ['downloadBackup'],
-      hash: true,
-      filename: 'download-backup.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'restore-backup.html'),
-      inject: 'body',
-      chunks: ['restoreBackup'],
-      hash: true,
-      filename: 'restore-backup.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'phishing.html'),
-      inject: 'body',
-      chunks: ['phishing'],
-      hash: true,
-      filename: 'phishing.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'select-address.html'),
-      inject: 'body',
-      chunks: ['selectAddress'],
-      hash: false,
-      filename: 'select-address.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'send.html'),
-      inject: 'body',
-      chunks: ['send'],
-      hash: true,
-      filename: 'send.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'send-confirmation.html'),
-      inject: 'body',
-      chunks: ['sendConfirmation'],
-      hash: true,
-      filename: 'send-confirmation.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'connect-trezor.html'),
-      inject: 'body',
-      chunks: ['connectTrezor'],
-      hash: true,
-      filename: 'connect-trezor.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'connect-ledger.html'),
-      inject: 'body',
-      chunks: ['connectLedger'],
-      hash: true,
-      filename: 'connect-ledger.html',
-    }),
-    new HtmlWebpackPlugin({
-      template: path.join(viewsPath, 'trezor-usb-permissions.html'),
-      inject: 'body',
-      chunks: [],
-      hash: true,
-      filename: 'trezor-usb-permissions.html',
-    }),
     new CopyWebpackPlugin({
       patterns: [
         { from: 'src/assets', to: 'assets' },
         { from: 'src/scripts', to: 'js' },
       ],
     }),
-    extensionReloaderPlugin,
-  ],
+  ].concat(multipleHtmlPlugins),
   optimization: {
     minimize: true,
     minimizer: [
@@ -247,9 +226,10 @@ const config = {
     ],
     splitChunks: {
       cacheGroups: {
-        vendors: {
+        vendor: {
           test: /[\\/]node_modules[\\/]((?!(@emurgo)).*)[\\/]/,
-          name: 'vendors',
+          name: 'vendor',
+          maxSize: 3500 * 1000,
           chunks(chunk) {
             return (
               chunk.name !== 'background' &&
@@ -263,6 +243,10 @@ const config = {
       },
     },
   },
+}
+
+if (nodeEnv === 'development') {
+  config.plugins.push(extensionReloaderPlugin)
 }
 
 module.exports = config
