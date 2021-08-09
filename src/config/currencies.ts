@@ -13,6 +13,7 @@ import tfuelLogo from '@assets/currencies/theta.svg'
 import cardanoLogo from '@assets/currencies/ada.svg'
 import rippleLogo from '@assets/currencies/xrp.svg'
 import neblioLogo from '@assets/currencies/nebl.svg'
+import nulsLogo from '@assets/currencies/nuls.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -137,6 +138,14 @@ const currencies: ICurrency[] = [
     logo: neblioLogo,
     background: '#9172CE',
     chain: 'neblio',
+    minSendAmount: 100000,
+  },
+  {
+    name: 'Nuls',
+    symbol: 'nuls',
+    logo: nulsLogo,
+    background: '#69E291',
+    chain: 'nuls',
     minSendAmount: 100000,
   },
 ]
