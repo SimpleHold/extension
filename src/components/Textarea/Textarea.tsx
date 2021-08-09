@@ -8,20 +8,21 @@ interface Props {
   value: string
   onChange: (value: string) => void
   errorLabel?: string | null
-  textareaRef: React.RefObject<HTMLTextAreaElement>
+  textareaRef?: React.RefObject<HTMLTextAreaElement>
 }
 
 const Textarea: React.FC<Props> = (props) => {
   const { label, value, onChange, errorLabel, textareaRef } = props
 
   const [isFocused, setIsFocused] = React.useState<boolean>(false)
+  const fieldRef = textareaRef || React.useRef<HTMLTextAreaElement>(null)
 
   const onChangeTextarea = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(event.target.value)
   }
 
   const onClick = (): void => {
-    textareaRef.current?.focus()
+    fieldRef.current?.focus()
   }
 
   const onFocus = (): void => {
@@ -45,7 +46,7 @@ const Textarea: React.FC<Props> = (props) => {
         <Styles.Textarea
           value={value}
           onChange={onChangeTextarea}
-          ref={textareaRef}
+          ref={fieldRef}
           onFocus={onFocus}
           onBlur={onBlur}
         />
