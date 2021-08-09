@@ -26,11 +26,11 @@ import useVisible from '@hooks/useVisible'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { price, toUpper, toLower, short } from '@utils/format'
+import { toUpper, toLower, short } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet, toggleVisibleWallet, updateBalance } from '@utils/wallet'
+import { IWallet, toggleVisibleWallet, updateBalance, THardware } from '@utils/wallet'
 import { getExplorerLink, getExtraIdName } from '@utils/address'
 import { openWebPage } from '@utils/extension'
 import { getItem } from '@utils/storage'
@@ -62,6 +62,7 @@ interface LocationState {
   tokenName?: string
   decimals?: number
   isHidden?: boolean
+  hardware?: THardware
 }
 
 const Receive: React.FC = () => {
@@ -75,6 +76,7 @@ const Receive: React.FC = () => {
       tokenName = undefined,
       decimals = undefined,
       isHidden = false,
+      hardware = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -113,8 +115,10 @@ const Receive: React.FC = () => {
   }, [balance, estimated, isRefreshing])
 
   const getDropDownList = (): void => {
-    const list = [
-      {
+    const list = []
+
+    if (!hardware) {
+      list.push({
         icon: isCurrencyWithPhrase
           ? {
               source: phraseIcon,
@@ -123,11 +127,12 @@ const Receive: React.FC = () => {
             }
           : { source: privateKeyIcon, width: 18, height: 18 },
         title: isCurrencyWithPhrase ? 'Show recovery phrase' : 'Show Private key',
-      },
-      { icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' },
-    ]
+      })
+    }
 
-    if (['eth', 'bnb'].indexOf(symbol) !== -1) {
+    list.push({ icon: { source: linkIcon, width: 16, height: 16 }, title: 'View in Explorer' })
+
+    if (['eth', 'bnb'].indexOf(symbol) !== -1 && !hardware) {
       list.push({
         icon: { source: plusCircleIcon, width: 18, height: 18 },
         title: 'Add token',
@@ -161,6 +166,7 @@ const Receive: React.FC = () => {
       contractAddress,
       tokenName,
       decimals,
+      hardware,
     })
   }
 
@@ -181,9 +187,9 @@ const Receive: React.FC = () => {
   const onClickDropDown = (index: number) => {
     setIsVisible(false)
 
-    if (index === 0) {
+    if (index === 0 && !hardware) {
       setActiveDrawer('confirm')
-    } else if (index === 1) {
+    } else if (index === 1 || hardware) {
       openWebPage(getExplorerLink(address, symbol, currency, chain, contractAddress))
     } else if (index === 2) {
       if (extraIdName?.length) {
@@ -268,7 +274,21 @@ const Receive: React.FC = () => {
                   chain={chain}
                   name={tokenName}
                 />
-                <Styles.CurrencyName>{name}</Styles.CurrencyName>
+                <Styles.HeadingRow>
+                  {hardware ? (
+                    <Styles.HardwareBlock>
+                      <Styles.HardwareLabel>{hardware.label}</Styles.HardwareLabel>
+                      {hardware.type === 'ledger' ? (
+                        <SVG src="../../assets/icons/ledger.svg" width={10} height={12} />
+                      ) : (
+                        <SVG src="../../assets/icons/trezor.svg" width={8.9} height={13} />
+                      )}
+                    </Styles.HardwareBlock>
+                  ) : null}
+                  <Styles.CurrencyName size={hardware ? 'small' : 'normal'}>
+                    {name}
+                  </Styles.CurrencyName>
+                </Styles.HeadingRow>
               </Styles.Currency>
               <Styles.Actions>
                 <Tooltip text={`${isHiddenWallet ? 'Show' : 'Hide'} address`} mt={5}>
@@ -301,7 +321,9 @@ const Receive: React.FC = () => {
 
             <Skeleton width={130} height={23} mt={10} type="gray" isLoading={estimated === null}>
               {estimated !== null ? (
-                <Styles.Estimated>{`$${price(estimated, 2)}`}</Styles.Estimated>
+                <Styles.Estimated>{`$${numeral(estimated).format(
+                  '0.[00000000]'
+                )}`}</Styles.Estimated>
               ) : null}
             </Skeleton>
 
@@ -328,7 +350,7 @@ const Receive: React.FC = () => {
             <CopyToClipboard value={address} onCopy={onCopyAddress}>
               <Styles.Address>{short(address, 70)}</Styles.Address>
             </CopyToClipboard>
-            <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} isSmall mt={30} />
+            <Button label={`Send ${toUpper(symbol)}`} onClick={onSend} mt={30} />
           </Styles.ReceiveBlock>
         </Styles.Container>
       </Styles.Wrapper>

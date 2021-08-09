@@ -190,7 +190,7 @@ const SortWalletsDrawer: React.FC<Props> = (props) => {
         </Styles.List>
 
         <Styles.Actions>
-          <Button label="Apply" disabled={isButtonDisabled} isSmall onClick={onApplySort} />
+          <Button label="Apply" disabled={isButtonDisabled} onClick={onApplySort} />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>

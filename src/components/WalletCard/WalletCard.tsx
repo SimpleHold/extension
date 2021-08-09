@@ -11,7 +11,7 @@ import Skeleton from '@components/Skeleton'
 import { getCurrency } from '@config/currencies'
 import { getBalance } from '@utils/api'
 import { toUpper, numberFriendly } from '@utils/format'
-import { updateBalance } from '@utils/wallet'
+import { updateBalance, THardware } from '@utils/wallet'
 
 // Config
 import { getToken } from '@config/tokens'
@@ -31,6 +31,7 @@ interface Props {
   sumEstimated?: (estimated: number) => void
   sumPending?: (pending: number) => void
   handleClick?: () => void
+  hardware?: THardware
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -46,6 +47,7 @@ const WalletCard: React.FC<Props> = (props) => {
     sumEstimated,
     sumPending,
     handleClick,
+    hardware,
   } = props
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
@@ -100,36 +102,63 @@ const WalletCard: React.FC<Props> = (props) => {
       tokenName: name,
       decimals,
       isHidden,
+      hardware,
     })
   }
 
   return (
     <Styles.Container onClick={openWallet}>
-      <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} name={name} />
-      <Styles.Row>
-        <Styles.AddressInfo>
-          {currency || name ? <Styles.Currency>{currency?.name || name}</Styles.Currency> : null}
-          <Styles.Address>{address}</Styles.Address>
-        </Styles.AddressInfo>
-        <Styles.Balances>
-          <Skeleton width={106} height={16} type="gray" br={4} isLoading={balance === null}>
-            <Styles.BalanceRow>
-              {pendingBalance !== 0 ? (
-                <Styles.PendingIcon>
-                  <SVG src="../../assets/icons/clock.svg" width={12} height={12} />
-                </Styles.PendingIcon>
-              ) : null}
+      <Styles.Body pb={typeof hardware !== 'undefined' ? 10 : 20}>
+        <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} name={name} />
+        <Styles.Row>
+          <Styles.AddressInfo>
+            {currency || name ? <Styles.Currency>{currency?.name || name}</Styles.Currency> : null}
+            <Styles.Address>{address}</Styles.Address>
+          </Styles.AddressInfo>
+          <Styles.Balances>
+            <Skeleton width={106} height={19} type="gray" br={4} isLoading={balance === null}>
+              <Styles.BalanceRow>
+                {pendingBalance !== 0 ? (
+                  <Styles.PendingIcon>
+                    <SVG src="../../assets/icons/clock.svg" width={12} height={12} />
+                  </Styles.PendingIcon>
+                ) : null}
 
-              <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
-                symbol
-              )}`}</Styles.Balance>
-            </Styles.BalanceRow>
-          </Skeleton>
-          <Skeleton width={80} height={14} type="gray" mt={9} br={4} isLoading={estimated === null}>
-            <Styles.Estimated>{`$${numberFriendly(estimated)}`}</Styles.Estimated>
-          </Skeleton>
-        </Styles.Balances>
-      </Styles.Row>
+                <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
+                  symbol
+                )}`}</Styles.Balance>
+              </Styles.BalanceRow>
+            </Skeleton>
+            <Skeleton
+              width={80}
+              height={16}
+              type="gray"
+              mt={4}
+              br={4}
+              isLoading={estimated === null}
+            >
+              <Styles.Estimated>{`$${
+                Number(estimated) < 0.01
+                  ? numeral(estimated).format('0.[00000000]')
+                  : numberFriendly(estimated)
+              }`}</Styles.Estimated>
+            </Skeleton>
+          </Styles.Balances>
+        </Styles.Row>
+      </Styles.Body>
+      {hardware ? (
+        <Styles.Footer>
+          <Styles.HardwareBlock>
+            {hardware.type === 'ledger' ? (
+              <SVG src="../../assets/icons/ledger.svg" width={10} height={12} />
+            ) : (
+              <SVG src="../../assets/icons/trezor.svg" width={8.22} height={12} />
+            )}
+
+            <Styles.HardwareLabel>{hardware.label}</Styles.HardwareLabel>
+          </Styles.HardwareBlock>
+        </Styles.Footer>
+      ) : null}
     </Styles.Container>
   )
 }

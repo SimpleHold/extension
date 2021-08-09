@@ -65,12 +65,17 @@ class GenerateAddress {
     }
   }
 
-  getFee = (address: string, outputs: UnspentOutput[], amount: string): number => {
+  getFee = (
+    address: string,
+    outputs: UnspentOutput[],
+    amount: string,
+    feePerByte: number
+  ): number => {
     try {
       const provider = this.getProvider()
 
       if (provider) {
-        return provider.getFee(outputs, address, this.toSat(Number(amount)), address)
+        return provider.getFee(outputs, address, this.toSat(Number(amount)), address, feePerByte)
       }
 
       return 0
@@ -95,14 +100,19 @@ class GenerateAddress {
     }
   }
 
-  getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], amount: string) => {
+  getNetworkFee = (
+    address: string,
+    unspentOutputs: UnspentOutput[],
+    amount: string,
+    feePerByte: number
+  ) => {
     const { symbol } = this
     const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
     const utxos: UnspentOutput[] = []
 
     for (const output of sortOutputs) {
       const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-      const transactionFeeBytes = this.getFee(address, utxos, amount)
+      const transactionFeeBytes = this.getFee(address, utxos, amount, feePerByte)
 
       if (getUtxosValue >= this.toSat(Number(amount)) + transactionFeeBytes) {
         break
@@ -111,7 +121,7 @@ class GenerateAddress {
       utxos.push(output)
     }
 
-    const networkFee = this.fromSat(this.getFee(address, utxos, amount))
+    const networkFee = this.fromSat(this.getFee(address, utxos, amount, feePerByte))
 
     return {
       networkFee: toLower(symbol) === 'doge' && networkFee < 1 ? 1 : networkFee,

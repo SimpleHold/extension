@@ -31,6 +31,7 @@ import {
 } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
 import { getItem, setItem, removeItem } from '@utils/storage'
+import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -41,7 +42,6 @@ import useDebounce from '@hooks/useDebounce'
 
 // Styles
 import Styles from './styles'
-import { ICardanoUnspentTxOutput } from 'utils/currencies/cardano'
 
 type TabInfo = {
   favIconUrl: string
@@ -211,6 +211,10 @@ const Send: React.FC = () => {
 
           if (data.networkFee) {
             setNetworkFee(data.networkFee)
+          } else {
+            if (Number(amount) > 0 && Number(balance) > 0) {
+              setAmountErrorLabel('Insufficient funds')
+            }
           }
 
           if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
@@ -376,9 +380,14 @@ const Send: React.FC = () => {
       }
 
       setItem('sendConfirmationData', JSON.stringify(data))
-      await updateTab(currenctTab.id, {
-        url,
-      })
+
+      if (isDraggable) {
+        location.href = `${url}?isDraggable=true`
+      } else {
+        await updateTab(currenctTab.id, {
+          url,
+        })
+      }
     }
   }
 
@@ -639,7 +648,7 @@ const Send: React.FC = () => {
             />
           ) : null}
           <TextInput
-            label={`Amount (${toUpper(selectedWallet?.symbol)})`}
+            label={`Amount ${selectedWallet ? `(${toUpper(selectedWallet?.symbol)})` : ''}`}
             value={amount}
             onChange={setAmount}
             type="number"
@@ -673,14 +682,8 @@ const Send: React.FC = () => {
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onClose} isSmall mr={7.5} />
-            <Button
-              label="Send"
-              disabled={isButtonDisabled()}
-              onClick={onConfirm}
-              isSmall
-              ml={7.5}
-            />
+            <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
+            <Button label="Send" disabled={isButtonDisabled()} onClick={onConfirm} ml={7.5} />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Body>

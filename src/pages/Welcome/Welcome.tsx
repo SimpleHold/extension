@@ -12,6 +12,7 @@ import { init, logEvent } from '@utils/amplitude'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getItem, setItem, removeItem } from '@utils/storage'
+import { getPhishingSites } from '@utils/api'
 
 // Config
 import config from '@config/index'
@@ -30,7 +31,16 @@ const Wallets: React.FC = () => {
   React.useEffect(() => {
     checkManualRestore()
     initAmplitude()
+    onGetPhishingSites()
   }, [])
+
+  const onGetPhishingSites = async (): Promise<void> => {
+    const data = await getPhishingSites()
+
+    if (data?.length) {
+      setItem('phishingSites', JSON.stringify(data))
+    }
+  }
 
   const checkManualRestore = () => {
     if (((os === 'macos' && browser === 'chrome') || browser === 'firefox') && !isManualRestore) {

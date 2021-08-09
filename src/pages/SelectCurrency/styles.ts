@@ -14,18 +14,6 @@ const Container = styled.div`
   justify-content: space-between;
 `
 
-const Row = styled.div`
-  padding: 30px 30px 0 30px;
-`
-
-const Title = styled.p`
-  margin: 0 0 20px 0;
-  font-weight: bold;
-  font-size: 23px;
-  line-height: 25px;
-  color: #1d1d22;
-`
-
 const CurrenciesList = styled.div`
   margin: 20px 0 0 0;
   display: grid;
@@ -106,18 +94,57 @@ const NotFoundMessage = styled.p`
   color: #7d7e8d;
 `
 
+const Tab = styled.div`
+  padding: 30px;
+`
+
+const HardwareWallets = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const HardwareWallet = styled.div`
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f8f8;
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
+  flex: 1;
+
+  &:hover {
+    cursor: pointer;
+    border: 1px solid #3fbb7d;
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
+
+  &:first-child {
+    margin: 0 7.5px 0 0;
+  }
+
+  &:last-child {
+    margin: 0 0 0 7.5px;
+  }
+`
+
 const Styles = {
   Wrapper,
   Container,
-  Row,
-  Title,
+  Tab,
+  HardwareWallets,
+  HardwareWallet,
+  NotFoundMessage,
   CurrenciesList,
   CurrencyBlock,
   CurrencyName,
   CurrencySymbol,
   CustomTokenLogo,
   CustomTokenLabel,
-  NotFoundMessage,
 }
 
 export default Styles

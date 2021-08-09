@@ -24,7 +24,9 @@ const PendingBalance: React.FC<Props> = (props) => {
   const [USDValue, setUSDValue] = React.useState<number>(0)
 
   React.useEffect(() => {
-    getUSDEstimated()
+    if (pending !== 0) {
+      getUSDEstimated()
+    }
   }, [pending])
 
   const getUSDEstimated = async (): Promise<void> => {
@@ -44,7 +46,9 @@ const PendingBalance: React.FC<Props> = (props) => {
           </Styles.Pending>
           <Skeleton width={56} height={14} isLoading={USDValue === null} type={type}>
             {USDValue ? (
-              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${price(USDValue)}`}</Styles.USDValue>
+              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${numeral(USDValue).format(
+                '0.[00000000]'
+              )}`}</Styles.USDValue>
             ) : null}
           </Skeleton>
         </Styles.Row>

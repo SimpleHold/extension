@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "SimpleHold",
-  "version": "1.9.0",
+  "version": "1.11.0",
   "icons": {
     "16": "assets/logo/favicon-16.png",
     "32": "assets/logo/favicon-32.png",
@@ -51,6 +51,10 @@
         "http://localhost/*"
       ],
       "js": ["js/contentScript.bundle.js"]
+    },
+    {
+      "matches": ["*://connect.trezor.io/*/popup.html"],
+      "js": ["js/trezor.bundle.js"]
     }
   ],
   "web_accessible_resources": [

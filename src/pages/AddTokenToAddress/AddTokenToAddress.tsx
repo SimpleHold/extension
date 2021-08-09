@@ -5,7 +5,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 import Button from '@components/Button'
-import CurrenciesDropdown from 'components/CurrenciesDropdown'
+import CurrenciesDropdown from '@components/CurrenciesDropdown'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -178,11 +178,10 @@ const AddTokenToAddress: React.FC = () => {
           </Styles.Row>
 
           <Styles.Actions>
-            <Button label="Skip" isLight isSmall mr={7.5} onClick={onSkip} />
+            <Button label="Skip" isLight mr={7.5} onClick={onSkip} />
             <Button
               label="Confirm"
               disabled={!chainAddresses.length}
-              isSmall
               ml={7.5}
               onClick={onConfirm}
             />

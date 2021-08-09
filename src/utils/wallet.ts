@@ -8,7 +8,14 @@ import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken } from 'config/tokens'
+import { getToken } from '@config/tokens'
+
+export type THardware = {
+  path: string
+  label: string
+  type: 'trezor' | 'ledger'
+  deviceId: string
+}
 
 export interface IWallet {
   symbol: string
@@ -24,11 +31,23 @@ export interface IWallet {
   createdAt?: Date
   isHidden?: boolean
   mnemonic?: string
+  hardware?: THardware
 }
 
 type TSelectedWalletFilter = {
   symbol: string
   chain?: string
+}
+
+type THardwareCurrency = {
+  symbol: string
+  address: string
+  path: string
+}
+
+type THardwareFirstAddress = {
+  symbol: string
+  address: string
 }
 
 const sortByBalance = (a: IWallet, b: IWallet, isAscending: boolean) => {
@@ -246,5 +265,97 @@ export const toggleVisibleWallet = (address: string, symbol: string, isHidden: b
   if (findWallet) {
     findWallet.isHidden = isHidden
     setItem('wallets', JSON.stringify(wallets))
+  }
+}
+
+export const addHardwareWallet = (
+  type: 'trezor' | 'ledger',
+  currencies: THardwareCurrency[],
+  hardwareLabel: string,
+  deviceId: string,
+  backup: string,
+  password: string,
+  firstAddresses?: THardwareFirstAddress[]
+): string | null => {
+  try {
+    const parseBackup = JSON.parse(backup)
+
+    const getDeviceId = (symbol: string): string => {
+      if (type === 'trezor') {
+        return deviceId
+      }
+
+      if (firstAddresses?.length) {
+        const findFirstAddress = firstAddresses.find(
+          (address: THardwareFirstAddress) => toLower(address.symbol) === toLower(symbol)
+        )
+
+        if (findFirstAddress) {
+          return findFirstAddress.address
+        }
+      }
+
+      return deviceId
+    }
+
+    for (const currency of currencies) {
+      const { symbol, address, path } = currency
+
+      const walletsList = getItem('wallets')
+
+      if (walletsList) {
+        const parseWallets = JSON.parse(walletsList)
+
+        const data = {
+          symbol: toLower(symbol),
+          address,
+          uuid: v4(),
+          createdAt: new Date(),
+          hardware: {
+            path,
+            label: hardwareLabel,
+            type,
+            deviceId: getDeviceId(symbol),
+          },
+        }
+
+        parseWallets.push(data)
+        parseBackup.wallets.push(data)
+
+        const getHardwareWalelts = parseWallets.filter(
+          (wallet: IWallet) =>
+            wallet.hardware?.type === type &&
+            toLower(wallet?.hardware?.deviceId) === toLower(deviceId)
+        )
+        const getBackupHardwareWalelts: IWallet[] = parseBackup.wallets.filter(
+          (wallet: IWallet) =>
+            wallet.hardware?.type === type &&
+            toLower(wallet?.hardware?.deviceId) === toLower(deviceId)
+        )
+
+        if (getHardwareWalelts.length) {
+          getHardwareWalelts.forEach((wallet: IWallet) => {
+            if (wallet?.hardware) {
+              wallet.hardware.label = hardwareLabel
+            }
+          })
+        }
+
+        if (getBackupHardwareWalelts.length) {
+          getBackupHardwareWalelts.forEach((wallet: IWallet) => {
+            if (wallet?.hardware) {
+              wallet.hardware.label = hardwareLabel
+            }
+          })
+        }
+
+        setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+        setItem('wallets', JSON.stringify(parseWallets))
+      }
+    }
+
+    return getItem('wallets')
+  } catch {
+    return null
   }
 }

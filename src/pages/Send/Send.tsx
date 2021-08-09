@@ -15,8 +15,8 @@ import CurrenciesDropdown from '@components/CurrenciesDropdown'
 import Tooltip from '@components/Tooltip'
 
 // Utils
-import { getWallets, IWallet, updateBalance } from '@utils/wallet'
-import { toUpper, price, toLower } from '@utils/format'
+import { getWallets, IWallet, updateBalance, THardware } from '@utils/wallet'
+import { toUpper, toLower } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
 import {
@@ -29,6 +29,8 @@ import {
 } from '@utils/address'
 import bitcoinLike from '@utils/bitcoinLike'
 import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
+import { getUrl, openWebPage } from '@utils/extension'
+import { setItem } from '@utils/storage'
 
 // Config
 import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
@@ -49,6 +51,7 @@ interface LocationState {
   contractAddress?: string
   tokenName?: string
   decimals?: number
+  hardware?: THardware
 }
 
 const Send: React.FC = () => {
@@ -62,6 +65,7 @@ const Send: React.FC = () => {
       contractAddress = undefined,
       tokenName = undefined,
       decimals = undefined,
+      hardware = undefined,
     },
   } = useLocation<LocationState>()
 
@@ -138,6 +142,9 @@ const Send: React.FC = () => {
 
   const getNetworkFee = async (): Promise<void> => {
     setUtxosList([])
+    if (networkFee) {
+      setNetworkFee(0)
+    }
 
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
 
@@ -163,10 +170,18 @@ const Send: React.FC = () => {
 
       if (data.networkFee) {
         setNetworkFee(data.networkFee)
+      } else {
+        if (Number(amount) > 0 && Number(balance) > 0) {
+          setAmountErrorLabel('Insufficient funds')
+        }
       }
 
       if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
         setCurrencyBalance(data.currencyBalance)
+      }
+    } else {
+      if (Number(amount) > 0 && Number(balance) > 0) {
+        setAmountErrorLabel('Insufficient funds')
       }
     }
   }
@@ -200,28 +215,48 @@ const Send: React.FC = () => {
     }
   }
 
-  const onSend = (): void => {
+  const onSend = async (): Promise<void> => {
     logEvent({
       name: ADDRESS_SEND,
     })
 
-    const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
-    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
+    if (hardware) {
+      openWebPage(getUrl('send-confirmation.html'))
 
-    history.push('/send-confirm', {
-      amount: Number(amount),
-      symbol,
-      networkFee,
-      networkFeeSymbol,
-      addressFrom: selectedAddress,
-      addressTo: address,
-      outputs: utxosList,
-      chain,
-      contractAddress: tokenContractAddress || contractAddress,
-      tokenChain,
-      decimals: getTokenDecimals || decimals,
-      extraId,
-    })
+      setItem(
+        'sendConfirmationData',
+        JSON.stringify({
+          amount: Number(amount),
+          symbol,
+          networkFee,
+          networkFeeSymbol,
+          addressFrom: selectedAddress,
+          addressTo: address,
+          outputs: utxosList,
+          chain,
+          hardware,
+          extraId,
+        })
+      )
+    } else {
+      const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
+      const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
+
+      history.push('/send-confirm', {
+        amount: Number(amount),
+        symbol,
+        networkFee,
+        networkFeeSymbol,
+        addressFrom: selectedAddress,
+        addressTo: address,
+        outputs: utxosList,
+        chain,
+        contractAddress: tokenContractAddress || contractAddress,
+        tokenChain,
+        decimals: getTokenDecimals || decimals,
+        extraId,
+      })
+    }
   }
 
   const onBlurAddressInput = (): void => {
@@ -253,10 +288,12 @@ const Send: React.FC = () => {
       setAmountErrorLabel(null)
     }
 
-    const availableBalance = getAvailableBalance()
+    if (toLower(symbol) === 'xrp') {
+      const availableBalance = getAvailableBalance()
 
-    if (amount.length && Number(amount) + Number(networkFee) >= Number(availableBalance)) {
-      return setAmountErrorLabel('Insufficient funds')
+      if (amount.length && Number(amount) + Number(networkFee) >= Number(availableBalance)) {
+        return setAmountErrorLabel('Insufficient funds')
+      }
     }
 
     if (currency) {
@@ -381,13 +418,15 @@ const Send: React.FC = () => {
       <Styles.Container>
         <Styles.Row withExtraid={withExtraid}>
           {!extraIdName?.length ? <Styles.PageTitle>Send</Styles.PageTitle> : null}
-          <Skeleton width={250} height={42} type="gray" mt={21} isLoading={balance === null}>
+          <Skeleton width={250} height={42} type="gray" isLoading={balance === null}>
             <Styles.Balance>
               {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
             </Styles.Balance>
           </Skeleton>
           <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
-            <Styles.USDEstimated>{`$${price(estimated, 2)}`}</Styles.USDEstimated>
+            <Styles.USDEstimated>{`$${numeral(estimated).format(
+              '0.[00000000]'
+            )}`}</Styles.USDEstimated>
           </Skeleton>
         </Styles.Row>
         <Styles.Form onSubmit={onSubmitForm} withExtraid={withExtraid}>
@@ -450,8 +489,8 @@ const Send: React.FC = () => {
           </Styles.NetworkFeeBlock>
 
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} isSmall />
-            <Button label="Send" onClick={onSend} disabled={isButtonDisabled()} ml={7.5} isSmall />
+            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
+            <Button label="Send" onClick={onSend} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
         </Styles.Form>
       </Styles.Container>

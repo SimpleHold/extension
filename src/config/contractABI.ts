@@ -1,6 +1,4 @@
-import { AbiItem } from 'web3-utils'
-
-const contract: AbiItem[] = [
+const contract = [
   {
     constant: false,
     inputs: [

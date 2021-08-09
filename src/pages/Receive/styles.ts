@@ -13,6 +13,10 @@ type TRefreshButtonProps = {
   isRefreshing: boolean
 }
 
+type TCurrencyNameProps = {
+  size: 'small' | 'normal'
+}
+
 const Wrapper = styled.div`
   height: 600px;
   overflow: hidden;
@@ -47,10 +51,10 @@ const Currency = styled.div`
 `
 
 const CurrencyName = styled.p`
-  margin: 0 0 0 10px;
+  margin: 0;
   font-weight: 500;
-  font-size: 20px;
-  line-height: 23px;
+  font-size: ${({ size }: TCurrencyNameProps) => (size === 'small' ? '14px' : '20px')};
+  line-height: ${({ size }: TCurrencyNameProps) => (size === 'small' ? '16px' : '23px')};
   color: #1d1d22;
 `
 
@@ -164,6 +168,27 @@ const PendingRow = styled.div`
   margin: 20px 0 0 0;
 `
 
+const HeadingRow = styled.div`
+  margin: 0 0 0 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+`
+
+const HardwareBlock = styled.div`
+  margin: 0 0 1px 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const HardwareLabel = styled.p`
+  margin: 0 5px 0 0;
+  font-size: 12px;
+  line-height: 14px;
+  color: #7d7e8d;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -180,6 +205,9 @@ const Styles = {
   PendingRow,
   ReceiveBlock,
   Address,
+  HeadingRow,
+  HardwareBlock,
+  HardwareLabel,
 }
 
 export default Styles

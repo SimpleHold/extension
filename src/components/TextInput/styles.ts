@@ -124,6 +124,15 @@ const NumberInput = styled(NumberFormat)`
   }
 `
 
+const IconRow = styled.div`
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0 0 20px;
+`
+
 const Styles = {
   Container,
   Row,
@@ -132,6 +141,7 @@ const Styles = {
   VisibleInput,
   EyeIcon,
   NumberInput,
+  IconRow,
 }
 
 export default Styles

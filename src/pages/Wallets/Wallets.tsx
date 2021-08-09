@@ -176,6 +176,7 @@ const Wallets: React.FC = () => {
                     contractAddress,
                     decimals,
                     isHidden,
+                    hardware,
                   } = wallet
 
                   return (
@@ -191,6 +192,7 @@ const Wallets: React.FC = () => {
                       sumBalance={sumBalance}
                       sumEstimated={sumEstimated}
                       sumPending={sumPending}
+                      hardware={hardware}
                     />
                   )
                 })
