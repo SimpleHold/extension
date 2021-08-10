@@ -5,14 +5,12 @@ import { BigNumber } from 'bignumber.js'
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
-import Button from '@components/Button'
-import TextInput from '@components/TextInput'
 
-import WalletCard from './components/WalletCard'
-import NetworkFee from './components/NetworkFee'
+import SendFormShared from '@shared/SendForm'
 
 // Drawers
 import WalletsDrawer from '@drawers/Wallets'
+import AboutFeeDrawer from '@drawers/AboutFee'
 
 // Utils
 import { toLower, toUpper } from '@utils/format'
@@ -291,31 +289,6 @@ const SendPage: React.FC = () => {
     }
   }
 
-  const renderInputButton = (inputType: 'address' | 'extraId' | 'amount') => {
-    if (inputType === 'address' && state.wallets.length > 1) {
-      return {
-        label: 'To my wallet',
-        onClick: openWalletsDrawer,
-      }
-    }
-
-    if (inputType === 'extraId') {
-      return {
-        label: 'Generate',
-        onClick: onGenerateExtraId,
-      }
-    }
-
-    if (inputType === 'amount' && Number(state.balance) > 0) {
-      return {
-        label: 'Send all',
-        onClick: onSendAll,
-      }
-    }
-
-    return undefined
-  }
-
   const checkAddress = (): void => {
     if (state.addressErrorLabel) {
       updateState({ addressErrorLabel: null })
@@ -410,12 +383,8 @@ const SendPage: React.FC = () => {
     updateState({ feeType, selectedFee: state.customFee[feeType] })
   }
 
-  const getAmountTooltip = (): string | undefined => {
-    if (toLower(symbol) === 'xrp' && state.amountErrorLabel) {
-      return 'The network requires at least 20 XRP balance at all times.'
-    }
-
-    return undefined
+  const showFeeDrawer = (): void => {
+    updateState({ activeDrawer: 'aboutFee' })
   }
 
   const isCurrencyBalanceError =
@@ -430,74 +399,44 @@ const SendPage: React.FC = () => {
       <Styles.Wrapper>
         <Cover />
         <Header withBack onBack={history.goBack} backTitle={state.backTitle} />
-        <Styles.Container>
-          <Styles.Title>Send {toUpper(symbol)}</Styles.Title>
-          <Styles.Body>
-            <Styles.Row>
-              <WalletCard
-                balance={state.balance}
-                estimated={state.estimated}
-                symbol={symbol}
-                hardware={state.hardware}
-                walletName={state.walletName}
-                address={state.selectedAddress}
-                name={tokenName}
-                wallets={state.wallets}
-                selectedAddress={state.selectedAddress}
-                changeWallet={changeWallet}
-                tokenChain={tokenChain}
-              />
-              <Styles.Form>
-                <Styles.FormBody>
-                  <TextInput
-                    label="Recipient Address"
-                    value={state.address}
-                    onChange={setAddress}
-                    disabled={state.balance === null}
-                    type="text"
-                    renderButton={renderInputButton('address')}
-                    errorLabel={state.addressErrorLabel}
-                    onBlurInput={checkAddress}
-                  />
-                  {state.extraIdName ? (
-                    <TextInput
-                      label={`${state.extraIdName} (optional)`}
-                      value={state.extraId}
-                      onChange={setExtraId}
-                      disabled={state.balance === null}
-                      type="text"
-                      renderButton={renderInputButton('extraId')}
-                    />
-                  ) : null}
-                  <TextInput
-                    label={`Amount (${toUpper(symbol)})`}
-                    value={state.amount}
-                    onChange={setAmount}
-                    disabled={state.balance === null}
-                    type="number"
-                    renderButton={renderInputButton('amount')}
-                    errorLabel={state.amountErrorLabel}
-                    onBlurInput={checkAmount}
-                    labelTooltip={getAmountTooltip()}
-                  />
-                </Styles.FormBody>
-                <NetworkFee
-                  isLoading={state.isFeeLoading}
-                  fee={state.fee}
-                  symbol={state.feeSymbol}
-                  type={state.feeType}
-                  setType={setFeeType}
-                  isBalanceError={isCurrencyBalanceError && state.currencyBalance !== null}
-                  withButton={currency.isCustomFee}
-                />
-              </Styles.Form>
-            </Styles.Row>
-          </Styles.Body>
-          <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-            <Button label="Send" onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
-          </Styles.Actions>
-        </Styles.Container>
+        <SendFormShared
+          balance={state.balance}
+          estimated={state.estimated}
+          symbol={symbol}
+          hardware={state.hardware}
+          walletName={state.walletName}
+          selectedAddress={state.selectedAddress}
+          tokenName={tokenName}
+          wallets={state.wallets}
+          changeWallet={changeWallet}
+          tokenChain={tokenChain}
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+          isDisabled={isButtonDisabled()}
+          address={state.address}
+          setAddress={setAddress}
+          addressErrorLabel={state.addressErrorLabel}
+          openWalletsDrawer={openWalletsDrawer}
+          onGenerateExtraId={onGenerateExtraId}
+          checkAddress={checkAddress}
+          onSendAll={onSendAll}
+          extraIdName={state.extraIdName}
+          extraId={state.extraId}
+          setExtraId={setExtraId}
+          amount={state.amount}
+          setAmount={setAmount}
+          amountErrorLabel={state.amountErrorLabel}
+          checkAmount={checkAmount}
+          isFeeLoading={state.isFeeLoading}
+          fee={state.fee}
+          feeSymbol={state.feeSymbol}
+          feeType={state.feeType}
+          setFeeType={setFeeType}
+          isCurrencyBalanceError={isCurrencyBalanceError}
+          currencyBalance={state.currencyBalance}
+          isCustomFee={currency.isCustomFee}
+          showFeeDrawer={showFeeDrawer}
+        />
       </Styles.Wrapper>
       <WalletsDrawer
         isActive={state.activeDrawer === 'wallets'}
@@ -506,6 +445,7 @@ const SendPage: React.FC = () => {
         wallets={state.wallets}
         onClickWallet={onClickDrawerWallet}
       />
+      <AboutFeeDrawer isActive={state.activeDrawer === 'aboutFee'} onClose={onCloseDrawer} />
     </>
   )
 }

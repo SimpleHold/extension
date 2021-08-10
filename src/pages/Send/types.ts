@@ -26,7 +26,7 @@ export interface IState {
   selectedAddress: string
   address: string
   wallets: IWallet[]
-  activeDrawer: 'wallets' | null
+  activeDrawer: 'wallets' | 'aboutFee' | null
   walletName: string
   hardware?: THardware
   amount: string
