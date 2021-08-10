@@ -1,13 +1,12 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import numeral from 'numeral'
-import { BigNumber } from 'bignumber.js'
 
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
-import Button from '@components/Button'
-import CurrencyLogo from '@components/CurrencyLogo'
+
+// Shared
+import SendConfirmShared from '@shared/SendConfirm'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -16,7 +15,6 @@ import FailDrawer from '@drawers/Fail'
 import FeedbackDrawer from '@drawers/Feedback'
 
 // Utils
-import { toUpper, short } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
@@ -71,6 +69,7 @@ const SendConfirmation: React.FC = () => {
       tokenChain = undefined,
       decimals = undefined,
       extraId = undefined,
+      name = undefined,
     },
   } = useLocation<ILocationState>()
 
@@ -261,99 +260,18 @@ const SendConfirmation: React.FC = () => {
       <Styles.Wrapper>
         <Cover />
         <Header withBack backTitle="Send" onBack={history.goBack} />
-        <Styles.Container>
-          <Styles.Row>
-            <Styles.Title>Confirm the sending</Styles.Title>
-            <Styles.SubTitle>Check transaction details</Styles.SubTitle>
-
-            <Styles.Destinations>
-              <Styles.CurrencyLogo>
-                <CurrencyLogo size={50} symbol={symbol} chain={tokenChain} />
-              </Styles.CurrencyLogo>
-
-              <Styles.Destination>
-                <Styles.DestinationType>From</Styles.DestinationType>
-                <Styles.DestinationText>{short(addressFrom, 20)}</Styles.DestinationText>
-              </Styles.Destination>
-
-              <Styles.Destination>
-                <Styles.DestinationType>To</Styles.DestinationType>
-                <Styles.DestinationText>{short(addressTo, 20)}</Styles.DestinationText>
-              </Styles.Destination>
-            </Styles.Destinations>
-
-            <Styles.Order>
-              <Styles.Amounts>
-                <Styles.Table>
-                  <Styles.Tbody>
-                    <Styles.TableTr>
-                      <Styles.TableTd>
-                        <Styles.TableTitle>Amount</Styles.TableTitle>
-                      </Styles.TableTd>
-                      <Styles.TableTd>
-                        <Styles.TableAmount>
-                          {numeral(amount).format('0.[00000000]')}
-                        </Styles.TableAmount>
-                      </Styles.TableTd>
-                      <Styles.TableTd>
-                        <Styles.TableSymbol>{toUpper(symbol)}</Styles.TableSymbol>
-                      </Styles.TableTd>
-                    </Styles.TableTr>
-                    <Styles.TableTr>
-                      <Styles.TableTd>
-                        <Styles.TableTitle>Network fee</Styles.TableTitle>
-                      </Styles.TableTd>
-                      <Styles.TableTd>
-                        <Styles.TableAmount>
-                          {numeral(networkFee).format('0.[00000000]')}
-                        </Styles.TableAmount>
-                      </Styles.TableTd>
-                      <Styles.TableTd>
-                        <Styles.TableSymbol>{toUpper(networkFeeSymbol)}</Styles.TableSymbol>
-                      </Styles.TableTd>
-                    </Styles.TableTr>
-                  </Styles.Tbody>
-                </Styles.Table>
-              </Styles.Amounts>
-
-              {toUpper(symbol) === toUpper(networkFeeSymbol) ? (
-                <>
-                  <Styles.Divider>
-                    <Styles.DividerCircle />
-                    <Styles.DividerLine />
-                    <Styles.DividerCircle />
-                  </Styles.Divider>
-
-                  <Styles.Total>
-                    <Styles.Table>
-                      <Styles.Tbody>
-                        <Styles.TableTr>
-                          <Styles.TableTd>
-                            <Styles.TableTotal>Total</Styles.TableTotal>
-                          </Styles.TableTd>
-                          <Styles.TableTd>
-                            <Styles.TableAmount>
-                              {numeral(new BigNumber(amount).plus(networkFee).toNumber()).format(
-                                '0.[00000000]'
-                              )}
-                            </Styles.TableAmount>
-                          </Styles.TableTd>
-                          <Styles.TableTd>
-                            <Styles.TableSymbol>{toUpper(symbol)}</Styles.TableSymbol>
-                          </Styles.TableTd>
-                        </Styles.TableTr>
-                      </Styles.Tbody>
-                    </Styles.Table>
-                  </Styles.Total>
-                </>
-              ) : null}
-            </Styles.Order>
-          </Styles.Row>
-          <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-            <Button label="Confirm" onClick={onConfirm} ml={7.5} />
-          </Styles.Actions>
-        </Styles.Container>
+        <SendConfirmShared
+          amount={amount}
+          symbol={symbol}
+          networkFee={networkFee}
+          addressFrom={addressFrom}
+          addressTo={addressTo}
+          networkFeeSymbol={networkFeeSymbol}
+          tokenChain={tokenChain}
+          tokenName={name}
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+        />
       </Styles.Wrapper>
       <ConfirmDrawer
         isActive={state.activeDrawer === 'confirm'}

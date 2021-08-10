@@ -1,4 +1,11 @@
-export interface ILocationState {
+import { THardware } from '@utils/wallet'
+
+export type TTabInfo = {
+  favIconUrl: string
+  url: string
+}
+
+export interface Props {
   amount: number
   symbol: TSymbols
   networkFee: number
@@ -12,13 +19,6 @@ export interface ILocationState {
   decimals?: number
   extraId?: string
   name?: string
-}
-
-export interface IState {
-  activeDrawer: null | 'confirm' | 'success' | 'fail' | 'feedback'
-  password: string
-  inputErrorLabel: null | string
-  transactionLink: string
-  isButtonLoading: boolean
-  failText: string
+  hardware?: THardware
+  tabInfo?: TTabInfo
 }

@@ -1,15 +1,9 @@
 import * as React from 'react'
-import { render } from 'react-dom'
-import numeral from 'numeral'
-import { BigNumber } from 'bignumber.js'
-import type Transport from '@ledgerhq/hw-transport-webusb'
 import { browser } from 'webextension-polyfill-ts'
+import { render } from 'react-dom'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
-
-// Components
-import Button from '@components/Button'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -18,14 +12,14 @@ import FailDrawer from '@drawers/Fail'
 import LedgerDrawer from '@drawers/Ledger'
 import BasicDrawer from '@drawers/Basic'
 
-// Assets
-import ErrorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
+// Shared
+import SendConfirmShared from '@shared/SendConfirm'
 
 // Utils
-import { toLower, toUpper } from '@utils/format'
+import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet, THardware } from '@utils/wallet'
+import { IWallet } from '@utils/wallet'
 import { convertDecimals } from '@utils/web3'
 import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
@@ -41,31 +35,18 @@ import {
   getFirstAddress,
 } from '@utils/ledger'
 
+// Assets
+import errorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
+
+// Types
+import type Transport from '@ledgerhq/hw-transport-webusb'
+import { Props } from './types'
+
 // Styles
 import Styles from './styles'
 
-interface Props {
-  amount?: number
-  symbol?: string
-  addressFrom?: string
-  addressTo?: string
-  networkFee?: number
-  tabInfo?: {
-    favIconUrl: string
-    url: string
-  }
-  tokenChain?: string
-  decimals?: number
-  chain?: string
-  contractAddress?: string
-  outputs?: UnspentOutput[]
-  networkFeeSymbol?: string
-  extraId?: string
-  hardware?: THardware
-}
-
 const SendConfirmation: React.FC = () => {
-  const [props, setProps] = React.useState<Props>({})
+  const [props, setProps] = React.useState<Props | null>(null)
   const [activeDrawer, setActiveDrawer] = React.useState<
     null | 'confirm' | 'success' | 'fail' | 'ledger' | 'wrongDevice'
   >(null)
@@ -103,6 +84,65 @@ const SendConfirmation: React.FC = () => {
       setActiveDrawer('ledger')
     }
   }, [ledgerDrawerState, activeDrawer])
+
+  const createLedgerTx = async (): Promise<void> => {
+    try {
+      if (ledgerTransport && props && props?.hardware) {
+        const {
+          symbol,
+          addressTo,
+          amount,
+          chain,
+          addressFrom,
+          hardware: { path },
+          outputs,
+          networkFee,
+          extraId,
+        } = props
+
+        const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+        const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
+
+        setLedgerDrawerState('reviewTx')
+
+        const request = await signLedgerTx(
+          ledgerTransport,
+          symbol,
+          path,
+          addressFrom,
+          addressTo,
+          parseAmount,
+          chain,
+          parseNetworkFee,
+          outputs,
+          extraId
+        )
+
+        if (typeof request === 'object' && request !== null) {
+          const { name } = request
+
+          if (name === 'TransportStatusError') {
+            setLedgerDrawerState('wrongApp')
+          } else if (name === 'DisconnectedDeviceDuringOperation') {
+            setLedgerDrawerState('connectionFailed')
+          }
+          return
+        }
+
+        if (request) {
+          const txHash = await sendRawTransaction(request, chain)
+
+          if (txHash) {
+            return checkTransaction(txHash)
+          }
+        }
+      }
+
+      return setActiveDrawer('fail')
+    } catch {
+      setActiveDrawer('fail')
+    }
+  }
 
   const signLedgerTx = async (
     transport: Transport,
@@ -149,68 +189,6 @@ const SendConfirmation: React.FC = () => {
 
     if (queryDraggable === 'true') {
       setIsDraggable(true)
-    }
-  }
-
-  const createLedgerTx = async (): Promise<void> => {
-    try {
-      if (ledgerTransport) {
-        const {
-          symbol,
-          addressTo,
-          amount,
-          chain,
-          addressFrom,
-          hardware,
-          outputs,
-          networkFee,
-          extraId,
-        } = props
-
-        if (symbol && amount && hardware && addressFrom && addressTo && chain && networkFee) {
-          const { path } = hardware
-          const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
-          const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
-
-          setLedgerDrawerState('reviewTx')
-
-          const request = await signLedgerTx(
-            ledgerTransport,
-            symbol,
-            path,
-            addressFrom,
-            addressTo,
-            parseAmount,
-            chain,
-            parseNetworkFee,
-            outputs,
-            extraId
-          )
-
-          if (typeof request === 'object' && request !== null) {
-            const { name } = request
-
-            if (name === 'TransportStatusError') {
-              setLedgerDrawerState('wrongApp')
-            } else if (name === 'DisconnectedDeviceDuringOperation') {
-              setLedgerDrawerState('connectionFailed')
-            }
-            return
-          }
-
-          if (request) {
-            const txHash = await sendRawTransaction(request, chain)
-
-            if (txHash) {
-              return checkTransaction(txHash)
-            }
-          }
-        }
-      }
-
-      return setActiveDrawer('fail')
-    } catch {
-      setActiveDrawer('fail')
     }
   }
 
@@ -265,7 +243,7 @@ const SendConfirmation: React.FC = () => {
 
     const transport = await requestTransport()
 
-    if (transport && props.hardware && props.symbol) {
+    if (transport && props && props?.hardware) {
       const {
         hardware: { deviceId },
       } = props
@@ -285,17 +263,17 @@ const SendConfirmation: React.FC = () => {
   }
 
   const onSendHardwareTx = async (): Promise<void> => {
-    const { symbol, addressTo, amount, chain, addressFrom, hardware, outputs, networkFee } = props
+    if (props && props?.hardware) {
+      const { symbol, addressTo, amount, chain, addressFrom, hardware, outputs, networkFee } = props
+      const { deviceId, path } = hardware
 
-    if (symbol && addressTo && amount && chain && addressFrom && hardware && networkFee) {
       const trezorFeatures = await getFeatures()
 
-      if (trezorFeatures?.device_id !== hardware.deviceId) {
+      if (trezorFeatures?.device_id !== deviceId) {
         return setActiveDrawer('wrongDevice')
       }
 
       setButtonLoading(true)
-      const { path } = hardware
 
       const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
       const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
@@ -343,6 +321,14 @@ const SendConfirmation: React.FC = () => {
     }
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+
+    if (ledgerDrawerState) {
+      setLedgerDrawerState(null)
+    }
+  }
+
   const onConfirmSend = async (): Promise<void> => {
     if (inputErrorLabel) {
       setInputErrorLabel(null)
@@ -350,15 +336,7 @@ const SendConfirmation: React.FC = () => {
 
     const backup = getItem('backup')
 
-    if (
-      backup &&
-      props?.amount &&
-      props?.symbol &&
-      props?.networkFee &&
-      props?.addressFrom &&
-      props?.addressTo &&
-      props?.chain
-    ) {
+    if (backup && props) {
       const {
         tokenChain,
         decimals,
@@ -455,10 +433,16 @@ const SendConfirmation: React.FC = () => {
     return setInputErrorLabel('Password is not valid')
   }
 
-  const checkTransaction = async (transaction: any) => {
-    const { tokenChain, symbol, chain } = props
+  const onClickLedgerDrawer = (): void => {
+    if (props?.hardware?.type === 'ledger') {
+      onConnectLedger()
+    }
+  }
 
-    if (symbol && chain) {
+  const checkTransaction = async (transaction: any) => {
+    if (props) {
+      const { tokenChain, symbol, chain } = props
+
       if (symbol === 'xrp' && transaction?.engine_result_code === 125) {
         setFailText(
           'You are sending funds to an inactive address. Due to the Network rules, you must transfer at least 20 XRP to activate it.'
@@ -484,20 +468,6 @@ const SendConfirmation: React.FC = () => {
     }
   }
 
-  const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
-
-    if (ledgerDrawerState) {
-      setLedgerDrawerState(null)
-    }
-  }
-
-  const onClickLedgerDrawer = (): void => {
-    if (props?.hardware?.type === 'ledger') {
-      onConnectLedger()
-    }
-  }
-
   return (
     <ExternalPageContainer
       onClose={onClose}
@@ -507,100 +477,24 @@ const SendConfirmation: React.FC = () => {
       isDraggable={isDraggable}
     >
       <>
-        <Styles.Body>
-          <Styles.Row>
-            <Styles.Title>Confirm the sending</Styles.Title>
-            {!props?.hardware ? (
-              <Styles.SiteInfo>
-                <Styles.SiteInfoLabel>Confirm sending on</Styles.SiteInfoLabel>
-                {props?.tabInfo ? (
-                  <Styles.SiteInfoRow>
-                    <Styles.SiteFavicon src={props.tabInfo.favIconUrl} />
-                    <Styles.SiteUrl>{props.tabInfo.url}</Styles.SiteUrl>
-                  </Styles.SiteInfoRow>
-                ) : null}
-              </Styles.SiteInfo>
-            ) : null}
-
-            <Styles.OrderCheck>
-              <Styles.Table>
-                <Styles.Tbody>
-                  <Styles.TableTr>
-                    <Styles.TableTd>
-                      <Styles.TableTitle>Amount:</Styles.TableTitle>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableAmount>
-                        {numeral(props?.amount).format('0.[00000000]')}
-                      </Styles.TableAmount>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
-                    </Styles.TableTd>
-                  </Styles.TableTr>
-                  <Styles.TableTr>
-                    <Styles.TableTd>
-                      <Styles.TableTitle>Network fee:</Styles.TableTitle>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableAmount>
-                        {numeral(props?.networkFee).format('0.[00000000]')}
-                      </Styles.TableAmount>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
-                    </Styles.TableTd>
-                  </Styles.TableTr>
-                </Styles.Tbody>
-              </Styles.Table>
-
-              {toUpper(props?.symbol) === toUpper(props?.networkFeeSymbol) ? (
-                <>
-                  <Styles.DashedDivider>
-                    <Styles.DashedDividerLine />
-                  </Styles.DashedDivider>
-
-                  <Styles.Table>
-                    <Styles.Tbody>
-                      <Styles.TableTr>
-                        <Styles.TableTd>
-                          <Styles.TableTitle>Total:</Styles.TableTitle>
-                        </Styles.TableTd>
-                        <Styles.TableTd>
-                          {props?.amount && props?.networkFee ? (
-                            <Styles.TableAmount>
-                              {numeral(
-                                new BigNumber(props.amount).plus(props.networkFee).toNumber()
-                              ).format('0.[00000000]')}
-                            </Styles.TableAmount>
-                          ) : null}
-                        </Styles.TableTd>
-                        <Styles.TableTd>
-                          <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
-                        </Styles.TableTd>
-                      </Styles.TableTr>
-                    </Styles.Tbody>
-                  </Styles.Table>
-                </>
-              ) : null}
-            </Styles.OrderCheck>
-
-            <Styles.DestinationsList>
-              <Styles.Destinate>
-                <Styles.DestinateTitle>From</Styles.DestinateTitle>
-                <Styles.DestinateText>{props?.addressFrom}</Styles.DestinateText>
-              </Styles.Destinate>
-              <Styles.Destinate>
-                <Styles.DestinateTitle>To</Styles.DestinateTitle>
-                <Styles.DestinateText>{props?.addressTo}</Styles.DestinateText>
-              </Styles.Destinate>
-            </Styles.DestinationsList>
-          </Styles.Row>
-          <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
-            <Button label="Confirm" onClick={onConfirm} isLoading={isButtonLoading} ml={7.5} />
-          </Styles.Actions>
-        </Styles.Body>
+        {props ? (
+          <Styles.Body>
+            <SendConfirmShared
+              amount={props.amount}
+              symbol={props.symbol}
+              networkFee={props.networkFee}
+              addressFrom={props.addressFrom}
+              addressTo={props.addressTo}
+              networkFeeSymbol={props.networkFeeSymbol}
+              tokenChain={props.tokenChain}
+              tokenName={props.name}
+              onCancel={onClose}
+              onConfirm={onConfirm}
+              isButtonLoading={isButtonLoading}
+              tabInfo={props.tabInfo}
+            />
+          </Styles.Body>
+        ) : null}
         <ConfirmDrawer
           isActive={activeDrawer === 'confirm'}
           onClose={onCloseDrawer}
@@ -643,7 +537,7 @@ const SendConfirmation: React.FC = () => {
           openFrom="browser"
           title="Wrong device"
           text="Connected Trezor is wrong. Please connect the correct device to confirm the transaction."
-          icon={ErrorHardwareConnectIcon}
+          icon={errorHardwareConnectIcon}
           button={{
             label: 'Try again',
             onClick: onConfirm,
