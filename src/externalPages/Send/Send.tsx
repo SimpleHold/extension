@@ -612,7 +612,9 @@ const Send: React.FC = () => {
             type="gray"
             isLoading={estimated === null || !selectedWallet}
           >
-            <Styles.Estimated>{`$ ${price(estimated, 2)}`}</Styles.Estimated>
+            <Styles.Estimated>{`$ ${
+              Number(estimated) !== 0 && Number(estimated) < 0.01 ? '< 0.01' : price(estimated, 2)
+            }`}</Styles.Estimated>
           </Skeleton>
         </Styles.Heading>
         <Styles.Form>

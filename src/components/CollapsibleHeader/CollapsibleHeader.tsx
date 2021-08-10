@@ -138,7 +138,11 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
                 lineHeight: `${estimatedLineHeight}px`,
               }}
             >
-              {`$ ${numeral(estimated).format('0.[00000000]')}`}
+              {`$ ${
+                estimated !== 0 && estimated < 0.01
+                  ? '< 0.01'
+                  : numeral(estimated).format('0.[00000000]')
+              }`}
             </Styles.Estimated>
           ) : null}
         </Skeleton>

@@ -152,8 +152,8 @@ const WalletCard: React.FC<Props> = (props) => {
           </Skeleton>
           <Skeleton width={80} height={16} type="gray" mt={7} br={4} isLoading={estimated === null}>
             <Styles.Estimated>{`$ ${
-              Number(estimated) < 0.01
-                ? numeral(estimated).format('0.[00000000]')
+              Number(estimated) !== 0 && Number(estimated) < 0.01
+                ? '< 0.01'
                 : numberFriendly(estimated)
             }`}</Styles.Estimated>
           </Skeleton>

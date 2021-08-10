@@ -81,7 +81,9 @@ const WalletCard: React.FC<Props> = (props) => {
           </Styles.BalanceRow>
           <Skeleton width={75} height={19} mt={4} type="gray" isLoading={estimated === null}>
             {estimated !== null ? (
-              <Styles.Estimated>{`$ ${price(estimated, 2)}`}</Styles.Estimated>
+              <Styles.Estimated>{`$ ${
+                estimated !== 0 && estimated < 0.01 ? '< 0.01' : price(estimated, 2)
+              }`}</Styles.Estimated>
             ) : null}
           </Skeleton>
         </Styles.WalletInfo>
