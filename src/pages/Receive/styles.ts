@@ -12,22 +12,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0 30px 30px 30px;
+  padding: 20px 30px 30px 30px;
   overflow: hidden;
 `
 
 const Row = styled.div`
-  padding: 24px 0 0 0;
   position: relative;
-`
-
-const Title = styled.p`
-  margin: 0;
-  font-weight: bold;
-  font-size: 20px;
-  line-height: 23px;
-  color: #1d1d22;
-  text-align: center;
 `
 
 const Receive = styled.div`
@@ -36,7 +26,6 @@ const Receive = styled.div`
   background-color: #ffffff;
   border-radius: 16px;
   padding: 30px 38px 0 38px;
-  margin: 13px 0 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -76,7 +65,6 @@ const Styles = {
   Wrapper,
   Container,
   Row,
-  Title,
   Receive,
   Address,
   Warning,

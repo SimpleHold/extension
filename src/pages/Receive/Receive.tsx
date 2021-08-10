@@ -12,7 +12,6 @@ import Button from '@components/Button'
 import ExtraIdDrawer from '@drawers/ExtraId'
 
 // Utils
-import { toUpper } from '@utils/format'
 import { getExtraIdName } from '@utils/address'
 import { logEvent } from '@utils/amplitude'
 
@@ -86,8 +85,6 @@ const ReceivePage: React.FC = () => {
         <Header withBack onBack={history.goBack} backTitle={walletName} />
         <Styles.Container>
           <Styles.Row>
-            <Styles.Title>Receive {toUpper(symbol)}</Styles.Title>
-
             <Styles.Receive>
               <QRCode size={170} value={address} />
               <Styles.Address>{address}</Styles.Address>
