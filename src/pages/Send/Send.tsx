@@ -410,6 +410,14 @@ const SendPage: React.FC = () => {
     updateState({ feeType, selectedFee: state.customFee[feeType] })
   }
 
+  const getAmountTooltip = (): string | undefined => {
+    if (toLower(symbol) === 'xrp' && state.amountErrorLabel) {
+      return 'The network requires at least 20 XRP balance at all times.'
+    }
+
+    return undefined
+  }
+
   const isCurrencyBalanceError =
     (tokenChain !== undefined || toLower(symbol) === 'theta') &&
     state.currencyBalance !== null &&
@@ -470,6 +478,7 @@ const SendPage: React.FC = () => {
                     renderButton={renderInputButton('amount')}
                     errorLabel={state.amountErrorLabel}
                     onBlurInput={checkAmount}
+                    labelTooltip={getAmountTooltip()}
                   />
                 </Styles.FormBody>
                 <NetworkFee
