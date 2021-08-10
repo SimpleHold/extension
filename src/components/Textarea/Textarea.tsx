@@ -9,10 +9,12 @@ interface Props {
   onChange: (value: string) => void
   errorLabel?: string | null
   textareaRef?: React.RefObject<HTMLTextAreaElement>
+  height?: number
+  disabled?: boolean
 }
 
 const Textarea: React.FC<Props> = (props) => {
-  const { label, value, onChange, errorLabel, textareaRef } = props
+  const { label, value, onChange, errorLabel, textareaRef, height, disabled } = props
 
   const [isFocused, setIsFocused] = React.useState<boolean>(false)
   const fieldRef = textareaRef || React.useRef<HTMLTextAreaElement>(null)
@@ -38,6 +40,7 @@ const Textarea: React.FC<Props> = (props) => {
       isFocused={isFocused}
       isError={errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0}
       onClick={onClick}
+      height={height}
     >
       <Styles.Row isActive={isFocused || value?.length > 0}>
         <Styles.Label>
@@ -49,6 +52,7 @@ const Textarea: React.FC<Props> = (props) => {
           ref={fieldRef}
           onFocus={onFocus}
           onBlur={onBlur}
+          disabled={disabled}
         />
       </Styles.Row>
     </Styles.Container>

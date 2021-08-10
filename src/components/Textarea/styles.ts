@@ -3,6 +3,7 @@ import styled from 'styled-components'
 type TContainerProps = {
   isFocused: boolean
   isError: boolean
+  height?: number
 }
 
 type TRowProps = {
@@ -13,10 +14,10 @@ type TRowProps = {
 const Container = styled.div`
   background: #ffffff;
   border: ${({ isFocused, isError }: TContainerProps) =>
-    isFocused || isError ? `1px solid ${isFocused ? '#3FBB7D' : '#EB5757'}` : '1px solid #eaeaea'};
-  border-radius: 5px;
-  padding: 0 20px;
-  height: 100%;
+    isFocused || isError ? `1px solid ${isFocused ? '#3FBB7D' : '#EB5757'}` : '1px solid #DEE1E9'};
+  border-radius: 8px;
+  padding: 0 15px;
+  height: ${({ height }: TContainerProps) => (height ? `${height}px` : '100%')};
   display: flex;
   flex-direction: column;
 
@@ -39,7 +40,7 @@ const Row = styled.div`
 
   label {
     font-size: ${({ isActive }: TRowProps) => (isActive ? '12px' : '16px')};
-    line-height: ${({ isActive }: TRowProps) => (isActive ? '14px' : '23px')};
+    line-height: ${({ isActive }: TRowProps) => (isActive ? '14px' : '19px')};
   }
 
   textarea {
@@ -53,7 +54,7 @@ const Label = styled.label`
 `
 
 const Textarea = styled.textarea`
-  margin: 5px 0 0 0;
+  margin: 2px 0 0 0;
   font-size: 16px;
   line-height: 23px;
   color: #1d1d22;
