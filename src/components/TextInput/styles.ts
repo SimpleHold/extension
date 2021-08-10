@@ -79,6 +79,7 @@ const Row = styled.div`
 
 const Label = styled.label`
   transition: all 0.3s ease-out;
+  margin-right: 6px;
 `
 
 const Input = styled.input`
@@ -185,6 +186,17 @@ const ButtonLabel = styled.p`
   color: #3fbb7d;
 `
 
+const LabelRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-content: flex-start;
+
+  path {
+    fill: #eb5757;
+  }
+`
+
 const Styles = {
   Container,
   Row,
@@ -196,6 +208,7 @@ const Styles = {
   ClearButton,
   Button,
   ButtonLabel,
+  LabelRow,
 }
 
 export default Styles

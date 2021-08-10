@@ -1,6 +1,9 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
 
+// Components
+import Tooltip from '@components/Tooltip'
+
 // Styles
 import Styles from './styles'
 
@@ -19,6 +22,7 @@ interface Props {
     label: string
     onClick: () => void
   }
+  labelTooltip?: string
 }
 
 const TextInput: React.FC<Props> = (props) => {
@@ -34,6 +38,7 @@ const TextInput: React.FC<Props> = (props) => {
     openFrom,
     button,
     renderButton,
+    labelTooltip,
   } = props
 
   const textInputRef = inputRef || React.useRef<HTMLInputElement>(null)
@@ -101,9 +106,16 @@ const TextInput: React.FC<Props> = (props) => {
       disabled={disabled}
     >
       <Styles.Row isActive={isFocused || value?.length > 0} openFrom={openFrom}>
-        <Styles.Label>
-          {errorLabel && !isFocused && value.length > 0 ? errorLabel : label}
-        </Styles.Label>
+        <Styles.LabelRow>
+          <Styles.Label>
+            {errorLabel && !isFocused && value.length > 0 ? errorLabel : label}
+          </Styles.Label>
+          {labelTooltip?.length && errorLabel && value.length && !isFocused ? (
+            <Tooltip text={labelTooltip} maxWidth={195} textSpace="pre-wrap" mt={5}>
+              <SVG src="../../assets/icons/warning.svg" width={12} height={12} />
+            </Tooltip>
+          ) : null}
+        </Styles.LabelRow>
         {type === 'number' ? (
           <Styles.NumberInput
             getInputRef={(el: HTMLInputElement) => (numberInputRef = el)}
