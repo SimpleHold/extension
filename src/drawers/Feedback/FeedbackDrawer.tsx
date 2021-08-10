@@ -5,62 +5,79 @@ import DrawerWrapper from '@components/DrawerWrapper'
 import Textarea from '@components/Textarea'
 import Button from '@components/Button'
 
+// Utils
+import { sendFeedback } from '@utils/api'
+import { getItem } from '@utils/storage'
+
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { IProps, IState } from './types'
+
 // Styles
 import Styles from './styles'
 
-interface Props {
-  onClose: () => void
-  isActive: boolean
+const initialState: IState = {
+  rating: 0,
+  feedback: '',
+  isLoading: false,
+  isSent: false,
 }
 
-const FeedbackDrawer: React.FC<Props> = (props) => {
+const FeedbackDrawer: React.FC<IProps> = (props) => {
   const { onClose, isActive } = props
 
-  const [selectedGrade, setGrade] = React.useState<number>(0)
-  const [feedback, setFeedback] = React.useState<string>('')
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [isSent, setIsSent] = React.useState<boolean>(false)
+  const { state, updateState } = useState<IState>(initialState)
 
-  const onClickGrade = (number: number) => (): void => {
-    if (selectedGrade !== number) {
-      setGrade(number)
+  const onClickGrade = (rating: number) => (): void => {
+    if (state.rating !== rating && !state.isLoading) {
+      updateState({ rating })
     }
   }
 
-  const onSend = (): void => {
-    setIsLoading(true)
+  const onSend = async (): Promise<void> => {
+    const clientId = getItem('clientId')
 
-    setTimeout(() => {
-      setIsLoading(false)
-      setIsSent(true)
-    }, 2000)
+    if (clientId) {
+      updateState({ isLoading: true })
+      await sendFeedback(clientId, state.feedback, state.rating)
+      updateState({ isLoading: false, isSent: true })
+    }
+  }
+
+  const setFeedback = (feedback: string): void => {
+    updateState({ feedback })
   }
 
   return (
     <DrawerWrapper
       title={
-        isSent ? 'Thank you for your feedback!' : 'How likely is it that you will recommend us?'
+        state.isSent
+          ? 'Thank you for your feedback!'
+          : 'How likely is it that you will recommend us?'
       }
       isActive={isActive}
       onClose={onClose}
       withCloseIcon
-      icon={isSent ? '../../assets/drawer/success.svg' : undefined}
+      icon={state.isSent ? '../../assets/drawer/success.svg' : undefined}
     >
       <Styles.Row>
-        {!isSent ? (
+        {!state.isSent ? (
           <>
             <Styles.Grade>
               {Array(10)
                 .fill('grade')
                 .map((i: string, index: number) => {
                   const number = index + 1
-                  const isActive = selectedGrade >= number
+                  const isActive = state.rating >= number
 
                   return (
                     <Styles.GradeItem
                       key={`${i}/${index}`}
                       onClick={onClickGrade(number)}
                       isActive={isActive}
+                      disabled={state.isLoading}
                     >
                       <Styles.GradeItemNumber>{number}</Styles.GradeItemNumber>
                     </Styles.GradeItem>
@@ -69,17 +86,19 @@ const FeedbackDrawer: React.FC<Props> = (props) => {
             </Styles.Grade>
             <Textarea
               label="What could we do to improve?"
-              value={feedback}
+              value={state.feedback}
               onChange={setFeedback}
+              height={180}
+              disabled={state.isLoading}
             />
           </>
         ) : null}
         <Button
-          label="Send feedback"
-          onClick={onSend}
+          label={state.isSent ? 'Close' : 'Send feedback'}
+          onClick={state.isSent ? onClose : onSend}
           mt={15}
-          disabled={selectedGrade === 0 || !feedback.length}
-          isLoading={isLoading}
+          disabled={state.rating === 0 || !state.feedback.length}
+          isLoading={state.isLoading}
         />
       </Styles.Row>
     </DrawerWrapper>

@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 type TGradeItemProps = {
   isActive: boolean
+  disabled: boolean
 }
 
 const Row = styled.div`
@@ -24,8 +25,9 @@ const GradeItem = styled.div`
   background-color: ${({ isActive }: TGradeItemProps) => (isActive ? '#b5e0c8' : '#d7efe3')};
 
   &:hover {
-    cursor: ${({ isActive }: TGradeItemProps) => (isActive ? 'default' : 'pointer')};
-    background-color: #b5e0c8;
+    cursor: ${({ disabled }: TGradeItemProps) => (disabled ? 'default' : 'pointer')};
+    background-color: ${({ isActive, disabled }: TGradeItemProps) =>
+      disabled ? (isActive ? '#b5e0c8' : '#d7efe3') : '#b5e0c8'};
   }
 
   &:not(:last-child) {
