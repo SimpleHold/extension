@@ -13,6 +13,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 import FailDrawer from '@drawers/Fail'
+import FeedbackDrawer from '@drawers/Feedback'
 
 // Utils
 import { toUpper, short } from '@utils/format'
@@ -25,6 +26,7 @@ import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } fro
 import { convertDecimals } from '@utils/web3'
 import * as theta from '@utils/currencies/theta'
 import { getItem } from '@utils/storage'
+import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
 
 // Config
 import {
@@ -225,6 +227,20 @@ const SendConfirmation: React.FC = () => {
       return
     }
 
+    const txsStats = getStats()
+
+    if (txsStats) {
+      const { amount } = JSON.parse(txsStats)
+
+      updateStats()
+
+      const isCanShowDrawer = isShowSatismeter(amount + 1)
+
+      if (isCanShowDrawer) {
+        return updateState({ activeDrawer: 'feedback' })
+      }
+    }
+
     history.replace('/wallets')
   }
 
@@ -234,6 +250,10 @@ const SendConfirmation: React.FC = () => {
 
   const setPassword = (password: string): void => {
     updateState({ password })
+  }
+
+  const onCloseFeedbackDrawer = (): void => {
+    history.replace('/wallets')
   }
 
   return (
@@ -360,6 +380,11 @@ const SendConfirmation: React.FC = () => {
         isActive={state.activeDrawer === 'fail'}
         onClose={onCloseDrawer}
         text={state.failText}
+      />
+
+      <FeedbackDrawer
+        isActive={state.activeDrawer === 'feedback'}
+        onClose={onCloseFeedbackDrawer}
       />
     </>
   )

@@ -127,3 +127,37 @@ export const save = (
     setItem(walletKey, JSON.stringify(nonPendintTxs))
   }
 }
+
+export const getStats = (): string | null => {
+  return getItem('txs_stats')
+}
+
+export const updateStats = (): void => {
+  const getStats = getItem('txs_stats')
+
+  let prevAmount = 0
+
+  if (getStats) {
+    const { amount } = JSON.parse(getStats)
+    prevAmount = amount
+  }
+  setItem(
+    'txs_stats',
+    JSON.stringify({
+      amount: prevAmount + 1,
+      lastUpdate: new Date().getTime(),
+    })
+  )
+}
+
+export const isShowSatismeter = (prevAmount: number): boolean => {
+  const getStats = getJSON('txs_stats')
+
+  if (getStats) {
+    const { amount, lastUpdate } = getStats
+
+    return (amount < 2 && prevAmount >= 2) || dayjs().diff(lastUpdate, 'month') >= 3
+  }
+
+  return false
+}

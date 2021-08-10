@@ -14,7 +14,7 @@ export interface ILocationState {
 }
 
 export interface IState {
-  activeDrawer: null | 'confirm' | 'success' | 'fail'
+  activeDrawer: null | 'confirm' | 'success' | 'fail' | 'feedback'
   password: string
   inputErrorLabel: null | string
   transactionLink: string
