@@ -40,6 +40,7 @@ const TotalBalanceLabel = styled.p`
   line-height: 19px;
   color: #ffffff;
   position: absolute;
+  user-select: none;
 `
 
 const PendingBalanceRow = styled.div``
@@ -59,6 +60,7 @@ const WalletsLabel = styled.p`
   font-weight: 500;
   line-height: 19px;
   color: #ffffff;
+  user-select: none;
 `
 
 const Actions = styled.div`

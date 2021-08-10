@@ -9,6 +9,7 @@ const Container = styled.div`
   flex-direction: row;
   align-items: center;
   padding: 20px;
+  user-select: none;
 
   &:hover {
     cursor: pointer;
