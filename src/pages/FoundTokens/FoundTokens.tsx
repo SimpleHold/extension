@@ -14,7 +14,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet } from '@utils/wallet'
-import { importPrivateKey } from '@utils/address'
+import { importPrivateKey } from '@utils/currencies'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
@@ -25,7 +25,7 @@ import Styles from './styles'
 
 interface LocationState {
   chain: string
-  symbol: TSymbols
+  symbol: string
   privateKey: string
   tokens: string[]
   tokenStandart: string

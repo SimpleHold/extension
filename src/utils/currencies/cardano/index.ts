@@ -11,23 +11,6 @@ export const coins = ['ada']
 
 import { getCardanoTransactionParams } from '@utils/api'
 
-export interface ICardanoUnspentTxOutput {
-  ctaAddress: string
-  ctaAmount: {
-    getCoin: string
-  }
-  ctaTxHash: string
-  ctaTxIndex: number
-}
-
-// Do not send money to this address!
-const testWallet = {
-  address:
-    'addr1q8j2yamnmsf3uevcmrcnzm4uv5tq46zzachqpql08l0vhrsa2ald8tuls2ddfggjj3dz0sq9gv2f4msu9t539ng3xk3sse5dty',
-  privateKey:
-    'xprv1erx3qfz40et93vmsfcuq9p3frucm8yfvu8yanqfp3j8zu8jasef6degjd7hj9q9gzw89kjaht0uuc6ky4fz6gw0nrsmklv3c5zwkp7em60mqlyv4e6kk0p6k9rqn9ry6s0ry6f7mtfu23l9n4nke2w05mgls4jkq',
-}
-
 const harden = (num: number): number => {
   return 0x80000000 + num
 }
@@ -124,50 +107,55 @@ const getTxBuilder = () => {
 }
 
 const calculateFee = (
-  outputs: ICardanoUnspentTxOutput[],
+  outputs: CardanoUnspentTxOutput[],
   amount: number | string,
   ttl: number
 ): number => {
   try {
     const txBuilder = getTxBuilder()
+    const testWallet = generateWallet()
 
-    const outputAddress = CardanoWasm.Address.from_bech32(testWallet.address)
-    const signingKey = CardanoWasm.Bip32PrivateKey.from_bech32(testWallet.privateKey).to_raw_key()
+    if (testWallet) {
+      const outputAddress = CardanoWasm.Address.from_bech32(testWallet.address)
+      const signingKey = CardanoWasm.Bip32PrivateKey.from_bech32(testWallet.privateKey).to_raw_key()
 
-    for (const output of outputs) {
-      const {
-        ctaAmount: { getCoin: inputAmount },
-        ctaTxHash: inputHash,
-        ctaTxIndex: inputIndex,
-      } = output
-      const txHashBuffer = Buffer.from(inputHash, 'hex')
-      const taxHashBufferArray = new Uint8Array(
-        txHashBuffer.buffer,
-        txHashBuffer.byteOffset,
-        txHashBuffer.byteLength
+      for (const output of outputs) {
+        const {
+          ctaAmount: { getCoin: inputAmount },
+          ctaTxHash: inputHash,
+          ctaTxIndex: inputIndex,
+        } = output
+        const txHashBuffer = Buffer.from(inputHash, 'hex')
+        const taxHashBufferArray = new Uint8Array(
+          txHashBuffer.buffer,
+          txHashBuffer.byteOffset,
+          txHashBuffer.byteLength
+        )
+        txBuilder.add_key_input(
+          signingKey.to_public().hash(),
+          CardanoWasm.TransactionInput.new(
+            CardanoWasm.TransactionHash.from_bytes(taxHashBufferArray),
+            inputIndex
+          ),
+          CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(inputAmount))
+        )
+      }
+
+      txBuilder.set_ttl(ttl)
+
+      txBuilder.add_output(
+        CardanoWasm.TransactionOutput.new(
+          outputAddress,
+          CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(`${toAda(amount)}`))
+        )
       )
-      txBuilder.add_key_input(
-        signingKey.to_public().hash(),
-        CardanoWasm.TransactionInput.new(
-          CardanoWasm.TransactionHash.from_bytes(taxHashBufferArray),
-          inputIndex
-        ),
-        CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(inputAmount))
-      )
+
+      txBuilder.add_change_if_needed(CardanoWasm.Address.from_bech32(testWallet.address))
+
+      return +txBuilder.min_fee().to_str()
     }
 
-    txBuilder.set_ttl(ttl)
-
-    txBuilder.add_output(
-      CardanoWasm.TransactionOutput.new(
-        outputAddress,
-        CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(`${toAda(amount)}`))
-      )
-    )
-
-    txBuilder.add_change_if_needed(CardanoWasm.Address.from_bech32(testWallet.address))
-
-    return +txBuilder.min_fee().to_str()
+    return 0
   } catch {
     return 0
   }
@@ -181,11 +169,11 @@ export const getNetworkFee = async (outputs: any[], amount: string | number) => 
       const { ttl } = transactionParams
 
       const sortOutputs = outputs.sort(
-        (a: ICardanoUnspentTxOutput, b: ICardanoUnspentTxOutput) =>
+        (a: CardanoUnspentTxOutput, b: CardanoUnspentTxOutput) =>
           Number(a.ctaAmount.getCoin) - Number(b.ctaAmount.getCoin)
       )
 
-      const selectedOutputs: ICardanoUnspentTxOutput[] = []
+      const selectedOutputs: CardanoUnspentTxOutput[] = []
 
       for (const output of sortOutputs) {
         const getTotalValue = selectedOutputs.reduce((a, b) => a + Number(b.ctaAmount.getCoin), 0)

@@ -4,23 +4,10 @@ import BigNumber from 'bignumber.js'
 // Utils
 import { getNulsTxParams } from '@utils/api'
 
+// Types
+import { TTransferInfo, TBalanceInfo } from './types'
+
 export const coins: string[] = ['nuls']
-
-type TTransferInfo = {
-  fromAddress: string
-  toAddress: string
-  amount: number
-}
-
-type TBalanceInfo = {
-  totalBalance: number
-  balance: number
-  timeLock: number
-  consensusLock: number
-  freeze: number
-  nonce: string
-  nonceType: number
-}
 
 const chainId = 1
 

@@ -17,7 +17,7 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
-import { generate, importPrivateKey, importRecoveryPhrase } from '@utils/address'
+import { generate, importPrivateKey, importRecoveryPhrase } from '@utils/currencies'
 import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
 
@@ -29,7 +29,7 @@ import { getCurrencyByChain, ICurrency, checkWithPhrase } from '@config/currenci
 import Styles from './styles'
 
 interface LocationState {
-  symbol: TSymbols
+  symbol: string
   warning?: string
   backTitle?: string
   chain?: string

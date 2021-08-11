@@ -26,7 +26,7 @@ import {
 } from '@utils/wallet'
 import { getTransactionHistory } from '@utils/api'
 import { openWebPage } from '@utils/extension'
-import { getExplorerLink, getTransactionLink } from '@utils/address'
+import { getExplorerLink, getTransactionLink } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
 import { getItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'

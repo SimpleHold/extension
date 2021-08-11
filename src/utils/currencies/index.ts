@@ -23,90 +23,92 @@ import * as ripple from '@utils/currencies/ripple'
 import * as neblio from '@utils/currencies/neblio'
 import * as nuls from '@utils/currencies/nuls'
 
+// Types
+import { TProvider, TCreateTransactionProps } from './types'
+
 const web3Symbols = ['eth', 'etc', 'bnb']
 
-type TCreateTransactionProps = {
-  from: string
-  to: string
-  amount: number
-  privateKey: string
-  symbol: string
-  tokenChain?: string
-  outputs?: UnspentOutput[]
-  networkFee?: number
-  gas?: number
-  chainId?: number
-  gasPrice?: string
-  nonce?: number
-  contractAddress?: string
-  xrpTxData?: {
-    fee: string
-    sequence: number
-    maxLedgerVersion: number
-  }
-  extraId?: string
-}
-
-export const isEthereumLike = (symbol: TSymbols | string, chain?: string): boolean => {
+export const isEthereumLike = (symbol: string, chain?: string): boolean => {
   return web3Symbols.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
 }
 
-export const generate = (symbol: TSymbols | string, chain?: string): TGenerateAddress | null => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
-    return nuls.generateWallet()
-  } else if (neblio.coins.indexOf(symbol) !== -1) {
-    return neblio.generateWallet()
-  } else if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.generateWallet()
-  } else if (cardano.coins.indexOf(symbol) !== -1) {
-    return cardano.generateWallet()
-  } else if (isEthereumLike(symbol, chain)) {
-    return web3.generateAddress()
-  } else if (theta.coins.indexOf(symbol) !== -1) {
-    return theta.generateWallet()
-  } else {
-    const generateBTCLikeAddress = new bitcoinLike(symbol).generate()
+const getProvider = (symbol: string): TProvider | null => {
+  try {
+    if (nuls.coins.indexOf(symbol) !== -1) {
+      return nuls
+    }
 
-    return generateBTCLikeAddress
+    if (neblio.coins.indexOf(symbol) !== -1) {
+      return neblio
+    }
+
+    if (ripple.coins.indexOf(symbol) !== -1) {
+      return ripple
+    }
+
+    if (cardano.coins.indexOf(symbol) !== -1) {
+      return cardano
+    }
+
+    if (theta.coins.indexOf(symbol) !== -1) {
+      return theta
+    }
+
+    return null
+  } catch {
+    return null
   }
 }
 
+export const generate = (symbol: string, chain?: string): TGenerateAddress | null => {
+  const provider = getProvider(symbol)
+
+  if (provider?.generateWallet) {
+    return provider.generateWallet()
+  }
+
+  if (isEthereumLike(symbol, chain)) {
+    return web3.generateAddress()
+  }
+
+  return new bitcoinLike(symbol).generate()
+}
+
 export const importPrivateKey = (
-  symbol: TSymbols | string,
+  symbol: string,
   privateKey: string,
   chain?: string
 ): string | null => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
-    return nuls.importPrivateKey(privateKey)
-  } else if (neblio.coins.indexOf(symbol) !== -1) {
-    return neblio.importPrivateKey(privateKey)
-  } else if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.importPrivateKey(privateKey)
-  } else if (isEthereumLike(symbol, chain)) {
+  const provider = getProvider(symbol)
+
+  if (provider?.importPrivateKey) {
+    return provider.importPrivateKey(privateKey)
+  }
+
+  if (isEthereumLike(symbol, chain)) {
     return web3.importPrivateKey(privateKey)
-  } else if (theta.coins.indexOf(symbol) !== -1) {
-    return theta.importPrivateKey(privateKey)
   } else {
     return new bitcoinLike(symbol).import(privateKey)
   }
 }
 
 export const validateAddress = (
-  symbol: TSymbols | string,
+  symbol: string,
   chain: string,
   address: string,
   tokenChain?: string
 ): boolean => {
   try {
-    if (nuls.coins.indexOf(symbol) !== -1) {
-      return nuls.validateAddress(address)
-    } else if (cardano.coins.indexOf(symbol) !== -1) {
-      return cardano.validateAddress(address)
-    } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
-      return new bitcoinLike(symbol).isAddressValid(address)
-    } else if (neblio.coins.indexOf(symbol) !== -1) {
-      return neblio.validateAddress(address)
+    const provider = getProvider(symbol)
+
+    if (provider?.validateAddress) {
+      return provider.validateAddress(address)
     }
+
+    if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
+      return new bitcoinLike(symbol).isAddressValid(address)
+    }
+
     // @ts-ignore
     return new RegExp(tokenChain ? addressValidate.eth : addressValidate[symbol])?.test(address)
   } catch {
@@ -361,17 +363,13 @@ export const getExplorerLink = (
   chain?: string,
   contractAddress?: string
 ) => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
-    return nuls.getExplorerLink(address)
-  } else if (neblio.coins.indexOf(symbol) !== -1) {
-    return neblio.getExplorerLink(address)
-  } else if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.getExplorerLink(address)
-  } else if (cardano.coins.indexOf(symbol) !== -1) {
-    return cardano.getExplorerLink(address)
-  } else if (theta.coins.indexOf(symbol) !== -1) {
-    return `https://explorer.thetatoken.org/account/${address}`
-  } else if (isEthereumLike(symbol, chain)) {
+  const provider = getProvider(symbol)
+
+  if (provider?.getExplorerLink) {
+    return provider.getExplorerLink(address)
+  }
+
+  if (isEthereumLike(symbol, chain)) {
     const parseSymbol = toLower(symbol)
 
     if (chain) {
@@ -403,15 +401,13 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string | null => {
-  if (nuls.coins.indexOf(symbol) !== -1) {
-    return nuls.getTransactionLink(hash)
-  } else if (neblio.coins.indexOf(symbol) !== -1) {
-    return neblio.getTransactionLink(hash)
-  } else if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.getTransactionLink(hash)
-  } else if (cardano.coins.indexOf(symbol) !== -1) {
-    return cardano.getTransactionLink(hash)
-  } else if (isEthereumLike(symbol, tokenChain)) {
+  const provider = getProvider(symbol)
+
+  if (provider?.getTransactionLink) {
+    return provider.getTransactionLink(hash)
+  }
+
+  if (isEthereumLike(symbol, tokenChain)) {
     const parseChain = tokenChain ? toLower(tokenChain) : toLower(chain)
 
     if (parseChain === 'eth') {
@@ -445,9 +441,12 @@ export const importRecoveryPhrase = (
   recoveryPhrase: string
 ): TGenerateAddress | null => {
   try {
-    if (cardano.coins.indexOf(symbol) !== -1) {
-      return cardano.importRecoveryPhrase(recoveryPhrase)
+    const provider = getProvider(symbol)
+
+    if (provider?.importRecoveryPhrase) {
+      return provider.importRecoveryPhrase(recoveryPhrase)
     }
+
     return null
   } catch {
     return null
@@ -462,8 +461,10 @@ export const getExtraIdName = (symbol: string): null | string => {
 }
 
 export const generateExtraId = (symbol: string): null | string => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.generateTag()
+  const provider = getProvider(symbol)
+
+  if (provider?.generateExtraId) {
+    return provider.generateExtraId()
   }
   return null
 }

@@ -98,3 +98,7 @@ export const createTransaction = async (
 export const getTransactionLink = (hash: string): string => {
   return `https://explorer.thetatoken.org/txs/${hash}`
 }
+
+export const getExplorerLink = (address: string): string => {
+  return `https://explorer.thetatoken.org/account/${address}`
+}

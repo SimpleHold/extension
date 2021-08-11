@@ -21,7 +21,12 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { convertDecimals } from '@utils/web3'
-import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
+import {
+  formatUnit,
+  createTransaction,
+  isEthereumLike,
+  getTransactionLink,
+} from '@utils/currencies'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, getJSON, removeItem } from '@utils/storage'

@@ -12,7 +12,7 @@ import Button from '@components/Button'
 import ExtraIdDrawer from '@drawers/ExtraId'
 
 // Utils
-import { getExtraIdName } from '@utils/address'
+import { getExtraIdName } from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
 
 // Config

@@ -20,7 +20,12 @@ import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
+import {
+  formatUnit,
+  createTransaction,
+  isEthereumLike,
+  getTransactionLink,
+} from '@utils/currencies'
 import { convertDecimals } from '@utils/web3'
 import * as theta from '@utils/currencies/theta'
 import { getItem } from '@utils/storage'
