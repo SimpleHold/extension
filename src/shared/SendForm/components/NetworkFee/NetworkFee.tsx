@@ -1,11 +1,12 @@
 import * as React from 'react'
+
 // Components
 import Switch from '@components/Switch'
-
 import FeeButton from '../FeeButton'
 
 // Types
 import { TFees } from '../../types'
+import { TCustomFee } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -20,6 +21,7 @@ interface Props {
   withButton: boolean
   isIncludeFee: boolean
   toggleIncludeFee: () => void
+  customFee: TCustomFee
 }
 
 const NetworkFee: React.FC<Props> = (props) => {
@@ -33,6 +35,7 @@ const NetworkFee: React.FC<Props> = (props) => {
     withButton,
     isIncludeFee,
     toggleIncludeFee,
+    customFee,
   } = props
 
   return (
@@ -45,6 +48,7 @@ const NetworkFee: React.FC<Props> = (props) => {
         fee={fee}
         withButton={withButton}
         symbol={symbol}
+        customFee={customFee}
       />
       <Styles.IncludeBlock>
         <Styles.IncludeLabel>Include Fee</Styles.IncludeLabel>

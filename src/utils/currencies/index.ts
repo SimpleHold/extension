@@ -7,11 +7,10 @@ import { getToken } from '@config/tokens'
 import {
   getEtherNetworkFee,
   getThetaNetworkFee,
-  getNetworkFee,
-  getFeePerByte,
+  getNetworkFee as getNetworkFeeRequest,
   getCustomFee,
 } from '@utils/api'
-import { IGetNetworkFeeResponse, TCustomFee } from '@utils/api/types'
+import { TCustomFee } from '@utils/api/types'
 import { toLower } from '@utils/format'
 
 // Currencies
@@ -24,7 +23,7 @@ import * as neblio from '@utils/currencies/neblio'
 import * as nuls from '@utils/currencies/nuls'
 
 // Types
-import { TProvider, TCreateTransactionProps } from './types'
+import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
 
 const web3Symbols = ['eth', 'etc', 'bnb']
 
@@ -200,139 +199,60 @@ export const createTransaction = async ({
   }
 }
 
-interface IGetNetworkFeeParams {
-  address: string
-  symbol: string
-  amount: string
-  from: string
-  to: string
-  chain: string
-  web3Params: {
-    tokenChain?: string
-    contractAddress?: string
-    decimals?: number
-  }
-  outputs?: UnspentOutput[]
-}
+export const getNetworkFee = async ({
+  symbol,
+  addressFrom,
+  addressTo,
+  chain,
+  amount,
+  tokenChain,
+  btcLikeParams,
+  ethLikeParams,
+}: IGetFeeParams): Promise<TGetFeeData | null> => {
+  if (btcLikeParams && btcLikeParams) {
+    const { outputs, feePerByte } = btcLikeParams
 
-export const getNewNetworkFee = async (
-  params: IGetNetworkFeeParams
-): Promise<IGetNetworkFeeResponse | null> => {
-  const { address, symbol, amount, from, to, chain, web3Params, outputs } = params
-
-  if (nuls.coins.indexOf(symbol) !== -1) {
-    return {
-      networkFee: 0.001,
-    }
-  }
-
-  if (
-    web3Params?.contractAddress ||
-    web3Params?.decimals ||
-    web3Params?.tokenChain ||
-    isEthereumLike(symbol)
-  ) {
-    const value = web3Params?.decimals
-      ? ethereumLike.convertDecimals(amount, web3Params.decimals)
-      : ethereumLike.toEther(amount)
-    const web3Chain = web3Params?.tokenChain || chain
-    const web3TokenChain = web3Params?.tokenChain ? symbol : undefined
-
-    return await getEtherNetworkFee(
-      from,
-      to,
-      value,
-      web3Chain,
-      web3TokenChain,
-      web3Params?.contractAddress,
-      web3Params?.decimals
-    )
-  }
-
-  if (outputs?.length) {
     if (cardano.coins.indexOf(symbol) !== -1) {
       return cardano.getNetworkFee(outputs, amount)
     }
-    if (neblio.coins.indexOf(symbol) !== -1) {
-      return neblio.getNetworkFee(address, outputs, amount)
-    }
-    const btcFeePerByte = await getFeePerByte(chain)
 
-    return bitcoinLike.getNetworkFee(address, outputs, amount, btcFeePerByte, symbol)
+    if (neblio.coins.indexOf(symbol) !== -1) {
+      return neblio.getNetworkFee(addressFrom, outputs, amount)
+    }
+
+    if (bitcoinLike.coins.indexOf(symbol) !== -1) {
+      return bitcoinLike.getNetworkFee(addressFrom, outputs, amount, feePerByte, symbol)
+    }
   }
 
-  if (ripple.coins.indexOf(symbol) !== -1) {
-    return await getNetworkFee('ripple')
+  if (isEthereumLike(symbol, tokenChain)) {
+    const { contractAddress, decimals, gasPrice } = ethLikeParams
+
+    const value = decimals
+      ? ethereumLike.convertDecimals(amount, decimals)
+      : ethereumLike.toEther(amount)
+
+    return await getEtherNetworkFee(
+      addressFrom,
+      addressTo,
+      value,
+      tokenChain || chain,
+      tokenChain ? symbol : undefined,
+      contractAddress,
+      decimals,
+      gasPrice
+    )
   }
 
   if (theta.coins.indexOf(symbol) !== -1) {
-    return await getThetaNetworkFee(address)
+    return await getThetaNetworkFee(addressFrom)
+  }
+
+  if (ripple.coins.indexOf(symbol) !== -1) {
+    return await getNetworkFeeRequest('ripple')
   }
 
   return null
-}
-
-export const getAddressNetworkFee = async (
-  address: string,
-  symbol: string,
-  amount: string,
-  from: string,
-  to: string,
-  chain: string,
-  outputs?: UnspentOutput[],
-  tokenChain?: string,
-  contractAddress?: string,
-  decimals?: number
-): Promise<IGetNetworkFeeResponse | null> => {
-  try {
-    if (nuls.coins.indexOf(symbol) !== -1) {
-      return {
-        networkFee: 0.001,
-      }
-    }
-
-    if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
-      const value = decimals
-        ? ethereumLike.convertDecimals(amount, decimals)
-        : ethereumLike.toEther(amount)
-      const data = await getEtherNetworkFee(
-        from,
-        to,
-        value,
-        tokenChain || chain,
-        tokenChain ? symbol : undefined,
-        contractAddress,
-        decimals
-      )
-
-      return data
-    }
-
-    if (ripple.coins.indexOf(symbol) !== -1) {
-      return await getNetworkFee('ripple')
-    }
-
-    if (theta.coins.indexOf(symbol) !== -1) {
-      return await getThetaNetworkFee(address)
-    }
-
-    if (typeof outputs !== 'undefined') {
-      if (cardano.coins.indexOf(symbol) !== -1) {
-        return cardano.getNetworkFee(outputs, amount)
-      }
-      if (neblio.coins.indexOf(symbol) !== -1) {
-        return neblio.getNetworkFee(address, outputs, amount)
-      }
-
-      const btcFeePerByte = await getFeePerByte(chain)
-
-      return bitcoinLike.getNetworkFee(address, outputs, amount, btcFeePerByte, symbol)
-    }
-
-    return null
-  } catch {
-    return null
-  }
 }
 
 export const formatUnit = (
@@ -479,6 +399,20 @@ export const getFee = async (
     if (bitcoinLike.coins.indexOf(chain) !== -1 || isEthereumLike(symbol, tokenChain)) {
       return await getCustomFee(chain)
     }
+    return null
+  } catch {
+    return null
+  }
+}
+
+export const getStandingFee = (symbol: string): number | null => {
+  try {
+    const provider = getProvider(symbol)
+
+    if (provider?.getStandingFee) {
+      return provider.getStandingFee()
+    }
+
     return null
   } catch {
     return null

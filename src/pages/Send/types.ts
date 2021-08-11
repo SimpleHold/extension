@@ -44,4 +44,5 @@ export interface IState {
   customFee: TCustomFee
   selectedFee: number
   isIncludeFee: boolean
+  isStandingFee: boolean
 }

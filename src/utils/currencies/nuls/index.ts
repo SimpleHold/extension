@@ -147,3 +147,7 @@ export const createTransaction = async (
     return null
   }
 }
+
+export const getStandingFee = (): number => {
+  return 0.001
+}

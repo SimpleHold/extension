@@ -69,7 +69,6 @@ const TextInput: React.FC<Props> = (props) => {
 
   const onClear = (): void => {
     onChange('')
-    textInputRef.current?.focus()
   }
 
   const onClickButton = (): void => {
@@ -85,6 +84,8 @@ const TextInput: React.FC<Props> = (props) => {
   }
 
   const onBlur = (): void => {
+    setIsFocused(false)
+
     if (onBlurInput) {
       onBlurInput()
     }

@@ -170,7 +170,8 @@ export const getEtherNetworkFee = async (
   chain: string,
   tokenSymbol?: string,
   contractAddress?: string,
-  decimals?: number
+  decimals?: number,
+  gasPrice?: number
 ): Promise<IGetNetworkFeeResponse> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/network-fee`, {
@@ -274,6 +275,7 @@ export const getTxHex = async (chain: string, txId: string): Promise<null | stri
   }
 }
 
+// Fix me
 export const getFeePerByte = async (chain: string): Promise<number> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/wallet/fee/${chain}`, {

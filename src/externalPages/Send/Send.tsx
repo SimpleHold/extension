@@ -23,7 +23,7 @@ import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { price, toLower, toUpper, formatEstimated } from '@utils/format'
 import {
   validateAddress,
-  getNewNetworkFee,
+  // getNewNetworkFee,
   formatUnit,
   getNetworkFeeSymbol,
   getExtraIdName,
@@ -186,40 +186,37 @@ const Send: React.FC = () => {
       const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
       if (currencyInfo) {
-        const data = await getNewNetworkFee({
-          address: selectedWallet.address,
-          symbol,
-          amount,
-          chain: currencyInfo.chain,
-          from: selectedWallet.address,
-          to: address,
-          web3Params: {
-            tokenChain: chain,
-            decimals,
-            contractAddress,
-          },
-          outputs,
-        })
-
-        setNetworkFeeLoading(false)
-
-        if (data) {
-          if (data.utxos) {
-            setUtxosList(data?.utxos)
-          }
-
-          if (data.networkFee) {
-            setNetworkFee(data.networkFee)
-          } else {
-            if (Number(amount) > 0 && Number(balance) > 0) {
-              setAmountErrorLabel('Insufficient funds')
-            }
-          }
-
-          if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
-            setCurrencyBalance(data.currencyBalance)
-          }
-        }
+        // const data = await getNewNetworkFee({
+        //   address: selectedWallet.address,
+        //   symbol,
+        //   amount,
+        //   chain: currencyInfo.chain,
+        //   from: selectedWallet.address,
+        //   to: address,
+        //   web3Params: {
+        //     tokenChain: chain,
+        //     decimals,
+        //     contractAddress,
+        //   },
+        //   outputs,
+        // })
+        // const data = null
+        // setNetworkFeeLoading(false)
+        // if (data) {
+        //   if (data.utxos) {
+        //     setUtxosList(data?.utxos)
+        //   }
+        //   if (data.networkFee) {
+        //     setNetworkFee(data.networkFee)
+        //   } else {
+        //     if (Number(amount) > 0 && Number(balance) > 0) {
+        //       setAmountErrorLabel('Insufficient funds')
+        //     }
+        //   }
+        //   if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
+        //     setCurrencyBalance(data.currencyBalance)
+        //   }
+        // }
       }
     }
   }

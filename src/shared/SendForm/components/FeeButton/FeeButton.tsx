@@ -13,6 +13,7 @@ import { toUpper } from '@utils/format'
 
 // Types
 import { TFees } from '../../types'
+import { TCustomFee } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -25,12 +26,13 @@ interface Props {
   fee: number
   withButton: boolean
   symbol: string
+  customFee: TCustomFee
 }
 
 const feeTypes: TFees[] = ['slow', 'average', 'fast']
 
 const FeeButton: React.FC<Props> = (props) => {
-  const { type, onChange, isError, isLoading, fee, withButton, symbol } = props
+  const { type, onChange, isError, isLoading, fee, withButton, symbol, customFee } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
@@ -83,7 +85,9 @@ const FeeButton: React.FC<Props> = (props) => {
             .map((item: TFees) => (
               <Styles.ListItem key={item} onClick={onClickItem(item)}>
                 <Styles.ListItemLabel className="fee-type">{item}</Styles.ListItemLabel>
-                <Styles.ListItemValue>0.00000543 {toUpper(symbol)}</Styles.ListItemValue>
+                <Styles.ListItemValue>
+                  {customFee[item] || '-'} {toUpper(symbol)}
+                </Styles.ListItemValue>
               </Styles.ListItem>
             ))}
         </Styles.List>

@@ -1,6 +1,7 @@
 // Types
 import { IWallet, THardware } from '@utils/wallet'
 import { TTabInfo } from '@shared/types'
+import { TCustomFee } from '@utils/api/types'
 
 export interface Props {
   balance: number | null
@@ -42,6 +43,7 @@ export interface Props {
   isIncludeFee: boolean
   toggleIncludeFee: () => void
   tabInfo?: TTabInfo
+  customFee: TCustomFee
 }
 
 export type TFees = 'slow' | 'average' | 'fast'

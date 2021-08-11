@@ -41,7 +41,11 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
 
     if (clientId) {
       updateState({ isLoading: true })
-      await sendFeedback(clientId, state.feedback, state.rating)
+
+      try {
+        await sendFeedback(clientId, state.feedback, state.rating)
+      } catch {}
+
       updateState({ isLoading: false, isSent: true })
     }
   }

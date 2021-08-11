@@ -6,6 +6,7 @@ export type TProvider = {
   getTransactionLink?: (hash: string) => string
   importRecoveryPhrase?: (recoveryPhrase: string) => TGenerateAddress | null
   generateExtraId?: () => string
+  getStandingFee?: () => number
 }
 
 export type TCreateTransactionProps = {
@@ -28,4 +29,32 @@ export type TCreateTransactionProps = {
     maxLedgerVersion: number
   }
   extraId?: string
+}
+
+export interface IGetFeeParams {
+  symbol: string
+  addressFrom: string
+  addressTo: string
+  chain: string
+  amount: string
+  tokenChain?: string
+  btcLikeParams: TBtcLikeFeeParams
+  ethLikeParams: TEthLikeFeeParams
+}
+
+export type TBtcLikeFeeParams = {
+  outputs: UnspentOutput[]
+  feePerByte: number
+}
+
+export type TEthLikeFeeParams = {
+  contractAddress?: string
+  decimals?: number
+  gasPrice: number
+}
+
+export type TGetFeeData = {
+  networkFee?: number
+  utxos?: UnspentOutput[] | CardanoUnspentTxOutput[]
+  currencyBalance?: number
 }

@@ -22,9 +22,10 @@ import {
   getNetworkFeeSymbol,
   validateAddress,
   formatUnit,
-  getAddressNetworkFee,
+  getNetworkFee,
   generateExtraId,
   getFee,
+  getStandingFee,
 } from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
 
@@ -71,6 +72,7 @@ const initialState: IState = {
   },
   selectedFee: 0,
   isIncludeFee: false,
+  isStandingFee: false,
 }
 
 const SendPage: React.FC = () => {
@@ -105,6 +107,7 @@ const SendPage: React.FC = () => {
     getExtraId()
     getFeeSymbol()
     getCustomFee()
+    checkStangindFee()
   }, [])
 
   React.useEffect(() => {
@@ -115,9 +118,14 @@ const SendPage: React.FC = () => {
   }, [state.selectedAddress])
 
   React.useEffect(() => {
-    if (state.amount.length && Number(state.balance) > 0 && !state.amountErrorLabel) {
+    if (
+      state.amount.length &&
+      Number(state.balance) > 0 &&
+      !state.amountErrorLabel &&
+      !state.isStandingFee
+    ) {
       updateState({ isFeeLoading: true })
-      getNetworkFee()
+      onGetNetworkFee()
     }
   }, [debounced])
 
@@ -142,23 +150,37 @@ const SendPage: React.FC = () => {
     }
   }
 
-  const getNetworkFee = async (): Promise<void> => {
+  const checkStangindFee = (): void => {
+    const data = getStandingFee(symbol)
+
+    if (data) {
+      updateState({ fee: data, isStandingFee: true })
+    }
+  }
+
+  const onGetNetworkFee = async (): Promise<void> => {
     updateState({ utxosList: [] })
 
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
+    const feePrice = state.customFee[state.feeType]
 
-    const data = await getAddressNetworkFee(
-      state.selectedAddress,
+    const data = await getNetworkFee({
       symbol,
-      state.amount,
-      state.selectedAddress,
-      state.address,
+      addressFrom: state.selectedAddress,
+      addressTo: state.address,
       chain,
-      state.outputs,
+      amount: state.amount,
       tokenChain,
-      contractAddress,
-      getTokenDecimals || decimals
-    )
+      btcLikeParams: {
+        outputs: state.outputs,
+        feePerByte: feePrice,
+      },
+      ethLikeParams: {
+        contractAddress,
+        decimals: getTokenDecimals,
+        gasPrice: feePrice,
+      },
+    })
 
     updateState({ isFeeLoading: false })
 
@@ -171,7 +193,7 @@ const SendPage: React.FC = () => {
         updateState({ fee: data.networkFee })
       } else {
         if (Number(state.amount) > 0 && Number(state.balance) > 0) {
-          updateState({ amountErrorLabel: 'Insufficient funds' })
+          setInsufficientError()
         }
       }
 
@@ -180,9 +202,13 @@ const SendPage: React.FC = () => {
       }
     } else {
       if (Number(state.amount) > 0 && Number(state.balance) > 0) {
-        updateState({ amountErrorLabel: 'Insufficient funds' })
+        setInsufficientError()
       }
     }
+  }
+
+  const setInsufficientError = (): void => {
+    updateState({ amountErrorLabel: 'Insufficient funds' })
   }
 
   const getFeeSymbol = (): void => {
@@ -287,7 +313,9 @@ const SendPage: React.FC = () => {
 
   const onSendAll = (): void => {
     if (state.balance) {
-      updateState({ amount: `${state.balance}` })
+      const fee = state.isIncludeFee ? 0 : state.fee
+
+      updateState({ amount: `${state.balance - fee}` })
     }
   }
 
@@ -322,8 +350,10 @@ const SendPage: React.FC = () => {
 
     const availableBalance = getAvailableBalance()
 
-    if (state.amount.length && Number(state.amount) + Number(state.fee) > availableBalance) {
-      return updateState({ amountErrorLabel: 'Insufficient funds' })
+    const fee = state.isIncludeFee ? 0 : state.fee
+
+    if (state.amount.length && Number(state.amount) + Number(fee) > availableBalance) {
+      return setInsufficientError()
     }
 
     if (currency) {
@@ -442,6 +472,7 @@ const SendPage: React.FC = () => {
           showFeeDrawer={showFeeDrawer}
           isIncludeFee={state.isIncludeFee}
           toggleIncludeFee={toggleIncludeFee}
+          customFee={state.customFee}
         />
       </Styles.Wrapper>
       <WalletsDrawer

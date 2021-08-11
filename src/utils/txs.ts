@@ -62,7 +62,7 @@ export const compare = (
 
   const findWalletStorage = getItem(walletKey)
 
-  if (findWalletStorage && txs.length) {
+  if (findWalletStorage) {
     const getTxs = getJSON(findWalletStorage)
 
     const getNewTxs = txs.filter((hash: string) => {
@@ -70,9 +70,9 @@ export const compare = (
     })
 
     return getNewTxs
+  } else {
+    return txs
   }
-
-  return []
 }
 
 export const getExist = (
@@ -150,13 +150,13 @@ export const updateStats = (): void => {
   )
 }
 
-export const isShowSatismeter = (prevAmount: number): boolean => {
+export const isShowSatismeter = (newAmount: number): boolean => {
   const getStats = getJSON('txs_stats')
 
   if (getStats) {
     const { amount, lastUpdate } = getStats
 
-    return (amount < 2 && prevAmount >= 2) || dayjs().diff(lastUpdate, 'month') >= 3
+    return (amount < 2 && newAmount >= 2) || dayjs().diff(lastUpdate, 'month') >= 3
   }
 
   return false

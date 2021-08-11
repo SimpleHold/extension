@@ -232,9 +232,8 @@ const SendConfirmation: React.FC = () => {
     const txsStats = getStats()
 
     if (txsStats) {
-      const { amount } = JSON.parse(txsStats)
-
       updateStats()
+      const { amount } = JSON.parse(txsStats)
 
       const isCanShowDrawer = isShowSatismeter(amount + 1)
 

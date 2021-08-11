@@ -37,7 +37,7 @@ const FormBody = styled.div`
 
 const AboutFee = styled.div`
   margin: 10px 0 0 0;
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
   align-items: center;
   user-select: none;

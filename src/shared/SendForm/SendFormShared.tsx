@@ -58,6 +58,7 @@ const SendFormShared: React.FC<Props> = (props) => {
     isIncludeFee,
     toggleIncludeFee,
     tabInfo,
+    customFee,
   } = props
 
   const renderInputButton = (inputType: 'address' | 'extraId' | 'amount') => {
@@ -164,6 +165,7 @@ const SendFormShared: React.FC<Props> = (props) => {
             withButton={isCustomFee}
             isIncludeFee={isIncludeFee}
             toggleIncludeFee={toggleIncludeFee}
+            customFee={customFee}
           />
 
           <Styles.AboutFee onClick={showFeeDrawer}>
