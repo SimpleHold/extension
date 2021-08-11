@@ -25,7 +25,7 @@ import {
   getAddressNetworkFee,
   generateExtraId,
   getFee,
-} from '@utils/address'
+} from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
 
 // Hooks
@@ -70,6 +70,7 @@ const initialState: IState = {
     fast: 0,
   },
   selectedFee: 0,
+  isIncludeFee: false,
 }
 
 const SendPage: React.FC = () => {
@@ -272,6 +273,7 @@ const SendPage: React.FC = () => {
       tokenChain,
       decimals: getTokenDecimals || decimals,
       extraId: state.extraId,
+      tokenName,
     })
   }
 
@@ -318,12 +320,10 @@ const SendPage: React.FC = () => {
       updateState({ amountErrorLabel: null })
     }
 
-    if (toLower(symbol) === 'xrp') {
-      const availableBalance = getAvailableBalance()
+    const availableBalance = getAvailableBalance()
 
-      if (state.amount.length && Number(state.amount) > availableBalance) {
-        return updateState({ amountErrorLabel: 'Insufficient funds' })
-      }
+    if (state.amount.length && Number(state.amount) + Number(state.fee) > availableBalance) {
+      return updateState({ amountErrorLabel: 'Insufficient funds' })
     }
 
     if (currency) {
@@ -387,6 +387,10 @@ const SendPage: React.FC = () => {
     updateState({ activeDrawer: 'aboutFee' })
   }
 
+  const toggleIncludeFee = (): void => {
+    updateState({ isIncludeFee: !state.isIncludeFee })
+  }
+
   const isCurrencyBalanceError =
     (tokenChain !== undefined || toLower(symbol) === 'theta') &&
     state.currencyBalance !== null &&
@@ -436,6 +440,8 @@ const SendPage: React.FC = () => {
           currencyBalance={state.currencyBalance}
           isCustomFee={currency.isCustomFee}
           showFeeDrawer={showFeeDrawer}
+          isIncludeFee={state.isIncludeFee}
+          toggleIncludeFee={toggleIncludeFee}
         />
       </Styles.Wrapper>
       <WalletsDrawer

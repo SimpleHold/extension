@@ -19,10 +19,6 @@ type TEyeIconPRops = {
   isVisible: boolean
 }
 
-type TClearButtonProps = {
-  isFocused: boolean
-}
-
 type TButtonProps = {
   isFocused: boolean
 }
@@ -40,6 +36,7 @@ const Container = styled.div`
   margin: 0 0 10px 0;
   padding: 0 10px 0 16px;
   position: relative;
+  user-select: none;
 
   label {
     color: ${({ isFocused, isError }: TContainerProps) =>
@@ -136,12 +133,12 @@ const NumberInput = styled(NumberFormat)`
 const ClearButton = styled.div`
   width: 24px;
   height: 24px;
+  margin: 0 0 0 10px;
   background-color: #f2f4f8;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: ${({ isFocused }: TClearButtonProps) => (isFocused ? '1' : '0')};
 
   path {
     fill: #7d7e8d;

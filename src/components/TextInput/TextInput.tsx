@@ -143,8 +143,8 @@ const TextInput: React.FC<Props> = (props) => {
           <Styles.EyeIcon isVisible={isPasswordVisible} />
         </Styles.VisibleInput>
       ) : null}
-      {value.length && type !== 'password' ? (
-        <Styles.ClearButton onClick={onClear} isFocused={isFocused}>
+      {value.length && type !== 'password' && isFocused ? (
+        <Styles.ClearButton onClick={onClear}>
           <SVG src="../../assets/icons/times.svg" width={10} height={10} />
         </Styles.ClearButton>
       ) : null}

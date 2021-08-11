@@ -12,7 +12,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px 30px 30px 30px;
+  padding: 30px;
   overflow: hidden;
 `
 
@@ -49,7 +49,7 @@ const Warning = styled.p`
 `
 
 const GenerateExtraId = styled.p`
-  margin: 5px 0 0 0;
+  margin: 10px 0 0 0;
   font-size: 14px;
   line-height: 16px;
   text-align: center;

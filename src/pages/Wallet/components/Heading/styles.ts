@@ -13,7 +13,7 @@ const Container = styled.div`
 `
 
 const WalletName = styled.p`
-  margin: 0 10px 0 0;
+  margin: 0 11px 0 0;
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
@@ -26,6 +26,7 @@ const WalletName = styled.p`
 const MoreButton = styled.div`
   width: 30px;
   height: 30px;
+  min-width: 30px;
   border-radius: 15px;
   background: rgba(222, 225, 233, 0.6);
   display: flex;
@@ -51,7 +52,6 @@ const RenameBlock = styled.div`
   flex-direction: row;
   align-items: center;
   overflow: hidden;
-  flex: 1;
   margin: 0 20px 0 0;
 
   svg {

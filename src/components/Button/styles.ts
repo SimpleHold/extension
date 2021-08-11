@@ -98,6 +98,7 @@ const Container = styled.button`
   align-items: center;
   justify-content: center;
   margin-top: ${({ mt }: TContainerProps) => (mt ? `${mt}px` : '0')};
+  user-select: none;
 
   &:hover {
     cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
