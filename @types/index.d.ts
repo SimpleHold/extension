@@ -57,6 +57,15 @@ interface UnspentOutput {
   address: string
 }
 
+interface CardanoUnspentTxOutput {
+  ctaAddress: string
+  ctaAmount: {
+    getCoin: string
+  }
+  ctaTxHash: string
+  ctaTxIndex: number
+}
+
 interface BitcoinLikeProvider {
   generateWallet: () => TGenerateAddress
   importPrivateKey: (privateKey: string) => string
@@ -92,21 +101,3 @@ declare const bitcoincash: BitcoinLikeProvider
 declare const dash: BitcoinLikeProvider
 declare const litecoin: BitcoinLikeProvider
 declare const dogecoin: BitcoinLikeProvider
-
-type TSymbols =
-  | 'btc'
-  | 'bch'
-  | 'bsv'
-  | 'ltc'
-  | 'doge'
-  | 'dash'
-  | 'eth'
-  | 'etc'
-  | 'bsc'
-  | 'bnb'
-  | 'theta'
-  | 'tfuel'
-  | 'ada'
-  | 'xrp'
-  | 'nebl'
-  | 'nuls'

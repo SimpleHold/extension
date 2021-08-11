@@ -7,7 +7,7 @@ export type TTabInfo = {
 
 export interface Props {
   amount: number
-  symbol: TSymbols
+  symbol: string
   networkFee: number
   addressFrom: string
   addressTo: string

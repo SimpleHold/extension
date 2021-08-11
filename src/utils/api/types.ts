@@ -1,6 +1,3 @@
-// Utils
-import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
-
 export interface IGetBalance {
   balance: number
   balance_usd: number
@@ -30,7 +27,7 @@ export interface Web3TxParams {
 export interface IGetNetworkFeeResponse {
   networkFee?: number
   networkFeeLabel?: string
-  utxos?: UnspentOutput[] | ICardanoUnspentTxOutput[]
+  utxos?: UnspentOutput[] | CardanoUnspentTxOutput[]
   chainId?: number
   gas?: number
   gasPrice?: string

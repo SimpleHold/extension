@@ -1,9 +1,9 @@
 import { toLower } from '@utils/format'
 
 class GenerateAddress {
-  symbol: TSymbols | string
+  symbol: string
 
-  constructor(symbol: TSymbols | string) {
+  constructor(symbol: string) {
     this.symbol = symbol
   }
 

@@ -1,6 +1,6 @@
 export interface ILocationState {
   amount: number
-  symbol: TSymbols
+  symbol: string
   networkFee: number
   addressFrom: string
   addressTo: string
