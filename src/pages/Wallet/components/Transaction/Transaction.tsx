@@ -7,7 +7,7 @@ import SVG from 'react-inlinesvg'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { toUpper, price, short } from '@utils/format'
+import { toUpper, price, short, formatEstimated } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -76,9 +76,10 @@ const Transaction: React.FC<Props> = (props) => {
             <Styles.CurrencyAmount>{`${numeral(amount).format('0.[000000]')} ${toUpper(
               symbol
             )}`}</Styles.CurrencyAmount>
-            <Styles.USDAmount>{`$ ${
-              estimated !== 0 && estimated < 0.01 ? '< 0.01' : price(estimated, 2)
-            }`}</Styles.USDAmount>
+            <Styles.USDAmount>{`$ ${formatEstimated(
+              estimated,
+              price(estimated, 2)
+            )}`}</Styles.USDAmount>
           </Styles.Amounts>
         </Styles.Row>
       </Styles.Container>

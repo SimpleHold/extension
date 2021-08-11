@@ -9,6 +9,7 @@ import PendingBalance from '@components/PendingBalance'
 
 // Utils
 import { getItem } from '@utils/storage'
+import { formatEstimated } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -138,11 +139,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
                 lineHeight: `${estimatedLineHeight}px`,
               }}
             >
-              {`$ ${
-                estimated !== 0 && estimated < 0.01
-                  ? '< 0.01'
-                  : numeral(estimated).format('0.[00000000]')
-              }`}
+              {`$ ${formatEstimated(estimated, numeral(estimated).format('0.[00000000]'))}`}
             </Styles.Estimated>
           ) : null}
         </Skeleton>

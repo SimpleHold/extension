@@ -20,7 +20,7 @@ import Tooltip from '@components/Tooltip'
 import { getWallets, IWallet } from '@utils/wallet'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
-import { price, toLower, toUpper } from '@utils/format'
+import { price, toLower, toUpper, formatEstimated } from '@utils/format'
 import {
   validateAddress,
   getNewNetworkFee,
@@ -28,10 +28,9 @@ import {
   getNetworkFeeSymbol,
   getExtraIdName,
   generateExtraId,
-} from '@utils/address'
+} from '@utils/currencies'
 import bitcoinLike from '@utils/bitcoinLike'
 import { getItem, setItem, removeItem } from '@utils/storage'
-import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
 
 // Config
 import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
@@ -73,7 +72,7 @@ const Send: React.FC = () => {
   const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
   const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
   const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
-  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | ICardanoUnspentTxOutput[]>([])
+  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | CardanoUnspentTxOutput[]>([])
   const [currencyBalance, setCurrencyBalance] = React.useState<number>(0)
   const [extraId, setExtraId] = React.useState<string>('')
   const [extraIdName, setExtraIdName] = React.useState<string>('')
@@ -612,9 +611,10 @@ const Send: React.FC = () => {
             type="gray"
             isLoading={estimated === null || !selectedWallet}
           >
-            <Styles.Estimated>{`$ ${
-              Number(estimated) !== 0 && Number(estimated) < 0.01 ? '< 0.01' : price(estimated, 2)
-            }`}</Styles.Estimated>
+            <Styles.Estimated>{`$ ${formatEstimated(
+              estimated,
+              price(estimated, 2)
+            )}`}</Styles.Estimated>
           </Skeleton>
         </Styles.Heading>
         <Styles.Form>

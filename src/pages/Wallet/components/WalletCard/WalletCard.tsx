@@ -8,7 +8,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { toUpper, price } from '@utils/format'
+import { toUpper, price, formatEstimated } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 
 // Assets
@@ -80,11 +80,10 @@ const WalletCard: React.FC<Props> = (props) => {
             </Styles.RefreshButton>
           </Styles.BalanceRow>
           <Skeleton width={75} height={19} mt={4} type="gray" isLoading={estimated === null}>
-            {estimated !== null ? (
-              <Styles.Estimated>{`$ ${
-                estimated !== 0 && estimated < 0.01 ? '< 0.01' : price(estimated, 2)
-              }`}</Styles.Estimated>
-            ) : null}
+            <Styles.Estimated>{`$ ${formatEstimated(
+              estimated,
+              price(estimated, 2)
+            )}`}</Styles.Estimated>
           </Skeleton>
         </Styles.WalletInfo>
       </Styles.Body>

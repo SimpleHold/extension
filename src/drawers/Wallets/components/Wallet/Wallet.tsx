@@ -8,7 +8,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { toUpper, numberFriendly, short } from '@utils/format'
+import { toUpper, numberFriendly, short, formatEstimated } from '@utils/format'
 import { updateBalance, THardware } from '@utils/wallet'
 
 // Config
@@ -105,11 +105,10 @@ const Wallet: React.FC<Props> = (props) => {
             </Styles.BalanceRow>
           </Skeleton>
           <Skeleton width={80} height={17} type="gray" mt={7} br={4} isLoading={estimated === null}>
-            <Styles.Estimated>{`$ ${
-              Number(estimated) !== 0 && Number(estimated) < 0.01
-                ? '< 0.01'
-                : numberFriendly(estimated)
-            }`}</Styles.Estimated>
+            <Styles.Estimated>{`$ ${formatEstimated(
+              estimated,
+              numberFriendly(estimated)
+            )}`}</Styles.Estimated>
           </Skeleton>
         </Styles.Balances>
       </Styles.Row>

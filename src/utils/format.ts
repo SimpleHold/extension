@@ -59,3 +59,13 @@ export const short = (data: string, max: number): string => {
         data.substring(data.length - max / 2 + 2, data.length)
     : data
 }
+
+export const formatEstimated = (
+  estimated: number | null,
+  value: number | string
+): number | string => {
+  if (estimated !== 0 && estimated !== null && estimated < 0.01) {
+    return '< 0.01'
+  }
+  return value
+}
