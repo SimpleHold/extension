@@ -55,6 +55,9 @@ const SendFormShared: React.FC<Props> = (props) => {
     currencyBalance,
     isCustomFee,
     showFeeDrawer,
+    isIncludeFee,
+    toggleIncludeFee,
+    tabInfo,
   } = props
 
   const renderInputButton = (inputType: 'address' | 'extraId' | 'amount') => {
@@ -92,6 +95,15 @@ const SendFormShared: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container>
+      {tabInfo ? (
+        <Styles.TabInfo>
+          <Styles.Title>Send it on</Styles.Title>
+          <Styles.SiteInfo>
+            <Styles.SiteFavicon src={tabInfo.favIconUrl} />
+            <Styles.SiteUrl>{tabInfo.url}</Styles.SiteUrl>
+          </Styles.SiteInfo>
+        </Styles.TabInfo>
+      ) : null}
       <Styles.Body>
         <Styles.Row>
           <WalletCard
@@ -150,12 +162,12 @@ const SendFormShared: React.FC<Props> = (props) => {
             setType={setFeeType}
             isBalanceError={isCurrencyBalanceError && currencyBalance !== null}
             withButton={isCustomFee}
+            isIncludeFee={isIncludeFee}
+            toggleIncludeFee={toggleIncludeFee}
           />
 
           <Styles.AboutFee onClick={showFeeDrawer}>
-            <Styles.AboutFeeIcon>
-              <SVG src="../../assets/icons/ask.svg" width={15} height={15} />
-            </Styles.AboutFeeIcon>
+            <SVG src="../../assets/icons/ask.svg" width={15} height={15} />
             <Styles.AboutFeeLabel>What is Network Fee</Styles.AboutFeeLabel>
           </Styles.AboutFee>
         </Styles.Row>

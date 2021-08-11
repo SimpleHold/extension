@@ -23,8 +23,8 @@ const SendConfirmShared: React.FC<Props> = (props) => {
     addressFrom,
     addressTo,
     networkFeeSymbol,
-    tokenChain = undefined,
-    tokenName = undefined,
+    tokenChain,
+    tokenName,
     onCancel,
     onConfirm,
     isButtonLoading,
@@ -37,14 +37,17 @@ const SendConfirmShared: React.FC<Props> = (props) => {
     <Styles.Container>
       <Styles.Row>
         <Styles.Title>Confirm the sending</Styles.Title>
-        <Styles.SubTitle>Check transaction details</Styles.SubTitle>
-
         {tabInfo ? (
-          <Styles.SiteInfoRow>
-            <Styles.SiteFavicon src={tabInfo.favIconUrl} />
-            <Styles.SiteUrl>{tabInfo.url}</Styles.SiteUrl>
-          </Styles.SiteInfoRow>
-        ) : null}
+          <Styles.TabInfo>
+            <Styles.TabInfoLabel>on</Styles.TabInfoLabel>
+            <Styles.SiteInfo>
+              <Styles.SiteFavicon src={tabInfo.favIconUrl} />
+              <Styles.SiteUrl>{tabInfo.url}</Styles.SiteUrl>
+            </Styles.SiteInfo>
+          </Styles.TabInfo>
+        ) : (
+          <Styles.SubTitle>Check transaction details</Styles.SubTitle>
+        )}
 
         <Styles.Destinations>
           <Styles.CurrencyLogo>

@@ -40,6 +40,7 @@ const AboutFee = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  user-select: none;
 
   path {
     fill: #bdc4d4;
@@ -58,20 +59,46 @@ const AboutFee = styled.div`
   }
 `
 
-const AboutFeeIcon = styled.div`
-  width: 17px;
-  height: 17px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
 const AboutFeeLabel = styled.p`
-  margin: 0 0 0 6px;
+  margin: 0 0 0 5px;
   font-weight: 500;
   font-size: 14px;
   line-height: 16px;
   color: #bdc4d4;
+`
+
+const TabInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 0 20px 0;
+`
+
+const Title = styled.p`
+  margin: 0;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
+`
+
+const SiteInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 0 0 10px;
+`
+
+const SiteFavicon = styled.img`
+  width: 16px;
+  height: 16px;
+`
+
+const SiteUrl = styled.p`
+  margin: 0 0 0 5px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: #1d1d22;
 `
 
 const Styles = {
@@ -82,8 +109,12 @@ const Styles = {
   Form,
   FormBody,
   AboutFee,
-  AboutFeeIcon,
   AboutFeeLabel,
+  TabInfo,
+  Title,
+  SiteInfo,
+  SiteFavicon,
+  SiteUrl,
 }
 
 export default Styles

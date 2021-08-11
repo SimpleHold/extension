@@ -1,6 +1,9 @@
+// Types
+import { TTabInfo } from '@shared/types'
+
 export interface Props {
   amount: number
-  symbol: TSymbols
+  symbol: string
   networkFee: number
   addressFrom: string
   addressTo: string
@@ -11,9 +14,4 @@ export interface Props {
   onConfirm: () => void
   isButtonLoading?: boolean
   tabInfo?: TTabInfo
-}
-
-export type TTabInfo = {
-  favIconUrl: string
-  url: string
 }

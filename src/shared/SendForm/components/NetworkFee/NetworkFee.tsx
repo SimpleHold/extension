@@ -1,15 +1,8 @@
 import * as React from 'react'
-import SVG from 'react-inlinesvg'
-
 // Components
-import Spinner from '@components/Spinner'
-import Tooltip from '@components/Tooltip'
 import Switch from '@components/Switch'
 
 import FeeButton from '../FeeButton'
-
-// Utils
-import { toUpper } from '@utils/format'
 
 // Types
 import { TFees } from '../../types'
@@ -25,53 +18,42 @@ interface Props {
   setType: (type: TFees) => void
   isBalanceError: boolean
   withButton: boolean
+  isIncludeFee: boolean
+  toggleIncludeFee: () => void
 }
 
 const NetworkFee: React.FC<Props> = (props) => {
-  const { isLoading, fee, symbol, type, setType, isBalanceError, withButton } = props
-
-  const [switchValue, setSwitchValue] = React.useState<boolean>(false)
-
-  const onToggleSwitch = (): void => {
-    setSwitchValue((prev: boolean) => !prev)
-  }
+  const {
+    isLoading,
+    fee,
+    symbol,
+    type,
+    setType,
+    isBalanceError,
+    withButton,
+    isIncludeFee,
+    toggleIncludeFee,
+  } = props
 
   return (
     <Styles.Container>
-      <FeeButton type={type} onChange={setType} />
+      <FeeButton
+        type={type}
+        onChange={setType}
+        isError={isBalanceError}
+        isLoading={isLoading}
+        fee={fee}
+        withButton={withButton}
+        symbol={symbol}
+      />
       <Styles.IncludeBlock>
         <Styles.IncludeLabel>Include Fee</Styles.IncludeLabel>
         <Styles.SwitchRow>
-          <Switch value={switchValue} onToggle={onToggleSwitch} />
+          <Switch value={isIncludeFee} onToggle={toggleIncludeFee} />
         </Styles.SwitchRow>
       </Styles.IncludeBlock>
     </Styles.Container>
   )
-
-  // return (
-  //   <Styles.Container>
-  //     <Styles.Row>
-  //       <Styles.Label>Network fee:</Styles.Label>
-  //       {isLoading ? (
-  //         <Spinner size={16} />
-  //       ) : (
-  //         <Styles.FeeRow>
-  //           <Styles.Fee isError={isBalanceError}>
-  //             {fee === 0 ? '-' : `${fee} ${toUpper(symbol)}`}
-  //           </Styles.Fee>
-  //           {isBalanceError ? (
-  //             <Styles.IconRow>
-  //               <Tooltip text="Insufficient funds" mt={5}>
-  //                 <SVG src="../../assets/icons/warning.svg" width={12} height={12} />
-  //               </Tooltip>
-  //             </Styles.IconRow>
-  //           ) : null}
-  //         </Styles.FeeRow>
-  //       )}
-  //     </Styles.Row>
-  //     {withButton ? <FeeButton type={type} onChange={setType} /> : null}
-  //   </Styles.Container>
-  // )
 }
 
 export default NetworkFee

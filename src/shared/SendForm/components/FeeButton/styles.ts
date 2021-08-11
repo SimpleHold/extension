@@ -1,130 +1,158 @@
 import styled from 'styled-components'
 
-const Container = styled.div`
-  border: 1px solid #ffffff;
-  border-radius: 12px;
+type TListProps = {
+  isVisible: boolean
+}
 
-  &:hover {
-    cursor: pointer;
-    border: 1px solid #3fbb7d;
-  }
+type TRowProps = {
+  disabled: boolean
+  isVisible: boolean
+}
+
+type TFeeProps = {
+  isError: boolean
+}
+
+const Container = styled.div`
+  position: relative;
+  user-select: none;
 `
 
 const Row = styled.div`
+  padding: 7px 14px;
   width: 153px;
-  height: 48px;
+  border-radius: ${({ isVisible }: TRowProps) => (isVisible ? '12px 12px 0 0' : '12px')};
+  border: ${({ isVisible }: TRowProps) => `1px solid ${isVisible ? '#3fbb7d' : '#ffffff'}`};
+
+  .arrow {
+    transition: all 0.3s;
+    transform: ${({ isVisible }: TRowProps) => `rotate(${isVisible ? 180 : 0}deg)`};
+
+    path {
+      fill: ${({ isVisible }: TRowProps) => (isVisible ? '#3FBB7D' : '#7D7E8D')};
+    }
+  }
+
+  p {
+    color: ${({ isVisible }: TRowProps) => (isVisible ? '#3fbb7d' : '#7d7e8d')};
+  }
+
+  &:hover {
+    cursor: ${({ disabled }: TRowProps) => (disabled ? 'default' : 'pointer')};
+    border: ${({ disabled }: TRowProps) => `1px solid ${disabled ? '#ffffff' : '#3fbb7d'}`};
+
+    .label {
+      color: ${({ disabled }: TRowProps) => (disabled ? '#7d7e8d' : '#3fbb7d')};
+    }
+
+    .arrow {
+      path {
+        fill: #3fbb7d;
+      }
+    }
+  }
 `
 
-const Heading = styled.div``
+const Heading = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 0 4px 0;
+`
 
-const Label = styled.p``
+const Label = styled.p`
+  margin: 0 4px 0 0;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+  text-transform: capitalize;
+`
+
+const Body = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const Fee = styled.span`
+  font-size: 14px;
+  line-height: 16px;
+  text-transform: capitalize;
+  color: #eb5757;
+  color: ${({ isError }: TFeeProps) => (isError ? '#EB5757' : '#1D1D22')};
+`
+
+const IconRow = styled.div`
+  margin: 0 0 0 4px;
+
+  path {
+    fill: #eb5757;
+  }
+`
+
+const List = styled.div`
+  position: absolute;
+  width: 153px;
+  opacity: ${({ isVisible }: TListProps) => (isVisible ? '1' : '0')};
+  visibility: ${({ isVisible }: TListProps) => (isVisible ? 'visible' : 'hidden')};
+  transform: ${({ isVisible }: TListProps) => `translateY(${isVisible ? '0' : '-20px'})`};
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+`
+
+const ListItem = styled.div`
+  background-color: #ffffff;
+  padding: 7px 14px;
+  border-left: 1px solid #3fbb7d;
+  border-right: 1px solid #3fbb7d;
+  height: 50px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid rgba(222, 225, 233, 0.5);
+  }
+
+  &:last-child {
+    border-radius: 0 0 12px 12px;
+    border-bottom: 1px solid #3fbb7d;
+  }
+
+  &:hover {
+    cursor: pointer;
+    background-color: #f8f9fb;
+
+    .fee-type {
+      color: #3fbb7d;
+    }
+  }
+`
+
+const ListItemLabel = styled.p`
+  margin: 0;
+  font-size: 12px;
+  line-height: 14px;
+  text-transform: capitalize;
+  color: #7d7e8d;
+`
+
+const ListItemValue = styled.p`
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  line-height: 16px;
+  text-transform: capitalize;
+  color: #1d1d22;
+`
 
 const Styles = {
   Container,
   Row,
   Heading,
   Label,
+  Body,
+  Fee,
+  IconRow,
+  List,
+  ListItem,
+  ListItemLabel,
+  ListItemValue,
 }
 
 export default Styles
-
-// type TVisibleProps = {
-//   isVisible: boolean
-// }
-
-// const Container = styled.div`
-//   position: relative;
-//   filter: drop-shadow(0px 5px 30px rgba(125, 126, 141, 0.15));
-//   user-select: none;
-// `
-
-// const Row = styled.div`
-//   width: 100px;
-//   height: 34px;
-//   display: flex;
-//   flex-direction: row;
-//   align-items: center;
-//   padding: 0 9px 0 14px;
-//   justify-content: space-between;
-//   background-color: #f8f9fb;
-//   border: ${({ isVisible }: TVisibleProps) => `1px solid ${isVisible ? '#3fbb7d' : '#dee1e9'}`};
-//   border-radius: ${({ isVisible }: TVisibleProps) => (isVisible ? '8px 8px 0 0' : '8px')};
-
-//   p {
-//     color: ${({ isVisible }: TVisibleProps) => (isVisible ? '#3fbb7d' : '#7d7e8d')};
-//   }
-
-//   svg {
-//     transition: all 0.3s;
-//     transform: ${({ isVisible }: TVisibleProps) => `rotate(${isVisible ? 180 : 0}deg)`};
-
-//     path {
-//       fill: ${({ isVisible }: TVisibleProps) => (isVisible ? '#3fbb7d' : '#bdc4d4')};
-//     }
-//   }
-
-//   &:hover {
-//     cursor: pointer;
-//     border: 1px solid #3fbb7d;
-
-//     p {
-//       color: #3fbb7d;
-//     }
-
-//     path {
-//       fill: #3fbb7d;
-//     }
-//   }
-// `
-
-// const Title = styled.p`
-//   margin: 0;
-//   font-size: 14px;
-//   line-height: 16px;
-//   text-transform: capitalize;
-// `
-
-// const List = styled.div`
-//   position: absolute;
-//   width: 100px;
-//   opacity: ${({ isVisible }: TVisibleProps) => (isVisible ? '1' : '0')};
-//   visibility: ${({ isVisible }: TVisibleProps) => (isVisible ? 'visible' : 'hidden')};
-//   transform: ${({ isVisible }: TVisibleProps) => `translateY(${isVisible ? '0' : '-20px'})`};
-//   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
-// `
-
-// const ListItem = styled.div`
-//   background-color: #ffffff;
-//   padding: 10px 14px;
-//   border-left: 1px solid #3fbb7d;
-//   border-right: 1px solid #3fbb7d;
-
-//   &:last-child {
-//     border-radius: 0 0 8px 8px;
-//     border-bottom: 1px solid #3fbb7d;
-//   }
-
-//   &:hover {
-//     cursor: pointer;
-//     background-color: #f8f9fb;
-//   }
-// `
-
-// const ListItemLabel = styled.p`
-//   margin: 0;
-//   font-size: 14px;
-//   line-height: 16px;
-//   color: #7d7e8d;
-//   text-transform: capitalize;
-// `
-
-// const Styles = {
-//   Container,
-//   Row,
-//   Title,
-//   List,
-//   ListItem,
-//   ListItemLabel,
-// }
-
-// export default Styles

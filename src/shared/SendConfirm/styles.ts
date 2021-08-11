@@ -11,7 +11,7 @@ const Container = styled.div`
 `
 
 const Row = styled.div`
-  padding: 24px 30px 0 30px;
+  padding: 20px 30px 0 30px;
 `
 
 const Actions = styled.div`
@@ -181,22 +181,34 @@ const TableTotal = styled.p`
   color: #7d7e8d;
 `
 
-const SiteInfoRow = styled.div`
+const TabInfo = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin: 10px 0 0 0;
+  margin: 5px 0 0 0;
+`
+
+const TabInfoLabel = styled.p`
+  margin: 0px;
+  font-size: 16px;
+  line-height: 19px;
+  color: #7d7e8d;
+`
+
+const SiteInfo = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 0 0 10px;
 `
 
 const SiteFavicon = styled.img`
   width: 16px;
   height: 16px;
-  border-radius: 8px;
-  margin: 0 5px 0 0;
 `
 
 const SiteUrl = styled.p`
-  margin: 0;
+  margin: 0 0 0 5px;
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
@@ -228,7 +240,9 @@ const Styles = {
   DividerLine,
   Total,
   TableTotal,
-  SiteInfoRow,
+  TabInfo,
+  TabInfoLabel,
+  SiteInfo,
   SiteFavicon,
   SiteUrl,
 }
