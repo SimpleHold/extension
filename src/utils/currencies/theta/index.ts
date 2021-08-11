@@ -2,7 +2,7 @@ import * as thetajs from '@thetalabs/theta-js'
 import { BigNumber } from 'bignumber.js'
 
 // Utils
-import { fromWei } from '@utils/web3'
+import { fromEther } from '@utils/currencies/ethereumLike'
 
 export const coins = ['theta', 'tfuel']
 
@@ -49,10 +49,10 @@ export const getBalance = async (
     const { coins } = await provider.getAccount(address)
 
     if (coin === 'theta') {
-      return fromWei(coins.thetawei, 'ether')
+      return fromEther(coins.thetawei)
     }
 
-    return fromWei(coins.tfuelwei, 'ether')
+    return fromEther(coins.tfuelwei)
   } catch {
     return null
   }

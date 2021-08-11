@@ -20,7 +20,7 @@ import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { convertDecimals } from '@utils/web3'
+import { convertDecimals } from '@utils/currencies/ethereumLike'
 import {
   formatUnit,
   createTransaction,
@@ -313,11 +313,7 @@ const SendConfirmation: React.FC = () => {
       }
 
       if (getTxId) {
-        const link = getTransactionLink(getTxId, symbol, chain)
-
-        if (link) {
-          setTransactionLink(link)
-        }
+        setTransactionLink(getTransactionLink(getTxId, symbol, chain))
         setButtonLoading(false)
         return setActiveDrawer('success')
       }
@@ -464,11 +460,7 @@ const SendConfirmation: React.FC = () => {
         txHash = transaction?.tx_json?.hash
       }
 
-      const link = getTransactionLink(txHash, symbol, chain, tokenChain)
-
-      if (link) {
-        setTransactionLink(link)
-      }
+      setTransactionLink(getTransactionLink(txHash, symbol, chain, tokenChain))
       return setActiveDrawer('success')
     }
   }

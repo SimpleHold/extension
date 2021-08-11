@@ -8,7 +8,7 @@ import ETHApp from '@ledgerhq/hw-app-eth'
 import XRPApp from '@ledgerhq/hw-app-xrp'
 
 // Utils
-import { toHex } from '@utils/web3'
+import { toHex } from '@utils/currencies/ethereumLike'
 import { toUpper } from '@utils/format'
 import { getXrpTxParams, getTxHex } from '@utils/api'
 import { toXrp } from '@utils/currencies/ripple'

@@ -2,7 +2,7 @@ import TrezorConnect, { TxInputType, TxOutputType, Features } from 'trezor-conne
 import { Transaction } from '@ethereumjs/tx'
 
 // Utils
-import { toHex } from '@utils/web3'
+import { toHex } from '@utils/currencies/ethereumLike'
 import { sendRawTransaction } from '@utils/api'
 
 export type TTrezorBundle = {

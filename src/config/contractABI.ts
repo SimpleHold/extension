@@ -1,4 +1,7 @@
-const contract = [
+// Types
+import { AbiItem } from '@utils/currencies/ethereumLike/types'
+
+const contract: AbiItem[] = [
   {
     constant: false,
     inputs: [

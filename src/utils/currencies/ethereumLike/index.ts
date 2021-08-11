@@ -1,37 +1,13 @@
 import Web3 from 'web3'
 
+// Config
 import contractABI from '@config/contractABI'
+import { getToken } from '@config/tokens'
+
+// Utils
+import { toLower } from '@utils/format'
 
 const web3 = new Web3()
-
-export type Unit =
-  | 'noether'
-  | 'wei'
-  | 'kwei'
-  | 'Kwei'
-  | 'babbage'
-  | 'femtoether'
-  | 'mwei'
-  | 'Mwei'
-  | 'lovelace'
-  | 'picoether'
-  | 'gwei'
-  | 'Gwei'
-  | 'shannon'
-  | 'nanoether'
-  | 'nano'
-  | 'szabo'
-  | 'microether'
-  | 'micro'
-  | 'finney'
-  | 'milliether'
-  | 'milli'
-  | 'ether'
-  | 'kether'
-  | 'grand'
-  | 'mether'
-  | 'gether'
-  | 'tether'
 
 interface TransferTokenOptions {
   value: string
@@ -70,17 +46,17 @@ export const importPrivateKey = (privateKey: string): string | null => {
   }
 }
 
-export const fromWei = (value: string, unit: Unit): number => {
-  return +web3.utils.fromWei(value, unit)
+export const fromEther = (value: string): number => {
+  return +web3.utils.fromWei(value, 'ether')
 }
 
-export const toWei = (value: string, unit: Unit): number => {
-  return +web3.utils.toWei(value, unit)
+export const toEther = (value: string): number => {
+  return +web3.utils.toWei(value, 'ether')
 }
 
 export const convertDecimals = (value: string | number, decimals: number): number => {
   return +web3.utils
-    .toBN(web3.utils.toWei(`${value}`, 'ether'))
+    .toBN(toEther(`${value}`))
     .div(
       web3.utils.toBN(
         `1${Array(18 - decimals)
@@ -132,7 +108,6 @@ export const transferToken = async ({
   contractAddress,
 }: TransferTokenOptions): Promise<string | null> => {
   try {
-    // @ts-ignore
     const contract = new web3.eth.Contract(contractABI, contractAddress, { from })
     const data = contract.methods.transfer(to, value)
 
@@ -156,4 +131,43 @@ export const transferToken = async ({
   } catch {
     return null
   }
+}
+
+export const getExplorerLink = (
+  address: string,
+  symbol: string,
+  tokenChain?: string,
+  contractAddress?: string
+): string => {
+  const parseSymbol = toLower(symbol)
+
+  if (tokenChain) {
+    const parseChain = toLower(tokenChain)
+    const tokenInfo = getToken(symbol, tokenChain)
+    const tokenAddress = tokenInfo?.address || contractAddress
+
+    if (parseChain === 'eth') {
+      return `https://etherscan.io/token/${tokenAddress}?a=${address}`
+    }
+    return `https://bscscan.com/token/${tokenAddress}?a=${address}`
+  } else {
+    if (parseSymbol === 'eth') {
+      return `https://etherscan.io/address/${address}`
+    } else if (parseSymbol === 'bnb') {
+      return `https://bscscan.com/address/${address}`
+    }
+    return `https://blockscout.com/etc/mainnet/address/${address}/transactions`
+  }
+}
+
+export const getTransactionLink = (hash: string, chain: string, tokenChain?: string): string => {
+  const parseChain = tokenChain ? toLower(tokenChain) : toLower(chain)
+
+  if (parseChain === 'eth') {
+    return `https://etherscan.io/tx/${hash}`
+  } else if (parseChain === 'bsc') {
+    return `https://bscscan.com/tx/${hash}`
+  }
+
+  return `https://blockscout.com/etc/mainnet/tx/${hash}/internal-transactions`
 }

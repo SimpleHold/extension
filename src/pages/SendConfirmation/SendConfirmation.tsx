@@ -26,7 +26,7 @@ import {
   isEthereumLike,
   getTransactionLink,
 } from '@utils/currencies'
-import { convertDecimals } from '@utils/web3'
+import { convertDecimals } from '@utils/currencies/ethereumLike'
 import * as theta from '@utils/currencies/theta'
 import { getItem } from '@utils/storage'
 import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
@@ -194,12 +194,10 @@ const SendConfirmation: React.FC = () => {
       txHash = transaction?.tx_json?.hash
     }
 
-    const transactionLink = getTransactionLink(txHash, symbol, chain, tokenChain)
-
-    if (transactionLink) {
-      updateState({ transactionLink })
-    }
-    return updateState({ activeDrawer: 'success' })
+    return updateState({
+      activeDrawer: 'success',
+      transactionLink: getTransactionLink(txHash, symbol, chain, tokenChain),
+    })
   }
 
   const onCancel = (): void => {
