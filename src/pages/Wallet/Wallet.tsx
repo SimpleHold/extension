@@ -179,8 +179,8 @@ const WalletPage: React.FC = () => {
   const onSelectDropdown = (key: string) => {
     if (key === 'recoveryPhrase' || key === 'privateKey') {
       updateState({ activeDrawer: 'confirm' })
-    } else if (key === 'explorer') {
-      openWebPage(getExplorerLink(address, symbol, currency, chain, contractAddress))
+    } else if (key === 'explorer' && currency) {
+      openWebPage(getExplorerLink(address, symbol, currency.chain, chain, contractAddress))
     } else if (key === 'availability') {
       toggleVisibleWallet(address, symbol, !state.isHiddenWallet)
       updateState({ isHiddenWallet: !state.isHiddenWallet })
@@ -246,11 +246,7 @@ const WalletPage: React.FC = () => {
 
   const openTx = (hash: string) => async (): Promise<void> => {
     if (currency) {
-      const url = getTransactionLink(hash, symbol, currency.chain, chain)
-
-      if (url) {
-        await openWebPage(url)
-      }
+      await openWebPage(getTransactionLink(hash, symbol, currency.chain, chain))
     }
   }
 

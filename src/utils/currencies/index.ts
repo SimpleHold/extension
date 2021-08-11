@@ -1,7 +1,7 @@
 // Config
 import addressValidate from '@config/addressValidate'
-import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
-import { getToken, IToken } from '@config/tokens'
+import { getCurrency, getCurrencyByChain } from '@config/currencies'
+import { getToken } from '@config/tokens'
 
 // Utils
 import {
@@ -15,8 +15,8 @@ import { IGetNetworkFeeResponse, TCustomFee } from '@utils/api/types'
 import { toLower } from '@utils/format'
 
 // Currencies
-import * as web3 from '@utils/web3'
-import bitcoinLike from '@utils/bitcoinLike'
+import * as ethereumLike from '@utils/currencies/ethereumLike'
+import * as bitcoinLike from '@utils/currencies/bitcoinLike'
 import * as theta from '@utils/currencies/theta'
 import * as cardano from '@utils/currencies/cardano'
 import * as ripple from '@utils/currencies/ripple'
@@ -68,10 +68,10 @@ export const generate = (symbol: string, chain?: string): TGenerateAddress | nul
   }
 
   if (isEthereumLike(symbol, chain)) {
-    return web3.generateAddress()
+    return ethereumLike.generateAddress()
   }
 
-  return new bitcoinLike(symbol).generate()
+  return bitcoinLike.generateWallet(symbol)
 }
 
 export const importPrivateKey = (
@@ -86,9 +86,9 @@ export const importPrivateKey = (
   }
 
   if (isEthereumLike(symbol, chain)) {
-    return web3.importPrivateKey(privateKey)
+    return ethereumLike.importPrivateKey(privateKey)
   } else {
-    return new bitcoinLike(symbol).import(privateKey)
+    return bitcoinLike.importPrivateKey(privateKey, symbol)
   }
 }
 
@@ -105,8 +105,8 @@ export const validateAddress = (
       return provider.validateAddress(address)
     }
 
-    if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
-      return new bitcoinLike(symbol).isAddressValid(address)
+    if (chain && bitcoinLike.coins.indexOf(chain) !== -1) {
+      return bitcoinLike.validateAddress(address, symbol)
     }
 
     // @ts-ignore
@@ -153,7 +153,7 @@ export const createTransaction = async ({
 
       if (gas && chainId && gasPrice && typeof nonce === 'number') {
         if (tokenChain && getContractAddress) {
-          return await web3.transferToken({
+          return await ethereumLike.transferToken({
             value: `${amount}`,
             from,
             to,
@@ -165,7 +165,15 @@ export const createTransaction = async ({
             contractAddress: getContractAddress,
           })
         }
-        return await web3.createTransaction(to, amount, gas, chainId, gasPrice, nonce, privateKey)
+        return await ethereumLike.createTransaction(
+          to,
+          amount,
+          gas,
+          chainId,
+          gasPrice,
+          nonce,
+          privateKey
+        )
       }
       return null
     }
@@ -174,13 +182,15 @@ export const createTransaction = async ({
       if (neblio.coins.indexOf(symbol) !== -1) {
         return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
       }
-      return new bitcoinLike(symbol).createTransaction(
+
+      return bitcoinLike.createTransaction(
         outputs,
         to,
         amount,
         networkFee,
         from,
-        privateKey
+        privateKey,
+        symbol
       )
     }
 
@@ -223,8 +233,8 @@ export const getNewNetworkFee = async (
     isEthereumLike(symbol)
   ) {
     const value = web3Params?.decimals
-      ? web3.convertDecimals(amount, web3Params.decimals)
-      : web3.toWei(amount, 'ether')
+      ? ethereumLike.convertDecimals(amount, web3Params.decimals)
+      : ethereumLike.toEther(amount)
     const web3Chain = web3Params?.tokenChain || chain
     const web3TokenChain = web3Params?.tokenChain ? symbol : undefined
 
@@ -247,7 +257,8 @@ export const getNewNetworkFee = async (
       return neblio.getNetworkFee(address, outputs, amount)
     }
     const btcFeePerByte = await getFeePerByte(chain)
-    return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount, btcFeePerByte)
+
+    return bitcoinLike.getNetworkFee(address, outputs, amount, btcFeePerByte, symbol)
   }
 
   if (ripple.coins.indexOf(symbol) !== -1) {
@@ -281,7 +292,9 @@ export const getAddressNetworkFee = async (
     }
 
     if (tokenChain || contractAddress || isEthereumLike(symbol, tokenChain)) {
-      const value = decimals ? web3.convertDecimals(amount, decimals) : web3.toWei(amount, 'ether')
+      const value = decimals
+        ? ethereumLike.convertDecimals(amount, decimals)
+        : ethereumLike.toEther(amount)
       const data = await getEtherNetworkFee(
         from,
         to,
@@ -312,7 +325,8 @@ export const getAddressNetworkFee = async (
       }
 
       const btcFeePerByte = await getFeePerByte(chain)
-      return new bitcoinLike(symbol).getNetworkFee(address, outputs, amount, btcFeePerByte)
+
+      return bitcoinLike.getNetworkFee(address, outputs, amount, btcFeePerByte, symbol)
     }
 
     return null
@@ -326,7 +340,7 @@ export const formatUnit = (
   value: string | number,
   type: 'from' | 'to',
   chain?: string,
-  unit?: web3.Unit
+  unit?: string
 ): number => {
   try {
     if (nuls.coins.indexOf(symbol) !== -1) {
@@ -337,13 +351,13 @@ export const formatUnit = (
       return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
     } else if (cardano.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
-    } else if (chain && bitcoinLike.coins().indexOf(chain) !== -1) {
-      return type === 'from'
-        ? new bitcoinLike(symbol).fromSat(Number(value))
-        : new bitcoinLike(symbol).toSat(Number(value))
+    } else if (chain && bitcoinLike.coins.indexOf(chain) !== -1) {
+      return type === 'from' ? bitcoinLike.fromSat(Number(value)) : bitcoinLike.toSat(Number(value))
     } else if (isEthereumLike(symbol, chain)) {
       if (unit) {
-        return type === 'from' ? web3.fromWei(`${value}`, unit) : web3.toWei(`${value}`, unit)
+        return type === 'from'
+          ? ethereumLike.fromEther(`${value}`)
+          : ethereumLike.toEther(`${value}`)
       }
       return Number(value)
     } else if (theta.coins.indexOf(symbol) !== -1) {
@@ -359,8 +373,8 @@ export const formatUnit = (
 export const getExplorerLink = (
   address: string,
   symbol: string,
-  currency?: ICurrency | IToken,
-  chain?: string,
+  chain: string,
+  tokenChain?: string,
   contractAddress?: string
 ) => {
   const provider = getProvider(symbol)
@@ -369,30 +383,11 @@ export const getExplorerLink = (
     return provider.getExplorerLink(address)
   }
 
-  if (isEthereumLike(symbol, chain)) {
-    const parseSymbol = toLower(symbol)
-
-    if (chain) {
-      const parseChain = toLower(chain)
-      const tokenInfo = getToken(symbol, chain)
-      const tokenAddress = tokenInfo?.address || contractAddress
-
-      if (parseChain === 'eth') {
-        return `https://etherscan.io/token/${tokenAddress}?a=${address}`
-      } else if (parseChain === 'bsc') {
-        ;`https://bscscan.com/token/${tokenAddress}?a=${address}`
-      }
-    } else {
-      if (parseSymbol === 'eth') {
-        return `https://etherscan.io/address/${address}`
-      } else if (parseSymbol === 'bnb') {
-        return `https://bscscan.com/address/${address}`
-      } else if (parseSymbol === 'etc') {
-        return `https://blockscout.com/etc/mainnet/address/${address}/transactions`
-      }
-    }
+  if (isEthereumLike(symbol, tokenChain)) {
+    return ethereumLike.getExplorerLink(address, symbol, tokenChain, contractAddress)
   }
-  return `https://blockchair.com/${currency?.chain}/address/${address}`
+
+  return `https://blockchair.com/${chain}/address/${address}`
 }
 
 export const getTransactionLink = (
@@ -400,7 +395,7 @@ export const getTransactionLink = (
   symbol: string,
   chain: string,
   tokenChain?: string
-): string | null => {
+): string => {
   const provider = getProvider(symbol)
 
   if (provider?.getTransactionLink) {
@@ -408,16 +403,7 @@ export const getTransactionLink = (
   }
 
   if (isEthereumLike(symbol, tokenChain)) {
-    const parseChain = tokenChain ? toLower(tokenChain) : toLower(chain)
-
-    if (parseChain === 'eth') {
-      return `https://etherscan.io/tx/${hash}`
-    } else if (parseChain === 'bsc') {
-      return `https://bscscan.com/tx/${hash}`
-    } else if (parseChain === 'etc') {
-      return `https://blockscout.com/etc/mainnet/tx/${hash}/internal-transactions`
-    }
-    return null
+    return ethereumLike.getTransactionLink(hash, chain, tokenChain)
   } else {
     return `https://blockchair.com/${chain}/transaction/${hash}`
   }
@@ -472,7 +458,7 @@ export const generateExtraId = (symbol: string): null | string => {
 export const checkWithOuputs = (chain: string, symbol: string): boolean => {
   try {
     if (
-      bitcoinLike.coins().indexOf(chain) !== -1 ||
+      bitcoinLike.coins.indexOf(chain) !== -1 ||
       toLower(symbol) === 'ada' ||
       toLower(symbol) === 'nebl'
     ) {
@@ -490,7 +476,7 @@ export const getFee = async (
   tokenChain?: string
 ): Promise<TCustomFee | null> => {
   try {
-    if (bitcoinLike.coins().indexOf(chain) !== -1 || isEthereumLike(symbol, tokenChain)) {
+    if (bitcoinLike.coins.indexOf(chain) !== -1 || isEthereumLike(symbol, tokenChain)) {
       return await getCustomFee(chain)
     }
     return null

@@ -29,7 +29,7 @@ import {
   getExtraIdName,
   generateExtraId,
 } from '@utils/currencies'
-import bitcoinLike from '@utils/bitcoinLike'
+import * as bitcoinLike from '@utils/currencies/bitcoinLike'
 import { getItem, setItem, removeItem } from '@utils/storage'
 
 // Config
@@ -158,7 +158,7 @@ const Send: React.FC = () => {
   const getOutputs = async (info: ICurrency): Promise<void> => {
     if (selectedWallet) {
       if (
-        bitcoinLike.coins().indexOf(info.chain) !== -1 ||
+        bitcoinLike.coins.indexOf(info.chain) !== -1 ||
         toLower(selectedWallet?.symbol) === 'ada' ||
         toLower(selectedWallet?.symbol) === 'nebl'
       ) {
@@ -527,7 +527,7 @@ const Send: React.FC = () => {
       ) {
         if (!outputs.length) {
           if (
-            bitcoinLike.coins().indexOf(currencyInfo.chain) !== -1 ||
+            bitcoinLike.coins.indexOf(currencyInfo.chain) !== -1 ||
             toLower(selectedWallet.symbol) === 'ada'
           ) {
             return true

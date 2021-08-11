@@ -69,6 +69,7 @@ const TextInput: React.FC<Props> = (props) => {
 
   const onClear = (): void => {
     onChange('')
+    textInputRef.current?.focus()
   }
 
   const onClickButton = (): void => {
@@ -84,11 +85,6 @@ const TextInput: React.FC<Props> = (props) => {
   }
 
   const onBlur = (): void => {
-    setTimeout(() => {
-      if (isFocused) {
-        setIsFocused(false)
-      }
-    }, 100)
     if (onBlurInput) {
       onBlurInput()
     }
@@ -143,7 +139,7 @@ const TextInput: React.FC<Props> = (props) => {
           <Styles.EyeIcon isVisible={isPasswordVisible} />
         </Styles.VisibleInput>
       ) : null}
-      {value.length && type !== 'password' && isFocused ? (
+      {value.length && type !== 'password' ? (
         <Styles.ClearButton onClick={onClear}>
           <SVG src="../../assets/icons/times.svg" width={10} height={10} />
         </Styles.ClearButton>
