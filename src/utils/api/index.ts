@@ -299,3 +299,20 @@ export const getPhishingSites = async (): Promise<TPhishingSite[] | null> => {
     return null
   }
 }
+
+export const getNulsTxParams = async (from: string) => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/nuls/params`, {
+      params: {
+        from,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data
+  } catch {
+    return null
+  }
+}
