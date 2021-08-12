@@ -53,7 +53,7 @@ const Row = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: 9px 0 10px 0;
+  padding: 11px 0 10px 0;
 
   label {
     font-size: ${({ isActive }: TRowProps) => (isActive ? '12px' : '14px')};
@@ -65,7 +65,7 @@ const Row = styled.div`
           : '0'
         : openFrom === 'browser'
         ? '20px'
-        : '13px'};
+        : '10px'};
   }
 
   input {
@@ -80,7 +80,7 @@ const Label = styled.label`
 `
 
 const Input = styled.input`
-  margin: 5px 0 0 0;
+  margin: 4px 0 0 0;
   padding: 0;
   border: none;
   height: 0;
