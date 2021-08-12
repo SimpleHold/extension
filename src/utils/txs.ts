@@ -59,20 +59,15 @@ export const compare = (
   contractAddress?: string
 ): string[] => {
   const walletKey = getWalletKey(address, chain, tokenSymbol, contractAddress)
+  const getTxs = getJSON(walletKey)
 
-  const findWalletStorage = getItem(walletKey)
-
-  if (findWalletStorage) {
-    const getTxs = getJSON(findWalletStorage)
-
-    const getNewTxs = txs.filter((hash: string) => {
+  if (getTxs?.length) {
+    return txs.filter((hash: string) => {
       return !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(hash))
     })
-
-    return getNewTxs
-  } else {
-    return txs
   }
+
+  return txs
 }
 
 export const getExist = (
@@ -83,15 +78,10 @@ export const getExist = (
 ): TAddressTx[] => {
   try {
     const walletKey = getWalletKey(address, chain, tokenSymbol, contractAddress)
+    const getTxs = getJSON(walletKey)
 
-    const findWalletStorage = getItem(walletKey)
-
-    if (findWalletStorage) {
-      const getTxs = getJSON(findWalletStorage)
-
-      if (getTxs) {
-        return getTxs
-      }
+    if (getTxs?.length) {
+      return getTxs
     }
     return []
   } catch {

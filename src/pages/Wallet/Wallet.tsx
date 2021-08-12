@@ -90,7 +90,7 @@ const WalletPage: React.FC = () => {
 
   React.useEffect(() => {
     loadBalance()
-    // getTxHistory() // Fix me
+    getTxHistory()
     getName()
   }, [])
 
