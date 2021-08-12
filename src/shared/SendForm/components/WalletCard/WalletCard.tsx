@@ -24,9 +24,9 @@ import Styles from './styles'
 interface Props {
   balance: null | number
   estimated: null | number
-  symbol: string
+  symbol?: string
   walletName: string
-  address: string
+  address?: string
   hardware?: THardware
   name?: string
   wallets: IWallet[]
@@ -63,6 +63,26 @@ const WalletCard: React.FC<Props> = (props) => {
   const onClickWallet = (address: string, walletName: string, hardware?: THardware) => (): void => {
     toggle()
     changeWallet(address, walletName, hardware)
+  }
+
+  if (!symbol || !address) {
+    return (
+      <Styles.Container>
+        <Styles.Row isVisible={false} disabled>
+          <Skeleton width={40} height={40} br={13} type="gray" isLoading />
+          <Styles.Info>
+            <Styles.Wallet isVisible={false}>
+              <Skeleton width={80} height={16} type="gray" br={4} isLoading />
+              <Skeleton width={70} height={17} type="gray" br={4} mt={7} isLoading />
+            </Styles.Wallet>
+            <Styles.Balances>
+              <Skeleton width={120} height={16} type="gray" br={4} isLoading />
+              <Skeleton width={65} height={16} type="gray" br={4} mt={7} isLoading />
+            </Styles.Balances>
+          </Styles.Info>
+        </Styles.Row>
+      </Styles.Container>
+    )
   }
 
   return (

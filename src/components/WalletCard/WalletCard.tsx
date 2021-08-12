@@ -73,14 +73,12 @@ const WalletCard: React.FC<Props> = (props) => {
   }, [])
 
   const fetchBalance = async (): Promise<void> => {
-    const tryGetBalance = await getBalance(
+    const { balance, balance_usd, balance_btc, pending, pending_btc } = await getBalance(
       address,
       currency?.chain || chain,
       tokenSymbol,
       contractAddress
     )
-
-    const { balance, balance_usd, balance_btc, pending, pending_btc } = tryGetBalance
 
     setBalance(balance)
     if (sumBalance) {

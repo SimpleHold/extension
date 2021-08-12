@@ -1,3 +1,9 @@
+import BigNumber from 'bignumber.js'
+
+export const minus = (from: number, to: number): number => {
+  return new BigNumber(from).minus(new BigNumber(to)).toNumber()
+}
+
 export const toUpper = (text?: string): string | undefined => {
   if (text?.length) {
     return text.toUpperCase()

@@ -78,7 +78,7 @@ const Transaction: React.FC<Props> = (props) => {
             )}`}</Styles.CurrencyAmount>
             <Styles.USDAmount>{`$ ${formatEstimated(
               estimated,
-              price(estimated, 2)
+              price(estimated)
             )}`}</Styles.USDAmount>
           </Styles.Amounts>
         </Styles.Row>

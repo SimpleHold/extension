@@ -6,6 +6,7 @@ import { BigNumber } from 'bignumber.js'
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 
+// Shared
 import SendFormShared from '@shared/SendForm'
 
 // Drawers
@@ -13,12 +14,12 @@ import WalletsDrawer from '@drawers/Wallets'
 import AboutFeeDrawer from '@drawers/AboutFee'
 
 // Utils
-import { toLower, toUpper } from '@utils/format'
+import { toLower, toUpper, minus } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
 import {
   getExtraIdName,
-  checkWithOuputs,
+  checkWithOutputs,
   getNetworkFeeSymbol,
   validateAddress,
   formatUnit,
@@ -59,7 +60,7 @@ const initialState: IState = {
   isFeeLoading: false,
   fee: 0,
   feeSymbol: '',
-  feeType: 'slow',
+  feeType: 'average',
   addressErrorLabel: null,
   amountErrorLabel: null,
   currencyBalance: null,
@@ -111,6 +112,18 @@ const SendPage: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
+    if (state.fee) {
+      onGetNetworkFee()
+    }
+  }, [state.feeType])
+
+  React.useEffect(() => {
+    if (state.balance !== null && Number(state.amount) > 0) {
+      checkAmount()
+    }
+  }, [state.balance, state.amount])
+
+  React.useEffect(() => {
     loadBalance()
     getOutputs()
     checkAddress()
@@ -124,23 +137,21 @@ const SendPage: React.FC = () => {
       !state.amountErrorLabel &&
       !state.isStandingFee
     ) {
-      updateState({ isFeeLoading: true })
       onGetNetworkFee()
     }
   }, [debounced])
 
   React.useEffect(() => {
     if (state.fee > 0 && !state.amountErrorLabel) {
-      if (
-        state.amount.length &&
-        Number(state.amount) + Number(state.fee) >= Number(state.balance)
-      ) {
+      if (state.amount.length && Number(state.amount) + getNormalFee() >= Number(state.balance)) {
         updateState({ amountErrorLabel: 'Insufficient funds' })
       }
     }
   }, [state.fee])
 
-  React.useEffect(() => {}, [state.feeType])
+  React.useEffect(() => {
+    checkAmount()
+  }, [state.isIncludeFee])
 
   const getCustomFee = async (): Promise<void> => {
     const customFee = await getFee(symbol, chain, tokenChain)
@@ -159,7 +170,17 @@ const SendPage: React.FC = () => {
   }
 
   const onGetNetworkFee = async (): Promise<void> => {
-    updateState({ utxosList: [] })
+    if (state.isStandingFee) {
+      return
+    }
+
+    updateState({ isFeeLoading: true })
+
+    const withOutputs = checkWithOutputs(symbol)
+
+    if (withOutputs) {
+      updateState({ utxosList: [] })
+    }
 
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
     const feePrice = state.customFee[state.feeType]
@@ -185,7 +206,7 @@ const SendPage: React.FC = () => {
     updateState({ isFeeLoading: false })
 
     if (data) {
-      if (data?.utxos) {
+      if (data?.utxos && withOutputs) {
         updateState({ utxosList: data.utxos })
       }
 
@@ -216,7 +237,7 @@ const SendPage: React.FC = () => {
   }
 
   const getOutputs = async (): Promise<void> => {
-    const withOutputs = checkWithOuputs(chain, symbol)
+    const withOutputs = checkWithOutputs(symbol)
 
     if (withOutputs) {
       const outputs = await getUnspentOutputs(state.selectedAddress, chain)
@@ -229,6 +250,11 @@ const SendPage: React.FC = () => {
   }
 
   const loadBalance = async (): Promise<void> => {
+    updateState({
+      balance: null,
+      estimated: null,
+    })
+
     const { balance, balance_usd, balance_btc } = await getBalance(
       state.selectedAddress,
       currency?.chain || tokenChain,
@@ -275,7 +301,11 @@ const SendPage: React.FC = () => {
   }
 
   const changeWallet = (selectedAddress: string, walletName: string, hardware?: THardware) => {
-    updateState({ selectedAddress, walletName, hardware })
+    updateState({ selectedAddress, walletName, hardware, utxosList: [], currencyBalance: null })
+
+    if (!state.isStandingFee) {
+      updateState({ fee: 0 })
+    }
   }
 
   const onConfirm = (): void => {
@@ -300,6 +330,7 @@ const SendPage: React.FC = () => {
       decimals: getTokenDecimals || decimals,
       extraId: state.extraId,
       tokenName,
+      isIncludeFee: state.isIncludeFee,
     })
   }
 
@@ -311,11 +342,13 @@ const SendPage: React.FC = () => {
     }
   }
 
+  const getNormalFee = (): number => {
+    return state.isIncludeFee ? 0 : state.fee
+  }
+
   const onSendAll = (): void => {
     if (state.balance) {
-      const fee = state.isIncludeFee ? 0 : state.fee
-
-      updateState({ amount: `${state.balance - fee}` })
+      updateState({ amount: `${minus(state.balance, getNormalFee())}` })
     }
   }
 
@@ -388,7 +421,7 @@ const SendPage: React.FC = () => {
       !isCurrencyBalanceError
     ) {
       if (!state.outputs.length) {
-        const withOuputs = checkWithOuputs(chain, symbol)
+        const withOuputs = checkWithOutputs(symbol)
 
         return withOuputs
       }

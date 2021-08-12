@@ -6,10 +6,10 @@ import { TCustomFee } from '@utils/api/types'
 export interface Props {
   balance: number | null
   estimated: number | null
-  symbol: string
+  symbol?: string
   hardware?: THardware
   walletName: string
-  selectedAddress: string
+  selectedAddress?: string
   tokenName?: string
   wallets: IWallet[]
   changeWallet: (address: string, name: string, hardware?: THardware) => void
@@ -44,6 +44,9 @@ export interface Props {
   toggleIncludeFee: () => void
   tabInfo?: TTabInfo
   customFee: TCustomFee
+  amountLabel?: string
+  openFrom?: string
+  disabled?: boolean
 }
 
 export type TFees = 'slow' | 'average' | 'fast'

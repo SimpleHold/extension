@@ -104,7 +104,7 @@ export const validateAddress = (
       return provider.validateAddress(address)
     }
 
-    if (chain && bitcoinLike.coins.indexOf(chain) !== -1) {
+    if (bitcoinLike.coins.indexOf(symbol) !== -1) {
       return bitcoinLike.validateAddress(address, symbol)
     }
 
@@ -209,7 +209,7 @@ export const getNetworkFee = async ({
   btcLikeParams,
   ethLikeParams,
 }: IGetFeeParams): Promise<TGetFeeData | null> => {
-  if (btcLikeParams && btcLikeParams) {
+  if (btcLikeParams) {
     const { outputs, feePerByte } = btcLikeParams
 
     if (cardano.coins.indexOf(symbol) !== -1) {
@@ -271,7 +271,7 @@ export const formatUnit = (
       return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
     } else if (cardano.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
-    } else if (chain && bitcoinLike.coins.indexOf(chain) !== -1) {
+    } else if (chain && bitcoinLike.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? bitcoinLike.fromSat(Number(value)) : bitcoinLike.toSat(Number(value))
     } else if (isEthereumLike(symbol, chain)) {
       if (unit) {
@@ -375,16 +375,13 @@ export const generateExtraId = (symbol: string): null | string => {
   return null
 }
 
-export const checkWithOuputs = (chain: string, symbol: string): boolean => {
+export const checkWithOutputs = (symbol: string): boolean => {
   try {
-    if (
-      bitcoinLike.coins.indexOf(chain) !== -1 ||
-      toLower(symbol) === 'ada' ||
-      toLower(symbol) === 'nebl'
-    ) {
-      return true
-    }
-    return false
+    const isBtcLike = bitcoinLike.coins.indexOf(symbol) !== -1
+    const isCardano = cardano.coins.indexOf(symbol) !== -1
+    const isNeblio = neblio.coins.indexOf(symbol) !== -1
+
+    return isBtcLike || isCardano || isNeblio
   } catch {
     return false
   }
@@ -396,7 +393,7 @@ export const getFee = async (
   tokenChain?: string
 ): Promise<TCustomFee | null> => {
   try {
-    if (bitcoinLike.coins.indexOf(chain) !== -1 || isEthereumLike(symbol, tokenChain)) {
+    if (bitcoinLike.coins.indexOf(symbol) !== -1 || isEthereumLike(symbol, tokenChain)) {
       return await getCustomFee(chain)
     }
     return null

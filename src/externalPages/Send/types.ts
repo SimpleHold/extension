@@ -1,6 +1,7 @@
 // Types
 import { IWallet } from '@utils/wallet'
 import { ICurrency } from '@config/currencies'
+import { TCustomFee } from '@utils/api/types'
 
 export type TTabInfo = {
   favIconUrl: string
@@ -16,6 +17,8 @@ export interface Props {
   extraId?: string
 }
 
+export type TFees = 'slow' | 'average' | 'fast'
+
 export interface IState {
   address: string
   amount: string
@@ -27,14 +30,19 @@ export interface IState {
   addressErrorLabel: null | string
   tabInfo: null | TTabInfo
   props: Props
-  networkFee: number
-  isNetworkFeeLoading: boolean
+  fee: number
+  feeSymbol: string
+  isFeeLoading: boolean
   amountErrorLabel: null | string
   outputs: UnspentOutput[]
-  networkFeeSymbol: string
   utxosList: UnspentOutput[] | CardanoUnspentTxOutput[]
   currencyBalance: number
   extraId: string
   extraIdName: string
   isDraggable: boolean
+  isIncludeFee: boolean
+  feeType: TFees
+  selectedFee: number
+  customFee: TCustomFee
+  activeDrawer: 'wallets' | 'aboutFee' | null
 }

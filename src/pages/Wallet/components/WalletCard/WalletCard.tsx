@@ -82,7 +82,7 @@ const WalletCard: React.FC<Props> = (props) => {
           <Skeleton width={75} height={19} mt={4} type="gray" isLoading={estimated === null}>
             <Styles.Estimated>{`$ ${formatEstimated(
               estimated,
-              price(estimated, 2)
+              price(estimated)
             )}`}</Styles.Estimated>
           </Skeleton>
         </Styles.WalletInfo>

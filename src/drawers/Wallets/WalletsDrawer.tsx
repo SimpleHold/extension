@@ -14,7 +14,7 @@ import Styles from './styles'
 interface Props {
   onClose: () => void
   isActive: boolean
-  selectedAddress: string
+  selectedAddress?: string
   wallets: IWallet[]
   onClickWallet: (address: string) => () => void
 }

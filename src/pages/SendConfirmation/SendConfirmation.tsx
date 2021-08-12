@@ -70,6 +70,7 @@ const SendConfirmation: React.FC = () => {
       outputs,
       chain,
       networkFeeSymbol,
+      isIncludeFee = false,
       contractAddress = undefined,
       tokenChain = undefined,
       decimals = undefined,
@@ -104,8 +105,8 @@ const SendConfirmation: React.FC = () => {
 
           const parseAmount =
             tokenChain && decimals
-              ? convertDecimals(amount, decimals)
-              : formatUnit(symbol, amount, 'to', chain, 'ether')
+              ? convertDecimals(getAmount(), decimals)
+              : formatUnit(symbol, getAmount(), 'to', chain, 'ether')
           const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
@@ -137,7 +138,7 @@ const SendConfirmation: React.FC = () => {
               symbol,
               addressFrom,
               addressTo,
-              amount,
+              getAmount(),
               findWallet.privateKey
             )
 
@@ -257,13 +258,20 @@ const SendConfirmation: React.FC = () => {
     history.replace('/wallets')
   }
 
+  const getAmount = (): number => {
+    if (isIncludeFee) {
+      return amount - networkFee
+    }
+    return amount
+  }
+
   return (
     <>
       <Styles.Wrapper>
         <Cover />
         <Header withBack backTitle="Send" onBack={history.goBack} />
         <SendConfirmShared
-          amount={amount}
+          amount={getAmount()}
           symbol={symbol}
           networkFee={networkFee}
           addressFrom={addressFrom}

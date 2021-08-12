@@ -1,7 +1,4 @@
-// Utils
-import { toLower } from '@utils/format'
-
-export const coins = ['bitcoin', 'bitcoin-cash', 'bitcoin-sv', 'litecoin', 'dogecoin', 'dash']
+export const coins = ['btc', 'bch', 'bsv', 'ltc', 'doge', 'dash']
 
 const getProvider = (symbol: string): BitcoinLikeProvider | null => {
   if (symbol === 'btc' || symbol === 'bsv') {
@@ -115,7 +112,7 @@ export const getNetworkFee = (
   const networkFee = fromSat(getFee(address, utxos, amount, feePerByte, symbol))
 
   return {
-    networkFee: toLower(symbol) === 'doge' && networkFee < 1 ? 1 : networkFee,
+    networkFee,
     utxos,
   }
 }

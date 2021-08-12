@@ -6,6 +6,10 @@ import { browser } from 'webextension-polyfill-ts'
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
 
+// Drawers
+import WalletsDrawer from '@drawers/Wallets'
+import AboutFeeDrawer from '@drawers/AboutFee'
+
 // Shared
 import SendFormShared from '@shared/SendForm'
 
@@ -13,19 +17,21 @@ import SendFormShared from '@shared/SendForm'
 import { getWallets, IWallet } from '@utils/wallet'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
-import { price, toLower, toUpper, formatEstimated } from '@utils/format'
+import { toLower, toUpper, minus } from '@utils/format'
 import {
   validateAddress,
   formatUnit,
   getNetworkFeeSymbol,
   getExtraIdName,
   generateExtraId,
+  getNetworkFee,
+  getFee,
 } from '@utils/currencies'
 import * as bitcoinLike from '@utils/currencies/bitcoinLike'
 import { getItem, setItem, removeItem } from '@utils/storage'
 
 // Config
-import { getCurrency, getCurrencyByChain, ICurrency } from '@config/currencies'
+import { getCurrency, ICurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
 // Hooks
@@ -33,7 +39,7 @@ import useDebounce from '@hooks/useDebounce'
 import useState from '@hooks/useState'
 
 // Types
-import { IState } from './types'
+import { IState, TFees } from './types'
 
 // Styles
 import Styles from './styles'
@@ -49,16 +55,25 @@ const initialState: IState = {
   addressErrorLabel: null,
   tabInfo: null,
   props: {},
-  networkFee: 0,
-  isNetworkFeeLoading: false,
+  fee: 0,
+  isFeeLoading: false,
   amountErrorLabel: null,
   outputs: [],
-  networkFeeSymbol: '',
+  feeSymbol: '',
   utxosList: [],
   currencyBalance: 0,
   extraId: '',
   extraIdName: '',
   isDraggable: false,
+  isIncludeFee: false,
+  feeType: 'average',
+  customFee: {
+    slow: 0,
+    average: 0,
+    fast: 0,
+  },
+  selectedFee: 0,
+  activeDrawer: null,
 }
 
 const Send: React.FC = () => {
@@ -69,13 +84,14 @@ const Send: React.FC = () => {
     getWalletsList(getItem('sendPageProps'))
     getStorageData()
     getQueryParams()
+    getCustomFee()
   }, [])
 
   React.useEffect(() => {
     if (state.selectedWallet) {
       getCurrencyInfo()
       getCurrencyBalance()
-      checkValidAddress()
+      checkAddress()
       onGetNetworkFeeSymbol()
       getExtraId()
     }
@@ -92,22 +108,22 @@ const Send: React.FC = () => {
       !state.amountErrorLabel &&
       state.selectedWallet
     ) {
-      getNetworkFee()
+      onGetNetworkFee()
     }
   }, [debounced])
 
   React.useEffect(() => {
     if (state.balance !== null) {
-      onBlurAmountInput()
-      checkValidAddress()
+      checkAmount()
+      checkAddress()
     }
   }, [state.balance])
 
   React.useEffect(() => {
-    if (state.isNetworkFeeLoading && state.amountErrorLabel) {
-      updateState({ isNetworkFeeLoading: false })
+    if (state.isFeeLoading && state.amountErrorLabel) {
+      updateState({ isFeeLoading: false })
     }
-  }, [state.isNetworkFeeLoading, state.amountErrorLabel])
+  }, [state.isFeeLoading, state.amountErrorLabel])
 
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -148,7 +164,7 @@ const Send: React.FC = () => {
   const getOutputs = async (info: ICurrency): Promise<void> => {
     if (state.selectedWallet) {
       if (
-        bitcoinLike.coins.indexOf(info.chain) !== -1 ||
+        bitcoinLike.coins.indexOf(info.symbol) !== -1 ||
         toLower(state.selectedWallet?.symbol) === 'ada' ||
         toLower(state.selectedWallet?.symbol) === 'nebl'
       ) {
@@ -162,34 +178,64 @@ const Send: React.FC = () => {
     if (state.selectedWallet) {
       const { chain, symbol } = state.selectedWallet
 
-      const networkFeeSymbol = getNetworkFeeSymbol(symbol, chain)
-      updateState({ networkFeeSymbol })
+      const feeSymbol = getNetworkFeeSymbol(symbol, chain)
+
+      updateState({ feeSymbol })
     }
   }
 
-  const getNetworkFee = async (): Promise<void> => {
+  const getCustomFee = async (): Promise<void> => {
     if (state.selectedWallet) {
-      updateState({ isNetworkFeeLoading: true })
-
-      const { symbol, chain, decimals, contractAddress } = state.selectedWallet
+      const { symbol, chain } = state.selectedWallet
 
       const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
       if (currencyInfo) {
-        const data = {
-          utxos: [],
-          networkFee: 0,
-          currencyBalance: 0,
-        }
+        const customFee = await getFee(symbol, currencyInfo.chain, chain)
 
-        updateState({ isNetworkFeeLoading: false })
+        if (customFee) {
+          updateState({ customFee })
+        }
+      }
+    }
+  }
+
+  const onGetNetworkFee = async (): Promise<void> => {
+    if (state.selectedWallet) {
+      updateState({ isFeeLoading: true })
+
+      const { symbol, chain, decimals, contractAddress } = state.selectedWallet
+
+      const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+      const feePrice = state.customFee[state.feeType]
+
+      if (currencyInfo) {
+        const data = await getNetworkFee({
+          symbol,
+          addressFrom: state.selectedWallet.address,
+          addressTo: state.address,
+          chain: currencyInfo.chain,
+          amount: state.amount,
+          tokenChain: chain,
+          btcLikeParams: {
+            outputs: state.outputs,
+            feePerByte: feePrice,
+          },
+          ethLikeParams: {
+            contractAddress,
+            decimals,
+            gasPrice: feePrice,
+          },
+        })
+
+        updateState({ isFeeLoading: false })
 
         if (data) {
           if (data?.utxos) {
             updateState({ utxosList: data.utxos })
           }
           if (data.networkFee) {
-            updateState({ networkFee: data.networkFee })
+            updateState({ fee: data.networkFee })
           } else {
             if (Number(state.amount) > 0 && Number(state.balance) > 0) {
               updateState({ amountErrorLabel: 'Insufficient funds' })
@@ -343,10 +389,10 @@ const Send: React.FC = () => {
         symbol: state.selectedWallet.symbol,
         addressFrom: state.selectedWallet.address,
         addressTo: state.address,
-        networkFee: state.networkFee,
+        networkFee: state.fee,
         tabInfo: state.tabInfo,
         chain: currency?.chain,
-        networkFeeSymbol: state.networkFeeSymbol,
+        networkFeeSymbol: state.feeSymbol,
         outputs: state.utxosList,
         contractAddress: state.selectedWallet?.contractAddress,
         tokenChain: state.selectedWallet?.chain,
@@ -366,47 +412,7 @@ const Send: React.FC = () => {
     }
   }
 
-  const dropdownList = state.walletsList
-    ?.filter(
-      (wallet: IWallet) =>
-        toLower(wallet.address) !== toLower(state.selectedWallet?.address) ||
-        toLower(wallet?.chain) !== toLower(state.selectedWallet?.chain)
-    )
-    .map((wallet: IWallet) => {
-      const currencyInfo = wallet?.chain
-        ? getCurrencyByChain(wallet.chain)
-        : getCurrency(wallet?.symbol)
-
-      return {
-        logo: {
-          symbol: wallet.symbol,
-          width: 40,
-          height: 40,
-          br: 13,
-          background: currencyInfo?.background,
-          chain: wallet?.chain,
-        },
-        label: wallet?.name || currencyInfo?.name,
-        value: wallet.address,
-        chain: wallet?.chain,
-      }
-    })
-
-  const onSelectDropdown = (index: number) => {
-    const currency = dropdownList[index]
-
-    const findWallet = state.walletsList.find(
-      (wallet: IWallet) =>
-        toLower(wallet.address) === toLower(currency.value) &&
-        toLower(wallet?.chain) === toLower(currency?.chain)
-    )
-
-    if (findWallet) {
-      updateState({ selectedWallet: findWallet })
-    }
-  }
-
-  const checkValidAddress = (): void => {
+  const checkAddress = (): void => {
     if (state.addressErrorLabel) {
       updateState({ addressErrorLabel: null })
     }
@@ -429,8 +435,8 @@ const Send: React.FC = () => {
       }
     }
 
-    if (!state.networkFee && Number(state.amount) > 0 && !state.amountErrorLabel) {
-      getNetworkFee()
+    if (!state.fee && Number(state.amount) > 0 && !state.amountErrorLabel) {
+      onGetNetworkFee()
     }
   }
 
@@ -444,7 +450,7 @@ const Send: React.FC = () => {
     return 0
   }
 
-  const onBlurAmountInput = (): void => {
+  const checkAmount = (): void => {
     if (state.amountErrorLabel) {
       updateState({ amountErrorLabel: null })
     }
@@ -453,7 +459,7 @@ const Send: React.FC = () => {
 
     if (
       state.amount.length &&
-      Number(state.amount) + Number(state.networkFee) >= Number(availableBalance)
+      Number(state.amount) + Number(state.fee) >= Number(availableBalance)
     ) {
       return updateState({ amountErrorLabel: 'Insufficient funds' })
     }
@@ -492,12 +498,13 @@ const Send: React.FC = () => {
   }
 
   const isCurrencyBalanceError =
-    state.selectedWallet &&
-    (state.selectedWallet?.chain || toLower(state.selectedWallet.symbol) === 'theta') &&
+    state.selectedWallet !== null &&
+    (state.selectedWallet?.chain !== undefined ||
+      toLower(state.selectedWallet.symbol) === 'theta') &&
     state.currencyBalance !== null &&
-    !state.isNetworkFeeLoading &&
-    state.networkFee &&
-    state.networkFee > state.currencyBalance
+    !state.isFeeLoading &&
+    state.fee > 0 &&
+    state.fee > state.currencyBalance
 
   const isButtonDisabled = (): boolean => {
     if (state.selectedWallet && state.currencyInfo) {
@@ -513,13 +520,13 @@ const Send: React.FC = () => {
         state.addressErrorLabel === null &&
         state.amountErrorLabel === null &&
         Number(state.balance) > 0 &&
-        state.networkFee > 0 &&
-        !state.isNetworkFeeLoading &&
+        state.fee > 0 &&
+        !state.isFeeLoading &&
         !isCurrencyBalanceError
       ) {
         if (!state.outputs.length) {
           if (
-            bitcoinLike.coins.indexOf(state.currencyInfo.chain) !== -1 ||
+            bitcoinLike.coins.indexOf(state.currencyInfo.symbol) !== -1 ||
             toLower(state.selectedWallet.symbol) === 'ada'
           ) {
             return true
@@ -531,7 +538,7 @@ const Send: React.FC = () => {
     return true
   }
 
-  const createExtraId = (): void => {
+  const onGenerateExtraId = (): void => {
     if (state.selectedWallet) {
       const extraId = generateExtraId(state.selectedWallet.symbol)
 
@@ -540,40 +547,6 @@ const Send: React.FC = () => {
       }
     }
   }
-
-  // const extraIdInputButton = () => (
-  //   <Tooltip text="Generate destination tag" direction="right">
-  //     <Styles.InputButton onClick={createExtraId} withHover>
-  //       <SVG src="../../assets/icons/generateExtraid.svg" width={16} height={16} />
-  //     </Styles.InputButton>
-  //   </Tooltip>
-  // )
-
-  // const amountInputButton = () => {
-  //   if (state.selectedWallet) {
-  //     if (
-  //       toLower(state.selectedWallet.symbol) === 'xrp' &&
-  //       state.amountErrorLabel === 'Insufficient funds'
-  //     ) {
-  //       return (
-  //         <Tooltip
-  //           text="The network requires at least 20 XRP balance at all times."
-  //           direction="right"
-  //           maxWidth={195}
-  //           textSpace="pre-wrap"
-  //         >
-  //           <Styles.InputButton disabled>
-  //             <SVG src="../../assets/icons/info.svg" width={16} height={16} />
-  //           </Styles.InputButton>
-  //         </Tooltip>
-  //       )
-  //     }
-  //   }
-
-  //   return null
-  // }
-
-  const withExtraid = state.extraIdName.length > 0
 
   const setAddress = (address: string): void => {
     updateState({ address })
@@ -587,124 +560,113 @@ const Send: React.FC = () => {
     updateState({ extraId })
   }
 
+  const getNormalFee = (): number => {
+    return state.isIncludeFee ? 0 : state.fee
+  }
+
+  const onSendAll = (): void => {
+    if (state.balance) {
+      updateState({ amount: `${minus(state.balance, getNormalFee())}` })
+    }
+  }
+
+  const changeWallet = (selectedAddress: string) => {
+    const findWallet = state.walletsList.find(
+      (wallet: IWallet) => toLower(wallet.address) === toLower(selectedAddress)
+    )
+
+    if (findWallet) {
+      updateState({ selectedWallet: findWallet })
+    }
+  }
+
+  const openWalletsDrawer = (): void => {}
+
+  const setFeeType = (feeType: TFees): void => {
+    updateState({ feeType, selectedFee: state.customFee[feeType] })
+  }
+
+  const showFeeDrawer = (): void => {
+    updateState({ activeDrawer: 'aboutFee' })
+  }
+
+  const toggleIncludeFee = (): void => {
+    updateState({ isIncludeFee: !state.isIncludeFee })
+  }
+
+  const onCloseDrawer = (): void => {
+    updateState({ activeDrawer: null })
+  }
+
+  const onClickDrawerWallet = (address: string) => (): void => {
+    updateState({ address })
+    onCloseDrawer()
+  }
+
   return (
     <ExternalPageContainer onClose={onClose} headerStyle="green" isDraggable={state.isDraggable}>
-      <Styles.Body>
-        {/* <SendFormShared
-        balance={state.balance}
-        estimated={state.estimated}
-        symbol={state.selectedWallet?.symbol}
-      /> */}
-        {/* <Styles.Heading withExtraid={withExtraid}>
-          <Styles.TitleRow>
-            <Styles.Title>Send it on</Styles.Title>
-            {state.tabInfo ? (
-              <Styles.SiteInfo>
-                <Styles.SiteFavicon src={state.tabInfo.favIconUrl} />
-                <Styles.SiteUrl>{state.tabInfo.url}</Styles.SiteUrl>
-              </Styles.SiteInfo>
-            ) : null}
-          </Styles.TitleRow>
-          <Skeleton
-            width={250}
-            height={42}
-            type="gray"
-            mt={31}
-            isLoading={state.balance === null || !state.selectedWallet}
-          >
-            <Styles.Balance>
-              {numeral(state.balance).format('0.[000000]')} {toUpper(state.selectedWallet?.symbol)}
-            </Styles.Balance>
-          </Skeleton>
-          <Skeleton
-            width={130}
-            height={23}
-            mt={10}
-            type="gray"
-            isLoading={state.estimated === null || !state.selectedWallet}
-          >
-            <Styles.Estimated>{`$ ${formatEstimated(
-              state.estimated,
-              price(state.estimated, 2)
-            )}`}</Styles.Estimated>
-          </Skeleton>
-        </Styles.Heading>
-        <Styles.Form>
-          {state.walletsList.length ? (
-            <CurrenciesDropdown
-              list={dropdownList}
-              onSelect={onSelectDropdown}
-              currencyBr={13}
-              label="Select address"
-              value={state.selectedWallet?.address}
-              currencySymbol={state.selectedWallet?.symbol}
-              background={state.currencyInfo?.background}
-              disabled={state.walletsList.length < 2}
-              tokenChain={state.props?.chain}
-            />
-          ) : null}
-          <TextInput
-            label="Recipient Address"
-            value={state.address}
-            onChange={setAddress}
-            openFrom="browser"
-            errorLabel={state.addressErrorLabel}
-            onBlurInput={checkValidAddress}
-            disabled={state.balance === null || state.props?.readOnly}
-            type="text"
-          />
-          {withExtraid ? (
-            <TextInput
-              label={`${state.extraIdName} (optional)`}
-              value={state.extraId}
-              onChange={setExtraId}
-              disabled={state.balance === null}
-              button={extraIdInputButton()}
-              type="text"
-            />
-          ) : null}
-          <TextInput
-            label={`Amount ${
+      <>
+        <Styles.Body>
+          <SendFormShared
+            balance={state.balance}
+            estimated={state.estimated}
+            symbol={state.selectedWallet?.symbol}
+            hardware={state.selectedWallet?.hardware}
+            walletName="{state.walletName}" // Fix me
+            selectedAddress={state.selectedWallet?.address}
+            tokenName={undefined}
+            wallets={state.walletsList}
+            changeWallet={changeWallet}
+            tokenChain={state.selectedWallet?.chain}
+            onCancel={onClose}
+            onConfirm={onConfirm}
+            isDisabled={isButtonDisabled()}
+            address={state.address}
+            setAddress={setAddress}
+            addressErrorLabel={state.addressErrorLabel}
+            openWalletsDrawer={openWalletsDrawer}
+            onGenerateExtraId={onGenerateExtraId}
+            checkAddress={checkAddress}
+            onSendAll={onSendAll}
+            extraIdName={state.extraIdName}
+            extraId={state.extraId}
+            setExtraId={setExtraId}
+            amount={state.amount}
+            setAmount={setAmount}
+            amountErrorLabel={state.amountErrorLabel}
+            checkAmount={checkAmount}
+            isFeeLoading={state.isFeeLoading}
+            fee={state.fee}
+            feeSymbol={state.feeSymbol}
+            feeType={state.feeType}
+            setFeeType={setFeeType}
+            isCurrencyBalanceError={isCurrencyBalanceError}
+            currencyBalance={state.currencyBalance}
+            isCustomFee={state?.currencyInfo?.isCustomFee || false} // Fix me
+            showFeeDrawer={showFeeDrawer}
+            isIncludeFee={state.isIncludeFee}
+            toggleIncludeFee={toggleIncludeFee}
+            customFee={state.customFee}
+            amountLabel={`Amount ${
               state.selectedWallet ? `(${toUpper(state.selectedWallet?.symbol)})` : ''
             }`}
-            value={state.amount}
-            onChange={setAmount}
-            type="number"
             openFrom="browser"
-            errorLabel={state.amountErrorLabel}
-            onBlurInput={onBlurAmountInput}
             disabled={state.props?.readOnly}
-            button={amountInputButton()}
           />
-          <Styles.NetworkFeeBlock>
-            <Styles.NetworkFeeLabel>Network fee:</Styles.NetworkFeeLabel>
-            {state.isNetworkFeeLoading ? (
-              <Spinner ml={10} size={16} />
-            ) : (
-              <>
-                {state.networkFee === 0 ? (
-                  <Styles.NetworkFee>-</Styles.NetworkFee>
-                ) : (
-                  <Styles.NetworkFee>
-                    {state.networkFee} {toUpper(state.networkFeeSymbol)}
-                  </Styles.NetworkFee>
-                )}
-              </>
-            )}
-            {isCurrencyBalanceError ? (
-              <Styles.NetworkFeeError>
-                Insufficient funds {Number(state.networkFee - state.currencyBalance)}{' '}
-                {toUpper(state.networkFeeSymbol)}
-              </Styles.NetworkFeeError>
-            ) : null}
-          </Styles.NetworkFeeBlock>
-
-          <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
-            <Button label="Send" disabled={isButtonDisabled()} onClick={onConfirm} ml={7.5} />
-          </Styles.Actions>
-        </Styles.Form> */}
-      </Styles.Body>
+        </Styles.Body>
+        <WalletsDrawer
+          isActive={state.activeDrawer === 'wallets'}
+          onClose={onCloseDrawer}
+          selectedAddress={state.selectedWallet?.address}
+          wallets={state.walletsList}
+          onClickWallet={onClickDrawerWallet}
+        />
+        <AboutFeeDrawer
+          isActive={state.activeDrawer === 'aboutFee'}
+          onClose={onCloseDrawer}
+          openFrom="browser"
+        />
+      </>
     </ExternalPageContainer>
   )
 }

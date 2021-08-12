@@ -17,7 +17,6 @@ interface Props {
   inputRef?: React.RefObject<HTMLInputElement>
   disabled?: boolean
   openFrom?: string
-  button?: React.ReactElement<any, any> | null
   renderButton?: {
     label: string
     onClick: () => void
@@ -36,7 +35,6 @@ const TextInput: React.FC<Props> = (props) => {
     inputRef,
     disabled,
     openFrom,
-    button,
     renderButton,
     labelTooltip,
   } = props
@@ -151,8 +149,6 @@ const TextInput: React.FC<Props> = (props) => {
           <Styles.ButtonLabel>{renderButton.label}</Styles.ButtonLabel>
         </Styles.Button>
       ) : null}
-
-      {button || null}
     </Styles.Container>
   )
 }

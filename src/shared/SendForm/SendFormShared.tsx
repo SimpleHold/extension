@@ -59,6 +59,9 @@ const SendFormShared: React.FC<Props> = (props) => {
     toggleIncludeFee,
     tabInfo,
     customFee,
+    amountLabel,
+    openFrom,
+    disabled,
   } = props
 
   const renderInputButton = (inputType: 'address' | 'extraId' | 'amount') => {
@@ -125,32 +128,35 @@ const SendFormShared: React.FC<Props> = (props) => {
                 label="Recipient Address"
                 value={address}
                 onChange={setAddress}
-                disabled={balance === null}
+                disabled={balance === null || disabled}
                 type="text"
                 renderButton={renderInputButton('address')}
                 errorLabel={addressErrorLabel}
                 onBlurInput={checkAddress}
+                openFrom={openFrom}
               />
               {extraIdName ? (
                 <TextInput
                   label={`${extraIdName} (optional)`}
                   value={extraId}
                   onChange={setExtraId}
-                  disabled={balance === null}
+                  disabled={balance === null || disabled}
                   type="text"
                   renderButton={renderInputButton('extraId')}
+                  openFrom={openFrom}
                 />
               ) : null}
               <TextInput
-                label={`Amount (${toUpper(symbol)})`}
+                label={amountLabel || `Amount (${toUpper(symbol)})`}
                 value={amount}
                 onChange={setAmount}
-                disabled={balance === null}
+                disabled={balance === null || disabled}
                 type="number"
                 renderButton={renderInputButton('amount')}
                 errorLabel={amountErrorLabel}
                 onBlurInput={checkAmount}
                 labelTooltip={getAmountTooltip()}
+                openFrom={openFrom}
               />
             </Styles.FormBody>
           </Styles.Form>

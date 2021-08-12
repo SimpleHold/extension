@@ -57,14 +57,12 @@ const Wallet: React.FC<Props> = (props) => {
   }, [])
 
   const fetchBalance = async (): Promise<void> => {
-    const tryGetBalance = await getBalance(
+    const { balance, balance_usd, balance_btc, pending } = await getBalance(
       address,
       currency?.chain || chain,
       chain ? symbol : undefined,
       contractAddress
     )
-
-    const { balance, balance_usd, balance_btc, pending } = tryGetBalance
 
     setBalance(balance)
     updateBalance(address, symbol, balance, balance_btc)

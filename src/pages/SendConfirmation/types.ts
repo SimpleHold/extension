@@ -7,6 +7,7 @@ export interface ILocationState {
   outputs: UnspentOutput[]
   chain: string
   networkFeeSymbol: string
+  isIncludeFee: boolean
   contractAddress?: string
   tokenChain?: string
   decimals?: number

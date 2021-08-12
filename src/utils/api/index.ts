@@ -366,9 +366,11 @@ export const getCustomFee = async (chain: string): Promise<TCustomFee | null> =>
 }
 
 export const setUserId = async (userid: string): Promise<void> => {
-  await axios.post(`${config.serverUrl}/satismeter/users/new`, {
-    userid,
-  })
+  try {
+    await axios.post(`${config.serverUrl}/satismeter/users/new`, {
+      userid,
+    })
+  } catch {}
 }
 
 export const sendFeedback = async (
@@ -376,9 +378,11 @@ export const sendFeedback = async (
   feedback: string,
   rating: number
 ): Promise<void> => {
-  await axios.post(`${config.serverUrl}/satismeter/feedback`, {
-    userId,
-    feedback,
-    rating,
-  })
+  try {
+    await axios.post(`${config.serverUrl}/satismeter/feedback`, {
+      userId,
+      feedback,
+      rating,
+    })
+  } catch {}
 }
