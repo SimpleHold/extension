@@ -21,17 +21,21 @@ import { getItem, setItem } from '@utils/storage'
 import { getUnusedAddressesForToken } from '@config/tokens'
 import { getCurrencyByChain } from '@config/currencies'
 
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { ILocationState, IState } from './types'
+
 // Styles
 import Styles from './styles'
 
-interface LocationState {
-  symbol: string
-  chain: string
-  chainName: string
-  tokenName: string
-  tokenStandart: string
-  contractAddress?: string
-  decimals?: number
+const initialState: IState = {
+  chainAddresses: [],
+  selectedAddress: '',
+  activeDrawer: null,
+  password: '',
+  errorLabel: null,
 }
 
 const AddTokenToAddress: React.FC = () => {
@@ -46,18 +50,14 @@ const AddTokenToAddress: React.FC = () => {
       contractAddress = undefined,
       decimals = undefined,
     },
-  } = useLocation<LocationState>()
+  } = useLocation<ILocationState>()
+
+  const { state, updateState } = useState(initialState)
 
   const getCurrencyInfo = getCurrencyByChain(chain)
 
-  const [chainAddresses, setChainAddresses] = React.useState<string[]>([])
-  const [selectedAddress, setSelectedAddress] = React.useState<string>('')
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
-  const [password, setPassword] = React.useState<string>('')
-  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
-
-  const mapList = chainAddresses
-    .filter((address: string) => toLower(address) !== toLower(selectedAddress))
+  const mapList = state.chainAddresses
+    .filter((address: string) => toLower(address) !== toLower(state.selectedAddress))
     .map((address: string) => {
       return {
         logo: {
@@ -76,17 +76,17 @@ const AddTokenToAddress: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
-    if (chainAddresses.length && !selectedAddress.length) {
-      setSelectedAddress(chainAddresses[0])
+    if (state.chainAddresses.length && !state.selectedAddress.length) {
+      updateState({ selectedAddress: state.chainAddresses[0] })
     }
-  }, [chainAddresses, selectedAddress])
+  }, [state.chainAddresses, state.selectedAddress])
 
   const getChainAddresses = (): void => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      const addresses = getUnusedAddressesForToken(walletsList, symbol, chain)
-      setChainAddresses(addresses)
+      const chainAddresses = getUnusedAddressesForToken(walletsList, symbol, chain)
+      updateState({ chainAddresses })
     }
   }
 
@@ -103,32 +103,32 @@ const AddTokenToAddress: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    setActiveDrawer('confirm')
+    updateState({ activeDrawer: 'confirm' })
   }
 
   const onSelectDropdown = (index: number): void => {
-    setSelectedAddress(mapList[index].value)
+    updateState({ selectedAddress: mapList[index].value })
   }
 
   const onConfirmDrawer = (): void => {
-    if (validatePassword(password)) {
+    if (validatePassword(state.password)) {
       const backup = getItem('backup')
 
       if (backup) {
-        const decryptBackup = decrypt(backup, password)
+        const decryptBackup = decrypt(backup, state.password)
 
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
           const findWallet = parseBackup?.wallets?.find(
-            (wallet: IWallet) => wallet.address === selectedAddress
+            (wallet: IWallet) => wallet.address === state.selectedAddress
           )
 
           if (findWallet) {
             const walletsList = addNewWallet(
-              selectedAddress,
+              state.selectedAddress,
               findWallet.privateKey,
               decryptBackup,
-              password,
+              state.password,
               [symbol],
               false,
               chain,
@@ -141,7 +141,7 @@ const AddTokenToAddress: React.FC = () => {
               setItem('backupStatus', 'notDownloaded')
 
               history.replace('/download-backup', {
-                password,
+                password: state.password,
                 from: 'addTokenToAddress',
               })
             }
@@ -149,7 +149,15 @@ const AddTokenToAddress: React.FC = () => {
         }
       }
     }
-    return setErrorLabel('Password is not valid')
+    updateState({ errorLabel: 'Password is not valid' })
+  }
+
+  const onCloseDrawer = (): void => {
+    updateState({ activeDrawer: null })
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
   }
 
   return (
@@ -168,11 +176,11 @@ const AddTokenToAddress: React.FC = () => {
 
             <CurrenciesDropdown
               label="Select address"
-              value={selectedAddress}
+              value={state.selectedAddress}
               currencySymbol={getCurrencyInfo?.symbol || chain}
               list={mapList}
               onSelect={onSelectDropdown}
-              disabled={chainAddresses.length < 2}
+              disabled={state.chainAddresses.length < 2}
               currencyBr={20}
             />
           </Styles.Row>
@@ -181,7 +189,7 @@ const AddTokenToAddress: React.FC = () => {
             <Button label="Skip" isLight mr={7.5} onClick={onSkip} />
             <Button
               label="Confirm"
-              disabled={!chainAddresses.length}
+              disabled={!state.chainAddresses.length}
               ml={7.5}
               onClick={onConfirm}
             />
@@ -189,16 +197,16 @@ const AddTokenToAddress: React.FC = () => {
         </Styles.Container>
       </Styles.Wrapper>
       <ConfirmDrawer
-        isActive={activeDrawer === 'confirm'}
-        onClose={() => setActiveDrawer(null)}
+        isActive={state.activeDrawer === 'confirm'}
+        onClose={onCloseDrawer}
         title="Please enter your password to add a new address"
         inputLabel="Enter password"
-        textInputValue={password}
-        isButtonDisabled={!validatePassword(password)}
+        textInputValue={state.password}
+        isButtonDisabled={!validatePassword(state.password)}
         onConfirm={onConfirmDrawer}
         onChangeText={setPassword}
         textInputType="password"
-        inputErrorLabel={errorLabel}
+        inputErrorLabel={state.errorLabel}
       />
     </>
   )

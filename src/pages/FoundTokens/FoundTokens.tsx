@@ -20,18 +20,21 @@ import { getItem, setItem } from '@utils/storage'
 // Config
 import { getCurrencyByChain } from '@config/currencies'
 
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { IState, ILocationState } from './types'
+
 // Styles
 import Styles from './styles'
 
-interface LocationState {
-  chain: string
-  symbol: string
-  privateKey: string
-  tokens: string[]
-  tokenStandart: string
-  tokenName?: string
-  contractAddress?: string
-  decimals: number
+const initialState: IState = {
+  selectedTokens: [],
+  activeDrawer: null,
+  password: '',
+  errorLabel: null,
+  isIncludeTokens: false,
 }
 
 const FoundTokens: React.FC = () => {
@@ -47,37 +50,39 @@ const FoundTokens: React.FC = () => {
       contractAddress = undefined,
       decimals = undefined,
     },
-  } = useLocation<LocationState>()
+  } = useLocation<ILocationState>()
 
-  const [selectedTokens, setSelectedTokens] = React.useState<string[]>(tokens)
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm'>(null)
-  const [password, setPassword] = React.useState<string>('')
-  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
-  const [isIncludeTokens, setIsIncludeTokens] = React.useState<boolean>(false)
+  const { state, updateState } = useState({
+    ...initialState,
+    selectedTokens: tokens,
+  })
 
   const onToggle = (tokenSymbol: string, isActive: boolean): void => {
     if (isActive) {
-      setSelectedTokens(selectedTokens.filter((token: string) => token !== tokenSymbol))
+      updateState({
+        selectedTokens: state.selectedTokens.filter((token: string) => token !== tokenSymbol),
+      })
     } else {
-      setSelectedTokens([...selectedTokens, tokenSymbol])
+      updateState({
+        selectedTokens: [...state.selectedTokens, tokenSymbol],
+      })
     }
   }
 
-  const onConfirm = (includeTokens: boolean): void => {
-    setIsIncludeTokens(includeTokens)
-    setActiveDrawer('confirm')
+  const onConfirm = (isIncludeTokens: boolean): void => {
+    updateState({ activeDrawer: 'confirm', isIncludeTokens })
   }
 
   const onConfirmDrawer = (): void => {
-    if (errorLabel) {
-      setErrorLabel(null)
+    if (state.errorLabel) {
+      updateState({ errorLabel: null })
     }
 
-    if (validatePassword(password)) {
+    if (validatePassword(state.password)) {
       const backup = getItem('backup')
 
       if (backup) {
-        const decryptBackup = decrypt(backup, password)
+        const decryptBackup = decrypt(backup, state.password)
 
         if (decryptBackup) {
           const address = importPrivateKey(symbol, privateKey, chain)
@@ -86,14 +91,14 @@ const FoundTokens: React.FC = () => {
           if (address && getCurrencyInfo) {
             const tokensList = [symbol, getCurrencyInfo.symbol]
 
-            if (isIncludeTokens) {
+            if (state.isIncludeTokens) {
               tokensList.push(...tokens)
             }
             const walletsList = addNewWallet(
               address,
               privateKey,
               decryptBackup,
-              password,
+              state.password,
               tokensList,
               true,
               chain,
@@ -106,7 +111,7 @@ const FoundTokens: React.FC = () => {
               setItem('backupStatus', 'notDownloaded')
 
               history.replace('/download-backup', {
-                password,
+                password: state.password,
                 from: 'foundTokens',
               })
             }
@@ -114,7 +119,15 @@ const FoundTokens: React.FC = () => {
         }
       }
     }
-    return setErrorLabel('Password is not valid')
+    updateState({ errorLabel: 'Password is not valid' })
+  }
+
+  const onCloseDrawer = (): void => {
+    updateState({ activeDrawer: null })
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
   }
 
   return (
@@ -134,7 +147,7 @@ const FoundTokens: React.FC = () => {
               <TokenCard symbol={symbol} chain={chain} hideSelect name={tokenName} />
 
               {tokens.map((tokenSymbol: string) => {
-                const isActive = selectedTokens.indexOf(tokenSymbol) !== -1
+                const isActive = state.selectedTokens.indexOf(tokenSymbol) !== -1
 
                 return (
                   <TokenCard
@@ -156,16 +169,16 @@ const FoundTokens: React.FC = () => {
         </Styles.Container>
       </Styles.Wrapper>
       <ConfirmDrawer
-        isActive={activeDrawer === 'confirm'}
-        onClose={() => setActiveDrawer(null)}
+        isActive={state.activeDrawer === 'confirm'}
+        onClose={onCloseDrawer}
         title="Please enter your password to add a new address"
         inputLabel="Enter password"
-        textInputValue={password}
-        isButtonDisabled={!validatePassword(password)}
+        textInputValue={state.password}
+        isButtonDisabled={!validatePassword(state.password)}
         onConfirm={onConfirmDrawer}
         onChangeText={setPassword}
         textInputType="password"
-        inputErrorLabel={errorLabel}
+        inputErrorLabel={state.errorLabel}
       />
     </>
   )
