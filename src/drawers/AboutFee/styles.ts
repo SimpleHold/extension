@@ -10,6 +10,10 @@ const Text = styled.p`
   text-align: center;
   color: #7d7e8d;
   margin: 0;
+
+  &:not(:first-child) {
+    margin: 10px 0 0 0;
+  }
 `
 
 const Styles = {
