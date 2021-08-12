@@ -1,4 +1,6 @@
+// Types
 import { THardware } from '@utils/wallet'
+import type Transport from '@ledgerhq/hw-transport-webusb'
 
 export type TTabInfo = {
   favIconUrl: string
@@ -21,4 +23,31 @@ export interface Props {
   name?: string
   hardware?: THardware
   tabInfo?: TTabInfo
+}
+
+export interface IState {
+  props: Props | null
+  activeDrawer: null | 'confirm' | 'success' | 'fail' | 'ledger' | 'wrongDevice'
+  password: string
+  inputErrorLabel: null | string
+  isDrawerButtonLoading: boolean
+  transactionLink: string
+  failText: string
+  isButtonLoading: boolean
+  ledgerTransport: Transport | null
+  ledgerDrawerState: 'wrongDevice' | 'wrongApp' | 'connectionFailed' | 'reviewTx' | null
+  isDraggable: boolean
+}
+
+export type TLedgerTxParams = {
+  transport: Transport
+  symbol: string
+  path: string
+  addressFrom: string
+  addressTo: string
+  amount: number
+  chain: string
+  fee: number
+  outputs?: UnspentOutput[]
+  extraId?: string
 }
