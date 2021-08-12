@@ -134,6 +134,10 @@ const SelectToken: React.FC = () => {
     return setErrorLabel('Password is not valid')
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -186,7 +190,7 @@ const SelectToken: React.FC = () => {
       </Styles.Wrapper>
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         title="Confirm adding new address"
         inputLabel="Enter password"
         textInputValue={password}

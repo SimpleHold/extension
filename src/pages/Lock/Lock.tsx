@@ -109,6 +109,10 @@ const Lock: React.FC = () => {
     }
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -140,7 +144,7 @@ const Lock: React.FC = () => {
       </Styles.Wrapper>
       <LogoutDrawer
         isActive={activeDrawer === 'logout'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         onConfirm={onConfirmLogout}
       />
     </>

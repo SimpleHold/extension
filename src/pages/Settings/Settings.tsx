@@ -169,6 +169,10 @@ const Settings: React.FC = () => {
     }
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -229,12 +233,12 @@ const Settings: React.FC = () => {
       </Styles.Wrapper>
       <LogoutDrawer
         isActive={activeDrawer === 'logout'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         onConfirm={onConfirmLogout}
       />
       <PasscodeDrawer
         isActive={activeDrawer === 'passcode'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         onConfirm={onConfirmPasscode}
         type={passcodeDrawerType}
         isError={isPasscodeError}

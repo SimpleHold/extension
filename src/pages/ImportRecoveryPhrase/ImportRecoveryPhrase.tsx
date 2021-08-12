@@ -108,6 +108,10 @@ const ImportRecoveryPhrase: React.FC = () => {
     })
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -150,7 +154,7 @@ const ImportRecoveryPhrase: React.FC = () => {
       </Styles.Wrapper>
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         title="Please enter your password to add a new address"
         inputLabel="Enter password"
         textInputValue={password}

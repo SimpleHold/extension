@@ -87,6 +87,10 @@ const RestoreWallet: React.FC = () => {
     }
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -149,7 +153,7 @@ const RestoreWallet: React.FC = () => {
       </Styles.Wrapper>
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         title="Enter your password to restore the wallet."
         textInputValue={password}
         onChangeText={setPassword}
@@ -161,7 +165,7 @@ const RestoreWallet: React.FC = () => {
       />
       <FailDrawer
         isActive={activeDrawer === 'fail'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         text="The backup file is broken. We cannot restore your wallet. Check your backup file and try again."
       />
     </>

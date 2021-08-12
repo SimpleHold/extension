@@ -113,6 +113,10 @@ const RestoreBackup: React.FC = () => {
     }
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   if (!isPageActive) {
     return null
   }
@@ -181,7 +185,7 @@ const RestoreBackup: React.FC = () => {
         </Styles.Body>
         <ConfirmDrawer
           isActive={activeDrawer === 'confirm'}
-          onClose={() => setActiveDrawer(null)}
+          onClose={onCloseDrawer}
           title="Enter the password to restore your wallet"
           textInputValue={password}
           onChangeText={setPassword}
@@ -194,7 +198,7 @@ const RestoreBackup: React.FC = () => {
         />
         <FailDrawer
           isActive={activeDrawer === 'fail'}
-          onClose={() => setActiveDrawer(null)}
+          onClose={onCloseDrawer}
           text="The backup file is broken. We cannot restore your wallet. Check your backup file and try again."
           openFrom="browser"
         />
