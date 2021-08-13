@@ -49,6 +49,8 @@ interface Window {
   }
 }
 
+type TFeeTypes = 'slow' | 'average' | 'fast'
+
 interface UnspentOutput {
   txId: string
   outputIndex: number

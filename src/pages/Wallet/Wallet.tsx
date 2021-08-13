@@ -26,7 +26,7 @@ import {
 } from '@utils/wallet'
 import { getTransactionHistory } from '@utils/api'
 import { openWebPage } from '@utils/extension'
-import { getExplorerLink, getTransactionLink } from '@utils/currencies'
+import { getExplorerLink, getTransactionLink, checkWithPhrase } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
 import { getItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
@@ -40,7 +40,7 @@ import {
 import { logEvent } from '@utils/amplitude'
 
 // Config
-import { getCurrency, checkWithPhrase } from '@config/currencies'
+import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
 import { ADDRESS_RECEIVE_SEND } from '@config/events'
 

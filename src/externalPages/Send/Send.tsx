@@ -3,6 +3,9 @@ import { render } from 'react-dom'
 import { BigNumber } from 'bignumber.js'
 import { browser } from 'webextension-polyfill-ts'
 
+// Components
+import Button from '@components/Button'
+
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
 
@@ -11,7 +14,9 @@ import WalletsDrawer from '@drawers/Wallets'
 import AboutFeeDrawer from '@drawers/AboutFee'
 
 // Shared
+import WalletCardShared from '@shared/WalletCard'
 import SendFormShared from '@shared/SendForm'
+import NetworkFeeShared from '@shared/NetworkFee'
 
 // Utils
 import { getWallets, IWallet } from '@utils/wallet'
@@ -39,7 +44,7 @@ import useDebounce from '@hooks/useDebounce'
 import useState from '@hooks/useState'
 
 // Types
-import { IState, TFees } from './types'
+import { IState } from './types'
 
 // Styles
 import Styles from './styles'
@@ -74,6 +79,7 @@ const initialState: IState = {
   },
   selectedFee: 0,
   activeDrawer: null,
+  feeValues: [],
 }
 
 const Send: React.FC = () => {
@@ -191,7 +197,7 @@ const Send: React.FC = () => {
       const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
       if (currencyInfo) {
-        const customFee = await getFee(symbol, currencyInfo.chain, chain)
+        const customFee = await getFee(symbol, currencyInfo.chain)
 
         if (customFee) {
           updateState({ customFee })
@@ -200,54 +206,7 @@ const Send: React.FC = () => {
     }
   }
 
-  const onGetNetworkFee = async (): Promise<void> => {
-    if (state.selectedWallet) {
-      updateState({ isFeeLoading: true })
-
-      const { symbol, chain, decimals, contractAddress } = state.selectedWallet
-
-      const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
-      const feePrice = state.customFee[state.feeType]
-
-      if (currencyInfo) {
-        const data = await getNetworkFee({
-          symbol,
-          addressFrom: state.selectedWallet.address,
-          addressTo: state.address,
-          chain: currencyInfo.chain,
-          amount: state.amount,
-          tokenChain: chain,
-          btcLikeParams: {
-            outputs: state.outputs,
-            feePerByte: feePrice,
-          },
-          ethLikeParams: {
-            contractAddress,
-            decimals,
-            gasPrice: feePrice,
-          },
-        })
-
-        updateState({ isFeeLoading: false })
-
-        if (data) {
-          if (data?.utxos) {
-            updateState({ utxosList: data.utxos })
-          }
-          if (data.networkFee) {
-            updateState({ fee: data.networkFee })
-          } else {
-            if (Number(state.amount) > 0 && Number(state.balance) > 0) {
-              updateState({ amountErrorLabel: 'Insufficient funds' })
-            }
-          }
-          if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
-            updateState({ currencyBalance: data.currencyBalance })
-          }
-        }
-      }
-    }
-  }
+  const onGetNetworkFee = async (): Promise<void> => {}
 
   const checkProps = () => {
     if (Object.keys(state.props).length) {
@@ -582,7 +541,7 @@ const Send: React.FC = () => {
 
   const openWalletsDrawer = (): void => {}
 
-  const setFeeType = (feeType: TFees): void => {
+  const setFeeType = (feeType: TFeeTypes): void => {
     updateState({ feeType, selectedFee: state.customFee[feeType] })
   }
 
@@ -606,54 +565,58 @@ const Send: React.FC = () => {
   return (
     <ExternalPageContainer onClose={onClose} headerStyle="green" isDraggable={state.isDraggable}>
       <>
-        <Styles.Body>
-          <SendFormShared
-            balance={state.balance}
-            estimated={state.estimated}
-            symbol={state.selectedWallet?.symbol}
-            hardware={state.selectedWallet?.hardware}
-            walletName="{state.walletName}" // Fix me
-            selectedAddress={state.selectedWallet?.address}
-            tokenName={undefined}
-            wallets={state.walletsList}
-            changeWallet={changeWallet}
-            tokenChain={state.selectedWallet?.chain}
-            onCancel={onClose}
-            onConfirm={onConfirm}
-            isDisabled={isButtonDisabled()}
-            address={state.address}
-            setAddress={setAddress}
-            addressErrorLabel={state.addressErrorLabel}
-            openWalletsDrawer={openWalletsDrawer}
-            onGenerateExtraId={onGenerateExtraId}
-            checkAddress={checkAddress}
-            onSendAll={onSendAll}
-            extraIdName={state.extraIdName}
-            extraId={state.extraId}
-            setExtraId={setExtraId}
-            amount={state.amount}
-            setAmount={setAmount}
-            amountErrorLabel={state.amountErrorLabel}
-            checkAmount={checkAmount}
-            isFeeLoading={state.isFeeLoading}
-            fee={state.fee}
-            feeSymbol={state.feeSymbol}
-            feeType={state.feeType}
-            setFeeType={setFeeType}
-            isCurrencyBalanceError={isCurrencyBalanceError}
-            currencyBalance={state.currencyBalance}
-            isCustomFee={state?.currencyInfo?.isCustomFee || false} // Fix me
-            showFeeDrawer={showFeeDrawer}
-            isIncludeFee={state.isIncludeFee}
-            toggleIncludeFee={toggleIncludeFee}
-            customFee={state.customFee}
-            amountLabel={`Amount ${
-              state.selectedWallet ? `(${toUpper(state.selectedWallet?.symbol)})` : ''
-            }`}
-            openFrom="browser"
-            disabled={state.props?.readOnly}
-          />
-        </Styles.Body>
+        <Styles.Container>
+          <Styles.Row>
+            <WalletCardShared
+              balance={state.balance}
+              estimated={state.estimated}
+              symbol={state.selectedWallet?.symbol}
+              hardware={state.selectedWallet?.hardware}
+              walletName="walletName"
+              address={state.selectedWallet?.address}
+              name={undefined}
+              wallets={state.walletsList}
+              changeWallet={changeWallet}
+              tokenChain={undefined}
+            />
+            <SendFormShared
+              balance={state.balance}
+              symbol={state.selectedWallet?.symbol}
+              wallets={state.walletsList}
+              address={state.address}
+              setAddress={setAddress}
+              addressErrorLabel={state.addressErrorLabel}
+              openWalletsDrawer={openWalletsDrawer}
+              onGenerateExtraId={onGenerateExtraId}
+              checkAddress={checkAddress}
+              onSendAll={onSendAll}
+              extraIdName={state.extraIdName}
+              extraId={state.extraId}
+              setExtraId={setExtraId}
+              amount={state.amount}
+              setAmount={setAmount}
+              amountErrorLabel={state.amountErrorLabel}
+              checkAmount={checkAmount}
+            />
+            <NetworkFeeShared
+              isLoading={state.isFeeLoading}
+              fee={state.fee}
+              symbol={state.feeSymbol}
+              type={state.feeType}
+              setType={setFeeType}
+              isBalanceError={isCurrencyBalanceError && state.currencyBalance !== null}
+              withButton={false}
+              isIncludeFee={state.isIncludeFee}
+              toggleIncludeFee={toggleIncludeFee}
+              showFeeDrawer={showFeeDrawer}
+              values={state.feeValues}
+            />
+          </Styles.Row>
+          <Styles.Actions>
+            <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
+            <Button label="Send" onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
+          </Styles.Actions>
+        </Styles.Container>
         <WalletsDrawer
           isActive={state.activeDrawer === 'wallets'}
           onClose={onCloseDrawer}

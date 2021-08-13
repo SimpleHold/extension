@@ -17,7 +17,11 @@ export interface Props {
   extraId?: string
 }
 
-export type TFees = 'slow' | 'average' | 'fast'
+export type TFeeValue = {
+  utxos?: UnspentOutput[]
+  type: TFeeTypes
+  value: number
+}
 
 export interface IState {
   address: string
@@ -41,8 +45,9 @@ export interface IState {
   extraIdName: string
   isDraggable: boolean
   isIncludeFee: boolean
-  feeType: TFees
+  feeType: TFeeTypes
   selectedFee: number
   customFee: TCustomFee
   activeDrawer: 'wallets' | 'aboutFee' | null
+  feeValues: TFeeValue[]
 }

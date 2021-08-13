@@ -33,6 +33,10 @@ export interface IGetNetworkFeeResponse {
   gasPrice?: string
   nonce?: number
   currencyBalance?: number
+  fees?: {
+    type: TFeeTypes
+    value: number
+  }[]
 }
 
 export interface IAdaTrParams {

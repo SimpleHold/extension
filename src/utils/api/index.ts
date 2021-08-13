@@ -170,11 +170,10 @@ export const getEtherNetworkFee = async (
   chain: string,
   tokenSymbol?: string,
   contractAddress?: string,
-  decimals?: number,
-  gasPrice?: number
+  decimals?: number
 ): Promise<IGetNetworkFeeResponse> => {
   try {
-    const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/network-fee`, {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/smart-network-fee`, {
       params: {
         from,
         to,

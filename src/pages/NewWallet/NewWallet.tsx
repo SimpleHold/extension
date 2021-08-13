@@ -17,13 +17,18 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
-import { generate, importPrivateKey, importRecoveryPhrase } from '@utils/currencies'
+import {
+  generate,
+  importPrivateKey,
+  importRecoveryPhrase,
+  checkWithPhrase,
+} from '@utils/currencies'
 import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
-import { getCurrencyByChain, ICurrency, checkWithPhrase } from '@config/currencies'
+import { getCurrencyByChain, ICurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
