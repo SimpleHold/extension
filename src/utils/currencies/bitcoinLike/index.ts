@@ -1,3 +1,8 @@
+// Types
+import { TFeeResponse } from './types'
+import { TCustomFee } from '@utils/api/types'
+import { TCustomFees } from '../types'
+
 export const coins = ['btc', 'bch', 'bsv', 'ltc', 'doge', 'dash']
 
 const getProvider = (symbol: string): BitcoinLikeProvider | null => {
@@ -90,30 +95,47 @@ export const fromSat = (value: number): number => {
 
 export const getNetworkFee = (
   address: string,
-  unspentOutputs: UnspentOutput[],
+  outputs: UnspentOutput[],
   amount: string,
-  feePerByte: number,
+  feeValues: TCustomFee,
   symbol: string
-) => {
-  const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
-  const utxos: UnspentOutput[] = []
+): TFeeResponse | null => {
+  try {
+    const fees: TCustomFees[] = []
 
-  for (const output of sortOutputs) {
-    const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-    const transactionFeeBytes = getFee(address, utxos, amount, feePerByte, symbol)
+    for (const type in feeValues) {
+      const sortOutputs = outputs.sort((a, b) => a.satoshis - b.satoshis)
+      const utxos: UnspentOutput[] = []
 
-    if (getUtxosValue >= toSat(Number(amount)) + transactionFeeBytes) {
-      break
+      // @ts-ignore
+      const getTypeValue = feeValues[type]
+
+      for (const output of sortOutputs) {
+        const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
+        const transactionFeeBytes = getFee(address, utxos, amount, getTypeValue, symbol)
+
+        if (getUtxosValue >= toSat(Number(amount)) + transactionFeeBytes) {
+          break
+        }
+
+        utxos.push(output)
+      }
+
+      const value = fromSat(getFee(address, utxos, amount, getTypeValue, symbol))
+
+      fees.push({
+        // @ts-ignore
+        type,
+        utxos,
+        value,
+      })
     }
 
-    utxos.push(output)
-  }
-
-  const networkFee = fromSat(getFee(address, utxos, amount, feePerByte, symbol))
-
-  return {
-    networkFee,
-    utxos,
+    return {
+      fees,
+    }
+  } catch {
+    return null
   }
 }
 

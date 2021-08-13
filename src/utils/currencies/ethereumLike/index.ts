@@ -7,19 +7,12 @@ import { getToken } from '@config/tokens'
 // Utils
 import { toLower } from '@utils/format'
 
+// Types
+import { TransferTokenOptions } from './types'
+
 const web3 = new Web3()
 
-interface TransferTokenOptions {
-  value: string
-  from: string
-  to: string
-  privateKey: string
-  gasPrice: string
-  gas: number
-  nonce: number
-  chainId: number
-  contractAddress?: string
-}
+export const coins: string[] = ['eth', 'etc', 'bnb']
 
 export const toHex = (value: number): string => {
   return web3.utils.toHex(value)

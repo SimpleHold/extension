@@ -1,3 +1,6 @@
+// Types
+import { TCustomFee } from '@utils/api/types'
+
 export type TProvider = {
   generateWallet: () => TGenerateAddress | null
   validateAddress?: (address: string) => boolean
@@ -44,17 +47,24 @@ export interface IGetFeeParams {
 
 export type TBtcLikeFeeParams = {
   outputs: UnspentOutput[]
-  feePerByte: number
+  customFee: TCustomFee
 }
 
 export type TEthLikeFeeParams = {
   contractAddress?: string
   decimals?: number
-  gasPrice: number
+  fees: TCustomFee
+}
+
+export type TCustomFees = {
+  utxos?: UnspentOutput[]
+  type: TFeeTypes
+  value: number
 }
 
 export type TGetFeeData = {
   networkFee?: number
   utxos?: UnspentOutput[] | CardanoUnspentTxOutput[]
   currencyBalance?: number
+  fees?: TCustomFees[]
 }

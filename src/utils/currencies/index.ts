@@ -11,7 +11,6 @@ import {
   getCustomFee,
 } from '@utils/api'
 import { TCustomFee } from '@utils/api/types'
-import { toLower } from '@utils/format'
 
 // Currencies
 import * as ethereumLike from '@utils/currencies/ethereumLike'
@@ -210,7 +209,7 @@ export const getNetworkFee = async ({
   ethLikeParams,
 }: IGetFeeParams): Promise<TGetFeeData | null> => {
   if (btcLikeParams) {
-    const { outputs, feePerByte } = btcLikeParams
+    const { outputs, customFee } = btcLikeParams
 
     if (cardano.coins.indexOf(symbol) !== -1) {
       return cardano.getNetworkFee(outputs, amount)
@@ -221,12 +220,12 @@ export const getNetworkFee = async ({
     }
 
     if (bitcoinLike.coins.indexOf(symbol) !== -1) {
-      return bitcoinLike.getNetworkFee(addressFrom, outputs, amount, feePerByte, symbol)
+      return bitcoinLike.getNetworkFee(addressFrom, outputs, amount, customFee, symbol)
     }
   }
 
   if (isEthereumLike(symbol, tokenChain)) {
-    const { contractAddress, decimals, gasPrice } = ethLikeParams
+    const { contractAddress, decimals } = ethLikeParams
 
     const value = decimals
       ? ethereumLike.convertDecimals(amount, decimals)
@@ -239,8 +238,7 @@ export const getNetworkFee = async ({
       tokenChain || chain,
       tokenChain ? symbol : undefined,
       contractAddress,
-      decimals,
-      gasPrice
+      decimals
     )
   }
 
@@ -387,13 +385,9 @@ export const checkWithOutputs = (symbol: string): boolean => {
   }
 }
 
-export const getFee = async (
-  symbol: string,
-  chain: string,
-  tokenChain?: string
-): Promise<TCustomFee | null> => {
+export const getFee = async (symbol: string, chain: string): Promise<TCustomFee | null> => {
   try {
-    if (bitcoinLike.coins.indexOf(symbol) !== -1 || isEthereumLike(symbol, tokenChain)) {
+    if (bitcoinLike.coins.indexOf(symbol) !== -1) {
       return await getCustomFee(chain)
     }
     return null
@@ -414,4 +408,12 @@ export const getStandingFee = (symbol: string): number | null => {
   } catch {
     return null
   }
+}
+
+export const checkWithPhrase = (symbol: string): boolean => {
+  if (cardano.coins.indexOf(symbol) !== -1) {
+    return true
+  }
+
+  return false
 }
