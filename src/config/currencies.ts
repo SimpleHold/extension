@@ -99,7 +99,7 @@ const currencies: ICurrency[] = [
     background: '#49803D',
     chain: 'etc',
     minSendAmount: 1000000000000000,
-    isCustomFee: true,
+    isCustomFee: false,
   },
   {
     name: 'Binance Smart Chain',
@@ -172,12 +172,6 @@ export const getCurrency = (symbol: string): ICurrency | undefined => {
 
 export const getCurrencyByChain = (chain: string): ICurrency | undefined => {
   return currencies.find((currency: ICurrency) => toLower(currency.chain) === toLower(chain))
-}
-
-export const checkWithPhrase = (symbol: string): boolean => {
-  const list: string[] = ['ada']
-
-  return list.indexOf(symbol) !== -1
 }
 
 export default currencies
