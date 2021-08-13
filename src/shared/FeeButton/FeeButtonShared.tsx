@@ -12,27 +12,26 @@ import useVisible from '@hooks/useVisible'
 import { toUpper } from '@utils/format'
 
 // Types
-import { TFees } from '../../types'
-import { TCustomFee } from '@utils/api/types'
+import { TFeeValue } from '../types'
 
 // Styles
 import Styles from './styles'
 
 interface Props {
-  type: TFees
-  onChange: (value: TFees) => void
+  type: TFeeTypes
+  onChange: (value: TFeeTypes) => void
   isError: boolean
   isLoading: boolean
   fee: number
   withButton: boolean
   symbol: string
-  customFee: TCustomFee
+  values: TFeeValue[]
 }
 
-const feeTypes: TFees[] = ['slow', 'average', 'fast']
+const feeTypes: TFeeTypes[] = ['slow', 'average', 'fast']
 
-const FeeButton: React.FC<Props> = (props) => {
-  const { type, onChange, isError, isLoading, fee, withButton, symbol, customFee } = props
+const FeeButtonShared: React.FC<Props> = (props) => {
+  const { type, onChange, isError, isLoading, fee, withButton, symbol, values } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
@@ -42,7 +41,7 @@ const FeeButton: React.FC<Props> = (props) => {
     }
   }
 
-  const onClickItem = (item: TFees) => (): void => {
+  const onClickItem = (item: TFeeTypes) => (): void => {
     onChange(item)
     setIsVisible(false)
   }
@@ -81,19 +80,23 @@ const FeeButton: React.FC<Props> = (props) => {
       {withButton ? (
         <Styles.List isVisible={isVisible}>
           {feeTypes
-            .filter((feeType: TFees) => toUpper(feeType) !== toUpper(type))
-            .map((item: TFees) => (
-              <Styles.ListItem key={item} onClick={onClickItem(item)}>
-                <Styles.ListItemLabel className="fee-type">{item}</Styles.ListItemLabel>
-                <Styles.ListItemValue>
-                  {customFee[item] || '-'} {toUpper(symbol)}
-                </Styles.ListItemValue>
-              </Styles.ListItem>
-            ))}
+            .filter((feeType: TFeeTypes) => toUpper(feeType) !== toUpper(type))
+            .map((item: TFeeTypes) => {
+              const getFee = values.find((value: TFeeValue) => value.type === item)
+
+              return (
+                <Styles.ListItem key={item} onClick={onClickItem(item)}>
+                  <Styles.ListItemLabel className="fee-type">{item}</Styles.ListItemLabel>
+                  <Styles.ListItemValue>
+                    {getFee?.value ? getFee.value : '-'} {toUpper(symbol)}
+                  </Styles.ListItemValue>
+                </Styles.ListItem>
+              )
+            })}
         </Styles.List>
       ) : null}
     </Styles.Container>
   )
 }
 
-export default FeeButton
+export default FeeButtonShared
