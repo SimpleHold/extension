@@ -42,9 +42,7 @@ const CurrenciesTab: React.FC<Props> = (props) => {
       />
 
       {!filterCurrenciesList.length ? (
-        <Styles.NotFoundMessage>
-          The currency was not found but you can add a custom token
-        </Styles.NotFoundMessage>
+        <Styles.NotFoundMessage>The currency was not found</Styles.NotFoundMessage>
       ) : null}
 
       <Styles.CurrenciesList>

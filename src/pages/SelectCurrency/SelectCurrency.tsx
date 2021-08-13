@@ -7,6 +7,7 @@ import Header from '@components/Header'
 import Tabs from '@components/Tabs'
 
 // Tabs
+import AllTab from './tabs/allTab'
 import CurrenciesTab from './tabs/currenciesTab'
 import TokensTab from './tabs/tokensTab'
 import HardwareTab from './tabs/hardwareTab'
@@ -27,7 +28,7 @@ import Styles from './styles'
 const SelectCurrency: React.FC = () => {
   const history = useHistory()
 
-  const [activeTabKey, setActiveTabKey] = React.useState<string>('currencies')
+  const [activeTabKey, setActiveTabKey] = React.useState<string>('all')
 
   const getWarning = (symbol: string): string | undefined => {
     if (theta.coins.indexOf(symbol) !== -1) {
@@ -79,6 +80,7 @@ const SelectCurrency: React.FC = () => {
   const onAddCustomToken = (): void => {
     history.push('/add-custom-token')
   }
+
   const onSelectTab = (tabKey: string) => (): void => {
     setActiveTabKey(tabKey)
   }
@@ -92,6 +94,17 @@ const SelectCurrency: React.FC = () => {
   }
 
   const tabs = [
+    {
+      title: 'All',
+      key: 'all',
+      renderItem: (
+        <AllTab
+          onAddCustomToken={onAddCustomToken}
+          onAddToken={onAddToken}
+          onAddAddress={onAddAddress}
+        />
+      ),
+    },
     {
       title: 'Currencies',
       key: 'currencies',
