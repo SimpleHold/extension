@@ -24,36 +24,31 @@ import { getItem, setItem, removeItem, removeMany } from '@utils/storage'
 // Config
 import { BACKUP_SETTINGS, PASSCODE_ENABLED, PASSCODE_DISABLED } from '@config/events'
 
+// Hooks
+import useState from '@hooks/useState'
+
 // Icons
 import cloudIcon from '@assets/icons/cloud.svg'
 import linkIcon from '@assets/icons/link.svg'
 
+// Types
+import { IList, IState } from './types'
+
 // Styles
 import Styles from './styles'
 
-interface List {
-  isButton?: boolean
-  title: string
-  text?: string
-  icon?: {
-    source: string
-    width: number
-    height: number
-  }
-  onClick?: () => void
-  withSwitch?: boolean
-  switchValue?: boolean
-  onToggle?: () => void
+const initialState: IState = {
+  activeDrawer: null,
+  passcodeDrawerType: 'create',
+  isPasscodeError: false,
+  isDownloadManually: false,
+  version: '1',
 }
 
 const Settings: React.FC = () => {
   const history = useHistory()
 
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'passcode' | 'logout'>(null)
-  const [passcodeDrawerType, setPasscodeDrawerType] = React.useState<'create' | 'remove'>('create')
-  const [isPasscodeError, setIsPasscodeError] = React.useState<boolean>(false)
-  const [isDownloadManually, setDownloadManually] = React.useState<boolean>(false)
-  const [version, setVersion] = React.useState<string>('1')
+  const { state, updateState } = useState<IState>(initialState)
 
   React.useEffect(() => {
     checkBrowserAndOS()
@@ -61,8 +56,8 @@ const Settings: React.FC = () => {
   }, [])
 
   const getManifestInfo = () => {
-    const data = getManifest()
-    setVersion(data.version)
+    const { version } = getManifest()
+    updateState({ version })
   }
 
   const checkBrowserAndOS = () => {
@@ -70,12 +65,12 @@ const Settings: React.FC = () => {
     const browser = detectBrowser()
 
     if (os === 'macos' && browser === 'chrome') {
-      setDownloadManually(true)
+      updateState({ isDownloadManually: true })
     }
   }
 
   const onDownloadBackup = async () => {
-    if (isDownloadManually) {
+    if (state.isDownloadManually) {
       openWebPage(getUrl('download-backup.html'))
     } else {
       const backup = getItem('backup')
@@ -91,19 +86,21 @@ const Settings: React.FC = () => {
 
   const togglePasscode = (): void => {
     const getPasscode = getItem('passcode')
-    setPasscodeDrawerType(getPasscode !== null ? 'remove' : 'create')
 
-    setActiveDrawer('passcode')
+    updateState({
+      activeDrawer: 'passcode',
+      passcodeDrawerType: getPasscode !== null ? 'remove' : 'create',
+    })
   }
 
-  const list: List[] = [
+  const list: IList[] = [
     {
       isButton: true,
       title: 'Download the backup',
       icon: {
-        source: isDownloadManually ? linkIcon : cloudIcon,
-        width: isDownloadManually ? 16 : 22,
-        height: isDownloadManually ? 16 : 14,
+        source: state.isDownloadManually ? linkIcon : cloudIcon,
+        width: state.isDownloadManually ? 16 : 22,
+        height: state.isDownloadManually ? 16 : 14,
       },
       onClick: onDownloadBackup,
     },
@@ -127,7 +124,7 @@ const Settings: React.FC = () => {
   ]
 
   const onLogout = (): void => {
-    setActiveDrawer('logout')
+    updateState({ activeDrawer: 'logout' })
   }
 
   const onConfirmLogout = (): void => {
@@ -144,24 +141,21 @@ const Settings: React.FC = () => {
   }
 
   const onConfirmPasscode = (passcode: string) => {
-    if (passcodeDrawerType === 'remove') {
+    if (state.passcodeDrawerType === 'remove') {
       if (sha256hash(passcode) === getItem('passcode')) {
         removeItem('passcode')
-
-        setActiveDrawer(null)
-        setPasscodeDrawerType('create')
+        updateState({ activeDrawer: null, passcodeDrawerType: 'create' })
 
         logEvent({
           name: PASSCODE_DISABLED,
         })
       } else {
-        setIsPasscodeError(true)
+        updateState({ isPasscodeError: true })
       }
     } else {
       setItem('passcode', sha256hash(passcode))
 
-      setActiveDrawer(null)
-      setPasscodeDrawerType('remove')
+      updateState({ activeDrawer: null, passcodeDrawerType: 'remove' })
 
       logEvent({
         name: PASSCODE_ENABLED,
@@ -170,7 +164,11 @@ const Settings: React.FC = () => {
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
+  }
+
+  const setIsPasscodeError = (isPasscodeError: boolean): void => {
+    updateState({ isPasscodeError })
   }
 
   return (
@@ -183,7 +181,7 @@ const Settings: React.FC = () => {
             <Styles.Title>Settings</Styles.Title>
 
             <Styles.List>
-              {list.map((list: List) => {
+              {list.map((list: IList) => {
                 const {
                   isButton,
                   title,
@@ -223,7 +221,7 @@ const Settings: React.FC = () => {
 
             <Styles.ExtensionInfo>
               <Styles.CopyRight>© 2021 SimpleHold</Styles.CopyRight>
-              <Styles.Version>Version {version}</Styles.Version>
+              <Styles.Version>Version {state.version}</Styles.Version>
             </Styles.ExtensionInfo>
           </Styles.Row>
           <Styles.Actions>
@@ -232,16 +230,16 @@ const Settings: React.FC = () => {
         </Styles.Container>
       </Styles.Wrapper>
       <LogoutDrawer
-        isActive={activeDrawer === 'logout'}
+        isActive={state.activeDrawer === 'logout'}
         onClose={onCloseDrawer}
         onConfirm={onConfirmLogout}
       />
       <PasscodeDrawer
-        isActive={activeDrawer === 'passcode'}
+        isActive={state.activeDrawer === 'passcode'}
         onClose={onCloseDrawer}
         onConfirm={onConfirmPasscode}
-        type={passcodeDrawerType}
-        isError={isPasscodeError}
+        type={state.passcodeDrawerType}
+        isError={state.isPasscodeError}
         setIsError={setIsPasscodeError}
       />
     </>

@@ -14,7 +14,7 @@ interface Props {
   onConfirm: (passcode: string) => void
   type: 'create' | 'remove'
   isError: boolean
-  setIsError: React.Dispatch<React.SetStateAction<boolean>>
+  setIsError: (isError: boolean) => void
 }
 
 const PasscodeDrawer: React.FC<Props> = (props) => {

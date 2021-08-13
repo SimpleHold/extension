@@ -30,25 +30,25 @@ import { getItem, setItem } from '@utils/storage'
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
 import { getCurrencyByChain, ICurrency } from '@config/currencies'
 
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { ILocationState, IState } from './types'
+
 // Styles
 import Styles from './styles'
 
-interface LocationState {
-  symbol: string
-  warning?: string
-  backTitle?: string
-  chain?: string
-  tokenName?: string
-  contractAddress?: string
-  decimals?: number
+const initialState: IState = {
+  privateKey: null,
+  activeDrawer: null,
+  password: '',
+  errorLabel: null,
+  mnemonic: null,
 }
 
 const NewWallet: React.FC = () => {
-  const [privateKey, setPrivateKey] = React.useState<null | string>(null)
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
-  const [password, setPassword] = React.useState<string>('')
-  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
-  const [mnemonic, setMnemonic] = React.useState<null | string>(null)
+  const { state, updateState } = useState<IState>(initialState)
 
   const history = useHistory()
   const {
@@ -61,7 +61,7 @@ const NewWallet: React.FC = () => {
       contractAddress = undefined,
       decimals = undefined,
     },
-  } = useLocation<LocationState>()
+  } = useLocation<ILocationState>()
 
   const onGenerateAddress = (): void => {
     logEvent({
@@ -71,14 +71,13 @@ const NewWallet: React.FC = () => {
     const generateAddress = generate(symbol, chain)
 
     if (generateAddress) {
-      const { privateKey: walletPrivateKey, mnemonic: walletMnemonic } = generateAddress
+      const { privateKey, mnemonic } = generateAddress
 
-      if (walletMnemonic) {
-        setMnemonic(walletMnemonic)
+      if (mnemonic) {
+        updateState({ mnemonic })
       }
 
-      setPrivateKey(walletPrivateKey)
-      setActiveDrawer('confirm')
+      updateState({ privateKey, activeDrawer: 'confirm' })
     }
   }
 
@@ -106,22 +105,22 @@ const NewWallet: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    if (validatePassword(password)) {
+    if (validatePassword(state.password)) {
       const backup = getItem('backup')
 
-      if (backup && privateKey) {
-        const decryptBackup = decrypt(backup, password)
+      if (backup && state.privateKey) {
+        const decryptBackup = decrypt(backup, state.password)
 
         if (decryptBackup) {
           let address
 
-          if (mnemonic) {
-            const tryImportPhrase = importRecoveryPhrase(symbol, mnemonic)
+          if (state.mnemonic) {
+            const tryImportPhrase = importRecoveryPhrase(symbol, state.mnemonic)
             if (tryImportPhrase) {
               address = tryImportPhrase.address
             }
           } else {
-            address = importPrivateKey(symbol, privateKey, chain)
+            address = importPrivateKey(symbol, state.privateKey, chain)
           }
 
           if (address) {
@@ -130,16 +129,16 @@ const NewWallet: React.FC = () => {
 
             const walletsList = addNewWallet(
               address,
-              privateKey,
+              state.privateKey,
               decryptBackup,
-              password,
+              state.password,
               currenciesList,
               false,
               chain,
               tokenName,
               contractAddress,
               decimals,
-              mnemonic
+              state.mnemonic
             )
 
             if (walletsList) {
@@ -153,22 +152,21 @@ const NewWallet: React.FC = () => {
                 name: ADD_ADDRESS_CONFIRM,
               })
 
-              setPrivateKey(null)
-
               setItem('backupStatus', 'notDownloaded')
 
-              return setActiveDrawer('success')
+              updateState({ privateKey: null, activeDrawer: 'success' })
+              return
             }
           }
         }
       }
     }
-    return setErrorLabel('Password is not valid')
+    updateState({ errorLabel: 'Password is not valid' })
   }
 
   const onDownloadBackup = (): void => {
     return history.replace('/download-backup', {
-      password,
+      password: state.password,
       from: 'newWallet',
     })
   }
@@ -180,7 +178,11 @@ const NewWallet: React.FC = () => {
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
   }
 
   return (
@@ -240,19 +242,19 @@ const NewWallet: React.FC = () => {
         </Styles.Container>
       </Styles.Wrapper>
       <ConfirmDrawer
-        isActive={activeDrawer === 'confirm'}
+        isActive={state.activeDrawer === 'confirm'}
         onClose={onCloseDrawer}
         title="Please enter your password to add a new address"
         inputLabel="Enter password"
-        textInputValue={password}
-        isButtonDisabled={!validatePassword(password)}
+        textInputValue={state.password}
+        isButtonDisabled={!validatePassword(state.password)}
         onConfirm={onConfirm}
         onChangeText={setPassword}
         textInputType="password"
-        inputErrorLabel={errorLabel}
+        inputErrorLabel={state.errorLabel}
       />
       <SuccessDrawer
-        isActive={activeDrawer === 'success'}
+        isActive={state.activeDrawer === 'success'}
         onClose={onDownloadBackup}
         text="The new address has been successfully added!"
       />

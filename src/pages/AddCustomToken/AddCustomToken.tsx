@@ -59,7 +59,7 @@ const initialState: IState = {
 const AddCustomToken: React.FC = () => {
   const history = useHistory()
   const { state: locationState } = useLocation<ILocationState>()
-  const { state, updateState } = useState(initialState)
+  const { state, updateState } = useState<IState>(initialState)
   const debounced = useDebounce(state.contractAddress, 1000)
   const useToast = useToastContext()
 

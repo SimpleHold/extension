@@ -26,39 +26,46 @@ import { getItem, setItem, removeItem } from '@utils/storage'
 // Config
 import { START_RESTORE_CONFIRM, START_RESTORE_PASSWORD } from '@config/events'
 
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { IState } from './types'
+
 // Icons
 import puzzleIcon from '../../assets/modalIcons/puzzle.svg'
 
 // Styles
 import Styles from './styles'
 
+const initialState: IState = {
+  isAgreed: true,
+  isFileBroken: false,
+  backupData: '',
+  activeDrawer: null,
+  password: '',
+  passwordErrorLabel: null,
+  isPageActive: false,
+}
+
 const RestoreBackup: React.FC = () => {
-  const [isAgreed, setIsAgreed] = React.useState<boolean>(true)
-  const [isFileBroken, setFileBroken] = React.useState<boolean>(false)
-  const [backupData, setBackupData] = React.useState<string>('')
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'fail' | 'success'>(
-    null
-  )
-  const [password, setPassword] = React.useState<string>('')
-  const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
-  const [isPageActive, setPageActive] = React.useState<boolean>(false)
+  const { state, updateState } = useState<IState>(initialState)
 
   React.useEffect(() => {
     if (getItem('manualRestoreBackup') === 'active') {
-      setPageActive(true)
+      updateState({ isPageActive: true })
     }
   }, [])
 
   const onDrop = React.useCallback(async (acceptedFiles) => {
-    setFileBroken(false)
-    setBackupData('')
+    updateState({ isFileBroken: false, backupData: '' })
 
     const text = await acceptedFiles[0]?.text()
 
     if (text?.length > 0 && acceptedFiles[0].name.indexOf('.dat') !== -1) {
-      setBackupData(text)
+      updateState({ backupData: text })
     } else {
-      setFileBroken(true)
+      updateState({ isFileBroken: true })
     }
   }, [])
 
@@ -73,7 +80,7 @@ const RestoreBackup: React.FC = () => {
       name: START_RESTORE_CONFIRM,
     })
 
-    setActiveDrawer('confirm')
+    updateState({ activeDrawer: 'confirm' })
   }
 
   const onConfirmRestore = (): void => {
@@ -81,43 +88,51 @@ const RestoreBackup: React.FC = () => {
       name: START_RESTORE_PASSWORD,
     })
 
-    if (passwordErrorLabel) {
-      setPasswordErrorLabel(null)
+    if (state.passwordErrorLabel) {
+      updateState({ passwordErrorLabel: null })
     }
 
-    if (!validatePassword(password)) {
-      return setPasswordErrorLabel('Password is not valid')
+    if (!validatePassword(state.password)) {
+      return updateState({ passwordErrorLabel: 'Password is not valid' })
     }
 
-    if (backupData) {
-      const decryptBackup = decrypt(backupData, password)
+    if (state.backupData) {
+      const decryptBackup = decrypt(state.backupData, state.password)
 
       if (decryptBackup === null) {
-        setPasswordErrorLabel('Password is not valid')
+        updateState({ passwordErrorLabel: 'Password is not valid' })
       } else {
         const getWalletsList = validateBackup(decryptBackup)
 
         if (getWalletsList) {
-          setItem('backup', backupData)
+          setItem('backup', state.backupData)
           setItem('wallets', getWalletsList)
           removeItem('manualRestoreBackup')
 
           setBadgeBackgroundColor('#EB5757')
           setBadgeText('1')
 
-          setActiveDrawer('success')
+          updateState({ activeDrawer: 'success' })
         } else {
-          setActiveDrawer('fail')
+          updateState({ activeDrawer: 'fail' })
         }
       }
     }
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
   }
 
-  if (!isPageActive) {
+  const toggleAgreed = (): void => {
+    updateState({ isAgreed: !state.isAgreed })
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
+  }
+
+  if (!state.isPageActive) {
     return null
   }
 
@@ -127,13 +142,13 @@ const RestoreBackup: React.FC = () => {
         <Styles.Body>
           <Styles.Title>Restore</Styles.Title>
 
-          <Styles.DNDArea {...getRootProps()} isFileBroken={isFileBroken}>
+          <Styles.DNDArea {...getRootProps()} isFileBroken={state.isFileBroken}>
             <input {...getInputProps({ multiple: false })} />
             <Styles.FileIconRow>
-              {isFileBroken || backupData.length ? (
+              {state.isFileBroken || state.backupData.length ? (
                 <SVG
                   src={
-                    isFileBroken
+                    state.isFileBroken
                       ? '../../assets/icons/invalidFile.svg'
                       : '../../assets/icons/fileUploaded.svg'
                   }
@@ -145,9 +160,12 @@ const RestoreBackup: React.FC = () => {
               )}
             </Styles.FileIconRow>
 
-            {isFileBroken || backupData.length > 0 ? (
-              <Styles.DNDText isFileBroken={isFileBroken} isFileUploaded={backupData.length > 0}>
-                {isFileBroken
+            {state.isFileBroken || state.backupData.length > 0 ? (
+              <Styles.DNDText
+                isFileBroken={state.isFileBroken}
+                isFileUploaded={state.backupData.length > 0}
+              >
+                {state.isFileBroken
                   ? 'The chosen file is invalid or broken, please pick another one.'
                   : 'The backup file is successfully loaded'}
               </Styles.DNDText>
@@ -158,14 +176,14 @@ const RestoreBackup: React.FC = () => {
             )}
           </Styles.DNDArea>
 
-          <AgreeTerms isAgreed={isAgreed} setIsAgreed={() => setIsAgreed(!isAgreed)} mt={20} />
+          <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
 
           <Styles.Actions>
             <Button label="Cancel" onClick={onClose} isLight mr={7.5} />
             <Button
               label="Confirm"
               onClick={onConfirm}
-              disabled={!backupData.length || !isAgreed}
+              disabled={!state.backupData.length || !state.isAgreed}
               ml={7.5}
             />
           </Styles.Actions>
@@ -184,26 +202,26 @@ const RestoreBackup: React.FC = () => {
           </Styles.Answer>
         </Styles.Body>
         <ConfirmDrawer
-          isActive={activeDrawer === 'confirm'}
+          isActive={state.activeDrawer === 'confirm'}
           onClose={onCloseDrawer}
           title="Enter the password to restore your wallet"
-          textInputValue={password}
+          textInputValue={state.password}
           onChangeText={setPassword}
           onConfirm={onConfirmRestore}
           textInputType="password"
           inputLabel="Enter password"
-          isButtonDisabled={!validatePassword(password)}
-          inputErrorLabel={passwordErrorLabel}
+          isButtonDisabled={!validatePassword(state.password)}
+          inputErrorLabel={state.passwordErrorLabel}
           openFrom="browser"
         />
         <FailDrawer
-          isActive={activeDrawer === 'fail'}
+          isActive={state.activeDrawer === 'fail'}
           onClose={onCloseDrawer}
           text="The backup file is broken. We cannot restore your wallet. Check your backup file and try again."
           openFrom="browser"
         />
         <SuccessDrawer
-          isActive={activeDrawer === 'success'}
+          isActive={state.activeDrawer === 'success'}
           onClose={() => null}
           icon={puzzleIcon}
           text="We successfully restored your wallet. Go to the extension by clicking on the SimpleHold icon in the extensions menu and enjoy your crypto!"

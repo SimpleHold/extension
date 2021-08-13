@@ -13,6 +13,7 @@ import FilterWalletsDrawer from '@drawers/FilterWallets'
 // Hooks
 import useScroll from '@hooks/useScroll'
 import useToastContext from '@hooks/useToastContext'
+import useState from '@hooks/useState'
 
 // Utils
 import { IWallet, getWallets, sortWallets, filterWallets, getWalletName } from '@utils/wallet'
@@ -23,25 +24,27 @@ import { clear } from '@utils/storage'
 // Config
 import { ADD_ADDRESS, BALANCE_CHANGED } from '@config/events'
 
+// Types
+import { ILocationState, IState } from './types'
+
 // Styles
 import Styles from './styles'
 
-interface LocationState {
-  status?: string
+const initialState: IState = {
+  wallets: null,
+  totalBalance: null,
+  totalEstimated: null,
+  walletsBalance: [],
+  walletsEstimated: [],
+  walletsPending: [],
+  pendingBalance: null,
+  activeDrawer: null,
 }
 
 const Wallets: React.FC = () => {
   const history = useHistory()
-  const { state } = useLocation<LocationState>()
-
-  const [wallets, setWallets] = React.useState<null | IWallet[]>(null)
-  const [totalBalance, setTotalBalance] = React.useState<number | null>(null)
-  const [totalEstimated, setTotalEstimated] = React.useState<number | null>(null)
-  const [walletsBalance, setWalletsBalance] = React.useState<number[]>([])
-  const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
-  const [walletsPending, setWalletsPending] = React.useState<number[]>([])
-  const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
-  const [activeDrawer, setActiveDrawer] = React.useState<'sort' | 'filters' | null>(null)
+  const { state: locationState } = useLocation<ILocationState>()
+  const { state, updateState } = useState<IState>(initialState)
 
   const { scrollPosition } = useScroll()
   const addToast = useToastContext()
@@ -52,52 +55,58 @@ const Wallets: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
-    if (wallets?.length === 0 && totalBalance === null && totalEstimated === null) {
-      setTotalBalance(0)
-      setTotalEstimated(0)
+    if (
+      state.wallets?.length === 0 &&
+      state.totalBalance === null &&
+      state.totalEstimated === null
+    ) {
+      updateState({
+        totalBalance: 0,
+        totalEstimated: 0,
+      })
     }
-  }, [wallets, totalBalance, totalEstimated])
+  }, [state.wallets, state.totalBalance, state.totalEstimated])
 
   React.useEffect(() => {
-    if (state?.status === 'passcodeTurnedOff') {
+    if (locationState?.status === 'passcodeTurnedOff') {
       addToast('Your passcode is disabled now. You can turn it on in settings.')
     }
-  }, [state])
+  }, [locationState])
 
   React.useEffect(() => {
-    if (walletsBalance.length === wallets?.length && totalBalance === null) {
-      setTotalBalance(walletsBalance.reduce((a, b) => a + b, 0))
+    if (state.walletsBalance.length === state.wallets?.length && state.totalBalance === null) {
+      updateState({ totalBalance: state.walletsBalance.reduce((a, b) => a + b, 0) })
     }
-  }, [walletsBalance, totalBalance])
+  }, [state.walletsBalance, state.totalBalance])
 
   React.useEffect(() => {
-    if (walletsEstimated.length === wallets?.length && totalEstimated === null) {
-      setTotalEstimated(walletsEstimated.reduce((a, b) => a + b, 0))
+    if (state.walletsEstimated.length === state.wallets?.length && state.totalEstimated === null) {
+      updateState({ totalEstimated: state.walletsEstimated.reduce((a, b) => a + b, 0) })
     }
-  }, [walletsEstimated, totalEstimated])
+  }, [state.walletsEstimated, state.totalEstimated])
 
   React.useEffect(() => {
-    if (walletsPending.length === wallets?.length && pendingBalance === null) {
-      setPendingBalance(walletsPending.reduce((a, b) => a + b, 0))
+    if (state.walletsPending.length === state.wallets?.length && state.pendingBalance === null) {
+      updateState({ pendingBalance: state.walletsPending.reduce((a, b) => a + b, 0) })
     }
-  }, [walletsPending, pendingBalance])
+  }, [state.walletsPending, state.pendingBalance])
 
   React.useEffect(() => {
-    if (totalBalance !== null && totalEstimated !== null) {
-      const getLatesTotalBalance = wallets?.reduce((a, b) => {
+    if (state.totalBalance !== null && state.totalEstimated !== null) {
+      const getLatesTotalBalance = state.wallets?.reduce((a, b) => {
         if (b.balance_btc) {
           return a + b.balance_btc
         }
         return 0
       }, 0)
 
-      if (getLatesTotalBalance !== totalBalance) {
+      if (getLatesTotalBalance !== state.totalBalance) {
         logEvent({
           name: BALANCE_CHANGED,
         })
       }
     }
-  }, [totalBalance, totalEstimated])
+  }, [state.totalBalance, state.totalEstimated])
 
   const checkBadgeText = async () => {
     const text = await getBadgeText()
@@ -108,12 +117,12 @@ const Wallets: React.FC = () => {
   }
 
   const getWalletsList = () => {
-    setWallets(null)
+    updateState({ wallets: null })
 
     const walletsList = getWallets()
 
     if (walletsList) {
-      setWallets(walletsList.filter(filterWallets).sort(sortWallets))
+      updateState({ wallets: walletsList.filter(filterWallets).sort(sortWallets) })
     } else {
       clear()
       history.push('/welcome')
@@ -129,23 +138,23 @@ const Wallets: React.FC = () => {
   }
 
   const sumBalance = (amount: number) => {
-    setWalletsBalance((prevArray: number[]) => [...prevArray, amount])
+    updateState({ walletsBalance: [...state.walletsBalance, amount] })
   }
 
   const sumEstimated = (amount: number) => {
-    setWalletsEstimated((prevArray: number[]) => [...prevArray, amount])
+    updateState({ walletsEstimated: [...state.walletsEstimated, amount] })
   }
 
   const sumPending = (amount: number) => {
-    setWalletsPending((prevArray: number[]) => [...prevArray, amount])
+    updateState({ walletsPending: [...state.walletsPending, amount] })
   }
 
-  const onShowDrawer = (drawerType: 'sort' | 'filters'): void => {
-    setActiveDrawer(drawerType)
+  const onShowDrawer = (activeDrawer: 'sort' | 'filters'): void => {
+    updateState({ activeDrawer })
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
   }
 
   const onApplyDrawer = (): void => {
@@ -158,16 +167,16 @@ const Wallets: React.FC = () => {
       <Styles.Wrapper>
         <CollapsibleHeader
           scrollPosition={scrollPosition}
-          balance={totalBalance}
-          estimated={totalEstimated}
-          pendingBalance={pendingBalance}
+          balance={state.totalBalance}
+          estimated={state.totalEstimated}
+          pendingBalance={state.pendingBalance}
           onShowDrawer={onShowDrawer}
-          isDrawersActive={activeDrawer !== null}
+          isDrawersActive={state.activeDrawer !== null}
         />
-        {wallets !== null ? (
+        {state.wallets !== null ? (
           <Styles.WalletsList>
-            {wallets?.length
-              ? wallets.map((wallet: IWallet) => {
+            {state.wallets?.length
+              ? state.wallets.map((wallet: IWallet) => {
                   const {
                     address,
                     symbol,
@@ -180,8 +189,10 @@ const Wallets: React.FC = () => {
                     hardware,
                   } = wallet
 
-                  const walletName =
-                    wallet.walletName || getWalletName(wallets, symbol, uuid, hardware, chain, name)
+                  const walletName = state.wallets
+                    ? wallet.walletName ||
+                      getWalletName(state.wallets, symbol, uuid, hardware, chain, name)
+                    : ''
 
                   return (
                     <WalletCard
@@ -203,7 +214,7 @@ const Wallets: React.FC = () => {
                   )
                 })
               : null}
-            {wallets.length === 0 ? (
+            {state.wallets.length === 0 ? (
               <Styles.NotFound>Nothing was found for the specified parameters</Styles.NotFound>
             ) : null}
             <Styles.AddWalletButton onClick={onAddNewAddress}>
@@ -218,12 +229,12 @@ const Wallets: React.FC = () => {
         ) : null}
       </Styles.Wrapper>
       <SortWalletsDrawer
-        isActive={activeDrawer === 'sort'}
+        isActive={state.activeDrawer === 'sort'}
         onClose={onCloseDrawer}
         onApply={onApplyDrawer}
       />
       <FilterWalletsDrawer
-        isActive={activeDrawer === 'filters'}
+        isActive={state.activeDrawer === 'filters'}
         onClose={onCloseDrawer}
         onApply={onApplyDrawer}
       />

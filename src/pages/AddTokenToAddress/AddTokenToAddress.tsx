@@ -52,7 +52,7 @@ const AddTokenToAddress: React.FC = () => {
     },
   } = useLocation<ILocationState>()
 
-  const { state, updateState } = useState(initialState)
+  const { state, updateState } = useState<IState>(initialState)
 
   const getCurrencyInfo = getCurrencyByChain(chain)
 

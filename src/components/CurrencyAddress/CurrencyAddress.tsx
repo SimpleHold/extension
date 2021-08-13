@@ -24,13 +24,13 @@ interface Props {
 const CurrencyAddress: React.FC<Props> = (props) => {
   const { symbol, address, isSelected, onToggle, isDisabled } = props
 
-  const currency = getCurrency(symbol)
-
   const [balance, setBalance] = React.useState<null | number>(null)
 
   React.useEffect(() => {
     onGetBalance()
   }, [])
+
+  const currency = getCurrency(symbol)
 
   const onGetBalance = async (): Promise<void> => {
     const request = await getBalance(address, currency?.chain)

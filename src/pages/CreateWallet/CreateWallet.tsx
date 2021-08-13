@@ -48,7 +48,7 @@ const initialState: IState = {
 const Wallets: React.FC = () => {
   const history = useHistory()
 
-  const { state, updateState } = useState(initialState)
+  const { state, updateState } = useState<IState>(initialState)
 
   const passwordInputRef = React.useRef<HTMLInputElement>(null)
 

@@ -14,48 +14,11 @@ import { getCurrencyByChain } from '@config/currencies'
 // Hooks
 import useVisible from '@hooks/useVisible'
 
+// Types
+import { Props, TList, TSelectedCurrency } from './types'
+
 // Styles
 import Styles from './styles'
-
-export type TList = {
-  logo?: {
-    symbol: string
-    width: number
-    height: number
-    br: number
-    background?: string
-    chain?: string
-    name?: string
-  }
-  value: string
-  label?: string
-  withRadioButton?: boolean
-}
-
-type TSelectedCurrency = {
-  symbol?: string
-  chain?: string
-}
-
-interface Props {
-  currencySymbol?: string
-  list: TList[]
-  onSelect?: (index: number) => void
-  label?: string
-  value?: string
-  disabled?: boolean
-  currencyBr?: number
-  background?: string
-  tokenChain?: string
-  tokenName?: string
-  toggleRadioButton?: (value: string) => void
-  selectedCurrencies?: TSelectedCurrency[]
-  renderRow?: React.ReactElement<any, any> | null
-  padding?: string
-  withActions?: boolean
-  onResetDropdown?: () => void
-  onClose?: () => void
-}
 
 const CurrenciesDropdown: React.FC<Props> = (props) => {
   const {

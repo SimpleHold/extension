@@ -14,14 +14,11 @@ import { getCurrency } from '@config/currencies'
 import { getBTCAddress, getETHAddress, getXRPAddress, requestTransport } from '@utils/ledger'
 import { toLower } from '@utils/format'
 
+// Types
+import { TSelectedAddress } from './types'
+
 // Styles
 import Styles from './styles'
-
-type TSelectedAddress = {
-  address: string
-  path: string
-  symbol: string
-}
 
 interface Props {
   symbol: string

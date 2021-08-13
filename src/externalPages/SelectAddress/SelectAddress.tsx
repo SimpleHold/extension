@@ -19,27 +19,23 @@ import { getItem, removeItem } from '@utils/storage'
 import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
+// Types
+import { IState } from './types'
+
 // Styles
 import Styles from './styles'
+import useState from 'hooks/useState'
 
-type TSelectedCurrency = {
-  symbol: string
-  name: string
-  background: string
-  chain?: string
-}
-
-type TabInfo = {
-  favIconUrl: string
-  url: string
+const initialState: IState = {
+  wallets: null,
+  isFiltersActive: false,
+  selectedCurrency: null,
+  tabInfo: null,
+  isDraggable: false,
 }
 
 const SelectAddress: React.FC = () => {
-  const [wallets, setWallets] = React.useState<null | IWallet[]>(null)
-  const [isFiltersActive, setFiltersActive] = React.useState<boolean>(false)
-  const [selectedCurrency, setSelectedCurrency] = React.useState<TSelectedCurrency | null>(null)
-  const [tabInfo, setTabInfo] = React.useState<TabInfo | null>(null)
-  const [isDraggable, setIsDraggable] = React.useState<boolean>(false)
+  const { state, updateState } = useState<IState>(initialState)
 
   React.useEffect(() => {
     getWalletsList()
@@ -74,9 +70,11 @@ const SelectAddress: React.FC = () => {
       const { favIconUrl = undefined, url = undefined } = parseTabInfo
 
       if (favIconUrl && url) {
-        setTabInfo({
-          favIconUrl,
-          url: new URL(url).host,
+        updateState({
+          tabInfo: {
+            favIconUrl,
+            url: new URL(url).host,
+          },
         })
       }
     }
@@ -99,25 +97,27 @@ const SelectAddress: React.FC = () => {
       if (getCurrencyInfo) {
         const { symbol, name, background } = getCurrencyInfo
 
-        setSelectedCurrency({
-          symbol,
-          name,
-          background,
-          chain: parseChain || undefined,
+        updateState({
+          selectedCurrency: {
+            symbol,
+            name,
+            background,
+            chain: parseChain || undefined,
+          },
         })
       }
     }
 
     if (queryDraggable === 'true') {
-      setIsDraggable(true)
+      updateState({ isDraggable: true })
     }
   }
 
   const getWalletsList = () => {
-    const walletsList = getWallets()
+    const wallets = getWallets()
 
-    if (walletsList) {
-      setWallets(walletsList)
+    if (wallets) {
+      updateState({ wallets })
     }
   }
 
@@ -150,13 +150,15 @@ const SelectAddress: React.FC = () => {
       : getCurrency(currency.logo.symbol)
 
     if (getCurrencyInfo) {
-      const { symbol, name, background, chain } = getCurrencyInfo
+      const { symbol, name, background } = getCurrencyInfo
 
-      setSelectedCurrency({
-        symbol,
-        name,
-        background,
-        chain: currency.logo.chain || undefined,
+      updateState({
+        selectedCurrency: {
+          symbol,
+          name,
+          background,
+          chain: currency.logo.chain || undefined,
+        },
       })
     }
   }
@@ -174,8 +176,8 @@ const SelectAddress: React.FC = () => {
         )
         .filter(
           (wallet: IWallet) =>
-            toLower(wallet.symbol) !== toLower(selectedCurrency?.symbol) ||
-            toLower(wallet.chain) !== toLower(selectedCurrency?.chain)
+            toLower(wallet.symbol) !== toLower(state.selectedCurrency?.symbol) ||
+            toLower(wallet.chain) !== toLower(state.selectedCurrency?.chain)
         )
 
       return mapWallets.map((wallet: IWallet) => {
@@ -199,28 +201,32 @@ const SelectAddress: React.FC = () => {
     return []
   }
 
-  const filterWallets = wallets?.filter((wallet: IWallet) => {
-    if (selectedCurrency) {
+  const filterWallets = state.wallets?.filter((wallet: IWallet) => {
+    if (state.selectedCurrency) {
       return (
-        toLower(wallet.symbol) === toLower(selectedCurrency.symbol) &&
-        toLower(wallet?.chain) === toLower(selectedCurrency?.chain)
+        toLower(wallet.symbol) === toLower(state.selectedCurrency.symbol) &&
+        toLower(wallet?.chain) === toLower(state.selectedCurrency?.chain)
       )
     }
     return wallet
   })
 
+  const toggleFilters = (): void => {
+    updateState({ isFiltersActive: !state.isFiltersActive })
+  }
+
   return (
-    <ExternalPageContainer onClose={onClose} headerStyle="green" isDraggable={isDraggable}>
+    <ExternalPageContainer onClose={onClose} headerStyle="green" isDraggable={state.isDraggable}>
       <Styles.Body>
         <Styles.Row>
           <Styles.Title>Select Address</Styles.Title>
 
-          {tabInfo ? (
+          {state.tabInfo ? (
             <Styles.SiteBlock>
               <Styles.UseOn>To use it on </Styles.UseOn>
               <Styles.SiteInfo>
-                <Styles.SiteFavicon src={tabInfo.favIconUrl} />
-                <Styles.SiteUrl>{tabInfo.url}</Styles.SiteUrl>
+                <Styles.SiteFavicon src={state.tabInfo.favIconUrl} />
+                <Styles.SiteUrl>{state.tabInfo.url}</Styles.SiteUrl>
               </Styles.SiteInfo>
             </Styles.SiteBlock>
           ) : null}
@@ -229,29 +235,26 @@ const SelectAddress: React.FC = () => {
         <Styles.Addresses>
           <Styles.AddressesRow>
             <Styles.AddressesLabel>
-              {selectedCurrency
-                ? `My ${toUpper(selectedCurrency.symbol)} addresses`
+              {state.selectedCurrency
+                ? `My ${toUpper(state.selectedCurrency.symbol)} addresses`
                 : 'My addresses'}
             </Styles.AddressesLabel>
-            <Styles.FiltersButton
-              onClick={() => setFiltersActive((prevState: boolean) => !prevState)}
-              isActive={isFiltersActive}
-            >
+            <Styles.FiltersButton onClick={toggleFilters} isActive={state.isFiltersActive}>
               <SVG src="../../assets/icons/filter.svg" width={20} height={16} />
             </Styles.FiltersButton>
           </Styles.AddressesRow>
 
-          <Styles.FiltersRow isActive={isFiltersActive}>
+          <Styles.FiltersRow isActive={state.isFiltersActive}>
             <CurrenciesDropdown
               label="Select currency"
-              value={selectedCurrency?.name}
-              currencySymbol={selectedCurrency?.symbol}
-              background={selectedCurrency?.background}
-              tokenChain={selectedCurrency?.chain}
+              value={state.selectedCurrency?.name}
+              currencySymbol={state.selectedCurrency?.symbol}
+              background={state.selectedCurrency?.background}
+              tokenChain={state.selectedCurrency?.chain}
               list={getDropdownList()}
               onSelect={onSelectCurrency}
               currencyBr={13}
-              disabled={getDropdownList().length < 1 && selectedCurrency !== null}
+              disabled={getDropdownList().length < 1 && state.selectedCurrency !== null}
             />
           </Styles.FiltersRow>
 

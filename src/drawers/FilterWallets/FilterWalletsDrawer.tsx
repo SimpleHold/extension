@@ -3,7 +3,7 @@ import SVG from 'react-inlinesvg'
 
 // Components
 import DrawerWrapper from '@components/DrawerWrapper'
-import CurrenciesDropdown, { TList } from '@components/CurrenciesDropdown/CurrenciesDropdown'
+import CurrenciesDropdown from '@components/CurrenciesDropdown/CurrenciesDropdown'
 import Button from '@components/Button'
 import Switch from '@components/Switch'
 import CurrencyLogo from '@components/CurrencyLogo'
@@ -15,6 +15,9 @@ import { toLower } from '@utils/format'
 
 // Hooks
 import useState from '@hooks/useState'
+
+// Types
+import { TList } from '@components/CurrenciesDropdown/types'
 
 // Config
 import { getCurrency } from '@config/currencies'

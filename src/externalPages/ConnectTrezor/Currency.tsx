@@ -8,6 +8,9 @@ import CurrencyAddress from '@components/CurrencyAddress'
 // Utils
 import { toLower } from '@utils/format'
 
+// Types
+import { TSelectedAddress } from './types'
+
 // Styles
 import Styles from './styles'
 
@@ -25,12 +28,6 @@ interface Props {
     isDisabled: boolean
   ) => () => void
   existWallets: TSelectedAddress[]
-}
-
-export type TSelectedAddress = {
-  address: string
-  symbol: string
-  path: string
 }
 
 const MAX_ADDRESSES_NUMBER = 100
