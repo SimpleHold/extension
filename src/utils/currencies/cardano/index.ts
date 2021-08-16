@@ -150,7 +150,9 @@ const calculateFee = (
         )
       )
 
-      txBuilder.add_change_if_needed(CardanoWasm.Address.from_bech32(testWallet.address))
+      try {
+        txBuilder.add_change_if_needed(CardanoWasm.Address.from_bech32(testWallet.address))
+      } catch {}
 
       return +txBuilder.min_fee().to_str()
     }

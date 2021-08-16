@@ -22,10 +22,10 @@ const Row = styled.div`
 
 const Receive = styled.div`
   width: 100%;
-  height: 290px;
+  min-height: 290px;
   background-color: #ffffff;
   border-radius: 16px;
-  padding: 30px 38px 0 38px;
+  padding: 30px 38px;
   display: flex;
   flex-direction: column;
   align-items: center;
