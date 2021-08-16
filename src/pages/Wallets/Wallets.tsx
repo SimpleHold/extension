@@ -34,9 +34,6 @@ const initialState: IState = {
   wallets: null,
   totalBalance: null,
   totalEstimated: null,
-  walletsBalance: [],
-  walletsEstimated: [],
-  walletsPending: [],
   pendingBalance: null,
   activeDrawer: null,
 }
@@ -45,6 +42,10 @@ const Wallets: React.FC = () => {
   const history = useHistory()
   const { state: locationState } = useLocation<ILocationState>()
   const { state, updateState } = useState<IState>(initialState)
+
+  const [walletsBalance, setWalletsBalance] = React.useState<number[]>([])
+  const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
+  const [walletsPending, setWalletsPending] = React.useState<number[]>([])
 
   const { scrollPosition } = useScroll()
   const addToast = useToastContext()
@@ -74,22 +75,22 @@ const Wallets: React.FC = () => {
   }, [locationState])
 
   React.useEffect(() => {
-    if (state.walletsBalance.length === state.wallets?.length && state.totalBalance === null) {
-      updateState({ totalBalance: state.walletsBalance.reduce((a, b) => a + b, 0) })
+    if (walletsBalance.length === state.wallets?.length && state.totalBalance === null) {
+      updateState({ totalBalance: walletsBalance.reduce((a, b) => a + b, 0) })
     }
-  }, [state.walletsBalance, state.totalBalance])
+  }, [walletsBalance, state.totalBalance])
 
   React.useEffect(() => {
-    if (state.walletsEstimated.length === state.wallets?.length && state.totalEstimated === null) {
-      updateState({ totalEstimated: state.walletsEstimated.reduce((a, b) => a + b, 0) })
+    if (walletsEstimated.length === state.wallets?.length && state.totalEstimated === null) {
+      updateState({ totalEstimated: walletsEstimated.reduce((a, b) => a + b, 0) })
     }
-  }, [state.walletsEstimated, state.totalEstimated])
+  }, [walletsEstimated, state.totalEstimated])
 
   React.useEffect(() => {
-    if (state.walletsPending.length === state.wallets?.length && state.pendingBalance === null) {
-      updateState({ pendingBalance: state.walletsPending.reduce((a, b) => a + b, 0) })
+    if (walletsPending.length === state.wallets?.length && state.pendingBalance === null) {
+      updateState({ pendingBalance: walletsPending.reduce((a, b) => a + b, 0) })
     }
-  }, [state.walletsPending, state.pendingBalance])
+  }, [walletsPending, state.pendingBalance])
 
   React.useEffect(() => {
     if (state.totalBalance !== null && state.totalEstimated !== null) {
@@ -138,15 +139,15 @@ const Wallets: React.FC = () => {
   }
 
   const sumBalance = (amount: number) => {
-    updateState({ walletsBalance: [...state.walletsBalance, amount] })
+    setWalletsBalance((prevArray: number[]) => [...prevArray, amount])
   }
 
   const sumEstimated = (amount: number) => {
-    updateState({ walletsEstimated: [...state.walletsEstimated, amount] })
+    setWalletsEstimated((prevArray: number[]) => [...prevArray, amount])
   }
 
   const sumPending = (amount: number) => {
-    updateState({ walletsPending: [...state.walletsPending, amount] })
+    setWalletsPending((prevArray: number[]) => [...prevArray, amount])
   }
 
   const onShowDrawer = (activeDrawer: 'sort' | 'filters'): void => {

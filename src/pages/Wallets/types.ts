@@ -9,9 +9,6 @@ export interface IState {
   wallets: null | IWallet[]
   totalBalance: null | number
   totalEstimated: null | number
-  walletsBalance: number[]
-  walletsEstimated: number[]
-  walletsPending: number[]
   pendingBalance: null | number
   activeDrawer: null | 'sort' | 'filters'
 }
