@@ -32,6 +32,8 @@ import {
   getStandingFee,
 } from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
+import { setItem } from '@utils/storage'
+import { getUrl, openWebPage } from '@utils/extension'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -141,7 +143,7 @@ const SendPage: React.FC = () => {
 
   React.useEffect(() => {
     if (state.fee > 0 && !state.amountErrorLabel) {
-      if (state.amount.length && Number(state.amount) + getNormalFee() >= Number(state.balance)) {
+      if (state.amount.length && Number(state.amount) + getNormalFee() > Number(state.balance)) {
         updateState({ amountErrorLabel: 'Insufficient funds' })
       }
     }
@@ -317,6 +319,7 @@ const SendPage: React.FC = () => {
       utxosList: [],
       currencyBalance: null,
       outputs: [],
+      feeValues: [],
     })
 
     if (!state.isStandingFee) {
@@ -328,6 +331,26 @@ const SendPage: React.FC = () => {
     logEvent({
       name: ADDRESS_SEND,
     })
+
+    if (hardware) {
+      openWebPage(getUrl('send-confirmation.html'))
+
+      setItem(
+        'sendConfirmationData',
+        JSON.stringify({
+          amount: Number(state.amount),
+          symbol,
+          networkFee: state.fee,
+          networkFeeSymbol: state.feeSymbol,
+          addressFrom: state.selectedAddress,
+          addressTo: address,
+          outputs: state.utxosList,
+          chain,
+          hardware,
+          extraId: state.extraId,
+        })
+      )
+    }
 
     const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
@@ -528,7 +551,7 @@ const SendPage: React.FC = () => {
               type={state.feeType}
               setType={setFeeType}
               isBalanceError={isCurrencyBalanceError && state.currencyBalance !== null}
-              withButton={currency.isCustomFee}
+              withButton={currency?.isCustomFee || tokenChain !== undefined}
               isIncludeFee={state.isIncludeFee}
               toggleIncludeFee={toggleIncludeFee}
               showFeeDrawer={showFeeDrawer}
