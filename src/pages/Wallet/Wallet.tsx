@@ -287,7 +287,7 @@ const WalletPage: React.FC = () => {
             />
             {state.balance !== null && state.balance < 20 && toLower(symbol) === 'xrp' ? (
               <Warning
-                text="You need 20 XRP minimum to activate your XRP address."
+                text="You need at least 20 XRP to activate your XRP address. This amount is reserved according to the network’s requirement, it can not be sent to another address"
                 color="#7D7E8D"
                 br={8}
                 mt={10}
