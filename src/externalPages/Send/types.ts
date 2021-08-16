@@ -50,4 +50,7 @@ export interface IState {
   customFee: TCustomFee
   activeDrawer: 'wallets' | 'aboutFee' | null
   feeValues: TFeeValue[]
+  walletName: string
+  walletsNotFound: boolean
+  isStandingFee: boolean
 }
