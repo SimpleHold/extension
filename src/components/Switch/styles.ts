@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 type TContainerProps = {
   isActive: boolean
+  openFrom?: string
 }
 
 const colors = {
@@ -10,14 +11,14 @@ const colors = {
 }
 
 const Container = styled.div`
-  width: 24px;
-  height: 12px;
+  width: ${({ openFrom }: TContainerProps) => (openFrom === 'browser' ? '22px' : '24px')};
+  height: ${({ openFrom }: TContainerProps) => (openFrom === 'browser' ? '10px' : '12px')};
   border: ${({ isActive }: TContainerProps) =>
     `1px solid ${isActive ? '#A6D9BC' : colors.disabled}`};
   border-radius: 6px;
   display: flex;
   align-items: center;
-  padding: 3px 0;
+  padding: ${({ openFrom }: TContainerProps) => (openFrom === 'browser' ? '0px' : '3px 0')};
   background-color: #f2f4f8;
 
   div {
