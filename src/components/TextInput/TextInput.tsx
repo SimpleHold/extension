@@ -45,6 +45,15 @@ const TextInput: React.FC<Props> = (props) => {
 
   const [isFocused, setIsFocused] = React.useState<boolean>(false)
   const [isPasswordVisible, setPasswordVisible] = React.useState<boolean>(false)
+  const [isButtonVisible, setButtonVisible] = React.useState<boolean>(false)
+
+  React.useEffect(() => {
+    if (!isFocused && isButtonVisible) {
+      setTimeout(() => {
+        setButtonVisible(false)
+      }, 150)
+    }
+  }, [isFocused, isButtonVisible])
 
   const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     if (
@@ -70,18 +79,23 @@ const TextInput: React.FC<Props> = (props) => {
   }
 
   const onClickButton = (): void => {
+    setIsFocused(false)
+
     if (renderButton) {
       renderButton.onClick()
       textInputRef.current?.focus()
-      setIsFocused(false)
     }
   }
 
   const onFocus = (): void => {
     setIsFocused(true)
+
+    if (renderButton) {
+      setButtonVisible(true)
+    }
   }
 
-  const onBlur = (): void => {
+  const onBlur = () => {
     setIsFocused(false)
 
     if (onBlurInput) {
@@ -133,19 +147,21 @@ const TextInput: React.FC<Props> = (props) => {
           />
         )}
       </Styles.Row>
+
       {type === 'password' ? (
         <Styles.VisibleInput ref={visibleBlockRef} onClick={toggleVisible}>
           <Styles.EyeIcon isVisible={isPasswordVisible} />
         </Styles.VisibleInput>
       ) : null}
+
       {value.length && type !== 'password' ? (
         <Styles.ClearButton onClick={onClear}>
           <SVG src="../../assets/icons/times.svg" width={10} height={10} />
         </Styles.ClearButton>
       ) : null}
 
-      {renderButton && !value.length ? (
-        <Styles.Button isFocused={isFocused} onClick={onClickButton}>
+      {renderButton && !value.length && isButtonVisible ? (
+        <Styles.Button onClick={onClickButton}>
           <Styles.ButtonLabel>{renderButton.label}</Styles.ButtonLabel>
         </Styles.Button>
       ) : null}

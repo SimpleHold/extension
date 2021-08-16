@@ -19,10 +19,6 @@ type TEyeIconPRops = {
   isVisible: boolean
 }
 
-type TButtonProps = {
-  isFocused: boolean
-}
-
 const Container = styled.div`
   height: 60px;
   background: #ffffff;
@@ -154,7 +150,6 @@ const ClearButton = styled.div`
 `
 
 const Button = styled.div`
-  opacity: ${({ isFocused }: TButtonProps) => (isFocused ? '1' : '0')};
   padding: 6px 10px;
   background: #e9f5ee;
   border-radius: 5px;
