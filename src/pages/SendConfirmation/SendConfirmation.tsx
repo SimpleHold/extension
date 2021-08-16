@@ -75,7 +75,7 @@ const SendConfirmation: React.FC = () => {
       tokenChain = undefined,
       decimals = undefined,
       extraId = undefined,
-      name = undefined,
+      tokenName = undefined,
     },
   } = useLocation<ILocationState>()
 
@@ -270,18 +270,20 @@ const SendConfirmation: React.FC = () => {
       <Styles.Wrapper>
         <Cover />
         <Header withBack backTitle="Send" onBack={history.goBack} />
-        <SendConfirmShared
-          amount={getAmount()}
-          symbol={symbol}
-          networkFee={networkFee}
-          addressFrom={addressFrom}
-          addressTo={addressTo}
-          networkFeeSymbol={networkFeeSymbol}
-          tokenChain={tokenChain}
-          tokenName={name}
-          onCancel={onCancel}
-          onConfirm={onConfirm}
-        />
+        <Styles.Body>
+          <SendConfirmShared
+            amount={getAmount()}
+            symbol={symbol}
+            networkFee={networkFee}
+            addressFrom={addressFrom}
+            addressTo={addressTo}
+            networkFeeSymbol={networkFeeSymbol}
+            tokenChain={tokenChain}
+            tokenName={tokenName}
+            onCancel={onCancel}
+            onConfirm={onConfirm}
+          />
+        </Styles.Body>
       </Styles.Wrapper>
       <ConfirmDrawer
         isActive={state.activeDrawer === 'confirm'}

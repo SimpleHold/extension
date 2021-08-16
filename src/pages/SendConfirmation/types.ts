@@ -12,7 +12,7 @@ export interface ILocationState {
   tokenChain?: string
   decimals?: number
   extraId?: string
-  name?: string
+  tokenName?: string
 }
 
 export interface IState {
