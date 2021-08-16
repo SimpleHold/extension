@@ -1,8 +1,9 @@
 import styled from 'styled-components'
 
 const Body = styled.div`
+  background-color: #f2f4f8;
   height: 640px;
-  background-color: #ffffff;
+  overflow: hidden;
 `
 
 const Styles = {

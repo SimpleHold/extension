@@ -278,11 +278,11 @@ const SendConfirmation: React.FC = () => {
 
       const trezorFeatures = await getFeatures()
 
+      updateState({ isButtonLoading: true })
+
       if (trezorFeatures?.device_id !== deviceId) {
         return updateState({ activeDrawer: 'wrongDevice' })
       }
-
-      updateState({ isButtonLoading: true })
 
       const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
       const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
