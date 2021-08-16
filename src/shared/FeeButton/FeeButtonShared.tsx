@@ -26,12 +26,13 @@ interface Props {
   withButton: boolean
   symbol: string
   values: TFeeValue[]
+  openFrom?: string
 }
 
 const feeTypes: TFeeTypes[] = ['slow', 'average', 'fast']
 
 const FeeButtonShared: React.FC<Props> = (props) => {
-  const { type, onChange, isError, isLoading, fee, withButton, symbol, values } = props
+  const { type, onChange, isError, isLoading, fee, withButton, symbol, values, openFrom } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
@@ -48,7 +49,12 @@ const FeeButtonShared: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container ref={ref}>
-      <Styles.Row onClick={toggleVisible} isVisible={isVisible} disabled={!withButton}>
+      <Styles.Row
+        onClick={toggleVisible}
+        isVisible={isVisible}
+        disabled={!withButton}
+        openFrom={openFrom}
+      >
         <Styles.Heading>
           <Styles.Label className="label">{withButton ? type : 'Network Fee'}</Styles.Label>
           {withButton ? (
@@ -85,7 +91,7 @@ const FeeButtonShared: React.FC<Props> = (props) => {
               const getFee = values.find((value: TFeeValue) => value.type === item)
 
               return (
-                <Styles.ListItem key={item} onClick={onClickItem(item)}>
+                <Styles.ListItem key={item} onClick={onClickItem(item)} openFrom={openFrom}>
                   <Styles.ListItemLabel className="fee-type">{item}</Styles.ListItemLabel>
                   <Styles.ListItemValue>
                     {getFee?.value ? getFee.value : '-'} {toUpper(symbol)}

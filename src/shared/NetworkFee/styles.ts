@@ -28,6 +28,7 @@ const IncludeLabel = styled.p`
   line-height: 16px;
   text-transform: capitalize;
   color: #7d7e8d;
+  white-space: nowrap;
 `
 
 const SwitchRow = styled.div`

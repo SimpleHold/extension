@@ -18,11 +18,12 @@ interface Props {
   type: TFeeTypes
   setType: (type: TFeeTypes) => void
   isBalanceError: boolean
-  withButton: boolean
+  withButton?: boolean
   isIncludeFee: boolean
   toggleIncludeFee: () => void
   showFeeDrawer: () => void
   values: TFeeValue[]
+  openFrom?: string
 }
 
 const NetworkFee: React.FC<Props> = (props) => {
@@ -33,11 +34,12 @@ const NetworkFee: React.FC<Props> = (props) => {
     type,
     setType,
     isBalanceError,
-    withButton,
+    withButton = false,
     isIncludeFee,
     toggleIncludeFee,
     showFeeDrawer,
     values,
+    openFrom,
   } = props
 
   return (
@@ -52,11 +54,12 @@ const NetworkFee: React.FC<Props> = (props) => {
           withButton={withButton}
           symbol={symbol}
           values={values}
+          openFrom={openFrom}
         />
         <Styles.IncludeBlock>
           <Styles.IncludeLabel>Include Fee</Styles.IncludeLabel>
           <Styles.SwitchRow>
-            <Switch value={isIncludeFee} onToggle={toggleIncludeFee} />
+            <Switch value={isIncludeFee} onToggle={toggleIncludeFee} openFrom={openFrom} />
           </Styles.SwitchRow>
         </Styles.IncludeBlock>
       </Styles.Row>

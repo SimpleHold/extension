@@ -7,10 +7,15 @@ type TListProps = {
 type TRowProps = {
   disabled: boolean
   isVisible: boolean
+  openFrom?: string
 }
 
 type TFeeProps = {
   isError: boolean
+}
+
+type TListItemProps = {
+  openFrom?: string
 }
 
 const Container = styled.div`
@@ -20,7 +25,7 @@ const Container = styled.div`
 
 const Row = styled.div`
   padding: 7px 14px;
-  width: 153px;
+  width: ${({ openFrom }: TRowProps) => (openFrom === 'browser' ? '123px' : '153px')};
   border-radius: ${({ isVisible }: TRowProps) => (isVisible ? '12px 12px 0 0' : '12px')};
   border: ${({ isVisible }: TRowProps) => `1px solid ${isVisible ? '#3fbb7d' : '#ffffff'}`};
 
@@ -104,7 +109,7 @@ const ListItem = styled.div`
   padding: 7px 14px;
   border-left: 1px solid #3fbb7d;
   border-right: 1px solid #3fbb7d;
-  height: 50px;
+  height: ${({ openFrom }: TListItemProps) => (openFrom === 'browser' ? '35px' : '50px')};
 
   &:not(:last-child) {
     border-bottom: 1px solid rgba(222, 225, 233, 0.5);
