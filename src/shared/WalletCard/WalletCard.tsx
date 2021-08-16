@@ -32,6 +32,7 @@ interface Props {
   wallets: IWallet[]
   changeWallet: (address: string, name: string, hardware?: THardware) => void
   tokenChain?: string
+  openFrom?: string
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -46,6 +47,7 @@ const WalletCard: React.FC<Props> = (props) => {
     wallets,
     changeWallet,
     tokenChain,
+    openFrom,
   } = props
 
   const filterWallets = wallets.filter(
@@ -133,7 +135,7 @@ const WalletCard: React.FC<Props> = (props) => {
           </Styles.Balances>
         </Styles.Info>
       </Styles.Row>
-      <Styles.WalletsDropdown isVisible={isVisible}>
+      <Styles.WalletsDropdown isVisible={isVisible} openFrom={openFrom}>
         {filterWallets.map((wallet: IWallet) => {
           const { symbol, chain, name, address, hardware, uuid, contractAddress } = wallet
 

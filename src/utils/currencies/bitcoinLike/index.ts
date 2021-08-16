@@ -131,8 +131,10 @@ export const getNetworkFee = (
       })
     }
 
+    const filterFees = fees.filter((fee: TCustomFees) => fee?.utxos?.length)
+
     return {
-      fees,
+      fees: filterFees,
     }
   } catch {
     return null

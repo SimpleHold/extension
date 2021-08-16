@@ -1,13 +1,10 @@
 import styled from 'styled-components'
 
 const Container = styled.div`
-  background-color: #f2f4f8;
-  border-radius: 5px 5px 0px 0px;
-  height: 540px;
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  height: 100%;
 `
 
 const Row = styled.div`
@@ -185,6 +182,7 @@ const TabInfo = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   margin: 5px 0 0 0;
 `
 

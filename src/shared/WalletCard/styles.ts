@@ -9,6 +9,11 @@ type TVisibleProps = {
   isVisible: boolean
 }
 
+type TWalletsDropdownProps = {
+  isVisible: boolean
+  openFrom?: string
+}
+
 const Container = styled.div`
   position: relative;
   user-select: none;
@@ -84,14 +89,15 @@ const WalletsDropdown = styled.div`
   border-top: none;
   filter: drop-shadow(0px 5px 30px rgba(125, 126, 141, 0.15));
   border-radius: 0 0 16px 16px;
-  width: 100%;
+  width: ${({ openFrom }: TWalletsDropdownProps) => (openFrom ? 'calc(100% - 2px)' : '100%')};
   max-height: 290px;
   background-color: #ffffff;
   overflow: scroll;
   z-index: 2;
-  opacity: ${({ isVisible }: TVisibleProps) => (isVisible ? '1' : '0')};
-  visibility: ${({ isVisible }: TVisibleProps) => (isVisible ? 'visible' : 'hidden')};
-  transform: ${({ isVisible }: TVisibleProps) => `translateY(${isVisible ? '0' : '-20px'})`};
+  opacity: ${({ isVisible }: TWalletsDropdownProps) => (isVisible ? '1' : '0')};
+  visibility: ${({ isVisible }: TWalletsDropdownProps) => (isVisible ? 'visible' : 'hidden')};
+  transform: ${({ isVisible }: TWalletsDropdownProps) =>
+    `translateY(${isVisible ? '0' : '-20px'})`};
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
 `
 
