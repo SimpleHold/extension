@@ -1,5 +1,17 @@
 import styled, { keyframes } from 'styled-components'
 
+type TRefreshButtonProps = {
+  isRefreshing: boolean
+}
+
+type TBalanceProps = {
+  height: number
+}
+
+type TEstimatedProps = {
+  mt: number
+}
+
 const rotating = keyframes`
   from {
     transform: rotate(360deg);
@@ -8,10 +20,6 @@ const rotating = keyframes`
     transform: rotate(0deg);
   }
 `
-
-type TRefreshButtonProps = {
-  isRefreshing: boolean
-}
 
 const Container = styled.div``
 
@@ -77,14 +85,15 @@ const BalanceRow = styled.div`
 
 const Balance = styled.p`
   font-weight: 500;
-  font-size: 23px;
-  line-height: 27px;
+  font-size: ${({ height }: TBalanceProps) => `${height}px`};
+  line-height: ${({ height }: TBalanceProps) => `${height}px`};
   color: #1d1d22;
   margin: 0;
 `
 
 const Estimated = styled.p`
-  margin: 4px 0 0 0;
+  margin: 0;
+  margin-top: ${({ mt }: TEstimatedProps) => `${mt}px`};
   font-size: 16px;
   line-height: 19px;
   color: #7d7e8d;
@@ -93,7 +102,7 @@ const Estimated = styled.p`
 const RefreshButton = styled.div`
   width: 16px;
   height: 16px;
-  margin: 0 0 0 8px;
+  margin: -2px 0 0 8px;
 
   path {
     fill: ${({ isRefreshing }: TRefreshButtonProps) => (isRefreshing ? '#3fbb7d' : '#c3c3c3')};
