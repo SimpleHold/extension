@@ -30,7 +30,7 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   margin: 0 0 10px 0;
-  padding: 0 10px 0 16px;
+  padding: 0 16px;
   position: relative;
   user-select: none;
 

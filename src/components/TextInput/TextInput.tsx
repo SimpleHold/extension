@@ -46,6 +46,7 @@ const TextInput: React.FC<Props> = (props) => {
   const [isFocused, setIsFocused] = React.useState<boolean>(false)
   const [isPasswordVisible, setPasswordVisible] = React.useState<boolean>(false)
   const [isButtonVisible, setButtonVisible] = React.useState<boolean>(false)
+  const [isClearButtonVisible, setClearButtonVisible] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     if (!isFocused && isButtonVisible) {
@@ -54,6 +55,20 @@ const TextInput: React.FC<Props> = (props) => {
       }, 150)
     }
   }, [isFocused, isButtonVisible])
+
+  React.useEffect(() => {
+    if (!isFocused && isClearButtonVisible) {
+      setTimeout(() => {
+        setClearButtonVisible(false)
+      }, 150)
+    }
+  }, [isFocused, isClearButtonVisible])
+
+  React.useEffect(() => {
+    if (value.length && !isClearButtonVisible && isFocused) {
+      setClearButtonVisible(true)
+    }
+  }, [value, isClearButtonVisible, isFocused])
 
   const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     if (
@@ -75,7 +90,10 @@ const TextInput: React.FC<Props> = (props) => {
   }
 
   const onClear = (): void => {
+    setIsFocused(false)
     onChange('')
+    textInputRef.current?.focus()
+    setClearButtonVisible(true)
   }
 
   const onClickButton = (): void => {
@@ -89,6 +107,7 @@ const TextInput: React.FC<Props> = (props) => {
 
   const onFocus = (): void => {
     setIsFocused(true)
+    setClearButtonVisible(true)
 
     if (renderButton) {
       setButtonVisible(true)
@@ -154,7 +173,7 @@ const TextInput: React.FC<Props> = (props) => {
         </Styles.VisibleInput>
       ) : null}
 
-      {value.length && type !== 'password' ? (
+      {value.length && type !== 'password' && isClearButtonVisible ? (
         <Styles.ClearButton onClick={onClear}>
           <SVG src="../../assets/icons/times.svg" width={10} height={10} />
         </Styles.ClearButton>
