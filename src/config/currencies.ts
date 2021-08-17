@@ -14,6 +14,7 @@ import cardanoLogo from '@assets/currencies/ada.svg'
 import rippleLogo from '@assets/currencies/xrp.svg'
 import neblioLogo from '@assets/currencies/nebl.svg'
 import nulsLogo from '@assets/currencies/nuls.svg'
+import maticLogo from '@assets/currencies/matic.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -162,6 +163,15 @@ const currencies: ICurrency[] = [
     background: '#69E291',
     chain: 'nuls',
     minSendAmount: 100000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Polygon',
+    symbol: 'matic',
+    logo: maticLogo,
+    background: '#9767E9',
+    chain: 'matic',
+    minSendAmount: 1000000000000000,
     isCustomFee: false,
   },
 ]

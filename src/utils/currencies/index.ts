@@ -25,10 +25,8 @@ import * as nuls from '@utils/currencies/nuls'
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
 
-const web3Symbols = ['eth', 'etc', 'bnb']
-
 export const isEthereumLike = (symbol: string, chain?: string): boolean => {
-  return web3Symbols.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
+  return ethereumLike.coins.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
 }
 
 const getProvider = (symbol: string): TProvider | null => {
