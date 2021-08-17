@@ -5,6 +5,9 @@ import SVG from 'react-inlinesvg'
 import Switch from '@components/Switch'
 import FeeButton from '../FeeButton'
 
+// Utils
+import { toLower } from '@utils/format'
+
 // Types
 import { TFeeValue } from '../types'
 
@@ -14,7 +17,7 @@ import Styles from './styles'
 interface Props {
   isLoading: boolean
   fee: number
-  symbol: string
+  feeSymbol: string
   type: TFeeTypes
   setType: (type: TFeeTypes) => void
   isBalanceError: boolean
@@ -23,6 +26,7 @@ interface Props {
   toggleIncludeFee: () => void
   showFeeDrawer: () => void
   values: TFeeValue[]
+  symbol: string
   openFrom?: string
 }
 
@@ -30,7 +34,7 @@ const NetworkFee: React.FC<Props> = (props) => {
   const {
     isLoading,
     fee,
-    symbol,
+    feeSymbol,
     type,
     setType,
     isBalanceError,
@@ -39,6 +43,7 @@ const NetworkFee: React.FC<Props> = (props) => {
     toggleIncludeFee,
     showFeeDrawer,
     values,
+    symbol,
     openFrom,
   } = props
 
@@ -52,16 +57,18 @@ const NetworkFee: React.FC<Props> = (props) => {
           isLoading={isLoading}
           fee={fee}
           withButton={withButton}
-          symbol={symbol}
+          symbol={feeSymbol}
           values={values}
           openFrom={openFrom}
         />
-        <Styles.IncludeBlock>
-          <Styles.IncludeLabel>Include Fee</Styles.IncludeLabel>
-          <Styles.SwitchRow>
-            <Switch value={isIncludeFee} onToggle={toggleIncludeFee} openFrom={openFrom} />
-          </Styles.SwitchRow>
-        </Styles.IncludeBlock>
+        {toLower(symbol) === toLower(feeSymbol) ? (
+          <Styles.IncludeBlock>
+            <Styles.IncludeLabel>Include Fee</Styles.IncludeLabel>
+            <Styles.SwitchRow>
+              <Switch value={isIncludeFee} onToggle={toggleIncludeFee} openFrom={openFrom} />
+            </Styles.SwitchRow>
+          </Styles.IncludeBlock>
+        ) : null}
       </Styles.Row>
 
       <Styles.AboutFee onClick={showFeeDrawer}>

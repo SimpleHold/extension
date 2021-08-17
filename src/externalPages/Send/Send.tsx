@@ -732,7 +732,8 @@ const Send: React.FC = () => {
                 <NetworkFeeShared
                   isLoading={state.isFeeLoading}
                   fee={state.fee}
-                  symbol={state.feeSymbol}
+                  symbol={state.selectedWallet?.symbol || ''}
+                  feeSymbol={state.feeSymbol}
                   type={state.feeType}
                   setType={setFeeType}
                   isBalanceError={isCurrencyBalanceError && state.currencyBalance !== null}

@@ -25,7 +25,7 @@ const Container = styled.div`
 
 const Row = styled.div`
   padding: 7px 14px;
-  width: ${({ openFrom }: TRowProps) => (openFrom === 'browser' ? '123px' : '153px')};
+  width: ${({ openFrom }: TRowProps) => (openFrom === 'browser' ? '153px' : '173px')};
   border-radius: ${({ isVisible }: TRowProps) => (isVisible ? '12px 12px 0 0' : '12px')};
   border: ${({ isVisible }: TRowProps) => `1px solid ${isVisible ? '#3fbb7d' : '#ffffff'}`};
 
@@ -83,7 +83,6 @@ const Fee = styled.span`
   font-size: 14px;
   line-height: 16px;
   text-transform: capitalize;
-  color: #eb5757;
   color: ${({ isError }: TFeeProps) => (isError ? '#EB5757' : '#1D1D22')};
 `
 
@@ -97,7 +96,7 @@ const IconRow = styled.div`
 
 const List = styled.div`
   position: absolute;
-  width: 153px;
+  width: 173px;
   opacity: ${({ isVisible }: TListProps) => (isVisible ? '1' : '0')};
   visibility: ${({ isVisible }: TListProps) => (isVisible ? 'visible' : 'hidden')};
   transform: ${({ isVisible }: TListProps) => `translateY(${isVisible ? '0' : '-20px'})`};

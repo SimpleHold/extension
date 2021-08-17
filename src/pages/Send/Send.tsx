@@ -17,7 +17,7 @@ import WalletsDrawer from '@drawers/Wallets'
 import AboutFeeDrawer from '@drawers/AboutFee'
 
 // Utils
-import { toLower, toUpper, minus } from '@utils/format'
+import { toLower, toUpper, minus, plus } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
 import {
@@ -428,20 +428,33 @@ const SendPage: React.FC = () => {
       return setInsufficientError()
     }
 
-    if (currency) {
-      let parseAmount: number = Number(state.amount)
-      let parseMinAmount: number = 0
+    const getAmount = (): number => {
+      let parseAmount = Number(state.amount)
 
-      if (tokenChain) {
-        parseMinAmount = currency.minSendAmount || 0.001
-      } else {
-        parseAmount = formatUnit(symbol, state.amount, 'to', chain, 'ether')
-        parseMinAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
+      if (state.isIncludeFee) {
+        parseAmount = parseAmount - state.fee
       }
 
-      if (parseAmount < currency.minSendAmount) {
+      return parseAmount
+    }
+
+    if (currency) {
+      let amount = getAmount()
+      let minAmount: number = 0
+      const getMinAmountWithFee = state.isIncludeFee ? state.fee : 0
+
+      if (tokenChain) {
+        minAmount = currency.minSendAmount || 0.001
+      } else {
+        amount = formatUnit(symbol, getAmount(), 'to', chain, 'ether')
+        minAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
+      }
+
+      const minAmountWithFee = plus(minAmount, getMinAmountWithFee)
+
+      if (amount < currency.minSendAmount) {
         return updateState({
-          amountErrorLabel: `Min amount is ${parseMinAmount} ${toUpper(symbol)}`,
+          amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(symbol)}`,
         })
       }
     }
@@ -547,7 +560,8 @@ const SendPage: React.FC = () => {
             <NetworkFeeShared
               isLoading={state.isFeeLoading}
               fee={state.fee}
-              symbol={state.feeSymbol}
+              feeSymbol={state.feeSymbol}
+              symbol={symbol}
               type={state.feeType}
               setType={setFeeType}
               isBalanceError={isCurrencyBalanceError && state.currencyBalance !== null}
