@@ -72,7 +72,7 @@ const currencies: ICurrency[] = [
     background: '#C3A634',
     chain: 'dogecoin',
     minSendAmount: 100000000,
-    isCustomFee: true,
+    isCustomFee: false,
   },
   {
     name: 'Dash',
