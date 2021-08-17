@@ -11,6 +11,7 @@ import {
   getCustomFee,
 } from '@utils/api'
 import { TCustomFee } from '@utils/api/types'
+import { toLower } from '@utils/format'
 
 // Currencies
 import * as ethereumLike from '@utils/currencies/ethereumLike'
@@ -402,6 +403,10 @@ export const getStandingFee = (symbol: string): number | null => {
 
     if (provider?.getStandingFee) {
       return provider.getStandingFee()
+    }
+
+    if (toLower(symbol) === 'doge') {
+      return 1
     }
 
     return null

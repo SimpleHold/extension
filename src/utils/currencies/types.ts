@@ -9,7 +9,7 @@ export type TProvider = {
   getTransactionLink?: (hash: string) => string
   importRecoveryPhrase?: (recoveryPhrase: string) => TGenerateAddress | null
   generateExtraId?: () => string
-  getStandingFee?: () => number
+  getStandingFee?: () => number | null
 }
 
 export type TCreateTransactionProps = {
