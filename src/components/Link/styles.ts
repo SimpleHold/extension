@@ -28,19 +28,24 @@ const Container = styled.div`
 `
 
 const IconRow = styled.div`
-  width: 17px;
-  height: 17px;
-  margin: 0 6px 0 0;
+  width: 15px;
+  height: 15px;
+  margin: 0 5px 0 0;
   display: flex;
   align-items: center;
   justify-content: center;
+
+  path {
+    fill: #bdc4d4;
+  }
 `
 
 const Title = styled.p`
   margin: 0;
   font-size: 14px;
   line-height: 16px;
-  color: #c3c3c3;
+  font-weight: 500;
+  color: #bdc4d4;
 `
 
 const Styles = {

@@ -85,14 +85,16 @@ const AddressesLabel = styled.p`
 `
 
 const FiltersButton = styled.div`
-  width: 30px;
+  width: 50px;
   height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border-radius: 8px;
+  background-color: #ffffff;
 
   path {
-    fill: ${({ isActive }: TFiltersButtonProps) => (isActive ? '#3fbb7d' : '#C3C3C3')};
+    fill: ${({ isActive }: TFiltersButtonProps) => (isActive ? '#3FBB7D' : '#BDC4D4')};
   }
 
   &:hover {

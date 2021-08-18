@@ -74,6 +74,7 @@ const Balance = styled.p`
   font-size: 14px;
   line-height: 16px;
   color: #1d1d22;
+  white-space: pre;
 `
 
 const Estimated = styled.p`

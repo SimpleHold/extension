@@ -197,7 +197,7 @@ const Wallets: React.FC = () => {
           <Link
             title="How it works?"
             to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
-            mt={22}
+            mt={14}
           />
         </Styles.Row>
         <Styles.Form onKeyDown={onKeyDown}>
@@ -218,7 +218,7 @@ const Wallets: React.FC = () => {
             errorLabel={state.confirmPasswordErrorLabel}
             onBlurInput={onBlurConfirmPassword}
           />
-          <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={4} />
+          <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
           <Styles.Actions>
             <Button label="Back" onClick={history.goBack} isLight mr={7.5} />
             <Button label="Confirm" onClick={onConfirm} disabled={isButtonDisabled} ml={7.5} />

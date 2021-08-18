@@ -34,7 +34,7 @@ const Description = styled.p`
 `
 
 const Form = styled.form`
-  border-top: 1px solid #eaeaea;
+  border-top: 1px solid #dee1e9;
   padding: 20px 30px 30px 30px;
   background-color: #f8f8f8;
   flex: 1;

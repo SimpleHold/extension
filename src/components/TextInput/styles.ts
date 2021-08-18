@@ -8,6 +8,7 @@ type TContainerProps = {
   isFocused: boolean
   isError: boolean
   disabled?: boolean
+  pr: number
 }
 
 type TRowProps = {
@@ -31,6 +32,7 @@ const Container = styled.div`
   justify-content: space-between;
   margin: 0 0 10px 0;
   padding: 0 16px;
+  padding-right: ${({ pr }: TContainerProps) => `${pr}px`};
   position: relative;
   user-select: none;
 

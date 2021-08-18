@@ -127,7 +127,7 @@ const ImportRecoveryPhrase: React.FC = () => {
             <Link
               to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
               title="How it works?"
-              mt={30}
+              mt={20}
             />
           </Styles.Row>
 

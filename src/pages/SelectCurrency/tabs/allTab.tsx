@@ -73,12 +73,6 @@ const AllTab: React.FC<Props> = (props) => {
             </Styles.CurrencyBlock>
           )
         })}
-        <Styles.CurrencyBlock onClick={onAddCustomToken}>
-          <Styles.CustomTokenLogo>
-            <SVG src="../../../assets/icons/plusCircle.svg" width={20} height={20} />
-          </Styles.CustomTokenLogo>
-          <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
-        </Styles.CurrencyBlock>
         {filterTokensList.map((token: IToken) => {
           const { name, symbol, chain } = token
 
@@ -93,6 +87,12 @@ const AllTab: React.FC<Props> = (props) => {
             </Styles.CurrencyBlock>
           )
         })}
+        <Styles.CustomTokenBlock onClick={onAddCustomToken}>
+          <Styles.CustomTokenLogo>
+            <SVG src="../../../assets/icons/plusCircle.svg" width={20} height={20} />
+          </Styles.CustomTokenLogo>
+          <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
+        </Styles.CustomTokenBlock>
       </Styles.CurrenciesList>
     </Styles.Tab>
   )

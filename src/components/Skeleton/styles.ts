@@ -22,7 +22,7 @@ const getBackground = (type: 'light' | 'gray'): string => {
   if (type === 'light') {
     return '270deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.3) 100%'
   }
-  return '270deg, rgba(234, 234, 234, 0.7) 0%, rgba(234, 234, 234, 0.4) 100%'
+  return '270deg, #EBEDF2 0%, #F2F4F8 100%'
 }
 
 const Container = styled.div`

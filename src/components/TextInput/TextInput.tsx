@@ -132,6 +132,7 @@ const TextInput: React.FC<Props> = (props) => {
       isFocused={isFocused}
       isError={errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0}
       disabled={disabled}
+      pr={isClearButtonVisible || type === 'password' ? 10 : 16}
     >
       <Styles.Row isActive={isFocused || value?.length > 0} openFrom={openFrom}>
         <Styles.LabelRow>

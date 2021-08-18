@@ -40,7 +40,7 @@ const ListItem = styled.div`
   justify-content: space-between;
   padding: ${({ isButton }: TListItemProps) => (isButton ? `15px 0` : '20px 0')};
   height: ${({ isButton }: TListItemProps) => (isButton ? `60px` : 'auto')};
-  border-bottom: 1px solid #eaeaea;
+  border-bottom: 1px solid #f2f4f8;
 
   &:hover {
     cursor: ${({ isButton }: TListItemProps) => (isButton ? `pointer` : 'default')};
@@ -104,9 +104,10 @@ const CopyRight = styled.p`
 
 const Version = styled.p`
   margin: 0;
+  font-weight: 500;
   font-size: 14px;
   line-height: 16px;
-  color: #c3c3c3;
+  color: #bdc4d4;
 `
 
 const Styles = {
