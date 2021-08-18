@@ -19,12 +19,14 @@ import { getItem, removeItem } from '@utils/storage'
 import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
+// Hooks
+import useState from '@hooks/useState'
+
 // Types
 import { IState } from './types'
 
 // Styles
 import Styles from './styles'
-import useState from 'hooks/useState'
 
 const initialState: IState = {
   wallets: null,
