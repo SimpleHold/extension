@@ -23,7 +23,7 @@ import NetworkFeeShared from '@shared/NetworkFee'
 import { getWallets, IWallet, getWalletName } from '@utils/wallet'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
-import { toLower, toUpper, minus } from '@utils/format'
+import { toLower, toUpper, minus, plus } from '@utils/format'
 import {
   validateAddress,
   formatUnit,
@@ -155,6 +155,10 @@ const Send: React.FC = () => {
       document.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
+
+  React.useEffect(() => {
+    checkAmount()
+  }, [state.isIncludeFee])
 
   const checkStangindFee = (): void => {
     if (state.selectedWallet) {
@@ -513,24 +517,35 @@ const Send: React.FC = () => {
       state.amount.length &&
       Number(state.amount) + Number(state.fee) >= Number(availableBalance)
     ) {
-      return updateState({ amountErrorLabel: 'Insufficient funds' })
+      return setInsufficientError()
+    }
+
+    const getAmount = (): number => {
+      let parseAmount = Number(state.amount)
+
+      if (state.isIncludeFee) {
+        parseAmount = parseAmount - state.fee
+      }
+
+      return parseAmount
     }
 
     if (state.currencyInfo && state.selectedWallet) {
-      let parseAmount: number = Number(state.amount)
-      let parseMinAmount: number = 0
+      let amount = getAmount()
+      let minAmount: number = 0
+      const getMinAmountWithFee = state.isIncludeFee ? state.fee : 0
 
       if (state.selectedWallet?.chain) {
-        parseMinAmount = state.currencyInfo.minSendAmount || 0.001
+        minAmount = state.currencyInfo.minSendAmount || 0.001
       } else {
-        parseAmount = formatUnit(
+        amount = formatUnit(
           state.selectedWallet.symbol,
-          state.amount,
+          getAmount(),
           'to',
           state.currencyInfo.chain,
           'ether'
         )
-        parseMinAmount = formatUnit(
+        minAmount = formatUnit(
           state.selectedWallet.symbol,
           state.currencyInfo.minSendAmount,
           'from',
@@ -539,9 +554,11 @@ const Send: React.FC = () => {
         )
       }
 
-      if (parseAmount < state.currencyInfo.minSendAmount) {
+      const minAmountWithFee = plus(minAmount, getMinAmountWithFee)
+
+      if (amount < state.currencyInfo.minSendAmount) {
         return updateState({
-          amountErrorLabel: `Min amount is ${parseMinAmount} ${toUpper(
+          amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(
             state.selectedWallet.symbol
           )}`,
         })

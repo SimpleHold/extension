@@ -114,7 +114,7 @@ const WalletCard: React.FC<Props> = (props) => {
             <Styles.Address>{short(address, 12)}</Styles.Address>
           </Styles.Wallet>
           <Styles.Balances>
-            <Skeleton width={120} height={16} type="gray" br={4} isLoading={balance === null}>
+            <Skeleton width={110} height={16} type="gray" br={4} isLoading={balance === null}>
               <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
                 symbol
               )}`}</Styles.Balance>

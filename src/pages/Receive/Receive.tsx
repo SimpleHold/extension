@@ -7,6 +7,7 @@ import Cover from '@components/Cover'
 import Header from '@components/Header'
 import QRCode from '@components/QRCode'
 import Button from '@components/Button'
+import CopyToClipboard from '@components/CopyToClipboard'
 
 // Drawers
 import ExtraIdDrawer from '@drawers/ExtraId'
@@ -87,7 +88,9 @@ const ReceivePage: React.FC = () => {
           <Styles.Row>
             <Styles.Receive>
               <QRCode size={170} value={address} />
-              <Styles.Address>{address}</Styles.Address>
+              <CopyToClipboard value={address}>
+                <Styles.Address>{address}</Styles.Address>
+              </CopyToClipboard>
             </Styles.Receive>
 
             <Styles.Warning>
