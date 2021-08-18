@@ -18,6 +18,7 @@ import cakeLogo from '@assets/tokens/cake.svg'
 import inchLogo from '@assets/tokens/inch.svg'
 import shibLogo from '@assets/tokens/shib.svg'
 import adaLogo from '@assets/tokens/ada.svg'
+import ctsiLogo from '@assets/tokens/ctsi.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -256,6 +257,17 @@ const tokens: IToken[] = [
     logo: adaLogo,
     background: '#EBBB4E',
     chain: 'bsc',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x491604c0fdf08347dd1fa4ee062a822a5dd06b5d',
+    name: 'Cartesi Token',
+    symbol: 'ctsi',
+    decimals: 18,
+    logo: ctsiLogo,
+    background: '#132BD8',
+    chain: 'eth',
     minSendAmount: 0.001,
     isCustomFee: true,
   },
