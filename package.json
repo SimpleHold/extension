@@ -38,6 +38,7 @@
     "detect-browser": "^5.2.0",
     "lodash": "^4.17.21",
     "neblio-lib": "https://github.com/NeblioTeam/bitcore-lib#neblcore-lib",
+    "nerve-sdk-js": "^1.0.8",
     "nuls-sdk-js": "^2.5.0",
     "numeral": "^2.0.6",
     "qrcode.react": "^1.0.1",

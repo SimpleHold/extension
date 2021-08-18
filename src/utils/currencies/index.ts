@@ -21,6 +21,7 @@ import * as cardano from '@utils/currencies/cardano'
 import * as ripple from '@utils/currencies/ripple'
 import * as neblio from '@utils/currencies/neblio'
 import * as nuls from '@utils/currencies/nuls'
+import * as nerve from '@utils/currencies/nerve'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -31,6 +32,10 @@ export const isEthereumLike = (symbol: string, chain?: string): boolean => {
 
 const getProvider = (symbol: string): TProvider | null => {
   try {
+    if (nerve.coins.indexOf(symbol) !== -1) {
+      return nerve
+    }
+
     if (nuls.coins.indexOf(symbol) !== -1) {
       return nuls
     }
@@ -131,6 +136,10 @@ export const createTransaction = async ({
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
+    if (nerve.coins.indexOf(symbol) !== -1) {
+      return await nerve.createTransaction(from, to, amount, privateKey)
+    }
+
     if (nuls.coins.indexOf(symbol) !== -1) {
       return await nuls.createTransaction(from, to, amount, privateKey)
     }
@@ -260,7 +269,9 @@ export const formatUnit = (
   unit?: string
 ): number => {
   try {
-    if (nuls.coins.indexOf(symbol) !== -1) {
+    if (nerve.coins.indexOf(symbol) !== -1) {
+      return type === 'from' ? nerve.fromNerve(value) : nerve.toNerve(value)
+    } else if (nuls.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? nuls.fromNuls(value) : nuls.toNuls(value)
     } else if (neblio.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? neblio.fromSat(Number(value)) : neblio.toSat(Number(value))

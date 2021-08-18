@@ -32,6 +32,35 @@ declare module 'nuls-sdk-js' {
   function transactionSerialize(pri: string, pub: string, assembleTx: any): string
 }
 
+declare module 'nerve-sdk-js' {
+  function newAddress(
+    chainId: number,
+    passWord: string,
+    prefix: string
+  ): {
+    address: string
+    pri: string
+  }
+  function importByKey(
+    chainId: number,
+    pri: string,
+    passWord: string,
+    prefix: string
+  ): {
+    address: string
+    pub: string
+    pri: string
+  }
+  function verifyAddress(
+    address: string
+  ): {
+    chainId: number
+    right: boolean
+  }
+  function transactionAssemble(inputs: any, outputs: any, remark: string, type: number): any
+  function transactionSerialize(pri: string, pub: string, assembleTx: any): string
+}
+
 type TGenerateAddress = {
   address: string
   privateKey: string
