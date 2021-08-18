@@ -4,8 +4,6 @@ import { v4 } from 'uuid'
 import { IWallet } from '@utils/wallet'
 import { validateWallet } from '@utils/validate'
 
-import * as manifest from '../manifest.json'
-
 type TGenerateCurrency = {
   symbol: string
   chain?: string
@@ -23,7 +21,7 @@ export const generate = (currencies: TGenerateCurrency[]): { [key: string]: stri
 
   const backup: TBackup = {
     wallets: [],
-    version: manifest.version,
+    version: '1.12.0',
     uuid: v4(),
   }
 

@@ -632,7 +632,7 @@ const Send: React.FC = () => {
 
   const onSendAll = (): void => {
     if (state.balance) {
-      updateState({ amount: `${minus(state.balance, getNormalFee())}` })
+      updateState({ amount: `${minus(state.balance, getNormalFee())}`, isIncludeFee: true })
     }
   }
 

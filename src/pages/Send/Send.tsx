@@ -387,7 +387,7 @@ const SendPage: React.FC = () => {
 
   const onSendAll = (): void => {
     if (state.balance) {
-      updateState({ amount: `${minus(getAvailableBalance(), getNormalFee())}` })
+      updateState({ amount: `${minus(getAvailableBalance(), getNormalFee())}`, isIncludeFee: true })
     }
   }
 
