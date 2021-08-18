@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import SVG from 'react-inlinesvg'
-import { useDropzone } from 'react-dropzone'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -9,6 +8,9 @@ import ExternalPageContainer from '@containers/ExternalPage'
 // Components
 import AgreeTerms from '@components/AgreeTerms'
 import Button from '@components/Button'
+
+// Shared
+import RestoreWallet from '@shared/RestoreWallet'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -68,8 +70,6 @@ const RestoreBackup: React.FC = () => {
       updateState({ isFileBroken: true })
     }
   }, [])
-
-  const { getRootProps, getInputProps } = useDropzone({ onDrop })
 
   const onClose = (): void => {
     window.close()
@@ -142,39 +142,11 @@ const RestoreBackup: React.FC = () => {
         <Styles.Body>
           <Styles.Title>Restore</Styles.Title>
 
-          <Styles.DNDArea {...getRootProps()} isFileBroken={state.isFileBroken}>
-            <input {...getInputProps({ multiple: false })} />
-            <Styles.FileIconRow>
-              {state.isFileBroken || state.backupData.length ? (
-                <SVG
-                  src={
-                    state.isFileBroken
-                      ? '../../assets/icons/invalidFile.svg'
-                      : '../../assets/icons/fileUploaded.svg'
-                  }
-                  width={26.5}
-                  height={34.8}
-                />
-              ) : (
-                <SVG src="../../assets/icons/file.svg" width={26.5} height={34.8} />
-              )}
-            </Styles.FileIconRow>
-
-            {state.isFileBroken || state.backupData.length > 0 ? (
-              <Styles.DNDText
-                isFileBroken={state.isFileBroken}
-                isFileUploaded={state.backupData.length > 0}
-              >
-                {state.isFileBroken
-                  ? 'The chosen file is invalid or broken, please pick another one.'
-                  : 'The backup file is successfully loaded'}
-              </Styles.DNDText>
-            ) : (
-              <Styles.DNDText>
-                Drag and drop or choose a backup file to restore your wallet
-              </Styles.DNDText>
-            )}
-          </Styles.DNDArea>
+          <RestoreWallet
+            isFileBroken={state.isFileBroken}
+            isFileUploaded={state.backupData.length > 0}
+            onDrop={onDrop}
+          />
 
           <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
 

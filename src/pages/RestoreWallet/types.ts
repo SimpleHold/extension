@@ -1,6 +1,6 @@
 export interface IState {
   isInvalidFile: boolean
-  backupData: null | string
+  backupData: string
   isAgreed: boolean
   activeDrawer: null | 'confirm' | 'fail'
   password: string

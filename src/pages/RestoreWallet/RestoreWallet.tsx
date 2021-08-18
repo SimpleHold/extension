@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { useDropzone } from 'react-dropzone'
-import SVG from 'react-inlinesvg'
 import { useHistory } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
 import Button from '@components/Button'
 import AgreeTerms from '@components/AgreeTerms'
+
+// Shared
+import RestoreWalletShared from '@shared/RestoreWallet'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -33,7 +34,7 @@ import Styles from './styles'
 
 const initialState: IState = {
   isInvalidFile: false,
-  backupData: null,
+  backupData: '',
   isAgreed: true,
   activeDrawer: null,
   password: '',
@@ -46,6 +47,8 @@ const RestoreWallet: React.FC = () => {
   const { state, updateState } = useState<IState>(initialState)
 
   const onDrop = React.useCallback(async (acceptedFiles) => {
+    updateState({ isInvalidFile: false, backupData: '' })
+
     const text = await acceptedFiles[0]?.text()
 
     if (text?.length > 0 && acceptedFiles[0].name.indexOf('.dat') !== -1) {
@@ -54,8 +57,6 @@ const RestoreWallet: React.FC = () => {
       updateState({ isInvalidFile: true })
     }
   }, [])
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   const onConfirm = (): void => {
     logEvent({
@@ -118,45 +119,13 @@ const RestoreWallet: React.FC = () => {
             <Styles.Title>Restore</Styles.Title>
             <Styles.Text>You can restore your SimpleHold wallet with a backup file.</Styles.Text>
 
-            <Styles.DNDBlock {...getRootProps()}>
-              <Styles.DNDArea isDragActive={isDragActive}>
-                <input {...getInputProps()} />
-                <Styles.DNDIconRow
-                  isDragActive={isDragActive || state.backupData !== null}
-                  isInvalidFile={state.isInvalidFile}
-                >
-                  {state.isInvalidFile ? (
-                    <SVG
-                      src="../../assets/icons/invalidFile.svg"
-                      width={21.85}
-                      height={21.85}
-                      title="file"
-                    />
-                  ) : (
-                    <SVG
-                      src="../../assets/icons/file.svg"
-                      width={16.85}
-                      height={21.5}
-                      title="file"
-                    />
-                  )}
-                </Styles.DNDIconRow>
-                {state.backupData ? (
-                  <Styles.DNDText>The backup file is successfully loaded</Styles.DNDText>
-                ) : null}
-                {!state.backupData && !state.isInvalidFile ? (
-                  <Styles.DNDText>
-                    Drag and drop or choose a backup file to restore your wallet
-                  </Styles.DNDText>
-                ) : null}
-                {state.isInvalidFile ? (
-                  <Styles.DNDText>
-                    The chosen file is invalid or broken, please pick another one
-                  </Styles.DNDText>
-                ) : null}
-              </Styles.DNDArea>
-            </Styles.DNDBlock>
-            <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={24} />
+            <RestoreWalletShared
+              isFileBroken={state.isInvalidFile}
+              isFileUploaded={state.backupData.length > 0}
+              onDrop={onDrop}
+            />
+
+            <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
           </Styles.Row>
           <Styles.Actions>
             <Button label="Cancel" onClick={history.goBack} isLight mr={7.5} />
