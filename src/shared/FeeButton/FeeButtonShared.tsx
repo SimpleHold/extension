@@ -84,7 +84,7 @@ const FeeButtonShared: React.FC<Props> = (props) => {
         )}
       </Styles.Row>
       {withButton ? (
-        <Styles.List isVisible={isVisible}>
+        <Styles.List isVisible={isVisible} openFrom={openFrom}>
           {feeTypes
             .filter((feeType: TFeeTypes) => toUpper(feeType) !== toUpper(type))
             .map((item: TFeeTypes) => {

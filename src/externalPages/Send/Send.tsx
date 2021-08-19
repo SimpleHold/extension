@@ -96,7 +96,6 @@ const Send: React.FC = () => {
     getWalletsList(getItem('sendPageProps'))
     getStorageData()
     getQueryParams()
-    getCustomFee()
   }, [])
 
   React.useEffect(() => {
@@ -108,6 +107,7 @@ const Send: React.FC = () => {
       getExtraId()
       setWalletName()
       checkStangindFee()
+      getCustomFee()
     }
   }, [state.selectedWallet])
 
@@ -193,9 +193,10 @@ const Send: React.FC = () => {
   }
 
   const getOutputs = async (info: ICurrency): Promise<void> => {
-    if (state.selectedWallet && state.currencyInfo) {
+    if (state.selectedWallet) {
       const { symbol, address } = state.selectedWallet
-      const { chain } = state.currencyInfo
+      const { chain } = info
+
       const withOutputs = checkWithOutputs(symbol)
 
       if (withOutputs) {
@@ -513,10 +514,9 @@ const Send: React.FC = () => {
 
     const availableBalance = getAvailableBalance()
 
-    if (
-      state.amount.length &&
-      Number(state.amount) + Number(state.fee) >= Number(availableBalance)
-    ) {
+    const fee = state.isIncludeFee ? 0 : state.fee
+
+    if (state.amount.length && Number(state.amount) + Number(fee) > availableBalance) {
       return setInsufficientError()
     }
 

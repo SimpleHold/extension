@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 type TListProps = {
   isVisible: boolean
+  openFrom?: string
 }
 
 type TRowProps = {
@@ -21,11 +22,12 @@ type TListItemProps = {
 const Container = styled.div`
   position: relative;
   user-select: none;
+  margin: 0 10px 0 0;
 `
 
 const Row = styled.div`
   padding: 7px 14px;
-  width: ${({ openFrom }: TRowProps) => (openFrom === 'browser' ? '153px' : '173px')};
+  width: ${({ openFrom }: TRowProps) => (openFrom === 'browser' ? '123px' : '173px')};
   border-radius: ${({ isVisible }: TRowProps) => (isVisible ? '12px 12px 0 0' : '12px')};
   border: ${({ isVisible }: TRowProps) => `1px solid ${isVisible ? '#3fbb7d' : '#ffffff'}`};
 
@@ -96,7 +98,7 @@ const IconRow = styled.div`
 
 const List = styled.div`
   position: absolute;
-  width: 173px;
+  width: ${({ openFrom }: TListProps) => (openFrom === 'browser' ? '153px' : '173px')};
   opacity: ${({ isVisible }: TListProps) => (isVisible ? '1' : '0')};
   visibility: ${({ isVisible }: TListProps) => (isVisible ? 'visible' : 'hidden')};
   transform: ${({ isVisible }: TListProps) => `translateY(${isVisible ? '0' : '-20px'})`};
