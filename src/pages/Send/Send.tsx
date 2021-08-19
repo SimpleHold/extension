@@ -34,6 +34,7 @@ import {
 import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
 import { getUrl, openWebPage } from '@utils/extension'
+import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -131,13 +132,14 @@ const SendPage: React.FC = () => {
   }, [state.selectedAddress])
 
   React.useEffect(() => {
-    if (
-      state.amount.length &&
-      Number(state.balance) > 0 &&
-      !state.amountErrorLabel &&
-      !state.isStandingFee
-    ) {
-      onGetNetworkFee()
+    if (state.amount.length && Number(state.balance) > 0 && !state.amountErrorLabel) {
+      if (!state.isStandingFee) {
+        onGetNetworkFee()
+      }
+
+      if (symbol === 'doge') {
+        onGetDogeUtxos()
+      }
     }
   }, [debounced])
 
@@ -169,7 +171,17 @@ const SendPage: React.FC = () => {
     }
   }
 
+  const onGetDogeUtxos = (): void => {
+    const utxosList = getDogeUtxos(state.outputs, state.address, state.amount)
+
+    updateState({ utxosList })
+  }
+
   const onGetNetworkFee = async (): Promise<void> => {
+    if (symbol === 'doge') {
+      onGetDogeUtxos()
+    }
+
     if (state.isStandingFee || !state.amount.length) {
       return
     }

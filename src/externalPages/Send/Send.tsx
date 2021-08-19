@@ -36,6 +36,7 @@ import {
   checkWithOutputs,
 } from '@utils/currencies'
 import { getItem, setItem, removeItem } from '@utils/storage'
+import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
 
 // Config
 import { getCurrency, ICurrency } from '@config/currencies'
@@ -120,10 +121,15 @@ const Send: React.FC = () => {
       state.amount.length &&
       Number(state.balance) > 0 &&
       !state.amountErrorLabel &&
-      state.selectedWallet &&
-      !state.isStandingFee
+      state.selectedWallet
     ) {
-      onGetNetworkFee()
+      if (!state.isStandingFee) {
+        onGetNetworkFee()
+      }
+
+      if (toLower(state.selectedWallet.symbol) === 'doge') {
+        onGetDogeUtxos()
+      }
     }
   }, [debounced])
 
@@ -233,12 +239,27 @@ const Send: React.FC = () => {
     }
   }
 
+  const onGetDogeUtxos = (): void => {
+    const utxosList = getDogeUtxos(state.outputs, state.address, state.amount)
+
+    updateState({ utxosList })
+  }
+
   const onGetNetworkFee = async (): Promise<void> => {
-    if (state.isStandingFee || !state.amount.length || !state.selectedWallet) {
+    if (!state.selectedWallet) {
       return
     }
 
     const { symbol, chain, decimals, contractAddress, address } = state.selectedWallet
+
+    if (toLower(symbol) === 'doge') {
+      onGetDogeUtxos()
+    }
+
+    if (state.isStandingFee || !state.amount.length) {
+      return
+    }
+
     const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
     if (currencyInfo) {
