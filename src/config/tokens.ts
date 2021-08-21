@@ -17,6 +17,7 @@ import bnbLogo from '@assets/tokens/bnb.svg'
 import cakeLogo from '@assets/tokens/cake.svg'
 import inchLogo from '@assets/tokens/inch.svg'
 import shibLogo from '@assets/tokens/shib.svg'
+import bankLogo from '@assets/tokens/bankr.svg'
 import adaLogo from '@assets/tokens/ada.svg'
 
 // Utils
@@ -197,6 +198,16 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+  },
+  {
+    address: '0x240eb70aafe740f753066a413ddad73b7c72b4e2',
+    name: 'BankRollBSC',
+    symbol: 'BaNkr',
+    decimals: 18,
+    logo: bankLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
+    minSendAmount: 0.1,
   },
   {
     address: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
