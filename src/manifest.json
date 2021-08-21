@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "SimpleHold",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "icons": {
     "16": "assets/logo/favicon-16.png",
     "32": "assets/logo/favicon-32.png",
@@ -39,7 +39,9 @@
     "__firefox__browser_style": false
   },
   "background": {
-    "scripts": ["js/background.bundle.js"],
+    "scripts": [
+      "js/background.bundle.js"
+    ],
     "__chrome|opera__persistent": false
   },
   "content_scripts": [
@@ -50,11 +52,17 @@
         "https://swapspace.co/*",
         "http://localhost/*"
       ],
-      "js": ["js/contentScript.bundle.js"]
+      "js": [
+        "js/contentScript.bundle.js"
+      ]
     },
     {
-      "matches": ["*://connect.trezor.io/*/popup.html"],
-      "js": ["js/trezor.bundle.js"]
+      "matches": [
+        "*://connect.trezor.io/*/popup.html"
+      ],
+      "js": [
+        "js/trezor.bundle.js"
+      ]
     }
   ],
   "web_accessible_resources": [
