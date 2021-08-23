@@ -3,14 +3,15 @@ import { TFeeResponse } from './types'
 import { TCustomFee } from '@utils/api/types'
 import { TCustomFees } from '../types'
 
-// Utils
-import { toLower } from '@utils/format'
-
 export const coins = ['btc', 'bch', 'bsv', 'ltc', 'doge', 'dash']
 
 const getProvider = (symbol: string): BitcoinLikeProvider | null => {
-  if (symbol === 'btc' || symbol === 'bsv') {
+  if (symbol === 'btc') {
     return bitcoin
+  }
+
+  if (symbol === 'bsv') {
+    return bitcoinsv
   }
 
   if (symbol === 'bch') {
