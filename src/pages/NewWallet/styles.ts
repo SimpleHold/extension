@@ -37,9 +37,9 @@ const Actions = styled.div`
 
 const Action = styled.div`
   background: #fafafa;
-  border: 1px solid #dfdfdf;
+  border: 1px solid #dee1e9;
   box-sizing: border-box;
-  border-radius: 5px;
+  border-radius: 16px;
   padding: 29px 0;
   display: flex;
   flex-direction: column;

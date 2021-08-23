@@ -144,6 +144,9 @@ const PendingIcon = styled.div`
   top: -3px;
   left: -3px;
   background-color: #3fbb7d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const HashRow = styled.div`
