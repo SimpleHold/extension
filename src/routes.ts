@@ -149,6 +149,13 @@ const routers: RouteProps[] = [
       loading: () => null,
     }),
   },
+  {
+    path: '/wallet',
+    component: Loadable({
+      loader: () => import('@pages/Wallet'),
+      loading: () => null,
+    }),
+  },
 ]
 
 export default routers

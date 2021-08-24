@@ -33,7 +33,7 @@ const Description = styled.p`
 
 const Form = styled.div`
   padding: 30px;
-  border-top: 1px solid #eaeaea;
+  border-top: 1px solid #dee1e9;
 `
 
 const Actions = styled.div`

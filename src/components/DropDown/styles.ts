@@ -5,16 +5,18 @@ type TContainerProps = {
 }
 
 const Container = styled.div`
-  border: 1px solid #eaeaea;
-  border-radius: 5px;
+  border: 1px solid #dee1e9;
   position: absolute;
   opacity: ${({ isVisible }: TContainerProps) => (isVisible ? '1' : '0')};
   visibility: ${({ isVisible }: TContainerProps) => (isVisible ? 'visible' : 'hidden')};
   transform: ${({ isVisible }: TContainerProps) => `translateY(${isVisible ? '0' : '-20px'})`};
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
-  width: calc(100% - 60px);
-  top: 56px;
+  width: 100%;
+  top: 50px;
   z-index: 2;
+  box-shadow: 0px 5px 30px rgba(125, 126, 141, 0.15);
+  border-radius: 16px;
+  background-color: #ffffff;
 `
 
 const ListItem = styled.div`
@@ -25,15 +27,17 @@ const ListItem = styled.div`
   background-color: #ffffff;
 
   &:first-child {
-    border-radius: 5px 5px 0 0;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
   }
 
   &:last-child {
-    border-radius: 0 0 5px 5px;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
   }
 
   &:hover {
-    background-color: #f8f8f8;
+    background: rgba(242, 244, 248, 0.5);
     cursor: pointer;
 
     p {
@@ -47,19 +51,19 @@ const ListItem = styled.div`
 `
 
 const IconRow = styled.div`
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
 
   path {
-    fill: #c3c3c3;
+    fill: #bdc4d4;
   }
 `
 
 const Title = styled.p`
-  margin: 0 0 0 13px;
+  margin: 0 0 0 10px;
   font-size: 16px;
   line-height: 19px;
   color: #1d1d22;

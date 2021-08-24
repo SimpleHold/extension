@@ -13,7 +13,7 @@ import { validatePassword } from '@utils/validate'
 import { logEvent, setUserProperties } from '@utils/amplitude'
 import { generate } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
-import { generate as generateAddress } from '@utils/address'
+import { generate as generateAddress } from '@utils/currencies'
 import { setItem } from '@utils/storage'
 import { getAllCookies, Cookie } from '@utils/extension'
 import * as theta from '@utils/currencies/theta'
@@ -23,29 +23,32 @@ import { START_PASSWORD } from '@config/events'
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { IState } from './types'
+
 // Styles
 import Styles from './styles'
 
-type TInitialCurrency = {
-  symbol: string
-  chain?: string
+const initialState: IState = {
+  password: '',
+  confirmPassword: '',
+  isAgreed: true,
+  passwordErrorLabel: null,
+  confirmPasswordErrorLabel: null,
+  initialCurrencies: [
+    {
+      symbol: 'btc',
+    },
+  ],
 }
 
 const Wallets: React.FC = () => {
   const history = useHistory()
 
-  const [password, setPassword] = React.useState<string>('')
-  const [confirmPassword, setConfirmPassword] = React.useState<string>('')
-  const [isAgreed, setIsAgreed] = React.useState<boolean>(true)
-  const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
-  const [confirmPasswordErrorLabel, setConfirmPasswordErrorLabel] = React.useState<null | string>(
-    null
-  )
-  const [initialCurrencies, setInitialCurrencies] = React.useState<TInitialCurrency[]>([
-    {
-      symbol: 'btc',
-    },
-  ])
+  const { state, updateState } = useState<IState>(initialState)
 
   const passwordInputRef = React.useRef<HTMLInputElement>(null)
 
@@ -69,15 +72,17 @@ const Wallets: React.FC = () => {
         const findToken = getToken(tokenSymbol, tokenChain)
 
         if (findCurrency && findToken) {
-          setInitialCurrencies([
-            {
-              symbol: findToken.symbol,
-              chain: findToken.chain,
-            },
-            {
-              symbol: findCurrency.symbol,
-            },
-          ])
+          updateState({
+            initialCurrencies: [
+              {
+                symbol: findToken.symbol,
+                chain: findToken.chain,
+              },
+              {
+                symbol: findCurrency.symbol,
+              },
+            ],
+          })
         }
       } else {
         const findCurrency = getCurrency(value)
@@ -86,20 +91,23 @@ const Wallets: React.FC = () => {
           const { symbol } = findCurrency
 
           if (theta.coins.indexOf(symbol) !== -1) {
-            setInitialCurrencies([{ symbol: 'theta' }, { symbol: 'tfuel' }])
+            updateState({ initialCurrencies: [{ symbol: 'theta' }, { symbol: 'tfuel' }] })
           } else {
-            setInitialCurrencies([
-              {
-                symbol,
-              },
-            ])
+            updateState({
+              initialCurrencies: [
+                {
+                  symbol,
+                },
+              ],
+            })
           }
         }
       }
     }
   }
 
-  const isButtonDisabled = password.length < 7 || password !== confirmPassword || !isAgreed
+  const isButtonDisabled =
+    state.password.length < 7 || state.password !== state.confirmPassword || !state.isAgreed
 
   const onConfirm = (): void => {
     logEvent({
@@ -108,7 +116,7 @@ const Wallets: React.FC = () => {
 
     let data = []
 
-    for (const currency of initialCurrencies) {
+    for (const currency of state.initialCurrencies) {
       const { symbol, chain } = currency
       const generate = generateAddress(symbol, chain)
 
@@ -123,7 +131,7 @@ const Wallets: React.FC = () => {
 
     const { backup, wallets } = generate(data)
 
-    setItem('backup', encrypt(backup, password))
+    setItem('backup', encrypt(backup, state.password))
     setItem('wallets', wallets)
     setItem('backupStatus', 'notDownloaded')
 
@@ -135,22 +143,22 @@ const Wallets: React.FC = () => {
   }
 
   const onBlurPassword = (): void => {
-    if (passwordErrorLabel) {
-      setPasswordErrorLabel(null)
+    if (state.passwordErrorLabel) {
+      updateState({ passwordErrorLabel: null })
     }
 
-    if (!validatePassword(password)) {
-      setPasswordErrorLabel('Password must be at least 8 symbols')
+    if (!validatePassword(state.password)) {
+      updateState({ passwordErrorLabel: 'Password must be at least 8 symbols' })
     }
   }
 
   const onBlurConfirmPassword = (): void => {
-    if (confirmPasswordErrorLabel) {
-      setConfirmPasswordErrorLabel(null)
+    if (state.confirmPasswordErrorLabel) {
+      updateState({ confirmPasswordErrorLabel: null })
     }
 
-    if (confirmPassword.length && confirmPassword !== password) {
-      setConfirmPasswordErrorLabel("Passwords don't match")
+    if (state.confirmPassword.length && state.confirmPassword !== state.password) {
+      updateState({ confirmPasswordErrorLabel: "Passwords don't match" })
     }
   }
 
@@ -162,6 +170,18 @@ const Wallets: React.FC = () => {
         onConfirm()
       }
     }
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
+  }
+
+  const setConfirmPassword = (confirmPassword: string): void => {
+    updateState({ confirmPassword })
+  }
+
+  const toggleAgreed = (): void => {
+    updateState({ isAgreed: !state.isAgreed })
   }
 
   return (
@@ -177,30 +197,28 @@ const Wallets: React.FC = () => {
           <Link
             title="How it works?"
             to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
-            mt={22}
+            mt={14}
           />
         </Styles.Row>
         <Styles.Form onKeyDown={onKeyDown}>
           <TextInput
             label="Enter password"
-            value={password}
+            value={state.password}
             onChange={setPassword}
             type="password"
-            withPasswordVisible
-            errorLabel={passwordErrorLabel}
+            errorLabel={state.passwordErrorLabel}
             onBlurInput={onBlurPassword}
             inputRef={passwordInputRef}
           />
           <TextInput
             label="Confirm password"
-            value={confirmPassword}
+            value={state.confirmPassword}
             onChange={setConfirmPassword}
             type="password"
-            withPasswordVisible
-            errorLabel={confirmPasswordErrorLabel}
+            errorLabel={state.confirmPasswordErrorLabel}
             onBlurInput={onBlurConfirmPassword}
           />
-          <AgreeTerms isAgreed={isAgreed} setIsAgreed={() => setIsAgreed(!isAgreed)} mt={4} />
+          <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
           <Styles.Actions>
             <Button label="Back" onClick={history.goBack} isLight mr={7.5} />
             <Button label="Confirm" onClick={onConfirm} disabled={isButtonDisabled} ml={7.5} />

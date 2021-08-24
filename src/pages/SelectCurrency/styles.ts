@@ -24,9 +24,9 @@ const CurrenciesList = styled.div`
 `
 
 const CurrencyBlock = styled.div`
-  border: 1px solid #eaeaea;
+  border: 1px solid #dee1e9;
   background-color: #ffffff;
-  border-radius: 5px;
+  border-radius: 16px;
   padding: 15px 10px;
   display: flex;
   flex-direction: column;
@@ -34,7 +34,8 @@ const CurrencyBlock = styled.div`
 
   &:hover {
     cursor: pointer;
-    background-color: #f8f8f8;
+    background-color: #f8f9fb;
+    border: 1px solid #3fbb7d;
 
     p > {
       color: #3fbb7d;
@@ -109,9 +110,9 @@ const HardwareWallet = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f8f8f8;
-  border: 1px solid #eaeaea;
-  border-radius: 5px;
+  background-color: #f8f9fb;
+  border: 1px solid #dee1e9;
+  border-radius: 16px;
   flex: 1;
 
   &:hover {
@@ -132,6 +133,24 @@ const HardwareWallet = styled.div`
   }
 `
 
+const CustomTokenBlock = styled(CurrencyBlock)`
+  border: 1px solid #ffffff;
+
+  &:hover {
+    background-color: #ffffff;
+    border: 1px solid #ffffff;
+
+    > div {
+      background: linear-gradient(
+          135deg,
+          rgba(255, 255, 255, 0.7) 0%,
+          rgba(255, 255, 255, 0.1) 100%
+        ),
+        #3fbb7d;
+    }
+  }
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -145,6 +164,7 @@ const Styles = {
   CurrencySymbol,
   CustomTokenLogo,
   CustomTokenLabel,
+  CustomTokenBlock,
 }
 
 export default Styles

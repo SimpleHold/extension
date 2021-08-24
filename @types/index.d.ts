@@ -49,12 +49,23 @@ interface Window {
   }
 }
 
+type TFeeTypes = 'slow' | 'average' | 'fast'
+
 interface UnspentOutput {
   txId: string
   outputIndex: number
   script: string
   satoshis: number
   address: string
+}
+
+interface CardanoUnspentTxOutput {
+  ctaAddress: string
+  ctaAmount: {
+    getCoin: string
+  }
+  ctaTxHash: string
+  ctaTxIndex: number
 }
 
 interface BitcoinLikeProvider {
@@ -92,21 +103,4 @@ declare const bitcoincash: BitcoinLikeProvider
 declare const dash: BitcoinLikeProvider
 declare const litecoin: BitcoinLikeProvider
 declare const dogecoin: BitcoinLikeProvider
-
-type TSymbols =
-  | 'btc'
-  | 'bch'
-  | 'bsv'
-  | 'ltc'
-  | 'doge'
-  | 'dash'
-  | 'eth'
-  | 'etc'
-  | 'bsc'
-  | 'bnb'
-  | 'theta'
-  | 'tfuel'
-  | 'ada'
-  | 'xrp'
-  | 'nebl'
-  | 'nuls'
+declare const bitcoinsv: BitcoinLikeProvider

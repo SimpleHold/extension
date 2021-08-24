@@ -1,15 +1,9 @@
 import * as React from 'react'
-import { render } from 'react-dom'
-import numeral from 'numeral'
-import { BigNumber } from 'bignumber.js'
-import type Transport from '@ledgerhq/hw-transport-webusb'
 import { browser } from 'webextension-polyfill-ts'
+import { render } from 'react-dom'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
-
-// Components
-import Button from '@components/Button'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -17,17 +11,23 @@ import SuccessDrawer from '@drawers/Success'
 import FailDrawer from '@drawers/Fail'
 import LedgerDrawer from '@drawers/Ledger'
 import BasicDrawer from '@drawers/Basic'
+import FeedbackDrawer from '@drawers/Feedback'
 
-// Assets
-import ErrorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
+// Shared
+import SendConfirmShared from '@shared/SendConfirm'
 
 // Utils
-import { toLower, toUpper } from '@utils/format'
+import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet, THardware } from '@utils/wallet'
-import { convertDecimals } from '@utils/web3'
-import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
+import { IWallet } from '@utils/wallet'
+import { convertDecimals } from '@utils/currencies/ethereumLike'
+import {
+  formatUnit,
+  createTransaction,
+  isEthereumLike,
+  getTransactionLink,
+} from '@utils/currencies'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, getJSON, removeItem } from '@utils/storage'
@@ -40,46 +40,36 @@ import {
   createBtcTx,
   getFirstAddress,
 } from '@utils/ledger'
+import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
+
+// Hooks
+import useState from '@hooks/useState'
+
+// Assets
+import errorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
+
+// Types
+import { IState, TLedgerTxParams } from './types'
 
 // Styles
 import Styles from './styles'
 
-interface Props {
-  amount?: number
-  symbol?: string
-  addressFrom?: string
-  addressTo?: string
-  networkFee?: number
-  tabInfo?: {
-    favIconUrl: string
-    url: string
-  }
-  tokenChain?: string
-  decimals?: number
-  chain?: string
-  contractAddress?: string
-  outputs?: UnspentOutput[]
-  networkFeeSymbol?: string
-  extraId?: string
-  hardware?: THardware
+const initialState: IState = {
+  props: null,
+  activeDrawer: null,
+  password: '',
+  inputErrorLabel: null,
+  isDrawerButtonLoading: false,
+  transactionLink: '',
+  failText: '',
+  isButtonLoading: false,
+  ledgerTransport: null,
+  ledgerDrawerState: null,
+  isDraggable: false,
 }
 
 const SendConfirmation: React.FC = () => {
-  const [props, setProps] = React.useState<Props>({})
-  const [activeDrawer, setActiveDrawer] = React.useState<
-    null | 'confirm' | 'success' | 'fail' | 'ledger' | 'wrongDevice'
-  >(null)
-  const [password, setPassword] = React.useState<string>('')
-  const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
-  const [isDrawerButtonLoading, setDrawerButtonLoading] = React.useState<boolean>(false)
-  const [transactionLink, setTransactionLink] = React.useState<string>('')
-  const [failText, setFailText] = React.useState<string>('')
-  const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
-  const [ledgerTransport, setLedgerTransport] = React.useState<Transport | null>(null)
-  const [ledgerDrawerState, setLedgerDrawerState] = React.useState<
-    'wrongDevice' | 'wrongApp' | 'connectionFailed' | 'reviewTx' | null
-  >(null)
-  const [isDraggable, setIsDraggable] = React.useState<boolean>(false)
+  const { state, updateState } = useState<IState>(initialState)
 
   React.useEffect(() => {
     checkProps()
@@ -87,35 +77,88 @@ const SendConfirmation: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
-    if (ledgerDrawerState && !activeDrawer) {
-      setActiveDrawer('ledger')
+    if (state.ledgerDrawerState && !state.activeDrawer) {
+      updateState({ activeDrawer: 'ledger' })
     }
-  }, [ledgerDrawerState, activeDrawer])
+  }, [state.ledgerDrawerState, state.activeDrawer])
 
   React.useEffect(() => {
-    if (ledgerTransport) {
+    if (state.ledgerTransport) {
       createLedgerTx()
     }
-  }, [ledgerTransport])
+  }, [state.ledgerTransport])
 
-  React.useEffect(() => {
-    if (ledgerDrawerState && !activeDrawer) {
-      setActiveDrawer('ledger')
+  const createLedgerTx = async (): Promise<void> => {
+    try {
+      if (state.ledgerTransport && state.props && state.props?.hardware) {
+        const {
+          symbol,
+          addressTo,
+          amount,
+          chain,
+          addressFrom,
+          hardware: { path },
+          outputs,
+          networkFee,
+          extraId,
+        } = state.props
+
+        const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
+        const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
+
+        updateState({ ledgerDrawerState: 'reviewTx' })
+
+        const request = await signLedgerTx({
+          transport: state.ledgerTransport,
+          symbol,
+          path,
+          addressFrom,
+          addressTo,
+          amount: parseAmount,
+          chain,
+          fee: parseNetworkFee,
+          outputs,
+          extraId,
+        })
+
+        if (typeof request === 'object' && request !== null) {
+          const { name } = request
+
+          if (name === 'TransportStatusError') {
+            updateState({ ledgerDrawerState: 'wrongApp' })
+          } else if (name === 'DisconnectedDeviceDuringOperation') {
+            updateState({ ledgerDrawerState: 'connectionFailed' })
+          }
+          return
+        }
+
+        if (request) {
+          const txHash = await sendRawTransaction(request, chain)
+
+          if (txHash) {
+            return checkTransaction(txHash)
+          }
+        }
+      }
+
+      updateState({ activeDrawer: 'fail' })
+    } catch {
+      updateState({ activeDrawer: 'fail' })
     }
-  }, [ledgerDrawerState, activeDrawer])
+  }
 
-  const signLedgerTx = async (
-    transport: Transport,
-    symbol: string,
-    path: string,
-    addressFrom: string,
-    addressTo: string,
-    amount: number,
-    chain: string,
-    fee: number,
-    outputs?: UnspentOutput[],
-    extraId?: string
-  ): Promise<string | null | ILedgerError> => {
+  const signLedgerTx = async ({
+    transport,
+    symbol,
+    path,
+    addressFrom,
+    addressTo,
+    amount,
+    chain,
+    fee,
+    outputs,
+    extraId,
+  }: TLedgerTxParams): Promise<string | null | ILedgerError> => {
     if (symbol === 'eth') {
       const ethParams = await getWeb3TxParams(addressFrom, addressTo, amount, chain)
 
@@ -148,78 +191,16 @@ const SendConfirmation: React.FC = () => {
     const queryDraggable = searchParams.get('isDraggable')
 
     if (queryDraggable === 'true') {
-      setIsDraggable(true)
-    }
-  }
-
-  const createLedgerTx = async (): Promise<void> => {
-    try {
-      if (ledgerTransport) {
-        const {
-          symbol,
-          addressTo,
-          amount,
-          chain,
-          addressFrom,
-          hardware,
-          outputs,
-          networkFee,
-          extraId,
-        } = props
-
-        if (symbol && amount && hardware && addressFrom && addressTo && chain && networkFee) {
-          const { path } = hardware
-          const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
-          const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
-
-          setLedgerDrawerState('reviewTx')
-
-          const request = await signLedgerTx(
-            ledgerTransport,
-            symbol,
-            path,
-            addressFrom,
-            addressTo,
-            parseAmount,
-            chain,
-            parseNetworkFee,
-            outputs,
-            extraId
-          )
-
-          if (typeof request === 'object' && request !== null) {
-            const { name } = request
-
-            if (name === 'TransportStatusError') {
-              setLedgerDrawerState('wrongApp')
-            } else if (name === 'DisconnectedDeviceDuringOperation') {
-              setLedgerDrawerState('connectionFailed')
-            }
-            return
-          }
-
-          if (request) {
-            const txHash = await sendRawTransaction(request, chain)
-
-            if (txHash) {
-              return checkTransaction(txHash)
-            }
-          }
-        }
-      }
-
-      return setActiveDrawer('fail')
-    } catch {
-      setActiveDrawer('fail')
+      updateState({ isDraggable: true })
     }
   }
 
   const checkProps = async (): Promise<void> => {
-    const data = getJSON('sendConfirmationData')
+    const props = getJSON('sendConfirmationData')
 
-    if (data) {
+    if (props) {
       removeItem('sendConfirmationData')
-      setProps(data)
+      updateState({ props })
     } else {
       onClose()
     }
@@ -238,64 +219,72 @@ const SendConfirmation: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    if (activeDrawer === 'fail') {
-      setActiveDrawer(null)
+    if (state.activeDrawer === 'fail') {
+      updateState({ activeDrawer: null })
     }
 
-    if (props?.hardware) {
-      if (props.hardware.type === 'ledger') {
+    if (state.props?.hardware) {
+      if (state.props.hardware.type === 'ledger') {
         onConnectLedger()
       } else {
-        if (activeDrawer === 'wrongDevice') {
-          setActiveDrawer(null)
+        if (state.activeDrawer === 'wrongDevice') {
+          updateState({ activeDrawer: null })
         }
 
         onSendHardwareTx()
       }
     } else {
-      setActiveDrawer('confirm')
+      updateState({ activeDrawer: 'confirm' })
     }
   }
 
   const onConnectLedger = async (): Promise<void> => {
-    if (ledgerDrawerState) {
-      setLedgerDrawerState(null)
-      setActiveDrawer(null)
+    if (state.ledgerDrawerState) {
+      updateState({ activeDrawer: null, ledgerDrawerState: null })
     }
 
     const transport = await requestTransport()
 
-    if (transport && props.hardware && props.symbol) {
+    if (transport && state.props && state.props?.hardware) {
       const {
         hardware: { deviceId },
-      } = props
+      } = state.props
 
-      const getFirstLedgerAddress = await getFirstAddress(transport, props.symbol)
+      const getFirstLedgerAddress = await getFirstAddress(transport, state.props.symbol)
 
       if (typeof getFirstLedgerAddress === 'string') {
         if (toLower(getFirstLedgerAddress) !== toLower(deviceId)) {
-          setLedgerDrawerState('wrongDevice')
+          updateState({ ledgerDrawerState: 'wrongDevice' })
         } else {
-          setLedgerTransport(transport)
+          updateState({ ledgerTransport: transport })
         }
       } else {
-        setLedgerDrawerState('wrongDevice')
+        updateState({ ledgerDrawerState: 'wrongDevice' })
       }
     }
   }
 
   const onSendHardwareTx = async (): Promise<void> => {
-    const { symbol, addressTo, amount, chain, addressFrom, hardware, outputs, networkFee } = props
+    if (state.props && state.props?.hardware) {
+      const {
+        symbol,
+        addressTo,
+        amount,
+        chain,
+        addressFrom,
+        hardware,
+        outputs,
+        networkFee,
+      } = state.props
+      const { deviceId, path } = hardware
 
-    if (symbol && addressTo && amount && chain && addressFrom && hardware && networkFee) {
       const trezorFeatures = await getFeatures()
 
-      if (trezorFeatures?.device_id !== hardware.deviceId) {
-        return setActiveDrawer('wrongDevice')
-      }
+      updateState({ isButtonLoading: true })
 
-      setButtonLoading(true)
-      const { path } = hardware
+      if (trezorFeatures?.device_id !== deviceId) {
+        return updateState({ activeDrawer: 'wrongDevice' })
+      }
 
       const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
       const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
@@ -330,35 +319,53 @@ const SendConfirmation: React.FC = () => {
       }
 
       if (getTxId) {
-        const link = getTransactionLink(getTxId, symbol, chain)
-
-        if (link) {
-          setTransactionLink(link)
-        }
-        setButtonLoading(false)
-        return setActiveDrawer('success')
+        return updateState({
+          activeDrawer: 'success',
+          transactionLink: getTransactionLink(getTxId, symbol, chain),
+          isButtonLoading: false,
+        })
       }
-      setButtonLoading(false)
-      return setActiveDrawer('fail')
+      return updateState({ activeDrawer: 'fail', isButtonLoading: false })
     }
   }
 
+  const onCloseDrawer = (): void => {
+    updateState({ activeDrawer: null })
+
+    if (state.ledgerDrawerState) {
+      updateState({ ledgerDrawerState: null })
+    }
+  }
+
+  const closeSuccessDrawer = (): void => {
+    if (state.isButtonLoading) {
+      return
+    }
+
+    const txsStats = getStats()
+
+    if (txsStats) {
+      updateStats()
+      const { amount } = JSON.parse(txsStats)
+
+      const isCanShowDrawer = isShowSatismeter(amount, amount + 1)
+
+      if (isCanShowDrawer) {
+        return updateState({ activeDrawer: 'feedback' })
+      }
+    }
+
+    onClose()
+  }
+
   const onConfirmSend = async (): Promise<void> => {
-    if (inputErrorLabel) {
-      setInputErrorLabel(null)
+    if (state.inputErrorLabel) {
+      updateState({ inputErrorLabel: null })
     }
 
     const backup = getItem('backup')
 
-    if (
-      backup &&
-      props?.amount &&
-      props?.symbol &&
-      props?.networkFee &&
-      props?.addressFrom &&
-      props?.addressTo &&
-      props?.chain
-    ) {
+    if (backup && state.props) {
       const {
         tokenChain,
         decimals,
@@ -371,17 +378,17 @@ const SendConfirmation: React.FC = () => {
         contractAddress,
         outputs,
         extraId,
-      } = props
+      } = state.props
 
-      const decryptBackup = decrypt(backup, password)
+      const decryptBackup = decrypt(backup, state.password)
 
       if (decryptBackup) {
         const findWallet: IWallet | null = JSON.parse(decryptBackup).wallets.find(
-          (wallet: IWallet) => toLower(wallet.address) === toLower(props.addressFrom)
+          (wallet: IWallet) => toLower(wallet.address) === toLower(state.props?.addressFrom)
         )
 
         if (findWallet?.privateKey) {
-          setDrawerButtonLoading(true)
+          updateState({ isDrawerButtonLoading: true })
 
           const parseAmount =
             tokenChain && decimals
@@ -423,11 +430,13 @@ const SendConfirmation: React.FC = () => {
             )
 
             if (transaction) {
-              setTransactionLink(theta.getTransactionLink(transaction))
-              setDrawerButtonLoading(false)
-              return setActiveDrawer('success')
+              return updateState({
+                activeDrawer: 'success',
+                isDrawerButtonLoading: false,
+                transactionLink: theta.getTransactionLink(transaction),
+              })
             }
-            return setInputErrorLabel('Error while creating transaction')
+            return updateState({ inputErrorLabel: 'Error while creating transaction' })
           }
 
           const transaction = await createTransaction({
@@ -437,7 +446,7 @@ const SendConfirmation: React.FC = () => {
             extraId,
           })
 
-          setDrawerButtonLoading(false)
+          updateState({ isDrawerButtonLoading: false })
 
           if (transaction) {
             const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
@@ -447,207 +456,131 @@ const SendConfirmation: React.FC = () => {
             }
           }
 
-          return setInputErrorLabel('Error while creating transaction')
+          return updateState({ inputErrorLabel: 'Error while creating transaction' })
         }
       }
     }
 
-    return setInputErrorLabel('Password is not valid')
+    return updateState({ inputErrorLabel: 'Error while creating transaction' })
+  }
+
+  const onClickLedgerDrawer = (): void => {
+    if (state.props?.hardware?.type === 'ledger') {
+      onConnectLedger()
+    }
   }
 
   const checkTransaction = async (transaction: any) => {
-    const { tokenChain, symbol, chain } = props
+    if (state.props) {
+      const { tokenChain, symbol, chain } = state.props
 
-    if (symbol && chain) {
       if (symbol === 'xrp' && transaction?.engine_result_code === 125) {
-        setFailText(
-          'You are sending funds to an inactive address. Due to the Network rules, you must transfer at least 20 XRP to activate it.'
-        )
-        return setActiveDrawer('fail')
+        return updateState({
+          activeDrawer: 'fail',
+          failText:
+            'You are sending funds to an inactive address. Due to the Network rules, you must transfer at least 20 XRP to activate it.',
+        })
       }
 
       let txHash = transaction
 
       if (symbol === 'xrp') {
         if (transaction?.engine_result !== 'tesSUCCESS') {
-          return setInputErrorLabel('Error while creating transaction')
+          return updateState({ inputErrorLabel: 'Error while creating transaction' })
         }
         txHash = transaction?.tx_json?.hash
       }
 
-      const link = getTransactionLink(txHash, symbol, chain, tokenChain)
-
-      if (link) {
-        setTransactionLink(link)
-      }
-      return setActiveDrawer('success')
+      updateState({
+        activeDrawer: 'success',
+        transactionLink: getTransactionLink(txHash, symbol, chain, tokenChain),
+      })
     }
   }
 
-  const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
-
-    if (ledgerDrawerState) {
-      setLedgerDrawerState(null)
-    }
-  }
-
-  const onClickLedgerDrawer = (): void => {
-    if (props?.hardware?.type === 'ledger') {
-      onConnectLedger()
-    }
+  const setPassword = (password: string): void => {
+    updateState({ password })
   }
 
   return (
     <ExternalPageContainer
       onClose={onClose}
       headerStyle="green"
-      backPageTitle={props?.hardware ? undefined : 'Send'}
-      backPageUrl={props?.hardware ? undefined : 'send.html'}
-      isDraggable={isDraggable}
+      backPageTitle={state.props?.hardware ? undefined : 'Send'}
+      backPageUrl={state.props?.hardware ? undefined : 'send.html'}
+      isDraggable={state.isDraggable}
     >
       <>
-        <Styles.Body>
-          <Styles.Row>
-            <Styles.Title>Confirm the sending</Styles.Title>
-            {!props?.hardware ? (
-              <Styles.SiteInfo>
-                <Styles.SiteInfoLabel>Confirm sending on</Styles.SiteInfoLabel>
-                {props?.tabInfo ? (
-                  <Styles.SiteInfoRow>
-                    <Styles.SiteFavicon src={props.tabInfo.favIconUrl} />
-                    <Styles.SiteUrl>{props.tabInfo.url}</Styles.SiteUrl>
-                  </Styles.SiteInfoRow>
-                ) : null}
-              </Styles.SiteInfo>
-            ) : null}
-
-            <Styles.OrderCheck>
-              <Styles.Table>
-                <Styles.Tbody>
-                  <Styles.TableTr>
-                    <Styles.TableTd>
-                      <Styles.TableTitle>Amount:</Styles.TableTitle>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableAmount>
-                        {numeral(props?.amount).format('0.[00000000]')}
-                      </Styles.TableAmount>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
-                    </Styles.TableTd>
-                  </Styles.TableTr>
-                  <Styles.TableTr>
-                    <Styles.TableTd>
-                      <Styles.TableTitle>Network fee:</Styles.TableTitle>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableAmount>
-                        {numeral(props?.networkFee).format('0.[00000000]')}
-                      </Styles.TableAmount>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
-                    </Styles.TableTd>
-                  </Styles.TableTr>
-                </Styles.Tbody>
-              </Styles.Table>
-
-              {toUpper(props?.symbol) === toUpper(props?.networkFeeSymbol) ? (
-                <>
-                  <Styles.DashedDivider>
-                    <Styles.DashedDividerLine />
-                  </Styles.DashedDivider>
-
-                  <Styles.Table>
-                    <Styles.Tbody>
-                      <Styles.TableTr>
-                        <Styles.TableTd>
-                          <Styles.TableTitle>Total:</Styles.TableTitle>
-                        </Styles.TableTd>
-                        <Styles.TableTd>
-                          {props?.amount && props?.networkFee ? (
-                            <Styles.TableAmount>
-                              {numeral(
-                                new BigNumber(props.amount).plus(props.networkFee).toNumber()
-                              ).format('0.[00000000]')}
-                            </Styles.TableAmount>
-                          ) : null}
-                        </Styles.TableTd>
-                        <Styles.TableTd>
-                          <Styles.TableSymbol>{toUpper(props.symbol)}</Styles.TableSymbol>
-                        </Styles.TableTd>
-                      </Styles.TableTr>
-                    </Styles.Tbody>
-                  </Styles.Table>
-                </>
-              ) : null}
-            </Styles.OrderCheck>
-
-            <Styles.DestinationsList>
-              <Styles.Destinate>
-                <Styles.DestinateTitle>From</Styles.DestinateTitle>
-                <Styles.DestinateText>{props?.addressFrom}</Styles.DestinateText>
-              </Styles.Destinate>
-              <Styles.Destinate>
-                <Styles.DestinateTitle>To</Styles.DestinateTitle>
-                <Styles.DestinateText>{props?.addressTo}</Styles.DestinateText>
-              </Styles.Destinate>
-            </Styles.DestinationsList>
-          </Styles.Row>
-          <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
-            <Button label="Confirm" onClick={onConfirm} isLoading={isButtonLoading} ml={7.5} />
-          </Styles.Actions>
-        </Styles.Body>
+        {state.props ? (
+          <Styles.Body>
+            <SendConfirmShared
+              amount={state.props.amount}
+              symbol={state.props.symbol}
+              networkFee={state.props.networkFee}
+              addressFrom={state.props.addressFrom}
+              addressTo={state.props.addressTo}
+              networkFeeSymbol={state.props.networkFeeSymbol}
+              tokenChain={state.props.tokenChain}
+              tokenName={state.props.name}
+              onCancel={onClose}
+              onConfirm={onConfirm}
+              isButtonLoading={state.isButtonLoading}
+              tabInfo={state.props.tabInfo}
+            />
+          </Styles.Body>
+        ) : null}
         <ConfirmDrawer
-          isActive={activeDrawer === 'confirm'}
+          isActive={state.activeDrawer === 'confirm'}
           onClose={onCloseDrawer}
           title="Confirm the sending"
           inputLabel="Enter password"
           textInputType="password"
-          textInputValue={password}
-          inputErrorLabel={inputErrorLabel}
+          textInputValue={state.password}
+          inputErrorLabel={state.inputErrorLabel}
           onChangeText={setPassword}
-          isButtonDisabled={!validatePassword(password)}
+          isButtonDisabled={!validatePassword(state.password)}
           onConfirm={onConfirmSend}
-          isButtonLoading={isDrawerButtonLoading}
+          isButtonLoading={state.isDrawerButtonLoading}
           openFrom="browser"
         />
         <SuccessDrawer
-          isActive={activeDrawer === 'success'}
-          onClose={onClose}
+          isActive={state.activeDrawer === 'success'}
+          onClose={closeSuccessDrawer}
           text="Your transaction has been successfully sent. You can check it here:"
-          link={transactionLink}
+          link={state.transactionLink}
           openFrom="browser"
           isCloseOnLinkClick
         />
         <FailDrawer
-          isActive={activeDrawer === 'fail'}
+          isActive={state.activeDrawer === 'fail'}
           onClose={onCloseDrawer}
-          text={failText}
+          text={state.failText}
           openFrom="browser"
         />
         <LedgerDrawer
-          isActive={activeDrawer === 'ledger'}
+          isActive={state.activeDrawer === 'ledger'}
           onClose={onCloseDrawer}
           openFrom="browser"
-          state={ledgerDrawerState}
+          state={state.ledgerDrawerState}
           buttonOnClick={onClickLedgerDrawer}
-          symbol={props?.symbol}
+          symbol={state.props?.symbol}
         />
         <BasicDrawer
-          isActive={activeDrawer === 'wrongDevice'}
+          isActive={state.activeDrawer === 'wrongDevice'}
           onClose={onCloseDrawer}
           openFrom="browser"
           title="Wrong device"
           text="Connected Trezor is wrong. Please connect the correct device to confirm the transaction."
-          icon={ErrorHardwareConnectIcon}
+          icon={errorHardwareConnectIcon}
           button={{
             label: 'Try again',
             onClick: onConfirm,
           }}
+        />
+        <FeedbackDrawer
+          isActive={state.activeDrawer === 'feedback'}
+          onClose={onClose}
+          openFrom="browser"
         />
       </>
     </ExternalPageContainer>

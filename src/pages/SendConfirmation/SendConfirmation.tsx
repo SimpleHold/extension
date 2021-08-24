@@ -1,29 +1,36 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import numeral from 'numeral'
-import { BigNumber } from 'bignumber.js'
 
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
-import Button from '@components/Button'
+
+// Shared
+import SendConfirmShared from '@shared/SendConfirm'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 import FailDrawer from '@drawers/Fail'
+import FeedbackDrawer from '@drawers/Feedback'
 
 // Utils
-import { toUpper } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
-import { formatUnit, createTransaction, isEthereumLike, getTransactionLink } from '@utils/address'
-import { convertDecimals } from '@utils/web3'
+import {
+  formatUnit,
+  createTransaction,
+  isEthereumLike,
+  getTransactionLink,
+} from '@utils/currencies'
+import { convertDecimals } from '@utils/currencies/ethereumLike'
 import * as theta from '@utils/currencies/theta'
 import { getItem } from '@utils/storage'
+import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
+import { minus } from '@utils/format'
 
 // Config
 import {
@@ -33,26 +40,27 @@ import {
   ADDRESS_SEND_PASSWORD_CANCEL,
 } from '@config/events'
 
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { ILocationState, IState } from './types'
+
 // Styles
 import Styles from './styles'
 
-interface LocationState {
-  amount: number
-  symbol: TSymbols
-  networkFee: number
-  addressFrom: string
-  addressTo: string
-  outputs: UnspentOutput[]
-  chain: string
-  networkFeeSymbol: string
-  contractAddress?: string
-  tokenChain?: string
-  decimals?: number
-  extraId?: string
+const initialState: IState = {
+  activeDrawer: null,
+  password: '',
+  inputErrorLabel: null,
+  transactionLink: '',
+  isButtonLoading: false,
+  failText: '',
 }
 
 const SendConfirmation: React.FC = () => {
   const history = useHistory()
+
   const {
     state: {
       amount,
@@ -63,35 +71,30 @@ const SendConfirmation: React.FC = () => {
       outputs,
       chain,
       networkFeeSymbol,
+      isIncludeFee = false,
       contractAddress = undefined,
       tokenChain = undefined,
       decimals = undefined,
       extraId = undefined,
+      tokenName = undefined,
     },
-  } = useLocation<LocationState>()
+  } = useLocation<ILocationState>()
 
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success' | 'fail'>(
-    null
-  )
-  const [password, setPassword] = React.useState<string>('')
-  const [inputErrorLabel, setInputErrorLabel] = React.useState<null | string>(null)
-  const [transactionLink, setTransactionLink] = React.useState<string>('')
-  const [isButtonLoading, setButtonLoading] = React.useState<boolean>(false)
-  const [failText, setFailText] = React.useState<string>('')
+  const { state, updateState } = useState<IState>(initialState)
 
   const onConfirmModal = async (): Promise<void> => {
     logEvent({
       name: ADDRESS_SEND_PASSWORD,
     })
 
-    if (inputErrorLabel) {
-      setInputErrorLabel(null)
+    if (state.inputErrorLabel) {
+      updateState({ inputErrorLabel: null })
     }
 
     const backup = getItem('backup')
 
     if (backup) {
-      const decryptBackup = decrypt(backup, password)
+      const decryptBackup = decrypt(backup, state.password)
 
       if (decryptBackup) {
         const findWallet: IWallet | null = JSON.parse(decryptBackup).wallets.find(
@@ -99,12 +102,12 @@ const SendConfirmation: React.FC = () => {
         )
 
         if (findWallet?.privateKey) {
-          setButtonLoading(true)
+          updateState({ isButtonLoading: true })
 
           const parseAmount =
             tokenChain && decimals
-              ? convertDecimals(amount, decimals)
-              : formatUnit(symbol, amount, 'to', chain, 'ether')
+              ? convertDecimals(getAmount(), decimals)
+              : formatUnit(symbol, getAmount(), 'to', chain, 'ether')
           const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
@@ -136,16 +139,18 @@ const SendConfirmation: React.FC = () => {
               symbol,
               addressFrom,
               addressTo,
-              amount,
+              getAmount(),
               findWallet.privateKey
             )
 
             if (transaction) {
-              setTransactionLink(theta.getTransactionLink(transaction))
-              setButtonLoading(false)
-              return setActiveDrawer('success')
+              return updateState({
+                activeDrawer: 'success',
+                transactionLink: theta.getTransactionLink(transaction),
+                isButtonLoading: false,
+              })
             }
-            return setInputErrorLabel('Error while creating transaction')
+            return updateState({ inputErrorLabel: 'Error while creating transaction' })
           }
 
           const transaction = await createTransaction({
@@ -155,8 +160,6 @@ const SendConfirmation: React.FC = () => {
             extraId,
           })
 
-          setButtonLoading(false)
-
           if (transaction) {
             const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
 
@@ -165,37 +168,44 @@ const SendConfirmation: React.FC = () => {
             }
           }
 
-          return setInputErrorLabel('Error while creating transaction')
+          return updateState({
+            inputErrorLabel: 'Error while creating transaction',
+            isButtonLoading: false,
+          })
         }
       }
     }
 
-    return setInputErrorLabel('Password is not valid')
+    return updateState({ inputErrorLabel: 'Password is not valid' })
   }
 
   const checkTransaction = async (transaction: any) => {
     if (symbol === 'xrp' && transaction?.engine_result_code === 125) {
-      setFailText(
-        'You are sending funds to an inactive address. Due to the Network rules, you must transfer at least 20 XRP to activate it.'
-      )
-      return setActiveDrawer('fail')
+      return updateState({
+        activeDrawer: 'fail',
+        isButtonLoading: false,
+        failText:
+          'You are sending funds to an inactive address. Due to the Network rules, you must transfer at least 20 XRP to activate it.',
+      })
     }
 
     let txHash = transaction
 
     if (symbol === 'xrp') {
       if (transaction?.engine_result !== 'tesSUCCESS') {
-        return setInputErrorLabel('Error while creating transaction')
+        return updateState({
+          inputErrorLabel: 'Error while creating transaction',
+          isButtonLoading: false,
+        })
       }
       txHash = transaction?.tx_json?.hash
     }
 
-    const link = getTransactionLink(txHash, symbol, chain, tokenChain)
-
-    if (link) {
-      setTransactionLink(link)
-    }
-    return setActiveDrawer('success')
+    return updateState({
+      activeDrawer: 'success',
+      transactionLink: getTransactionLink(txHash, symbol, chain, tokenChain),
+      isButtonLoading: false,
+    })
   }
 
   const onCancel = (): void => {
@@ -211,23 +221,55 @@ const SendConfirmation: React.FC = () => {
       name: ADDRESS_SEND_CONFIRM,
     })
 
-    setActiveDrawer('confirm')
+    updateState({ activeDrawer: 'confirm' })
   }
 
-  const onCloseConfirmModal = (): void => {
+  const onCloseConfirmDrawer = (): void => {
     logEvent({
       name: ADDRESS_SEND_PASSWORD_CANCEL,
     })
 
-    setActiveDrawer(null)
+    onCloseDrawer()
   }
 
   const closeSuccessDrawer = (): void => {
-    if (isButtonLoading) {
+    if (state.isButtonLoading) {
       return
     }
 
+    const txsStats = getStats()
+
+    if (txsStats) {
+      updateStats()
+      const { amount } = JSON.parse(txsStats)
+
+      const isCanShowDrawer = isShowSatismeter(amount, amount + 1)
+
+      if (isCanShowDrawer) {
+        return updateState({ activeDrawer: 'feedback' })
+      }
+    }
+
     history.replace('/wallets')
+  }
+
+  const onCloseDrawer = (): void => {
+    updateState({ activeDrawer: null })
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
+  }
+
+  const onCloseFeedbackDrawer = (): void => {
+    history.replace('/wallets')
+  }
+
+  const getAmount = (): number => {
+    if (isIncludeFee) {
+      return minus(amount, networkFee)
+    }
+    return amount
   }
 
   return (
@@ -235,115 +277,51 @@ const SendConfirmation: React.FC = () => {
       <Styles.Wrapper>
         <Cover />
         <Header withBack backTitle="Send" onBack={history.goBack} />
-        <Styles.Container>
-          <Styles.Row>
-            <Styles.Title>Confirm the sending</Styles.Title>
-            <Styles.Description>Check transaction details</Styles.Description>
-
-            <Styles.OrderCheck>
-              <Styles.Table>
-                <Styles.Tbody>
-                  <Styles.TableTr>
-                    <Styles.TableTd>
-                      <Styles.TableTitle>Amount:</Styles.TableTitle>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableAmount>
-                        {numeral(amount).format('0.[00000000]')}
-                      </Styles.TableAmount>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableSymbol>{toUpper(symbol)}</Styles.TableSymbol>
-                    </Styles.TableTd>
-                  </Styles.TableTr>
-                  <Styles.TableTr>
-                    <Styles.TableTd>
-                      <Styles.TableTitle>Network fee:</Styles.TableTitle>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableAmount>
-                        {numeral(networkFee).format('0.[00000000]')}
-                      </Styles.TableAmount>
-                    </Styles.TableTd>
-                    <Styles.TableTd>
-                      <Styles.TableSymbol>{toUpper(networkFeeSymbol)}</Styles.TableSymbol>
-                    </Styles.TableTd>
-                  </Styles.TableTr>
-                </Styles.Tbody>
-              </Styles.Table>
-
-              {toUpper(symbol) === toUpper(networkFeeSymbol) ? (
-                <>
-                  <Styles.DashedDivider>
-                    <Styles.DashedDividerLine />
-                  </Styles.DashedDivider>
-
-                  <Styles.Table>
-                    <Styles.Tbody>
-                      <Styles.TableTr>
-                        <Styles.TableTd>
-                          <Styles.TableTitle>Total:</Styles.TableTitle>
-                        </Styles.TableTd>
-                        <Styles.TableTd>
-                          <Styles.TableAmount>
-                            {numeral(new BigNumber(amount).plus(networkFee).toNumber()).format(
-                              '0.[00000000]'
-                            )}
-                          </Styles.TableAmount>
-                        </Styles.TableTd>
-                        <Styles.TableTd>
-                          <Styles.TableSymbol>{toUpper(symbol)}</Styles.TableSymbol>
-                        </Styles.TableTd>
-                      </Styles.TableTr>
-                    </Styles.Tbody>
-                  </Styles.Table>
-                </>
-              ) : null}
-            </Styles.OrderCheck>
-
-            <Styles.DestinationsList>
-              <Styles.Destinate>
-                <Styles.DestinateTitle>From</Styles.DestinateTitle>
-                <Styles.DestinateText>{addressFrom}</Styles.DestinateText>
-              </Styles.Destinate>
-              <Styles.Destinate>
-                <Styles.DestinateTitle>To</Styles.DestinateTitle>
-                <Styles.DestinateText>{addressTo}</Styles.DestinateText>
-              </Styles.Destinate>
-            </Styles.DestinationsList>
-          </Styles.Row>
-          <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-            <Button label="Confirm" onClick={onConfirm} ml={7.5} />
-          </Styles.Actions>
-        </Styles.Container>
+        <Styles.Body>
+          <SendConfirmShared
+            amount={getAmount()}
+            symbol={symbol}
+            networkFee={networkFee}
+            addressFrom={addressFrom}
+            addressTo={addressTo}
+            networkFeeSymbol={networkFeeSymbol}
+            tokenChain={tokenChain}
+            tokenName={tokenName}
+            onCancel={onCancel}
+            onConfirm={onConfirm}
+          />
+        </Styles.Body>
       </Styles.Wrapper>
-
       <ConfirmDrawer
-        isActive={activeDrawer === 'confirm'}
-        onClose={onCloseConfirmModal}
+        isActive={state.activeDrawer === 'confirm'}
+        onClose={onCloseConfirmDrawer}
         title="Confirm the sending"
         inputLabel="Enter password"
         textInputType="password"
-        textInputValue={password}
-        inputErrorLabel={inputErrorLabel}
+        textInputValue={state.password}
+        inputErrorLabel={state.inputErrorLabel}
         onChangeText={setPassword}
-        isButtonDisabled={!validatePassword(password)}
+        isButtonDisabled={!validatePassword(state.password)}
         onConfirm={onConfirmModal}
-        isButtonLoading={isButtonLoading}
+        isButtonLoading={state.isButtonLoading}
       />
 
       <SuccessDrawer
-        isActive={activeDrawer === 'success'}
+        isActive={state.activeDrawer === 'success'}
         onClose={closeSuccessDrawer}
         text="Your transaction has been successfully sent. You can check it here:"
-        link={transactionLink}
+        link={state.transactionLink}
       />
 
       <FailDrawer
-        isActive={activeDrawer === 'fail'}
-        onClose={() => setActiveDrawer(null)}
-        text={failText}
+        isActive={state.activeDrawer === 'fail'}
+        onClose={onCloseDrawer}
+        text={state.failText}
+      />
+
+      <FeedbackDrawer
+        isActive={state.activeDrawer === 'feedback'}
+        onClose={onCloseFeedbackDrawer}
       />
     </>
   )

@@ -1,10 +1,9 @@
 import * as React from 'react'
 import { render } from 'react-dom'
-import TrezorConnect, { DEVICE_EVENT } from 'trezor-connect'
 
 // Components
 import Button from '@components/Button'
-import Currency, { TSelectedAddress } from './Currency'
+import Currency from './Currency'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -36,34 +35,37 @@ import errorConnectTrezorImage from '@assets/illustrate/errorConnectTrezor.svg'
 // Config
 import { getCurrency } from '@config/currencies'
 
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { TCurrency, TSelectedAddress, IState } from './types'
+
 // Styles
 import Styles from './styles'
 
-type TCurrency = {
-  symbol: string
-  addresses: string[]
-}
-
-type TTrezorInfo = {
-  device_id: string
-  label: string
+const initialState: IState = {
+  isError: false,
+  currencies: [],
+  isLoading: false,
+  currencyIndexes: [],
+  trezorInfo: {
+    label: 'Trezor',
+    device_id: '-1',
+  },
+  selectedAddresses: [],
+  activeDrawer: null,
+  password: '',
+  passwordErrorLabel: null,
+  isTrezorInit: false,
+  existWallets: [],
 }
 
 const ConnectTrezor: React.FC = () => {
-  const [isError, setIsError] = React.useState<boolean>(false)
-  const [currencies, setCurrencies] = React.useState<TCurrency[]>([])
-  const [isLoading, setIsLoading] = React.useState<boolean>(false)
-  const [currencyIndexes, setCurrencyIndexex] = React.useState<TTrezorCurrency[]>(trezorCurrencies)
-  const [trezorInfo, setTrezorInfo] = React.useState<TTrezorInfo>({
-    label: 'Trezor',
-    device_id: '-1',
+  const { state, updateState } = useState({
+    ...initialState,
+    currencyIndexes: trezorCurrencies,
   })
-  const [selectedAddresses, setSelectedAddresses] = React.useState<TSelectedAddress[]>([])
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
-  const [password, setPassword] = React.useState<string>('')
-  const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
-  const [isTrezorInit, setIsTrezorInit] = React.useState<boolean>(false)
-  const [existWallets, setExistWallets] = React.useState<TSelectedAddress[]>([])
 
   React.useEffect(() => {
     getWalletsList()
@@ -84,7 +86,7 @@ const ConnectTrezor: React.FC = () => {
           }
         })
 
-        setExistWallets(mapAddresses)
+        updateState({ existWallets: mapAddresses })
       }
     }
   }
@@ -94,14 +96,14 @@ const ConnectTrezor: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    if (trezorInfo.device_id === '-1') {
-      return setIsError(true)
+    if (state.trezorInfo.device_id === '-1') {
+      return updateState({ isError: true })
     }
-    setActiveDrawer('confirm')
+    updateState({ activeDrawer: 'confirm' })
   }
 
   const getTrezorBundle = (symbol: string): TTrezorBundle[] | null => {
-    const getCurrency = currencyIndexes.find(
+    const getCurrency = state.currencyIndexes.find(
       (currency: TTrezorCurrency) => toLower(currency.symbol) === toLower(symbol)
     )
 
@@ -120,11 +122,13 @@ const ConnectTrezor: React.FC = () => {
 
       getCurrency.index += 5
 
-      const findCurrencyCurrency = currencyIndexes.filter(
+      const findCurrencyCurrency = state.currencyIndexes.filter(
         (i: TTrezorCurrency) => toLower(i.symbol) !== toLower(symbol)
       )
 
-      setCurrencyIndexex([...findCurrencyCurrency, getCurrency])
+      updateState({
+        currencyIndexes: [...findCurrencyCurrency, getCurrency],
+      })
 
       return data
     }
@@ -134,24 +138,26 @@ const ConnectTrezor: React.FC = () => {
 
   const onConnectTrezor = async (): Promise<void> => {
     try {
-      setIsLoading(true)
+      updateState({ isLoading: true })
 
-      if (!isTrezorInit) {
+      if (!state.isTrezorInit) {
         await init()
-        setIsTrezorInit(true)
+        updateState({ isTrezorInit: true })
       }
 
       const trezorFeatures = await getFeatures()
 
       if (!trezorFeatures) {
-        setIsError(true)
+        updateState({ isError: true })
       } else {
         const { device_id, label } = trezorFeatures
 
         if (device_id && label) {
-          setTrezorInfo({
-            device_id,
-            label,
+          updateState({
+            trezorInfo: {
+              device_id,
+              label,
+            },
           })
         }
       }
@@ -161,16 +167,18 @@ const ConnectTrezor: React.FC = () => {
       if (bundle) {
         const addresses = await getAddresses(bundle, 'btc')
 
-        setIsLoading(false)
+        updateState({ isLoading: false })
 
         if (addresses?.length) {
-          setCurrencies([
-            { symbol: 'btc', addresses },
-            { symbol: 'ltc', addresses: [] },
-            { symbol: 'bch', addresses: [] },
-            { symbol: 'dash', addresses: [] },
-            { symbol: 'eth', addresses: [] },
-          ])
+          updateState({
+            currencies: [
+              { symbol: 'btc', addresses },
+              { symbol: 'ltc', addresses: [] },
+              { symbol: 'bch', addresses: [] },
+              { symbol: 'dash', addresses: [] },
+              { symbol: 'eth', addresses: [] },
+            ],
+          })
 
           const mapAddresses = addresses.map((address: string, index: number) => {
             return {
@@ -181,7 +189,7 @@ const ConnectTrezor: React.FC = () => {
           })
 
           const findUnusedAddresses = mapAddresses.filter((currency: TSelectedAddress) => {
-            const findExist = existWallets.find(
+            const findExist = state.existWallets.find(
               (wallet: TSelectedAddress) =>
                 toLower(wallet.address) === toLower(currency.address) &&
                 toLower(wallet.symbol) === toLower(currency.symbol)
@@ -193,15 +201,15 @@ const ConnectTrezor: React.FC = () => {
           })
 
           if (findUnusedAddresses.length) {
-            setSelectedAddresses([findUnusedAddresses[0]])
+            updateState({ selectedAddresses: [findUnusedAddresses[0]] })
           }
         } else {
-          setIsLoading(false)
-          setIsError(true)
+          updateState({ isLoading: false })
+          updateState({ isError: true })
         }
       }
     } catch {
-      setIsError(true)
+      updateState({ isError: true })
     }
   }
 
@@ -212,21 +220,21 @@ const ConnectTrezor: React.FC = () => {
       const addresses = await getAddresses(bundle, symbol)
 
       if (addresses) {
-        const getCurrency = currencies.find(
+        const getCurrency = state.currencies.find(
           (currency: TCurrency) => toLower(currency.symbol) === toLower(symbol)
         )
 
         if (getCurrency) {
           getCurrency.addresses.push(...addresses)
-          setCurrencies([...currencies])
+          updateState({ currencies: [...state.currencies] })
         }
       }
     }
   }
 
   const onClickButton = (): void => {
-    if (isError) {
-      setIsError(false)
+    if (state.isError) {
+      updateState({ isError: false })
     } else {
       onConnectTrezor()
     }
@@ -243,7 +251,7 @@ const ConnectTrezor: React.FC = () => {
       return
     }
 
-    const getCurrency = currencyIndexes.find(
+    const getCurrency = state.currencyIndexes.find(
       (currency: TTrezorCurrency) => toLower(currency.symbol) === toLower(symbol)
     )
 
@@ -257,16 +265,16 @@ const ConnectTrezor: React.FC = () => {
           path: `${path}${index}`,
         }
 
-        setSelectedAddresses([...selectedAddresses, newAddress])
+        updateState({ selectedAddresses: [...state.selectedAddresses, newAddress] })
       } else {
-        const removeExist = selectedAddresses.filter(
+        const removeExist = state.selectedAddresses.filter(
           (currency: TSelectedAddress) =>
             toLower(currency.address) !== toLower(address) ||
             toLower(currency.symbol) !== toLower(symbol) ||
             toLower(currency.path) !== toLower(`${path}${index}`)
         )
 
-        setSelectedAddresses(removeExist)
+        updateState({ selectedAddresses: removeExist })
       }
     }
   }
@@ -276,60 +284,64 @@ const ConnectTrezor: React.FC = () => {
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
   }
 
   const onConfirmDrawer = (): void => {
-    if (passwordErrorLabel) {
-      setPasswordErrorLabel(null)
+    if (state.passwordErrorLabel) {
+      updateState({ passwordErrorLabel: null })
     }
 
     const backup = getItem('backup')
 
     if (backup) {
-      const decryptBackup = decrypt(backup, password)
+      const decryptBackup = decrypt(backup, state.password)
 
       if (decryptBackup) {
         const walletsList = addHardwareWallet(
           'trezor',
-          selectedAddresses,
-          trezorInfo.label,
-          trezorInfo.device_id,
+          state.selectedAddresses,
+          state.trezorInfo.label,
+          state.trezorInfo.device_id,
           decryptBackup,
-          password
+          state.password
         )
 
         if (walletsList) {
           setItem('backupStatus', 'notDownloaded')
-          return setActiveDrawer('success')
+          return updateState({ activeDrawer: 'success' })
         }
       }
     }
 
-    return setPasswordErrorLabel('Password is not valid')
+    updateState({ passwordErrorLabel: 'Password is not valid' })
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
   }
 
   return (
     <ExternalPageContainer onClose={onClose} height="100%" headerStyle="white">
       <>
         <Styles.Wrapper>
-          {!currencies.length || isError ? (
+          {!state.currencies.length || state.isError ? (
             <Styles.Row pt={40}>
               <Styles.ConnectRow>
-                <Styles.Image src={isError ? errorConnectTrezorImage : connectTrezorImage} />
+                <Styles.Image src={state.isError ? errorConnectTrezorImage : connectTrezorImage} />
                 <Styles.ConnectTitle>
-                  {isError ? 'Connection failed' : 'Connect Trezor'}
+                  {state.isError ? 'Connection failed' : 'Connect Trezor'}
                 </Styles.ConnectTitle>
                 <Styles.ConnectDescription>
-                  {isError
+                  {state.isError
                     ? 'Something went wrong. Please reconnect your device and try again.'
                     : 'Connect your Trezor wallet and follow the instructions on the service page.'}
                 </Styles.ConnectDescription>
               </Styles.ConnectRow>
               <Button
-                label={isError ? 'Try again' : 'Connect'}
+                label={state.isError ? 'Try again' : 'Connect'}
                 onClick={onClickButton}
-                isLoading={isLoading}
+                isLoading={state.isLoading}
               />
             </Styles.Row>
           ) : (
@@ -341,7 +353,7 @@ const ConnectTrezor: React.FC = () => {
               </Styles.Description>
 
               <Styles.CurrenciesList>
-                {currencies.map((currency: TCurrency) => {
+                {state.currencies.map((currency: TCurrency) => {
                   const { symbol, addresses } = currency
                   const currencyInfo = getCurrency(symbol)
 
@@ -352,9 +364,9 @@ const ConnectTrezor: React.FC = () => {
                       name={currencyInfo?.name}
                       addresses={addresses}
                       onConnect={onConnectCurrency}
-                      selectedAddresses={selectedAddresses}
+                      selectedAddresses={state.selectedAddresses}
                       onToggleSelect={onToggleSelectAddress}
-                      existWallets={existWallets}
+                      existWallets={state.existWallets}
                     />
                   )
                 })}
@@ -366,7 +378,7 @@ const ConnectTrezor: React.FC = () => {
                   label="Confirm"
                   onClick={onConfirm}
                   ml={7.5}
-                  disabled={!selectedAddresses.length}
+                  disabled={!state.selectedAddresses.length}
                 />
               </Styles.Actions>
             </Styles.Row>
@@ -374,20 +386,20 @@ const ConnectTrezor: React.FC = () => {
         </Styles.Wrapper>
 
         <ConfirmDrawer
-          isActive={activeDrawer === 'confirm'}
+          isActive={state.activeDrawer === 'confirm'}
           onClose={onCloseDrawer}
           title="Enter the password to restore your wallet"
-          textInputValue={password}
+          textInputValue={state.password}
           onChangeText={setPassword}
           onConfirm={onConfirmDrawer}
           textInputType="password"
           inputLabel="Enter password"
-          isButtonDisabled={!validatePassword(password)}
-          inputErrorLabel={passwordErrorLabel}
+          isButtonDisabled={!validatePassword(state.password)}
+          inputErrorLabel={state.passwordErrorLabel}
           openFrom="browser"
         />
         <SuccessDrawer
-          isActive={activeDrawer === 'success'}
+          isActive={state.activeDrawer === 'success'}
           onClose={onDownloadBackup}
           text="You have successfully added your addresses!"
           openFrom="browser"

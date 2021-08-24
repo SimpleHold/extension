@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { render } from 'react-dom'
-import type Transport from '@ledgerhq/hw-transport-webusb'
 
 // Components
 import Button from '@components/Button'
@@ -22,29 +21,28 @@ import { decrypt } from '@utils/crypto'
 import { addHardwareWallet, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { TSelectedAddress, IState } from './types'
+
 // Styles
 import Styles from './styles'
 
-type TSelectedAddress = {
-  address: string
-  path: string
-  symbol: string
-}
-
-type TFirstAddress = {
-  symbol: string
-  address: string
+const initialState: IState = {
+  ledgerTransport: null,
+  ledgerName: 'Ledger',
+  activeDrawer: null,
+  password: '',
+  passwordErrorLabel: null,
+  selectedAddresses: [],
+  existWallets: [],
+  firstAddresses: [],
 }
 
 const ConnectLedger: React.FC = () => {
-  const [ledgerTransport, setLedgerTransport] = React.useState<Transport | null>(null)
-  const [ledgerName, setLedgerName] = React.useState<string>('Ledger')
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
-  const [password, setPassword] = React.useState<string>('')
-  const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
-  const [selectedAddresses, setSelectedAddresses] = React.useState<TSelectedAddress[]>([])
-  const [existWallets, setExistWallets] = React.useState<TSelectedAddress[]>([])
-  const [firstAddresses, setFirstAddresses] = React.useState<TFirstAddress[]>([])
+  const { state, updateState } = useState<IState>(initialState)
 
   React.useEffect(() => {
     getWalletsList()
@@ -65,7 +63,7 @@ const ConnectLedger: React.FC = () => {
           }
         })
 
-        setExistWallets(mapAddresses)
+        updateState({ existWallets: mapAddresses })
       }
     }
   }
@@ -75,56 +73,57 @@ const ConnectLedger: React.FC = () => {
   }
 
   const onConnect = async () => {
-    const transport = await requestTransport()
+    const ledgerTransport = await requestTransport()
 
-    if (transport) {
-      setLedgerTransport(transport)
+    if (ledgerTransport) {
+      updateState({ ledgerTransport })
 
-      const getProductName = transport.deviceModel?.productName
+      const ledgerName = ledgerTransport.deviceModel?.productName
 
-      if (getProductName) {
-        setLedgerName(getProductName)
+      if (ledgerName) {
+        updateState({ ledgerName })
       }
     }
   }
 
   const onConfirm = (): void => {
-    setActiveDrawer('confirm')
+    updateState({ activeDrawer: 'confirm' })
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
   }
 
   const onConfirmDrawer = (): void => {
-    if (passwordErrorLabel) {
-      setPasswordErrorLabel(null)
+    if (state.passwordErrorLabel) {
+      updateState({ passwordErrorLabel: null })
     }
 
     const backup = getItem('backup')
 
     if (backup) {
-      const decryptBackup = decrypt(backup, password)
+      const decryptBackup = decrypt(backup, state.password)
 
       if (decryptBackup) {
         const walletsList = addHardwareWallet(
           'ledger',
-          selectedAddresses,
-          ledgerName,
+          state.selectedAddresses,
+          state.ledgerName,
           'ledger',
           decryptBackup,
-          password,
-          firstAddresses
+          state.password,
+          state.firstAddresses
         )
 
         if (walletsList) {
           setItem('backupStatus', 'notDownloaded')
-          return setActiveDrawer('success')
+          updateState({ activeDrawer: 'success' })
+          return
         }
       }
     }
 
-    return setPasswordErrorLabel('Password is not valid')
+    updateState({ passwordErrorLabel: 'Password is not valid' })
   }
 
   const onDownloadBackup = (): void => {
@@ -156,22 +155,26 @@ const ConnectLedger: React.FC = () => {
           path: `${path}${index}`,
         }
 
-        setSelectedAddresses([...selectedAddresses, newAddress])
+        updateState({ selectedAddresses: [...state.selectedAddresses, newAddress] })
       } else {
-        const removeExist = selectedAddresses.filter(
+        const removeExist = state.selectedAddresses.filter(
           (currency: TSelectedAddress) =>
             toLower(currency.address) !== toLower(address) ||
             toLower(currency.symbol) !== toLower(symbol) ||
             toLower(currency.path) !== toLower(`${path}${index}`)
         )
 
-        setSelectedAddresses(removeExist)
+        updateState({ selectedAddresses: removeExist })
       }
     }
   }
 
   const saveFirstAddress = (symbol: string, address: string) => {
-    setFirstAddresses((firstAddresses: TFirstAddress[]) => [...firstAddresses, { symbol, address }])
+    updateState({ firstAddresses: [...state.firstAddresses, { symbol, address }] })
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
   }
 
   const renderConnect = () => (
@@ -196,29 +199,38 @@ const ConnectLedger: React.FC = () => {
           connect.
         </Styles.WalletsDescription>
 
-        {ledgerTransport ? (
+        {state.ledgerTransport ? (
           <Styles.WalletsList>
             {currencies.map((currency: TCurrency) => {
               const { symbol } = currency
 
-              return (
-                <Currency
-                  key={symbol}
-                  symbol={symbol}
-                  transport={ledgerTransport}
-                  selectedAddresses={selectedAddresses}
-                  existWallets={existWallets}
-                  onToggleSelect={onToggleSelectAddress}
-                  saveFirstAddress={saveFirstAddress}
-                />
-              )
+              if (state.ledgerTransport) {
+                return (
+                  <Currency
+                    key={symbol}
+                    symbol={symbol}
+                    transport={state.ledgerTransport}
+                    selectedAddresses={state.selectedAddresses}
+                    existWallets={state.existWallets}
+                    onToggleSelect={onToggleSelectAddress}
+                    saveFirstAddress={saveFirstAddress}
+                  />
+                )
+              }
+
+              return null
             })}
           </Styles.WalletsList>
         ) : null}
       </Styles.Row>
       <Styles.Actions>
         <Button label="Cancel" onClick={onClose} isLight mr={7.5} />
-        <Button label="Confirm" onClick={onConfirm} disabled={!selectedAddresses.length} mr={7.5} />
+        <Button
+          label="Confirm"
+          onClick={onConfirm}
+          disabled={!state.selectedAddresses.length}
+          mr={7.5}
+        />
       </Styles.Actions>
     </Styles.Container>
   )
@@ -226,22 +238,22 @@ const ConnectLedger: React.FC = () => {
   return (
     <ExternalPageContainer onClose={onClose} height="100%" headerStyle="white">
       <>
-        <Styles.Wrapper>{ledgerTransport ? renderWallets() : renderConnect()}</Styles.Wrapper>
+        <Styles.Wrapper>{state.ledgerTransport ? renderWallets() : renderConnect()}</Styles.Wrapper>
         <ConfirmDrawer
-          isActive={activeDrawer === 'confirm'}
+          isActive={state.activeDrawer === 'confirm'}
           onClose={onCloseDrawer}
           title="Enter the password to restore your wallet"
-          textInputValue={password}
+          textInputValue={state.password}
           onChangeText={setPassword}
           onConfirm={onConfirmDrawer}
           textInputType="password"
           inputLabel="Enter password"
-          isButtonDisabled={!validatePassword(password)}
-          inputErrorLabel={passwordErrorLabel}
+          isButtonDisabled={!validatePassword(state.password)}
+          inputErrorLabel={state.passwordErrorLabel}
           openFrom="browser"
         />
         <SuccessDrawer
-          isActive={activeDrawer === 'success'}
+          isActive={state.activeDrawer === 'success'}
           onClose={onDownloadBackup}
           text="You have successfully added your addresses!"
           openFrom="browser"

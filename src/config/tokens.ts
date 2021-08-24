@@ -1,4 +1,3 @@
-// Tokens logo
 import usdtLogo from '@assets/tokens/usdt.svg'
 import usdcLogo from '@assets/tokens/usdc.svg'
 import daiLogo from '@assets/tokens/dai.svg'
@@ -18,6 +17,7 @@ import cakeLogo from '@assets/tokens/cake.svg'
 import inchLogo from '@assets/tokens/inch.svg'
 import shibLogo from '@assets/tokens/shib.svg'
 import adaLogo from '@assets/tokens/ada.svg'
+import ctsiLogo from '@assets/tokens/ctsi.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -35,6 +35,7 @@ export interface IToken {
   background: string
   chain: string
   minSendAmount: number
+  isCustomFee: boolean
 }
 
 const tokens: IToken[] = [
@@ -47,6 +48,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
@@ -57,6 +59,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -67,6 +70,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x8e870d67f660d95d5be530380d0ec0bd388289e1',
@@ -77,6 +81,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x4Fabb145d64652a948d72533023f6E7A623C7C53',
@@ -87,6 +92,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0xa47c8bf37f92aBed4A126BDA807A7b7498661acD',
@@ -97,6 +103,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0xf629cbd94d3791c9250152bd8dfbdf380e2a3b9c',
@@ -107,6 +114,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
@@ -117,6 +125,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0xb59490ab09a0f526cc7305822ac65f2ab12f9723',
@@ -127,6 +136,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x6468e79A80C0eaB0F9A2B574c8d5bC374Af59414',
@@ -137,6 +147,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x5580ab97F226C324c671746a1787524AEF42E415',
@@ -147,6 +158,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x4c19596f5aaff459fa38b0f7ed92f11ae6543784',
@@ -157,6 +169,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x67c597624b17b16fb77959217360b7cd18284253',
@@ -167,6 +180,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0xf2ddae89449b7d26309a5d54614b1fc99c608af5',
@@ -177,6 +191,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0xB8c77482e45F1F44dE1745F52C74426C631bDD52',
@@ -187,6 +202,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce',
@@ -197,6 +213,7 @@ const tokens: IToken[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0xe9e7cea3dedca5984780bafc599bd69add087d56',
@@ -207,6 +224,7 @@ const tokens: IToken[] = [
     background: '#EBBB4E',
     chain: 'bsc',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82',
@@ -217,6 +235,7 @@ const tokens: IToken[] = [
     background: '#EBBB4E',
     chain: 'bsc',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x111111111117dc0aa78b770fa6a738034120c302',
@@ -227,6 +246,7 @@ const tokens: IToken[] = [
     background: '#EBBB4E',
     chain: 'bsc',
     minSendAmount: 0.001,
+    isCustomFee: true,
   },
   {
     address: '0x3ee2200efb3400fabb9aacf31297cbdd1d435d47',
@@ -237,6 +257,18 @@ const tokens: IToken[] = [
     background: '#EBBB4E',
     chain: 'bsc',
     minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x491604c0FDF08347Dd1fa4Ee062a822A5DD06B5D',
+    name: 'Cartesi Token',
+    symbol: 'ctsi',
+    decimals: 18,
+    logo: ctsiLogo,
+    background: '#132BD8',
+    chain: 'eth',
+    minSendAmount: 0.001,
+    isCustomFee: true,
   },
 ]
 
@@ -306,7 +338,7 @@ export const getUnusedAddressesForToken = (
     )
 
     for (const wallet of filterWallets) {
-      const { address, hardware } = wallet
+      const { hardware, address } = wallet
 
       const findExist = walletsList.find(
         (walletItem: IWallet) =>

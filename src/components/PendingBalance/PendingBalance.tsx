@@ -42,7 +42,10 @@ const PendingBalance: React.FC<Props> = (props) => {
         </Styles.IconRow>
         <Styles.Row>
           <Styles.Pending>
-            {`${pending > 0 ? '+' : ''}${numeral(pending).format('0.[000000]')}`} {toUpper(symbol)}
+            {pending < 0.000001
+              ? '< 0.000001'
+              : `${pending > 0 ? '+' : ''}${numeral(pending).format('0.[000000]')}`}{' '}
+            {toUpper(symbol)}
           </Styles.Pending>
           <Skeleton width={56} height={14} isLoading={USDValue === null} type={type}>
             {USDValue ? (

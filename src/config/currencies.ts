@@ -14,6 +14,7 @@ import cardanoLogo from '@assets/currencies/ada.svg'
 import rippleLogo from '@assets/currencies/xrp.svg'
 import neblioLogo from '@assets/currencies/nebl.svg'
 import nulsLogo from '@assets/currencies/nuls.svg'
+import maticLogo from '@assets/currencies/matic.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -25,6 +26,7 @@ export interface ICurrency {
   background: string
   chain: string
   minSendAmount: number
+  isCustomFee: boolean
 }
 
 const currencies: ICurrency[] = [
@@ -35,6 +37,7 @@ const currencies: ICurrency[] = [
     background: '#F7931A',
     chain: 'bitcoin',
     minSendAmount: 1000,
+    isCustomFee: true,
   },
   {
     name: 'Bitcoin Cash',
@@ -43,6 +46,7 @@ const currencies: ICurrency[] = [
     background: '#57BD91',
     chain: 'bitcoin-cash',
     minSendAmount: 87000,
+    isCustomFee: true,
   },
   {
     name: 'Bitcoin SV',
@@ -51,6 +55,7 @@ const currencies: ICurrency[] = [
     background: '#EAB300',
     chain: 'bitcoin-sv',
     minSendAmount: 200000,
+    isCustomFee: true,
   },
   {
     name: 'Litecoin',
@@ -59,6 +64,7 @@ const currencies: ICurrency[] = [
     background: '#5EABE9',
     chain: 'litecoin',
     minSendAmount: 245000,
+    isCustomFee: true,
   },
   {
     name: 'Dogecoin',
@@ -67,6 +73,7 @@ const currencies: ICurrency[] = [
     background: '#C3A634',
     chain: 'dogecoin',
     minSendAmount: 100000000,
+    isCustomFee: false,
   },
   {
     name: 'Dash',
@@ -75,6 +82,7 @@ const currencies: ICurrency[] = [
     background: '#008DE4',
     chain: 'dash',
     minSendAmount: 100000,
+    isCustomFee: true,
   },
   {
     name: 'Ethereum',
@@ -83,6 +91,7 @@ const currencies: ICurrency[] = [
     background: '#132BD8',
     chain: 'eth',
     minSendAmount: 1000000000000000,
+    isCustomFee: true,
   },
   {
     name: 'Ethereum Classic',
@@ -91,6 +100,7 @@ const currencies: ICurrency[] = [
     background: '#49803D',
     chain: 'etc',
     minSendAmount: 1000000000000000,
+    isCustomFee: false,
   },
   {
     name: 'Binance Smart Chain',
@@ -99,6 +109,7 @@ const currencies: ICurrency[] = [
     background: '#EBBB4E',
     chain: 'bsc',
     minSendAmount: 1000000000000000,
+    isCustomFee: true,
   },
   {
     name: 'Theta',
@@ -107,6 +118,7 @@ const currencies: ICurrency[] = [
     background: '#76CCD3',
     chain: 'theta',
     minSendAmount: 1000000000000000,
+    isCustomFee: false,
   },
   {
     name: 'Theta Fuel',
@@ -115,6 +127,7 @@ const currencies: ICurrency[] = [
     background: '#EF8053',
     chain: 'tfuel',
     minSendAmount: 1000000000000000,
+    isCustomFee: false,
   },
   {
     name: 'Cardano Shelley',
@@ -123,6 +136,7 @@ const currencies: ICurrency[] = [
     background: '#2B55BB',
     chain: 'cardano',
     minSendAmount: 1000000,
+    isCustomFee: false,
   },
   {
     name: 'XRP',
@@ -131,6 +145,7 @@ const currencies: ICurrency[] = [
     background: '#5088BC',
     chain: 'ripple',
     minSendAmount: 1000,
+    isCustomFee: false,
   },
   {
     name: 'Neblio',
@@ -139,6 +154,7 @@ const currencies: ICurrency[] = [
     background: '#9172CE',
     chain: 'neblio',
     minSendAmount: 100000,
+    isCustomFee: false,
   },
   {
     name: 'Nuls',
@@ -147,6 +163,16 @@ const currencies: ICurrency[] = [
     background: '#69E291',
     chain: 'nuls',
     minSendAmount: 100000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Polygon',
+    symbol: 'matic',
+    logo: maticLogo,
+    background: '#9767E9',
+    chain: 'matic',
+    minSendAmount: 1000000000000000,
+    isCustomFee: false,
   },
 ]
 
@@ -156,12 +182,6 @@ export const getCurrency = (symbol: string): ICurrency | undefined => {
 
 export const getCurrencyByChain = (chain: string): ICurrency | undefined => {
   return currencies.find((currency: ICurrency) => toLower(currency.chain) === toLower(chain))
-}
-
-export const checkWithPhrase = (symbol: string): boolean => {
-  const list: string[] = ['ada']
-
-  return list.indexOf(symbol) !== -1
 }
 
 export default currencies

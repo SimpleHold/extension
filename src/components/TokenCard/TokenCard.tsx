@@ -30,7 +30,7 @@ const TokenCard: React.FC<Props> = (props) => {
   if (tokenInfo || name) {
     return (
       <Styles.Container>
-        <CurrencyLogo width={40} height={40} symbol={symbol} chain={chain} name={name} />
+        <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
         <Styles.Row>
           <Styles.Info>
             <Styles.TokenName>{tokenInfo?.name || name}</Styles.TokenName>

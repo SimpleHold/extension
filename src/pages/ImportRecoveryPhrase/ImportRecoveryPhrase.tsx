@@ -13,7 +13,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 
 // Utils
-import { importRecoveryPhrase } from '@utils/address'
+import { importRecoveryPhrase } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { getItem, setItem } from '@utils/storage'
@@ -108,6 +108,10 @@ const ImportRecoveryPhrase: React.FC = () => {
     })
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -123,7 +127,7 @@ const ImportRecoveryPhrase: React.FC = () => {
             <Link
               to="https://simplehold.freshdesk.com/support/solutions/articles/69000197144-what-is-simplehold-"
               title="How it works?"
-              mt={30}
+              mt={20}
             />
           </Styles.Row>
 
@@ -150,7 +154,7 @@ const ImportRecoveryPhrase: React.FC = () => {
       </Styles.Wrapper>
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         title="Please enter your password to add a new address"
         inputLabel="Enter password"
         textInputValue={password}

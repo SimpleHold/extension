@@ -31,6 +31,7 @@ export interface IWallet {
   createdAt?: Date
   isHidden?: boolean
   mnemonic?: string
+  walletName?: string
   hardware?: THardware
 }
 
@@ -257,14 +258,17 @@ export const addNew = (
 
 export const toggleVisibleWallet = (address: string, symbol: string, isHidden: boolean): void => {
   const wallets = getWallets()
-  const findWallet = wallets?.find(
-    (wallet: IWallet) =>
-      toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol)
-  )
 
-  if (findWallet) {
-    findWallet.isHidden = isHidden
-    setItem('wallets', JSON.stringify(wallets))
+  if (wallets) {
+    const findWallet = wallets.find(
+      (wallet: IWallet) =>
+        toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol)
+    )
+
+    if (findWallet) {
+      findWallet.isHidden = isHidden
+      setItem('wallets', JSON.stringify(wallets))
+    }
   }
 }
 
@@ -357,5 +361,47 @@ export const addHardwareWallet = (
     return getItem('wallets')
   } catch {
     return null
+  }
+}
+
+export const getWalletName = (
+  wallets: IWallet[],
+  symbol: string,
+  uuid: string,
+  hardware?: THardware,
+  chain?: string,
+  name?: string
+): string => {
+  if (hardware) {
+    return hardware.label
+  }
+
+  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+
+  const getWalletPosition = wallets
+    .filter((wallet: IWallet) => toLower(wallet.symbol) === toLower(symbol))
+    .findIndex((wallet) => toLower(wallet.uuid) === toLower(uuid))
+
+  if (currency) {
+    return `${currency.name}-${getWalletPosition + 1}`
+  } else if (name) {
+    return `${name}-${getWalletPosition + 1}`
+  }
+
+  return symbol
+}
+
+export const renameWallet = (uuid: string, name: string) => {
+  const wallets = getWallets()
+
+  if (wallets) {
+    const findWalletIndex = wallets.findIndex(
+      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+    )
+
+    if (findWalletIndex !== -1) {
+      wallets[findWalletIndex].walletName = name
+      setItem('wallets', JSON.stringify(wallets))
+    }
   }
 }

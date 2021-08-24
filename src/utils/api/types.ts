@@ -1,6 +1,3 @@
-// Utils
-import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
-
 export interface IGetBalance {
   balance: number
   balance_usd: number
@@ -30,12 +27,16 @@ export interface Web3TxParams {
 export interface IGetNetworkFeeResponse {
   networkFee?: number
   networkFeeLabel?: string
-  utxos?: UnspentOutput[] | ICardanoUnspentTxOutput[]
+  utxos?: UnspentOutput[] | CardanoUnspentTxOutput[]
   chainId?: number
   gas?: number
   gasPrice?: string
   nonce?: number
   currencyBalance?: number
+  fees?: {
+    type: TFeeTypes
+    value: number
+  }[]
 }
 
 export interface IAdaTrParams {
@@ -47,4 +48,19 @@ export type TPhishingSite = {
   rightUrl: string
   name: string
   favicon: string
+}
+
+export type TAddressTx = {
+  type: 'spend' | 'received'
+  isPending: boolean
+  date: string
+  hash: string
+  amount: number
+  estimated: number
+}
+
+export type TCustomFee = {
+  slow: number
+  average: number
+  fast: number
 }

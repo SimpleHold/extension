@@ -40,11 +40,7 @@ const TokensTab: React.FC<Props> = (props) => {
         value={searchValue}
         label="Type a currency or a ticker"
         onChange={setSearchValue}
-        icon={{
-          src: '../../../assets/icons/search.svg',
-          width: 16,
-          height: 16,
-        }}
+        type="text"
       />
 
       {!filterTokensList.length ? (
@@ -54,12 +50,12 @@ const TokensTab: React.FC<Props> = (props) => {
       ) : null}
 
       <Styles.CurrenciesList>
-        <Styles.CurrencyBlock onClick={onAddCustomToken}>
+        <Styles.CustomTokenBlock onClick={onAddCustomToken}>
           <Styles.CustomTokenLogo>
             <SVG src="../../../assets/icons/plusCircle.svg" width={20} height={20} />
           </Styles.CustomTokenLogo>
           <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
-        </Styles.CurrencyBlock>
+        </Styles.CustomTokenBlock>
         {filterTokensList.map((token: IToken) => {
           const { name, symbol, chain } = token
 
@@ -68,7 +64,7 @@ const TokensTab: React.FC<Props> = (props) => {
               key={`${symbol}/${chain}`}
               onClick={onAddToken(symbol, chain, name)}
             >
-              <CurrencyLogo symbol={symbol} width={40} height={40} br={10} chain={chain} />
+              <CurrencyLogo symbol={symbol} size={40} br={10} chain={chain} />
               <Styles.CurrencyName>{name}</Styles.CurrencyName>
               <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
             </Styles.CurrencyBlock>

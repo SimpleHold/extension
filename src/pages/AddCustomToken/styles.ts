@@ -28,7 +28,7 @@ const Title = styled.p`
 `
 
 const Form = styled.div`
-  border-top: 1px solid #eaeaea;
+  border-top: 1px solid #dee1e9;
   background-color: #f8f8f8;
   padding: 20px 30px 30px 30px;
 `
@@ -42,8 +42,8 @@ const TokenCard = styled.div`
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  background: #f8f8f8;
-  border-radius: 5px;
+  background-color: #f8f9fb;
+  border-radius: 16px;
   margin: 20px 0 0 0;
 `
 

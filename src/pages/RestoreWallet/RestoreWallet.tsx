@@ -1,12 +1,13 @@
 import * as React from 'react'
-import { useDropzone } from 'react-dropzone'
-import SVG from 'react-inlinesvg'
 import { useHistory } from 'react-router-dom'
 
 // Components
 import Header from '@components/Header'
 import Button from '@components/Button'
 import AgreeTerms from '@components/AgreeTerms'
+
+// Shared
+import RestoreWalletShared from '@shared/RestoreWallet'
 
 // Drawers
 import ConfirmDrawer from '@drawers/Confirm'
@@ -22,37 +23,47 @@ import { setItem } from '@utils/storage'
 // Config
 import { START_RESTORE_CONFIRM, START_RESTORE_PASSWORD } from '@config/events'
 
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { IState } from './types'
+
 // Styles
 import Styles from './styles'
+
+const initialState: IState = {
+  isInvalidFile: false,
+  backupData: '',
+  isAgreed: true,
+  activeDrawer: null,
+  password: '',
+  passwordErrorLabel: null,
+}
 
 const RestoreWallet: React.FC = () => {
   const history = useHistory()
 
-  const [isInvalidFile, setInvalidFile] = React.useState<boolean>(false)
-  const [backupData, setBackupData] = React.useState<null | string>(null)
-  const [isAgreed, setIsAgreed] = React.useState<boolean>(true)
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'fail'>(null)
-  const [password, setPassword] = React.useState<string>('')
-  const [passwordErrorLabel, setPasswordErrorLabel] = React.useState<null | string>(null)
+  const { state, updateState } = useState<IState>(initialState)
 
   const onDrop = React.useCallback(async (acceptedFiles) => {
+    updateState({ isInvalidFile: false, backupData: '' })
+
     const text = await acceptedFiles[0]?.text()
 
     if (text?.length > 0 && acceptedFiles[0].name.indexOf('.dat') !== -1) {
-      setBackupData(text)
+      updateState({ backupData: text })
     } else {
-      setInvalidFile(true)
+      updateState({ isInvalidFile: true })
     }
   }, [])
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop })
 
   const onConfirm = (): void => {
     logEvent({
       name: START_RESTORE_CONFIRM,
     })
 
-    setActiveDrawer('confirm')
+    updateState({ activeDrawer: 'confirm' })
   }
 
   const onConfirmRestore = (): void => {
@@ -60,31 +71,43 @@ const RestoreWallet: React.FC = () => {
       name: START_RESTORE_PASSWORD,
     })
 
-    if (passwordErrorLabel) {
-      setPasswordErrorLabel(null)
+    if (state.passwordErrorLabel) {
+      updateState({ passwordErrorLabel: null })
     }
 
-    if (!validatePassword(password)) {
-      return setPasswordErrorLabel('Password is not valid')
+    if (!validatePassword(state.password)) {
+      return updateState({ passwordErrorLabel: 'Password is not valid' })
     }
 
-    if (backupData) {
-      const decryptBackup = decrypt(backupData, password)
+    if (state.backupData) {
+      const decryptBackup = decrypt(state.backupData, state.password)
 
       if (decryptBackup === null) {
-        setPasswordErrorLabel('Password is not valid')
+        updateState({ passwordErrorLabel: 'Password is not valid' })
       } else {
         const getWalletsList = validateBackup(decryptBackup)
 
         if (getWalletsList) {
-          setItem('backup', backupData)
+          setItem('backup', state.backupData)
           setItem('wallets', getWalletsList)
           history.replace('/wallets')
         } else {
-          setActiveDrawer('fail')
+          updateState({ activeDrawer: 'fail' })
         }
       }
     }
+  }
+
+  const onCloseDrawer = (): void => {
+    updateState({ activeDrawer: null })
+  }
+
+  const toggleAgreed = (): void => {
+    updateState({ isAgreed: !state.isAgreed })
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
   }
 
   return (
@@ -96,45 +119,13 @@ const RestoreWallet: React.FC = () => {
             <Styles.Title>Restore</Styles.Title>
             <Styles.Text>You can restore your SimpleHold wallet with a backup file.</Styles.Text>
 
-            <Styles.DNDBlock {...getRootProps()}>
-              <Styles.DNDArea isDragActive={isDragActive}>
-                <input {...getInputProps()} />
-                <Styles.DNDIconRow
-                  isDragActive={isDragActive || backupData !== null}
-                  isInvalidFile={isInvalidFile}
-                >
-                  {isInvalidFile ? (
-                    <SVG
-                      src="../../assets/icons/invalidFile.svg"
-                      width={21.85}
-                      height={21.85}
-                      title="file"
-                    />
-                  ) : (
-                    <SVG
-                      src="../../assets/icons/file.svg"
-                      width={16.85}
-                      height={21.5}
-                      title="file"
-                    />
-                  )}
-                </Styles.DNDIconRow>
-                {backupData ? (
-                  <Styles.DNDText>The backup file is successfully loaded</Styles.DNDText>
-                ) : null}
-                {!backupData && !isInvalidFile ? (
-                  <Styles.DNDText>
-                    Drag and drop or choose a backup file to restore your wallet
-                  </Styles.DNDText>
-                ) : null}
-                {isInvalidFile ? (
-                  <Styles.DNDText>
-                    The chosen file is invalid or broken, please pick another one
-                  </Styles.DNDText>
-                ) : null}
-              </Styles.DNDArea>
-            </Styles.DNDBlock>
-            <AgreeTerms isAgreed={isAgreed} setIsAgreed={() => setIsAgreed(!isAgreed)} mt={24} />
+            <RestoreWalletShared
+              isFileBroken={state.isInvalidFile}
+              isFileUploaded={state.backupData.length > 0}
+              onDrop={onDrop}
+            />
+
+            <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
           </Styles.Row>
           <Styles.Actions>
             <Button label="Cancel" onClick={history.goBack} isLight mr={7.5} />
@@ -142,26 +133,26 @@ const RestoreWallet: React.FC = () => {
               label="Confirm"
               onClick={onConfirm}
               ml={7.5}
-              disabled={!backupData?.length || !isAgreed}
+              disabled={!state.backupData?.length || !state.isAgreed}
             />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>
       <ConfirmDrawer
-        isActive={activeDrawer === 'confirm'}
-        onClose={() => setActiveDrawer(null)}
+        isActive={state.activeDrawer === 'confirm'}
+        onClose={onCloseDrawer}
         title="Enter your password to restore the wallet."
-        textInputValue={password}
+        textInputValue={state.password}
         onChangeText={setPassword}
         onConfirm={onConfirmRestore}
         textInputType="password"
         inputLabel="Enter password"
-        isButtonDisabled={!validatePassword(password)}
-        inputErrorLabel={passwordErrorLabel}
+        isButtonDisabled={!validatePassword(state.password)}
+        inputErrorLabel={state.passwordErrorLabel}
       />
       <FailDrawer
-        isActive={activeDrawer === 'fail'}
-        onClose={() => setActiveDrawer(null)}
+        isActive={state.activeDrawer === 'fail'}
+        onClose={onCloseDrawer}
         text="The backup file is broken. We cannot restore your wallet. Check your backup file and try again."
       />
     </>

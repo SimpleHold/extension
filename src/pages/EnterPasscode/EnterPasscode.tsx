@@ -84,6 +84,10 @@ const EnterPasscode: React.FC = () => {
     e.preventDefault()
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -106,7 +110,7 @@ const EnterPasscode: React.FC = () => {
       </Styles.Wrapper>
       <ForgotPasscodeDrawer
         isActive={activeDrawer === 'forgotPasscode'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         onConfirm={onConfirmReset}
       />
     </>

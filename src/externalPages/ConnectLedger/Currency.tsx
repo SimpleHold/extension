@@ -14,14 +14,11 @@ import { getCurrency } from '@config/currencies'
 import { getBTCAddress, getETHAddress, getXRPAddress, requestTransport } from '@utils/ledger'
 import { toLower } from '@utils/format'
 
+// Types
+import { TSelectedAddress } from './types'
+
 // Styles
 import Styles from './styles'
-
-type TSelectedAddress = {
-  address: string
-  path: string
-  symbol: string
-}
 
 interface Props {
   symbol: string
@@ -131,7 +128,7 @@ const Currency: React.FC<Props> = (props) => {
   return (
     <Styles.Currency>
       <Styles.CurrencyHeading onClick={onClickHeading} isActive={isActive}>
-        <CurrencyLogo symbol={symbol} width={30} height={30} br={10} />
+        <CurrencyLogo symbol={symbol} size={30} br={10} />
         <Styles.CurrencyHeadingRow>
           {currencyInfo ? <Styles.CurrencyName>{currencyInfo.name}</Styles.CurrencyName> : null}
           {!isActive ? (

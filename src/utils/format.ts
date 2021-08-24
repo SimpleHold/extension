@@ -1,3 +1,13 @@
+import BigNumber from 'bignumber.js'
+
+export const minus = (from: number, to: number): number => {
+  return new BigNumber(from).minus(new BigNumber(to)).toNumber()
+}
+
+export const plus = (from: number, to: number): number => {
+  return new BigNumber(from).plus(new BigNumber(to)).toNumber()
+}
+
 export const toUpper = (text?: string): string | undefined => {
   if (text?.length) {
     return text.toUpperCase()
@@ -58,4 +68,14 @@ export const short = (data: string, max: number): string => {
         '...' +
         data.substring(data.length - max / 2 + 2, data.length)
     : data
+}
+
+export const formatEstimated = (
+  estimated: number | null,
+  value: number | string
+): number | string => {
+  if (estimated !== 0 && estimated !== null && estimated < 0.01) {
+    return '< 0.01'
+  }
+  return value
 }

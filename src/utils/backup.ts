@@ -1,5 +1,6 @@
 import { v4 } from 'uuid'
 
+// Utils
 import { IWallet } from '@utils/wallet'
 import { validateWallet } from '@utils/validate'
 
@@ -20,7 +21,7 @@ export const generate = (currencies: TGenerateCurrency[]): { [key: string]: stri
 
   const backup: TBackup = {
     wallets: [],
-    version: '1.11.0',
+    version: '1.12.0',
     uuid: v4(),
   }
 

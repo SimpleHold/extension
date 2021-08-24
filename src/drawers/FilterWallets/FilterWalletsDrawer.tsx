@@ -3,7 +3,7 @@ import SVG from 'react-inlinesvg'
 
 // Components
 import DrawerWrapper from '@components/DrawerWrapper'
-import CurrenciesDropdown, { TList } from '@components/CurrenciesDropdown/CurrenciesDropdown'
+import CurrenciesDropdown from '@components/CurrenciesDropdown/CurrenciesDropdown'
 import Button from '@components/Button'
 import Switch from '@components/Switch'
 import CurrencyLogo from '@components/CurrencyLogo'
@@ -15,6 +15,9 @@ import { toLower } from '@utils/format'
 
 // Hooks
 import useState from '@hooks/useState'
+
+// Types
+import { TList } from '@components/CurrenciesDropdown/types'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -244,6 +247,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
 
   const onReset = (): void => {
     removeMany(['hiddenWalletsFilter', 'zeroBalancesFilter', 'selectedCurrenciesFilter'])
+    updateState(initialState)
     onApply()
   }
 
@@ -262,13 +266,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
               if (symbol && index < 5) {
                 return (
                   <Styles.DropdownCurrency key={`${symbol}/${chain}`}>
-                    <CurrencyLogo
-                      symbol={symbol}
-                      chain={chain}
-                      width={40}
-                      height={40}
-                      name={name}
-                    />
+                    <CurrencyLogo symbol={symbol} chain={chain} size={40} name={name} />
                   </Styles.DropdownCurrency>
                 )
               }

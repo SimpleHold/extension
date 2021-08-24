@@ -14,7 +14,7 @@ interface Props {
   onConfirm: (passcode: string) => void
   type: 'create' | 'remove'
   isError: boolean
-  setIsError: React.Dispatch<React.SetStateAction<boolean>>
+  setIsError: (isError: boolean) => void
 }
 
 const PasscodeDrawer: React.FC<Props> = (props) => {
@@ -69,7 +69,12 @@ const PasscodeDrawer: React.FC<Props> = (props) => {
 
         <Styles.Actions>
           <Button label="Cancel" isLight onClick={onClose} mr={7.5} />
-          <Button label="Ok" disabled={passcode.length !== 6} onClick={() => onConfirm(passcode)} />
+          <Button
+            label="Ok"
+            disabled={passcode.length !== 6}
+            ml={7.5}
+            onClick={() => onConfirm(passcode)}
+          />
         </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>

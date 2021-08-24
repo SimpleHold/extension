@@ -18,7 +18,7 @@ import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets } from '@
 import { decrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toLower, toUpper } from '@utils/format'
-import { importPrivateKey } from '@utils/address'
+import { importPrivateKey } from '@utils/currencies'
 import { getTokensBalance } from '@utils/api'
 import { ITokensBalance } from '@utils/api/types'
 import * as theta from '@utils/currencies/theta'
@@ -32,7 +32,7 @@ import { getCurrencyByChain, ICurrency } from '@config/currencies'
 import Styles from './styles'
 
 interface LocationState {
-  symbol: TSymbols
+  symbol: string
   chain?: string
   tokenName?: string
   contractAddress?: string
@@ -188,6 +188,10 @@ const ImportPrivateKey: React.FC = () => {
     })
   }
 
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -213,6 +217,7 @@ const ImportPrivateKey: React.FC = () => {
               onChange={setPrivateKey}
               errorLabel={errorLabel}
               inputRef={textInputRef}
+              type="text"
             />
             <Styles.Actions>
               <Button label="Back" isLight onClick={history.goBack} mr={7.5} />
@@ -229,7 +234,7 @@ const ImportPrivateKey: React.FC = () => {
       </Styles.Wrapper>
       <ConfirmDrawer
         isActive={activeDrawer === 'confirm'}
-        onClose={() => setActiveDrawer(null)}
+        onClose={onCloseDrawer}
         title="Please enter your password to add a new address"
         inputLabel="Enter password"
         textInputValue={password}

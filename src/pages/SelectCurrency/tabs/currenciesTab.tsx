@@ -38,17 +38,11 @@ const CurrenciesTab: React.FC<Props> = (props) => {
         value={searchValue}
         label="Type a currency or a ticker"
         onChange={setSearchValue}
-        icon={{
-          src: '../../../assets/icons/search.svg',
-          width: 16,
-          height: 16,
-        }}
+        type="text"
       />
 
       {!filterCurrenciesList.length ? (
-        <Styles.NotFoundMessage>
-          The currency was not found but you can add a custom token
-        </Styles.NotFoundMessage>
+        <Styles.NotFoundMessage>The currency was not found</Styles.NotFoundMessage>
       ) : null}
 
       <Styles.CurrenciesList>
@@ -57,7 +51,7 @@ const CurrenciesTab: React.FC<Props> = (props) => {
 
           return (
             <Styles.CurrencyBlock key={symbol} onClick={onAddAddress(symbol)}>
-              <CurrencyLogo symbol={symbol} width={40} height={40} br={10} />
+              <CurrencyLogo symbol={symbol} size={40} br={10} />
               <Styles.CurrencyName>{name}</Styles.CurrencyName>
               <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
             </Styles.CurrencyBlock>

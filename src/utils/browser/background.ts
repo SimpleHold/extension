@@ -6,7 +6,7 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 import { getManifest, getUrl, openWebPage } from '@utils/extension'
 import { setItem, getJSON } from '@utils/storage'
-import { generateTag } from '@utils/currencies/ripple'
+import { generateExtraId } from '@utils/currencies/ripple'
 import { getPhishingSites } from '@utils/api'
 import { TPhishingSite } from '@utils/api/types'
 import { msToMin } from '@utils/dates'
@@ -305,7 +305,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId !== 'sh-other-wallets') {
       const menuItemId = `${info.menuItemId}`.split('_')[1]
 
-      const data = menuItemId === 'extraId' ? generateTag() : menuItemId
+      const data = menuItemId === 'extraId' ? generateExtraId() : menuItemId
 
       await browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',

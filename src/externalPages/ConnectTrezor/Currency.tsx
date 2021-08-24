@@ -8,6 +8,9 @@ import CurrencyAddress from '@components/CurrencyAddress'
 // Utils
 import { toLower } from '@utils/format'
 
+// Types
+import { TSelectedAddress } from './types'
+
 // Styles
 import Styles from './styles'
 
@@ -25,12 +28,6 @@ interface Props {
     isDisabled: boolean
   ) => () => void
   existWallets: TSelectedAddress[]
-}
-
-export type TSelectedAddress = {
-  address: string
-  symbol: string
-  path: string
 }
 
 const MAX_ADDRESSES_NUMBER = 100
@@ -59,7 +56,7 @@ const Currency: React.FC<Props> = (props) => {
   return (
     <Styles.CurrencyItem>
       <Styles.CurrencyHeading isActive={addresses.length > 0} onClick={onClickHeading}>
-        <CurrencyLogo symbol={symbol} width={30} height={30} br={10} />
+        <CurrencyLogo symbol={symbol} size={30} br={10} />
         <Styles.CurrencyHeadingRow>
           <Styles.CurrencyName>{name}</Styles.CurrencyName>
           {!addresses.length ? (

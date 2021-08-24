@@ -20,7 +20,7 @@ export const clear = (): void => {
   localStorage.clear()
 }
 
-export const getJSON = (key: string): any => {
+export const getJSON = (key: string): any | null => {
   try {
     const item = getItem(key)
 

@@ -10,7 +10,7 @@ interface Props {
   mt?: number
   br?: number
   isLoading: boolean
-  children: React.ReactElement<any, any> | null
+  children?: React.ReactElement<any, any> | null
   mb?: number
 }
 
@@ -21,7 +21,7 @@ const Skeleton: React.FC<Props> = (props) => {
     return <Styles.Container type={type} width={width} height={height} mt={mt} br={br} mb={mb} />
   }
 
-  return children
+  return children || null
 }
 
 export default Skeleton

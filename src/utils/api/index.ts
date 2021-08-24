@@ -11,13 +11,16 @@ import {
   IGetNetworkFeeResponse,
   IAdaTrParams,
   TPhishingSite,
+  TAddressTx,
+  TCustomFee,
 } from './types'
 
 export const getBalance = async (
   address: string,
   chain?: string,
   tokenSymbol?: string,
-  contractAddress?: string
+  contractAddress?: string,
+  isFullBalance?: boolean
 ): Promise<IGetBalance> => {
   try {
     const { data }: AxiosResponse = await axios(
@@ -26,6 +29,7 @@ export const getBalance = async (
         params: {
           tokenSymbol,
           contractAddress,
+          isFullBalance,
         },
       }
     )
@@ -171,7 +175,7 @@ export const getEtherNetworkFee = async (
   decimals?: number
 ): Promise<IGetNetworkFeeResponse> => {
   try {
-    const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/network-fee`, {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/smart-network-fee`, {
       params: {
         from,
         to,
@@ -272,20 +276,6 @@ export const getTxHex = async (chain: string, txId: string): Promise<null | stri
   }
 }
 
-export const getFeePerByte = async (chain: string): Promise<number> => {
-  try {
-    const { data } = await axios.get(`${config.serverUrl}/wallet/fee/${chain}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    return data.data
-  } catch {
-    return 0
-  }
-}
-
 export const getPhishingSites = async (): Promise<TPhishingSite[] | null> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/phishing-sites`, {
@@ -315,4 +305,85 @@ export const getNulsTxParams = async (from: string) => {
   } catch {
     return null
   }
+}
+
+export const getTransactionHistory = async (
+  chain: string,
+  address: string,
+  tokenSymbol?: string,
+  contractAddress?: string
+): Promise<string[]> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/${chain}/history`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+        address,
+        tokenSymbol,
+        contractAddress,
+      },
+    })
+
+    return data.data
+  } catch {
+    return []
+  }
+}
+
+export const getTxsInfo = async (
+  chain: string,
+  address: string,
+  txs: string[]
+): Promise<TAddressTx[]> => {
+  try {
+    const { data } = await axios.post(
+      `${config.serverUrl}/transaction/${chain}/info`,
+      {
+        txs,
+        address,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    return data.data
+  } catch {
+    return []
+  }
+}
+
+export const getCustomFee = async (chain: string): Promise<TCustomFee | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/fee/${chain}`)
+
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const setUserId = async (userid: string): Promise<void> => {
+  try {
+    await axios.post(`${config.serverUrl}/satismeter/users/new`, {
+      userid,
+    })
+  } catch {}
+}
+
+export const sendFeedback = async (
+  userId: string,
+  feedback: string,
+  rating: number
+): Promise<void> => {
+  try {
+    await axios.post(`${config.serverUrl}/satismeter/feedback`, {
+      userId,
+      feedback,
+      rating,
+    })
+  } catch {}
 }

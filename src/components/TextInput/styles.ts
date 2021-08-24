@@ -8,7 +8,7 @@ type TContainerProps = {
   isFocused: boolean
   isError: boolean
   disabled?: boolean
-  withButton: boolean
+  pr: number
 }
 
 type TRowProps = {
@@ -24,14 +24,17 @@ const Container = styled.div`
   height: 60px;
   background: #ffffff;
   border: ${({ isFocused, isError }: TContainerProps) =>
-    isFocused || isError ? `1px solid ${isFocused ? '#3FBB7D' : '#EB5757'}` : '1px solid #eaeaea'};
-  border-radius: 5px;
+    isFocused || isError ? `1px solid ${isFocused ? '#3FBB7D' : '#EB5757'}` : '1px solid #DEE1E9'};
+  border-radius: 8px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   margin: 0 0 10px 0;
-  padding: ${({ withButton }: TContainerProps) => (withButton ? '0 12px 0 20px' : '0 20px')};
+  padding: 0 16px;
+  padding-right: ${({ pr }: TContainerProps) => `${pr}px`};
+  position: relative;
+  user-select: none;
 
   label {
     color: ${({ isFocused, isError }: TContainerProps) =>
@@ -48,11 +51,11 @@ const Row = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
-  padding: 11px 0;
+  padding: 11px 0 10px 0;
 
   label {
-    font-size: ${({ isActive }: TRowProps) => (isActive ? '12px' : '16px')};
-    line-height: ${({ isActive }: TRowProps) => (isActive ? '14px' : '19px')};
+    font-size: ${({ isActive }: TRowProps) => (isActive ? '12px' : '14px')};
+    line-height: ${({ isActive }: TRowProps) => (isActive ? '14px' : '16px')};
     margin-top: ${({ isActive, openFrom }: TRowProps) =>
       isActive
         ? openFrom === 'browser'
@@ -71,10 +74,11 @@ const Row = styled.div`
 
 const Label = styled.label`
   transition: all 0.3s ease-out;
+  margin-right: 6px;
 `
 
 const Input = styled.input`
-  margin: 5px 0 0 0;
+  margin: 4px 0 0 0;
   padding: 0;
   border: none;
   height: 0;
@@ -86,7 +90,7 @@ const Input = styled.input`
 
   &:disabled {
     background-color: #ffffff !important;
-    color: #7d7e8d;
+    color: #1d1d22;
   }
 `
 
@@ -120,17 +124,71 @@ const NumberInput = styled(NumberFormat)`
 
   &:disabled {
     background-color: #ffffff !important;
-    color: #7d7e8d;
+    color: #1d1d22;
   }
 `
 
-const IconRow = styled.div`
-  width: 30px;
-  height: 30px;
+const ClearButton = styled.div`
+  width: 24px;
+  height: 24px;
+  margin: 0 0 0 10px;
+  background-color: #f2f4f8;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 0 0 20px;
+
+  path {
+    fill: #7d7e8d;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
+`
+
+const Button = styled.div`
+  padding: 6px 10px;
+  background: #e9f5ee;
+  border-radius: 5px;
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  transition: all 0.3s;
+
+  &:hover {
+    cursor: pointer;
+    background: #3fbb7d;
+
+    p {
+      color: #ffffff;
+    }
+  }
+`
+
+const ButtonLabel = styled.p`
+  margin: 0;
+  font-weight: 500;
+  font-size: 10px;
+  line-height: 12px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #3fbb7d;
+`
+
+const LabelRow = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  justify-content: flex-start;
+
+  path {
+    fill: #eb5757;
+  }
 `
 
 const Styles = {
@@ -141,7 +199,10 @@ const Styles = {
   VisibleInput,
   EyeIcon,
   NumberInput,
-  IconRow,
+  ClearButton,
+  Button,
+  ButtonLabel,
+  LabelRow,
 }
 
 export default Styles

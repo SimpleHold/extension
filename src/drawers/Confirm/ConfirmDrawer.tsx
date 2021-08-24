@@ -17,7 +17,7 @@ interface Props {
   textInputValue: string
   onChangeText: (data: string) => void
   inputLabel: string
-  textInputType?: string
+  textInputType: 'text' | 'password' | 'number'
   inputErrorLabel?: string | null
   openFrom?: string
   isButtonLoading?: boolean

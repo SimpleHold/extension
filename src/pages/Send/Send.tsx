@@ -1,345 +1,326 @@
 import * as React from 'react'
-import { useHistory, useLocation } from 'react-router-dom'
-import numeral from 'numeral'
+import { useLocation, useHistory } from 'react-router-dom'
 import { BigNumber } from 'bignumber.js'
-import SVG from 'react-inlinesvg'
 
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
-import TextInput from '@components/TextInput'
 import Button from '@components/Button'
-import Skeleton from '@components/Skeleton'
-import Spinner from '@components/Spinner'
-import CurrenciesDropdown from '@components/CurrenciesDropdown'
-import Tooltip from '@components/Tooltip'
+
+// Shared
+import WalletCardShared from '@shared/WalletCard'
+import SendFormShared from '@shared/SendForm'
+import NetworkFeeShared from '@shared/NetworkFee'
+
+// Drawers
+import WalletsDrawer from '@drawers/Wallets'
+import AboutFeeDrawer from '@drawers/AboutFee'
 
 // Utils
-import { getWallets, IWallet, updateBalance, THardware } from '@utils/wallet'
-import { toUpper, toLower } from '@utils/format'
+import { toLower, toUpper, minus, plus } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
-import { logEvent } from '@utils/amplitude'
+import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
 import {
-  validateAddress,
-  getAddressNetworkFee,
-  formatUnit,
-  getNetworkFeeSymbol,
   getExtraIdName,
+  checkWithOutputs,
+  getNetworkFeeSymbol,
+  validateAddress,
+  formatUnit,
+  getNetworkFee,
   generateExtraId,
-} from '@utils/address'
-import bitcoinLike from '@utils/bitcoinLike'
-import { ICardanoUnspentTxOutput } from '@utils/currencies/cardano'
-import { getUrl, openWebPage } from '@utils/extension'
+  getFee,
+  getStandingFee,
+  isEthereumLike,
+} from '@utils/currencies'
+import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
-
-// Config
-import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
-import { getCurrency } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getUrl, openWebPage } from '@utils/extension'
+import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
+import useState from '@hooks/useState'
+
+// Config
+import { getToken } from '@config/tokens'
+import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
+
+// Types
+import { ILocationState, IState, TFeeValue } from './types'
 
 // Styles
 import Styles from './styles'
 
-interface LocationState {
-  symbol: TSymbols
-  address: string
-  chain: string
-  tokenChain?: string
-  contractAddress?: string
-  tokenName?: string
-  decimals?: number
-  hardware?: THardware
+const initialState: IState = {
+  balance: null,
+  estimated: null,
+  selectedAddress: '',
+  address: '',
+  wallets: [],
+  activeDrawer: null,
+  walletName: '',
+  hardware: undefined,
+  amount: '',
+  extraIdName: null,
+  extraId: '',
+  outputs: [],
+  isFeeLoading: false,
+  fee: 0,
+  feeSymbol: '',
+  feeType: 'average',
+  addressErrorLabel: null,
+  amountErrorLabel: null,
+  currencyBalance: null,
+  utxosList: [],
+  backTitle: '',
+  customFee: {
+    slow: 0,
+    average: 0,
+    fast: 0,
+  },
+  isIncludeFee: false,
+  isStandingFee: false,
+  feeValues: [],
+  timer: null,
 }
 
-const Send: React.FC = () => {
-  const history = useHistory()
+const SendPage: React.FC = () => {
   const {
     state: {
       symbol,
-      address: locationAddress,
       chain,
-      tokenChain = undefined,
-      contractAddress = undefined,
-      tokenName = undefined,
-      decimals = undefined,
-      hardware = undefined,
+      tokenChain,
+      contractAddress,
+      tokenName,
+      decimals,
+      address,
+      walletName,
+      hardware,
+      currency,
     },
-  } = useLocation<LocationState>()
+  } = useLocation<ILocationState>()
+  const history = useHistory()
 
-  const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrency(symbol)
+  const { state, updateState } = useState<IState>({
+    ...initialState,
+    selectedAddress: address,
+    walletName,
+    hardware,
+    backTitle: walletName,
+  })
 
-  const [address, setAddress] = React.useState<string>('')
-  const [amount, setAmount] = React.useState<string>('')
-  const [addresses, setAddresses] = React.useState<string[]>([])
-  const [selectedAddress, setSelectedAddress] = React.useState<string>(locationAddress)
-  const [networkFee, setNetworkFee] = React.useState<number>(0)
-  const [balance, setBalance] = React.useState<null | number>(null)
-  const [estimated, setEstimated] = React.useState<null | number>(null)
-  const [addressErrorLabel, setAddressErrorLabel] = React.useState<null | string>(null)
-  const [amountErrorLabel, setAmountErrorLabel] = React.useState<null | string>(null)
-  const [outputs, setOutputs] = React.useState<UnspentOutput[]>([])
-  const [utxosList, setUtxosList] = React.useState<UnspentOutput[] | ICardanoUnspentTxOutput[]>([])
-  const [isNetworkFeeLoading, setNetworkFeeLoading] = React.useState<boolean>(false)
-  const [currencyBalance, setCurrencyBalance] = React.useState<number | null>(null)
-  const [networkFeeSymbol, setNetworkFeeSymbol] = React.useState<string>('')
-  const [extraId, setExtraId] = React.useState<string>('')
-  const [extraIdName, setExtraIdName] = React.useState<string>('')
-
-  const debounced = useDebounce(amount, 1000)
+  const debounced = useDebounce(state.amount, 1000)
 
   React.useEffect(() => {
     getWalletsList()
-    onGetNetworkFeeSymbol()
     getExtraId()
+    getFeeSymbol()
+    getCustomFee()
+    checkStangindFee()
   }, [])
 
   React.useEffect(() => {
-    getOutputs()
-    loadBalance()
-  }, [selectedAddress])
+    if (state.balance !== null && Number(state.amount) > 0) {
+      checkAmount()
+    }
+  }, [state.balance, state.amount])
 
   React.useEffect(() => {
-    if (amount.length && Number(balance) > 0 && !amountErrorLabel) {
-      setNetworkFeeLoading(true)
-      getNetworkFee()
+    loadBalance()
+    getOutputs()
+    checkAddress()
+    checkAmount()
+    onGetNetworkFee()
+  }, [state.selectedAddress])
+
+  React.useEffect(() => {
+    if (state.balance && state.balance > 0 && Number(state.amount) > 0 && state.fee === 0) {
+      onGetNetworkFee()
+    }
+  }, [state.balance])
+
+  React.useEffect(() => {
+    if (state.amount.length && Number(state.balance) > 0 && !state.amountErrorLabel) {
+      if (!state.isStandingFee) {
+        onGetNetworkFee()
+      }
+
+      if (symbol === 'doge') {
+        onGetDogeUtxos()
+      }
     }
   }, [debounced])
 
   React.useEffect(() => {
-    if (networkFee > 0 && !amountErrorLabel) {
-      if (amount.length && Number(amount) + Number(networkFee) >= Number(balance)) {
-        setAmountErrorLabel('Insufficient funds')
+    if (state.fee > 0 && !state.amountErrorLabel) {
+      if (state.amount.length && Number(state.amount) + getNormalFee() > Number(state.balance)) {
+        updateState({ amountErrorLabel: 'Insufficient funds' })
       }
     }
-  }, [networkFee])
+  }, [state.fee])
 
-  const getExtraId = (): void => {
-    const name = getExtraIdName(symbol)
+  React.useEffect(() => {
+    checkAmount()
+  }, [state.isIncludeFee, state.fee])
 
-    if (name) {
-      setExtraIdName(name)
+  const getCustomFee = async (): Promise<void> => {
+    const customFee = await getFee(symbol, chain)
+
+    if (customFee) {
+      updateState({ customFee })
     }
   }
 
-  const onGetNetworkFeeSymbol = (): void => {
-    const data = getNetworkFeeSymbol(symbol, tokenChain)
-    setNetworkFeeSymbol(data)
-  }
+  const checkStangindFee = (): void => {
+    const data = getStandingFee(symbol)
 
-  const getOutputs = async (): Promise<void> => {
-    if (
-      bitcoinLike.coins().indexOf(chain) !== -1 ||
-      toLower(symbol) === 'ada' ||
-      toLower(symbol) === 'nebl'
-    ) {
-      const unspentOutputs = await getUnspentOutputs(selectedAddress, chain)
-      setOutputs(unspentOutputs)
+    if (data) {
+      updateState({ fee: data, isStandingFee: true })
     }
   }
 
-  const getNetworkFee = async (): Promise<void> => {
-    setUtxosList([])
-    if (networkFee) {
-      setNetworkFee(0)
+  const onGetDogeUtxos = (): void => {
+    const utxosList = getDogeUtxos(state.outputs, state.address, state.amount)
+
+    updateState({ utxosList })
+  }
+
+  const onGetNetworkFee = async (): Promise<void> => {
+    if (symbol === 'doge') {
+      onGetDogeUtxos()
+    }
+
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+
+    if (state.isStandingFee || !state.amount.length) {
+      return
+    }
+
+    updateState({ isFeeLoading: true })
+
+    const withOutputs = checkWithOutputs(symbol)
+
+    if (withOutputs) {
+      updateState({ utxosList: [] })
     }
 
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
 
-    const data = await getAddressNetworkFee(
-      selectedAddress,
+    const data = await getNetworkFee({
       symbol,
-      amount,
-      selectedAddress,
-      address,
+      addressFrom: state.selectedAddress,
+      addressTo: state.address,
       chain,
-      outputs,
+      amount: state.amount,
       tokenChain,
-      contractAddress,
-      getTokenDecimals || decimals
-    )
+      btcLikeParams: {
+        outputs: state.outputs,
+        customFee: state.customFee,
+      },
+      ethLikeParams: {
+        contractAddress,
+        decimals: getTokenDecimals,
+        fees: state.customFee,
+      },
+    })
 
-    setNetworkFeeLoading(false)
+    updateState({ isFeeLoading: false })
 
     if (data) {
-      if (data.utxos) {
-        setUtxosList(data?.utxos)
+      if (data?.utxos && withOutputs) {
+        updateState({ utxosList: data.utxos })
       }
 
-      if (data.networkFee) {
-        setNetworkFee(data.networkFee)
+      if (data.networkFee || data.fees?.length) {
+        if (data.networkFee) {
+          updateState({ fee: data.networkFee })
+        }
+
+        if (data.fees?.length) {
+          const getFee = data.fees.find((value: TFeeValue) => value.type === state.feeType)
+
+          updateState({ feeValues: data.fees })
+
+          if (getFee) {
+            updateState({
+              feeValues: data.fees,
+              utxosList: getFee.utxos,
+              fee: getFee.value,
+            })
+          }
+        }
       } else {
-        if (Number(amount) > 0 && Number(balance) > 0) {
-          setAmountErrorLabel('Insufficient funds')
+        if (Number(state.amount) > 0 && Number(state.balance) > 0) {
+          setInsufficientError()
         }
       }
 
-      if (typeof data.currencyBalance !== 'undefined' && !isNaN(data.currencyBalance)) {
-        setCurrencyBalance(data.currencyBalance)
+      if (!isNaN(Number(data.currencyBalance))) {
+        updateState({ currencyBalance: data.currencyBalance })
       }
-    } else {
-      if (Number(amount) > 0 && Number(balance) > 0) {
-        setAmountErrorLabel('Insufficient funds')
+
+      if (isEthereumLike(symbol, tokenChain)) {
+        const timer = setTimeout(() => {
+          onGetNetworkFee()
+        }, 5000)
+
+        updateState({ timer })
       }
     }
+  }
+
+  const setInsufficientError = (): void => {
+    updateState({ amountErrorLabel: 'Insufficient funds' })
+  }
+
+  const getFeeSymbol = (): void => {
+    updateState({ feeSymbol: getNetworkFeeSymbol(symbol, chain) })
+  }
+
+  const getOutputs = async (): Promise<void> => {
+    const withOutputs = checkWithOutputs(symbol)
+
+    if (withOutputs) {
+      const outputs = await getUnspentOutputs(state.selectedAddress, chain)
+      updateState({ outputs })
+    }
+  }
+
+  const getExtraId = (): void => {
+    updateState({ extraIdName: getExtraIdName(symbol) })
+  }
+
+  const loadBalance = async (): Promise<void> => {
+    updateState({
+      balance: null,
+      estimated: null,
+    })
+
+    const { balance, balance_usd, balance_btc } = await getBalance(
+      state.selectedAddress,
+      currency?.chain || tokenChain,
+      tokenChain ? symbol : undefined,
+      contractAddress,
+      true
+    )
+
+    updateState({
+      balance,
+      estimated: balance_usd,
+    })
+
+    updateBalance(state.selectedAddress, symbol, balance, balance_btc)
   }
 
   const getWalletsList = (): void => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      const filterWallets = walletsList
-        .filter((wallet: IWallet) => wallet.symbol === symbol)
-        .map((wallet: IWallet) => wallet.address)
-      setAddresses(filterWallets)
+      const filterWallets = walletsList.filter((wallet: IWallet) => wallet.symbol === symbol)
+      updateState({ wallets: filterWallets })
     }
-  }
-
-  const loadBalance = async (): Promise<void> => {
-    setBalance(null)
-    setEstimated(null)
-
-    if (currency || contractAddress) {
-      const { balance, balance_usd, balance_btc } = await getBalance(
-        selectedAddress,
-        currency?.chain || tokenChain,
-        tokenChain ? symbol : undefined,
-        contractAddress
-      )
-
-      setBalance(balance)
-      updateBalance(address, symbol, balance, balance_btc)
-      setEstimated(balance_usd)
-    }
-  }
-
-  const onSend = async (): Promise<void> => {
-    logEvent({
-      name: ADDRESS_SEND,
-    })
-
-    if (hardware) {
-      openWebPage(getUrl('send-confirmation.html'))
-
-      setItem(
-        'sendConfirmationData',
-        JSON.stringify({
-          amount: Number(amount),
-          symbol,
-          networkFee,
-          networkFeeSymbol,
-          addressFrom: selectedAddress,
-          addressTo: address,
-          outputs: utxosList,
-          chain,
-          hardware,
-          extraId,
-        })
-      )
-    } else {
-      const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
-      const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
-
-      history.push('/send-confirm', {
-        amount: Number(amount),
-        symbol,
-        networkFee,
-        networkFeeSymbol,
-        addressFrom: selectedAddress,
-        addressTo: address,
-        outputs: utxosList,
-        chain,
-        contractAddress: tokenContractAddress || contractAddress,
-        tokenChain,
-        decimals: getTokenDecimals || decimals,
-        extraId,
-      })
-    }
-  }
-
-  const onBlurAddressInput = (): void => {
-    if (addressErrorLabel) {
-      setAddressErrorLabel(null)
-    }
-
-    if (address.length && !validateAddress(symbol, chain, address, tokenChain)) {
-      setAddressErrorLabel('Address is not valid')
-    }
-
-    if (address === selectedAddress) {
-      setAddressErrorLabel('Address same as sender')
-    }
-  }
-
-  const getAvailableBalance = (): number => {
-    if (balance) {
-      if (toLower(symbol) === 'xrp') {
-        return new BigNumber(balance).minus(20).toNumber()
-      }
-      return Number(balance)
-    }
-    return 0
-  }
-
-  const onBlurAmountInput = (): void => {
-    if (amountErrorLabel) {
-      setAmountErrorLabel(null)
-    }
-
-    if (toLower(symbol) === 'xrp') {
-      const availableBalance = getAvailableBalance()
-
-      if (amount.length && Number(amount) + Number(networkFee) >= Number(availableBalance)) {
-        return setAmountErrorLabel('Insufficient funds')
-      }
-    }
-
-    if (currency) {
-      let parseAmount: number = Number(amount)
-      let parseMinAmount: number = 0
-
-      if (tokenChain) {
-        parseMinAmount = currency.minSendAmount || 0.001
-      } else {
-        parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
-        parseMinAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
-      }
-
-      if (parseAmount < currency.minSendAmount) {
-        return setAmountErrorLabel(`Min amount is ${parseMinAmount} ${toUpper(symbol)}`)
-      }
-    }
-  }
-
-  const isCurrencyBalanceError =
-    (tokenChain || toLower(symbol) === 'theta') &&
-    currencyBalance !== null &&
-    !isNetworkFeeLoading &&
-    networkFee &&
-    networkFee > currencyBalance
-
-  const isButtonDisabled = (): boolean => {
-    if (
-      validateAddress(symbol, chain, address, tokenChain) &&
-      amount.length &&
-      Number(amount) > 0 &&
-      addressErrorLabel === null &&
-      amountErrorLabel === null &&
-      Number(balance) > 0 &&
-      networkFee > 0 &&
-      !isNetworkFeeLoading &&
-      !isCurrencyBalanceError
-    ) {
-      if (!outputs.length) {
-        if (bitcoinLike.coins().indexOf(chain) !== -1 || toLower(symbol) === 'ada') {
-          return true
-        }
-      }
-      return false
-    }
-    return true
   }
 
   const onCancel = (): void => {
@@ -350,152 +331,305 @@ const Send: React.FC = () => {
     history.goBack()
   }
 
-  const mapDropDownList = addresses
-    .filter((address: string) => address !== selectedAddress)
-    .map((address: string) => {
-      return {
-        logo: {
-          symbol: symbol,
-          width: 40,
-          height: 40,
-          br: 10,
-          background: currency?.background,
-          chain: tokenChain,
-        },
-        label: currency?.name,
-        value: address,
-      }
+  const onCloseDrawer = (): void => {
+    updateState({ activeDrawer: null })
+  }
+
+  const openWalletsDrawer = (): void => {
+    updateState({ activeDrawer: 'wallets' })
+  }
+
+  const onClickDrawerWallet = (address: string) => (): void => {
+    updateState({ address })
+    onCloseDrawer()
+  }
+
+  const changeWallet = (selectedAddress: string, walletName: string, hardware?: THardware) => {
+    updateState({
+      selectedAddress,
+      walletName,
+      hardware,
+      utxosList: [],
+      currencyBalance: null,
+      outputs: [],
+      feeValues: [],
     })
 
-  const onSelectDropDown = (index: number) => {
-    setSelectedAddress(mapDropDownList[index].value)
+    if (!state.isStandingFee) {
+      updateState({ fee: 0 })
+    }
   }
 
-  const onSubmitForm = (e: React.FormEvent) => {
-    e.preventDefault()
+  const onConfirm = (): void => {
+    logEvent({
+      name: ADDRESS_SEND,
+    })
+
+    if (state.timer) {
+      clearTimeout(state.timer)
+    }
+
+    if (hardware) {
+      openWebPage(getUrl('send-confirmation.html'))
+
+      setItem(
+        'sendConfirmationData',
+        JSON.stringify({
+          amount: Number(state.amount),
+          symbol,
+          networkFee: state.fee,
+          networkFeeSymbol: state.feeSymbol,
+          addressFrom: state.selectedAddress,
+          addressTo: address,
+          outputs: state.utxosList,
+          chain,
+          hardware,
+          extraId: state.extraId,
+        })
+      )
+    }
+
+    const tokenContractAddress = tokenChain ? getToken(symbol, tokenChain)?.address : undefined
+    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
+
+    history.push('/send-confirm', {
+      amount: Number(state.amount),
+      symbol,
+      networkFee: state.fee,
+      networkFeeSymbol: state.feeSymbol,
+      addressFrom: state.selectedAddress,
+      addressTo: state.address,
+      outputs: state.utxosList,
+      chain,
+      contractAddress: tokenContractAddress || contractAddress,
+      tokenChain,
+      decimals: getTokenDecimals || decimals,
+      extraId: state.extraId,
+      tokenName,
+      isIncludeFee: state.isIncludeFee,
+    })
   }
 
-  const createExtraId = (): void => {
+  const onGenerateExtraId = (): void => {
     const newExtraId = generateExtraId(symbol)
 
     if (newExtraId) {
-      setExtraId(newExtraId)
+      updateState({ extraId: newExtraId })
     }
   }
 
-  const extraIdInputButton = () => (
-    <Tooltip text="Generate destination tag" direction="right">
-      <Styles.InputButton onClick={createExtraId} withHover>
-        <SVG src="../../assets/icons/generateExtraid.svg" width={16} height={16} />
-      </Styles.InputButton>
-    </Tooltip>
-  )
-
-  const amountInputButton = () => {
-    if (toLower(symbol) === 'xrp' && amountErrorLabel === 'Insufficient funds') {
-      return (
-        <Tooltip
-          text="The network requires at least 20 XRP balance at all times."
-          direction="right"
-          maxWidth={195}
-          textSpace="pre-wrap"
-        >
-          <Styles.InputButton disabled>
-            <SVG src="../../assets/icons/info.svg" width={16} height={16} />
-          </Styles.InputButton>
-        </Tooltip>
-      )
-    }
-    return null
+  const getNormalFee = (): number => {
+    return state.isIncludeFee ? 0 : state.fee
   }
 
-  const withExtraid = extraIdName?.length > 0
+  const onSendAll = (): void => {
+    if (state.balance) {
+      updateState({ amount: `${minus(getAvailableBalance(), getNormalFee())}`, isIncludeFee: true })
+    }
+  }
+
+  const checkAddress = (): void => {
+    if (state.addressErrorLabel) {
+      updateState({ addressErrorLabel: null })
+    }
+
+    if (state.address.length && !validateAddress(symbol, state.address, tokenChain)) {
+      updateState({ addressErrorLabel: 'Address is not valid' })
+    }
+
+    if (toLower(state.address) === toLower(state.selectedAddress)) {
+      updateState({ addressErrorLabel: 'Address same as sender' })
+    }
+  }
+
+  const getAvailableBalance = (): number => {
+    if (state.balance) {
+      if (toLower(symbol) === 'xrp') {
+        return new BigNumber(state.balance).minus(20).toNumber()
+      }
+      return Number(state.balance)
+    }
+    return 0
+  }
+
+  const checkAmount = (): void => {
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+
+    const availableBalance = getAvailableBalance()
+
+    const fee = state.isIncludeFee ? 0 : state.fee
+
+    if (state.amount.length && Number(state.amount) + Number(fee) > availableBalance) {
+      return setInsufficientError()
+    }
+
+    const getAmount = (): number => {
+      let parseAmount = Number(state.amount)
+
+      if (state.isIncludeFee) {
+        parseAmount = parseAmount - state.fee
+      }
+
+      return parseAmount
+    }
+
+    if (currency) {
+      let amount = getAmount()
+      let minAmount: number = 0
+      const getMinAmountWithFee = state.isIncludeFee ? state.fee : 0
+
+      if (tokenChain) {
+        minAmount = currency.minSendAmount || 0.001
+      } else {
+        amount = formatUnit(symbol, getAmount(), 'to', chain, 'ether')
+        minAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
+      }
+
+      const minAmountWithFee = plus(minAmount, getMinAmountWithFee)
+
+      if (amount < currency.minSendAmount) {
+        return updateState({
+          amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(symbol)}`,
+        })
+      }
+    }
+  }
+
+  const isButtonDisabled = (): boolean => {
+    const getAmount = state.isIncludeFee ? Number(state.amount) - state.fee : Number(state.amount)
+
+    if (
+      validateAddress(symbol, state.address, tokenChain) &&
+      state.amount.length &&
+      getAmount > 0 &&
+      state.addressErrorLabel === null &&
+      state.amountErrorLabel === null &&
+      Number(state.balance) > 0 &&
+      state.fee > 0 &&
+      !state.isFeeLoading &&
+      !isCurrencyBalanceError
+    ) {
+      if (!state.outputs.length) {
+        const withOuputs = checkWithOutputs(symbol)
+
+        return withOuputs
+      }
+      return false
+    }
+    return true
+  }
+
+  const setAddress = (address: string): void => {
+    updateState({ address })
+  }
+
+  const setAmount = (amount: string): void => {
+    updateState({ amount })
+  }
+
+  const setExtraId = (extraId: string): void => {
+    updateState({ extraId })
+  }
+
+  const setFeeType = (feeType: TFeeTypes): void => {
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+    updateState({ feeType })
+
+    const getFee = state.feeValues.find((value: TFeeValue) => value.type === feeType)
+
+    if (getFee) {
+      updateState({ utxosList: getFee.utxos, fee: getFee.value })
+    }
+  }
+
+  const showFeeDrawer = (): void => {
+    updateState({ activeDrawer: 'aboutFee' })
+  }
+
+  const toggleIncludeFee = (): void => {
+    updateState({ isIncludeFee: !state.isIncludeFee })
+  }
+
+  const isCurrencyBalanceError =
+    (tokenChain !== undefined || toLower(symbol) === 'theta') &&
+    state.currencyBalance !== null &&
+    !state.isFeeLoading &&
+    state.fee > 0 &&
+    state.fee > state.currencyBalance
 
   return (
-    <Styles.Wrapper>
-      <Cover />
-      <Header withBack backTitle="Wallet" onBack={history.goBack} />
-      <Styles.Container>
-        <Styles.Row withExtraid={withExtraid}>
-          {!extraIdName?.length ? <Styles.PageTitle>Send</Styles.PageTitle> : null}
-          <Skeleton width={250} height={42} type="gray" isLoading={balance === null}>
-            <Styles.Balance>
-              {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
-            </Styles.Balance>
-          </Skeleton>
-          <Skeleton width={130} height={23} mt={5} type="gray" isLoading={estimated === null}>
-            <Styles.USDEstimated>{`$${numeral(estimated).format(
-              '0.[00000000]'
-            )}`}</Styles.USDEstimated>
-          </Skeleton>
-        </Styles.Row>
-        <Styles.Form onSubmit={onSubmitForm} withExtraid={withExtraid}>
-          {addresses?.length ? (
-            <CurrenciesDropdown
-              label={currency?.name}
-              value={selectedAddress}
-              currencySymbol={symbol}
-              currencyBr={10}
-              background={currency?.background}
-              list={mapDropDownList}
-              onSelect={onSelectDropDown}
-              disabled={addresses.length < 2}
+    <>
+      <Styles.Wrapper>
+        <Cover />
+        <Header withBack onBack={history.goBack} backTitle={state.backTitle} />
+        <Styles.Container>
+          <Styles.Row>
+            <WalletCardShared
+              balance={state.balance}
+              estimated={state.estimated}
+              symbol={symbol}
+              hardware={hardware}
+              walletName={state.walletName}
+              address={state.selectedAddress}
+              name={tokenName}
+              wallets={state.wallets}
+              changeWallet={changeWallet}
               tokenChain={tokenChain}
-              tokenName={tokenName}
             />
-          ) : null}
-          <TextInput
-            label="Recipient Address"
-            value={address}
-            onChange={setAddress}
-            errorLabel={addressErrorLabel}
-            onBlurInput={onBlurAddressInput}
-            disabled={balance === null}
-          />
-          {withExtraid ? (
-            <TextInput
-              label={`${extraIdName} (optional)`}
-              value={extraId}
-              onChange={setExtraId}
-              disabled={balance === null}
-              button={extraIdInputButton()}
+            <SendFormShared
+              balance={state.balance}
+              symbol={symbol}
+              wallets={state.wallets}
+              address={state.address}
+              setAddress={setAddress}
+              addressErrorLabel={state.addressErrorLabel}
+              openWalletsDrawer={openWalletsDrawer}
+              onGenerateExtraId={onGenerateExtraId}
+              checkAddress={checkAddress}
+              onSendAll={onSendAll}
+              extraIdName={state.extraIdName}
+              extraId={state.extraId}
+              setExtraId={setExtraId}
+              amount={state.amount}
+              setAmount={setAmount}
+              amountErrorLabel={state.amountErrorLabel}
+              checkAmount={checkAmount}
             />
-          ) : null}
-          <TextInput
-            label={`Amount (${toUpper(symbol)})`}
-            value={amount}
-            onChange={setAmount}
-            type="number"
-            errorLabel={amountErrorLabel}
-            onBlurInput={onBlurAmountInput}
-            disabled={balance === null}
-            button={amountInputButton()}
-          />
-          <Styles.NetworkFeeBlock>
-            <Styles.NetworkFeeLabel withExtraid={withExtraid}>Network fee:</Styles.NetworkFeeLabel>
-            {isNetworkFeeLoading ? (
-              <Spinner ml={10} size={16} />
-            ) : (
-              <Styles.NetworkFee withExtraid={withExtraid}>
-                {networkFee === 0 ? '-' : `${networkFee} ${toUpper(networkFeeSymbol)}`}
-              </Styles.NetworkFee>
-            )}
-            {isCurrencyBalanceError && currencyBalance !== null ? (
-              <Styles.NetworkFeeError>
-                Insufficient funds {Number(networkFee - currencyBalance)}{' '}
-                {toUpper(networkFeeSymbol)}
-              </Styles.NetworkFeeError>
-            ) : null}
-          </Styles.NetworkFeeBlock>
-
+            <NetworkFeeShared
+              isLoading={state.isFeeLoading}
+              fee={state.fee}
+              feeSymbol={state.feeSymbol}
+              symbol={symbol}
+              type={state.feeType}
+              setType={setFeeType}
+              isBalanceError={isCurrencyBalanceError && state.currencyBalance !== null}
+              withButton={currency?.isCustomFee || tokenChain !== undefined}
+              isIncludeFee={state.isIncludeFee}
+              toggleIncludeFee={toggleIncludeFee}
+              showFeeDrawer={showFeeDrawer}
+              values={state.feeValues}
+            />
+          </Styles.Row>
           <Styles.Actions>
             <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-            <Button label="Send" onClick={onSend} disabled={isButtonDisabled()} ml={7.5} />
+            <Button label="Send" onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
-        </Styles.Form>
-      </Styles.Container>
-    </Styles.Wrapper>
+        </Styles.Container>
+      </Styles.Wrapper>
+      <WalletsDrawer
+        isActive={state.activeDrawer === 'wallets'}
+        onClose={onCloseDrawer}
+        selectedAddress={state.selectedAddress}
+        wallets={state.wallets}
+        onClickWallet={onClickDrawerWallet}
+      />
+      <AboutFeeDrawer isActive={state.activeDrawer === 'aboutFee'} onClose={onCloseDrawer} />
+    </>
   )
 }
 
-export default Send
+export default SendPage

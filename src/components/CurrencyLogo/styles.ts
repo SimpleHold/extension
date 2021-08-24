@@ -12,6 +12,14 @@ type TLogoRowProps = {
   br?: number
 }
 
+type TTokenRowProps = {
+  size: number
+}
+
+type TTokenLogoProps = {
+  size: number
+}
+
 const Container = styled.div`
   position: relative;
   width: ${({ width }: TContainerProps) => `${width}px`};
@@ -34,23 +42,23 @@ const LogoRow = styled.div`
 `
 
 const TokenRow = styled.div`
-  width: 18px;
-  height: 18px;
+  width: ${({ size }: TTokenRowProps) => `${size / 2}px`};
+  height: ${({ size }: TTokenRowProps) => `${size / 2}px`};
   border: 1px solid #ffffff;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%),
     #1d1d22;
-  border-radius: 10px;
+  border-radius: ${({ size }: TTokenRowProps) => `${size / 4}px`};
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: ${({ size }: TTokenRowProps) => `-${size * 0.15}px`};
+  right: ${({ size }: TTokenRowProps) => `-${size * 0.15}px`};
   display: flex;
   align-items: center;
   justify-content: center;
 `
 
 const TokenLogo = styled.img`
-  width: 10px;
-  height: 10px;
+  width: ${({ size }: TTokenLogoProps) => `${size * 0.3}px`};
+  height: ${({ size }: TTokenLogoProps) => `${size * 0.3}px`};
 `
 
 const LetterLogo = styled.span`

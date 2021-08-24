@@ -14,8 +14,8 @@ const Container = styled.div`
       input {
         height: 50px;
         width: 45px !important;
-        border: ${({ isError }: TContainerProps) => `1px solid ${isError ? 'red' : '#eaeaea'}`};
-        border-radius: 5px;
+        border: ${({ isError }: TContainerProps) => `1px solid ${isError ? '#EB5757' : '#3FBB7D'}`};
+        border-radius: 8px;
         outline-color: #3fbb7d;
         font-size: 23px;
         line-height: 27px;

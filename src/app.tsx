@@ -15,6 +15,8 @@ import { FIRST_ENTER, SESSION_START } from '@config/events'
 import { validateWallet } from '@utils/validate'
 import { init, logEvent } from '@utils/amplitude'
 import { getItem, setItem } from '@utils/storage'
+import { getStats, updateStats } from '@utils/txs'
+import { setUserId } from '@utils/api'
 
 import { ToastContextProvider } from '@contexts/Toast/Toast'
 
@@ -70,6 +72,18 @@ const App: React.FC = () => {
     logEvent({
       name: SESSION_START,
     })
+
+    checkTxsStats()
+  }
+
+  const checkTxsStats = async (): Promise<void> => {
+    const clientId = getItem('clientId')
+    const txsStats = getStats()
+
+    if (clientId && !txsStats) {
+      updateStats()
+      setUserId(clientId)
+    }
   }
 
   const getInitialPage = (): string => {

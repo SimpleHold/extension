@@ -7,7 +7,11 @@ const Wrapper = styled.div`
 `
 
 const Container = styled.div`
-  padding: 30px 30px 0 30px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 540px;
 `
 
 const Title = styled.p`
@@ -30,9 +34,9 @@ const WalletActions = styled.div`
 `
 
 const Action = styled.div`
-  background-color: #fafafa;
-  border: 1px solid #eaeaea;
-  border-radius: 5px;
+  background-color: #f8f9fb;
+  border: 1px solid #dee1e9;
+  border-radius: 16px;
   padding: 38px 0;
   display: flex;
   flex-direction: column;
@@ -40,7 +44,7 @@ const Action = styled.div`
   position: relative;
 
   &:not(:last-child) {
-    margin: 0 0 20px 0;
+    margin: 0 0 10px 0;
   }
 
   &:hover {
@@ -78,6 +82,8 @@ const HoverActionText = styled.span`
   bottom: 20px;
 `
 
+const Row = styled.div``
+
 const Styles = {
   Wrapper,
   Container,
@@ -88,6 +94,7 @@ const Styles = {
   ActionIcon,
   ActionName,
   HoverActionText,
+  Row,
 }
 
 export default Styles
