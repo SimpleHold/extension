@@ -81,6 +81,7 @@ const initialState: IState = {
   isIncludeFee: false,
   isStandingFee: false,
   feeValues: [],
+  timer: null,
 }
 
 const SendPage: React.FC = () => {
@@ -261,9 +262,11 @@ const SendPage: React.FC = () => {
       }
 
       if (isEthereumLike(symbol, tokenChain)) {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
           onGetNetworkFee()
         }, 5000)
+
+        updateState({ timer })
       }
     }
   }
@@ -361,6 +364,10 @@ const SendPage: React.FC = () => {
     logEvent({
       name: ADDRESS_SEND,
     })
+
+    if (state.timer) {
+      clearTimeout(state.timer)
+    }
 
     if (hardware) {
       openWebPage(getUrl('send-confirmation.html'))

@@ -152,7 +152,7 @@ const TextInput: React.FC<Props> = (props) => {
             onBlur={onBlur}
             value={value}
             onChange={onChangeInput}
-            decimalScale={8}
+            decimalScale={18}
             disabled={disabled}
           />
         ) : (

@@ -30,6 +30,7 @@ import { convertDecimals } from '@utils/currencies/ethereumLike'
 import * as theta from '@utils/currencies/theta'
 import { getItem } from '@utils/storage'
 import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
+import { minus } from '@utils/format'
 
 // Config
 import {
@@ -266,7 +267,7 @@ const SendConfirmation: React.FC = () => {
 
   const getAmount = (): number => {
     if (isIncludeFee) {
-      return amount - networkFee
+      return minus(amount, networkFee)
     }
     return amount
   }

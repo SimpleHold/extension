@@ -88,6 +88,7 @@ const initialState: IState = {
   walletName: '',
   walletsNotFound: false,
   isStandingFee: false,
+  timer: null,
 }
 
 const Send: React.FC = () => {
@@ -335,9 +336,11 @@ const Send: React.FC = () => {
         }
 
         if (isEthereumLike(symbol, chain)) {
-          setTimeout(() => {
+          const timer = setTimeout(() => {
             onGetNetworkFee()
           }, 5000)
+
+          updateState({ timer })
         }
       }
     }
@@ -494,6 +497,10 @@ const Send: React.FC = () => {
         decimals: state.selectedWallet?.decimals,
         extraId: state.extraId,
         hardware: state.selectedWallet?.hardware,
+      }
+
+      if (state.timer) {
+        clearTimeout(state.timer)
       }
 
       setItem('sendConfirmationData', JSON.stringify(data))
