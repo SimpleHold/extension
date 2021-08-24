@@ -115,9 +115,7 @@ const WalletCard: React.FC<Props> = (props) => {
           </Styles.Wallet>
           <Styles.Balances>
             <Skeleton width={110} height={16} type="gray" br={4} isLoading={balance === null}>
-              <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
-                symbol
-              )}`}</Styles.Balance>
+              <Styles.Balance>{`${balance} ${toUpper(symbol)}`}</Styles.Balance>
             </Skeleton>
             <Skeleton
               width={65}

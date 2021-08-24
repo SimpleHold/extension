@@ -30,6 +30,7 @@ import {
   generateExtraId,
   getFee,
   getStandingFee,
+  isEthereumLike,
 } from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
@@ -130,6 +131,12 @@ const SendPage: React.FC = () => {
     checkAmount()
     onGetNetworkFee()
   }, [state.selectedAddress])
+
+  React.useEffect(() => {
+    if (state.balance && state.balance > 0 && Number(state.amount) > 0 && state.fee === 0) {
+      onGetNetworkFee()
+    }
+  }, [state.balance])
 
   React.useEffect(() => {
     if (state.amount.length && Number(state.balance) > 0 && !state.amountErrorLabel) {
@@ -253,7 +260,7 @@ const SendPage: React.FC = () => {
         updateState({ currencyBalance: data.currencyBalance })
       }
 
-      if (currency.isCustomFee) {
+      if (isEthereumLike(symbol, tokenChain)) {
         setTimeout(() => {
           onGetNetworkFee()
         }, 5000)
@@ -292,7 +299,8 @@ const SendPage: React.FC = () => {
       state.selectedAddress,
       currency?.chain || tokenChain,
       tokenChain ? symbol : undefined,
-      contractAddress
+      contractAddress,
+      true
     )
 
     updateState({

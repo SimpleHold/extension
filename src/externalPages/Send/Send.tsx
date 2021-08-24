@@ -34,6 +34,7 @@ import {
   getFee,
   getStandingFee,
   checkWithOutputs,
+  isEthereumLike,
 } from '@utils/currencies'
 import { getItem, setItem, removeItem } from '@utils/storage'
 import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
@@ -111,6 +112,12 @@ const Send: React.FC = () => {
       getCustomFee()
     }
   }, [state.selectedWallet])
+
+  React.useEffect(() => {
+    if (state.balance && state.balance > 0 && Number(state.amount) > 0 && state.fee === 0) {
+      onGetNetworkFee()
+    }
+  }, [state.balance])
 
   React.useEffect(() => {
     checkProps()
@@ -327,7 +334,7 @@ const Send: React.FC = () => {
           updateState({ currencyBalance: data.currencyBalance })
         }
 
-        if (state?.currencyInfo?.isCustomFee) {
+        if (isEthereumLike(symbol, chain)) {
           setTimeout(() => {
             onGetNetworkFee()
           }, 5000)
@@ -409,7 +416,8 @@ const Send: React.FC = () => {
           address,
           getCurrencyInfo?.chain,
           chain ? symbol : undefined,
-          contractAddress
+          contractAddress,
+          true
         )
 
         updateState({ balance, estimated: balance_usd })
