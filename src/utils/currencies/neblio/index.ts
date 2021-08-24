@@ -30,7 +30,7 @@ export const getFee = (address: string, outputs: UnspentOutput[], amount: string
   try {
     return new neblioLib.Transaction()
       .from(outputs)
-      .to(address, toSat(Number(amount)))
+      .to(address, formatValue(amount, 'to'))
       .change(address)
       .getFee()
   } catch {
@@ -38,20 +38,14 @@ export const getFee = (address: string, outputs: UnspentOutput[], amount: string
   }
 }
 
-export const toSat = (value: number): number => {
-  try {
-    return neblioLib.Unit.fromBTC(value).toSatoshis()
-  } catch {
-    return 0
-  }
-}
+export const formatValue = (value: string | number, type: 'from' | 'to'): number => {
+  const formatValue = Number(value)
 
-export const fromSat = (value: number): number => {
-  try {
-    return neblioLib.Unit.fromSatoshis(value).toBTC()
-  } catch {
-    return 0
+  if (type === 'from') {
+    return neblioLib.Unit.fromSatoshis(formatValue).toBTC()
   }
+
+  return neblioLib.Unit.fromBTC(formatValue).toSatoshis()
 }
 
 export const getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], amount: string) => {
@@ -62,14 +56,14 @@ export const getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], 
     const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
     const transactionFeeBytes = getFee(address, utxos, amount)
 
-    if (getUtxosValue >= toSat(Number(amount)) + transactionFeeBytes) {
+    if (getUtxosValue >= formatValue(amount, 'to') + transactionFeeBytes) {
       break
     }
 
     utxos.push(output)
   }
 
-  const networkFee = fromSat(getFee(address, utxos, amount))
+  const networkFee = formatValue(getFee(address, utxos, amount), 'from')
 
   return {
     networkFee,

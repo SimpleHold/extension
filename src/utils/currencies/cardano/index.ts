@@ -86,11 +86,11 @@ export const getTransactionLink = (hash: string): string => {
 
 const ten6 = new BigNumber(10).pow(6)
 
-export const fromAda = (value: string | number): number => {
-  return Number(new BigNumber(value).div(ten6))
-}
+export const formatValue = (value: string | number, type: 'from' | 'to'): number => {
+  if (type === 'from') {
+    return Number(new BigNumber(value).div(ten6))
+  }
 
-export const toAda = (value: string | number): number => {
   return Number(new BigNumber(value).multipliedBy(ten6))
 }
 
@@ -146,7 +146,7 @@ const calculateFee = (
       txBuilder.add_output(
         CardanoWasm.TransactionOutput.new(
           outputAddress,
-          CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(`${toAda(amount)}`))
+          CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(`${formatValue(amount, 'to')}`))
         )
       )
 
@@ -181,7 +181,7 @@ export const getNetworkFee = async (outputs: any[], amount: string | number) => 
         const getTotalValue = selectedOutputs.reduce((a, b) => a + Number(b.ctaAmount.getCoin), 0)
         const fee = calculateFee([...selectedOutputs, output], amount, ttl)
 
-        if (getTotalValue >= toAda(amount) + fee) {
+        if (getTotalValue >= formatValue(amount, 'to') + fee) {
           break
         }
 
@@ -189,7 +189,7 @@ export const getNetworkFee = async (outputs: any[], amount: string | number) => 
       }
 
       return {
-        networkFee: fromAda(calculateFee(selectedOutputs, amount, ttl)),
+        networkFee: formatValue(calculateFee(selectedOutputs, amount, ttl), 'from'),
         utxos: selectedOutputs,
       }
     }
