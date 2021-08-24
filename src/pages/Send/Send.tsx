@@ -160,7 +160,7 @@ const SendPage: React.FC = () => {
 
   React.useEffect(() => {
     checkAmount()
-  }, [state.isIncludeFee])
+  }, [state.isIncludeFee, state.fee])
 
   const getCustomFee = async (): Promise<void> => {
     const customFee = await getFee(symbol, chain)
@@ -426,7 +426,7 @@ const SendPage: React.FC = () => {
       updateState({ addressErrorLabel: null })
     }
 
-    if (state.address.length && !validateAddress(symbol, chain, state.address, tokenChain)) {
+    if (state.address.length && !validateAddress(symbol, state.address, tokenChain)) {
       updateState({ addressErrorLabel: 'Address is not valid' })
     }
 
@@ -491,10 +491,12 @@ const SendPage: React.FC = () => {
   }
 
   const isButtonDisabled = (): boolean => {
+    const getAmount = state.isIncludeFee ? Number(state.amount) - state.fee : Number(state.amount)
+
     if (
-      validateAddress(symbol, chain, state.address, tokenChain) &&
+      validateAddress(symbol, state.address, tokenChain) &&
       state.amount.length &&
-      Number(state.amount) > 0 &&
+      getAmount > 0 &&
       state.addressErrorLabel === null &&
       state.amountErrorLabel === null &&
       Number(state.balance) > 0 &&

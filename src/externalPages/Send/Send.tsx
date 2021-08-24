@@ -171,7 +171,7 @@ const Send: React.FC = () => {
 
   React.useEffect(() => {
     checkAmount()
-  }, [state.isIncludeFee])
+  }, [state.isIncludeFee, state.fee])
 
   const checkStangindFee = (): void => {
     if (state.selectedWallet) {
@@ -516,12 +516,7 @@ const Send: React.FC = () => {
     if (state.selectedWallet && state.currencyInfo) {
       if (
         state.address.length &&
-        !validateAddress(
-          state.selectedWallet.symbol,
-          state.currencyInfo.chain,
-          state.address,
-          state.selectedWallet?.chain
-        )
+        !validateAddress(state.selectedWallet.symbol, state.address, state.selectedWallet?.chain)
       ) {
         return updateState({ addressErrorLabel: 'Address is not valid' })
       }
@@ -616,15 +611,12 @@ const Send: React.FC = () => {
 
   const isButtonDisabled = (): boolean => {
     if (state.selectedWallet && state.currencyInfo) {
+      const getAmount = state.isIncludeFee ? Number(state.amount) - state.fee : Number(state.amount)
+
       if (
-        validateAddress(
-          state.selectedWallet.symbol,
-          state.currencyInfo.chain,
-          state.address,
-          state.selectedWallet?.chain
-        ) &&
+        validateAddress(state.selectedWallet.symbol, state.address, state.selectedWallet?.chain) &&
         state.amount.length &&
-        Number(state.amount) > 0 &&
+        getAmount > 0 &&
         state.addressErrorLabel === null &&
         state.amountErrorLabel === null &&
         Number(state.balance) > 0 &&
