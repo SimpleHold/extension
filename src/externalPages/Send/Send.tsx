@@ -250,6 +250,10 @@ const Send: React.FC = () => {
       return
     }
 
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+
     const { symbol, chain, decimals, contractAddress, address } = state.selectedWallet
 
     if (toLower(symbol) === 'doge') {
@@ -321,6 +325,12 @@ const Send: React.FC = () => {
 
         if (!isNaN(Number(data.currencyBalance))) {
           updateState({ currencyBalance: data.currencyBalance })
+        }
+
+        if (state?.currencyInfo?.isCustomFee) {
+          setTimeout(() => {
+            onGetNetworkFee()
+          }, 5000)
         }
       }
     }
@@ -676,7 +686,17 @@ const Send: React.FC = () => {
   }
 
   const setFeeType = (feeType: TFeeTypes): void => {
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+
     updateState({ feeType, selectedFee: state.customFee[feeType] })
+
+    const getFee = state.feeValues.find((value: TFeeValue) => value.type === feeType)
+
+    if (getFee) {
+      updateState({ utxosList: getFee.utxos, fee: getFee.value })
+    }
   }
 
   const showFeeDrawer = (): void => {

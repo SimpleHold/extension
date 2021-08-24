@@ -182,6 +182,10 @@ const SendPage: React.FC = () => {
       onGetDogeUtxos()
     }
 
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+
     if (state.isStandingFee || !state.amount.length) {
       return
     }
@@ -247,6 +251,12 @@ const SendPage: React.FC = () => {
 
       if (!isNaN(Number(data.currencyBalance))) {
         updateState({ currencyBalance: data.currencyBalance })
+      }
+
+      if (currency.isCustomFee) {
+        setTimeout(() => {
+          onGetNetworkFee()
+        }, 5000)
       }
     }
   }
@@ -507,6 +517,9 @@ const SendPage: React.FC = () => {
   }
 
   const setFeeType = (feeType: TFeeTypes): void => {
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
     updateState({ feeType })
 
     const getFee = state.feeValues.find((value: TFeeValue) => value.type === feeType)
