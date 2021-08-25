@@ -34,8 +34,10 @@ import {
   getFee,
   getStandingFee,
   checkWithOutputs,
+  isEthereumLike,
 } from '@utils/currencies'
 import { getItem, setItem, removeItem } from '@utils/storage'
+import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
 
 // Config
 import { getCurrency, ICurrency } from '@config/currencies'
@@ -86,6 +88,7 @@ const initialState: IState = {
   walletName: '',
   walletsNotFound: false,
   isStandingFee: false,
+  timer: null,
 }
 
 const Send: React.FC = () => {
@@ -96,7 +99,6 @@ const Send: React.FC = () => {
     getWalletsList(getItem('sendPageProps'))
     getStorageData()
     getQueryParams()
-    getCustomFee()
   }, [])
 
   React.useEffect(() => {
@@ -108,8 +110,15 @@ const Send: React.FC = () => {
       getExtraId()
       setWalletName()
       checkStangindFee()
+      getCustomFee()
     }
   }, [state.selectedWallet])
+
+  React.useEffect(() => {
+    if (state.balance && state.balance > 0 && Number(state.amount) > 0 && state.fee === 0) {
+      onGetNetworkFee()
+    }
+  }, [state.balance])
 
   React.useEffect(() => {
     checkProps()
@@ -120,10 +129,15 @@ const Send: React.FC = () => {
       state.amount.length &&
       Number(state.balance) > 0 &&
       !state.amountErrorLabel &&
-      state.selectedWallet &&
-      !state.isStandingFee
+      state.selectedWallet
     ) {
-      onGetNetworkFee()
+      if (!state.isStandingFee) {
+        onGetNetworkFee()
+      }
+
+      if (toLower(state.selectedWallet.symbol) === 'doge') {
+        onGetDogeUtxos()
+      }
     }
   }, [debounced])
 
@@ -158,7 +172,7 @@ const Send: React.FC = () => {
 
   React.useEffect(() => {
     checkAmount()
-  }, [state.isIncludeFee])
+  }, [state.isIncludeFee, state.fee])
 
   const checkStangindFee = (): void => {
     if (state.selectedWallet) {
@@ -193,9 +207,10 @@ const Send: React.FC = () => {
   }
 
   const getOutputs = async (info: ICurrency): Promise<void> => {
-    if (state.selectedWallet && state.currencyInfo) {
+    if (state.selectedWallet) {
       const { symbol, address } = state.selectedWallet
-      const { chain } = state.currencyInfo
+      const { chain } = info
+
       const withOutputs = checkWithOutputs(symbol)
 
       if (withOutputs) {
@@ -232,12 +247,31 @@ const Send: React.FC = () => {
     }
   }
 
+  const onGetDogeUtxos = (): void => {
+    const utxosList = getDogeUtxos(state.outputs, state.address, state.amount)
+
+    updateState({ utxosList })
+  }
+
   const onGetNetworkFee = async (): Promise<void> => {
-    if (state.isStandingFee || !state.amount.length || !state.selectedWallet) {
+    if (!state.selectedWallet) {
       return
     }
 
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+
     const { symbol, chain, decimals, contractAddress, address } = state.selectedWallet
+
+    if (toLower(symbol) === 'doge') {
+      onGetDogeUtxos()
+    }
+
+    if (state.isStandingFee || !state.amount.length) {
+      return
+    }
+
     const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
     if (currencyInfo) {
@@ -299,6 +333,14 @@ const Send: React.FC = () => {
 
         if (!isNaN(Number(data.currencyBalance))) {
           updateState({ currencyBalance: data.currencyBalance })
+        }
+
+        if (isEthereumLike(symbol, chain)) {
+          const timer = setTimeout(() => {
+            onGetNetworkFee()
+          }, 5000)
+
+          updateState({ timer })
         }
       }
     }
@@ -377,7 +419,8 @@ const Send: React.FC = () => {
           address,
           getCurrencyInfo?.chain,
           chain ? symbol : undefined,
-          contractAddress
+          contractAddress,
+          true
         )
 
         updateState({ balance, estimated: balance_usd })
@@ -456,6 +499,10 @@ const Send: React.FC = () => {
         hardware: state.selectedWallet?.hardware,
       }
 
+      if (state.timer) {
+        clearTimeout(state.timer)
+      }
+
       setItem('sendConfirmationData', JSON.stringify(data))
 
       if (state.isDraggable) {
@@ -476,12 +523,7 @@ const Send: React.FC = () => {
     if (state.selectedWallet && state.currencyInfo) {
       if (
         state.address.length &&
-        !validateAddress(
-          state.selectedWallet.symbol,
-          state.currencyInfo.chain,
-          state.address,
-          state.selectedWallet?.chain
-        )
+        !validateAddress(state.selectedWallet.symbol, state.address, state.selectedWallet?.chain)
       ) {
         return updateState({ addressErrorLabel: 'Address is not valid' })
       }
@@ -513,10 +555,9 @@ const Send: React.FC = () => {
 
     const availableBalance = getAvailableBalance()
 
-    if (
-      state.amount.length &&
-      Number(state.amount) + Number(state.fee) >= Number(availableBalance)
-    ) {
+    const fee = state.isIncludeFee ? 0 : state.fee
+
+    if (state.amount.length && Number(state.amount) + Number(fee) > availableBalance) {
       return setInsufficientError()
     }
 
@@ -577,15 +618,12 @@ const Send: React.FC = () => {
 
   const isButtonDisabled = (): boolean => {
     if (state.selectedWallet && state.currencyInfo) {
+      const getAmount = state.isIncludeFee ? Number(state.amount) - state.fee : Number(state.amount)
+
       if (
-        validateAddress(
-          state.selectedWallet.symbol,
-          state.currencyInfo.chain,
-          state.address,
-          state.selectedWallet?.chain
-        ) &&
+        validateAddress(state.selectedWallet.symbol, state.address, state.selectedWallet?.chain) &&
         state.amount.length &&
-        Number(state.amount) > 0 &&
+        getAmount > 0 &&
         state.addressErrorLabel === null &&
         state.amountErrorLabel === null &&
         Number(state.balance) > 0 &&
@@ -632,7 +670,7 @@ const Send: React.FC = () => {
 
   const onSendAll = (): void => {
     if (state.balance) {
-      updateState({ amount: `${minus(state.balance, getNormalFee())}` })
+      updateState({ amount: `${minus(state.balance, getNormalFee())}`, isIncludeFee: true })
     }
   }
 
@@ -655,7 +693,17 @@ const Send: React.FC = () => {
   }
 
   const setFeeType = (feeType: TFeeTypes): void => {
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+
     updateState({ feeType, selectedFee: state.customFee[feeType] })
+
+    const getFee = state.feeValues.find((value: TFeeValue) => value.type === feeType)
+
+    if (getFee) {
+      updateState({ utxosList: getFee.utxos, fee: getFee.value })
+    }
   }
 
   const showFeeDrawer = (): void => {

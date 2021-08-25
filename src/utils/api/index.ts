@@ -19,7 +19,8 @@ export const getBalance = async (
   address: string,
   chain?: string,
   tokenSymbol?: string,
-  contractAddress?: string
+  contractAddress?: string,
+  isFullBalance?: boolean
 ): Promise<IGetBalance> => {
   try {
     const { data }: AxiosResponse = await axios(
@@ -28,6 +29,7 @@ export const getBalance = async (
         params: {
           tokenSymbol,
           contractAddress,
+          isFullBalance,
         },
       }
     )

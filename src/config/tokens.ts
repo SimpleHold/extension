@@ -1,4 +1,3 @@
-// Tokens logo
 import usdtLogo from '@assets/tokens/usdt.svg'
 import usdcLogo from '@assets/tokens/usdc.svg'
 import daiLogo from '@assets/tokens/dai.svg'

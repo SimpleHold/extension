@@ -30,6 +30,7 @@ import { convertDecimals } from '@utils/currencies/ethereumLike'
 import * as theta from '@utils/currencies/theta'
 import { getItem } from '@utils/storage'
 import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
+import { minus } from '@utils/format'
 
 // Config
 import {
@@ -159,8 +160,6 @@ const SendConfirmation: React.FC = () => {
             extraId,
           })
 
-          updateState({ isButtonLoading: false })
-
           if (transaction) {
             const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
 
@@ -169,7 +168,10 @@ const SendConfirmation: React.FC = () => {
             }
           }
 
-          return updateState({ inputErrorLabel: 'Error while creating transaction' })
+          return updateState({
+            inputErrorLabel: 'Error while creating transaction',
+            isButtonLoading: false,
+          })
         }
       }
     }
@@ -181,6 +183,7 @@ const SendConfirmation: React.FC = () => {
     if (symbol === 'xrp' && transaction?.engine_result_code === 125) {
       return updateState({
         activeDrawer: 'fail',
+        isButtonLoading: false,
         failText:
           'You are sending funds to an inactive address. Due to the Network rules, you must transfer at least 20 XRP to activate it.',
       })
@@ -190,7 +193,10 @@ const SendConfirmation: React.FC = () => {
 
     if (symbol === 'xrp') {
       if (transaction?.engine_result !== 'tesSUCCESS') {
-        return updateState({ inputErrorLabel: 'Error while creating transaction' })
+        return updateState({
+          inputErrorLabel: 'Error while creating transaction',
+          isButtonLoading: false,
+        })
       }
       txHash = transaction?.tx_json?.hash
     }
@@ -198,6 +204,7 @@ const SendConfirmation: React.FC = () => {
     return updateState({
       activeDrawer: 'success',
       transactionLink: getTransactionLink(txHash, symbol, chain, tokenChain),
+      isButtonLoading: false,
     })
   }
 
@@ -236,7 +243,7 @@ const SendConfirmation: React.FC = () => {
       updateStats()
       const { amount } = JSON.parse(txsStats)
 
-      const isCanShowDrawer = isShowSatismeter(amount + 1)
+      const isCanShowDrawer = isShowSatismeter(amount, amount + 1)
 
       if (isCanShowDrawer) {
         return updateState({ activeDrawer: 'feedback' })
@@ -260,7 +267,7 @@ const SendConfirmation: React.FC = () => {
 
   const getAmount = (): number => {
     if (isIncludeFee) {
-      return amount - networkFee
+      return minus(amount, networkFee)
     }
     return amount
   }

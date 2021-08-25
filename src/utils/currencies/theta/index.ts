@@ -8,12 +8,12 @@ export const coins = ['theta', 'tfuel']
 
 const ten18 = new BigNumber(10).pow(18)
 
-export const toTheta = (value: number | string): number => {
-  return Number(new BigNumber(value).multipliedBy(ten18))
-}
+export const formatValue = (value: string | number, type: 'from' | 'to'): number => {
+  if (type === 'from') {
+    return Number(new BigNumber(value).div(ten18))
+  }
 
-export const fromTheta = (value: number | string): number => {
-  return Number(new BigNumber(value).div(ten18))
+  return Number(new BigNumber(value).multipliedBy(ten18))
 }
 
 export const generateWallet = (): TGenerateAddress | null => {

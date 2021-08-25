@@ -26,7 +26,7 @@ const initialState: IState = {
 }
 
 const FeedbackDrawer: React.FC<IProps> = (props) => {
-  const { onClose, isActive } = props
+  const { onClose, isActive, openFrom } = props
 
   const { state, updateState } = useState<IState>(initialState)
 
@@ -54,15 +54,12 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
 
   return (
     <DrawerWrapper
-      title={
-        state.isSent
-          ? 'Thank you for your feedback!'
-          : 'How likely is it that you will recommend us?'
-      }
+      title={state.isSent ? 'Thank you for your feedback!' : 'How likely are you to recommend us?'}
       isActive={isActive}
       onClose={onClose}
       withCloseIcon
       icon={state.isSent ? '../../assets/drawer/success.svg' : undefined}
+      openFrom={openFrom}
     >
       <Styles.Row>
         {!state.isSent ? (

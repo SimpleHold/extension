@@ -11,6 +11,7 @@ import SuccessDrawer from '@drawers/Success'
 import FailDrawer from '@drawers/Fail'
 import LedgerDrawer from '@drawers/Ledger'
 import BasicDrawer from '@drawers/Basic'
+import FeedbackDrawer from '@drawers/Feedback'
 
 // Shared
 import SendConfirmShared from '@shared/SendConfirm'
@@ -39,6 +40,7 @@ import {
   createBtcTx,
   getFirstAddress,
 } from '@utils/ledger'
+import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -335,6 +337,27 @@ const SendConfirmation: React.FC = () => {
     }
   }
 
+  const closeSuccessDrawer = (): void => {
+    if (state.isButtonLoading) {
+      return
+    }
+
+    const txsStats = getStats()
+
+    if (txsStats) {
+      updateStats()
+      const { amount } = JSON.parse(txsStats)
+
+      const isCanShowDrawer = isShowSatismeter(amount, amount + 1)
+
+      if (isCanShowDrawer) {
+        return updateState({ activeDrawer: 'feedback' })
+      }
+    }
+
+    onClose()
+  }
+
   const onConfirmSend = async (): Promise<void> => {
     if (state.inputErrorLabel) {
       updateState({ inputErrorLabel: null })
@@ -522,7 +545,7 @@ const SendConfirmation: React.FC = () => {
         />
         <SuccessDrawer
           isActive={state.activeDrawer === 'success'}
-          onClose={onClose}
+          onClose={closeSuccessDrawer}
           text="Your transaction has been successfully sent. You can check it here:"
           link={state.transactionLink}
           openFrom="browser"
@@ -553,6 +576,11 @@ const SendConfirmation: React.FC = () => {
             label: 'Try again',
             onClick: onConfirm,
           }}
+        />
+        <FeedbackDrawer
+          isActive={state.activeDrawer === 'feedback'}
+          onClose={onClose}
+          openFrom="browser"
         />
       </>
     </ExternalPageContainer>

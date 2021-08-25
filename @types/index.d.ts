@@ -132,3 +132,4 @@ declare const bitcoincash: BitcoinLikeProvider
 declare const dash: BitcoinLikeProvider
 declare const litecoin: BitcoinLikeProvider
 declare const dogecoin: BitcoinLikeProvider
+declare const bitcoinsv: BitcoinLikeProvider

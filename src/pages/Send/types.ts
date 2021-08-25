@@ -49,4 +49,5 @@ export interface IState {
   isIncludeFee: boolean
   isStandingFee: boolean
   feeValues: TFeeValue[]
+  timer: null | ReturnType<typeof setTimeout>
 }

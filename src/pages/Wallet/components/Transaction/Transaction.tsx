@@ -60,7 +60,11 @@ const Transaction: React.FC<Props> = (props) => {
               <Styles.DestinationType isPending={isPending} type={type}>
                 <SVG src="../../../assets/icons/txArrow.svg" width={12} height={16} />
               </Styles.DestinationType>
-              {isPending ? <Styles.PendingIcon /> : null}
+              {isPending ? (
+                <Styles.PendingIcon>
+                  <SVG src="../../../assets/icons/clock.svg" width={8} height={9.5} />
+                </Styles.PendingIcon>
+              ) : null}
             </Styles.TypeRow>
             <Styles.InfoRow>
               <Styles.HashRow>

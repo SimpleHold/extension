@@ -94,12 +94,7 @@ export const importPrivateKey = (
   }
 }
 
-export const validateAddress = (
-  symbol: string,
-  chain: string,
-  address: string,
-  tokenChain?: string
-): boolean => {
+export const validateAddress = (symbol: string, address: string, tokenChain?: string): boolean => {
   try {
     const provider = getProvider(symbol)
 
@@ -269,17 +264,13 @@ export const formatUnit = (
   unit?: string
 ): number => {
   try {
-    if (nerve.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? nerve.fromNerve(value) : nerve.toNerve(value)
-    } else if (nuls.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? nuls.fromNuls(value) : nuls.toNuls(value)
-    } else if (neblio.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? neblio.fromSat(Number(value)) : neblio.toSat(Number(value))
-    } else if (ripple.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? ripple.fromXrp(value) : ripple.toXrp(value)
-    } else if (cardano.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? cardano.fromAda(value) : cardano.toAda(value)
-    } else if (chain && bitcoinLike.coins.indexOf(symbol) !== -1) {
+    const provider = getProvider(symbol)
+
+    if (provider?.formatValue) {
+      return provider.formatValue(value, type)
+    }
+
+    if (chain && bitcoinLike.coins.indexOf(symbol) !== -1) {
       return type === 'from' ? bitcoinLike.fromSat(Number(value)) : bitcoinLike.toSat(Number(value))
     } else if (isEthereumLike(symbol, chain)) {
       if (unit) {
@@ -288,10 +279,7 @@ export const formatUnit = (
           : ethereumLike.toEther(`${value}`)
       }
       return Number(value)
-    } else if (theta.coins.indexOf(symbol) !== -1) {
-      return type === 'from' ? theta.fromTheta(value) : theta.toTheta(value)
     }
-
     return 0
   } catch {
     return 0

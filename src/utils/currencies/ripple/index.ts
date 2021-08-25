@@ -9,11 +9,11 @@ const api = new RippleAPI()
 export const coins = ['xrp']
 export const extraIdName = 'Destination tag'
 
-export const fromXrp = (value: string | number): number => {
-  return +api.dropsToXrp(value)
-}
+export const formatValue = (value: string | number, type: 'from' | 'to'): number => {
+  if (type === 'from') {
+    return +api.dropsToXrp(value)
+  }
 
-export const toXrp = (value: string | number): number => {
   return +api.xrpToDrops(value)
 }
 
@@ -66,7 +66,7 @@ export const createTransaction = async (
 ): Promise<string | null> => {
   try {
     const { fee, sequence, maxLedgerVersion } = txParams
-    const parseValue = fromXrp(value)
+    const parseValue = formatValue(value, 'from')
 
     const payment: IPayment = {
       source: {

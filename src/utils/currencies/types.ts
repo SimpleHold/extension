@@ -10,6 +10,7 @@ export type TProvider = {
   importRecoveryPhrase?: (recoveryPhrase: string) => TGenerateAddress | null
   generateExtraId?: () => string
   getStandingFee?: () => number | null
+  formatValue: (value: string | number, type: 'from' | 'to') => number
 }
 
 export type TCreateTransactionProps = {

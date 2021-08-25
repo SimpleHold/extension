@@ -27,7 +27,7 @@ export interface Props {
 
 export interface IState {
   props: Props | null
-  activeDrawer: null | 'confirm' | 'success' | 'fail' | 'ledger' | 'wrongDevice'
+  activeDrawer: null | 'confirm' | 'success' | 'fail' | 'ledger' | 'wrongDevice' | 'feedback'
   password: string
   inputErrorLabel: null | string
   isDrawerButtonLoading: boolean

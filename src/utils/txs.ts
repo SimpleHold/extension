@@ -96,7 +96,6 @@ export const save = (
   tokenSymbol?: string,
   contractAddress?: string
 ) => {
-  const nonPendintTxs = txs.filter((tx: TAddressTx) => !tx.isPending)
   const walletKey = getWalletKey(address, chain, tokenSymbol, contractAddress)
 
   const findWalletStorage = getItem(walletKey)
@@ -105,6 +104,7 @@ export const save = (
     const getTxs = getJSON(findWalletStorage)
 
     if (getTxs) {
+      const nonPendintTxs = txs.filter((tx: TAddressTx) => !tx.isPending)
       const getNewTxs = nonPendintTxs.filter((newTx: TAddressTx) => {
         return !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(newTx.hash))
       })
@@ -112,9 +112,11 @@ export const save = (
       if (getNewTxs.length) {
         setItem(walletKey, JSON.stringify([...getTxs, ...getNewTxs]))
       }
+    } else {
+      setItem(walletKey, JSON.stringify(txs))
     }
   } else {
-    setItem(walletKey, JSON.stringify(nonPendintTxs))
+    setItem(walletKey, JSON.stringify(txs))
   }
 }
 
@@ -125,28 +127,30 @@ export const getStats = (): string | null => {
 export const updateStats = (): void => {
   const getStats = getItem('txs_stats')
 
-  let prevAmount = 0
+  let newAmount = 0
 
   if (getStats) {
     const { amount } = JSON.parse(getStats)
-    prevAmount = amount
+    newAmount = amount + 1
   }
+
   setItem(
     'txs_stats',
     JSON.stringify({
-      amount: prevAmount + 1,
+      amount: newAmount,
       lastUpdate: new Date().getTime(),
     })
   )
 }
 
-export const isShowSatismeter = (newAmount: number): boolean => {
+export const isShowSatismeter = (prevValue: number, value: number): boolean => {
   const getStats = getJSON('txs_stats')
 
   if (getStats) {
-    const { amount, lastUpdate } = getStats
+    const { lastUpdate } = getStats
+    const monthDiff = dayjs().diff(lastUpdate, 'month')
 
-    return (amount < 2 && newAmount >= 2) || dayjs().diff(lastUpdate, 'month') >= 3
+    return (prevValue < 2 && value > 1) || monthDiff >= 3
   }
 
   return false
