@@ -18,10 +18,8 @@
     "build": "yarn run build:chrome && yarn run build:firefox && yarn run build:opera",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "test": "jest"
-  },
-  "jest": {
-    "verbose": true
+    "test:unit": "cd test/unit && jest",
+    "test:e2e": "cd test/e2e && jest"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
@@ -44,6 +42,7 @@
     "neblio-lib": "https://github.com/NeblioTeam/bitcore-lib#neblcore-lib",
     "nuls-sdk-js": "^2.5.0",
     "numeral": "^2.0.6",
+    "puppeteer": "^10.2.0",
     "qrcode.react": "^1.0.1",
     "query-string": "^7.0.1",
     "react": "^17.0.1",
@@ -79,6 +78,7 @@
     "@types/jest": "^27.0.1",
     "@types/node": "^16.6.2",
     "@types/numeral": "^2.0.1",
+    "@types/puppeteer": "^5.4.4",
     "@types/qrcode.react": "^1.0.1",
     "@types/react": "^16.9.56",
     "@types/react-dom": "^16.9.9",
@@ -114,7 +114,10 @@
     "fork-ts-checker-webpack-plugin": "^6.0.1",
     "html-webpack-plugin": "^4.5.0",
     "jest": "^27.0.6",
+    "jest-environment-selenium": "^2.1.2",
+    "jest-puppeteer": "^5.0.4",
     "prettier": "^2.1.2",
+    "selenium-webdriver": "^4.0.0-beta.4",
     "terser-webpack-plugin": "^4.2.3",
     "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",

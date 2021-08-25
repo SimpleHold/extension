@@ -29,5 +29,5 @@
       "@shared/*": ["src/shared/*"]
     }
   },
-  "include": ["src", "@types", "webpack.config.js"]
+  "include": ["src", "@types", "webpack.config.js", "test"]
 }
