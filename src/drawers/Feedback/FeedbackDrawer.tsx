@@ -54,11 +54,7 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
 
   return (
     <DrawerWrapper
-      title={
-        state.isSent
-          ? 'Thank you for your feedback!'
-          : 'How likely is it that you will recommend us?'
-      }
+      title={state.isSent ? 'Thank you for your feedback!' : 'How likely are you to recommend us?'}
       isActive={isActive}
       onClose={onClose}
       withCloseIcon

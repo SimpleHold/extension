@@ -30,10 +30,12 @@ import {
   generateExtraId,
   getFee,
   getStandingFee,
+  isEthereumLike,
 } from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
 import { getUrl, openWebPage } from '@utils/extension'
+import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -79,6 +81,7 @@ const initialState: IState = {
   isIncludeFee: false,
   isStandingFee: false,
   feeValues: [],
+  timer: null,
 }
 
 const SendPage: React.FC = () => {
@@ -131,13 +134,20 @@ const SendPage: React.FC = () => {
   }, [state.selectedAddress])
 
   React.useEffect(() => {
-    if (
-      state.amount.length &&
-      Number(state.balance) > 0 &&
-      !state.amountErrorLabel &&
-      !state.isStandingFee
-    ) {
+    if (state.balance && state.balance > 0 && Number(state.amount) > 0 && state.fee === 0) {
       onGetNetworkFee()
+    }
+  }, [state.balance])
+
+  React.useEffect(() => {
+    if (state.amount.length && Number(state.balance) > 0 && !state.amountErrorLabel) {
+      if (!state.isStandingFee) {
+        onGetNetworkFee()
+      }
+
+      if (symbol === 'doge') {
+        onGetDogeUtxos()
+      }
     }
   }, [debounced])
 
@@ -151,7 +161,7 @@ const SendPage: React.FC = () => {
 
   React.useEffect(() => {
     checkAmount()
-  }, [state.isIncludeFee])
+  }, [state.isIncludeFee, state.fee])
 
   const getCustomFee = async (): Promise<void> => {
     const customFee = await getFee(symbol, chain)
@@ -169,7 +179,21 @@ const SendPage: React.FC = () => {
     }
   }
 
+  const onGetDogeUtxos = (): void => {
+    const utxosList = getDogeUtxos(state.outputs, state.address, state.amount)
+
+    updateState({ utxosList })
+  }
+
   const onGetNetworkFee = async (): Promise<void> => {
+    if (symbol === 'doge') {
+      onGetDogeUtxos()
+    }
+
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
+
     if (state.isStandingFee || !state.amount.length) {
       return
     }
@@ -236,6 +260,14 @@ const SendPage: React.FC = () => {
       if (!isNaN(Number(data.currencyBalance))) {
         updateState({ currencyBalance: data.currencyBalance })
       }
+
+      if (isEthereumLike(symbol, tokenChain)) {
+        const timer = setTimeout(() => {
+          onGetNetworkFee()
+        }, 5000)
+
+        updateState({ timer })
+      }
     }
   }
 
@@ -270,7 +302,8 @@ const SendPage: React.FC = () => {
       state.selectedAddress,
       currency?.chain || tokenChain,
       tokenChain ? symbol : undefined,
-      contractAddress
+      contractAddress,
+      true
     )
 
     updateState({
@@ -331,6 +364,10 @@ const SendPage: React.FC = () => {
     logEvent({
       name: ADDRESS_SEND,
     })
+
+    if (state.timer) {
+      clearTimeout(state.timer)
+    }
 
     if (hardware) {
       openWebPage(getUrl('send-confirmation.html'))
@@ -396,7 +433,7 @@ const SendPage: React.FC = () => {
       updateState({ addressErrorLabel: null })
     }
 
-    if (state.address.length && !validateAddress(symbol, chain, state.address, tokenChain)) {
+    if (state.address.length && !validateAddress(symbol, state.address, tokenChain)) {
       updateState({ addressErrorLabel: 'Address is not valid' })
     }
 
@@ -461,10 +498,12 @@ const SendPage: React.FC = () => {
   }
 
   const isButtonDisabled = (): boolean => {
+    const getAmount = state.isIncludeFee ? Number(state.amount) - state.fee : Number(state.amount)
+
     if (
-      validateAddress(symbol, chain, state.address, tokenChain) &&
+      validateAddress(symbol, state.address, tokenChain) &&
       state.amount.length &&
-      Number(state.amount) > 0 &&
+      getAmount > 0 &&
       state.addressErrorLabel === null &&
       state.amountErrorLabel === null &&
       Number(state.balance) > 0 &&
@@ -495,6 +534,9 @@ const SendPage: React.FC = () => {
   }
 
   const setFeeType = (feeType: TFeeTypes): void => {
+    if (state.amountErrorLabel) {
+      updateState({ amountErrorLabel: null })
+    }
     updateState({ feeType })
 
     const getFee = state.feeValues.find((value: TFeeValue) => value.type === feeType)

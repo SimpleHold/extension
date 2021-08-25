@@ -53,4 +53,5 @@ export interface IState {
   walletName: string
   walletsNotFound: boolean
   isStandingFee: boolean
+  timer: null | ReturnType<typeof setTimeout>
 }

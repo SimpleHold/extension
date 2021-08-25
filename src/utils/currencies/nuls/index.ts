@@ -13,12 +13,12 @@ const chainId = 1
 
 const ten8 = new BigNumber(10).pow(8)
 
-export const toNuls = (value: string | number): number => {
-  return Number(new BigNumber(value).multipliedBy(ten8))
-}
+export const formatValue = (value: string | number, type: 'from' | 'to'): number => {
+  if (type === 'from') {
+    return Number(new BigNumber(value).div(ten8))
+  }
 
-export const fromNuls = (value: string | number): number => {
-  return Number(new BigNumber(value).div(ten8))
+  return Number(new BigNumber(value).multipliedBy(ten8))
 }
 
 export const generateWallet = (): TGenerateAddress | null => {

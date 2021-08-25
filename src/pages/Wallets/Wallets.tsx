@@ -163,6 +163,22 @@ const Wallets: React.FC = () => {
     getWalletsList()
   }
 
+  const getNameWallet = (wallet: IWallet): string => {
+    if (wallet.walletName) {
+      return wallet.walletName
+    }
+
+    const walletsList = getWallets()
+
+    if (walletsList) {
+      const { symbol, uuid, hardware, chain, name } = wallet
+
+      return getWalletName(walletsList, symbol, uuid, hardware, chain, name)
+    }
+
+    return ''
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -190,10 +206,7 @@ const Wallets: React.FC = () => {
                     hardware,
                   } = wallet
 
-                  const walletName = state.wallets
-                    ? wallet.walletName ||
-                      getWalletName(state.wallets, symbol, uuid, hardware, chain, name)
-                    : ''
+                  const walletName = getNameWallet(wallet)
 
                   return (
                     <WalletCard

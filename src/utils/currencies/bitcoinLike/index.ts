@@ -6,8 +6,12 @@ import { TCustomFees } from '../types'
 export const coins = ['btc', 'bch', 'bsv', 'ltc', 'doge', 'dash']
 
 const getProvider = (symbol: string): BitcoinLikeProvider | null => {
-  if (symbol === 'btc' || symbol === 'bsv') {
+  if (symbol === 'btc') {
     return bitcoin
+  }
+
+  if (symbol === 'bsv') {
+    return bitcoinsv
   }
 
   if (symbol === 'bch') {
@@ -93,6 +97,39 @@ export const fromSat = (value: number): number => {
   }
 }
 
+const getFeeType = (type: string): TFeeTypes => {
+  if (type === 'slow') {
+    return 'slow'
+  }
+  if (type === 'average') {
+    return 'average'
+  }
+
+  return 'fast'
+}
+
+export const getDogeUtxos = (
+  outputs: UnspentOutput[],
+  address: string,
+  amount: string
+): UnspentOutput[] => {
+  const sortOutputs = outputs.sort((a, b) => a.satoshis - b.satoshis)
+  const utxos: UnspentOutput[] = []
+
+  for (const output of sortOutputs) {
+    const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
+    const transactionFeeBytes = getFee(address, utxos, amount, 1, 'doge')
+
+    if (getUtxosValue >= toSat(Number(amount)) + transactionFeeBytes) {
+      break
+    }
+
+    utxos.push(output)
+  }
+
+  return utxos
+}
+
 export const getNetworkFee = (
   address: string,
   outputs: UnspentOutput[],
@@ -107,8 +144,8 @@ export const getNetworkFee = (
       const sortOutputs = outputs.sort((a, b) => a.satoshis - b.satoshis)
       const utxos: UnspentOutput[] = []
 
-      // @ts-ignore
-      const getTypeValue = feeValues[type]
+      const feeType = getFeeType(type)
+      const getTypeValue = feeValues[feeType]
 
       for (const output of sortOutputs) {
         const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
@@ -124,8 +161,7 @@ export const getNetworkFee = (
       const value = fromSat(getFee(address, utxos, amount, getTypeValue, symbol))
 
       fees.push({
-        // @ts-ignore
-        type,
+        type: feeType,
         utxos,
         value,
       })
