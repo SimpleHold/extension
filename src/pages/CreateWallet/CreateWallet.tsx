@@ -109,7 +109,7 @@ const Wallets: React.FC = () => {
   const isButtonDisabled =
     state.password.length < 7 || state.password !== state.confirmPassword || !state.isAgreed
 
-  const onConfirm = (): void => {
+  const onConfirm = async (): Promise<void> => {
     logEvent({
       name: START_PASSWORD,
     })
@@ -118,7 +118,7 @@ const Wallets: React.FC = () => {
 
     for (const currency of state.initialCurrencies) {
       const { symbol, chain } = currency
-      const generate = generateAddress(symbol, chain)
+      const generate = await generateAddress(symbol, chain)
 
       if (generate) {
         data.push({

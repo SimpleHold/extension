@@ -58,13 +58,12 @@ export const compare = (
   tokenSymbol?: string,
   contractAddress?: string
 ): string[] => {
-  const walletKey = getWalletKey(address, chain, tokenSymbol, contractAddress)
-  const getTxs = getJSON(walletKey)
+  const getTxs = getJSON(getWalletKey(address, chain, tokenSymbol, contractAddress))
 
   if (getTxs?.length) {
-    return txs.filter((hash: string) => {
-      return !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(hash))
-    })
+    return txs.filter(
+      (hash: string) => !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(hash))
+    )
   }
 
   return txs
@@ -77,8 +76,7 @@ export const getExist = (
   contractAddress?: string
 ): TAddressTx[] => {
   try {
-    const walletKey = getWalletKey(address, chain, tokenSymbol, contractAddress)
-    const getTxs = getJSON(walletKey)
+    const getTxs = getJSON(getWalletKey(address, chain, tokenSymbol, contractAddress))
 
     if (getTxs?.length) {
       return getTxs
@@ -101,7 +99,7 @@ export const save = (
   const findWalletStorage = getItem(walletKey)
 
   if (findWalletStorage) {
-    const getTxs = getJSON(findWalletStorage)
+    const getTxs = getJSON(walletKey)
 
     if (getTxs) {
       const nonPendintTxs = txs.filter((tx: TAddressTx) => !tx.isPending)

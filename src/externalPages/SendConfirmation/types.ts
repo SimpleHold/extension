@@ -23,6 +23,7 @@ export interface Props {
   name?: string
   hardware?: THardware
   tabInfo?: TTabInfo
+  isIncludeFee?: string
 }
 
 export interface IState {
