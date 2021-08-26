@@ -31,7 +31,6 @@ import {
   createInternalTx,
 } from '@utils/currencies'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
-import * as theta from '@utils/currencies/theta'
 import { getItem, getJSON, removeItem } from '@utils/storage'
 import { ethereumSignTransaction, signTransaction, getFeatures } from '@utils/trezor'
 import {
@@ -43,6 +42,7 @@ import {
   getFirstAddress,
 } from '@utils/ledger'
 import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
+import { minus } from '@utils/format'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -517,6 +517,18 @@ const SendConfirmation: React.FC = () => {
 
   const setPassword = (password: string): void => {
     updateState({ password })
+  }
+
+  const getAmount = (): number => {
+    if (state.props) {
+      const { amount, networkFee, isIncludeFee } = state.props
+
+      if (isIncludeFee === 'true') {
+        return minus(amount, networkFee)
+      }
+      return amount
+    }
+    return 0
   }
 
   return (

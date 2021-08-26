@@ -17,7 +17,7 @@ import WalletsDrawer from '@drawers/Wallets'
 import AboutFeeDrawer from '@drawers/AboutFee'
 
 // Utils
-import { toLower, toUpper, minus, plus } from '@utils/format'
+import { toLower, toUpper, plus } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
 import {
@@ -425,7 +425,7 @@ const SendPage: React.FC = () => {
 
   const onSendAll = (): void => {
     if (state.balance) {
-      updateState({ amount: `${minus(getAvailableBalance(), getNormalFee())}`, isIncludeFee: true })
+      updateState({ amount: `${getAvailableBalance()}`, isIncludeFee: true })
     }
   }
 

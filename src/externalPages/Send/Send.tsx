@@ -23,7 +23,7 @@ import NetworkFeeShared from '@shared/NetworkFee'
 import { getWallets, IWallet, getWalletName } from '@utils/wallet'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
-import { toLower, toUpper, minus, plus } from '@utils/format'
+import { toLower, toUpper, plus } from '@utils/format'
 import {
   validateAddress,
   formatUnit,
@@ -498,6 +498,7 @@ const Send: React.FC = () => {
         decimals: state.selectedWallet?.decimals,
         extraId: state.extraId,
         hardware: state.selectedWallet?.hardware,
+        isIncludeFee: state.isIncludeFee,
       }
 
       if (state.timer) {
@@ -674,7 +675,7 @@ const Send: React.FC = () => {
 
   const onSendAll = (): void => {
     if (state.balance) {
-      updateState({ amount: `${minus(state.balance, getNormalFee())}`, isIncludeFee: true })
+      updateState({ amount: `${state.balance}`, isIncludeFee: true })
     }
   }
 
