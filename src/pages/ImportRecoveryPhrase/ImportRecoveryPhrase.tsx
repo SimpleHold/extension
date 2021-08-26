@@ -36,11 +36,9 @@ const ImportRecoveryPhrase: React.FC = () => {
   const [drawerErrorLabel, setDrawerErrorLabel] = React.useState<null | string>(null)
 
   const history = useHistory()
-  // const {
-  //   state: { symbol },
-  // } = useLocation<LocationState>()
-
-  const symbol = 'ada'
+  const {
+    state: { symbol },
+  } = useLocation<LocationState>()
 
   const textareaInputRef = React.useRef<HTMLTextAreaElement>(null)
 
@@ -77,7 +75,7 @@ const ImportRecoveryPhrase: React.FC = () => {
           privateKey,
           decryptBackup,
           password,
-          ['ada'],
+          [symbol],
           false,
           undefined,
           undefined,

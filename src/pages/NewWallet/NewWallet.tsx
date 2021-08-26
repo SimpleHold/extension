@@ -63,12 +63,12 @@ const NewWallet: React.FC = () => {
     },
   } = useLocation<ILocationState>()
 
-  const onGenerateAddress = (): void => {
+  const onGenerateAddress = async (): Promise<void> => {
     logEvent({
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const generateAddress = generate(symbol, chain)
+    const generateAddress = await generate(symbol, chain)
 
     if (generateAddress) {
       const { privateKey, mnemonic } = generateAddress
