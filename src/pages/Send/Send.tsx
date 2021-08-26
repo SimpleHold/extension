@@ -17,7 +17,7 @@ import WalletsDrawer from '@drawers/Wallets'
 import AboutFeeDrawer from '@drawers/AboutFee'
 
 // Utils
-import { toLower, toUpper, minus, plus } from '@utils/format'
+import { toLower, toUpper, plus } from '@utils/format'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
 import {
@@ -31,6 +31,7 @@ import {
   getFee,
   getStandingFee,
   isEthereumLike,
+  checkWithZeroFee,
 } from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
@@ -424,7 +425,7 @@ const SendPage: React.FC = () => {
 
   const onSendAll = (): void => {
     if (state.balance) {
-      updateState({ amount: `${minus(getAvailableBalance(), getNormalFee())}`, isIncludeFee: true })
+      updateState({ amount: `${getAvailableBalance()}`, isIncludeFee: true })
     }
   }
 
@@ -507,7 +508,6 @@ const SendPage: React.FC = () => {
       state.addressErrorLabel === null &&
       state.amountErrorLabel === null &&
       Number(state.balance) > 0 &&
-      state.fee > 0 &&
       !state.isFeeLoading &&
       !isCurrencyBalanceError
     ) {
@@ -516,6 +516,11 @@ const SendPage: React.FC = () => {
 
         return withOuputs
       }
+
+      if (state.fee > 0 || checkWithZeroFee(symbol)) {
+        return true
+      }
+
       return false
     }
     return true

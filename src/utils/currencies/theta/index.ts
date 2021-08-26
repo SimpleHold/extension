@@ -16,7 +16,7 @@ export const formatValue = (value: string | number, type: 'from' | 'to'): number
   return Number(new BigNumber(value).multipliedBy(ten18))
 }
 
-export const generateWallet = (): TGenerateAddress | null => {
+export const generateWallet = async (): Promise<TGenerateAddress | null> => {
   try {
     const wallet = thetajs.Wallet.createRandom()
 

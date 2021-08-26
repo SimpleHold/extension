@@ -27,9 +27,10 @@ import {
   createTransaction,
   isEthereumLike,
   getTransactionLink,
+  checkIsInternalTx,
+  createInternalTx,
 } from '@utils/currencies'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
-import * as theta from '@utils/currencies/theta'
 import { getItem, getJSON, removeItem } from '@utils/storage'
 import { ethereumSignTransaction, signTransaction, getFeatures } from '@utils/trezor'
 import {
@@ -41,6 +42,7 @@ import {
   getFirstAddress,
 } from '@utils/ledger'
 import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
+import { minus } from '@utils/format'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -420,8 +422,10 @@ const SendConfirmation: React.FC = () => {
             contractAddress,
           }
 
-          if (theta.coins.indexOf(symbol) !== -1) {
-            const transaction = await theta.createTransaction(
+          const isInternalTx = checkIsInternalTx(symbol)
+
+          if (isInternalTx) {
+            const createTx = await createInternalTx(
               symbol,
               addressFrom,
               addressTo,
@@ -429,14 +433,18 @@ const SendConfirmation: React.FC = () => {
               findWallet.privateKey
             )
 
-            if (transaction) {
+            if (createTx) {
               return updateState({
                 activeDrawer: 'success',
-                isDrawerButtonLoading: false,
-                transactionLink: theta.getTransactionLink(transaction),
+                transactionLink: getTransactionLink(createTx, symbol, chain, tokenChain),
+                isButtonLoading: false,
               })
             }
-            return updateState({ inputErrorLabel: 'Error while creating transaction' })
+
+            return updateState({
+              inputErrorLabel: 'Error while creating transaction',
+              isButtonLoading: false,
+            })
           }
 
           const transaction = await createTransaction({
@@ -456,12 +464,18 @@ const SendConfirmation: React.FC = () => {
             }
           }
 
-          return updateState({ inputErrorLabel: 'Error while creating transaction' })
+          return updateState({
+            inputErrorLabel: 'Error while creating transaction',
+            isButtonLoading: false,
+          })
         }
       }
     }
 
-    return updateState({ inputErrorLabel: 'Error while creating transaction' })
+    return updateState({
+      inputErrorLabel: 'Error while creating transaction',
+      isButtonLoading: false,
+    })
   }
 
   const onClickLedgerDrawer = (): void => {
@@ -486,7 +500,10 @@ const SendConfirmation: React.FC = () => {
 
       if (symbol === 'xrp') {
         if (transaction?.engine_result !== 'tesSUCCESS') {
-          return updateState({ inputErrorLabel: 'Error while creating transaction' })
+          return updateState({
+            inputErrorLabel: 'Error while creating transaction',
+            isButtonLoading: false,
+          })
         }
         txHash = transaction?.tx_json?.hash
       }
@@ -500,6 +517,18 @@ const SendConfirmation: React.FC = () => {
 
   const setPassword = (password: string): void => {
     updateState({ password })
+  }
+
+  const getAmount = (): number => {
+    if (state.props) {
+      const { amount, networkFee, isIncludeFee } = state.props
+
+      if (isIncludeFee === 'true') {
+        return minus(amount, networkFee)
+      }
+      return amount
+    }
+    return 0
   }
 
   return (

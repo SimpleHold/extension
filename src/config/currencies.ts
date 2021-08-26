@@ -15,6 +15,8 @@ import rippleLogo from '@assets/currencies/xrp.svg'
 import neblioLogo from '@assets/currencies/nebl.svg'
 import nulsLogo from '@assets/currencies/nuls.svg'
 import maticLogo from '@assets/currencies/matic.svg'
+import nerveLogo from '@assets/currencies/nvt.svg'
+import tronLogo from '@assets/currencies/trx.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -172,6 +174,24 @@ const currencies: ICurrency[] = [
     background: '#9767E9',
     chain: 'matic',
     minSendAmount: 1000000000000000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Nerve',
+    symbol: 'nvt',
+    logo: nerveLogo,
+    background: '#729EEB',
+    chain: 'nvt',
+    minSendAmount: 100000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Tron',
+    symbol: 'trx',
+    logo: tronLogo,
+    background: '#D0564E',
+    chain: 'tron',
+    minSendAmount: 1000000,
     isCustomFee: false,
   },
 ]

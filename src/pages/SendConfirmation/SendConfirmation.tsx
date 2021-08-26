@@ -25,9 +25,10 @@ import {
   createTransaction,
   isEthereumLike,
   getTransactionLink,
+  checkIsInternalTx,
+  createInternalTx,
 } from '@utils/currencies'
 import { convertDecimals } from '@utils/currencies/ethereumLike'
-import * as theta from '@utils/currencies/theta'
 import { getItem } from '@utils/storage'
 import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
 import { minus } from '@utils/format'
@@ -106,8 +107,8 @@ const SendConfirmation: React.FC = () => {
 
           const parseAmount =
             tokenChain && decimals
-              ? convertDecimals(getAmount(), decimals)
-              : formatUnit(symbol, getAmount(), 'to', chain, 'ether')
+              ? convertDecimals(amount, decimals)
+              : formatUnit(symbol, amount, 'to', chain, 'ether')
           const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
@@ -134,23 +135,29 @@ const SendConfirmation: React.FC = () => {
             contractAddress,
           }
 
-          if (theta.coins.indexOf(symbol) !== -1) {
-            const transaction = await theta.createTransaction(
+          const isInternalTx = checkIsInternalTx(symbol)
+
+          if (isInternalTx) {
+            const createTx = await createInternalTx(
               symbol,
               addressFrom,
               addressTo,
-              getAmount(),
+              amount,
               findWallet.privateKey
             )
 
-            if (transaction) {
+            if (createTx) {
               return updateState({
                 activeDrawer: 'success',
-                transactionLink: theta.getTransactionLink(transaction),
+                transactionLink: getTransactionLink(createTx, symbol, chain, tokenChain),
                 isButtonLoading: false,
               })
             }
-            return updateState({ inputErrorLabel: 'Error while creating transaction' })
+
+            return updateState({
+              inputErrorLabel: 'Error while creating transaction',
+              isButtonLoading: false,
+            })
           }
 
           const transaction = await createTransaction({

@@ -23,7 +23,7 @@ import NetworkFeeShared from '@shared/NetworkFee'
 import { getWallets, IWallet, getWalletName } from '@utils/wallet'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
-import { toLower, toUpper, minus, plus } from '@utils/format'
+import { toLower, toUpper, plus } from '@utils/format'
 import {
   validateAddress,
   formatUnit,
@@ -35,6 +35,7 @@ import {
   getStandingFee,
   checkWithOutputs,
   isEthereumLike,
+  checkWithZeroFee,
 } from '@utils/currencies'
 import { getItem, setItem, removeItem } from '@utils/storage'
 import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
@@ -497,6 +498,7 @@ const Send: React.FC = () => {
         decimals: state.selectedWallet?.decimals,
         extraId: state.extraId,
         hardware: state.selectedWallet?.hardware,
+        isIncludeFee: state.isIncludeFee,
       }
 
       if (state.timer) {
@@ -627,7 +629,6 @@ const Send: React.FC = () => {
         state.addressErrorLabel === null &&
         state.amountErrorLabel === null &&
         Number(state.balance) > 0 &&
-        state.fee > 0 &&
         !state.isFeeLoading &&
         !isCurrencyBalanceError
       ) {
@@ -635,6 +636,10 @@ const Send: React.FC = () => {
           const withOuputs = checkWithOutputs(state.currencyInfo.symbol)
 
           return withOuputs
+        }
+
+        if (state.fee > 0 || checkWithZeroFee(state.currencyInfo.symbol)) {
+          return true
         }
         return false
       }
@@ -670,7 +675,7 @@ const Send: React.FC = () => {
 
   const onSendAll = (): void => {
     if (state.balance) {
-      updateState({ amount: `${minus(state.balance, getNormalFee())}`, isIncludeFee: true })
+      updateState({ amount: `${state.balance}`, isIncludeFee: true })
     }
   }
 

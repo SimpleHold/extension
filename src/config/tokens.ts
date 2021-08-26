@@ -260,7 +260,7 @@ const tokens: IToken[] = [
     isCustomFee: true,
   },
   {
-    address: '0x491604c0FDF08347Dd1fa4Ee062a822A5DD06B5D',
+    address: '0x491604c0fdf08347dd1fa4ee062a822a5dd06b5d',
     name: 'Cartesi Token',
     symbol: 'ctsi',
     decimals: 18,

@@ -2,7 +2,7 @@
 import { TCustomFee } from '@utils/api/types'
 
 export type TProvider = {
-  generateWallet: () => TGenerateAddress | null
+  generateWallet: () => Promise<TGenerateAddress | null> | TGenerateAddress | null
   validateAddress?: (address: string) => boolean
   importPrivateKey?: (privateKey: string) => string | null
   getExplorerLink?: (address: string) => string
