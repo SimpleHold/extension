@@ -419,3 +419,11 @@ export const checkWithPhrase = (symbol: string): boolean => {
 
   return false
 }
+
+export const checkWithZeroFee = (symbol: string): boolean => {
+  if (nerve.coins.indexOf(symbol) !== -1) {
+    return true
+  }
+
+  return false
+}

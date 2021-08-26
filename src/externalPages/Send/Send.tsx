@@ -35,6 +35,7 @@ import {
   getStandingFee,
   checkWithOutputs,
   isEthereumLike,
+  checkWithZeroFee,
 } from '@utils/currencies'
 import { getItem, setItem, removeItem } from '@utils/storage'
 import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
@@ -627,7 +628,6 @@ const Send: React.FC = () => {
         state.addressErrorLabel === null &&
         state.amountErrorLabel === null &&
         Number(state.balance) > 0 &&
-        state.fee > 0 &&
         !state.isFeeLoading &&
         !isCurrencyBalanceError
       ) {
@@ -635,6 +635,10 @@ const Send: React.FC = () => {
           const withOuputs = checkWithOutputs(state.currencyInfo.symbol)
 
           return withOuputs
+        }
+
+        if (state.fee > 0 || checkWithZeroFee(state.currencyInfo.symbol)) {
+          return true
         }
         return false
       }

@@ -9,7 +9,8 @@ import Spinner from '@components/Spinner'
 import useVisible from '@hooks/useVisible'
 
 // Utils
-import { toUpper } from '@utils/format'
+import { toLower, toUpper } from '@utils/format'
+import { checkWithZeroFee } from '@utils/currencies'
 
 // Types
 import { TFeeValue } from '../types'
@@ -71,7 +72,7 @@ const FeeButtonShared: React.FC<Props> = (props) => {
         ) : (
           <Styles.Body>
             <Styles.Fee isError={isError}>
-              {fee === 0 ? '-' : `${fee} ${toUpper(symbol)}`}
+              {fee === 0 && !checkWithZeroFee(symbol) ? '-' : `${fee} ${toUpper(symbol)}`}
             </Styles.Fee>
             {isError ? (
               <Styles.IconRow>

@@ -180,7 +180,7 @@ const currencies: ICurrency[] = [
     symbol: 'nvt',
     logo: nerveLogo,
     background: '#729EEB',
-    chain: 'nerve',
+    chain: 'nvt',
     minSendAmount: 100000,
     isCustomFee: false,
   },

@@ -7,6 +7,7 @@ import FeeButton from '../FeeButton'
 
 // Utils
 import { toLower } from '@utils/format'
+import { checkWithZeroFee } from '@utils/currencies'
 
 // Types
 import { TFeeValue } from '../types'
@@ -61,7 +62,7 @@ const NetworkFee: React.FC<Props> = (props) => {
           values={values}
           openFrom={openFrom}
         />
-        {toLower(symbol) === toLower(feeSymbol) ? (
+        {toLower(symbol) === toLower(feeSymbol) && !checkWithZeroFee(symbol) ? (
           <Styles.IncludeBlock>
             <Styles.IncludeLabel>Include Fee</Styles.IncludeLabel>
             <Styles.SwitchRow>

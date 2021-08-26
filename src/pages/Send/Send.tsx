@@ -31,6 +31,7 @@ import {
   getFee,
   getStandingFee,
   isEthereumLike,
+  checkWithZeroFee,
 } from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
@@ -507,7 +508,6 @@ const SendPage: React.FC = () => {
       state.addressErrorLabel === null &&
       state.amountErrorLabel === null &&
       Number(state.balance) > 0 &&
-      state.fee > 0 &&
       !state.isFeeLoading &&
       !isCurrencyBalanceError
     ) {
@@ -516,6 +516,11 @@ const SendPage: React.FC = () => {
 
         return withOuputs
       }
+
+      if (state.fee > 0 || checkWithZeroFee(symbol)) {
+        return true
+      }
+
       return false
     }
     return true

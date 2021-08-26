@@ -83,20 +83,13 @@ export const getPubKeyFromPriv = (privateKey: string): string | null => {
   }
 }
 
-const Plus = (nu: number, arg: number) => {
-  let newPlus = new BigNumber(nu)
-  return newPlus.plus(arg)
-}
-
 const getInputsOutputs = (transferInfo: TTransferInfo, balanceInfo: TBalanceInfo) => {
-  const newAmount = Number(Plus(transferInfo.amount, 100000))
-
   const inputs = [
     {
       address: transferInfo.fromAddress,
-      assetsChainId: 1,
+      assetsChainId: 9,
       assetsId: 1,
-      amount: newAmount,
+      amount: transferInfo.amount,
       locked: 0,
       nonce: balanceInfo.nonce,
     },
@@ -105,7 +98,7 @@ const getInputsOutputs = (transferInfo: TTransferInfo, balanceInfo: TBalanceInfo
   const outputs = [
     {
       address: transferInfo.toAddress ? transferInfo.toAddress : transferInfo.fromAddress,
-      assetsChainId: 1,
+      assetsChainId: 9,
       assetsId: 1,
       amount: transferInfo.amount,
       lockTime: 0,
@@ -149,5 +142,5 @@ export const createTransaction = async (
 }
 
 export const getStandingFee = (): number => {
-  return 0.001
+  return 0
 }
