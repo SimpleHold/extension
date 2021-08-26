@@ -9,7 +9,7 @@ import Spinner from '@components/Spinner'
 import useVisible from '@hooks/useVisible'
 
 // Utils
-import { toLower, toUpper } from '@utils/format'
+import { toUpper } from '@utils/format'
 import { checkWithZeroFee } from '@utils/currencies'
 
 // Types
