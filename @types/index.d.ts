@@ -3,6 +3,7 @@ declare module '*.svg'
 declare module '@thetalabs/theta-js'
 declare module 'neblio-lib'
 declare module 'tronweb'
+declare module 'enzyme-adapter-react-16'
 
 declare module 'nuls-sdk-js' {
   function newAddress(

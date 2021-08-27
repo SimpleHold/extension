@@ -1,11 +1,11 @@
 export default {
-  collectCoverage: true,
-  coverageDirectory: 'coverage',
-  testEnvironment: 'jsdom',
-  preset: 'jest-puppeteer',
-  globals: {
-    URL: 'http://localhost:8080',
+  clearMocks: true,
+  transform: {
+    '^.+\\.(js|ts|tsx)$': 'ts-jest',
   },
-  verbose: true,
-  transform: { '\\.ts$': ['ts-jest'] },
+  setupFiles: ['<rootDir>/test-setup.ts'],
+  collectCoverage: false,
+  coverageDirectory: 'coverage',
+  coverageProvider: 'v8',
+  testEnvironment: 'jsdom',
 }
