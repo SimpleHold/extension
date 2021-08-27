@@ -11,7 +11,7 @@ import AgreeTerms from '@components/AgreeTerms'
 // Utils
 import { validatePassword } from '@utils/validate'
 import { logEvent, setUserProperties } from '@utils/amplitude'
-import { generate } from '@utils/backup'
+import { generate as generateBackup } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
 import { generate as generateAddress } from '@utils/currencies'
 import { setItem } from '@utils/storage'
@@ -129,7 +129,7 @@ const Wallets: React.FC = () => {
       }
     }
 
-    const { backup, wallets } = generate(data)
+    const { backup, wallets } = generateBackup(data)
 
     setItem('backup', encrypt(backup, state.password))
     setItem('wallets', wallets)
