@@ -3,11 +3,12 @@ import styled from 'styled-components'
 type TContainerProps = {
   isDisabled?: boolean
   color?: string
+  size: number
 }
 
 const Container = styled.div`
-  width: 13px;
-  height: 13px;
+  width: ${({ size }: TContainerProps) => `${size}px`};
+  height: ${({ size }: TContainerProps) => `${size}px`};
   border: ${({ color, isDisabled }: TContainerProps) =>
     `1.5px solid ${color || isDisabled ? '#C3C3C3' : '#7d7e8d'}`};
   border-radius: 2px;

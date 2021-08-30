@@ -11,13 +11,14 @@ interface Props {
   iconWidth?: number
   iconHeight?: number
   isDisabled?: boolean
+  size?: number
 }
 
 const CheckBox: React.FC<Props> = (props) => {
-  const { value, onClick, color, iconWidth, iconHeight, isDisabled } = props
+  const { value, onClick, color, iconWidth, iconHeight, isDisabled, size = 13 } = props
 
   return (
-    <Styles.Container onClick={onClick} color={color} isDisabled={isDisabled}>
+    <Styles.Container onClick={onClick} color={color} isDisabled={isDisabled} size={size}>
       {value ? (
         <SVG
           src="../../assets/icons/check.svg"
