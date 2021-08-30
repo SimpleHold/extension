@@ -156,6 +156,20 @@ const routers: RouteProps[] = [
       loading: () => null,
     }),
   },
+  {
+    path: '/tx-history',
+    component: Loadable({
+      loader: () => import('@pages/TxHistory'),
+      loading: () => null,
+    }),
+  },
+  {
+    path: '/tx',
+    component: Loadable({
+      loader: () => import('@pages/Tx'),
+      loading: () => null,
+    }),
+  },
 ]
 
 export default routers
