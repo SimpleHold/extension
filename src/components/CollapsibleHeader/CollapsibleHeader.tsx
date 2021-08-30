@@ -21,6 +21,7 @@ interface Props {
   pendingBalance: null | number
   isDrawersActive: boolean
   onShowDrawer: (drawerType: 'sort' | 'filters') => void
+  onViewTxHistory: () => void
 }
 
 const CollapsibleHeader: React.FC<Props> = (props) => {
@@ -31,6 +32,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
     pendingBalance,
     isDrawersActive,
     onShowDrawer,
+    onViewTxHistory,
   } = props
 
   const [latesScrollPosition, setLatestScrollPosition] = React.useState<number>(0)
@@ -171,6 +173,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
               <SVG src="../../assets/icons/filter.svg" width={18} height={14} />
               {isFiltersActive() ? <Styles.ButtonDot /> : null}
             </Styles.Button>
+            <p onClick={onViewTxHistory}>View tx history</p>
           </Styles.Actions>
         </Styles.Bottom>
       </Styles.Row>

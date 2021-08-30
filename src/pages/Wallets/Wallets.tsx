@@ -179,6 +179,10 @@ const Wallets: React.FC = () => {
     return ''
   }
 
+  const onViewTxHistory = (): void => {
+    history.push('/tx-history')
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -189,6 +193,7 @@ const Wallets: React.FC = () => {
           pendingBalance={state.pendingBalance}
           onShowDrawer={onShowDrawer}
           isDrawersActive={state.activeDrawer !== null}
+          onViewTxHistory={onViewTxHistory}
         />
         {state.wallets !== null ? (
           <Styles.WalletsList>
