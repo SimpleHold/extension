@@ -23,7 +23,9 @@ const Currency: React.FC<Props> = (props) => {
       <CurrencyLogo size={40} br={13} symbol={symbol} chain={chain} />
       <Styles.Row>
         <Styles.Name>{name}</Styles.Name>
-        <CheckBox value={isActive} onClick={onToggle} />
+        <Styles.CheckBoxRow>
+          <CheckBox value={isActive} size={16} onClick={onToggle} />
+        </Styles.CheckBoxRow>
       </Styles.Row>
     </Styles.Container>
   )

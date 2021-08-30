@@ -1,10 +1,17 @@
 import * as React from 'react'
+import SVG from 'react-inlinesvg'
 
 // Components
 import DrawerWrapper from '@components/DrawerWrapper'
 import Button from '@components/Button'
+
 import Dropdown from './components/Dropdown'
 import Currency from './components/Currency'
+import Wallet from './components/Wallet'
+
+// Utils
+import { getWallets, IWallet } from '@utils/wallet'
+import { toLower } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -36,10 +43,36 @@ const statuses: TStatusItem[] = [
   },
 ]
 
+type TCurrency = {
+  symbol: string
+  chain?: string
+}
+
 const HistoryFilterDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive } = props
 
   const [status, setStatus] = React.useState<TStatuses | null>('received')
+  const [wallets, setWallets] = React.useState<IWallet[]>([])
+  const [selectedCurrencies, setCurrencies] = React.useState<TCurrency[]>([])
+
+  React.useEffect(() => {
+    onGetWallets()
+  }, [])
+
+  const onGetWallets = (): void => {
+    const walletsList = getWallets()
+
+    if (walletsList?.length) {
+      const filterWallets = walletsList.filter(
+        (v, i, a) =>
+          a.findIndex(
+            (wallet: IWallet) => wallet.symbol === v.symbol && wallet.chain === v.chain
+          ) === i
+      )
+
+      setWallets(filterWallets)
+    }
+  }
 
   const onApply = (): void => {}
 
@@ -47,16 +80,59 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     setStatus(status)
   }
 
+  const onToggleCurrency = (symbol: string, isActive: boolean, chain?: string) => (): void => {
+    let newCurrenciesList = [...selectedCurrencies]
+
+    if (isActive) {
+      newCurrenciesList = newCurrenciesList.filter(
+        (currency: TCurrency) =>
+          toLower(currency.symbol) !== toLower(symbol) || toLower(currency.chain) !== toLower(chain)
+      )
+    } else {
+      newCurrenciesList.push({
+        symbol,
+        chain,
+      })
+    }
+
+    setCurrencies(newCurrenciesList)
+  }
+
   const renderCurrencies = (
     <>
-      <Currency symbol="btc" name="Bitcoin" isActive onToggle={() => null} />
+      {wallets.map((wallet: IWallet) => {
+        const { symbol, chain } = wallet
+        const name = 'Bitcoin' // Fix me
+        const isActive =
+          selectedCurrencies.find(
+            (currency: TCurrency) =>
+              toLower(currency.symbol) === toLower(symbol) &&
+              toLower(currency.chain) === toLower(chain)
+          ) !== undefined
+
+        return (
+          <Currency
+            symbol={symbol}
+            chain={chain}
+            name={name}
+            isActive={isActive}
+            onToggle={onToggleCurrency(symbol, isActive, chain)}
+          />
+        )
+      })}
     </>
   )
 
   const renderAddresses = (
-    <div>
-      <p>KEK</p>
-    </div>
+    <>
+      <Wallet
+        symbol="btc"
+        walletName="Wallet name"
+        address="bc1q34aq5drsd23ruwyw77gl9"
+        isActive={false}
+        onToggle={() => null}
+      />
+    </>
   )
 
   return (
@@ -90,10 +166,14 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
           <Styles.Group>
             <Styles.GroupHeading>
               <Styles.GroupTitle>Currency</Styles.GroupTitle>
-              <Styles.ResetGroup>
-                <Styles.ResetTitle>2 selected</Styles.ResetTitle>
-                <Styles.ResetIcon />
-              </Styles.ResetGroup>
+              {selectedCurrencies.length ? (
+                <Styles.ResetGroup>
+                  <Styles.ResetTitle>{selectedCurrencies.length} selected</Styles.ResetTitle>
+                  <Styles.ResetIcon>
+                    <SVG src="../../assets/icons/times.svg" width={8.33} height={8.33} />
+                  </Styles.ResetIcon>
+                </Styles.ResetGroup>
+              ) : null}
             </Styles.GroupHeading>
             <Dropdown title="Select currencies" render={renderCurrencies} />
           </Styles.Group>

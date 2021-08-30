@@ -85,6 +85,21 @@ const ResetIcon = styled.div`
   height: 20px;
   background-color: #f2f4f8;
   border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  path {
+    fill: #7d7e8d;
+  }
+
+  &:hover {
+    cursor: pointer;
+
+    path {
+      fill: #3fbb7d;
+    }
+  }
 `
 
 const Styles = {
