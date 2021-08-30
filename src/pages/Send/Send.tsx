@@ -517,8 +517,8 @@ const SendPage: React.FC = () => {
         return withOuputs
       }
 
-      if (state.fee > 0 || checkWithZeroFee(symbol)) {
-        return true
+      if (state.fee === 0) {
+        return !checkWithZeroFee(symbol)
       }
 
       return false
