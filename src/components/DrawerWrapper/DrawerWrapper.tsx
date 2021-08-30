@@ -14,6 +14,7 @@ interface Props {
   openFrom?: string
   withCloseIcon?: boolean
   padding?: string
+  height?: number
 }
 
 const BackgroundStyles = {
@@ -24,7 +25,17 @@ const BackgroundStyles = {
 }
 
 const DrawerWrapper: React.FC<Props> = (props) => {
-  const { title, children, isActive, onClose, icon, openFrom, withCloseIcon, padding } = props
+  const {
+    title,
+    children,
+    isActive,
+    onClose,
+    icon,
+    openFrom,
+    withCloseIcon,
+    padding,
+    height,
+  } = props
 
   const nodeRef = React.useRef(null)
 
@@ -58,6 +69,7 @@ const DrawerWrapper: React.FC<Props> = (props) => {
           <Styles.Drawer
             openFrom={openFrom}
             padding={padding}
+            height={height}
             style={{
               ...drawerStyle[state],
             }}

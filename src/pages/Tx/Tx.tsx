@@ -1,24 +1,69 @@
 import * as React from 'react'
-import { useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
+import dayjs from 'dayjs'
 
 // Components
 import Header from '@components/Header'
 import Cover from '@components/Cover'
 import Button from '@components/Button'
 import CurrencyLogo from '@components/CurrencyLogo'
+import Skeleton from '@components/Skeleton'
+import CopyToClipboard from '@components/CopyToClipboard'
 
 // Assets
 import linkIcon from '@assets/icons/link.svg'
 import copyIcon from '@assets/icons/copy.svg'
 
+// Utils
+import { short, toUpper } from '@utils/format'
+import { getTransactionLink } from '@utils/currencies'
+import { openWebPage } from '@utils/extension'
+
 // Styles
 import Styles from './styles'
 
+interface ILocationState {
+  hash: string
+  symbol: string
+  chain: string
+}
+
+type TTxInfo = {
+  fee: number
+  feeEstimated: number
+  addressFrom: string
+  addressTo: string
+  date: string
+}
+
 const TxHistory: React.FC = () => {
   const history = useHistory()
+  const {
+    state: { hash, symbol, chain },
+  } = useLocation<ILocationState>()
 
-  const onViewTx = (): void => {}
+  const [txInfo, setTxInfo] = React.useState<TTxInfo | null>(null)
+
+  React.useEffect(() => {
+    getTxsInfo()
+  }, [])
+
+  const getTxsInfo = async (): Promise<void> => {
+    setTimeout(() => {
+      setTxInfo({
+        fee: 0.005,
+        feeEstimated: 14.23,
+        addressFrom: '1BXpV6NKYVxPg5kxCLjtzfTC24FAysSK7x',
+        addressTo: '16FqBrvNEdtbwVDbw12geKo7H6JvPZHf9T',
+        date: new Date().toISOString(),
+      })
+    }, 1000)
+  }
+
+  const onViewTx = (): void => {
+    openWebPage(getTransactionLink(hash, symbol, chain))
+  }
 
   return (
     <Styles.Wrapper>
@@ -27,10 +72,16 @@ const TxHistory: React.FC = () => {
       <Styles.Container>
         <Styles.Body>
           <Styles.Heading>
-            <CurrencyLogo size={50} symbol="btc" />
+            <Skeleton width={50} height={50} br={16} type="gray" isLoading={!txInfo}>
+              <CurrencyLogo size={50} symbol={symbol} />
+            </Skeleton>
             <Styles.HeadingInfo>
-              <Styles.Amount>- 0.165558 BTC</Styles.Amount>
-              <Styles.Estimated>$ 5.75</Styles.Estimated>
+              <Skeleton width={160} height={27} br={5} type="gray" isLoading={!txInfo}>
+                <Styles.Amount>- 0.165558 BTC</Styles.Amount>
+              </Skeleton>
+              <Skeleton width={50} height={19} br={5} mt={4} type="gray" isLoading={!txInfo}>
+                <Styles.Estimated>$ 5.75</Styles.Estimated>
+              </Skeleton>
             </Styles.HeadingInfo>
           </Styles.Heading>
 
@@ -39,8 +90,14 @@ const TxHistory: React.FC = () => {
               <Styles.InfoColumnRow>
                 <Styles.InfoLabel>Fee</Styles.InfoLabel>
                 <Styles.InfoContent>
-                  <Styles.InfoBold>0.0000234 BTC</Styles.InfoBold>
-                  <Styles.InfoText>$ 1.75</Styles.InfoText>
+                  <Skeleton width={100} height={19} br={5} type="gray" isLoading={!txInfo}>
+                    <Styles.InfoBold>
+                      {txInfo?.fee} {toUpper(symbol)}
+                    </Styles.InfoBold>
+                  </Skeleton>
+                  <Skeleton width={50} height={16} br={5} mt={5} type="gray" isLoading={!txInfo}>
+                    <Styles.InfoText>$ {txInfo?.feeEstimated}</Styles.InfoText>
+                  </Skeleton>
                 </Styles.InfoContent>
               </Styles.InfoColumnRow>
             </Styles.InfoColumn>
@@ -48,13 +105,21 @@ const TxHistory: React.FC = () => {
               <Styles.InfoColumnRow pb={7}>
                 <Styles.InfoLabel>From</Styles.InfoLabel>
                 <Styles.InfoContent>
-                  <Styles.InfoBold>bc1q34aq5drpuwyw77gl9</Styles.InfoBold>
+                  <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
+                    {txInfo ? (
+                      <Styles.InfoBold>{short(txInfo.addressFrom, 20)}</Styles.InfoBold>
+                    ) : null}
+                  </Skeleton>
                 </Styles.InfoContent>
               </Styles.InfoColumnRow>
               <Styles.InfoColumnRow pt={7}>
                 <Styles.InfoLabel>To</Styles.InfoLabel>
                 <Styles.InfoContent>
-                  <Styles.InfoBold>bc1q34aq5drpuwyw77gl9</Styles.InfoBold>
+                  <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
+                    {txInfo ? (
+                      <Styles.InfoBold>{short(txInfo.addressTo, 20)}</Styles.InfoBold>
+                    ) : null}
+                  </Skeleton>
                 </Styles.InfoContent>
               </Styles.InfoColumnRow>
             </Styles.InfoColumn>
@@ -62,7 +127,9 @@ const TxHistory: React.FC = () => {
               <Styles.InfoColumnRow>
                 <Styles.InfoLabel>Created</Styles.InfoLabel>
                 <Styles.InfoContent>
-                  <Styles.Date>July 1, 15:43:09</Styles.Date>
+                  <Skeleton width={100} height={19} br={5} type="gray" isLoading={!txInfo}>
+                    <Styles.Date>{dayjs(txInfo?.date).format('MMM D, HH:mm:ss')}</Styles.Date>
+                  </Skeleton>
                 </Styles.InfoContent>
               </Styles.InfoColumnRow>
             </Styles.InfoColumn>
@@ -71,10 +138,12 @@ const TxHistory: React.FC = () => {
           <Styles.HashBlock>
             <Styles.HashBlockRow>
               <Styles.Label>Transaction hash</Styles.Label>
-              <Styles.Text>kk99kt1Eке23e...kk9ке9kt17Eye</Styles.Text>
+              <Styles.Text>{short(hash, 25)}</Styles.Text>
             </Styles.HashBlockRow>
             <Styles.CopyButton>
-              <SVG src={copyIcon} width={12} height={12} />
+              <CopyToClipboard value={hash}>
+                <SVG src={copyIcon} width={12} height={12} />
+              </CopyToClipboard>
             </Styles.CopyButton>
           </Styles.HashBlock>
         </Styles.Body>

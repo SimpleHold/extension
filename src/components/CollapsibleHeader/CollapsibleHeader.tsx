@@ -173,7 +173,9 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
               <SVG src="../../assets/icons/filter.svg" width={18} height={14} />
               {isFiltersActive() ? <Styles.ButtonDot /> : null}
             </Styles.Button>
-            <p onClick={onViewTxHistory}>View tx history</p>
+            <Styles.Button onClick={onViewTxHistory}>
+              <SVG src="../../assets/icons/tx.svg" width={14.06} height={14} />
+            </Styles.Button>
           </Styles.Actions>
         </Styles.Bottom>
       </Styles.Row>
