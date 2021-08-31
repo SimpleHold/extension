@@ -8,7 +8,7 @@ import Skeleton from '@components/Skeleton'
 import PendingBalance from '@components/PendingBalance'
 
 // Utils
-import { getItem } from '@utils/storage'
+import { getItem, checkOneOfExist } from '@utils/storage'
 import { formatEstimated, price } from '@utils/format'
 
 // Styles
@@ -20,7 +20,6 @@ interface Props {
   estimated: null | number
   pendingBalance: null | number
   isDrawersActive: boolean
-  // onShowDrawer: (drawerType: 'sort' | 'filters') => void
   onViewTxHistory: () => void
   openFilters: () => void
 }
@@ -69,16 +68,14 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
 
   const walletsLabelFontSize = Math.max(0, 16 - 0.05 * latesScrollPosition)
 
-  const isSortActive = (): boolean => {
-    return getItem('activeSortKey') !== null || getItem('activeSortType') !== null
-  }
-
   const isFiltersActive = (): boolean => {
-    return (
-      getItem('selectedCurrenciesFilter') !== null ||
-      getItem('hiddenWalletsFilter') !== null ||
-      getItem('zeroBalancesFilter') !== null
-    )
+    return checkOneOfExist([
+      'selectedCurrenciesFilter',
+      'hiddenWalletsFilter',
+      'zeroBalancesFilter',
+      'activeSortKey',
+      'activeSortType',
+    ])
   }
 
   return (
@@ -168,12 +165,8 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
           <Styles.Actions>
             <Styles.Button onClick={openFilters}>
               <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
-              {isSortActive() ? <Styles.ButtonDot /> : null}
-            </Styles.Button>
-            {/* <Styles.Button onClick={() => onShowDrawer('filters')}>
-              <SVG src="../../assets/icons/filter.svg" width={18} height={14} />
               {isFiltersActive() ? <Styles.ButtonDot /> : null}
-            </Styles.Button> */}
+            </Styles.Button>
             <Styles.Button onClick={onViewTxHistory}>
               <SVG src="../../assets/icons/tx.svg" width={14.06} height={14} />
             </Styles.Button>
