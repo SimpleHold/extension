@@ -6,6 +6,7 @@ type THeadingProps = {
 
 type TBodyProps = {
   isVisible: boolean
+  maxHeight?: number
 }
 
 const Container = styled.div`
@@ -69,6 +70,7 @@ const Body = styled.div`
   visibility: ${({ isVisible }: TBodyProps) => (isVisible ? 'visible' : 'hidden')};
   transform: ${({ isVisible }: TBodyProps) => `translateY(${isVisible ? '0' : '-20px'})`};
   transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s;
+  max-height: ${({ maxHeight }: TBodyProps) => (maxHeight ? `${maxHeight}px` : 'initial')};
 `
 
 const Styles = {
