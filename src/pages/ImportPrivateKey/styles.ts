@@ -8,7 +8,7 @@ const Wrapper = styled.div`
 const Container = styled.div`
   height: 540px;
   background-color: #f8f8f8;
-  border-radius: 5px 5px 0 0;
+  border-radius: 16px 16px 0 0;
 `
 
 const Heading = styled.div`

@@ -6,7 +6,7 @@ const Wrapper = styled.div`
 
 const Body = styled.div`
   background-color: #f2f4f8;
-  border-radius: 5px 5px 0px 0px;
+  border-radius: 16px 16px 0px 0px;
   height: 540px;
   overflow: hidden;
   display: flex;
