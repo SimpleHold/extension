@@ -10,21 +10,25 @@ interface Props {
   direction?: 'left' | 'right'
   maxWidth?: number
   textSpace?: string
+  render?: React.ReactElement<any, any> | null
+  left?: number
+  arrowLeft?: number
 }
 
 const Tooltip: React.FC<Props> = (props) => {
-  const { children, text, mt, direction, maxWidth, textSpace } = props
+  const { children, text, mt, direction, maxWidth, textSpace, render, left, arrowLeft } = props
 
   return (
-    <Styles.Container mt={mt}>
+    <Styles.Container mt={mt} left={left}>
       {children}
       <Styles.Tooltip
         className="tooltip"
         direction={direction}
         maxWidth={maxWidth}
         textSpace={textSpace}
+        arrowLeft={arrowLeft}
       >
-        <Styles.TooltipText>{text}</Styles.TooltipText>
+        {render || <Styles.TooltipText>{text}</Styles.TooltipText>}
       </Styles.Tooltip>
     </Styles.Container>
   )
