@@ -5,6 +5,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  background-color: #ffffff;
+
+  &:hover {
+    cursor: pointer;
+    background-color: #f8f9fb;
+  }
 `
 
 const Row = styled.div`

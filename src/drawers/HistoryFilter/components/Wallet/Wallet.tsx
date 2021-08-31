@@ -5,6 +5,9 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import CheckBox from '@components/CheckBox'
 import HardwareLogo from '@components/HardwareLogo'
 
+// Utils
+import { short } from '@utils/format'
+
 // Types
 import { THardware } from '@utils/wallet'
 
@@ -19,24 +22,25 @@ interface Props {
   onToggle: () => void
   chain?: string
   hardware?: THardware
+  name?: string
 }
 
 const Wallet: React.FC<Props> = (props) => {
-  const { symbol, walletName, address, isActive, onToggle, chain, hardware } = props
+  const { symbol, walletName, address, isActive, onToggle, chain, hardware, name } = props
 
   return (
-    <Styles.Container>
-      <CurrencyLogo size={40} br={13} symbol={symbol} chain={chain} />
+    <Styles.Container onClick={onToggle}>
+      <CurrencyLogo size={40} br={13} symbol={symbol} chain={chain} name={name} />
       <Styles.Row>
         <Styles.Currency>
           <Styles.WalletNameRow>
             <HardwareLogo size={12} mr={4} type={hardware?.type} color="#7D7E8D" />
             <Styles.WalletName>{walletName}</Styles.WalletName>
           </Styles.WalletNameRow>
-          <Styles.Address>{address}</Styles.Address>
+          <Styles.Address>{short(address, 20)}</Styles.Address>
         </Styles.Currency>
         <Styles.CheckBoxRow>
-          <CheckBox value={isActive} size={16} onClick={onToggle} />
+          <CheckBox value={isActive} size={16} borderSize={2} />
         </Styles.CheckBoxRow>
       </Styles.Row>
     </Styles.Container>

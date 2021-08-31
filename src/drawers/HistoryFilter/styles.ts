@@ -13,7 +13,7 @@ const Group = styled.div`
 `
 
 const GroupTitle = styled.p`
-  margin: 0;
+  margin: 0 6px 0 0;
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
@@ -60,6 +60,7 @@ const StatusTitle = styled.p`
 `
 
 const GroupHeading = styled.div`
+  height: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -102,6 +103,93 @@ const ResetIcon = styled.div`
   }
 `
 
+const CurrenciesList = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: -10px;
+`
+
+const DropdownCurrency = styled.div`
+  &:not(:first-child) {
+    margin: 0 0 0 6px;
+  }
+`
+
+const GroupTitleRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const AddressWarningIcon = styled.div`
+  width: 12px;
+  height: 12px;
+  border-radius: 6px;
+  background-color: #bdc4d4;
+`
+
+const Tooltip = styled.div`
+  width: 275px;
+  padding: 6px 0;
+
+  button {
+    height: 30px;
+    width: auto;
+    padding: 8px 16px;
+
+    p {
+      font-size: 12px;
+      line-height: 14px;
+    }
+  }
+`
+
+const TooltipText = styled.p`
+  margin: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: #7d7e8d;
+`
+
+const TooltipActions = styled.div`
+  margin: 10px 0 0 0;
+  display: flex;
+  align-items: center;
+`
+
+const WalletsList = styled.div`
+  width: 100%;
+  margin: -10px -16px;
+`
+
+const WalletItem = styled.div`
+  padding: 8px 12px 8px 15px;
+  background-color: #f2f4f8;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  &:not(:first-child) {
+    margin: 4px 0 0 0;
+  }
+`
+
+const WalletItemName = styled.p`
+  margin: 0;
+  font-size: 14px;
+  line-height: 16px;
+  color: #1d1d22;
+`
+
+const WalletItemButton = styled.div`
+  width: 8px;
+  height: 8px;
+  background-color: red;
+`
+
 const Styles = {
   Row,
   Group,
@@ -113,6 +201,17 @@ const Styles = {
   ResetGroup,
   ResetTitle,
   ResetIcon,
+  CurrenciesList,
+  DropdownCurrency,
+  GroupTitleRow,
+  AddressWarningIcon,
+  Tooltip,
+  TooltipText,
+  TooltipActions,
+  WalletsList,
+  WalletItem,
+  WalletItemName,
+  WalletItemButton,
 }
 
 export default Styles
