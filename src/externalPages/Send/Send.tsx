@@ -638,9 +638,10 @@ const Send: React.FC = () => {
           return withOuputs
         }
 
-        if (state.fee > 0 || checkWithZeroFee(state.currencyInfo.symbol)) {
-          return true
+        if (state.fee === 0) {
+          return !checkWithZeroFee(state.currencyInfo.symbol)
         }
+
         return false
       }
     }

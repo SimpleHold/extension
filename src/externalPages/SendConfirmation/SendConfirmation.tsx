@@ -394,8 +394,8 @@ const SendConfirmation: React.FC = () => {
 
           const parseAmount =
             tokenChain && decimals
-              ? convertDecimals(amount, decimals)
-              : formatUnit(symbol, amount, 'to', chain, 'ether')
+              ? convertDecimals(getAmount(), decimals)
+              : formatUnit(symbol, getAmount(), 'to', chain, 'ether')
           const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
@@ -429,7 +429,7 @@ const SendConfirmation: React.FC = () => {
               symbol,
               addressFrom,
               addressTo,
-              amount,
+              getAmount(),
               findWallet.privateKey
             )
 
@@ -543,7 +543,7 @@ const SendConfirmation: React.FC = () => {
         {state.props ? (
           <Styles.Body>
             <SendConfirmShared
-              amount={state.props.amount}
+              amount={getAmount()}
               symbol={state.props.symbol}
               networkFee={state.props.networkFee}
               addressFrom={state.props.addressFrom}
