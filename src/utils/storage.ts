@@ -32,3 +32,19 @@ export const getJSON = (key: string): any | null => {
     return null
   }
 }
+
+export const checkOneOfExist = (keys: string[]): boolean => {
+  try {
+    let isExist = false
+
+    for (const key of keys) {
+      if (getItem(key)) {
+        isExist = true
+      }
+    }
+
+    return isExist
+  } catch {
+    return false
+  }
+}

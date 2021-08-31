@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
 import dayjs from 'dayjs'
+import copy from 'copy-to-clipboard'
 
 // Components
 import Header from '@components/Header'
@@ -14,6 +15,7 @@ import CopyToClipboard from '@components/CopyToClipboard'
 // Assets
 import linkIcon from '@assets/icons/link.svg'
 import copyIcon from '@assets/icons/copy.svg'
+import checkCopyIcon from '@assets/icons/checkCopy.svg'
 
 // Utils
 import { short, toUpper } from '@utils/format'
@@ -44,10 +46,19 @@ const TxHistory: React.FC = () => {
   } = useLocation<ILocationState>()
 
   const [txInfo, setTxInfo] = React.useState<TTxInfo | null>(null)
+  const [isCopied, setIsCopied] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     getTxsInfo()
   }, [])
+
+  React.useEffect(() => {
+    if (isCopied) {
+      setTimeout(() => {
+        setIsCopied(false)
+      }, 1000)
+    }
+  }, [isCopied])
 
   const getTxsInfo = async (): Promise<void> => {
     setTimeout(() => {
@@ -63,6 +74,11 @@ const TxHistory: React.FC = () => {
 
   const onViewTx = (): void => {
     openWebPage(getTransactionLink(hash, symbol, chain))
+  }
+
+  const onCopyHash = (): void => {
+    copy(hash)
+    setIsCopied(true)
   }
 
   return (
@@ -107,7 +123,9 @@ const TxHistory: React.FC = () => {
                 <Styles.InfoContent>
                   <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
                     {txInfo ? (
-                      <Styles.InfoBold>{short(txInfo.addressFrom, 20)}</Styles.InfoBold>
+                      <CopyToClipboard value={txInfo.addressFrom}>
+                        <Styles.InfoBold>{short(txInfo.addressFrom, 20)}</Styles.InfoBold>
+                      </CopyToClipboard>
                     ) : null}
                   </Skeleton>
                 </Styles.InfoContent>
@@ -117,7 +135,9 @@ const TxHistory: React.FC = () => {
                 <Styles.InfoContent>
                   <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
                     {txInfo ? (
-                      <Styles.InfoBold>{short(txInfo.addressTo, 20)}</Styles.InfoBold>
+                      <CopyToClipboard value={txInfo.addressTo}>
+                        <Styles.InfoBold>{short(txInfo.addressTo, 20)}</Styles.InfoBold>
+                      </CopyToClipboard>
                     ) : null}
                   </Skeleton>
                 </Styles.InfoContent>
@@ -140,10 +160,12 @@ const TxHistory: React.FC = () => {
               <Styles.Label>Transaction hash</Styles.Label>
               <Styles.Text>{short(hash, 25)}</Styles.Text>
             </Styles.HashBlockRow>
-            <Styles.CopyButton>
-              <CopyToClipboard value={hash}>
-                <SVG src={copyIcon} width={12} height={12} />
-              </CopyToClipboard>
+            <Styles.CopyButton onClick={onCopyHash}>
+              <SVG
+                src={isCopied ? checkCopyIcon : copyIcon}
+                width={12}
+                height={isCopied ? 11 : 12}
+              />
             </Styles.CopyButton>
           </Styles.HashBlock>
         </Styles.Body>

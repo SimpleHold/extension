@@ -257,6 +257,8 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       {state.selectedCurrencies.map((item: TCurrency, index: number) => {
         const { symbol, chain, name } = item
 
+        // Fix me name
+
         if (symbol && index < 5) {
           return (
             <Styles.DropdownCurrency key={`${symbol}/${chain}`}>
