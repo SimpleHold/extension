@@ -4,9 +4,8 @@ import SVG from 'react-inlinesvg'
 // Components
 import DrawerWrapper from '@components/DrawerWrapper'
 import Button from '@components/Button'
-
-import Dropdown from './components/Dropdown'
-import Currency from './components/Currency'
+import GroupDropdown from '@components/GroupDropdown'
+import DropdownCurrency from '@components/DropdownCurrency'
 import Wallet from './components/Wallet'
 
 // Utils
@@ -111,7 +110,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
           ) !== undefined
 
         return (
-          <Currency
+          <DropdownCurrency
             symbol={symbol}
             chain={chain}
             name={name}
@@ -175,14 +174,14 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
                 </Styles.ResetGroup>
               ) : null}
             </Styles.GroupHeading>
-            <Dropdown title="Select currencies" render={renderCurrencies} />
+            <GroupDropdown title="Select currencies" render={renderCurrencies} />
           </Styles.Group>
 
           <Styles.Group>
             <Styles.GroupHeading>
               <Styles.GroupTitle>Address</Styles.GroupTitle>
             </Styles.GroupHeading>
-            <Dropdown title="Select addresses" render={renderAddresses} />
+            <GroupDropdown title="Select addresses" render={renderAddresses} />
           </Styles.Group>
         </Styles.Row>
         <Button label="Apply" isLight onClick={onApply} />

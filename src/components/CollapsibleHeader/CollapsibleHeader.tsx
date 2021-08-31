@@ -20,8 +20,9 @@ interface Props {
   estimated: null | number
   pendingBalance: null | number
   isDrawersActive: boolean
-  onShowDrawer: (drawerType: 'sort' | 'filters') => void
+  // onShowDrawer: (drawerType: 'sort' | 'filters') => void
   onViewTxHistory: () => void
+  openFilters: () => void
 }
 
 const CollapsibleHeader: React.FC<Props> = (props) => {
@@ -31,8 +32,8 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
     estimated,
     pendingBalance,
     isDrawersActive,
-    onShowDrawer,
     onViewTxHistory,
+    openFilters,
   } = props
 
   const [latesScrollPosition, setLatestScrollPosition] = React.useState<number>(0)
@@ -165,14 +166,14 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
             Wallets
           </Styles.WalletsLabel>
           <Styles.Actions>
-            <Styles.Button onClick={() => onShowDrawer('sort')}>
+            <Styles.Button onClick={openFilters}>
               <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
               {isSortActive() ? <Styles.ButtonDot /> : null}
             </Styles.Button>
-            <Styles.Button onClick={() => onShowDrawer('filters')}>
+            {/* <Styles.Button onClick={() => onShowDrawer('filters')}>
               <SVG src="../../assets/icons/filter.svg" width={18} height={14} />
               {isFiltersActive() ? <Styles.ButtonDot /> : null}
-            </Styles.Button>
+            </Styles.Button> */}
             <Styles.Button onClick={onViewTxHistory}>
               <SVG src="../../assets/icons/tx.svg" width={14.06} height={14} />
             </Styles.Button>
