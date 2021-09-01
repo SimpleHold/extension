@@ -90,15 +90,6 @@ const EmptyHistoryText = styled.p`
 
 const TxList = styled.div``
 
-const SpinnerRow = styled.div`
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto;
-`
-
 const Styles = {
   Wrapper,
   Container,
@@ -112,7 +103,6 @@ const Styles = {
   EmptyHistoryIcon,
   EmptyHistoryText,
   TxList,
-  SpinnerRow,
 }
 
 export default Styles

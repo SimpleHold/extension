@@ -9,10 +9,13 @@ import Cover from '@components/Cover'
 import DividerLine from '@components/DividerLine'
 import HistoryItem from './components/Item'
 import Skeleton from '@components/Skeleton'
-import Spinner from '@components/Spinner'
 
 // Drawers
 import HistoryFilterDrawer from '@drawers/HistoryFilter'
+
+// Utils
+import { IWallet, getWallets, getWalletChain } from '@utils/wallet'
+import { getFullTxHistory } from '@utils/api'
 
 // Styles
 import Styles from './styles'
@@ -35,29 +38,73 @@ const TxHistory: React.FC = () => {
 
   const [activeDrawer, setActiveFilter] = React.useState<'filters' | null>(null)
   const [txGroups, setTxGroups] = React.useState<TGroup[] | null>(null)
-  const [isLoadingMore, setIsLoadingMore] = React.useState<boolean>(false)
+  const [wallets, setWallets] = React.useState<IWallet[]>([])
+  const [isNotFound, setIsNotFound] = React.useState<boolean>(false)
 
   React.useEffect(() => {
-    onGetTxHistory()
+    getWalletList()
   }, [])
 
+  React.useEffect(() => {
+    if (wallets.length && txGroups === null) {
+      onGetTxHistory()
+    }
+  }, [wallets, txGroups])
+
+  const getWalletList = (): void => {
+    const walletsList = getWallets()
+
+    if (walletsList?.length) {
+      setWallets(walletsList)
+    }
+  }
+
   const onGetTxHistory = async (): Promise<void> => {
-    setTimeout(() => {
-      setTxGroups([
-        {
-          date: new Date().toString(),
-          data: [
-            {
-              symbol: 'btc',
-              hash: '1ef718814a52ccb046c6976606b2858e57817d13600e4c42d56f04b8f849686b',
-              name: 'Bitcoin Wallet',
-              amount: 10,
-              estimated: 0.001,
-            },
-          ],
-        },
-      ])
-    }, 2000)
+    const mapWallets = wallets.map((wallet: IWallet) => {
+      const { address, chain, symbol, contractAddress } = wallet
+
+      return {
+        address,
+        chain: getWalletChain(symbol, chain),
+        tokenSymbol: chain ? symbol : undefined,
+        contractAddress,
+      }
+    })
+
+    const data = await getFullTxHistory(mapWallets)
+
+    // if (!data.length) {
+    //   setIsNotFound(true)
+    // }
+
+    setTxGroups([
+      {
+        date: new Date().toString(),
+        data: [
+          {
+            symbol: 'eth',
+            hash: '0xa38b8dc1aab577093da9b60a7cdadcd4d1b1be0f5764d2eab128348eed72c8c4',
+            name: 'Bitcoin Wallet',
+            amount: 10,
+            estimated: 0.001,
+          },
+          {
+            symbol: 'btc',
+            hash: '8992be2fb5038724d5ab098540c306cbb222a4baf15086acce9ad62bb167a81a',
+            name: 'Bitcoin Wallet',
+            amount: 10,
+            estimated: 0.001,
+          },
+          {
+            symbol: 'ada',
+            hash: '65fa809a52b45748b8795b16ed0e38479562a59d914e5411d507e3633c5f6c27',
+            name: 'Bitcoin Wallet',
+            amount: 10,
+            estimated: 0.001,
+          },
+        ],
+      },
+    ])
   }
 
   const onCloseDrawer = (): void => {
@@ -116,9 +163,8 @@ const TxHistory: React.FC = () => {
             </Styles.Button>
           </Styles.Heading>
 
-          {txGroups?.length === 0 ? renderNotFound() : null}
-          {txGroups === null ? renderLoading() : null}
-
+          {isNotFound ? renderNotFound() : null}
+          {txGroups === null && !isNotFound ? renderLoading() : null}
           {txGroups !== null && txGroups.length > 0 ? (
             <>
               {txGroups.map((group: TGroup) => {
@@ -144,7 +190,7 @@ const TxHistory: React.FC = () => {
                             estimated,
                             isPending: false, // Fix me
                           }}
-                          onClick={openTx(symbol, 'bitcoin', hash)} // Fix me
+                          onClick={openTx(symbol, 'cardano', hash)} // Fix me
                         />
                       )
                     })}
@@ -153,12 +199,6 @@ const TxHistory: React.FC = () => {
                 )
               })}
             </>
-          ) : null}
-
-          {isLoadingMore ? (
-            <Styles.SpinnerRow>
-              <Spinner size={16} />
-            </Styles.SpinnerRow>
           ) : null}
         </Styles.Container>
       </Styles.Wrapper>
