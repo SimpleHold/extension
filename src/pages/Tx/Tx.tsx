@@ -3,6 +3,7 @@ import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
 import dayjs from 'dayjs'
 import copy from 'copy-to-clipboard'
+import numeral from 'numeral'
 
 // Components
 import Header from '@components/Header'
@@ -12,15 +13,22 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 import CopyToClipboard from '@components/CopyToClipboard'
 
+// Drawers
+import TxAddressesDrawer from '@drawers/TxAddresses'
+
 // Assets
 import linkIcon from '@assets/icons/link.svg'
 import copyIcon from '@assets/icons/copy.svg'
 import checkCopyIcon from '@assets/icons/checkCopy.svg'
 
 // Utils
-import { short, toUpper } from '@utils/format'
+import { short, toUpper, formatEstimated, price } from '@utils/format'
 import { getTransactionLink } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
+import { getHistoryTxInfo } from '@utils/api'
+
+// Types
+import { THistoryTx, TTxHistoryAddress } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -31,25 +39,20 @@ interface ILocationState {
   chain: string
 }
 
-type TTxInfo = {
-  fee: number
-  feeEstimated: number
-  addressFrom: string
-  addressTo: string
-  date: string
-}
-
 const TxHistory: React.FC = () => {
   const history = useHistory()
   const {
     state: { hash, symbol, chain },
   } = useLocation<ILocationState>()
 
-  const [txInfo, setTxInfo] = React.useState<TTxInfo | null>(null)
+  const [txInfo, setTxInfo] = React.useState<THistoryTx | null>(null)
   const [isCopied, setIsCopied] = React.useState<boolean>(false)
+  const [isError, setIsError] = React.useState<boolean>(false)
+  const [txAddresses, setTxAddresses] = React.useState<TTxHistoryAddress[]>([])
+  const [activeDrawer, setActiveDrawer] = React.useState<'txAddresses' | null>(null)
 
   React.useEffect(() => {
-    getTxsInfo()
+    getTxInfo()
   }, [])
 
   React.useEffect(() => {
@@ -60,16 +63,18 @@ const TxHistory: React.FC = () => {
     }
   }, [isCopied])
 
-  const getTxsInfo = async (): Promise<void> => {
-    setTimeout(() => {
-      setTxInfo({
-        fee: 0.005,
-        feeEstimated: 14.23,
-        addressFrom: '1BXpV6NKYVxPg5kxCLjtzfTC24FAysSK7x',
-        addressTo: '16FqBrvNEdtbwVDbw12geKo7H6JvPZHf9T',
-        date: new Date().toISOString(),
-      })
-    }, 1000)
+  const getTxInfo = async (): Promise<void> => {
+    if (isError) {
+      setIsError(false)
+    }
+
+    const data = await getHistoryTxInfo(hash, chain)
+
+    if (data) {
+      setTxInfo(data)
+    } else {
+      setIsError(true)
+    }
   }
 
   const onViewTx = (): void => {
@@ -81,97 +86,182 @@ const TxHistory: React.FC = () => {
     setIsCopied(true)
   }
 
+  const onClickButton = (): void => {
+    if (isError) {
+      getTxInfo()
+    } else {
+      onViewTx()
+    }
+  }
+
+  const onViewAddresses = (type: 'from' | 'to') => (): void => {
+    if (type === 'from' && txInfo?.addressesFrom?.length) {
+      setTxAddresses(txInfo.addressesFrom)
+    } else if (type === 'to' && txInfo?.addressesTo?.length) {
+      setTxAddresses(txInfo.addressesTo)
+    }
+
+    setActiveDrawer('txAddresses')
+  }
+
+  const onCloseDrawer = (): void => {
+    setActiveDrawer(null)
+  }
+
   return (
-    <Styles.Wrapper>
-      <Cover />
-      <Header withBack backTitle="History" onBack={history.goBack} />
-      <Styles.Container>
-        <Styles.Body>
-          <Styles.Heading>
-            <Skeleton width={50} height={50} br={16} type="gray" isLoading={!txInfo}>
-              <CurrencyLogo size={50} symbol={symbol} />
-            </Skeleton>
-            <Styles.HeadingInfo>
-              <Skeleton width={160} height={27} br={5} type="gray" isLoading={!txInfo}>
-                <Styles.Amount>- 0.165558 BTC</Styles.Amount>
-              </Skeleton>
-              <Skeleton width={50} height={19} br={5} mt={4} type="gray" isLoading={!txInfo}>
-                <Styles.Estimated>$ 5.75</Styles.Estimated>
-              </Skeleton>
-            </Styles.HeadingInfo>
-          </Styles.Heading>
+    <>
+      <Styles.Wrapper>
+        <Cover />
+        <Header withBack backTitle="History" onBack={history.goBack} />
+        <Styles.Container>
+          <Styles.Body>
+            {isError ? (
+              <Styles.ErrorBlock>
+                <Styles.ErrorLoadingIcon />
+                <Styles.ErrorLoadingText>
+                  Failed to load transaction info. Plase try again
+                </Styles.ErrorLoadingText>
+              </Styles.ErrorBlock>
+            ) : (
+              <>
+                <Styles.Heading>
+                  <Skeleton width={50} height={50} br={16} type="gray" isLoading={!txInfo}>
+                    <CurrencyLogo size={50} symbol={symbol} />
+                  </Skeleton>
+                  <Styles.HeadingInfo>
+                    <Skeleton width={160} height={27} br={5} type="gray" isLoading={!txInfo}>
+                      {txInfo ? (
+                        <Styles.Amount>{`${numeral(txInfo.amount).format('0.[000000]')} ${toUpper(
+                          symbol
+                        )}`}</Styles.Amount>
+                      ) : null}
+                    </Skeleton>
+                    <Skeleton width={50} height={19} br={5} mt={4} type="gray" isLoading={!txInfo}>
+                      {txInfo ? (
+                        <Styles.Estimated>
+                          {`$ ${formatEstimated(txInfo.estimated, price(txInfo.estimated))}`}
+                        </Styles.Estimated>
+                      ) : null}
+                    </Skeleton>
+                  </Styles.HeadingInfo>
+                </Styles.Heading>
 
-          <Styles.Info>
-            <Styles.InfoColumn>
-              <Styles.InfoColumnRow>
-                <Styles.InfoLabel>Fee</Styles.InfoLabel>
-                <Styles.InfoContent>
-                  <Skeleton width={100} height={19} br={5} type="gray" isLoading={!txInfo}>
-                    <Styles.InfoBold>
-                      {txInfo?.fee} {toUpper(symbol)}
-                    </Styles.InfoBold>
-                  </Skeleton>
-                  <Skeleton width={50} height={16} br={5} mt={5} type="gray" isLoading={!txInfo}>
-                    <Styles.InfoText>$ {txInfo?.feeEstimated}</Styles.InfoText>
-                  </Skeleton>
-                </Styles.InfoContent>
-              </Styles.InfoColumnRow>
-            </Styles.InfoColumn>
-            <Styles.InfoColumn>
-              <Styles.InfoColumnRow pb={7}>
-                <Styles.InfoLabel>From</Styles.InfoLabel>
-                <Styles.InfoContent>
-                  <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
-                    {txInfo ? (
-                      <CopyToClipboard value={txInfo.addressFrom}>
-                        <Styles.InfoBold>{short(txInfo.addressFrom, 20)}</Styles.InfoBold>
-                      </CopyToClipboard>
-                    ) : null}
-                  </Skeleton>
-                </Styles.InfoContent>
-              </Styles.InfoColumnRow>
-              <Styles.InfoColumnRow pt={7}>
-                <Styles.InfoLabel>To</Styles.InfoLabel>
-                <Styles.InfoContent>
-                  <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
-                    {txInfo ? (
-                      <CopyToClipboard value={txInfo.addressTo}>
-                        <Styles.InfoBold>{short(txInfo.addressTo, 20)}</Styles.InfoBold>
-                      </CopyToClipboard>
-                    ) : null}
-                  </Skeleton>
-                </Styles.InfoContent>
-              </Styles.InfoColumnRow>
-            </Styles.InfoColumn>
-            <Styles.InfoColumn>
-              <Styles.InfoColumnRow>
-                <Styles.InfoLabel>Created</Styles.InfoLabel>
-                <Styles.InfoContent>
-                  <Skeleton width={100} height={19} br={5} type="gray" isLoading={!txInfo}>
-                    <Styles.Date>{dayjs(txInfo?.date).format('MMM D, HH:mm:ss')}</Styles.Date>
-                  </Skeleton>
-                </Styles.InfoContent>
-              </Styles.InfoColumnRow>
-            </Styles.InfoColumn>
-          </Styles.Info>
-
-          <Styles.HashBlock>
-            <Styles.HashBlockRow>
-              <Styles.Label>Transaction hash</Styles.Label>
-              <Styles.Text>{short(hash, 25)}</Styles.Text>
-            </Styles.HashBlockRow>
-            <Styles.CopyButton onClick={onCopyHash}>
-              <SVG
-                src={isCopied ? checkCopyIcon : copyIcon}
-                width={12}
-                height={isCopied ? 11 : 12}
-              />
-            </Styles.CopyButton>
-          </Styles.HashBlock>
-        </Styles.Body>
-        <Button label="View on explorer" onClick={onViewTx} icon={linkIcon} />
-      </Styles.Container>
-    </Styles.Wrapper>
+                <Styles.Info>
+                  <Styles.InfoColumn>
+                    <Styles.InfoColumnRow>
+                      <Styles.InfoLabel>Fee</Styles.InfoLabel>
+                      <Styles.InfoContent>
+                        <Skeleton width={100} height={19} br={5} type="gray" isLoading={!txInfo}>
+                          <Styles.InfoBold>
+                            {txInfo?.fee} {toUpper(symbol)}
+                          </Styles.InfoBold>
+                        </Skeleton>
+                        <Skeleton
+                          width={50}
+                          height={16}
+                          br={5}
+                          mt={5}
+                          type="gray"
+                          isLoading={!txInfo}
+                        >
+                          {txInfo ? (
+                            <Styles.InfoText>
+                              {`$ ${formatEstimated(
+                                txInfo.feeEstimated,
+                                price(txInfo.feeEstimated)
+                              )}`}
+                            </Styles.InfoText>
+                          ) : null}
+                        </Skeleton>
+                      </Styles.InfoContent>
+                    </Styles.InfoColumnRow>
+                  </Styles.InfoColumn>
+                  <Styles.InfoColumn>
+                    <Styles.InfoColumnRow pb={7}>
+                      <Styles.InfoLabel>From</Styles.InfoLabel>
+                      <Styles.InfoContent>
+                        <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
+                          {txInfo ? (
+                            <>
+                              {txInfo?.addressFrom ? (
+                                <CopyToClipboard value={txInfo.addressFrom} zIndex={3}>
+                                  <Styles.InfoBold>{short(txInfo.addressFrom, 20)}</Styles.InfoBold>
+                                </CopyToClipboard>
+                              ) : null}
+                              {txInfo?.addressesFrom ? (
+                                <Styles.InfoBold onClick={onViewAddresses('from')}>
+                                  View all addresses ({txInfo.addressesFrom.length})
+                                </Styles.InfoBold>
+                              ) : null}
+                            </>
+                          ) : null}
+                        </Skeleton>
+                      </Styles.InfoContent>
+                    </Styles.InfoColumnRow>
+                    <Styles.InfoColumnRow pt={7}>
+                      <Styles.InfoLabel>To</Styles.InfoLabel>
+                      <Styles.InfoContent>
+                        <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
+                          {txInfo ? (
+                            <>
+                              {txInfo?.addressTo ? (
+                                <CopyToClipboard value={txInfo.addressTo}>
+                                  <Styles.InfoBold>{short(txInfo.addressTo, 20)}</Styles.InfoBold>
+                                </CopyToClipboard>
+                              ) : null}
+                              {txInfo?.addressesTo ? (
+                                <Styles.InfoBold onClick={onViewAddresses('to')}>
+                                  View all addresses ({txInfo.addressesTo.length})
+                                </Styles.InfoBold>
+                              ) : null}
+                            </>
+                          ) : null}
+                        </Skeleton>
+                      </Styles.InfoContent>
+                    </Styles.InfoColumnRow>
+                  </Styles.InfoColumn>
+                  <Styles.InfoColumn>
+                    <Styles.InfoColumnRow>
+                      <Styles.InfoLabel>Created</Styles.InfoLabel>
+                      <Styles.InfoContent>
+                        <Skeleton width={100} height={19} br={5} type="gray" isLoading={!txInfo}>
+                          <Styles.Date>{dayjs(txInfo?.date).format('MMM D, HH:mm:ss')}</Styles.Date>
+                        </Skeleton>
+                      </Styles.InfoContent>
+                    </Styles.InfoColumnRow>
+                  </Styles.InfoColumn>
+                </Styles.Info>
+              </>
+            )}
+            <Styles.HashBlock>
+              <Styles.HashBlockRow>
+                <Styles.Label>Transaction hash</Styles.Label>
+                <Styles.Text>{short(hash, 25)}</Styles.Text>
+              </Styles.HashBlockRow>
+              <Styles.CopyButton onClick={onCopyHash}>
+                <SVG
+                  src={isCopied ? checkCopyIcon : copyIcon}
+                  width={12}
+                  height={isCopied ? 11 : 12}
+                />
+              </Styles.CopyButton>
+            </Styles.HashBlock>
+          </Styles.Body>
+          {isError || txInfo ? (
+            <Button
+              label={isError ? 'Try again' : 'View on explorer'}
+              onClick={onClickButton}
+              icon={isError ? undefined : linkIcon}
+            />
+          ) : null}
+        </Styles.Container>
+      </Styles.Wrapper>
+      <TxAddressesDrawer
+        isActive={activeDrawer === 'txAddresses'}
+        onClose={onCloseDrawer}
+        addresses={txAddresses}
+      />
+    </>
   )
 }
 

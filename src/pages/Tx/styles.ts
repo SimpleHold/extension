@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 
+import breakFileIcon from '@assets/icons/breakFile.svg'
+
 type TInfoColumnRowProps = {
   pb?: number
   pt?: number
@@ -53,10 +55,11 @@ const Estimated = styled.p`
 const Info = styled.div`
   background-color: #ffffff;
   border-radius: 16px;
-  margin: 10px 0;
+  margin: 10px 0 0 0;
 `
 
 const HashBlock = styled.div`
+  margin: 10px 0 0 0;
   padding: 15px 20px;
   background-color: #ffffff;
   border-radius: 16px;
@@ -155,6 +158,34 @@ const Date = styled.p`
   color: #7d7e8d;
 `
 
+const ErrorBlock = styled.div`
+  width: 100%;
+  height: 333px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 0 32px;
+`
+
+const ErrorLoadingIcon = styled.div`
+  width: 50px;
+  height: 50px;
+  background-image: url(${breakFileIcon});
+  background-repeat: no-repeat;
+  background-size: contain;
+`
+
+const ErrorLoadingText = styled.p`
+  margin: 10px 0 0 0;
+  font-size: 16px;
+  line-height: 23px;
+  text-align: center;
+  color: #7d7e8d;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -176,6 +207,9 @@ const Styles = {
   InfoBold,
   InfoText,
   Date,
+  ErrorBlock,
+  ErrorLoadingIcon,
+  ErrorLoadingText,
 }
 
 export default Styles
