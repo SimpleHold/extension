@@ -64,3 +64,29 @@ export type TCustomFee = {
   average: number
   fast: number
 }
+
+export type TTxWallet = {
+  chain: string
+  address: string
+  tokenSymbol?: string
+  contractAddress?: string
+}
+
+export type THistoryTx = {
+  fee: number
+  feeEstimated: number
+  addressFrom?: string
+  addressTo?: string
+  date: string
+  isPending: boolean
+  amount: number
+  estimated: number
+  addressesFrom?: TTxHistoryAddress[]
+  addressesTo?: TTxHistoryAddress[]
+}
+
+export type TTxHistoryAddress = {
+  address: string
+  amount: number
+  estimated: number
+}

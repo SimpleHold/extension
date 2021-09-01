@@ -13,6 +13,8 @@ import {
   TPhishingSite,
   TAddressTx,
   TCustomFee,
+  TTxWallet,
+  THistoryTx,
 } from './types'
 
 export const getBalance = async (
@@ -419,6 +421,27 @@ export const getWarning = async (symbol: string, chain?: string): Promise<string
     }
 
     return null
+  } catch {
+    return null
+  }
+}
+
+export const getFullTxHistory = async (wallets: TTxWallet[]): Promise<string[]> => {
+  return []
+}
+
+export const getHistoryTxInfo = async (hash: string, chain: string): Promise<THistoryTx | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(
+      `${config.serverUrl}/transaction/hash/${hash}`,
+      {
+        params: {
+          chain,
+        },
+      }
+    )
+
+    return data?.data || null
   } catch {
     return null
   }
