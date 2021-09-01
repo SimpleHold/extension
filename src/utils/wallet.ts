@@ -405,3 +405,13 @@ export const renameWallet = (uuid: string, name: string) => {
     }
   }
 }
+
+export const getWalletChain = (symbol: string, chain?: string): string => {
+  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+
+  if (currency) {
+    return currency?.chain
+  }
+
+  return ''
+}
