@@ -26,4 +26,5 @@ export interface IState {
   privateKey: null | string
   walletName: string
   isHiddenWallet: boolean
+  warning: null | string
 }

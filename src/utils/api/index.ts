@@ -404,3 +404,22 @@ export const sendFeedback = async (
     })
   } catch {}
 }
+
+export const getWarning = async (symbol: string, chain?: string): Promise<string | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/wallet/warning`, {
+      params: {
+        symbol,
+        chain,
+      },
+    })
+
+    if (data?.data) {
+      return data.data
+    }
+
+    return null
+  } catch {
+    return null
+  }
+}
