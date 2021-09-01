@@ -5,6 +5,7 @@ import tooltipArrowIcon from '@assets/icons/tooltipArrow.svg'
 type TContainerProps = {
   mt?: number
   left?: number
+  zIndex: number
 }
 
 type TTooltipProps = {
@@ -31,7 +32,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   filter: drop-shadow(0px 3px 15px rgba(125, 126, 141, 0.2));
-  z-index: 2;
+  z-index: ${({ zIndex }: TContainerProps) => zIndex};
 
   &:hover {
     cursor: pointer;
