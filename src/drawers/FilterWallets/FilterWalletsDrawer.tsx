@@ -12,7 +12,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 
 // Utils
 import { toLower } from '@utils/format'
-import { getItem, removeItem, setItem } from '@utils/storage'
+import { getItem, removeItem, setItem, removeMany } from '@utils/storage'
 import { getWallets, IWallet } from '@utils/wallet'
 
 // Hooks
@@ -257,8 +257,6 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       {state.selectedCurrencies.map((item: TCurrency, index: number) => {
         const { symbol, chain, name } = item
 
-        // Fix me name
-
         if (symbol && index < 5) {
           return (
             <Styles.DropdownCurrency key={`${symbol}/${chain}`}>
@@ -270,6 +268,42 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       })}
     </Styles.CurrenciesList>
   ) : undefined
+
+  const isButtonDisabled = (): boolean => {
+    const {
+      isShowPrevHiddenAddress,
+      isShowHiddenAddress,
+      isShowPrevZeroBalances,
+      isShowZeroBalances,
+      prevSelectedCurrencies,
+      selectedCurrencies,
+    } = state
+
+    return (
+      isShowPrevHiddenAddress === isShowHiddenAddress &&
+      isShowPrevZeroBalances === isShowZeroBalances &&
+      prevSelectedCurrencies.length === selectedCurrencies.length
+    )
+  }
+
+  const isShowResetButton = (): boolean => {
+    const getHiddenWalletsFilter = getItem('hiddenWalletsFilter')
+    const getZeroBalancesFilter = getItem('zeroBalancesFilter')
+    const getSelectedCurrenciesFilter = getItem('selectedCurrenciesFilter')
+
+    return (
+      (getHiddenWalletsFilter !== null ||
+        getZeroBalancesFilter !== null ||
+        getSelectedCurrenciesFilter !== null) &&
+      isButtonDisabled()
+    )
+  }
+
+  const onReset = (): void => {
+    removeMany(['hiddenWalletsFilter', 'zeroBalancesFilter', 'selectedCurrenciesFilter'])
+    updateState(initialState)
+    onApply()
+  }
 
   return (
     <DrawerWrapper
@@ -344,7 +378,12 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
           </Styles.Group>
         </Styles.Row>
 
-        <Button label="Apply" onClick={onApplyDrawer} />
+        <Styles.Actions>
+          {isShowResetButton() ? (
+            <Button label="Reset" isDanger onClick={onReset} mr={7.5} />
+          ) : null}
+          <Button label="Apply" onClick={onApplyDrawer} ml={isShowResetButton() ? 7.5 : 0} />
+        </Styles.Actions>
       </Styles.Container>
     </DrawerWrapper>
   )

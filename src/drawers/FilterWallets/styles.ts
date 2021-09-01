@@ -84,6 +84,12 @@ const DropdownCurrency = styled.div`
   }
 `
 
+const Actions = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
 const Styles = {
   Container,
   Row,
@@ -96,6 +102,7 @@ const Styles = {
   ClearButton,
   CurrenciesList,
   DropdownCurrency,
+  Actions,
 }
 
 export default Styles
