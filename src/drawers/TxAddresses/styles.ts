@@ -1,32 +1,23 @@
 import styled from 'styled-components'
 
-const Row = styled.div`
-  overflow-y: scroll;
-  max-height: 477px;
-  margin: 10px 0 0 0;
+const Row = styled.div``
+
+const Group = styled.div``
+
+const Actions = styled.div`
+  padding: 30px;
 `
 
-const AddressBlock = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+const List = styled.div`
+  overflow: scroll;
+  height: 375px;
 `
-
-const AddressRow = styled.div``
-
-const Address = styled.p``
-
-const Amount = styled.p``
-
-const Estimated = styled.p``
 
 const Styles = {
   Row,
-  AddressBlock,
-  AddressRow,
-  Address,
-  Amount,
-  Estimated,
+  Group,
+  Actions,
+  List,
 }
 
 export default Styles

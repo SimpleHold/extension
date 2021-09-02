@@ -2,10 +2,14 @@ import * as React from 'react'
 
 // Components
 import DrawerWrapper from '@components/DrawerWrapper'
-import CurrencyLogo from '@components/CurrencyLogo'
+import Tabs from '@components/Tabs'
+import Address from './components/Address'
+import DividerLine from '@components/DividerLine'
+import Button from '@components/Button'
 
 // Types
 import { TTxHistoryAddress } from '@utils/api/types'
+import { TTab } from '@components/Tabs/types'
 
 // Styles
 import Styles from './styles'
@@ -13,35 +17,58 @@ import Styles from './styles'
 interface Props {
   onClose: () => void
   isActive: boolean
-  addresses: TTxHistoryAddress[]
+  addressesFrom: TTxHistoryAddress[]
+  addressesTo: TTxHistoryAddress[]
+  symbol: string
 }
 
 const TxAddressesDrawer: React.FC<Props> = (props) => {
-  const { onClose, isActive, addresses } = props
+  const { onClose, isActive, addressesFrom, addressesTo, symbol } = props
+
+  const renderAddresses = (data: TTxHistoryAddress[]) => (
+    <Styles.List>
+      {data.map((item: TTxHistoryAddress, index: number) => {
+        const { address, amount, estimated } = item
+
+        return (
+          <Styles.Group key={`${address}/${index}`}>
+            <Address address={address} amount={amount} estimated={estimated} symbol={symbol} />
+            {index !== data.length - 1 ? <DividerLine /> : null}
+          </Styles.Group>
+        )
+      })}
+    </Styles.List>
+  )
+
+  const tabs: TTab[] = [
+    {
+      title: 'Senders',
+      key: 'senders',
+      badge: addressesFrom.length,
+      renderItem: renderAddresses(addressesFrom),
+    },
+    {
+      title: 'Recipients',
+      key: 'recipients',
+      badge: addressesTo.length,
+      renderItem: renderAddresses(addressesTo),
+    },
+  ]
+
+  const [activeTabKey, setActiveTabKey] = React.useState<string>('senders')
+
+  const onSelectTab = (tabKey: string) => (): void => {
+    setActiveTabKey(tabKey)
+  }
 
   return (
-    <DrawerWrapper
-      title="Addresses"
-      isActive={isActive}
-      onClose={onClose}
-      withCloseIcon
-      height={540}
-    >
+    <DrawerWrapper isActive={isActive} onClose={onClose} padding="0" height={540}>
       <Styles.Row>
-        {addresses.map((item: TTxHistoryAddress) => {
-          const { address, amount, estimated } = item
+        <Tabs tabs={tabs} activeTabKey={activeTabKey} onSelectTab={onSelectTab} />
 
-          return (
-            <Styles.AddressBlock key={address}>
-              <CurrencyLogo size={40} symbol="btc" />
-              <Styles.AddressRow>
-                <Styles.Address>{address}</Styles.Address>
-                <Styles.Amount>{amount}</Styles.Amount>
-                <Styles.Estimated>{estimated}</Styles.Estimated>
-              </Styles.AddressRow>
-            </Styles.AddressBlock>
-          )
-        })}
+        <Styles.Actions>
+          <Button label="Close" onClick={onClose} />
+        </Styles.Actions>
       </Styles.Row>
     </DrawerWrapper>
   )
