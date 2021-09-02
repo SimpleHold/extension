@@ -4,6 +4,10 @@ type TTabProps = {
   isActive: boolean
 }
 
+type TBadgeProps = {
+  isActive: boolean
+}
+
 const Container = styled.div``
 
 const Tabs = styled.div`
@@ -44,11 +48,39 @@ const TabTitle = styled.p`
   line-height: 16px;
 `
 
+const TabRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const Badge = styled.div`
+  padding: 3px 8px;
+  background-color: ${({ isActive }: TBadgeProps) =>
+    isActive ? 'rgba(215, 239, 227, 0.7)' : '#f2f4f8'};
+  border-radius: 10px;
+  margin: 0 0 0 6px;
+
+  span {
+    color: ${({ isActive }: TBadgeProps) => (isActive ? '#3FBB7D' : '#7D7E8D')};
+  }
+`
+
+const BadgeText = styled.span`
+  margin: 0;
+  font-weight: 500;
+  font-size: 12px;
+  line-height: 14px;
+`
+
 const Styles = {
   Container,
   Tabs,
   Tab,
   TabTitle,
+  TabRow,
+  Badge,
+  BadgeText,
 }
 
 export default Styles
