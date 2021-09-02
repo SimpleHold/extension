@@ -2,7 +2,7 @@ import React from 'react'
 import { Route, RouteProps, MemoryRouter as Router, Switch } from 'react-router-dom'
 import { mount } from 'enzyme'
 
-import routes from '../src/routes'
+import routes from '../../../src/routes'
 
 describe('Test React router', () => {
   it('onboarding', () => {

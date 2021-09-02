@@ -1,7 +1,7 @@
 import React from 'react'
 import { shallow } from 'enzyme'
 
-import Counter from '../src/components/Counter'
+import Counter from '@components/Counter'
 
 describe('Test Button component', () => {
   it('Test click event', () => {

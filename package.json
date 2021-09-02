@@ -19,8 +19,13 @@
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix",
     "test:unit": "jest --projects test/unit",
-    "test:e2e": "jest --projects test/e2e",
-    "test": "jest"
+    "test:e2e": "jest --projects test/e2e"
+  },
+  "jest": {
+    "projects": [
+      "test/e2e/jest.config.ts",
+      "test/unit/jest.config.ts"
+    ]
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
