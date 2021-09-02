@@ -185,7 +185,7 @@ const Wallets: React.FC = () => {
   }
 
   return (
-    <Styles.Wrapper>
+    <Styles.Wrapper className="create-wallet-page">
       <Header noActions logoColor="#3FBB7D" withBorder />
       <Styles.Container>
         <Styles.Row>

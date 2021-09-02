@@ -4,6 +4,7 @@ export default {
     '^.+\\.(js|ts|tsx)$': 'ts-jest',
   },
   rootDir: './../../',
+  testMatch: ['**/specs/*.spec.tsx'],
   setupFiles: ['<rootDir>/test/e2e/utils/test-setup.ts'],
   collectCoverage: false,
   coverageDirectory: 'coverage',

@@ -102,7 +102,7 @@ const Wallets: React.FC = () => {
             been easier to use crypto!
           </Styles.Description>
           <Styles.WalletActions>
-            <Styles.Action onClick={onCreateWallet}>
+            <Styles.Action onClick={onCreateWallet} className="create-wallet">
               <Styles.ActionIcon>
                 <SVG
                   src="../../assets/icons/plusCircle.svg"
