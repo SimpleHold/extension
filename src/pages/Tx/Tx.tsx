@@ -20,6 +20,7 @@ import TxAddressesDrawer from '@drawers/TxAddresses'
 import linkIcon from '@assets/icons/link.svg'
 import copyIcon from '@assets/icons/copy.svg'
 import checkCopyIcon from '@assets/icons/checkCopy.svg'
+import clockIcon from '@assets/icons/clock.svg'
 
 // Utils
 import { short, toUpper, formatEstimated, price } from '@utils/format'
@@ -126,9 +127,16 @@ const TxHistory: React.FC = () => {
                   <Styles.HeadingInfo>
                     <Skeleton width={160} height={27} br={5} type="gray" isLoading={!state.txInfo}>
                       {state.txInfo ? (
-                        <Styles.Amount>{`${numeral(state.txInfo.amount).format(
-                          '0.[000000]'
-                        )} ${toUpper(symbol)}`}</Styles.Amount>
+                        <Styles.AmountRow>
+                          <Styles.Amount>{`${numeral(state.txInfo.amount).format(
+                            '0.[000000]'
+                          )} ${toUpper(symbol)}`}</Styles.Amount>
+                          {state.txInfo.isPending ? (
+                            <Styles.PendingIcon>
+                              <SVG src={clockIcon} width={16} height={16} />
+                            </Styles.PendingIcon>
+                          ) : null}
+                        </Styles.AmountRow>
                       ) : null}
                     </Skeleton>
                     <Skeleton

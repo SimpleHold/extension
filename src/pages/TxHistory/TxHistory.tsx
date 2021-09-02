@@ -125,12 +125,12 @@ const TxHistory: React.FC = () => {
         <Styles.GroupDateRow>
           <Skeleton width={50} height={16} br={5} type="gray" isLoading />
         </Styles.GroupDateRow>
-        {Array(5)
+        {Array(7)
           .fill('loading')
           .map((item: string, index: number) => (
             <Styles.TxList key={`${item}/${index}`}>
               <HistoryItem isLoading />
-              {index !== 4 ? <DividerLine /> : null}
+              {index !== 6 ? <DividerLine /> : null}
             </Styles.TxList>
           ))}
       </Styles.Group>

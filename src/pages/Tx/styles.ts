@@ -203,6 +203,22 @@ const Addresses = styled.p`
   color: #3fbb7d;
 `
 
+const AmountRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const PendingIcon = styled.div`
+  width: 16px;
+  height: 16px;
+  margin: 0 0 0 10px;
+
+  path {
+    fill: #bdc4d4;
+  }
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -229,6 +245,8 @@ const Styles = {
   ErrorLoadingText,
   AddressesRow,
   Addresses,
+  AmountRow,
+  PendingIcon,
 }
 
 export default Styles
