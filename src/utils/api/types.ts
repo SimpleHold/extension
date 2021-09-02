@@ -90,3 +90,32 @@ export type TTxHistoryAddress = {
   amount: number
   estimated: number
 }
+
+export type TTxAddressItem = {
+  chain: string
+  address: string
+  txs: string[]
+  tokenSymbol?: string
+  contractAddress?: string
+}
+
+export type TFullTxHistoryResponse = {
+  error: boolean
+  data?: TTxAddressItem[]
+}
+
+export type TFullTxWallet = {
+  chain: string
+  address: string
+  txs: string[]
+}
+
+export type TFullTxInfo = {
+  hash: string
+  amount: number
+  estimated: number
+  chain: string
+  address: string
+  isPending: boolean
+  date: string
+}

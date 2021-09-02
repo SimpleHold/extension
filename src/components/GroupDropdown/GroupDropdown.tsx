@@ -12,23 +12,27 @@ interface Props {
   render: React.ReactElement<any, any> | null
   renderRow?: React.ReactElement<any, any> | null
   maxHeight?: number
-  hideArrowOnRender?: boolean
+  toggle?: (value: boolean) => void
 }
 
 const Dropdown: React.FC<Props> = (props) => {
-  const { title, render, renderRow, maxHeight, hideArrowOnRender } = props
+  const { title, render, renderRow, maxHeight, toggle } = props
 
-  const { ref, isVisible, toggle } = useVisible(false)
+  const { ref, isVisible, toggle: toggleVisible } = useVisible(false)
+
+  React.useEffect(() => {
+    if (toggle) {
+      toggle(isVisible)
+    }
+  }, [isVisible])
 
   return (
     <Styles.Container ref={ref}>
-      <Styles.Heading isVisible={isVisible} onClick={toggle}>
+      <Styles.Heading isVisible={isVisible} onClick={toggleVisible}>
         {renderRow || <Styles.HeadingTitle>{title}</Styles.HeadingTitle>}
-        {renderRow && hideArrowOnRender ? null : (
-          <Styles.ArrowIcon className="arrow">
-            <SVG src="../../assets/icons/arrow.svg" width={8} height={14} />
-          </Styles.ArrowIcon>
-        )}
+        <Styles.ArrowIcon className="arrow">
+          <SVG src="../../assets/icons/arrow.svg" width={8} height={14} />
+        </Styles.ArrowIcon>
       </Styles.Heading>
       <Styles.Body isVisible={isVisible} maxHeight={maxHeight}>
         {render}

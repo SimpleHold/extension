@@ -6,11 +6,16 @@ import { getItem, getJSON, setItem } from '@utils/storage'
 import { toLower } from '@utils/format'
 
 // Types
-import { TAddressTx } from '@utils/api/types'
+import { TAddressTx, TFullTxInfo } from '@utils/api/types'
 
 export type TAddressTxGroup = {
   date: string
   data: TAddressTx[]
+}
+
+export type THistoryTxGroup = {
+  date: string
+  data: TFullTxInfo[]
 }
 
 const getWalletKey = (
@@ -39,6 +44,25 @@ export const group = (txs: TAddressTx[]): TAddressTxGroup[] => {
 
   const data: TAddressTxGroup[] = []
   const groupByMonth = (item: TAddressTx) => dayjs(item.date, 'YYYY-MM-DD').format('YYYY-MM-DD')
+  const result = groupBy(txs, groupByMonth)
+
+  for (const i in result) {
+    data.push({
+      date: i,
+      data: result[i],
+    })
+  }
+
+  return data
+}
+
+export const groupHistory = (txs: TFullTxInfo[]): THistoryTxGroup[] => {
+  if (!txs.length) {
+    return []
+  }
+
+  const data: THistoryTxGroup[] = []
+  const groupByMonth = (item: TFullTxInfo) => dayjs(item.date, 'YYYY-MM-DD').format('YYYY-MM-DD')
   const result = groupBy(txs, groupByMonth)
 
   for (const i in result) {

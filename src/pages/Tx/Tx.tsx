@@ -27,16 +27,21 @@ import { getTransactionLink } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
 import { getHistoryTxInfo } from '@utils/api'
 
+// Hooks
+import useState from '@hooks/useState'
+
 // Types
 import { THistoryTx } from '@utils/api/types'
+import { IState, ILocationState } from './types'
 
 // Styles
 import Styles from './styles'
 
-interface ILocationState {
-  hash: string
-  symbol: string
-  chain: string
+const initialState: IState = {
+  txInfo: null,
+  isCopied: false,
+  isLoadingError: false,
+  activeDrawer: null,
 }
 
 const TxHistory: React.FC = () => {
@@ -45,34 +50,31 @@ const TxHistory: React.FC = () => {
     state: { hash, symbol, chain },
   } = useLocation<ILocationState>()
 
-  const [txInfo, setTxInfo] = React.useState<THistoryTx | null>(null)
-  const [isCopied, setIsCopied] = React.useState<boolean>(false)
-  const [isError, setIsError] = React.useState<boolean>(false)
-  const [activeDrawer, setActiveDrawer] = React.useState<'txAddresses' | null>(null)
+  const { state, updateState } = useState(initialState)
 
   React.useEffect(() => {
     getTxInfo()
   }, [])
 
   React.useEffect(() => {
-    if (isCopied) {
+    if (state.isCopied) {
       setTimeout(() => {
-        setIsCopied(false)
+        updateState({ isCopied: false })
       }, 1000)
     }
-  }, [isCopied])
+  }, [state.isCopied])
 
   const getTxInfo = async (): Promise<void> => {
-    if (isError) {
-      setIsError(false)
+    if (state.isLoadingError) {
+      updateState({ isLoadingError: false })
     }
 
-    const data = await getHistoryTxInfo(hash, chain)
+    const txInfo = await getHistoryTxInfo(hash, chain)
 
-    if (data) {
-      setTxInfo(data)
+    if (txInfo) {
+      updateState({ txInfo })
     } else {
-      setIsError(true)
+      updateState({ isLoadingError: true })
     }
   }
 
@@ -82,11 +84,11 @@ const TxHistory: React.FC = () => {
 
   const onCopyHash = (): void => {
     copy(hash)
-    setIsCopied(true)
+    updateState({ isCopied: true })
   }
 
   const onClickButton = (): void => {
-    if (isError) {
+    if (state.isLoadingError) {
       getTxInfo()
     } else {
       onViewTx()
@@ -94,11 +96,11 @@ const TxHistory: React.FC = () => {
   }
 
   const onViewAddresses = (): void => {
-    setActiveDrawer('txAddresses')
+    updateState({ activeDrawer: 'txAddresses' })
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
   }
 
   return (
@@ -108,7 +110,7 @@ const TxHistory: React.FC = () => {
         <Header withBack backTitle="History" onBack={history.goBack} />
         <Styles.Container>
           <Styles.Body>
-            {isError ? (
+            {state.isLoadingError ? (
               <Styles.ErrorBlock>
                 <Styles.ErrorLoadingIcon />
                 <Styles.ErrorLoadingText>
@@ -118,21 +120,31 @@ const TxHistory: React.FC = () => {
             ) : (
               <>
                 <Styles.Heading>
-                  <Skeleton width={50} height={50} br={16} type="gray" isLoading={!txInfo}>
+                  <Skeleton width={50} height={50} br={16} type="gray" isLoading={!state.txInfo}>
                     <CurrencyLogo size={50} symbol={symbol} />
                   </Skeleton>
                   <Styles.HeadingInfo>
-                    <Skeleton width={160} height={27} br={5} type="gray" isLoading={!txInfo}>
-                      {txInfo ? (
-                        <Styles.Amount>{`${numeral(txInfo.amount).format('0.[000000]')} ${toUpper(
-                          symbol
-                        )}`}</Styles.Amount>
+                    <Skeleton width={160} height={27} br={5} type="gray" isLoading={!state.txInfo}>
+                      {state.txInfo ? (
+                        <Styles.Amount>{`${numeral(state.txInfo.amount).format(
+                          '0.[000000]'
+                        )} ${toUpper(symbol)}`}</Styles.Amount>
                       ) : null}
                     </Skeleton>
-                    <Skeleton width={50} height={19} br={5} mt={4} type="gray" isLoading={!txInfo}>
-                      {txInfo ? (
+                    <Skeleton
+                      width={50}
+                      height={19}
+                      br={5}
+                      mt={4}
+                      type="gray"
+                      isLoading={!state.txInfo}
+                    >
+                      {state.txInfo ? (
                         <Styles.Estimated>
-                          {`$ ${formatEstimated(txInfo.estimated, price(txInfo.estimated))}`}
+                          {`$ ${formatEstimated(
+                            state.txInfo.estimated,
+                            price(state.txInfo.estimated)
+                          )}`}
                         </Styles.Estimated>
                       ) : null}
                     </Skeleton>
@@ -144,9 +156,15 @@ const TxHistory: React.FC = () => {
                     <Styles.InfoColumnRow>
                       <Styles.InfoLabel>Fee</Styles.InfoLabel>
                       <Styles.InfoContent>
-                        <Skeleton width={100} height={19} br={5} type="gray" isLoading={!txInfo}>
+                        <Skeleton
+                          width={100}
+                          height={19}
+                          br={5}
+                          type="gray"
+                          isLoading={!state.txInfo}
+                        >
                           <Styles.InfoBold>
-                            {txInfo?.fee} {toUpper(symbol)}
+                            {state.txInfo?.fee} {toUpper(symbol)}
                           </Styles.InfoBold>
                         </Skeleton>
                         <Skeleton
@@ -155,13 +173,13 @@ const TxHistory: React.FC = () => {
                           br={5}
                           mt={5}
                           type="gray"
-                          isLoading={!txInfo}
+                          isLoading={!state.txInfo}
                         >
-                          {txInfo ? (
+                          {state.txInfo ? (
                             <Styles.InfoText>
                               {`$ ${formatEstimated(
-                                txInfo.feeEstimated,
-                                price(txInfo.feeEstimated)
+                                state.txInfo.feeEstimated,
+                                price(state.txInfo.feeEstimated)
                               )}`}
                             </Styles.InfoText>
                           ) : null}
@@ -173,18 +191,26 @@ const TxHistory: React.FC = () => {
                     <Styles.InfoColumnRow pb={7}>
                       <Styles.InfoLabel>From</Styles.InfoLabel>
                       <Styles.InfoContent>
-                        <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
-                          {txInfo ? (
+                        <Skeleton
+                          width={200}
+                          height={19}
+                          br={5}
+                          type="gray"
+                          isLoading={!state.txInfo}
+                        >
+                          {state.txInfo ? (
                             <>
-                              {txInfo?.addressFrom ? (
-                                <CopyToClipboard value={txInfo.addressFrom} zIndex={3}>
-                                  <Styles.InfoBold>{short(txInfo.addressFrom, 20)}</Styles.InfoBold>
+                              {state.txInfo?.addressFrom ? (
+                                <CopyToClipboard value={state.txInfo.addressFrom} zIndex={3}>
+                                  <Styles.InfoBold>
+                                    {short(state.txInfo.addressFrom, 20)}
+                                  </Styles.InfoBold>
                                 </CopyToClipboard>
                               ) : null}
-                              {txInfo?.addressesFrom ? (
+                              {state.txInfo?.addressesFrom ? (
                                 <Styles.AddressesRow onClick={onViewAddresses}>
                                   <Styles.Addresses>
-                                    Senders {txInfo.addressesFrom.length}
+                                    Senders {state.txInfo.addressesFrom.length}
                                   </Styles.Addresses>
                                   <SVG
                                     src="../../../assets/icons/dropdownArrow.svg"
@@ -201,18 +227,26 @@ const TxHistory: React.FC = () => {
                     <Styles.InfoColumnRow pt={7}>
                       <Styles.InfoLabel>To</Styles.InfoLabel>
                       <Styles.InfoContent>
-                        <Skeleton width={200} height={19} br={5} type="gray" isLoading={!txInfo}>
-                          {txInfo ? (
+                        <Skeleton
+                          width={200}
+                          height={19}
+                          br={5}
+                          type="gray"
+                          isLoading={!state.txInfo}
+                        >
+                          {state.txInfo ? (
                             <>
-                              {txInfo?.addressTo ? (
-                                <CopyToClipboard value={txInfo.addressTo}>
-                                  <Styles.InfoBold>{short(txInfo.addressTo, 20)}</Styles.InfoBold>
+                              {state.txInfo?.addressTo ? (
+                                <CopyToClipboard value={state.txInfo.addressTo}>
+                                  <Styles.InfoBold>
+                                    {short(state.txInfo.addressTo, 20)}
+                                  </Styles.InfoBold>
                                 </CopyToClipboard>
                               ) : null}
-                              {txInfo?.addressesTo ? (
+                              {state.txInfo?.addressesTo ? (
                                 <Styles.AddressesRow onClick={onViewAddresses}>
                                   <Styles.Addresses>
-                                    Recipients {txInfo.addressesTo.length}
+                                    Recipients {state.txInfo.addressesTo.length}
                                   </Styles.Addresses>
                                   <SVG
                                     src="../../../assets/icons/dropdownArrow.svg"
@@ -231,8 +265,16 @@ const TxHistory: React.FC = () => {
                     <Styles.InfoColumnRow>
                       <Styles.InfoLabel>Created</Styles.InfoLabel>
                       <Styles.InfoContent>
-                        <Skeleton width={100} height={19} br={5} type="gray" isLoading={!txInfo}>
-                          <Styles.Date>{dayjs(txInfo?.date).format('MMM D, HH:mm:ss')}</Styles.Date>
+                        <Skeleton
+                          width={100}
+                          height={19}
+                          br={5}
+                          type="gray"
+                          isLoading={!state.txInfo}
+                        >
+                          <Styles.Date>
+                            {dayjs(state.txInfo?.date).format('MMM D, HH:mm:ss')}
+                          </Styles.Date>
                         </Skeleton>
                       </Styles.InfoContent>
                     </Styles.InfoColumnRow>
@@ -247,28 +289,28 @@ const TxHistory: React.FC = () => {
               </Styles.HashBlockRow>
               <Styles.CopyButton onClick={onCopyHash}>
                 <SVG
-                  src={isCopied ? checkCopyIcon : copyIcon}
+                  src={state.isCopied ? checkCopyIcon : copyIcon}
                   width={12}
-                  height={isCopied ? 11 : 12}
+                  height={state.isCopied ? 11 : 12}
                 />
               </Styles.CopyButton>
             </Styles.HashBlock>
           </Styles.Body>
-          {isError || txInfo ? (
+          {state.isLoadingError || state.txInfo ? (
             <Button
-              label={isError ? 'Try again' : 'View on explorer'}
+              label={state.isLoadingError ? 'Try again' : 'View on explorer'}
               onClick={onClickButton}
-              icon={isError ? undefined : linkIcon}
+              icon={state.isLoadingError ? undefined : linkIcon}
             />
           ) : null}
         </Styles.Container>
       </Styles.Wrapper>
-      {txInfo?.addressesFrom && txInfo?.addressesTo ? (
+      {state.txInfo?.addressesFrom && state.txInfo?.addressesTo ? (
         <TxAddressesDrawer
-          isActive={activeDrawer === 'txAddresses'}
+          isActive={state.activeDrawer === 'txAddresses'}
           onClose={onCloseDrawer}
-          addressesFrom={txInfo.addressesFrom}
-          addressesTo={txInfo.addressesTo}
+          addressesFrom={state.txInfo.addressesFrom}
+          addressesTo={state.txInfo.addressesTo}
           symbol={symbol}
         />
       ) : null}

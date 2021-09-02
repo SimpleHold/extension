@@ -15,6 +15,10 @@ import {
   TCustomFee,
   TTxWallet,
   THistoryTx,
+  TTxAddressItem,
+  TFullTxHistoryResponse,
+  TFullTxWallet,
+  TFullTxInfo,
 } from './types'
 
 export const getBalance = async (
@@ -426,8 +430,44 @@ export const getWarning = async (symbol: string, chain?: string): Promise<string
   }
 }
 
-export const getFullTxHistory = async (wallets: TTxWallet[]): Promise<string[]> => {
-  return []
+export const getFullTxHistory = async (wallets: TTxWallet[]): Promise<TTxAddressItem[]> => {
+  try {
+    const { data }: AxiosResponse<TFullTxHistoryResponse> = await axios.post(
+      `${config.serverUrl}/transaction/full-history`,
+      {
+        wallets,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    return data?.data || []
+  } catch {
+    return []
+  }
+}
+
+export const getFullTxHistoryInfo = async (wallets: TFullTxWallet[]): Promise<TFullTxInfo[]> => {
+  try {
+    const { data }: AxiosResponse = await axios.post(
+      `${config.serverUrl}/transaction/full-history-info`,
+      {
+        wallets,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    return data?.data || []
+  } catch {
+    return []
+  }
 }
 
 export const getHistoryTxInfo = async (hash: string, chain: string): Promise<THistoryTx | null> => {

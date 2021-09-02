@@ -15,52 +15,51 @@ import HistoryFilterDrawer from '@drawers/HistoryFilter'
 
 // Utils
 import { IWallet, getWallets, getWalletChain } from '@utils/wallet'
-import { getFullTxHistory } from '@utils/api'
+import { getFullTxHistory, getFullTxHistoryInfo } from '@utils/api'
+import { groupHistory, THistoryTxGroup } from '@utils/txs'
+
+// Hooks
+import useState from '@hooks/useState'
+
+// Types
+import { TTxAddressItem, TFullTxWallet, TFullTxInfo } from '@utils/api/types'
+import { IState } from './types'
 
 // Styles
 import Styles from './styles'
 
-type THistoryItem = {
-  symbol: string
-  hash: string
-  name: string
-  amount: number
-  estimated: number
-}
-
-type TGroup = {
-  date: string
-  data: THistoryItem[]
+const initialState: IState = {
+  activeDrawer: null,
+  txGroups: null,
+  wallets: [],
+  isNotFound: false,
 }
 
 const TxHistory: React.FC = () => {
   const history = useHistory()
 
-  const [activeDrawer, setActiveFilter] = React.useState<'filters' | null>(null)
-  const [txGroups, setTxGroups] = React.useState<TGroup[] | null>(null)
-  const [wallets, setWallets] = React.useState<IWallet[]>([])
-  const [isNotFound, setIsNotFound] = React.useState<boolean>(false)
+  const { state, updateState } = useState(initialState)
 
   React.useEffect(() => {
     getWalletList()
   }, [])
 
   React.useEffect(() => {
-    if (wallets.length && txGroups === null) {
+    if (state.wallets.length && state.txGroups === null) {
       onGetTxHistory()
     }
-  }, [wallets, txGroups])
+  }, [state.wallets, state.txGroups])
 
   const getWalletList = (): void => {
-    const walletsList = getWallets()
+    const wallets = getWallets()
 
-    if (walletsList?.length) {
-      setWallets(walletsList)
+    if (wallets?.length) {
+      updateState({ wallets })
     }
   }
 
   const onGetTxHistory = async (): Promise<void> => {
-    const mapWallets = wallets.map((wallet: IWallet) => {
+    const mapWallets = state.wallets.map((wallet: IWallet) => {
       const { address, chain, symbol, contractAddress } = wallet
 
       return {
@@ -73,46 +72,34 @@ const TxHistory: React.FC = () => {
 
     const data = await getFullTxHistory(mapWallets)
 
-    // if (!data.length) {
-    //   setIsNotFound(true)
-    // }
+    if (data.length) {
+      const mapData: TFullTxWallet[] = data.map((item: TTxAddressItem) => {
+        const { chain, address, txs } = item
 
-    setTxGroups([
-      {
-        date: new Date().toString(),
-        data: [
-          {
-            symbol: 'eth',
-            hash: '0xa38b8dc1aab577093da9b60a7cdadcd4d1b1be0f5764d2eab128348eed72c8c4',
-            name: 'Bitcoin Wallet',
-            amount: 10,
-            estimated: 0.001,
-          },
-          {
-            symbol: 'btc',
-            hash: '8992be2fb5038724d5ab098540c306cbb222a4baf15086acce9ad62bb167a81a',
-            name: 'Bitcoin Wallet',
-            amount: 10,
-            estimated: 0.001,
-          },
-          {
-            symbol: 'ada',
-            hash: '65fa809a52b45748b8795b16ed0e38479562a59d914e5411d507e3633c5f6c27',
-            name: 'Bitcoin Wallet',
-            amount: 10,
-            estimated: 0.001,
-          },
-        ],
-      },
-    ])
+        return {
+          chain,
+          address,
+          txs,
+        }
+      })
+
+      const fullTxsInfo = await getFullTxHistoryInfo(mapData)
+
+      if (fullTxsInfo.length) {
+        updateState({ txGroups: groupHistory(fullTxsInfo) })
+        return
+      }
+    }
+
+    updateState({ isNotFound: true })
   }
 
   const onCloseDrawer = (): void => {
-    setActiveFilter(null)
+    updateState({ activeDrawer: null })
   }
 
   const openFilters = (): void => {
-    setActiveFilter('filters')
+    updateState({ activeDrawer: 'filters' })
   }
 
   const openTx = (symbol: string, chain: string, hash: string) => (): void => {
@@ -150,6 +137,53 @@ const TxHistory: React.FC = () => {
     </>
   )
 
+  const renderHistory = () => {
+    if (state.txGroups != null) {
+      return (
+        <Styles.TxList>
+          {state.txGroups?.map((group: THistoryTxGroup, index: number) => {
+            const { date, data } = group
+
+            return (
+              <Styles.Group key={date}>
+                <Styles.GroupDateRow>
+                  <Styles.GroupDate>{dayjs(date).format('MMM D')}</Styles.GroupDate>
+                </Styles.GroupDateRow>
+
+                {data.map((tx: TFullTxInfo) => {
+                  const { hash, amount, estimated, chain, isPending } = tx
+
+                  const symbol = 'btc'
+                  const walletName = 'Wallet name'
+
+                  return (
+                    <HistoryItem
+                      key={hash}
+                      data={{
+                        symbol,
+                        hash,
+                        name: walletName,
+                        amount,
+                        estimated,
+                        isPending,
+                      }}
+                      onClick={openTx(symbol, chain, hash)}
+                    />
+                  )
+                })}
+                {state.txGroups !== null && index !== state.txGroups.length - 1 ? (
+                  <DividerLine />
+                ) : null}
+              </Styles.Group>
+            )
+          })}
+        </Styles.TxList>
+      )
+    }
+
+    return null
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -162,47 +196,14 @@ const TxHistory: React.FC = () => {
               <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
             </Styles.Button>
           </Styles.Heading>
-
-          {isNotFound ? renderNotFound() : null}
-          {txGroups === null && !isNotFound ? renderLoading() : null}
-          {txGroups !== null && txGroups.length > 0 ? (
-            <>
-              {txGroups.map((group: TGroup) => {
-                const { date, data } = group
-
-                return (
-                  <Styles.Group key={date}>
-                    <Styles.GroupDateRow>
-                      <Styles.GroupDate>{dayjs(date).format('MMM D')}</Styles.GroupDate>
-                    </Styles.GroupDateRow>
-
-                    {data.map((tx: THistoryItem) => {
-                      const { symbol, hash, name, amount, estimated } = tx
-
-                      return (
-                        <HistoryItem
-                          key={hash}
-                          data={{
-                            symbol,
-                            hash,
-                            name,
-                            amount,
-                            estimated,
-                            isPending: false, // Fix me
-                          }}
-                          onClick={openTx(symbol, 'cardano', hash)} // Fix me
-                        />
-                      )
-                    })}
-                    <DividerLine />
-                  </Styles.Group>
-                )
-              })}
-            </>
-          ) : null}
+          {state.isNotFound ? renderNotFound() : null}
+          {state.txGroups === null && !state.isNotFound ? renderLoading() : null}
+          {state.txGroups !== null && state.txGroups.length > 0 && !state.isNotFound
+            ? renderHistory()
+            : null}
         </Styles.Container>
       </Styles.Wrapper>
-      <HistoryFilterDrawer isActive={activeDrawer === 'filters'} onClose={onCloseDrawer} />
+      <HistoryFilterDrawer isActive={state.activeDrawer === 'filters'} onClose={onCloseDrawer} />
     </>
   )
 }

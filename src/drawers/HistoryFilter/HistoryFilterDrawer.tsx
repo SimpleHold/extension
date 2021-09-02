@@ -8,7 +8,7 @@ import GroupDropdown from '@components/GroupDropdown'
 import DropdownCurrency from '@components/DropdownCurrency'
 import Wallet from './components/Wallet'
 import CurrencyLogo from '@components/CurrencyLogo'
-import Tooltip from '@components/Tooltip'
+import SelectedWallets from './components/SelectedWallets'
 
 // Utils
 import { getWallets, IWallet, getWalletName } from '@utils/wallet'
@@ -18,20 +18,11 @@ import { toLower } from '@utils/format'
 import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
+// Types
+import { Props, TStatuses, TStatusItem, TCurrency } from './types'
+
 // Styles
 import Styles from './styles'
-
-interface Props {
-  onClose: () => void
-  isActive: boolean
-}
-
-type TStatuses = 'sended' | 'received' | 'pending'
-
-type TStatusItem = {
-  title: string
-  key: TStatuses
-}
 
 const statuses: TStatusItem[] = [
   {
@@ -48,20 +39,15 @@ const statuses: TStatusItem[] = [
   },
 ]
 
-type TCurrency = {
-  symbol: string
-  name: string
-  chain?: string
-}
-
 const HistoryFilterDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive } = props
 
-  const [status, setStatus] = React.useState<TStatuses | null>('received')
+  const [status, setStatus] = React.useState<TStatuses | null>('sended')
   const [currencies, setCurrencies] = React.useState<TCurrency[]>([])
   const [selectedCurrencies, setSelectedCurrencies] = React.useState<TCurrency[]>([])
   const [wallets, setWallets] = React.useState<IWallet[]>([])
   const [selectedWallets, setSelectedWallets] = React.useState<string[]>([])
+  const [isWalletsVisible, setWalletsVisible] = React.useState<boolean>(false)
 
   React.useEffect(() => {
     onGetCurrencies()
@@ -147,6 +133,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
 
         return (
           <DropdownCurrency
+            key={`${symbol}/${name}/${chain}`}
             symbol={symbol}
             chain={chain}
             name={name}
@@ -222,38 +209,21 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     </Styles.CurrenciesList>
   ) : null
 
-  const renderTooltip = (
-    <Styles.Tooltip>
-      <Styles.TooltipText>
-        If you start to select addresses, then the filter with selected currencies will be reset
-      </Styles.TooltipText>
-      <Styles.TooltipActions>
-        <Button label="Cancel" isLight onClick={() => null} mr={10} />
-        <Button label="Ok, continue" onClick={() => null} />
-      </Styles.TooltipActions>
-    </Styles.Tooltip>
-  )
-
   const onResetWallets = (): void => {
     setSelectedWallets([])
   }
 
-  const renderWallets = selectedWallets.length ? (
-    <Styles.WalletsList>
-      <Styles.WalletItem>
-        <Styles.WalletItemName>Wallet Name 1</Styles.WalletItemName>
-        <Styles.WalletItemButton />
-      </Styles.WalletItem>
-      <Styles.WalletItem>
-        <Styles.WalletItemName>Wallet Name 2</Styles.WalletItemName>
-        <Styles.WalletItemButton />
-      </Styles.WalletItem>
-      <Styles.WalletItem>
-        <Styles.WalletItemName>Wallet Name 2</Styles.WalletItemName>
-        <Styles.WalletItemButton />
-      </Styles.WalletItem>
-    </Styles.WalletsList>
-  ) : undefined
+  const onShowWallets = (): void => {
+    setWalletsVisible(true)
+  }
+
+  const toggleWalletsDropdown = (value: boolean): void => {
+    setWalletsVisible(value)
+  }
+
+  const onResetCurrencies = (): void => {
+    setSelectedCurrencies([])
+  }
 
   return (
     <DrawerWrapper
@@ -289,7 +259,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
               {selectedCurrencies.length ? (
                 <Styles.ResetGroup>
                   <Styles.ResetTitle>{selectedCurrencies.length} selected</Styles.ResetTitle>
-                  <Styles.ResetIcon>
+                  <Styles.ResetIcon onClick={onResetCurrencies}>
                     <SVG src="../../assets/icons/times.svg" width={8.33} height={8.33} />
                   </Styles.ResetIcon>
                 </Styles.ResetGroup>
@@ -299,33 +269,32 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
               title="Select currencies"
               render={renderCurrencies}
               renderRow={renderSelectedCurrencies}
+              maxHeight={150}
             />
           </Styles.Group>
 
           <Styles.Group>
             <Styles.GroupHeading>
-              <Styles.GroupTitleRow>
-                <Styles.GroupTitle>Address</Styles.GroupTitle>
-                <Tooltip text="" render={renderTooltip} mt={4} left={-65} arrowLeft={62}>
-                  <Styles.AddressWarningIcon />
-                </Tooltip>
-              </Styles.GroupTitleRow>
+              <Styles.GroupTitle>Address</Styles.GroupTitle>
               {selectedWallets.length ? (
-                <Styles.ResetGroup onClick={onResetWallets}>
+                <Styles.ResetGroup>
                   <Styles.ResetTitle>{selectedWallets.length} selected</Styles.ResetTitle>
-                  <Styles.ResetIcon>
+                  <Styles.ResetIcon onClick={onResetWallets}>
                     <SVG src="../../assets/icons/times.svg" width={8.33} height={8.33} />
                   </Styles.ResetIcon>
                 </Styles.ResetGroup>
               ) : null}
             </Styles.GroupHeading>
-            <GroupDropdown
-              title="Select addresses"
-              render={renderAddresses}
-              maxHeight={150}
-              renderRow={renderWallets}
-              hideArrowOnRender
-            />
+            {selectedWallets.length && !isWalletsVisible ? (
+              <SelectedWallets walletNames={selectedWallets} onShowWallets={onShowWallets} />
+            ) : (
+              <GroupDropdown
+                title="Select addresses"
+                render={renderAddresses}
+                maxHeight={150}
+                toggle={toggleWalletsDropdown}
+              />
+            )}
           </Styles.Group>
         </Styles.Row>
         <Button label="Apply" isLight onClick={onApply} />
