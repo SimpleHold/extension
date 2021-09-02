@@ -28,7 +28,7 @@ import { openWebPage } from '@utils/extension'
 import { getHistoryTxInfo } from '@utils/api'
 
 // Types
-import { THistoryTx, TTxHistoryAddress } from '@utils/api/types'
+import { THistoryTx } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -48,7 +48,6 @@ const TxHistory: React.FC = () => {
   const [txInfo, setTxInfo] = React.useState<THistoryTx | null>(null)
   const [isCopied, setIsCopied] = React.useState<boolean>(false)
   const [isError, setIsError] = React.useState<boolean>(false)
-  const [txAddresses, setTxAddresses] = React.useState<TTxHistoryAddress[]>([])
   const [activeDrawer, setActiveDrawer] = React.useState<'txAddresses' | null>(null)
 
   React.useEffect(() => {
@@ -94,13 +93,7 @@ const TxHistory: React.FC = () => {
     }
   }
 
-  const onViewAddresses = (type: 'from' | 'to') => (): void => {
-    if (type === 'from' && txInfo?.addressesFrom?.length) {
-      setTxAddresses(txInfo.addressesFrom)
-    } else if (type === 'to' && txInfo?.addressesTo?.length) {
-      setTxAddresses(txInfo.addressesTo)
-    }
-
+  const onViewAddresses = (): void => {
     setActiveDrawer('txAddresses')
   }
 
@@ -189,9 +182,16 @@ const TxHistory: React.FC = () => {
                                 </CopyToClipboard>
                               ) : null}
                               {txInfo?.addressesFrom ? (
-                                <Styles.InfoBold onClick={onViewAddresses('from')}>
-                                  View all addresses ({txInfo.addressesFrom.length})
-                                </Styles.InfoBold>
+                                <Styles.AddressesRow onClick={onViewAddresses}>
+                                  <Styles.Addresses>
+                                    Senders {txInfo.addressesFrom.length}
+                                  </Styles.Addresses>
+                                  <SVG
+                                    src="../../../assets/icons/dropdownArrow.svg"
+                                    width={8}
+                                    height={6}
+                                  />
+                                </Styles.AddressesRow>
                               ) : null}
                             </>
                           ) : null}
@@ -210,9 +210,16 @@ const TxHistory: React.FC = () => {
                                 </CopyToClipboard>
                               ) : null}
                               {txInfo?.addressesTo ? (
-                                <Styles.InfoBold onClick={onViewAddresses('to')}>
-                                  View all addresses ({txInfo.addressesTo.length})
-                                </Styles.InfoBold>
+                                <Styles.AddressesRow onClick={onViewAddresses}>
+                                  <Styles.Addresses>
+                                    Recipients {txInfo.addressesTo.length}
+                                  </Styles.Addresses>
+                                  <SVG
+                                    src="../../../assets/icons/dropdownArrow.svg"
+                                    width={8}
+                                    height={6}
+                                  />
+                                </Styles.AddressesRow>
                               ) : null}
                             </>
                           ) : null}
@@ -256,11 +263,15 @@ const TxHistory: React.FC = () => {
           ) : null}
         </Styles.Container>
       </Styles.Wrapper>
-      <TxAddressesDrawer
-        isActive={activeDrawer === 'txAddresses'}
-        onClose={onCloseDrawer}
-        addresses={txAddresses}
-      />
+      {txInfo?.addressesFrom && txInfo?.addressesTo ? (
+        <TxAddressesDrawer
+          isActive={activeDrawer === 'txAddresses'}
+          onClose={onCloseDrawer}
+          addressesFrom={txInfo.addressesFrom}
+          addressesTo={txInfo.addressesTo}
+          symbol={symbol}
+        />
+      ) : null}
     </>
   )
 }

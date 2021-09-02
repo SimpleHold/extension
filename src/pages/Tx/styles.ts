@@ -186,6 +186,23 @@ const ErrorLoadingText = styled.p`
   color: #7d7e8d;
 `
 
+const AddressesRow = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  &:hover {
+    cursor: pointer;
+  }
+`
+
+const Addresses = styled.p`
+  margin: 0 6px 0 0;
+  font-size: 16px;
+  line-height: 19px;
+  color: #3fbb7d;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -210,6 +227,8 @@ const Styles = {
   ErrorBlock,
   ErrorLoadingIcon,
   ErrorLoadingText,
+  AddressesRow,
+  Addresses,
 }
 
 export default Styles
