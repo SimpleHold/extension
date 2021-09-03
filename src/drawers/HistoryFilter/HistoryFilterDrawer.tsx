@@ -46,7 +46,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
   const [currencies, setCurrencies] = React.useState<TCurrency[]>([])
   const [selectedCurrencies, setSelectedCurrencies] = React.useState<TCurrency[]>([])
   const [wallets, setWallets] = React.useState<IWallet[]>([])
-  const [selectedWallets, setSelectedWallets] = React.useState<string[]>([])
+  const [selectedWallets, setSelectedWallets] = React.useState<IWallet[]>([])
   const [isWalletsVisible, setWalletsVisible] = React.useState<boolean>(false)
 
   React.useEffect(() => {
@@ -90,7 +90,9 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     }
   }
 
-  const onApply = (): void => {}
+  const onApply = (): void => {
+    onClose()
+  }
 
   const selectStatus = (status: TStatuses) => (): void => {
     setStatus(status)
@@ -161,20 +163,36 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     return ''
   }
 
-  const onToggleAddress = (isActive: boolean, uuid: string) => (): void => {
+  const onToggleAddress = (isActive: boolean, wallet: IWallet) => (): void => {
     if (isActive) {
-      setSelectedWallets(selectedWallets.filter((i: string) => i !== uuid))
+      const removeExist = selectedWallets.filter((item: IWallet) => item.uuid !== wallet.uuid)
+      setSelectedWallets(removeExist)
     } else {
-      setSelectedWallets([...selectedWallets, uuid])
+      setSelectedWallets([...selectedWallets, wallet])
     }
+  }
+
+  const filterWallets = (wallet: IWallet): boolean | IWallet => {
+    if (selectedCurrencies.length) {
+      return (
+        selectedCurrencies.find(
+          (currency: TCurrency) =>
+            toLower(currency.symbol) === toLower(wallet.symbol) &&
+            toLower(currency.chain) === toLower(wallet.chain)
+        ) !== undefined
+      )
+    }
+
+    return wallet
   }
 
   const renderAddresses = (
     <>
-      {wallets.map((wallet: IWallet) => {
+      {wallets.filter(filterWallets).map((wallet: IWallet) => {
         const { symbol, address, chain, name, uuid } = wallet
         const walletName = getNameWallet(wallet)
-        const isActive = selectedWallets.indexOf(uuid) !== -1
+        const isActive =
+          selectedWallets.find((wallet: IWallet) => wallet.uuid === uuid) !== undefined
 
         return (
           <Wallet
@@ -185,7 +203,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
             address={address}
             chain={chain}
             isActive={isActive}
-            onToggle={onToggleAddress(isActive, uuid)}
+            onToggle={onToggleAddress(isActive, wallet)}
           />
         )
       })}
@@ -223,6 +241,12 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
 
   const onResetCurrencies = (): void => {
     setSelectedCurrencies([])
+  }
+
+  const onRemoveWallet = (uuid: string) => (): void => {
+    const removeExist = selectedWallets.filter((item: IWallet) => item.uuid !== uuid)
+
+    setSelectedWallets(removeExist)
   }
 
   return (
@@ -285,19 +309,26 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
                 </Styles.ResetGroup>
               ) : null}
             </Styles.GroupHeading>
-            {selectedWallets.length && !isWalletsVisible ? (
-              <SelectedWallets walletNames={selectedWallets} onShowWallets={onShowWallets} />
-            ) : (
-              <GroupDropdown
-                title="Select addresses"
-                render={renderAddresses}
-                maxHeight={150}
-                toggle={toggleWalletsDropdown}
-              />
-            )}
+            <GroupDropdown
+              title="Select addresses"
+              render={renderAddresses}
+              maxHeight={150}
+              toggle={toggleWalletsDropdown}
+              renderRow={
+                selectedWallets.length && !isWalletsVisible ? (
+                  <SelectedWallets
+                    wallets={selectedWallets}
+                    onShowWallets={onShowWallets}
+                    onRemove={onRemoveWallet}
+                  />
+                ) : undefined
+              }
+              hideArrowOnRender
+              paddingOnRender="0px"
+            />
           </Styles.Group>
         </Styles.Row>
-        <Button label="Apply" isLight onClick={onApply} />
+        <Button label="Apply" onClick={onApply} />
       </>
     </DrawerWrapper>
   )
