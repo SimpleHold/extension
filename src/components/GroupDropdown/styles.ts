@@ -2,6 +2,7 @@ import styled from 'styled-components'
 
 type THeadingProps = {
   isVisible: boolean
+  padding?: string
 }
 
 type TBodyProps = {
@@ -21,7 +22,7 @@ const Heading = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 10px 14px 20px;
+  padding: ${({ padding }: THeadingProps) => padding || '14px 10px 14px 20px'};
 
   &:hover {
     cursor: pointer;
