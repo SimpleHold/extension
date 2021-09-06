@@ -27,6 +27,7 @@ import useState from '@hooks/useState'
 // Types
 import { TTxAddressItem, TFullTxWallet, TFullTxInfo, TTxWallet } from '@utils/api/types'
 import { IState } from './types'
+import { TCurrency } from '@drawers/HistoryFilter/types'
 
 // Styles
 import Styles from './styles'
@@ -61,10 +62,32 @@ const TxHistory: React.FC = () => {
     }
   }
 
-  const onGetTxHistory = async (): Promise<void> => {
-    updateState({ txGroups: null })
+  const filterWallets = (wallet: IWallet): IWallet => {
+    const getCurrencies = getItem('txHistoryCurrencies')
+    const getAddresses = getItem('txHistoryAddresses')
 
-    const mapWallets: TTxWallet[] = state.wallets.map((wallet: IWallet) => {
+    if (getCurrencies?.length && !getAddresses) {
+      return JSON.parse(getCurrencies).find(
+        (currency: TCurrency) => toLower(currency.symbol) === toLower(wallet.symbol)
+      )
+    }
+
+    if (getAddresses?.length) {
+      return JSON.parse(getAddresses).find(
+        (item: IWallet) =>
+          toLower(item.symbol) === toLower(wallet.symbol) &&
+          toLower(item.address) === toLower(wallet.address)
+      )
+    }
+
+    return wallet
+  }
+
+  const onGetTxHistory = async (): Promise<void> => {
+    updateState({ txGroups: null, isNotFound: false })
+
+    const getFilteredWallets = state.wallets.filter(filterWallets)
+    const mapWallets: TTxWallet[] = getFilteredWallets.map((wallet: IWallet) => {
       const { address, chain, symbol, contractAddress } = wallet
 
       return {
@@ -101,7 +124,7 @@ const TxHistory: React.FC = () => {
     const getSavedHistory = getFullHistory()
 
     if (getSavedHistory.length) {
-      updateState({ txGroups: groupHistory(getFullHistory()) })
+      updateState({ txGroups: groupHistory(getSavedHistory) })
     } else {
       updateState({ isNotFound: true })
     }
@@ -150,7 +173,9 @@ const TxHistory: React.FC = () => {
     <Styles.EmptyHistory>
       <Styles.EmptyHistoryIcon />
       <Styles.EmptyHistoryText>
-        Your transaction history will be displayed here
+        {isFiltersActive()
+          ? 'Nothing was found for the specified parameters'
+          : 'Your transaction history will be displayed here'}
       </Styles.EmptyHistoryText>
     </Styles.EmptyHistory>
   )

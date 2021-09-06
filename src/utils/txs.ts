@@ -7,6 +7,8 @@ import { toLower } from '@utils/format'
 
 // Types
 import { TAddressTx, TFullTxInfo, TTxAddressItem } from '@utils/api/types'
+import { IWallet } from '@utils/wallet'
+import { TCurrency } from '@drawers/HistoryFilter/types'
 
 export type TAddressTxGroup = {
   date: string
@@ -214,18 +216,36 @@ export const compareFullHistory = (items: TTxAddressItem[]): TTxAddressItem[] =>
 export const saveFullHistory = (txs: TFullTxInfo[]): void => {
   const getHistory = getJSON('full_history')
 
-  if (getHistory?.length) {
-    setItem('full_history', JSON.stringify([...getHistory, ...txs]))
-  } else {
-    setItem('full_history', JSON.stringify(txs))
+  const data = getHistory?.length ? [...getHistory, ...txs] : txs
+  setItem('full_history', JSON.stringify(data))
+}
+
+const filterFullHistory = (item: TFullTxInfo): TFullTxInfo => {
+  const getCurrencies = getItem('txHistoryCurrencies')
+  const getAddresses = getItem('txHistoryAddresses')
+
+  if (getCurrencies?.length && !getAddresses) {
+    return JSON.parse(getCurrencies).find(
+      (currency: TCurrency) => toLower(currency.symbol) === toLower(item.symbol)
+    )
   }
+
+  if (getAddresses?.length) {
+    return JSON.parse(getAddresses).find(
+      (wallet: IWallet) =>
+        toLower(wallet.symbol) === toLower(item.symbol) &&
+        toLower(wallet.address) === toLower(item.address)
+    )
+  }
+
+  return item
 }
 
 export const getFullHistory = (): TFullTxInfo[] => {
   const getHistory = getJSON('full_history')
 
   if (getHistory?.length) {
-    return getHistory
+    return getHistory.filter(filterFullHistory)
   }
 
   return []
