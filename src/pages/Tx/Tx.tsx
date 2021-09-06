@@ -32,7 +32,6 @@ import { getHistoryTxInfo } from '@utils/api'
 import useState from '@hooks/useState'
 
 // Types
-import { THistoryTx } from '@utils/api/types'
 import { IState, ILocationState } from './types'
 
 // Styles
@@ -43,6 +42,7 @@ const initialState: IState = {
   isCopied: false,
   isLoadingError: false,
   activeDrawer: null,
+  activeDrawerTabKey: 'senders',
 }
 
 const TxHistory: React.FC = () => {
@@ -96,8 +96,8 @@ const TxHistory: React.FC = () => {
     }
   }
 
-  const onViewAddresses = (): void => {
-    updateState({ activeDrawer: 'txAddresses' })
+  const onViewAddresses = (activeDrawerTabKey: 'senders' | 'recipients') => (): void => {
+    updateState({ activeDrawer: 'txAddresses', activeDrawerTabKey })
   }
 
   const onCloseDrawer = (): void => {
@@ -216,7 +216,7 @@ const TxHistory: React.FC = () => {
                                 </CopyToClipboard>
                               ) : null}
                               {state.txInfo?.addressesFrom ? (
-                                <Styles.AddressesRow onClick={onViewAddresses}>
+                                <Styles.AddressesRow onClick={onViewAddresses('senders')}>
                                   <Styles.Addresses>
                                     Senders {state.txInfo.addressesFrom.length}
                                   </Styles.Addresses>
@@ -252,7 +252,7 @@ const TxHistory: React.FC = () => {
                                 </CopyToClipboard>
                               ) : null}
                               {state.txInfo?.addressesTo ? (
-                                <Styles.AddressesRow onClick={onViewAddresses}>
+                                <Styles.AddressesRow onClick={onViewAddresses('recipients')}>
                                   <Styles.Addresses>
                                     Recipients {state.txInfo.addressesTo.length}
                                   </Styles.Addresses>
@@ -320,6 +320,7 @@ const TxHistory: React.FC = () => {
           addressesFrom={state.txInfo.addressesFrom}
           addressesTo={state.txInfo.addressesTo}
           symbol={symbol}
+          activeDrawerTabKey={state.activeDrawerTabKey}
         />
       ) : null}
     </>

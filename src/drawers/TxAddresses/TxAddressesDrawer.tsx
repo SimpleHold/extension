@@ -20,10 +20,17 @@ interface Props {
   addressesFrom: TTxHistoryAddress[]
   addressesTo: TTxHistoryAddress[]
   symbol: string
+  activeDrawerTabKey: 'senders' | 'recipients'
 }
 
 const TxAddressesDrawer: React.FC<Props> = (props) => {
-  const { onClose, isActive, addressesFrom, addressesTo, symbol } = props
+  const { onClose, isActive, addressesFrom, addressesTo, symbol, activeDrawerTabKey } = props
+
+  const [activeTabKey, setActiveTabKey] = React.useState<string>('senders')
+
+  React.useEffect(() => {
+    setActiveTabKey(activeDrawerTabKey)
+  }, [activeDrawerTabKey])
 
   const renderAddresses = (data: TTxHistoryAddress[]) => (
     <Styles.List>
@@ -54,8 +61,6 @@ const TxAddressesDrawer: React.FC<Props> = (props) => {
       renderItem: renderAddresses(addressesTo),
     },
   ]
-
-  const [activeTabKey, setActiveTabKey] = React.useState<string>('senders')
 
   const onSelectTab = (tabKey: string) => (): void => {
     setActiveTabKey(tabKey)

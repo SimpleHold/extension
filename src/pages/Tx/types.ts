@@ -12,4 +12,5 @@ export interface IState {
   isCopied: boolean
   isLoadingError: boolean
   activeDrawer: null | 'txAddresses'
+  activeDrawerTabKey: 'senders' | 'recipients'
 }
