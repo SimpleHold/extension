@@ -8,7 +8,7 @@ import Skeleton from '@components/Skeleton'
 import PendingBalance from '@components/PendingBalance'
 
 // Utils
-import { getItem, checkOneOfExist } from '@utils/storage'
+import { checkOneOfExist } from '@utils/storage'
 import { formatEstimated, price } from '@utils/format'
 
 // Styles

@@ -11,7 +11,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import SelectedWallets from './components/SelectedWallets'
 
 // Utils
-import { getWallets, IWallet, getWalletName } from '@utils/wallet'
+import { getWallets, IWallet, getWalletName, getUnique, sortAlphabetically } from '@utils/wallet'
 import { toLower } from '@utils/format'
 
 // Config
@@ -42,7 +42,7 @@ const statuses: TStatusItem[] = [
 const HistoryFilterDrawer: React.FC<Props> = (props) => {
   const { onClose, isActive } = props
 
-  const [status, setStatus] = React.useState<TStatuses | null>('sended')
+  const [status, setStatus] = React.useState<TStatuses | null>(null)
   const [currencies, setCurrencies] = React.useState<TCurrency[]>([])
   const [selectedCurrencies, setSelectedCurrencies] = React.useState<TCurrency[]>([])
   const [wallets, setWallets] = React.useState<IWallet[]>([])
@@ -66,25 +66,19 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     const walletsList = getWallets()
 
     if (walletsList?.length) {
-      const mapWallets = walletsList
-        .filter(
-          (v, i, a) =>
-            a.findIndex(
-              (wallet: IWallet) => wallet.symbol === v.symbol && wallet.chain === v.chain
-            ) === i
-        )
-        .sort((a: IWallet, b: IWallet) => a.symbol.localeCompare(b.symbol))
-        .map((wallet: IWallet) => {
-          const { chain, symbol, name } = wallet
+      const uniqueWallets = getUnique(walletsList)
 
-          const getWalletInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+      const mapWallets = uniqueWallets.sort(sortAlphabetically).map((wallet: IWallet) => {
+        const { chain, symbol, name } = wallet
 
-          return {
-            symbol: getWalletInfo?.symbol || symbol,
-            name: name || getWalletInfo?.name || '',
-            chain,
-          }
-        })
+        const getWalletInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+
+        return {
+          symbol: getWalletInfo?.symbol || symbol,
+          name: name || getWalletInfo?.name || '',
+          chain,
+        }
+      })
 
       setCurrencies(mapWallets)
     }

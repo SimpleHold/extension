@@ -13,7 +13,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 // Utils
 import { toLower } from '@utils/format'
 import { getItem, removeItem, setItem, removeMany } from '@utils/storage'
-import { getWallets, IWallet } from '@utils/wallet'
+import { getWallets, IWallet, getUnique, sortAlphabetically } from '@utils/wallet'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -79,25 +79,18 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
         totalHiddenWallets: getHiddenWallets,
       })
 
-      const currenciesList = wallets
-        .filter(
-          (v, i, a) =>
-            a.findIndex(
-              (wallet: IWallet) => wallet.symbol === v.symbol && wallet.chain === v.chain
-            ) === i
-        )
-        .sort((a: IWallet, b: IWallet) => a.symbol.localeCompare(b.symbol))
-        .map((wallet: IWallet) => {
-          const { chain, symbol, name } = wallet
+      const uniqueWallets = getUnique(wallets)
+      const currenciesList = uniqueWallets.sort(sortAlphabetically).map((wallet: IWallet) => {
+        const { chain, symbol, name } = wallet
 
-          const getWalletInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+        const getWalletInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
-          return {
-            symbol: getWalletInfo?.symbol || symbol,
-            name: name || getWalletInfo?.name || '',
-            chain,
-          }
-        })
+        return {
+          symbol: getWalletInfo?.symbol || symbol,
+          name: name || getWalletInfo?.name || '',
+          chain,
+        }
+      })
 
       updateState({ currenciesList })
     }
@@ -142,8 +135,9 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
     }
   }
 
-  const onToggleCurrency = (currency: TCurrency): void => {
+  const onToggleCurrency = (currency: TCurrency) => (): void => {
     const { symbol, name, chain } = currency
+
     const getCurrency = state.currenciesList.find(
       (item: TCurrency) =>
         toLower(item.symbol) === toLower(currency.symbol) &&
@@ -154,14 +148,12 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       const checkExist = findCurrency(symbol, chain) !== undefined
 
       if (checkExist) {
-        if (state.selectedCurrencies.length > 1) {
-          updateState({
-            selectedCurrencies: state.selectedCurrencies.filter(
-              (i: TCurrency) =>
-                toLower(i.symbol) !== toLower(symbol) || toLower(i.chain) !== toLower(chain)
-            ),
-          })
-        }
+        updateState({
+          selectedCurrencies: state.selectedCurrencies.filter(
+            (i: TCurrency) =>
+              toLower(i.symbol) !== toLower(symbol) || toLower(i.chain) !== toLower(chain)
+          ),
+        })
       } else {
         updateState({
           selectedCurrencies: [...state.selectedCurrencies, ...[{ symbol, chain, name }]],
@@ -189,7 +181,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
             name={name}
             chain={chain}
             isActive={isActive}
-            onToggle={() => onToggleCurrency(currency)}
+            onToggle={onToggleCurrency(currency)}
           />
         )
       })}

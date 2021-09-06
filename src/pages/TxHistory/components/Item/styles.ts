@@ -4,10 +4,6 @@ type TContainerProps = {
   disabled?: boolean
 }
 
-type TAmountProps = {
-  amount: number
-}
-
 const Container = styled.div`
   padding: 15px 30px;
   display: flex;
@@ -59,7 +55,7 @@ const Amount = styled.p`
   font-weight: 500;
   font-size: 16px;
   line-height: 19px;
-  color: ${({ amount }: TAmountProps) => (amount > 0 ? '#3FBB7D' : '#1D1D22')};
+  color: #1d1d22;
   user-select: none;
 `
 

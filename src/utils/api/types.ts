@@ -118,4 +118,5 @@ export type TFullTxInfo = {
   address: string
   isPending: boolean
   date: string
+  symbol: string
 }
