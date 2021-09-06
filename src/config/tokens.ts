@@ -284,6 +284,17 @@ const tokens: IToken[] = [
     isCustomFee: true,
   },
   {
+    address: '0x47bead2563dcbf3bf2c9407fea4dc236faba485a',
+    name: 'Swipe',
+    symbol: 'sxp',
+    decimals: 18,
+    logo: sxpLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
     address: '0xcf6bb5389c92bdda8a3747ddb454cb7a64626c63',
     name: 'Venus',
     symbol: 'xvs',
