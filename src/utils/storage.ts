@@ -1,3 +1,17 @@
+const deletedDataOnLogout: string[] = [
+  'wallets',
+  'backup',
+  'activeSortKey',
+  'activeSortType',
+  'zeroBalancesFilter',
+  'hiddenWalletsFilter',
+  'selectedCurrenciesFilter',
+  'txHistoryStatus',
+  'txHistoryCurrencies',
+  'txHistoryAddresses',
+  'full_history',
+]
+
 export const getItem = (key: string): string | null => {
   return localStorage.getItem(key)
 }
@@ -47,4 +61,8 @@ export const checkOneOfExist = (keys: string[]): boolean => {
   } catch {
     return false
   }
+}
+
+export const removeCache = (): void => {
+  removeMany(deletedDataOnLogout)
 }
