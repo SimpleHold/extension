@@ -159,14 +159,11 @@ const WalletPage: React.FC = () => {
           const getFullTxHistoryInfo = await getTxsInfo(currency.chain, address, compare)
           saveTxs(address, currency.chain, getFullTxHistoryInfo, tokenSymbol, contractAddress)
         }
-
-        const txHistory = groupTxs(
-          getExistTxs(address, currency.chain, tokenSymbol, contractAddress)
-        )
-        updateState({ txHistory })
-      } else {
-        updateState({ txHistory: [] })
       }
+
+      const txHistory = groupTxs(getExistTxs(address, currency.chain, tokenSymbol, contractAddress))
+
+      updateState({ txHistory })
     }
   }
 

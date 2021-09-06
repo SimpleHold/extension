@@ -24,7 +24,7 @@ const Currency: React.FC<Props> = (props) => {
       <Styles.Row>
         <Styles.Name>{name}</Styles.Name>
         <Styles.CheckBoxRow>
-          <CheckBox value={isActive} size={16} onClick={onToggle} />
+          <CheckBox value={isActive} size={16} onClick={onToggle} borderSize={2} />
         </Styles.CheckBoxRow>
       </Styles.Row>
     </Styles.Container>
