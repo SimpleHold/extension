@@ -29,6 +29,7 @@ interface Props {
     estimated: number
     hardware?: THardware
     isPending?: boolean
+    tokenChain?: string
   }
   onClick?: () => void
 }
@@ -55,11 +56,11 @@ const Item: React.FC<Props> = (props) => {
   }
 
   if (data) {
-    const { symbol, hash, name, amount, estimated, hardware, isPending } = data
+    const { symbol, hash, name, amount, estimated, hardware, isPending, tokenChain } = data
 
     return (
       <Styles.Container onClick={onClick}>
-        <CurrencyLogo size={40} symbol={symbol} />
+        <CurrencyLogo size={40} symbol={symbol} chain={tokenChain} />
         <Styles.Row>
           <Styles.AddressInfo>
             <Styles.Hash>{short(hash, 15)}</Styles.Hash>

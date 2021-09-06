@@ -52,7 +52,11 @@ const Button = styled.div`
   }
 `
 
-const Group = styled.div``
+const Group = styled.div`
+  &:not(:first-child) {
+    margin: 10px 0 0 0;
+  }
+`
 
 const GroupDateRow = styled.div`
   margin: 0 0 0 30px;
@@ -89,7 +93,10 @@ const EmptyHistoryText = styled.p`
   color: #7d7e8d;
 `
 
-const TxList = styled.div``
+const TxList = styled.div`
+  height: 100%;
+  overflow-y: scroll;
+`
 
 const ButtonDot = styled.div`
   width: 6px;
