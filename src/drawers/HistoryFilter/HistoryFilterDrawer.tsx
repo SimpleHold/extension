@@ -257,10 +257,6 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     updateState({ selectedWallets: [] })
   }
 
-  const onShowWallets = (): void => {
-    updateState({ isWalletsVisible: true })
-  }
-
   const toggleWalletsDropdown = (isWalletsVisible: boolean): void => {
     updateState({ isWalletsVisible })
   }
@@ -274,12 +270,8 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     updateState({ selectedWallets })
   }
 
-  const isButtonDisabled = (): boolean => {
-    return true // Fix me
-  }
-
   const isShowResetButton = (): boolean => {
-    return checkOneOfExist(storageKeys) && isButtonDisabled()
+    return checkOneOfExist(storageKeys)
   }
 
   const onReset = (): void => {
@@ -354,11 +346,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
               toggle={toggleWalletsDropdown}
               renderRow={
                 state.selectedWallets.length && !state.isWalletsVisible ? (
-                  <SelectedWallets
-                    wallets={state.selectedWallets}
-                    onShowWallets={onShowWallets}
-                    onRemove={onRemoveWallet}
-                  />
+                  <SelectedWallets wallets={state.selectedWallets} onRemove={onRemoveWallet} />
                 ) : undefined
               }
               hideArrowOnRender

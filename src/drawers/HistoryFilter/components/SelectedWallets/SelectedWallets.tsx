@@ -13,12 +13,11 @@ import Styles from './styles'
 
 interface Props {
   wallets: IWallet[]
-  onShowWallets: () => void
   onRemove: (uuid: string) => () => void
 }
 
 const SelectedWallets: React.FC<Props> = (props) => {
-  const { wallets, onShowWallets, onRemove } = props
+  const { wallets, onRemove } = props
 
   const getNameWallet = (wallet: IWallet): string => {
     if (wallet.walletName) {
@@ -43,9 +42,9 @@ const SelectedWallets: React.FC<Props> = (props) => {
           const walletName = getNameWallet(wallet)
 
           return (
-            <Styles.Wallet key={walletName} onClick={onRemove(wallet.uuid)}>
+            <Styles.Wallet key={walletName}>
               <Styles.WalletName>{walletName}</Styles.WalletName>
-              <Styles.WalletButton>
+              <Styles.WalletButton onClick={onRemove(wallet.uuid)}>
                 <SVG src={timesIcon} width={10} height={10} />
               </Styles.WalletButton>
             </Styles.Wallet>
@@ -53,7 +52,7 @@ const SelectedWallets: React.FC<Props> = (props) => {
         })}
       </Styles.WalletsList>
 
-      <Styles.ShowMoreBlock onClick={onShowWallets}>
+      <Styles.ShowMoreBlock>
         <Styles.ShowMoreLabel>Show more</Styles.ShowMoreLabel>
         <SVG src={arrowIcon} width={4} height={7} />
       </Styles.ShowMoreBlock>
