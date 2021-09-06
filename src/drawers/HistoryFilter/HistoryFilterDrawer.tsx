@@ -12,53 +12,65 @@ import SelectedWallets from './components/SelectedWallets'
 
 // Utils
 import { getWallets, IWallet, getWalletName, getUnique, sortAlphabetically } from '@utils/wallet'
+import { getItem, checkOneOfExist, removeItem, setItem, removeMany } from '@utils/storage'
 import { toLower } from '@utils/format'
 
 // Config
 import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
+// Hooks
+import useState from '@hooks/useState'
+
 // Types
-import { Props, TStatuses, TStatusItem, TCurrency } from './types'
+import { Props, TStatuses, TStatusItem, TCurrency, IState } from './types'
+import { statuses, storageKeys, initialState } from './data'
 
 // Styles
 import Styles from './styles'
 
-const statuses: TStatusItem[] = [
-  {
-    title: 'Sended',
-    key: 'sended',
-  },
-  {
-    title: 'Received',
-    key: 'received',
-  },
-  {
-    title: 'Pending',
-    key: 'pending',
-  },
-]
-
 const HistoryFilterDrawer: React.FC<Props> = (props) => {
-  const { onClose, isActive } = props
+  const { onClose, isActive, onApply } = props
 
-  const [status, setStatus] = React.useState<TStatuses | null>(null)
-  const [currencies, setCurrencies] = React.useState<TCurrency[]>([])
-  const [selectedCurrencies, setSelectedCurrencies] = React.useState<TCurrency[]>([])
-  const [wallets, setWallets] = React.useState<IWallet[]>([])
-  const [selectedWallets, setSelectedWallets] = React.useState<IWallet[]>([])
-  const [isWalletsVisible, setWalletsVisible] = React.useState<boolean>(false)
+  const { state, updateState } = useState<IState>(initialState)
 
   React.useEffect(() => {
     onGetCurrencies()
     onGetWallets()
   }, [])
 
-  const onGetWallets = (): void => {
-    const walletsList = getWallets()
+  React.useEffect(() => {
+    if (isActive) {
+      checkActiveFilters()
+    }
+  }, [isActive])
 
-    if (walletsList) {
-      setWallets(walletsList)
+  const checkActiveFilters = (): void => {
+    const getStatus = getItem('txHistoryStatus')
+    const getCurrencies = getItem('txHistoryCurrencies')
+    const getAddresses = getItem('txHistoryAddresses')
+
+    if (getStatus) {
+      const findStatus = statuses.find((status: TStatusItem) => status.key === getStatus)
+
+      if (findStatus) {
+        updateState({ status: findStatus.key })
+      }
+    } else {
+      updateState({ status: null })
+    }
+
+    updateState({
+      selectedCurrencies: getCurrencies?.length ? JSON.parse(getCurrencies) : [],
+      selectedWallets: getAddresses?.length ? JSON.parse(getAddresses) : [],
+    })
+  }
+
+  const onGetWallets = (): void => {
+    const wallets = getWallets()
+
+    if (wallets) {
+      updateState({ wallets })
     }
   }
 
@@ -68,7 +80,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     if (walletsList?.length) {
       const uniqueWallets = getUnique(walletsList)
 
-      const mapWallets = uniqueWallets.sort(sortAlphabetically).map((wallet: IWallet) => {
+      const currencies = uniqueWallets.sort(sortAlphabetically).map((wallet: IWallet) => {
         const { chain, symbol, name } = wallet
 
         const getWalletInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
@@ -80,16 +92,34 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
         }
       })
 
-      setCurrencies(mapWallets)
+      updateState({ currencies })
     }
   }
 
-  const onApply = (): void => {
-    onClose()
+  const onApplyFilters = (): void => {
+    if (state.status) {
+      setItem('txHistoryStatus', state.status)
+    } else {
+      removeItem('txHistoryStatus')
+    }
+
+    if (state.selectedCurrencies.length) {
+      setItem('txHistoryCurrencies', JSON.stringify(state.selectedCurrencies))
+    } else {
+      removeItem('txHistoryCurrencies')
+    }
+
+    if (state.selectedWallets.length) {
+      setItem('txHistoryAddresses', JSON.stringify(state.selectedWallets))
+    } else {
+      removeItem('txHistoryAddresses')
+    }
+
+    onApply()
   }
 
   const selectStatus = (status: TStatuses) => (): void => {
-    setStatus(status)
+    updateState({ status })
   }
 
   const onToggleCurrency = (
@@ -98,30 +128,30 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     isActive: boolean,
     chain?: string
   ) => (): void => {
-    let newCurrenciesList = [...selectedCurrencies]
+    let selectedCurrencies = [...state.selectedCurrencies]
 
     if (isActive) {
-      newCurrenciesList = newCurrenciesList.filter(
+      selectedCurrencies = selectedCurrencies.filter(
         (currency: TCurrency) =>
           toLower(currency.symbol) !== toLower(symbol) || toLower(currency.chain) !== toLower(chain)
       )
     } else {
-      newCurrenciesList.push({
+      selectedCurrencies.push({
         symbol,
         chain,
         name,
       })
     }
 
-    setSelectedCurrencies(newCurrenciesList)
+    updateState({ selectedCurrencies })
   }
 
   const renderCurrencies = (
     <>
-      {currencies.map((currency: TCurrency) => {
+      {state.currencies.map((currency: TCurrency) => {
         const { symbol, name, chain } = currency
         const isActive =
-          selectedCurrencies.find(
+          state.selectedCurrencies.find(
             (currency: TCurrency) =>
               toLower(currency.symbol) === toLower(symbol) &&
               toLower(currency.chain) === toLower(chain)
@@ -159,17 +189,19 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
 
   const onToggleAddress = (isActive: boolean, wallet: IWallet) => (): void => {
     if (isActive) {
-      const removeExist = selectedWallets.filter((item: IWallet) => item.uuid !== wallet.uuid)
-      setSelectedWallets(removeExist)
+      const selectedWallets = state.selectedWallets.filter(
+        (item: IWallet) => item.uuid !== wallet.uuid
+      )
+      updateState({ selectedWallets })
     } else {
-      setSelectedWallets([...selectedWallets, wallet])
+      updateState({ selectedWallets: [...state.selectedWallets, wallet] })
     }
   }
 
   const filterWallets = (wallet: IWallet): boolean | IWallet => {
-    if (selectedCurrencies.length) {
+    if (state.selectedCurrencies.length) {
       return (
-        selectedCurrencies.find(
+        state.selectedCurrencies.find(
           (currency: TCurrency) =>
             toLower(currency.symbol) === toLower(wallet.symbol) &&
             toLower(currency.chain) === toLower(wallet.chain)
@@ -182,11 +214,11 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
 
   const renderAddresses = (
     <>
-      {wallets.filter(filterWallets).map((wallet: IWallet) => {
+      {state.wallets.filter(filterWallets).map((wallet: IWallet) => {
         const { symbol, address, chain, name, uuid } = wallet
         const walletName = getNameWallet(wallet)
         const isActive =
-          selectedWallets.find((wallet: IWallet) => wallet.uuid === uuid) !== undefined
+          state.selectedWallets.find((wallet: IWallet) => wallet.uuid === uuid) !== undefined
 
         return (
           <Wallet
@@ -204,9 +236,9 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     </>
   )
 
-  const renderSelectedCurrencies = selectedCurrencies.length ? (
+  const renderSelectedCurrencies = state.selectedCurrencies.length ? (
     <Styles.CurrenciesList>
-      {selectedCurrencies.map((item: TCurrency, index: number) => {
+      {state.selectedCurrencies.map((item: TCurrency, index: number) => {
         const { symbol, chain } = item
 
         if (symbol && index < 5) {
@@ -222,25 +254,37 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
   ) : null
 
   const onResetWallets = (): void => {
-    setSelectedWallets([])
+    updateState({ selectedWallets: [] })
   }
 
   const onShowWallets = (): void => {
-    setWalletsVisible(true)
+    updateState({ isWalletsVisible: true })
   }
 
-  const toggleWalletsDropdown = (value: boolean): void => {
-    setWalletsVisible(value)
+  const toggleWalletsDropdown = (isWalletsVisible: boolean): void => {
+    updateState({ isWalletsVisible })
   }
 
   const onResetCurrencies = (): void => {
-    setSelectedCurrencies([])
+    updateState({ selectedCurrencies: [] })
   }
 
   const onRemoveWallet = (uuid: string) => (): void => {
-    const removeExist = selectedWallets.filter((item: IWallet) => item.uuid !== uuid)
+    const selectedWallets = state.selectedWallets.filter((item: IWallet) => item.uuid !== uuid)
+    updateState({ selectedWallets })
+  }
 
-    setSelectedWallets(removeExist)
+  const isButtonDisabled = (): boolean => {
+    return true // Fix me
+  }
+
+  const isShowResetButton = (): boolean => {
+    return checkOneOfExist(storageKeys) && isButtonDisabled()
+  }
+
+  const onReset = (): void => {
+    removeMany(storageKeys)
+    onApply()
   }
 
   return (
@@ -260,7 +304,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
             <Styles.Statuses>
               {statuses.map((statusItem: TStatusItem) => {
                 const { title, key } = statusItem
-                const isActive = status === key
+                const isActive = state.status === key
 
                 return (
                   <Styles.Status key={key} isActive={isActive} onClick={selectStatus(key)}>
@@ -274,9 +318,9 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
           <Styles.Group>
             <Styles.GroupHeading>
               <Styles.GroupTitle>Currency</Styles.GroupTitle>
-              {selectedCurrencies.length ? (
+              {state.selectedCurrencies.length ? (
                 <Styles.ResetGroup>
-                  <Styles.ResetTitle>{selectedCurrencies.length} selected</Styles.ResetTitle>
+                  <Styles.ResetTitle>{state.selectedCurrencies.length} selected</Styles.ResetTitle>
                   <Styles.ResetIcon onClick={onResetCurrencies}>
                     <SVG src="../../assets/icons/times.svg" width={8.33} height={8.33} />
                   </Styles.ResetIcon>
@@ -294,9 +338,9 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
           <Styles.Group>
             <Styles.GroupHeading>
               <Styles.GroupTitle>Address</Styles.GroupTitle>
-              {selectedWallets.length ? (
+              {state.selectedWallets.length ? (
                 <Styles.ResetGroup>
-                  <Styles.ResetTitle>{selectedWallets.length} selected</Styles.ResetTitle>
+                  <Styles.ResetTitle>{state.selectedWallets.length} selected</Styles.ResetTitle>
                   <Styles.ResetIcon onClick={onResetWallets}>
                     <SVG src="../../assets/icons/times.svg" width={8.33} height={8.33} />
                   </Styles.ResetIcon>
@@ -309,9 +353,9 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
               maxHeight={150}
               toggle={toggleWalletsDropdown}
               renderRow={
-                selectedWallets.length && !isWalletsVisible ? (
+                state.selectedWallets.length && !state.isWalletsVisible ? (
                   <SelectedWallets
-                    wallets={selectedWallets}
+                    wallets={state.selectedWallets}
                     onShowWallets={onShowWallets}
                     onRemove={onRemoveWallet}
                   />
@@ -322,7 +366,12 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
             />
           </Styles.Group>
         </Styles.Row>
-        <Button label="Apply" onClick={onApply} />
+        <Styles.Actions>
+          {isShowResetButton() ? (
+            <Button label="Reset" isDanger onClick={onReset} mr={7.5} />
+          ) : null}
+          <Button label="Apply" onClick={onApplyFilters} ml={isShowResetButton() ? 7.5 : 0} />
+        </Styles.Actions>
       </>
     </DrawerWrapper>
   )
