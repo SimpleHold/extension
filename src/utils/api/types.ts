@@ -68,6 +68,7 @@ export type TCustomFee = {
 export type TTxWallet = {
   chain: string
   address: string
+  symbol: string
   tokenSymbol?: string
   contractAddress?: string
 }
@@ -94,6 +95,7 @@ export type TTxHistoryAddress = {
 export type TTxAddressItem = {
   chain: string
   address: string
+  symbol: string
   txs: string[]
   tokenSymbol?: string
   contractAddress?: string
@@ -107,6 +109,7 @@ export type TFullTxHistoryResponse = {
 export type TFullTxWallet = {
   chain: string
   address: string
+  symbol: string
   txs: string[]
 }
 

@@ -37,6 +37,7 @@ const Button = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 
   path {
     fill: #7d7e8d;
@@ -90,6 +91,16 @@ const EmptyHistoryText = styled.p`
 
 const TxList = styled.div``
 
+const ButtonDot = styled.div`
+  width: 6px;
+  height: 6px;
+  background-color: #eb5757;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border-radius: 3px;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -103,6 +114,7 @@ const Styles = {
   EmptyHistoryIcon,
   EmptyHistoryText,
   TxList,
+  ButtonDot,
 }
 
 export default Styles

@@ -14,15 +14,18 @@ import Skeleton from '@components/Skeleton'
 import HistoryFilterDrawer from '@drawers/HistoryFilter'
 
 // Utils
-import { IWallet, getWallets, getWalletChain } from '@utils/wallet'
+import { IWallet, getWallets, getWalletChain, getWalletName } from '@utils/wallet'
 import { getFullTxHistory, getFullTxHistoryInfo } from '@utils/api'
 import { groupHistory, THistoryTxGroup } from '@utils/txs'
+import { toLower } from '@utils/format'
+import { checkOneOfExist, getItem } from '@utils/storage'
+import { compareFullHistory, saveFullHistory, getFullHistory } from '@utils/txs'
 
 // Hooks
 import useState from '@hooks/useState'
 
 // Types
-import { TTxAddressItem, TFullTxWallet, TFullTxInfo } from '@utils/api/types'
+import { TTxAddressItem, TFullTxWallet, TFullTxInfo, TTxWallet } from '@utils/api/types'
 import { IState } from './types'
 
 // Styles
@@ -59,12 +62,15 @@ const TxHistory: React.FC = () => {
   }
 
   const onGetTxHistory = async (): Promise<void> => {
-    const mapWallets = state.wallets.map((wallet: IWallet) => {
+    updateState({ txGroups: null })
+
+    const mapWallets: TTxWallet[] = state.wallets.map((wallet: IWallet) => {
       const { address, chain, symbol, contractAddress } = wallet
 
       return {
         address,
         chain: getWalletChain(symbol, chain),
+        symbol,
         tokenSymbol: chain ? symbol : undefined,
         contractAddress,
       }
@@ -73,25 +79,32 @@ const TxHistory: React.FC = () => {
     const data = await getFullTxHistory(mapWallets)
 
     if (data.length) {
-      const mapData: TFullTxWallet[] = data.map((item: TTxAddressItem) => {
-        const { chain, address, txs } = item
+      const compare = compareFullHistory(data)
 
-        return {
-          chain,
-          address,
-          txs,
-        }
-      })
+      if (compare.length) {
+        const mapData: TFullTxWallet[] = data.map((item: TTxAddressItem) => {
+          const { chain, address, txs, symbol } = item
 
-      const fullTxsInfo = await getFullTxHistoryInfo(mapData)
+          return {
+            chain,
+            address,
+            symbol,
+            txs,
+          }
+        })
 
-      if (fullTxsInfo.length) {
-        updateState({ txGroups: groupHistory(fullTxsInfo) })
-        return
+        const fullTxsInfo = await getFullTxHistoryInfo(mapData)
+        saveFullHistory(fullTxsInfo)
       }
     }
 
-    updateState({ isNotFound: true })
+    const getSavedHistory = getFullHistory()
+
+    if (getSavedHistory.length) {
+      updateState({ txGroups: groupHistory(getFullHistory()) })
+    } else {
+      updateState({ isNotFound: true })
+    }
   }
 
   const onCloseDrawer = (): void => {
@@ -108,6 +121,29 @@ const TxHistory: React.FC = () => {
       chain,
       hash,
     })
+  }
+
+  const getNameWallet = (symbol: string, address: string): string => {
+    const walletsList = getWallets()
+
+    if (walletsList) {
+      const findWallet = walletsList.find(
+        (wallet: IWallet) =>
+          toLower(wallet.symbol) === toLower(symbol) && toLower(wallet.address) === toLower(address)
+      )
+
+      if (findWallet) {
+        const { symbol, uuid, hardware, chain, name, walletName } = findWallet
+
+        if (walletName) {
+          return walletName
+        }
+
+        return getWalletName(walletsList, symbol, uuid, hardware, chain, name)
+      }
+    }
+
+    return ''
   }
 
   const renderNotFound = () => (
@@ -151,10 +187,8 @@ const TxHistory: React.FC = () => {
                 </Styles.GroupDateRow>
 
                 {data.map((tx: TFullTxInfo) => {
-                  const { hash, amount, estimated, chain, isPending } = tx
-
-                  const symbol = 'btc'
-                  const walletName = 'Wallet name'
+                  const { hash, amount, estimated, chain, isPending, symbol, address } = tx
+                  const walletName = getNameWallet(symbol, address)
 
                   return (
                     <HistoryItem
@@ -184,6 +218,15 @@ const TxHistory: React.FC = () => {
     return null
   }
 
+  const isFiltersActive = (): boolean => {
+    return checkOneOfExist(['txHistoryStatus', 'txHistoryCurrencies', 'txHistoryAddresses'])
+  }
+
+  const onApplyDrawer = (): void => {
+    onCloseDrawer()
+    onGetTxHistory()
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -194,6 +237,7 @@ const TxHistory: React.FC = () => {
             <Styles.Title>History</Styles.Title>
             <Styles.Button onClick={openFilters}>
               <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
+              {isFiltersActive() ? <Styles.ButtonDot /> : null}
             </Styles.Button>
           </Styles.Heading>
           {state.isNotFound ? renderNotFound() : null}
@@ -203,7 +247,11 @@ const TxHistory: React.FC = () => {
             : null}
         </Styles.Container>
       </Styles.Wrapper>
-      <HistoryFilterDrawer isActive={state.activeDrawer === 'filters'} onClose={onCloseDrawer} />
+      <HistoryFilterDrawer
+        isActive={state.activeDrawer === 'filters'}
+        onClose={onCloseDrawer}
+        onApply={onApplyDrawer}
+      />
     </>
   )
 }

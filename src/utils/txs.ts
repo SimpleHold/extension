@@ -6,7 +6,7 @@ import { getItem, getJSON, setItem } from '@utils/storage'
 import { toLower } from '@utils/format'
 
 // Types
-import { TAddressTx, TFullTxInfo } from '@utils/api/types'
+import { TAddressTx, TFullTxInfo, TTxAddressItem } from '@utils/api/types'
 
 export type TAddressTxGroup = {
   date: string
@@ -176,4 +176,57 @@ export const isShowSatismeter = (prevValue: number, value: number): boolean => {
   }
 
   return false
+}
+
+export const compareFullHistory = (items: TTxAddressItem[]): TTxAddressItem[] => {
+  const getHistory = getJSON('full_history')
+
+  if (getHistory?.length) {
+    const data: TTxAddressItem[] = []
+
+    for (const item of items) {
+      const { address, chain, symbol, tokenSymbol, contractAddress } = item
+
+      const findTxs = item.txs.filter((i) =>
+        getHistory.find(
+          (ii: TFullTxInfo) => ii.hash !== i || ii.symbol !== symbol || ii.chain !== chain
+        )
+      )
+
+      if (findTxs.length) {
+        data.push({
+          address,
+          chain,
+          symbol,
+          txs: findTxs,
+          tokenSymbol,
+          contractAddress,
+        })
+      }
+    }
+
+    return data
+  }
+
+  return items
+}
+
+export const saveFullHistory = (txs: TFullTxInfo[]): void => {
+  const getHistory = getJSON('full_history')
+
+  if (getHistory?.length) {
+    setItem('full_history', JSON.stringify([...getHistory, ...txs]))
+  } else {
+    setItem('full_history', JSON.stringify(txs))
+  }
+}
+
+export const getFullHistory = (): TFullTxInfo[] => {
+  const getHistory = getJSON('full_history')
+
+  if (getHistory?.length) {
+    return getHistory
+  }
+
+  return []
 }
