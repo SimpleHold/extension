@@ -18,6 +18,8 @@ import inchLogo from '@assets/tokens/inch.svg'
 import shibLogo from '@assets/tokens/shib.svg'
 import adaLogo from '@assets/tokens/ada.svg'
 import ctsiLogo from '@assets/tokens/ctsi.svg'
+import sxpLogo from '@assets/tokens/sxp.svg'
+import xvsLogo from '@assets/tokens/xvs.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -267,6 +269,28 @@ const tokens: IToken[] = [
     logo: ctsiLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x8ce9137d39326ad0cd6491fb5cc0cba0e089b6a9',
+    name: 'Swipe',
+    symbol: 'sxp',
+    decimals: 18,
+    logo: sxpLogo,
+    background: '#132BD8',
+    chain: 'eth',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0xcf6bb5389c92bdda8a3747ddb454cb7a64626c63',
+    name: 'Venus',
+    symbol: 'xvs',
+    decimals: 18,
+    logo: xvsLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
     minSendAmount: 0.001,
     isCustomFee: true,
   },
