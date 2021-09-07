@@ -111,6 +111,8 @@ export type TFullTxWallet = {
   address: string
   symbol: string
   txs: string[]
+  tokenSymbol?: string
+  contractAddress?: string
 }
 
 export type TFullTxInfo = {
@@ -122,4 +124,6 @@ export type TFullTxInfo = {
   isPending: boolean
   date: string
   symbol: string
+  tokenSymbol?: string
+  contractAddress?: string
 }

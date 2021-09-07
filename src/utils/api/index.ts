@@ -470,13 +470,22 @@ export const getFullTxHistoryInfo = async (wallets: TFullTxWallet[]): Promise<TF
   }
 }
 
-export const getHistoryTxInfo = async (hash: string, chain: string): Promise<THistoryTx | null> => {
+export const getHistoryTxInfo = async (
+  hash: string,
+  chain: string,
+  address: string,
+  tokenSymbol?: string,
+  contractAddress?: string
+): Promise<THistoryTx | null> => {
   try {
     const { data }: AxiosResponse = await axios.get(
       `${config.serverUrl}/transaction/hash/${hash}`,
       {
         params: {
           chain,
+          address,
+          tokenSymbol,
+          contractAddress,
         },
       }
     )
