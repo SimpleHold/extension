@@ -216,29 +216,67 @@ export const compareFullHistory = (items: TTxAddressItem[]): TTxAddressItem[] =>
 export const saveFullHistory = (txs: TFullTxInfo[]): void => {
   const getHistory = getJSON('full_history')
 
-  const data = getHistory?.length ? [...getHistory, ...txs] : txs
-  setItem('full_history', JSON.stringify(data))
+  if (getHistory) {
+    const nonPendintTxs = txs.filter((tx: TFullTxInfo) => !tx.isPending)
+    const getNewTxs = nonPendintTxs.filter((newTx: TFullTxInfo) => {
+      return !JSON.parse(getHistory).find(
+        (tx: TFullTxInfo) =>
+          toLower(tx.hash) === toLower(newTx.hash) && toLower(tx.chain) === toLower(newTx.chain)
+      )
+    })
+
+    setItem('full_history', JSON.stringify([...getHistory, ...getNewTxs]))
+  } else {
+    setItem('full_history', JSON.stringify(txs))
+  }
 }
 
-const filterFullHistory = (item: TFullTxInfo): TFullTxInfo => {
-  const getCurrencies = getItem('txHistoryCurrencies')
-  const getAddresses = getItem('txHistoryAddresses')
+const filterHistoryByStatus = (item: TFullTxInfo, status: string): boolean => {
+  if (status === 'sent') {
+    return item.amount < 0
+  } else if (status === 'received') {
+    return item.amount > 0
+  }
+  return item.isPending
+}
 
-  if (getCurrencies?.length && !getAddresses) {
-    return JSON.parse(getCurrencies).find(
+const filterHistoryByCurrencies = (
+  currencies: string | null,
+  addresses: string | null,
+  item: TFullTxInfo
+) => {
+  if (!currencies && !addresses) {
+    return item
+  }
+
+  if (currencies?.length && !addresses) {
+    return JSON.parse(currencies).find(
       (currency: TCurrency) => toLower(currency.symbol) === toLower(item.symbol)
     )
   }
 
-  if (getAddresses?.length) {
-    return JSON.parse(getAddresses).find(
+  if (addresses?.length) {
+    return JSON.parse(addresses).find(
       (wallet: IWallet) =>
         toLower(wallet.symbol) === toLower(item.symbol) &&
         toLower(wallet.address) === toLower(item.address)
     )
   }
+}
 
-  return item
+const filterFullHistory = (item: TFullTxInfo): TFullTxInfo | boolean => {
+  const getCurrencies = getItem('txHistoryCurrencies')
+  const getAddresses = getItem('txHistoryAddresses')
+  const getStatus = getItem('txHistoryStatus')
+
+  if (!getCurrencies && !getAddresses && !getStatus) {
+    return item
+  }
+
+  const filterByStatus = getStatus ? filterHistoryByStatus(item, getStatus) : item
+  const filterByCurrencies = filterHistoryByCurrencies(getCurrencies, getAddresses, item)
+
+  return filterByStatus && filterByCurrencies
 }
 
 export const getFullHistory = (): TFullTxInfo[] => {
