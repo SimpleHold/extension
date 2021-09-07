@@ -7,6 +7,10 @@ type TInfoColumnRowProps = {
   pt?: number
 }
 
+type TAmountProps = {
+  amount: number
+}
+
 const Wrapper = styled.div`
   height: 600px;
   overflow: hidden;
@@ -42,7 +46,7 @@ const Amount = styled.p`
   font-weight: bold;
   font-size: 23px;
   line-height: 27px;
-  color: #1d1d22;
+  color: ${({ amount }: TAmountProps) => (amount > 0 ? '#3FBB7D' : '#1D1D22')};
 `
 
 const Estimated = styled.p`

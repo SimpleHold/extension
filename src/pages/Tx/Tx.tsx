@@ -24,7 +24,7 @@ import clockIcon from '@assets/icons/clock.svg'
 
 // Utils
 import { short, toUpper, formatEstimated, price } from '@utils/format'
-import { getTransactionLink } from '@utils/currencies'
+import { getTransactionLink, getNetworkFeeSymbol } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
 import { getHistoryTxInfo } from '@utils/api'
 
@@ -43,18 +43,20 @@ const initialState: IState = {
   isLoadingError: false,
   activeDrawer: null,
   activeDrawerTabKey: 'senders',
+  feeSymbol: '',
 }
 
 const TxHistory: React.FC = () => {
   const history = useHistory()
   const {
-    state: { hash, symbol, chain },
+    state: { hash, address, symbol, chain, tokenChain, tokenSymbol, contractAddress },
   } = useLocation<ILocationState>()
 
-  const { state, updateState } = useState(initialState)
+  const { state, updateState } = useState({ ...initialState, feeSymbol: symbol })
 
   React.useEffect(() => {
     getTxInfo()
+    getFeeSymbol()
   }, [])
 
   React.useEffect(() => {
@@ -65,12 +67,16 @@ const TxHistory: React.FC = () => {
     }
   }, [state.isCopied])
 
+  const getFeeSymbol = (): void => {
+    updateState({ feeSymbol: getNetworkFeeSymbol(symbol, chain) })
+  }
+
   const getTxInfo = async (): Promise<void> => {
     if (state.isLoadingError) {
       updateState({ isLoadingError: false })
     }
 
-    const txInfo = await getHistoryTxInfo(hash, chain)
+    const txInfo = await getHistoryTxInfo(hash, chain, address, tokenSymbol, contractAddress)
 
     if (txInfo) {
       updateState({ txInfo })
@@ -80,7 +86,7 @@ const TxHistory: React.FC = () => {
   }
 
   const onViewTx = (): void => {
-    openWebPage(getTransactionLink(hash, symbol, chain))
+    openWebPage(getTransactionLink(hash, symbol, chain, tokenChain))
   }
 
   const onCopyHash = (): void => {
@@ -122,15 +128,17 @@ const TxHistory: React.FC = () => {
               <>
                 <Styles.Heading>
                   <Skeleton width={50} height={50} br={16} type="gray" isLoading={!state.txInfo}>
-                    <CurrencyLogo size={50} symbol={symbol} />
+                    <CurrencyLogo size={50} symbol={symbol} chain={tokenChain} />
                   </Skeleton>
                   <Styles.HeadingInfo>
                     <Skeleton width={160} height={27} br={5} type="gray" isLoading={!state.txInfo}>
                       {state.txInfo ? (
                         <Styles.AmountRow>
-                          <Styles.Amount>{`${numeral(state.txInfo.amount).format(
-                            '0.[000000]'
-                          )} ${toUpper(symbol)}`}</Styles.Amount>
+                          <Styles.Amount amount={state.txInfo.amount}>{`${
+                            state.txInfo.amount > 0 ? '+' : ''
+                          } ${numeral(state.txInfo.amount).format('0.[000000]')} ${toUpper(
+                            symbol
+                          )}`}</Styles.Amount>
                           {state.txInfo.isPending ? (
                             <Styles.PendingIcon>
                               <SVG src={clockIcon} width={16} height={16} />
@@ -172,7 +180,7 @@ const TxHistory: React.FC = () => {
                           isLoading={!state.txInfo}
                         >
                           <Styles.InfoBold>
-                            {state.txInfo?.fee} {toUpper(symbol)}
+                            {state.txInfo?.fee} {toUpper(state.feeSymbol)}
                           </Styles.InfoBold>
                         </Skeleton>
                         <Skeleton
