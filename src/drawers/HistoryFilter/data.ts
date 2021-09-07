@@ -2,8 +2,8 @@ import { TStatusItem, IState } from './types'
 
 export const statuses: TStatusItem[] = [
   {
-    title: 'Sended',
-    key: 'sended',
+    title: 'Sent',
+    key: 'sent',
   },
   {
     title: 'Received',

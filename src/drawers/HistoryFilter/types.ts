@@ -6,7 +6,7 @@ export interface Props {
   onApply: () => void
 }
 
-export type TStatuses = 'sended' | 'received' | 'pending'
+export type TStatuses = 'sent' | 'received' | 'pending'
 
 export type TStatusItem = {
   title: string
