@@ -26,7 +26,7 @@ import useState from '@hooks/useState'
 
 // Types
 import { TTxAddressItem, TFullTxWallet, TFullTxInfo, TTxWallet } from '@utils/api/types'
-import { IState } from './types'
+import { IState, TTxData } from './types'
 import { TCurrency } from '@drawers/HistoryFilter/types'
 
 // Styles
@@ -106,13 +106,15 @@ const TxHistory: React.FC = () => {
 
       if (compare.length) {
         const mapData: TFullTxWallet[] = data.map((item: TTxAddressItem) => {
-          const { chain, address, txs, symbol } = item
+          const { chain, address, txs, symbol, tokenSymbol, contractAddress } = item
 
           return {
             chain,
             address,
             symbol,
             txs,
+            tokenSymbol,
+            contractAddress,
           }
         })
 
@@ -138,12 +140,8 @@ const TxHistory: React.FC = () => {
     updateState({ activeDrawer: 'filters' })
   }
 
-  const openTx = (symbol: string, chain: string, hash: string) => (): void => {
-    history.push('/tx', {
-      symbol,
-      chain,
-      hash,
-    })
+  const openTx = (data: TTxData) => (): void => {
+    history.push('/tx', data)
   }
 
   const getNameWallet = (symbol: string, address: string): string => {
@@ -212,12 +210,25 @@ const TxHistory: React.FC = () => {
                 </Styles.GroupDateRow>
 
                 {data.map((tx: TFullTxInfo) => {
-                  const { hash, amount, estimated, chain, isPending, symbol, address } = tx
+                  const {
+                    hash,
+                    amount,
+                    estimated,
+                    chain,
+                    isPending,
+                    symbol,
+                    address,
+                    tokenSymbol,
+                    contractAddress,
+                    date,
+                  } = tx
+
                   const walletName = getNameWallet(symbol, address)
+                  const tokenChain = tokenSymbol ? chain : undefined
 
                   return (
                     <HistoryItem
-                      key={hash}
+                      key={`${hash}/${date}/${amount}`}
                       data={{
                         symbol,
                         hash,
@@ -225,8 +236,17 @@ const TxHistory: React.FC = () => {
                         amount,
                         estimated,
                         isPending,
+                        tokenChain,
                       }}
-                      onClick={openTx(symbol, chain, hash)}
+                      onClick={openTx({
+                        symbol,
+                        address,
+                        chain,
+                        hash,
+                        tokenChain,
+                        tokenSymbol,
+                        contractAddress,
+                      })}
                     />
                   )
                 })}

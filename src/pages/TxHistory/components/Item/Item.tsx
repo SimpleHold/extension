@@ -76,9 +76,9 @@ const Item: React.FC<Props> = (props) => {
                   <SVG src={clockIcon} width={12} height={12} />
                 </Styles.PendingIcon>
               ) : null}
-              <Styles.Amount>{`${numeral(amount).format('0.[000000]')} ${toUpper(
-                symbol
-              )}`}</Styles.Amount>
+              <Styles.Amount amount={amount}>{`${amount > 0 ? '+' : ''} ${numeral(amount).format(
+                '0.[000000]'
+              )} ${toUpper(symbol)}`}</Styles.Amount>
             </Styles.AmountRow>
             <Styles.Estimated>
               {`$ ${formatEstimated(estimated, price(estimated))}`}

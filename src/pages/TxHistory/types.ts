@@ -8,3 +8,13 @@ export interface IState {
   wallets: IWallet[]
   isNotFound: boolean
 }
+
+export type TTxData = {
+  symbol: string
+  address: string
+  chain: string
+  hash: string
+  tokenChain?: string
+  tokenSymbol?: string
+  contractAddress?: string
+}
