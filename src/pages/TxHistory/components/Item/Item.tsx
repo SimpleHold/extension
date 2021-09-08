@@ -8,7 +8,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import HardwareLogo from '@components/HardwareLogo'
 
 // Utils
-import { toUpper, short, formatEstimated, price } from '@utils/format'
+import { toUpper, short, price } from '@utils/format'
 
 // Assets
 import clockIcon from '@assets/icons/clock.svg'
@@ -80,9 +80,7 @@ const Item: React.FC<Props> = (props) => {
                 '0.[000000]'
               )} ${toUpper(symbol)}`}</Styles.Amount>
             </Styles.AmountRow>
-            <Styles.Estimated>
-              {`$ ${formatEstimated(estimated, price(estimated))}`}
-            </Styles.Estimated>
+            <Styles.Estimated>{`$ ${price(estimated)}`}</Styles.Estimated>
           </Styles.Balances>
         </Styles.Row>
       </Styles.Container>

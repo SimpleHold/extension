@@ -216,10 +216,10 @@ export const compareFullHistory = (items: TTxAddressItem[]): TTxAddressItem[] =>
 export const saveFullHistory = (txs: TFullTxInfo[]): void => {
   const getHistory = getJSON('full_history')
 
-  if (getHistory) {
+  if (getHistory?.length) {
     const nonPendintTxs = txs.filter((tx: TFullTxInfo) => !tx.isPending)
     const getNewTxs = nonPendintTxs.filter((newTx: TFullTxInfo) => {
-      return !JSON.parse(getHistory).find(
+      return !getHistory.find(
         (tx: TFullTxInfo) =>
           toLower(tx.hash) === toLower(newTx.hash) && toLower(tx.chain) === toLower(newTx.chain)
       )
