@@ -23,6 +23,8 @@ import * as neblio from '@utils/currencies/neblio'
 import * as nuls from '@utils/currencies/nuls'
 import * as nerve from '@utils/currencies/nerve'
 import * as tron from '@utils/currencies/tron'
+import * as hedera from '@utils/currencies/hedera'
+import * as zilliqa from '@utils/currencies/zilliqa'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -59,6 +61,14 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (theta.coins.indexOf(symbol) !== -1) {
       return theta
+    }
+
+    if (hedera.coins.indexOf(symbol) !== -1) {
+      return hedera
+    }
+
+    if (zilliqa.coins.indexOf(symbol) !== -1) {
+      return zilliqa
     }
 
     return null

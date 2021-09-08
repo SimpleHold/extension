@@ -23,6 +23,7 @@
     "@babel/runtime": "^7.12.5",
     "@emurgo/cardano-serialization-lib-browser": "^7.0.0",
     "@ethereumjs/tx": "^3.3.0",
+    "@hashgraph/sdk": "^2.0.30",
     "@ledgerhq/hw-app-btc": "^6.1.0",
     "@ledgerhq/hw-app-eth": "^6.1.0",
     "@ledgerhq/hw-app-xrp": "^6.1.0",
