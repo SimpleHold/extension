@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 
 import txHistoryIcon from '@assets/icons/txHistory.svg'
+import txLoadingIcon from '@assets/icons/txLoading.svg'
 
 const Wrapper = styled.div`
   height: 600px;
@@ -90,7 +91,7 @@ const EmptyHistoryText = styled.p`
   font-size: 16px;
   line-height: 23px;
   text-align: center;
-  color: #7d7e8d;
+  color: #1d1d22;
 `
 
 const TxList = styled.div`
@@ -108,6 +109,53 @@ const ButtonDot = styled.div`
   border-radius: 3px;
 `
 
+const Loading = styled.div`
+  position: relative;
+`
+
+const LoadingBackground = styled.div`
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.2) 100%);
+  position: absolute;
+  top: 0;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  padding: 120px 0 0 0;
+`
+
+const LoadingImageRow = styled.div`
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const LoadingImage = styled.div`
+  width: 46px;
+  height: 50px;
+  background-image: url(${txLoadingIcon});
+  background-repeat: no-repeat;
+  background-size: contain;
+  position: relative;
+
+  & > div {
+    position: absolute;
+    top: 30px;
+    right: 2px;
+  }
+`
+
+const LoadingText = styled.p`
+  margin: 20px 0 0 0;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 23px;
+  color: #1d1d22;
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -122,6 +170,11 @@ const Styles = {
   EmptyHistoryText,
   TxList,
   ButtonDot,
+  Loading,
+  LoadingBackground,
+  LoadingImageRow,
+  LoadingImage,
+  LoadingText,
 }
 
 export default Styles

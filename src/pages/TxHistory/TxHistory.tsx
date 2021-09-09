@@ -9,6 +9,7 @@ import Cover from '@components/Cover'
 import DividerLine from '@components/DividerLine'
 import HistoryItem from './components/Item'
 import Skeleton from '@components/Skeleton'
+import Spinner from '@components/Spinner'
 
 // Drawers
 import HistoryFilterDrawer from '@drawers/HistoryFilter'
@@ -179,7 +180,7 @@ const TxHistory: React.FC = () => {
   )
 
   const renderLoading = () => (
-    <>
+    <Styles.Loading>
       <Styles.Group>
         <Styles.GroupDateRow>
           <Skeleton width={50} height={16} br={5} type="gray" isLoading />
@@ -193,7 +194,16 @@ const TxHistory: React.FC = () => {
             </Styles.TxList>
           ))}
       </Styles.Group>
-    </>
+      <Styles.LoadingBackground>
+        <Styles.LoadingImageRow>
+          <Styles.LoadingImage>
+            <Spinner size={18} />
+          </Styles.LoadingImage>
+        </Styles.LoadingImageRow>
+
+        <Styles.LoadingText>Loading...</Styles.LoadingText>
+      </Styles.LoadingBackground>
+    </Styles.Loading>
   )
 
   const renderHistory = () => {
