@@ -173,8 +173,8 @@ const TxHistory: React.FC = () => {
       <Styles.EmptyHistoryIcon />
       <Styles.EmptyHistoryText>
         {isFiltersActive()
-          ? 'Nothing was found for the specified parameters'
-          : 'Your transaction history will be displayed here'}
+          ? 'We couldn’t find anything matching selected criteria'
+          : 'You have no transactions yet, but new ones will appear here'}
       </Styles.EmptyHistoryText>
     </Styles.EmptyHistory>
   )
@@ -201,7 +201,7 @@ const TxHistory: React.FC = () => {
           </Styles.LoadingImage>
         </Styles.LoadingImageRow>
 
-        <Styles.LoadingText>Loading...</Styles.LoadingText>
+        <Styles.LoadingText>Please wait, we’re uploading data</Styles.LoadingText>
       </Styles.LoadingBackground>
     </Styles.Loading>
   )
