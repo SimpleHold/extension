@@ -405,3 +405,24 @@ export const renameWallet = (uuid: string, name: string) => {
     }
   }
 }
+
+export const getWalletChain = (symbol: string, chain?: string): string => {
+  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+
+  if (currency) {
+    return currency?.chain
+  }
+
+  return ''
+}
+
+export const getUnique = (wallets: IWallet[]): IWallet[] => {
+  return wallets.filter(
+    (v, i, a) =>
+      a.findIndex((wallet: IWallet) => wallet.symbol === v.symbol && wallet.chain === v.chain) === i
+  )
+}
+
+export const sortAlphabetically = (a: IWallet, b: IWallet): number => {
+  return a.symbol.localeCompare(b.symbol)
+}

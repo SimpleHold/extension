@@ -7,7 +7,7 @@ const Wrapper = styled.div`
 
 const Container = styled.div`
   background-color: #ffffff;
-  border-radius: 5px 5px 0 0;
+  border-radius: 16px 16px 0 0;
   height: 540px;
   display: flex;
   flex-direction: column;

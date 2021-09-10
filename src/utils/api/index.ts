@@ -13,6 +13,12 @@ import {
   TPhishingSite,
   TAddressTx,
   TCustomFee,
+  TTxWallet,
+  THistoryTx,
+  TTxAddressItem,
+  TFullTxHistoryResponse,
+  TFullTxWallet,
+  TFullTxInfo,
 } from './types'
 
 export const getBalance = async (
@@ -403,4 +409,89 @@ export const sendFeedback = async (
       rating,
     })
   } catch {}
+}
+
+export const getWarning = async (symbol: string, chain?: string): Promise<string | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/wallet/warning`, {
+      params: {
+        symbol,
+        chain,
+      },
+    })
+
+    if (data?.data) {
+      return data.data
+    }
+
+    return null
+  } catch {
+    return null
+  }
+}
+
+export const getFullTxHistory = async (wallets: TTxWallet[]): Promise<TTxAddressItem[]> => {
+  try {
+    const { data }: AxiosResponse<TFullTxHistoryResponse> = await axios.post(
+      `${config.serverUrl}/transaction/full-history`,
+      {
+        wallets,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    return data?.data || []
+  } catch {
+    return []
+  }
+}
+
+export const getFullTxHistoryInfo = async (wallets: TFullTxWallet[]): Promise<TFullTxInfo[]> => {
+  try {
+    const { data }: AxiosResponse = await axios.post(
+      `${config.serverUrl}/transaction/full-history-info`,
+      {
+        wallets,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    return data?.data || []
+  } catch {
+    return []
+  }
+}
+
+export const getHistoryTxInfo = async (
+  hash: string,
+  chain: string,
+  address: string,
+  tokenSymbol?: string,
+  contractAddress?: string
+): Promise<THistoryTx | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(
+      `${config.serverUrl}/transaction/hash/${hash}`,
+      {
+        params: {
+          chain,
+          address,
+          tokenSymbol,
+          contractAddress,
+        },
+      }
+    )
+
+    return data?.data || null
+  } catch {
+    return null
+  }
 }

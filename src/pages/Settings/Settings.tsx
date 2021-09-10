@@ -19,7 +19,7 @@ import { sha256hash } from '@utils/crypto'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getManifest } from '@utils/extension'
-import { getItem, setItem, removeItem, removeMany } from '@utils/storage'
+import { getItem, setItem, removeItem, removeCache } from '@utils/storage'
 
 // Config
 import { BACKUP_SETTINGS, PASSCODE_ENABLED, PASSCODE_DISABLED } from '@config/events'
@@ -128,15 +128,7 @@ const Settings: React.FC = () => {
   }
 
   const onConfirmLogout = (): void => {
-    removeMany([
-      'wallets',
-      'backup',
-      'activeSortKey',
-      'activeSortType',
-      'zeroBalancesFilter',
-      'hiddenWalletsFilter',
-      'selectedCurrenciesFilter',
-    ])
+    removeCache()
     history.push('/welcome')
   }
 

@@ -4,12 +4,15 @@ import tooltipArrowIcon from '@assets/icons/tooltipArrow.svg'
 
 type TContainerProps = {
   mt?: number
+  left?: number
+  zIndex: number
 }
 
 type TTooltipProps = {
   direction?: 'left' | 'right'
   maxWidth?: number
   textSpace?: string
+  arrowLeft?: number
 }
 
 const scale = keyframes`
@@ -29,7 +32,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   filter: drop-shadow(0px 3px 15px rgba(125, 126, 141, 0.2));
-  z-index: 2;
+  z-index: ${({ zIndex }: TContainerProps) => zIndex};
 
   &:hover {
     cursor: pointer;
@@ -39,6 +42,7 @@ const Container = styled.div`
       top: ${({ mt }: TContainerProps) =>
         `calc(100% + 9px + ${typeof mt !== 'undefined' ? mt : 0}px)`};
       animation: ${scale} 0.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+      left: ${({ left }: TContainerProps) => (left ? `${left}px` : 'initial')};
     }
   }
 `
@@ -63,8 +67,8 @@ const Tooltip = styled.div`
     width: 18px;
     height: 9px;
     background-image: url(${tooltipArrowIcon});
-    left: ${({ direction }: TTooltipProps) =>
-      direction === 'right' ? 'initial' : 'calc(100% / 2 - 9px)'};
+    left: ${({ direction, arrowLeft }: TTooltipProps) =>
+      arrowLeft ? `${arrowLeft}px` : direction === 'right' ? 'initial' : 'calc(100% / 2 - 9px)'};
     right: ${({ direction }: TTooltipProps) => (direction === 'right' ? '20px' : 'initial')};
     bottom: 100%;
   }
