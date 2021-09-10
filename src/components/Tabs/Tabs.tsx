@@ -1,19 +1,10 @@
 import * as React from 'react'
 
+// Types
+import { Props, TTab } from './types'
+
 // Styles
 import Styles from './styles'
-
-type TTab = {
-  title: string
-  key: string
-  renderItem: React.ReactElement<any, any> | null
-}
-
-interface Props {
-  tabs: TTab[]
-  activeTabKey: string
-  onSelectTab: (tabKey: string) => () => void
-}
 
 const Tabs: React.FC<Props> = (props) => {
   const { tabs, activeTabKey, onSelectTab } = props
@@ -22,12 +13,19 @@ const Tabs: React.FC<Props> = (props) => {
     <Styles.Container>
       <Styles.Tabs>
         {tabs.map((tab: TTab) => {
-          const { title, key } = tab
+          const { title, key, badge } = tab
           const isActive = activeTabKey === key
 
           return (
             <Styles.Tab key={key} onClick={onSelectTab(key)} isActive={isActive}>
-              <Styles.TabTitle>{title}</Styles.TabTitle>
+              <Styles.TabRow>
+                <Styles.TabTitle>{title}</Styles.TabTitle>
+                {badge !== undefined ? (
+                  <Styles.Badge isActive={isActive}>
+                    <Styles.BadgeText>{badge}</Styles.BadgeText>
+                  </Styles.Badge>
+                ) : null}
+              </Styles.TabRow>
             </Styles.Tab>
           )
         })}

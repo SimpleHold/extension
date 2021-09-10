@@ -10,5 +10,5 @@ export interface IState {
   totalBalance: null | number
   totalEstimated: null | number
   pendingBalance: null | number
-  activeDrawer: null | 'sort' | 'filters'
+  activeDrawer: null | 'filters'
 }

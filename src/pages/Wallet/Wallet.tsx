@@ -15,7 +15,7 @@ import PrivateKeyDrawer from '@drawers/PrivateKey'
 import RenameWalletDrawer from '@drawers/RenameWallet'
 
 // Utils
-import { getBalance, getTxsInfo } from '@utils/api'
+import { getBalance, getTxsInfo, getWarning } from '@utils/api'
 import {
   IWallet,
   updateBalance,
@@ -64,6 +64,7 @@ const initialState: IState = {
   privateKey: null,
   walletName: '',
   isHiddenWallet: false,
+  warning: null,
 }
 
 const WalletPage: React.FC = () => {
@@ -92,6 +93,7 @@ const WalletPage: React.FC = () => {
     loadBalance()
     getTxHistory()
     getName()
+    getWalletWarning()
   }, [])
 
   React.useEffect(() => {
@@ -99,6 +101,14 @@ const WalletPage: React.FC = () => {
       updateState({ isBalanceRefreshing: false })
     }
   }, [state.balance, state.estimated, state.isBalanceRefreshing])
+
+  const getWalletWarning = async () => {
+    const warning = await getWarning(symbol, chain)
+
+    if (warning) {
+      updateState({ warning })
+    }
+  }
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const withPhrase = checkWithPhrase(symbol)
@@ -149,14 +159,11 @@ const WalletPage: React.FC = () => {
           const getFullTxHistoryInfo = await getTxsInfo(currency.chain, address, compare)
           saveTxs(address, currency.chain, getFullTxHistoryInfo, tokenSymbol, contractAddress)
         }
-
-        const txHistory = groupTxs(
-          getExistTxs(address, currency.chain, tokenSymbol, contractAddress)
-        )
-        updateState({ txHistory })
-      } else {
-        updateState({ txHistory: [] })
       }
+
+      const txHistory = groupTxs(getExistTxs(address, currency.chain, tokenSymbol, contractAddress))
+
+      updateState({ txHistory })
     }
   }
 
@@ -258,6 +265,8 @@ const WalletPage: React.FC = () => {
     updateState({ password })
   }
 
+  const isShowXrpWarning = state.balance !== null && state.balance < 20 && toLower(symbol) === 'xrp'
+
   return (
     <>
       <Styles.Wrapper>
@@ -285,7 +294,7 @@ const WalletPage: React.FC = () => {
               address={address}
               tokenName={tokenName}
             />
-            {state.balance !== null && state.balance < 20 && toLower(symbol) === 'xrp' ? (
+            {isShowXrpWarning ? (
               <Warning
                 text="You need at least 20 XRP to activate your XRP address. This amount is reserved according to the network’s requirement, it can not be sent to another address"
                 color="#7D7E8D"
@@ -293,6 +302,16 @@ const WalletPage: React.FC = () => {
                 mt={10}
                 padding="8px 10px"
                 background="rgba(189, 196, 212, 0.2)"
+              />
+            ) : null}
+            {state.warning ? (
+              <Warning
+                text={state.warning}
+                color="#EB5757"
+                br={8}
+                mt={10}
+                padding="8px 10px"
+                background="#FCE6E6"
               />
             ) : null}
           </Styles.Row>

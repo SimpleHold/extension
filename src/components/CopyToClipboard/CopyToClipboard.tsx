@@ -11,10 +11,11 @@ interface Props {
   children: React.ReactElement<any, any> | null
   value: string
   onCopy?: () => void
+  zIndex?: number
 }
 
 const CopyToClipboard: React.FC<Props> = (props) => {
-  const { children, value, onCopy: onCopySuccess } = props
+  const { children, value, onCopy: onCopySuccess, zIndex } = props
 
   const [isCopied, setIsCopied] = React.useState<boolean>(false)
 
@@ -34,7 +35,7 @@ const CopyToClipboard: React.FC<Props> = (props) => {
   }
 
   return (
-    <Tooltip text={isCopied ? 'Copied!' : 'Сopy to clipboard'}>
+    <Tooltip text={isCopied ? 'Copied!' : 'Сopy to clipboard'} zIndex={zIndex}>
       <Styles.Container onMouseLeave={onMouseLeave}>
         <Styles.Row onClick={onCopy}>{children}</Styles.Row>
       </Styles.Container>

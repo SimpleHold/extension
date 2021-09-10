@@ -6,7 +6,7 @@ import SVG from 'react-inlinesvg'
 import Styles from './styles'
 
 interface Props {
-  title: string
+  title?: string
   children: React.ReactElement<any, any> | null
   isActive: boolean
   onClose: (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
@@ -14,6 +14,7 @@ interface Props {
   openFrom?: string
   withCloseIcon?: boolean
   padding?: string
+  height?: number
 }
 
 const BackgroundStyles = {
@@ -24,7 +25,17 @@ const BackgroundStyles = {
 }
 
 const DrawerWrapper: React.FC<Props> = (props) => {
-  const { title, children, isActive, onClose, icon, openFrom, withCloseIcon, padding } = props
+  const {
+    title,
+    children,
+    isActive,
+    onClose,
+    icon,
+    openFrom,
+    withCloseIcon,
+    padding,
+    height,
+  } = props
 
   const nodeRef = React.useRef(null)
 
@@ -58,6 +69,7 @@ const DrawerWrapper: React.FC<Props> = (props) => {
           <Styles.Drawer
             openFrom={openFrom}
             padding={padding}
+            height={height}
             style={{
               ...drawerStyle[state],
             }}
@@ -67,7 +79,8 @@ const DrawerWrapper: React.FC<Props> = (props) => {
                 <Styles.Icon src={icon} alt="icon" />
               </Styles.IconRow>
             ) : null}
-            <Styles.Title>{title}</Styles.Title>
+            {title ? <Styles.Title>{title}</Styles.Title> : null}
+
             {withCloseIcon ? (
               <Styles.CloseIconRow onClick={onClose}>
                 <SVG src="../../assets/icons/times.svg" width={16} height={16} />

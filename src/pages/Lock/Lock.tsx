@@ -15,7 +15,7 @@ import { download as downloadBackup } from '@utils/backup'
 import { validatePassword } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
 import { openWebPage } from '@utils/extension'
-import { getItem, removeItem, removeMany } from '@utils/storage'
+import { getItem, removeItem, removeCache } from '@utils/storage'
 
 // Config
 import { LOG_OUT_CACHE, PASSWORD_AFTER_LOG_OUT, SUCCESS_ENTER } from '@config/events'
@@ -86,16 +86,7 @@ const Lock: React.FC = () => {
         name: LOG_OUT_CACHE,
       })
 
-      removeMany([
-        'backup',
-        'wallets',
-        'isLocked',
-        'activeSortKey',
-        'activeSortType',
-        'zeroBalancesFilter',
-        'hiddenWalletsFilter',
-        'selectedCurrenciesFilter',
-      ])
+      removeCache()
 
       history.push('/welcome')
     }

@@ -3,6 +3,7 @@ import styled from 'styled-components'
 type TDrawerProps = {
   openFrom?: string
   padding?: string
+  height?: number
 }
 
 type TBackgroundProps = {
@@ -14,7 +15,7 @@ const Wrapper = styled.div``
 const Background = styled.div`
   position: ${({ openFrom }: TBackgroundProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
   backdrop-filter: blur(2px);
-  z-index: 10;
+  z-index: 100;
   background-color: rgba(29, 29, 34, 0.2);
   top: 0;
   left: 0;
@@ -26,11 +27,12 @@ const Background = styled.div`
 
 const Drawer = styled.div`
   background-color: #ffffff;
-  border-radius: 8px 8px 0px 0px;
+  border-radius: 16px 16px 0px 0px;
   padding: ${({ padding }: TDrawerProps) => padding || '30px'};
   word-break: break-word;
   position: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
-  z-index: 11;
+  height: ${({ height }: TDrawerProps) => (height ? `${height}px` : 'auto')};
+  z-index: 101;
   left: 0;
   bottom: 0;
   width: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? '315px' : '100%')};

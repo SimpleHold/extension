@@ -7,7 +7,6 @@ import WalletCard from '@components/WalletCard'
 import CollapsibleHeader from '@components/CollapsibleHeader'
 
 // Drawers
-import SortWalletsDrawer from '@drawers/SortWallets'
 import FilterWalletsDrawer from '@drawers/FilterWallets'
 
 // Hooks
@@ -150,10 +149,6 @@ const Wallets: React.FC = () => {
     setWalletsPending((prevArray: number[]) => [...prevArray, amount])
   }
 
-  const onShowDrawer = (activeDrawer: 'sort' | 'filters'): void => {
-    updateState({ activeDrawer })
-  }
-
   const onCloseDrawer = (): void => {
     updateState({ activeDrawer: null })
   }
@@ -179,6 +174,14 @@ const Wallets: React.FC = () => {
     return ''
   }
 
+  const onViewTxHistory = (): void => {
+    history.push('/tx-history')
+  }
+
+  const openFilters = (): void => {
+    updateState({ activeDrawer: 'filters' })
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -187,8 +190,9 @@ const Wallets: React.FC = () => {
           balance={state.totalBalance}
           estimated={state.totalEstimated}
           pendingBalance={state.pendingBalance}
-          onShowDrawer={onShowDrawer}
           isDrawersActive={state.activeDrawer !== null}
+          onViewTxHistory={onViewTxHistory}
+          openFilters={openFilters}
         />
         {state.wallets !== null ? (
           <Styles.WalletsList>
@@ -242,11 +246,6 @@ const Wallets: React.FC = () => {
           </Styles.WalletsList>
         ) : null}
       </Styles.Wrapper>
-      <SortWalletsDrawer
-        isActive={state.activeDrawer === 'sort'}
-        onClose={onCloseDrawer}
-        onApply={onApplyDrawer}
-      />
       <FilterWalletsDrawer
         isActive={state.activeDrawer === 'filters'}
         onClose={onCloseDrawer}

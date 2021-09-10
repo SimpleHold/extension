@@ -4,6 +4,8 @@ import { v4 } from 'uuid'
 import { IWallet } from '@utils/wallet'
 import { validateWallet } from '@utils/validate'
 
+const pjson = require('../../package.json')
+
 type TGenerateCurrency = {
   symbol: string
   chain?: string
@@ -21,7 +23,7 @@ export const generate = (currencies: TGenerateCurrency[]): { [key: string]: stri
 
   const backup: TBackup = {
     wallets: [],
-    version: '1.12.2',
+    version: pjson.version,
     uuid: v4(),
   }
 
