@@ -64,8 +64,14 @@ export const groupHistory = (txs: TFullTxInfo[]): THistoryTxGroup[] => {
   }
 
   const data: THistoryTxGroup[] = []
-  const groupByMonth = (item: TFullTxInfo) => dayjs(item.date, 'YYYY-MM-DD').format('YYYY-MM-DD')
-  const result = groupBy(txs, groupByMonth)
+
+  const sortTxs = txs.sort(
+    (a: TFullTxInfo, b: TFullTxInfo) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  )
+
+  const result = groupBy(sortTxs, (item: TFullTxInfo) =>
+    dayjs(item.date, 'YYYY-MM-DD').format('YYYY-MM-DD')
+  )
 
   for (const i in result) {
     data.push({

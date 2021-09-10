@@ -157,7 +157,7 @@ const TxHistory: React.FC = () => {
                     >
                       {state.txInfo ? (
                         <Styles.Estimated>
-                          {`$ ${formatEstimated(
+                          {`$ ${state.txInfo.estimated > 0 ? '+' : ''} ${formatEstimated(
                             state.txInfo.estimated,
                             price(state.txInfo.estimated)
                           )}`}

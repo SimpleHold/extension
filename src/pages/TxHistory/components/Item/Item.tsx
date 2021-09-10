@@ -80,7 +80,9 @@ const Item: React.FC<Props> = (props) => {
                 '0.[000000]'
               )} ${toUpper(symbol)}`}</Styles.Amount>
             </Styles.AmountRow>
-            <Styles.Estimated>{`$ ${price(estimated)}`}</Styles.Estimated>
+            <Styles.Estimated>{`$ ${estimated > 0 ? '+' : ''} ${price(
+              estimated
+            )}`}</Styles.Estimated>
           </Styles.Balances>
         </Styles.Row>
       </Styles.Container>
