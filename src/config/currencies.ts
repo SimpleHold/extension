@@ -211,8 +211,8 @@ const currencies: ICurrency[] = [
     logo: hbarLogo,
     background: '#343439',
     chain: 'hedera',
-    minSendAmount: 1000000, // Fix me
-    isCustomFee: false, // Check me me
+    minSendAmount: 1000,
+    isCustomFee: false,
   },
 ]
 

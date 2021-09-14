@@ -20,31 +20,33 @@ import { setUserProperties } from '@utils/amplitude'
 import { toLower, toUpper } from '@utils/format'
 import { importPrivateKey } from '@utils/currencies'
 import { getTokensBalance } from '@utils/api'
-import { ITokensBalance } from '@utils/api/types'
 import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
+
+// Hooks
+import useState from '@hooks/useState'
 
 // Config
 import tokens, { IToken } from '@config/tokens'
 import { getCurrencyByChain, ICurrency } from '@config/currencies'
 
+// Types
+import { IState, LocationState } from './types'
+import { ITokensBalance } from '@utils/api/types'
+
 // Styles
 import Styles from './styles'
 
-interface LocationState {
-  symbol: string
-  chain?: string
-  tokenName?: string
-  contractAddress?: string
-  decimals?: number
+const initialState: IState = {
+  privateKey: '',
+  activeDrawer: null,
+  errorLabel: null,
+  password: '',
+  isImportButtonLoading: false,
 }
 
 const ImportPrivateKey: React.FC = () => {
-  const [privateKey, setPrivateKey] = React.useState<string>('')
-  const [activeDrawer, setActiveDrawer] = React.useState<null | 'confirm' | 'success'>(null)
-  const [errorLabel, setErrorLabel] = React.useState<null | string>(null)
-  const [password, setPassword] = React.useState<string>('')
-  const [isImportButtonLoading, setImportButtonLoading] = React.useState<boolean>(false)
+  const { state, updateState } = useState<IState>(initialState)
 
   const history = useHistory()
   const {
@@ -64,36 +66,38 @@ const ImportPrivateKey: React.FC = () => {
   }, [])
 
   const onConfirm = async (isSkipFindTokens?: boolean): Promise<void> => {
-    if (errorLabel) {
-      setErrorLabel(null)
+    if (state.errorLabel) {
+      updateState({ errorLabel: null })
     }
 
-    const getAddress = importPrivateKey(symbol, privateKey, chain)
+    updateState({ isImportButtonLoading: true })
+    const getAddress = await importPrivateKey(symbol, state.privateKey, chain)
+    updateState({ isImportButtonLoading: false })
 
     if (getAddress) {
       const checkExist = checkExistWallet(getAddress, symbol, chain)
 
       if (checkExist) {
-        return setErrorLabel('This address has already been added')
+        return updateState({ errorLabel: 'This address has already been added' })
       }
 
       if (chain && !isSkipFindTokens) {
-        return await findAddressTokens(getAddress, privateKey)
+        return await findAddressTokens(getAddress, state.privateKey)
       }
-      return setActiveDrawer('confirm')
+      return updateState({ activeDrawer: 'confirm' })
     }
 
-    return setErrorLabel('Invalid private key')
+    return updateState({ errorLabel: 'Invalid private key' })
   }
 
   const findAddressTokens = async (address: string, privateKey: string): Promise<void> => {
     if (chain) {
-      setImportButtonLoading(true)
+      updateState({ isImportButtonLoading: true })
 
       const data = await getTokensBalance(address, chain)
       const filterData = data?.filter((item) => toLower(item.symbol) !== toLower(symbol))
 
-      setImportButtonLoading(false)
+      updateState({ isImportButtonLoading: false })
       const wallets = getWallets()
 
       if (filterData?.length && wallets) {
@@ -140,13 +144,13 @@ const ImportPrivateKey: React.FC = () => {
     return [symbol]
   }
 
-  const onConfirmDrawer = (): void => {
+  const onConfirmDrawer = async (): Promise<void> => {
     const backup = getItem('backup')
 
-    if (backup && privateKey) {
-      const decryptBackup = decrypt(backup, password)
+    if (backup && state.privateKey) {
+      const decryptBackup = decrypt(backup, state.password)
       if (decryptBackup) {
-        const address = importPrivateKey(symbol, privateKey, chain)
+        const address = await importPrivateKey(symbol, state.privateKey, chain)
 
         if (address) {
           const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
@@ -154,9 +158,9 @@ const ImportPrivateKey: React.FC = () => {
 
           const walletsList = addNewWallet(
             address,
-            privateKey,
+            state.privateKey,
             decryptBackup,
-            password,
+            state.password,
             currenciesList,
             false,
             chain,
@@ -173,23 +177,32 @@ const ImportPrivateKey: React.FC = () => {
             ).length
             setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
-            return setActiveDrawer('success')
+            return updateState({ activeDrawer: 'success' })
           }
         }
       }
     }
-    return setErrorLabel('Password is not valid')
+
+    return updateState({ errorLabel: 'Password is not valid' })
   }
 
   const onDownloadBackup = (): void => {
     return history.replace('/download-backup', {
-      password,
+      password: state.password,
       from: 'privateKey',
     })
   }
 
   const onCloseDrawer = (): void => {
-    setActiveDrawer(null)
+    updateState({ activeDrawer: null })
+  }
+
+  const setPrivateKey = (privateKey: string): void => {
+    updateState({ privateKey })
+  }
+
+  const setPassword = (password: string): void => {
+    updateState({ password })
   }
 
   return (
@@ -213,9 +226,9 @@ const ImportPrivateKey: React.FC = () => {
           <Styles.Form>
             <TextInput
               label="Enter key"
-              value={privateKey}
+              value={state.privateKey}
               onChange={setPrivateKey}
-              errorLabel={errorLabel}
+              errorLabel={state.errorLabel}
               inputRef={textInputRef}
               type="text"
             />
@@ -223,29 +236,29 @@ const ImportPrivateKey: React.FC = () => {
               <Button label="Back" isLight onClick={history.goBack} mr={7.5} />
               <Button
                 label="Import"
-                disabled={!privateKey.length}
+                disabled={!state.privateKey.length}
                 onClick={onConfirm}
                 ml={7.5}
-                isLoading={isImportButtonLoading}
+                isLoading={state.isImportButtonLoading}
               />
             </Styles.Actions>
           </Styles.Form>
         </Styles.Container>
       </Styles.Wrapper>
       <ConfirmDrawer
-        isActive={activeDrawer === 'confirm'}
+        isActive={state.activeDrawer === 'confirm'}
         onClose={onCloseDrawer}
         title="Please enter your password to add a new address"
         inputLabel="Enter password"
-        textInputValue={password}
-        isButtonDisabled={!validatePassword(password)}
+        textInputValue={state.password}
+        isButtonDisabled={!validatePassword(state.password)}
         onConfirm={onConfirmDrawer}
         onChangeText={setPassword}
         textInputType="password"
-        inputErrorLabel={errorLabel}
+        inputErrorLabel={state.errorLabel}
       />
       <SuccessDrawer
-        isActive={activeDrawer === 'success'}
+        isActive={state.activeDrawer === 'success'}
         onClose={onDownloadBackup}
         text="The new address has been successfully added!"
       />

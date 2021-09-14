@@ -104,7 +104,7 @@ const NewWallet: React.FC = () => {
     return [symbol]
   }
 
-  const onConfirm = (): void => {
+  const onConfirm = async (): Promise<void> => {
     if (validatePassword(state.password)) {
       const backup = getItem('backup')
 
@@ -120,7 +120,7 @@ const NewWallet: React.FC = () => {
               address = tryImportPhrase.address
             }
           } else {
-            address = importPrivateKey(symbol, state.privateKey, chain)
+            address = await importPrivateKey(symbol, state.privateKey, chain)
           }
 
           if (address) {

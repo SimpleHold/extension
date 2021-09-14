@@ -7,6 +7,7 @@ import { TAccount } from './types'
 const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' })
 
 export const coins: string[] = ['trx']
+export const isInternalTx = true
 
 const ten6 = new BigNumber(10).pow(6)
 

@@ -4,13 +4,14 @@ import { TCustomFee } from '@utils/api/types'
 export type TProvider = {
   generateWallet: () => Promise<TGenerateAddress | null> | TGenerateAddress | null
   validateAddress?: (address: string) => boolean
-  importPrivateKey?: (privateKey: string) => string | null
+  importPrivateKey?: (privateKey: string) => string | null | Promise<string | null>
   getExplorerLink?: (address: string) => string
   getTransactionLink?: (hash: string) => string
   importRecoveryPhrase?: (recoveryPhrase: string) => TGenerateAddress | null
   generateExtraId?: () => string
   getStandingFee?: () => number | null
   formatValue: (value: string | number, type: 'from' | 'to') => number
+  isInternalTx?: boolean
 }
 
 export type TCreateTransactionProps = {

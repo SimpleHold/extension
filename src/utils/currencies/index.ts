@@ -94,15 +94,15 @@ export const generate = async (
   return bitcoinLike.generateWallet(symbol)
 }
 
-export const importPrivateKey = (
+export const importPrivateKey = async (
   symbol: string,
   privateKey: string,
   chain?: string
-): string | null => {
+): Promise<string | null> => {
   const provider = getProvider(symbol)
 
   if (provider?.importPrivateKey) {
-    return provider.importPrivateKey(privateKey)
+    return await provider.importPrivateKey(privateKey)
   }
 
   if (isEthereumLike(symbol, chain)) {
@@ -447,10 +447,13 @@ export const checkWithZeroFee = (symbol: string): boolean => {
 }
 
 export const checkIsInternalTx = (symbol: string): boolean => {
-  const isThetaLike = theta.coins.indexOf(symbol) !== -1
-  const isTron = tron.coins.indexOf(symbol) !== -1
+  const provider = getProvider(symbol)
 
-  return isThetaLike || isTron
+  if (provider?.isInternalTx) {
+    return true
+  }
+
+  return false
 }
 
 export const createInternalTx = async (
@@ -467,6 +470,10 @@ export const createInternalTx = async (
 
     if (tron.coins.indexOf(symbol) !== -1) {
       return await tron.createTransaction(addressFrom, addressTo, amount, privateKey)
+    }
+
+    if (hedera.coins.indexOf(symbol) !== -1) {
+      return await hedera.createTransaction(addressFrom, addressTo, amount, privateKey)
     }
 
     return null

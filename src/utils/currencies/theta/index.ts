@@ -5,6 +5,7 @@ import { BigNumber } from 'bignumber.js'
 import { fromEther } from '@utils/currencies/ethereumLike'
 
 export const coins = ['theta', 'tfuel']
+export const isInternalTx = true
 
 const ten18 = new BigNumber(10).pow(18)
 
