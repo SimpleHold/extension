@@ -82,5 +82,5 @@ export const validateAddress = (address: string): boolean => {
 }
 
 export const getStandingFee = (): number => {
-  return 0.00021
+  return 0.005
 }
