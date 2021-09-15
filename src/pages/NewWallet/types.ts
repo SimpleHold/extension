@@ -9,9 +9,8 @@ export interface ILocationState {
 }
 
 export interface IState {
-  privateKey: null | string
   activeDrawer: null | 'confirm' | 'success'
   password: string
   errorLabel: null | string
-  mnemonic: null | string
+  isButtonLoading: boolean
 }

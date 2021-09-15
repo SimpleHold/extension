@@ -70,9 +70,15 @@ const ImportPrivateKey: React.FC = () => {
       updateState({ errorLabel: null })
     }
 
-    updateState({ isImportButtonLoading: true })
+    if (symbol === 'hbar') {
+      updateState({ isImportButtonLoading: true })
+    }
+
     const getAddress = await importPrivateKey(symbol, state.privateKey, chain)
-    updateState({ isImportButtonLoading: false })
+
+    if (symbol === 'hbar') {
+      updateState({ isImportButtonLoading: false })
+    }
 
     if (getAddress) {
       const checkExist = checkExistWallet(getAddress, symbol, chain)

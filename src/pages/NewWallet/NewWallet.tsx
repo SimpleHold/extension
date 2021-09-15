@@ -40,11 +40,10 @@ import { ILocationState, IState } from './types'
 import Styles from './styles'
 
 const initialState: IState = {
-  privateKey: null,
   activeDrawer: null,
   password: '',
   errorLabel: null,
-  mnemonic: null,
+  isButtonLoading: false,
 }
 
 const NewWallet: React.FC = () => {
@@ -68,17 +67,7 @@ const NewWallet: React.FC = () => {
       name: ADD_ADDRESS_GENERATE,
     })
 
-    const generateAddress = await generate(symbol, chain)
-
-    if (generateAddress) {
-      const { privateKey, mnemonic } = generateAddress
-
-      if (mnemonic) {
-        updateState({ mnemonic })
-      }
-
-      updateState({ privateKey, activeDrawer: 'confirm' })
-    }
+    updateState({ activeDrawer: 'confirm' })
   }
 
   const onImportPrivateKey = (): void => {
@@ -106,62 +95,73 @@ const NewWallet: React.FC = () => {
 
   const onConfirm = async (): Promise<void> => {
     if (validatePassword(state.password)) {
-      const backup = getItem('backup')
+      updateState({ isButtonLoading: true })
 
-      if (backup && state.privateKey) {
-        const decryptBackup = decrypt(backup, state.password)
+      const generateAddress = await generate(symbol, chain)
 
-        if (decryptBackup) {
-          let address
+      if (generateAddress) {
+        const { privateKey, mnemonic } = generateAddress
 
-          if (state.mnemonic) {
-            const tryImportPhrase = importRecoveryPhrase(symbol, state.mnemonic)
-            if (tryImportPhrase) {
-              address = tryImportPhrase.address
+        const backup = getItem('backup')
+
+        if (backup && privateKey) {
+          const decryptBackup = decrypt(backup, state.password)
+
+          if (decryptBackup) {
+            let address
+
+            if (mnemonic) {
+              const tryImportPhrase = importRecoveryPhrase(symbol, mnemonic)
+              if (tryImportPhrase) {
+                address = tryImportPhrase.address
+              }
+            } else {
+              address = await importPrivateKey(symbol, privateKey, chain)
             }
-          } else {
-            address = await importPrivateKey(symbol, state.privateKey, chain)
-          }
 
-          if (address) {
-            const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
-            const currenciesList = getCurrenciesList(getCurrencyInfo)
+            if (address) {
+              updateState({ isButtonLoading: false })
 
-            const walletsList = addNewWallet(
-              address,
-              state.privateKey,
-              decryptBackup,
-              state.password,
-              currenciesList,
-              false,
-              chain,
-              tokenName,
-              contractAddress,
-              decimals,
-              state.mnemonic
-            )
+              const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
+              const currenciesList = getCurrenciesList(getCurrencyInfo)
 
-            if (walletsList) {
-              const walletAmount = JSON.parse(walletsList).filter(
-                (wallet: IWallet) => wallet.symbol === symbol
-              ).length
+              const walletsList = addNewWallet(
+                address,
+                privateKey,
+                decryptBackup,
+                state.password,
+                currenciesList,
+                false,
+                chain,
+                tokenName,
+                contractAddress,
+                decimals,
+                mnemonic
+              )
 
-              setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
+              if (walletsList) {
+                const walletAmount = JSON.parse(walletsList).filter(
+                  (wallet: IWallet) => wallet.symbol === symbol
+                ).length
 
-              logEvent({
-                name: ADD_ADDRESS_CONFIRM,
-              })
+                setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
-              setItem('backupStatus', 'notDownloaded')
+                logEvent({
+                  name: ADD_ADDRESS_CONFIRM,
+                })
 
-              updateState({ privateKey: null, activeDrawer: 'success' })
-              return
+                setItem('backupStatus', 'notDownloaded')
+
+                updateState({ activeDrawer: 'success' })
+                return
+              }
             }
           }
         }
       }
+
+      updateState({ isButtonLoading: false, errorLabel: 'Password is not valid' })
     }
-    updateState({ errorLabel: 'Password is not valid' })
   }
 
   const onDownloadBackup = (): void => {
@@ -252,6 +252,7 @@ const NewWallet: React.FC = () => {
         onChangeText={setPassword}
         textInputType="password"
         inputErrorLabel={state.errorLabel}
+        isButtonLoading={state.isButtonLoading}
       />
       <SuccessDrawer
         isActive={state.activeDrawer === 'success'}
