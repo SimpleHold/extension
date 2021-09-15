@@ -202,8 +202,8 @@ const currencies: ICurrency[] = [
     logo: zilLogo,
     background: '#59D0C9',
     chain: 'zilliqa',
-    minSendAmount: 1000000, // Fix me
-    isCustomFee: false, // Check me me
+    minSendAmount: 1000000,
+    isCustomFee: false,
   },
   {
     name: 'Hedera Hashgraph',

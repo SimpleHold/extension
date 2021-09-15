@@ -4,6 +4,9 @@ import { BigNumber } from 'bignumber.js'
 // Utils
 import { fromEther } from '@utils/currencies/ethereumLike'
 
+// Types
+import { TInternalTxProps } from '../types'
+
 export const coins = ['theta', 'tfuel']
 export const isInternalTx = true
 
@@ -59,24 +62,24 @@ export const getBalance = async (
   }
 }
 
-export const createTransaction = async (
-  currency: string,
-  from: string,
-  to: string,
-  amount: string | number,
-  privateKey: string
-): Promise<string | null> => {
+export const createInternalTx = async ({
+  symbol,
+  addressFrom,
+  addressTo,
+  amount,
+  privateKey,
+}: TInternalTxProps): Promise<string | null> => {
   try {
     const thetaWeiToSend =
-      currency === 'theta' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
+      symbol === 'theta' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
     const tfuelWeiToSend =
-      currency === 'tfuel' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
+      symbol === 'tfuel' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
 
     const transaction = new thetajs.transactions.SendTransaction({
-      from,
+      addressFrom,
       outputs: [
         {
-          address: to,
+          address: addressTo,
           thetaWei: thetaWeiToSend,
           tfuelWei: tfuelWeiToSend,
         },

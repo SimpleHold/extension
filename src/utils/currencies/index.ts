@@ -124,8 +124,7 @@ export const validateAddress = (symbol: string, address: string, tokenChain?: st
       return bitcoinLike.validateAddress(address, symbol)
     }
 
-    // @ts-ignore
-    return new RegExp(tokenChain ? addressValidate.eth : addressValidate[symbol])?.test(address)
+    return addressValidate(symbol, address, tokenChain)
   } catch {
     return false
   }
@@ -464,16 +463,10 @@ export const createInternalTx = async (
   privateKey: string
 ): Promise<string | null> => {
   try {
-    if (theta.coins.indexOf(symbol) !== -1) {
-      return await theta.createTransaction(symbol, addressFrom, addressTo, amount, privateKey)
-    }
+    const provider = getProvider(symbol)
 
-    if (tron.coins.indexOf(symbol) !== -1) {
-      return await tron.createTransaction(addressFrom, addressTo, amount, privateKey)
-    }
-
-    if (hedera.coins.indexOf(symbol) !== -1) {
-      return await hedera.createTransaction(addressFrom, addressTo, amount, privateKey)
+    if (provider?.createInternalTx) {
+      return await provider.createInternalTx({ symbol, addressFrom, addressTo, amount, privateKey })
     }
 
     return null

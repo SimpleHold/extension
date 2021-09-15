@@ -12,6 +12,7 @@ export type TProvider = {
   getStandingFee?: () => number | null
   formatValue: (value: string | number, type: 'from' | 'to') => number
   isInternalTx?: boolean
+  createInternalTx?: (props: TInternalTxProps) => Promise<string | null>
 }
 
 export type TCreateTransactionProps = {
@@ -69,4 +70,12 @@ export type TGetFeeData = {
   utxos?: UnspentOutput[] | CardanoUnspentTxOutput[]
   currencyBalance?: number
   fees?: TCustomFees[]
+}
+
+export type TInternalTxProps = {
+  symbol: string
+  addressFrom: string
+  addressTo: string
+  amount: number
+  privateKey: string
 }

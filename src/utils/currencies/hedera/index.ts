@@ -4,6 +4,9 @@ import { Buffer } from 'buffer'
 // Utils
 import { activateAccount, getHederaAccountId } from '@utils/api'
 
+// Types
+import { TInternalTxProps } from '../types'
+
 export const coins: string[] = ['hbar']
 export const isInternalTx = true
 
@@ -50,18 +53,18 @@ export const getTransactionLink = (hash: string): string => {
   return `https://app.dragonglass.me/hedera/search?q=${hash}`
 }
 
-export const createTransaction = async (
-  fromAddress: string,
-  toAddress: string,
-  amount: number,
-  privateKey: string
-): Promise<string | null> => {
+export const createInternalTx = async ({
+  addressFrom,
+  addressTo,
+  amount,
+  privateKey,
+}: TInternalTxProps): Promise<string | null> => {
   try {
-    const client = Client.forMainnet().setOperator(fromAddress, PrivateKey.fromString(privateKey))
+    const client = Client.forMainnet().setOperator(addressFrom, PrivateKey.fromString(privateKey))
 
     const transferTransactionResponse = await new TransferTransaction()
-      .addHbarTransfer(fromAddress, Hbar.from(-Math.abs(amount), HbarUnit.Hbar))
-      .addHbarTransfer(toAddress, Hbar.from(Number(amount), HbarUnit.Hbar))
+      .addHbarTransfer(addressFrom, Hbar.from(-Math.abs(amount), HbarUnit.Hbar))
+      .addHbarTransfer(addressTo, Hbar.from(Number(amount), HbarUnit.Hbar))
       .execute(client)
 
     return Buffer.from(transferTransactionResponse.transactionHash).toString('hex')
