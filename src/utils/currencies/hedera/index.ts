@@ -2,7 +2,7 @@ import { PrivateKey, Hbar, HbarUnit, Client, TransferTransaction } from '@hashgr
 import { Buffer } from 'buffer'
 
 // Utils
-import { activateAccount, getHederaAccountId } from '@utils/api'
+import { getHederaAccountId } from '@utils/api'
 
 // Types
 import { TInternalTxProps } from '../types'
@@ -22,16 +22,11 @@ export const generateWallet = async (): Promise<TGenerateAddress | null> => {
   try {
     const newKey = PrivateKey.generate()
 
-    const getAddress = await activateAccount('hedera', `${newKey.publicKey}`)
-
-    if (getAddress) {
-      return {
-        address: getAddress,
-        privateKey: `${newKey}`,
-      }
+    return {
+      address: '',
+      privateKey: `${newKey}`,
+      isNotActivated: true,
     }
-
-    return null
   } catch {
     return null
   }

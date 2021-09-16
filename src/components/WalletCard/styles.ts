@@ -1,5 +1,9 @@
 import styled from 'styled-components'
 
+type TRowProps = {
+  gridColumns: string
+}
+
 const Container = styled.div`
   background-color: #ffffff;
   border-radius: 16px;
@@ -29,7 +33,7 @@ const Container = styled.div`
 
 const Row = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: ${({ gridColumns }: TRowProps) => gridColumns};
   gap: 18px;
   margin: 0 0 0 15px;
 `
@@ -108,6 +112,21 @@ const Estimated = styled.p`
   color: #7d7e8d;
 `
 
+const ActivateBlock = styled.div`
+  padding: 2px 8px;
+  background-color: #e9f7f0;
+  border-radius: 5px;
+  margin: 5px 0 0 0;
+  width: fit-content;
+`
+
+const ActivateLabel = styled.p`
+  margin: 0;
+  font-size: 12px;
+  line-height: 14px;
+  color: #3fbb7d;
+`
+
 const Styles = {
   Container,
   Row,
@@ -121,6 +140,8 @@ const Styles = {
   PendingIcon,
   Balance,
   Estimated,
+  ActivateBlock,
+  ActivateLabel,
 }
 
 export default Styles

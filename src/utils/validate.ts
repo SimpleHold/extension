@@ -12,8 +12,10 @@ export const validateWallet = (wallets: string | null) => {
   const parseWallets = JSON.parse(wallets)
 
   if (parseWallets) {
-    const totalWallets = parseWallets.length
-    const filterWallets = parseWallets.filter((wallet: IWallet) => wallet.address && wallet.symbol)
+    const totalWallets = parseWallets.filter((wallet: IWallet) => !wallet.isNotActivated).length
+    const filterWallets = parseWallets
+      .filter((wallet: IWallet) => !wallet.isNotActivated)
+      .filter((wallet: IWallet) => wallet.address && wallet.symbol)
 
     return filterWallets.length === totalWallets
   }

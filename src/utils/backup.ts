@@ -12,7 +12,7 @@ type TGenerateCurrency = {
   data: TGenerateAddress
 }
 
-type TBackup = {
+export type TBackup = {
   wallets: IWallet[]
   version: string
   uuid: string

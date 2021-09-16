@@ -199,6 +199,7 @@ const Wallets: React.FC = () => {
                     isHidden,
                     uuid,
                     hardware,
+                    isNotActivated,
                   } = wallet
 
                   const walletName = getNameWallet(wallet)
@@ -219,6 +220,7 @@ const Wallets: React.FC = () => {
                       walletName={walletName}
                       uuid={uuid}
                       hardware={hardware}
+                      isNotActivated={isNotActivated}
                     />
                   )
                 })

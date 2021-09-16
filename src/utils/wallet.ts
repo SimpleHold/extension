@@ -10,6 +10,9 @@ import { getItem, setItem } from '@utils/storage'
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
+// Types
+import { TBackup } from '@utils/backup'
+
 export type THardware = {
   path: string
   label: string
@@ -33,6 +36,7 @@ export interface IWallet {
   mnemonic?: string
   walletName?: string
   hardware?: THardware
+  isNotActivated?: boolean
 }
 
 type TSelectedWalletFilter = {
@@ -214,7 +218,8 @@ export const addNew = (
   tokenName?: string,
   contractAddress?: string,
   decimals?: number,
-  mnemonic?: string | null
+  mnemonic?: string | null,
+  isNotActivated?: boolean
 ): string | null => {
   const parseBackup = JSON.parse(decryptBackup)
 
@@ -246,6 +251,7 @@ export const addNew = (
         contractAddress: getContractAddress,
         decimals: getDecimals,
         createdAt: new Date(),
+        isNotActivated,
       }
 
       parseWallets.push(data)
@@ -428,4 +434,40 @@ export const getUnique = (wallets: IWallet[]): IWallet[] => {
 
 export const sortAlphabetically = (a: IWallet, b: IWallet): number => {
   return a.symbol.localeCompare(b.symbol)
+}
+
+export const activateAddress = (
+  uuid: string,
+  address: string,
+  backup: string,
+  password: string
+): void => {
+  const wallets = getWallets()
+
+  if (wallets) {
+    const findWalletIndex = wallets.findIndex(
+      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+    )
+
+    if (findWalletIndex !== -1) {
+      wallets[findWalletIndex].address = address
+      delete wallets[findWalletIndex].isNotActivated
+      setItem('wallets', JSON.stringify(wallets))
+    }
+  }
+
+  const parseBackup: TBackup | null = JSON.parse(backup)
+
+  if (parseBackup) {
+    const findWalletIndex = parseBackup.wallets.findIndex(
+      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+    )
+
+    if (findWalletIndex !== -1) {
+      parseBackup.wallets[findWalletIndex].address = address
+      delete parseBackup.wallets[findWalletIndex].isNotActivated
+
+      setItem('backup', encrypt(JSON.stringify(parseBackup), password))
+    }
+  }
 }

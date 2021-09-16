@@ -41,6 +41,15 @@ interface Props {
   walletName: string
   uuid: string
   hardware?: THardware
+  isNotActivated?: boolean
+}
+
+const emptyData = {
+  balance: 0,
+  balance_usd: 0,
+  balance_btc: 0,
+  pending: 0,
+  pending_btc: 0,
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -59,6 +68,7 @@ const WalletCard: React.FC<Props> = (props) => {
     walletName,
     uuid,
     hardware,
+    isNotActivated,
   } = props
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
@@ -75,12 +85,9 @@ const WalletCard: React.FC<Props> = (props) => {
   }, [])
 
   const fetchBalance = async (): Promise<void> => {
-    const { balance, balance_usd, balance_btc, pending, pending_btc } = await getBalance(
-      address,
-      currency?.chain || chain,
-      tokenSymbol,
-      contractAddress
-    )
+    const { balance, balance_usd, balance_btc, pending, pending_btc } = isNotActivated
+      ? emptyData
+      : await getBalance(address, currency?.chain || chain, tokenSymbol, contractAddress)
 
     const latestBalance = getLatestBalance(address, chain)
 
@@ -134,13 +141,14 @@ const WalletCard: React.FC<Props> = (props) => {
       walletName,
       uuid,
       hardware,
+      isNotActivated,
     })
   }
 
   return (
     <Styles.Container onClick={openWallet}>
       <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
-      <Styles.Row>
+      <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>
         <Styles.AddressInfo>
           <Styles.CurrencyInfo>
             {hardware ? (
@@ -154,28 +162,43 @@ const WalletCard: React.FC<Props> = (props) => {
             ) : null}
             <Styles.WalletName className="wallet-name">{walletName}</Styles.WalletName>
           </Styles.CurrencyInfo>
-          <Styles.Address>{address}</Styles.Address>
+          {isNotActivated ? (
+            <Styles.ActivateBlock>
+              <Styles.ActivateLabel>Need activation</Styles.ActivateLabel>
+            </Styles.ActivateBlock>
+          ) : (
+            <Styles.Address>{address}</Styles.Address>
+          )}
         </Styles.AddressInfo>
-        <Styles.Balances>
-          <Skeleton width={110} height={16} type="gray" br={4} isLoading={balance === null}>
-            <Styles.BalanceRow>
-              {pendingBalance !== 0 ? (
-                <Styles.PendingIcon>
-                  <SVG src={clockIcon} width={12} height={12} />
-                </Styles.PendingIcon>
-              ) : null}
-              <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
-                symbol
-              )}`}</Styles.Balance>
-            </Styles.BalanceRow>
-          </Skeleton>
-          <Skeleton width={80} height={16} type="gray" mt={7} br={4} isLoading={estimated === null}>
-            <Styles.Estimated>{`$ ${formatEstimated(
-              estimated,
-              numberFriendly(estimated)
-            )}`}</Styles.Estimated>
-          </Skeleton>
-        </Styles.Balances>
+        {!isNotActivated ? (
+          <Styles.Balances>
+            <Skeleton width={110} height={16} type="gray" br={4} isLoading={balance === null}>
+              <Styles.BalanceRow>
+                {pendingBalance !== 0 ? (
+                  <Styles.PendingIcon>
+                    <SVG src={clockIcon} width={12} height={12} />
+                  </Styles.PendingIcon>
+                ) : null}
+                <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
+                  symbol
+                )}`}</Styles.Balance>
+              </Styles.BalanceRow>
+            </Skeleton>
+            <Skeleton
+              width={80}
+              height={16}
+              type="gray"
+              mt={7}
+              br={4}
+              isLoading={estimated === null}
+            >
+              <Styles.Estimated>{`$ ${formatEstimated(
+                estimated,
+                numberFriendly(estimated)
+              )}`}</Styles.Estimated>
+            </Skeleton>
+          </Styles.Balances>
+        ) : null}
       </Styles.Row>
     </Styles.Container>
   )

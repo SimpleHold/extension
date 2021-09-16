@@ -66,6 +66,7 @@ type TGenerateAddress = {
   address: string
   privateKey: string
   mnemonic?: string
+  isNotActivated?: boolean
 }
 
 type TCreatedTransaction = {

@@ -100,7 +100,7 @@ const NewWallet: React.FC = () => {
       const generateAddress = await generate(symbol, chain)
 
       if (generateAddress) {
-        const { privateKey, mnemonic } = generateAddress
+        const { privateKey, mnemonic, isNotActivated } = generateAddress
 
         const backup = getItem('backup')
 
@@ -119,14 +119,14 @@ const NewWallet: React.FC = () => {
               address = await importPrivateKey(symbol, privateKey, chain)
             }
 
-            if (address) {
+            if (address || isNotActivated) {
               updateState({ isButtonLoading: false })
 
               const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
               const currenciesList = getCurrenciesList(getCurrencyInfo)
 
               const walletsList = addNewWallet(
-                address,
+                address || '',
                 privateKey,
                 decryptBackup,
                 state.password,
@@ -136,7 +136,8 @@ const NewWallet: React.FC = () => {
                 tokenName,
                 contractAddress,
                 decimals,
-                mnemonic
+                mnemonic,
+                isNotActivated
               )
 
               if (walletsList) {
