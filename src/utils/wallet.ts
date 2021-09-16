@@ -155,18 +155,21 @@ export const updateBalance = (
   }
 }
 
-export const getLatestBalance = (address: string): number => {
+export const getLatestBalance = (address: string, chain?: string): number | null => {
   const wallets = getWallets()
 
   if (wallets) {
-    const findWallet = wallets.find((wallet: IWallet) => wallet.address === address)
+    const findWallet = wallets.find(
+      (wallet: IWallet) =>
+        toLower(wallet.address) === toLower(address) && toLower(wallet.chain) === toLower(chain)
+    )
 
     if (findWallet) {
-      return findWallet.balance || 0
+      return findWallet.balance || null
     }
   }
 
-  return 0
+  return null
 }
 
 export const checkExistWallet = (address: string, symbol: string, chain?: string): boolean => {

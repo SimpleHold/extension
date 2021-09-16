@@ -20,9 +20,13 @@ import { getItem, getJSON, setItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { addHardwareWallet, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
+import { logEvent } from '@utils/amplitude'
 
 // Hooks
 import useState from '@hooks/useState'
+
+// Config
+import { HARDWARE_CONNECT } from '@config/events'
 
 // Types
 import { TSelectedAddress, IState } from './types'
@@ -70,10 +74,26 @@ const ConnectLedger: React.FC = () => {
 
   const onClose = (): void => {
     window.close()
+
+    logEvent({
+      name: HARDWARE_CONNECT,
+      properties: {
+        kind: 'ledger',
+        result: 'close',
+      },
+    })
   }
 
   const onConnect = async () => {
     const ledgerTransport = await requestTransport()
+
+    logEvent({
+      name: HARDWARE_CONNECT,
+      properties: {
+        kind: 'ledger',
+        result: 'success',
+      },
+    })
 
     if (ledgerTransport) {
       updateState({ ledgerTransport })

@@ -15,7 +15,7 @@ import { logEvent } from '@utils/amplitude'
 import refreshIcon from '@assets/icons/refresh.svg'
 
 // Config
-import { ADDRESS_COPY } from '@config/events'
+import { ADDRESS_ACTION } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -60,7 +60,10 @@ const WalletCard: React.FC<Props> = (props) => {
     setIsCopied(true)
 
     logEvent({
-      name: ADDRESS_COPY,
+      name: ADDRESS_ACTION,
+      properties: {
+        addressAction: 'copy',
+      },
     })
   }
 

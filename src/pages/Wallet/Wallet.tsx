@@ -42,7 +42,7 @@ import { logEvent } from '@utils/amplitude'
 // Config
 import { getCurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
-import { ADDRESS_RECEIVE_SEND } from '@config/events'
+import { ADDRESS_ACTION } from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -168,11 +168,12 @@ const WalletPage: React.FC = () => {
   }
 
   const openPage = (url: string) => () => {
-    if (url === '/send') {
-      logEvent({
-        name: ADDRESS_RECEIVE_SEND,
-      })
-    }
+    logEvent({
+      name: ADDRESS_ACTION,
+      properties: {
+        addressAction: url === '/send' ? 'send' : 'receive',
+      },
+    })
 
     history.push(url, {
       ...locationState,
@@ -203,6 +204,13 @@ const WalletPage: React.FC = () => {
     if (state.balance !== null && state.estimated !== null) {
       updateState({ balance: null, estimated: null, isBalanceRefreshing: true })
       loadBalance()
+
+      logEvent({
+        name: ADDRESS_ACTION,
+        properties: {
+          addressAction: 'refreshBalance',
+        },
+      })
     }
   }
 
@@ -249,6 +257,13 @@ const WalletPage: React.FC = () => {
   const onRenameWallet = (walletName: string) => (): void => {
     updateState({ activeDrawer: null, walletName })
     renameWallet(uuid, walletName)
+
+    logEvent({
+      name: ADDRESS_ACTION,
+      properties: {
+        addressAction: 'renameWallet',
+      },
+    })
   }
 
   const openTx = (hash: string) => async (): Promise<void> => {

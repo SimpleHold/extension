@@ -43,12 +43,16 @@ import {
 } from '@utils/ledger'
 import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
 import { minus } from '@utils/format'
+import { logEvent } from '@utils/amplitude'
 
 // Hooks
 import useState from '@hooks/useState'
 
 // Assets
 import errorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
+
+// Config
+import { TRANSACTION_CANCEL, TRANSACTION_CONFIRM, TRANSACTION_PASSWORD } from '@config/events'
 
 // Types
 import { IState, TLedgerTxParams } from './types'
@@ -213,6 +217,13 @@ const SendConfirmation: React.FC = () => {
       removeItem('sendPageProps')
     }
 
+    logEvent({
+      name: TRANSACTION_CANCEL,
+      properties: {
+        stage: 'confirm',
+      },
+    })
+
     browser.runtime.sendMessage({
       type: 'close_select_address_window',
     })
@@ -224,6 +235,13 @@ const SendConfirmation: React.FC = () => {
     if (state.activeDrawer === 'fail') {
       updateState({ activeDrawer: null })
     }
+
+    logEvent({
+      name: TRANSACTION_CONFIRM,
+      properties: {
+        stage: state.props?.hardware ? 'hConfirmation' : 'confirmation',
+      },
+    })
 
     if (state.props?.hardware) {
       if (state.props.hardware.type === 'ledger') {
@@ -334,6 +352,13 @@ const SendConfirmation: React.FC = () => {
   const onCloseDrawer = (): void => {
     updateState({ activeDrawer: null })
 
+    logEvent({
+      name: TRANSACTION_CANCEL,
+      properties: {
+        stage: 'password',
+      },
+    })
+
     if (state.ledgerDrawerState) {
       updateState({ ledgerDrawerState: null })
     }
@@ -381,6 +406,13 @@ const SendConfirmation: React.FC = () => {
         outputs,
         extraId,
       } = state.props
+
+      logEvent({
+        name: TRANSACTION_PASSWORD,
+        properties: {
+          symbol,
+        },
+      })
 
       const decryptBackup = decrypt(backup, state.password)
 

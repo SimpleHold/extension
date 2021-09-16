@@ -10,11 +10,13 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getBalance } from '@utils/api'
 import { toUpper, numberFriendly, formatEstimated } from '@utils/format'
-import { updateBalance, THardware } from '@utils/wallet'
+import { updateBalance, THardware, getLatestBalance } from '@utils/wallet'
+import { logEvent } from '@utils/amplitude'
 
 // Config
 import { getToken } from '@config/tokens'
 import { getCurrency } from '@config/currencies'
+import { BALANCE_CHANGED, ADDRESS_WATCH } from '@config/events'
 
 // Assets
 import ledgerLogo from '@assets/icons/ledger.svg'
@@ -80,6 +82,17 @@ const WalletCard: React.FC<Props> = (props) => {
       contractAddress
     )
 
+    const latestBalance = getLatestBalance(address, chain)
+
+    if (latestBalance !== null && latestBalance !== balance) {
+      logEvent({
+        name: BALANCE_CHANGED,
+        properties: {
+          symbol,
+        },
+      })
+    }
+
     setBalance(balance)
     if (sumBalance) {
       sumBalance(balance_btc)
@@ -101,6 +114,14 @@ const WalletCard: React.FC<Props> = (props) => {
     if (handleClick) {
       return handleClick()
     }
+
+    logEvent({
+      name: ADDRESS_WATCH,
+      properties: {
+        symbol,
+      },
+    })
+
     history.push('/wallet', {
       name: currency?.name || name,
       symbol,

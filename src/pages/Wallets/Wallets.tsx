@@ -21,7 +21,7 @@ import { setBadgeText, getBadgeText } from '@utils/extension'
 import { clear } from '@utils/storage'
 
 // Config
-import { ADD_ADDRESS, BALANCE_CHANGED } from '@config/events'
+import { ADD_ADDRESS, FILTERS_WATCH, HISTORY_WATCH } from '@config/events'
 
 // Types
 import { ILocationState, IState } from './types'
@@ -91,23 +91,6 @@ const Wallets: React.FC = () => {
     }
   }, [walletsPending, state.pendingBalance])
 
-  React.useEffect(() => {
-    if (state.totalBalance !== null && state.totalEstimated !== null) {
-      const getLatesTotalBalance = state.wallets?.reduce((a, b) => {
-        if (b.balance_btc) {
-          return a + b.balance_btc
-        }
-        return 0
-      }, 0)
-
-      if (getLatesTotalBalance !== state.totalBalance) {
-        logEvent({
-          name: BALANCE_CHANGED,
-        })
-      }
-    }
-  }, [state.totalBalance, state.totalEstimated])
-
   const checkBadgeText = async () => {
     const text = await getBadgeText()
 
@@ -176,10 +159,18 @@ const Wallets: React.FC = () => {
 
   const onViewTxHistory = (): void => {
     history.push('/tx-history')
+
+    logEvent({
+      name: HISTORY_WATCH,
+    })
   }
 
   const openFilters = (): void => {
     updateState({ activeDrawer: 'filters' })
+
+    logEvent({
+      name: FILTERS_WATCH,
+    })
   }
 
   return (

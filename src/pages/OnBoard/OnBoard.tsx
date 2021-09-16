@@ -22,6 +22,9 @@ import { setItem } from '@utils/storage'
 import { getAllCookies, Cookie } from '@utils/extension'
 import { toLower } from '@utils/format'
 
+// Config
+import { ONBOARDING } from '@config/events'
+
 // Styles
 import Styles from './styles'
 
@@ -88,7 +91,10 @@ const OnBoard: React.FC = () => {
 
   React.useEffect(() => {
     logEvent({
-      name: `ONBOARDING_${currentStep + 1}`,
+      name: ONBOARDING,
+      properties: {
+        stage: currentStep + 1,
+      },
     })
   }, [currentStep])
 

@@ -39,10 +39,12 @@ import {
 } from '@utils/currencies'
 import { getItem, setItem, removeItem } from '@utils/storage'
 import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
+import { logEvent } from '@utils/amplitude'
 
 // Config
 import { getCurrency, ICurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
+import { TRANSACTION_AUTO_FILL, TRANSACTION_START, TRANSACTION_CANCEL } from '@config/events'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -466,6 +468,13 @@ const Send: React.FC = () => {
       removeItem('sendPageProps')
     }
 
+    logEvent({
+      name: TRANSACTION_CANCEL,
+      properties: {
+        stage: 'send',
+      },
+    })
+
     browser.runtime.sendMessage({
       type: 'close_select_address_window',
     })
@@ -500,6 +509,14 @@ const Send: React.FC = () => {
         hardware: state.selectedWallet?.hardware,
         isIncludeFee: state.isIncludeFee,
       }
+
+      logEvent({
+        name: TRANSACTION_START,
+        properties: {
+          fee: state.isIncludeFee ? 'incl' : 'excl',
+          speed: currency?.isCustomFee ? 'fixed' : state.feeType,
+        },
+      })
 
       if (state.timer) {
         clearTimeout(state.timer)
@@ -670,13 +687,16 @@ const Send: React.FC = () => {
     updateState({ extraId })
   }
 
-  const getNormalFee = (): number => {
-    return state.isIncludeFee ? 0 : state.fee
-  }
-
   const onSendAll = (): void => {
     if (state.balance) {
       updateState({ amount: `${state.balance}`, isIncludeFee: true })
+
+      logEvent({
+        name: TRANSACTION_AUTO_FILL,
+        properties: {
+          king: 'allFunds',
+        },
+      })
     }
   }
 
@@ -696,6 +716,13 @@ const Send: React.FC = () => {
 
   const openWalletsDrawer = (): void => {
     updateState({ activeDrawer: 'wallets' })
+
+    logEvent({
+      name: TRANSACTION_AUTO_FILL,
+      properties: {
+        king: 'myWallet',
+      },
+    })
   }
 
   const setFeeType = (feeType: TFeeTypes): void => {
