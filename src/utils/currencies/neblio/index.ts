@@ -3,7 +3,8 @@ import neblioLib from 'neblio-lib'
 // Utils
 import { toLower } from '@utils/format'
 
-export const coins = ['nebl']
+export const coins: string[] = ['nebl']
+export const isWithOutputs = true
 
 export const generateWallet = (): TGenerateAddress | null => {
   try {

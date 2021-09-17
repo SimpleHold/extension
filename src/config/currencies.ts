@@ -19,6 +19,7 @@ import nerveLogo from '@assets/currencies/nvt.svg'
 import tronLogo from '@assets/currencies/trx.svg'
 import zilLogo from '@assets/currencies/zil.svg'
 import hbarLogo from '@assets/currencies/hbar.svg'
+import xvgLogo from '@assets/currencies/xvg.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -212,6 +213,15 @@ const currencies: ICurrency[] = [
     background: '#343439',
     chain: 'hedera',
     minSendAmount: 1000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Verge',
+    symbol: 'xvg',
+    logo: xvgLogo,
+    background: '#6FBDDB',
+    chain: 'verge',
+    minSendAmount: 100000,
     isCustomFee: false,
   },
 ]

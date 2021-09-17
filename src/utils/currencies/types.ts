@@ -13,6 +13,7 @@ export type TProvider = {
   formatValue: (value: string | number, type: 'from' | 'to') => number
   isInternalTx?: boolean
   createInternalTx?: (props: TInternalTxProps) => Promise<string | null>
+  isWithOutputs?: boolean
 }
 
 export type TCreateTransactionProps = {

@@ -77,10 +77,12 @@ export const createInternalTx = async ({
     const nextNonce = (await zilliqa.blockchain.getBalance(fromAddress)).result.nonce + 1
     const getGasPrice = await zilliqa.blockchain.getMinimumGasPrice()
 
+    const formatAmount = new BigNumber(amount).multipliedBy(new BigNumber(10).pow(6)).toNumber()
+
     if (getGasPrice?.result) {
       const rawTx = zilliqa.transactions.new({
         version: Zilliqa.bytes.pack(1, 1),
-        amount: new Zilliqa.BN(Zilliqa.units.toQa(amount * 1000000, Zilliqa.units.Units.Li)),
+        amount: new Zilliqa.BN(Zilliqa.units.toQa(formatAmount, Zilliqa.units.Units.Li)),
         nonce: nextNonce,
         gasLimit: Zilliqa.Long.fromNumber(50),
         gasPrice: new Zilliqa.BN(getGasPrice.result),
