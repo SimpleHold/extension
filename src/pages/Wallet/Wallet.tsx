@@ -84,7 +84,6 @@ const WalletPage: React.FC = () => {
   const { state, updateState } = useState<IState>({
     ...initialState,
     isHiddenWallet: isHidden,
-    isNotActivated: locationState.isNotActivated || false,
     address: locationState.address,
   })
 
@@ -93,6 +92,7 @@ const WalletPage: React.FC = () => {
     getTxHistory()
     getName()
     getWalletWarning()
+    getWalletData()
   }, [])
 
   React.useEffect(() => {
@@ -100,6 +100,18 @@ const WalletPage: React.FC = () => {
       updateState({ isBalanceRefreshing: false })
     }
   }, [state.balance, state.estimated, state.isBalanceRefreshing])
+
+  const getWalletData = (): void => {
+    const currentWallet = getCurrentWallet()
+
+    if (currentWallet?.isNotActivated) {
+      updateState({ isNotActivated: true })
+    }
+
+    if (currentWallet?.address?.length) {
+      updateState({ address: currentWallet.address })
+    }
+  }
 
   const getWalletWarning = async () => {
     const warning = await getWarning(symbol, chain)
@@ -112,6 +124,16 @@ const WalletPage: React.FC = () => {
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const withPhrase = checkWithPhrase(symbol)
   const tokenSymbol = chain ? symbol : undefined
+
+  const getCurrentWallet = (): IWallet | undefined => {
+    const walletsList = getWallets()
+
+    if (walletsList) {
+      return walletsList.find((wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid))
+    }
+
+    return undefined
+  }
 
   const getName = (): void => {
     const walletsList = getWallets()
@@ -197,6 +219,7 @@ const WalletPage: React.FC = () => {
       tokenChain: chain,
       chain: currency?.chain,
       currency,
+      address: state.address,
     })
   }
 
@@ -273,6 +296,7 @@ const WalletPage: React.FC = () => {
                   isNotActivated: false,
                   activeDrawer: null,
                   password: '',
+                  address: getAddress,
                 })
               }
             }

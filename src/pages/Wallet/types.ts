@@ -13,7 +13,6 @@ export interface ILocationState {
   decimals?: number
   isHidden?: boolean
   hardware: THardware
-  isNotActivated?: boolean
 }
 
 export interface IState {

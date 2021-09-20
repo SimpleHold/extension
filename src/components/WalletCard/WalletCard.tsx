@@ -141,7 +141,6 @@ const WalletCard: React.FC<Props> = (props) => {
       walletName,
       uuid,
       hardware,
-      isNotActivated,
     })
   }
 
