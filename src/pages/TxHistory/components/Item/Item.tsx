@@ -77,7 +77,7 @@ const Item: React.FC<Props> = (props) => {
                 </Styles.PendingIcon>
               ) : null}
               <Styles.Amount amount={amount}>{`${amount > 0 ? '+' : ''} ${
-                amount < 0.000001 ? '< 0.000001' : numeral(amount).format('0.[000000]')
+                Math.abs(amount) < 0.000001 ? '< 0.000001' : numeral(amount).format('0.[000000]')
               } ${toUpper(symbol)}`}</Styles.Amount>
             </Styles.AmountRow>
             <Styles.Estimated>{`$ ${estimated > 0 ? '+' : ''} ${price(
