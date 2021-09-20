@@ -59,6 +59,9 @@ const Lock: React.FC = () => {
         if (decryptWallet) {
           logEvent({
             name: SUCCESS_ENTER,
+            properties: {
+              security: 'password',
+            },
           })
           removeItem('isLocked')
           return history.replace('/wallets', {

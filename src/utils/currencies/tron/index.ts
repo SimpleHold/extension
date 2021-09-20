@@ -3,10 +3,12 @@ import BigNumber from 'bignumber.js'
 
 // Types
 import { TAccount } from './types'
+import { TInternalTxProps } from '../types'
 
 const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' })
 
 export const coins: string[] = ['trx']
+export const isInternalTx = true
 
 const ten6 = new BigNumber(10).pow(6)
 
@@ -55,17 +57,17 @@ export const validateAddress = (address: string): boolean => {
   }
 }
 
-export const createTransaction = async (
-  fromAddress: string,
-  toAddress: string,
-  amount: number,
-  privateKey: string
-): Promise<string | null> => {
+export const createInternalTx = async ({
+  addressFrom,
+  addressTo,
+  amount,
+  privateKey,
+}: TInternalTxProps): Promise<string | null> => {
   try {
     const sendTrx = await tronWeb.transactionBuilder.sendTrx(
-      toAddress,
+      addressTo,
       formatValue(amount, 'to'),
-      fromAddress,
+      addressFrom,
       1
     )
     const signedtxn = await tronWeb.trx.sign(sendTrx, privateKey)

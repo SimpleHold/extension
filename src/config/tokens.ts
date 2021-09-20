@@ -18,6 +18,7 @@ import inchLogo from '@assets/tokens/inch.svg'
 import shibLogo from '@assets/tokens/shib.svg'
 import adaLogo from '@assets/tokens/ada.svg'
 import ctsiLogo from '@assets/tokens/ctsi.svg'
+import zilLogo from '@assets/tokens/zil.svg'
 import sxpLogo from '@assets/tokens/sxp.svg'
 import xvsLogo from '@assets/tokens/xvs.svg'
 
@@ -300,6 +301,17 @@ const tokens: IToken[] = [
     symbol: 'xvs',
     decimals: 18,
     logo: xvsLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0xb86abcb37c3a4b64f74f59301aff131a1becc787',
+    name: 'Zilliqa',
+    symbol: 'zil',
+    decimals: 12,
+    logo: zilLogo,
     background: '#EBBB4E',
     chain: 'bsc',
     minSendAmount: 0.001,

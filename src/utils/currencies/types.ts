@@ -4,13 +4,16 @@ import { TCustomFee } from '@utils/api/types'
 export type TProvider = {
   generateWallet: () => Promise<TGenerateAddress | null> | TGenerateAddress | null
   validateAddress?: (address: string) => boolean
-  importPrivateKey?: (privateKey: string) => string | null
+  importPrivateKey?: (privateKey: string) => string | null | Promise<string | null>
   getExplorerLink?: (address: string) => string
   getTransactionLink?: (hash: string) => string
   importRecoveryPhrase?: (recoveryPhrase: string) => TGenerateAddress | null
   generateExtraId?: () => string
   getStandingFee?: () => number | null
   formatValue: (value: string | number, type: 'from' | 'to') => number
+  isInternalTx?: boolean
+  createInternalTx?: (props: TInternalTxProps) => Promise<string | null>
+  isWithOutputs?: boolean
 }
 
 export type TCreateTransactionProps = {
@@ -68,4 +71,12 @@ export type TGetFeeData = {
   utxos?: UnspentOutput[] | CardanoUnspentTxOutput[]
   currencyBalance?: number
   fees?: TCustomFees[]
+}
+
+export type TInternalTxProps = {
+  symbol: string
+  addressFrom: string
+  addressTo: string
+  amount: number
+  privateKey: string
 }

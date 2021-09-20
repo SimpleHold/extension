@@ -4,6 +4,7 @@ import { TCustomFee } from '@utils/api/types'
 import { TCustomFees } from '../types'
 
 export const coins = ['btc', 'bch', 'bsv', 'ltc', 'doge', 'dash']
+export const isWithOutputs = true
 
 const getProvider = (symbol: string): BitcoinLikeProvider | null => {
   if (symbol === 'btc') {

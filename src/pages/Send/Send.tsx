@@ -44,7 +44,12 @@ import useState from '@hooks/useState'
 
 // Config
 import { getToken } from '@config/tokens'
-import { ADDRESS_SEND, ADDRESS_SEND_CANCEL } from '@config/events'
+import {
+  ADDRESS_SEND,
+  TRANSACTION_AUTO_FILL,
+  TRANSACTION_START,
+  TRANSACTION_CANCEL,
+} from '@config/events'
 
 // Types
 import { ILocationState, IState, TFeeValue } from './types'
@@ -326,7 +331,10 @@ const SendPage: React.FC = () => {
 
   const onCancel = (): void => {
     logEvent({
-      name: ADDRESS_SEND_CANCEL,
+      name: TRANSACTION_CANCEL,
+      properties: {
+        stage: 'send',
+      },
     })
 
     history.goBack()
@@ -338,6 +346,13 @@ const SendPage: React.FC = () => {
 
   const openWalletsDrawer = (): void => {
     updateState({ activeDrawer: 'wallets' })
+
+    logEvent({
+      name: TRANSACTION_AUTO_FILL,
+      properties: {
+        king: 'myWallet',
+      },
+    })
   }
 
   const onClickDrawerWallet = (address: string) => (): void => {
@@ -409,6 +424,14 @@ const SendPage: React.FC = () => {
       tokenName,
       isIncludeFee: state.isIncludeFee,
     })
+
+    logEvent({
+      name: TRANSACTION_START,
+      properties: {
+        fee: state.isIncludeFee ? 'incl' : 'excl',
+        speed: currency?.isCustomFee ? 'fixed' : state.feeType,
+      },
+    })
   }
 
   const onGenerateExtraId = (): void => {
@@ -426,6 +449,13 @@ const SendPage: React.FC = () => {
   const onSendAll = (): void => {
     if (state.balance) {
       updateState({ amount: `${getAvailableBalance()}`, isIncludeFee: true })
+
+      logEvent({
+        name: TRANSACTION_AUTO_FILL,
+        properties: {
+          king: 'allFunds',
+        },
+      })
     }
   }
 

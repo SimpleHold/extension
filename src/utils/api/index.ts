@@ -495,3 +495,41 @@ export const getHistoryTxInfo = async (
     return null
   }
 }
+
+export const activateAccount = async (chain: string, publicKey: string): Promise<string | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.post(
+      `${config.serverUrl}/wallet/activate`,
+      {
+        chain,
+        publicKey,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const getHederaAccountId = async (publicKey: string): Promise<string | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/wallet/hedera/accountId`, {
+      params: {
+        publicKey,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return null
+  }
+}

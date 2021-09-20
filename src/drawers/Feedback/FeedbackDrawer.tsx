@@ -8,9 +8,13 @@ import Button from '@components/Button'
 // Utils
 import { sendFeedback } from '@utils/api'
 import { getItem } from '@utils/storage'
+import { logEvent } from '@utils/amplitude'
 
 // Hooks
 import useState from '@hooks/useState'
+
+// Config
+import { NPS_GET, NPS_FINISH } from '@config/events'
 
 // Types
 import { IProps, IState } from './types'
@@ -30,6 +34,14 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
 
   const { state, updateState } = useState<IState>(initialState)
 
+  React.useEffect(() => {
+    if (isActive) {
+      logEvent({
+        name: NPS_GET,
+      })
+    }
+  }, [isActive])
+
   const onClickGrade = (rating: number) => (): void => {
     if (state.rating !== rating && !state.isLoading) {
       updateState({ rating })
@@ -43,6 +55,13 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
       updateState({ isLoading: true })
 
       await sendFeedback(clientId, state.feedback, state.rating)
+
+      logEvent({
+        name: NPS_FINISH,
+        properties: {
+          rating: state.rating,
+        },
+      })
 
       updateState({ isLoading: false, isSent: true })
     }

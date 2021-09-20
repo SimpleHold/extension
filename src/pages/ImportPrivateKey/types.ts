@@ -1,7 +1,5 @@
-export interface ILocationState {
+export interface LocationState {
   symbol: string
-  warning?: string
-  backTitle?: string
   chain?: string
   tokenName?: string
   contractAddress?: string
@@ -9,8 +7,9 @@ export interface ILocationState {
 }
 
 export interface IState {
+  privateKey: string
   activeDrawer: null | 'confirm' | 'success'
-  password: string
   errorLabel: null | string
-  isButtonLoading: boolean
+  password: string
+  isImportButtonLoading: boolean
 }

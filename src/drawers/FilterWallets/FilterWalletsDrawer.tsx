@@ -347,6 +347,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
               title="Select currency"
               render={renderCurrenciesList}
               renderRow={renderSelectedCurrencies}
+              maxHeight={200}
             />
           </Styles.Group>
 

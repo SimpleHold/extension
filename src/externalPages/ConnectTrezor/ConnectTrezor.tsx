@@ -27,6 +27,7 @@ import {
   TTrezorCurrency,
   getFeatures,
 } from '@utils/trezor'
+import { logEvent } from '@utils/amplitude'
 
 // Assets
 import connectTrezorImage from '@assets/illustrate/connectTrezor.svg'
@@ -34,6 +35,7 @@ import errorConnectTrezorImage from '@assets/illustrate/errorConnectTrezor.svg'
 
 // Config
 import { getCurrency } from '@config/currencies'
+import { HARDWARE_CONNECT } from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -93,6 +95,14 @@ const ConnectTrezor: React.FC = () => {
 
   const onClose = (): void => {
     window.close()
+
+    logEvent({
+      name: HARDWARE_CONNECT,
+      properties: {
+        kind: 'trezor',
+        result: 'close',
+      },
+    })
   }
 
   const onConfirm = (): void => {
@@ -198,6 +208,14 @@ const ConnectTrezor: React.FC = () => {
             if (!findExist) {
               return currency
             }
+          })
+
+          logEvent({
+            name: HARDWARE_CONNECT,
+            properties: {
+              kind: 'trezor',
+              result: 'success',
+            },
           })
 
           if (findUnusedAddresses.length) {

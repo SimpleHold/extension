@@ -15,7 +15,7 @@ import { logEvent } from '@utils/amplitude'
 import refreshIcon from '@assets/icons/refresh.svg'
 
 // Config
-import { ADDRESS_COPY } from '@config/events'
+import { ADDRESS_ACTION } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -30,6 +30,8 @@ interface Props {
   isBalanceRefreshing: boolean
   address: string
   tokenName?: string
+  isNotActivated: boolean
+  onConfirmActivate: () => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -43,6 +45,8 @@ const WalletCard: React.FC<Props> = (props) => {
     isBalanceRefreshing,
     address,
     tokenName,
+    isNotActivated,
+    onConfirmActivate,
   } = props
 
   const [isCopied, setIsCopied] = React.useState<boolean>(false)
@@ -60,7 +64,10 @@ const WalletCard: React.FC<Props> = (props) => {
     setIsCopied(true)
 
     logEvent({
-      name: ADDRESS_COPY,
+      name: ADDRESS_ACTION,
+      properties: {
+        addressAction: 'copy',
+      },
     })
   }
 
@@ -78,9 +85,11 @@ const WalletCard: React.FC<Props> = (props) => {
                 {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
               </Styles.Balance>
             </Skeleton>
-            <Styles.RefreshButton onClick={onRefreshBalance} isRefreshing={isBalanceRefreshing}>
-              <SVG src={refreshIcon} width={16} height={16} />
-            </Styles.RefreshButton>
+            {!isNotActivated ? (
+              <Styles.RefreshButton onClick={onRefreshBalance} isRefreshing={isBalanceRefreshing}>
+                <SVG src={refreshIcon} width={16} height={16} />
+              </Styles.RefreshButton>
+            ) : null}
           </Styles.BalanceRow>
           <Skeleton
             width={75}
@@ -97,15 +106,23 @@ const WalletCard: React.FC<Props> = (props) => {
         </Styles.WalletInfo>
       </Styles.Body>
       <Styles.Actions>
-        <Styles.ActionButton onClick={openPage('/send')}>
-          <Styles.ActionName>Send</Styles.ActionName>
-        </Styles.ActionButton>
-        <Styles.ActionButton onClick={openPage('/receive')}>
-          <Styles.ActionName>Receive</Styles.ActionName>
-        </Styles.ActionButton>
-        <Styles.ActionButton onClick={copyAddress}>
-          <Styles.ActionName>{isCopied ? 'Copied!' : 'Copy'}</Styles.ActionName>
-        </Styles.ActionButton>
+        {isNotActivated ? (
+          <Styles.ActionButton onClick={onConfirmActivate}>
+            <Styles.ActionName>Activate</Styles.ActionName>
+          </Styles.ActionButton>
+        ) : (
+          <>
+            <Styles.ActionButton onClick={openPage('/send')}>
+              <Styles.ActionName>Send</Styles.ActionName>
+            </Styles.ActionButton>
+            <Styles.ActionButton onClick={openPage('/receive')}>
+              <Styles.ActionName>Receive</Styles.ActionName>
+            </Styles.ActionButton>
+            <Styles.ActionButton onClick={copyAddress}>
+              <Styles.ActionName>{isCopied ? 'Copied!' : 'Copy'}</Styles.ActionName>
+            </Styles.ActionButton>
+          </>
+        )}
       </Styles.Actions>
     </Styles.Container>
   )

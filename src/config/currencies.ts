@@ -17,6 +17,8 @@ import nulsLogo from '@assets/currencies/nuls.svg'
 import maticLogo from '@assets/currencies/matic.svg'
 import nerveLogo from '@assets/currencies/nvt.svg'
 import tronLogo from '@assets/currencies/trx.svg'
+import zilLogo from '@assets/currencies/zil.svg'
+import hbarLogo from '@assets/currencies/hbar.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -192,6 +194,24 @@ const currencies: ICurrency[] = [
     background: '#D0564E',
     chain: 'tron',
     minSendAmount: 1000000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Zilliqa',
+    symbol: 'zil',
+    logo: zilLogo,
+    background: '#59D0C9',
+    chain: 'zilliqa',
+    minSendAmount: 1000000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Hedera Hashgraph',
+    symbol: 'hbar',
+    logo: hbarLogo,
+    background: '#343439',
+    chain: 'hedera',
+    minSendAmount: 1000,
     isCustomFee: false,
   },
 ]

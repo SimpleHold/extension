@@ -14,7 +14,7 @@ import { logEvent } from '@utils/amplitude'
 import { getItem, removeItem } from '@utils/storage'
 
 // Config
-import { PASSCODE_LOCKED_INVALID, PASSCODE_LOCKED_FORGOT } from '@config/events'
+import { PASSCODE_LOCKED_INVALID, PASSCODE_LOCKED_FORGOT, SUCCESS_ENTER } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -57,6 +57,14 @@ const EnterPasscode: React.FC = () => {
 
     if (getPasscodeHash && getPasscodeHash === sha256hash(passcode)) {
       removeItem('isLocked')
+
+      logEvent({
+        name: SUCCESS_ENTER,
+        properties: {
+          security: 'code',
+        },
+      })
+
       history.replace('/wallets')
     } else {
       setIsError(true)

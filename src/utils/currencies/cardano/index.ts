@@ -7,7 +7,8 @@ import('@emurgo/cardano-serialization-lib-browser').then((module) => {
   CardanoWasm = module
 })
 
-export const coins = ['ada']
+export const coins: string[] = ['ada']
+export const isWithOutputs = true
 
 import { getCardanoTransactionParams } from '@utils/api'
 

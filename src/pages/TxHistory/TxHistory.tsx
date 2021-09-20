@@ -188,10 +188,10 @@ const TxHistory: React.FC = () => {
         {Array(7)
           .fill('loading')
           .map((item: string, index: number) => (
-            <Styles.TxList key={`${item}/${index}`}>
+            <div key={`${item}/${index}`}>
               <HistoryItem isLoading />
               {index !== 6 ? <DividerLine /> : null}
-            </Styles.TxList>
+            </div>
           ))}
       </Styles.Group>
       <Styles.LoadingBackground>

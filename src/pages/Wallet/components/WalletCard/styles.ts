@@ -57,11 +57,12 @@ const ActionButton = styled.div`
   }
 
   &:first-child {
+    border-bottom-left-radius: 16px;
     border-radius: 0 0 0 16px;
   }
 
   &:last-child {
-    border-radius: 0 0 16px 0;
+    border-bottom-right-radius: 16px;
   }
 `
 

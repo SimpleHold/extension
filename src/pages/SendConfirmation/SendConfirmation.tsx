@@ -34,12 +34,7 @@ import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
 import { minus } from '@utils/format'
 
 // Config
-import {
-  ADDRESS_SEND_CONFIRM,
-  ADDRESS_SEND_CONFIRM_CANCEL,
-  ADDRESS_SEND_PASSWORD,
-  ADDRESS_SEND_PASSWORD_CANCEL,
-} from '@config/events'
+import { TRANSACTION_CANCEL, TRANSACTION_CONFIRM, TRANSACTION_PASSWORD } from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -83,9 +78,12 @@ const SendConfirmation: React.FC = () => {
 
   const { state, updateState } = useState<IState>(initialState)
 
-  const onConfirmModal = async (): Promise<void> => {
+  const onConfirmDrawer = async (): Promise<void> => {
     logEvent({
-      name: ADDRESS_SEND_PASSWORD,
+      name: TRANSACTION_PASSWORD,
+      properties: {
+        symbol,
+      },
     })
 
     if (state.inputErrorLabel) {
@@ -217,7 +215,10 @@ const SendConfirmation: React.FC = () => {
 
   const onCancel = (): void => {
     logEvent({
-      name: ADDRESS_SEND_CONFIRM_CANCEL,
+      name: TRANSACTION_CANCEL,
+      properties: {
+        stage: 'confirm',
+      },
     })
 
     history.goBack()
@@ -225,7 +226,10 @@ const SendConfirmation: React.FC = () => {
 
   const onConfirm = (): void => {
     logEvent({
-      name: ADDRESS_SEND_CONFIRM,
+      name: TRANSACTION_CONFIRM,
+      properties: {
+        stage: 'confirmation',
+      },
     })
 
     updateState({ activeDrawer: 'confirm' })
@@ -233,7 +237,10 @@ const SendConfirmation: React.FC = () => {
 
   const onCloseConfirmDrawer = (): void => {
     logEvent({
-      name: ADDRESS_SEND_PASSWORD_CANCEL,
+      name: TRANSACTION_CANCEL,
+      properties: {
+        stage: 'password',
+      },
     })
 
     onCloseDrawer()
@@ -309,7 +316,7 @@ const SendConfirmation: React.FC = () => {
         inputErrorLabel={state.inputErrorLabel}
         onChangeText={setPassword}
         isButtonDisabled={!validatePassword(state.password)}
-        onConfirm={onConfirmModal}
+        onConfirm={onConfirmDrawer}
         isButtonLoading={state.isButtonLoading}
       />
 

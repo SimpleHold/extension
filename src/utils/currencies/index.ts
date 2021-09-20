@@ -23,6 +23,8 @@ import * as neblio from '@utils/currencies/neblio'
 import * as nuls from '@utils/currencies/nuls'
 import * as nerve from '@utils/currencies/nerve'
 import * as tron from '@utils/currencies/tron'
+import * as hedera from '@utils/currencies/hedera'
+import * as zilliqa from '@utils/currencies/zilliqa'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -61,6 +63,14 @@ const getProvider = (symbol: string): TProvider | null => {
       return theta
     }
 
+    if (hedera.coins.indexOf(symbol) !== -1) {
+      return hedera
+    }
+
+    if (zilliqa.coins.indexOf(symbol) !== -1) {
+      return zilliqa
+    }
+
     return null
   } catch {
     return null
@@ -84,15 +94,15 @@ export const generate = async (
   return bitcoinLike.generateWallet(symbol)
 }
 
-export const importPrivateKey = (
+export const importPrivateKey = async (
   symbol: string,
   privateKey: string,
   chain?: string
-): string | null => {
+): Promise<string | null> => {
   const provider = getProvider(symbol)
 
   if (provider?.importPrivateKey) {
-    return provider.importPrivateKey(privateKey)
+    return await provider.importPrivateKey(privateKey)
   }
 
   if (isEthereumLike(symbol, chain)) {
@@ -114,8 +124,7 @@ export const validateAddress = (symbol: string, address: string, tokenChain?: st
       return bitcoinLike.validateAddress(address, symbol)
     }
 
-    // @ts-ignore
-    return new RegExp(tokenChain ? addressValidate.eth : addressValidate[symbol])?.test(address)
+    return addressValidate(symbol, address, tokenChain)
   } catch {
     return false
   }
@@ -381,11 +390,12 @@ export const generateExtraId = (symbol: string): null | string => {
 
 export const checkWithOutputs = (symbol: string): boolean => {
   try {
-    const isBtcLike = bitcoinLike.coins.indexOf(symbol) !== -1
-    const isCardano = cardano.coins.indexOf(symbol) !== -1
-    const isNeblio = neblio.coins.indexOf(symbol) !== -1
+    const provider = getProvider(symbol)
 
-    return isBtcLike || isCardano || isNeblio
+    if (provider?.isWithOutputs) {
+      return true
+    }
+    return false
   } catch {
     return false
   }
@@ -437,10 +447,13 @@ export const checkWithZeroFee = (symbol: string): boolean => {
 }
 
 export const checkIsInternalTx = (symbol: string): boolean => {
-  const isThetaLike = theta.coins.indexOf(symbol) !== -1
-  const isTron = tron.coins.indexOf(symbol) !== -1
+  const provider = getProvider(symbol)
 
-  return isThetaLike || isTron
+  if (provider?.isInternalTx) {
+    return true
+  }
+
+  return false
 }
 
 export const createInternalTx = async (
@@ -451,12 +464,10 @@ export const createInternalTx = async (
   privateKey: string
 ): Promise<string | null> => {
   try {
-    if (theta.coins.indexOf(symbol) !== -1) {
-      return await theta.createTransaction(symbol, addressFrom, addressTo, amount, privateKey)
-    }
+    const provider = getProvider(symbol)
 
-    if (tron.coins.indexOf(symbol) !== -1) {
-      return await tron.createTransaction(addressFrom, addressTo, amount, privateKey)
+    if (provider?.createInternalTx) {
+      return await provider.createInternalTx({ symbol, addressFrom, addressTo, amount, privateKey })
     }
 
     return null

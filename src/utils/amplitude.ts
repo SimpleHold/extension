@@ -5,7 +5,7 @@ import { getItem } from '@utils/storage'
 
 interface IEvent {
   name: string
-  properties?: { [key: string]: string }
+  properties?: { [key: string]: string | number }
 }
 
 export const init = (apiKey: string, clientId: string) => {

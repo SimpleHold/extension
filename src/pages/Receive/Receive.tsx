@@ -14,10 +14,6 @@ import ExtraIdDrawer from '@drawers/ExtraId'
 
 // Utils
 import { getExtraIdName } from '@utils/currencies'
-import { logEvent } from '@utils/amplitude'
-
-// Config
-import { ADDRESS_RECEIVE } from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -51,10 +47,6 @@ const ReceivePage: React.FC = () => {
   }, [state.isCopied])
 
   React.useEffect(() => {
-    logEvent({
-      name: ADDRESS_RECEIVE,
-    })
-
     const extraIdName = getExtraIdName(symbol)
 
     if (extraIdName) {

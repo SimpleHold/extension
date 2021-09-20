@@ -77,9 +77,9 @@ const Transaction: React.FC<Props> = (props) => {
             </Styles.InfoRow>
           </Styles.Info>
           <Styles.Amounts>
-            <Styles.CurrencyAmount>{`${numeral(amount).format('0.[000000]')} ${toUpper(
-              symbol
-            )}`}</Styles.CurrencyAmount>
+            <Styles.CurrencyAmount>{`${
+              Math.abs(amount) < 0.000001 ? '< 0.000001' : numeral(amount).format('0.[000000]')
+            } ${toUpper(symbol)}`}</Styles.CurrencyAmount>
             <Styles.USDAmount>{`$ ${price(estimated)}`}</Styles.USDAmount>
           </Styles.Amounts>
         </Styles.Row>

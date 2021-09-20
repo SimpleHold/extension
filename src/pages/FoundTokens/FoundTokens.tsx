@@ -73,7 +73,7 @@ const FoundTokens: React.FC = () => {
     updateState({ activeDrawer: 'confirm', isIncludeTokens })
   }
 
-  const onConfirmDrawer = (): void => {
+  const onConfirmDrawer = async (): Promise<void> => {
     if (state.errorLabel) {
       updateState({ errorLabel: null })
     }
@@ -85,7 +85,7 @@ const FoundTokens: React.FC = () => {
         const decryptBackup = decrypt(backup, state.password)
 
         if (decryptBackup) {
-          const address = importPrivateKey(symbol, privateKey, chain)
+          const address = await importPrivateKey(symbol, privateKey, chain)
           const getCurrencyInfo = getCurrencyByChain(chain)
 
           if (address && getCurrencyInfo) {

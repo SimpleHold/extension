@@ -27,4 +27,9 @@ export interface IState {
   walletName: string
   isHiddenWallet: boolean
   warning: null | string
+  confirmDrawerTitle: string
+  confirmDrawerType: 'showPhrase' | 'showPrivateKey' | 'activateWallet' | null
+  isDrawerButtonLoading: boolean
+  isNotActivated: boolean
+  address: string
 }
