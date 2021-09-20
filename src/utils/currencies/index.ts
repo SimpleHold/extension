@@ -25,7 +25,6 @@ import * as nerve from '@utils/currencies/nerve'
 import * as tron from '@utils/currencies/tron'
 import * as hedera from '@utils/currencies/hedera'
 import * as zilliqa from '@utils/currencies/zilliqa'
-import * as verge from '@utils/currencies/verge'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -70,10 +69,6 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (zilliqa.coins.indexOf(symbol) !== -1) {
       return zilliqa
-    }
-
-    if (verge.coins.indexOf(symbol) !== -1) {
-      return verge
     }
 
     return null
@@ -204,10 +199,6 @@ export const createTransaction = async ({
     if (outputs?.length && networkFee) {
       if (neblio.coins.indexOf(symbol) !== -1) {
         return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
-      }
-
-      if (verge.coins.indexOf(symbol) !== -1) {
-        return verge.createTransaction(outputs, to, amount, networkFee, from, privateKey)
       }
 
       return bitcoinLike.createTransaction(
