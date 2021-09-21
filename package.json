@@ -63,7 +63,8 @@
     "tronweb": "^4.0.0",
     "uuid": "^8.3.2",
     "web3": "^1.3.5",
-    "webextension-polyfill-ts": "^0.22.0"
+    "webextension-polyfill-ts": "^0.22.0",
+    "xdc3": "^1.3.13416"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",

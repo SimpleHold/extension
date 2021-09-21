@@ -13786,6 +13786,247 @@ ws@^7.2.0:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.3.tgz#1f9643de34a543b8edb124bdcbc457ae55a6e5cd"
   integrity sha512-hr6vCR76GsossIRsr8OLR9acVVm1jyfEWvhbNjtgPOrfvAlKzvyeg/P6r8RuDjRyrcQoPQT7K0DGEPc7Ae6jzA==
 
+xdc3-bzz@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-bzz/-/xdc3-bzz-1.3.13416.tgz#754cc92c7ec3aea733b218c6dcd85ea3eed94b5a"
+  integrity sha512-RP8dh+MbYxHdyHfcQLC66rHoDeY6zLLqdQQIa5CfkAXWQAUzzCMaUbztXQ4nI6HbvFRaqNANaW+/pEMxpVRT3A==
+  dependencies:
+    "@types/node" "^12.12.6"
+    got "9.6.0"
+    swarm-js "^0.1.40"
+    underscore "1.9.1"
+
+xdc3-core-helpers@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-core-helpers/-/xdc3-core-helpers-1.3.13416.tgz#ebe40ca63be9e9e019426f510db4efa4c9a48a4c"
+  integrity sha512-s0NDBe/JsSkkNh61MW6aigoZtsUQrjvgdqKl4rBsgzFlJ9FzKlLKLwvq1zVGCagkAVw5sOB16faK7+wsWlhyag==
+  dependencies:
+    underscore "1.9.1"
+    xdc3-eth-iban "1.3.13416"
+    xdc3-utils "1.3.13416"
+
+xdc3-core-method@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-core-method/-/xdc3-core-method-1.3.13416.tgz#19dfc5368bfa109340be53dd03f5d53de79b8e94"
+  integrity sha512-5hAPTW0JGXMw/DMh/iyIixme9Fuj/MXIFNn53IEd1eVNKQ3epPaLUeScjJyQMU21JdFoQkJzMYNqo6v2XxCd2w==
+  dependencies:
+    "@ethersproject/transactions" "^5.0.0-beta.135"
+    underscore "1.9.1"
+    xdc3-core-helpers "1.3.13416"
+    xdc3-core-promievent "1.3.13416"
+    xdc3-core-subscriptions "1.3.13416"
+    xdc3-utils "1.3.13416"
+
+xdc3-core-promievent@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-core-promievent/-/xdc3-core-promievent-1.3.13416.tgz#b52d5006676c22f054981d295d22a8d73a3359fa"
+  integrity sha512-vhZ4+SN08FbFRjJMoyH0m7PgE/ZYMnTIVwz9H5PzwljSI4DtFB5QNlWIG564jIx3KeurI8ojenDRfDcAHmkZvg==
+  dependencies:
+    eventemitter3 "4.0.4"
+
+xdc3-core-requestmanager@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-core-requestmanager/-/xdc3-core-requestmanager-1.3.13416.tgz#b0ccfc2ed989cc01120711e4562bca9d15ef2373"
+  integrity sha512-J+dXNuLix1OE2mlYkMWUHnV/7PB68AeOrLfRJUdjIf+XUSdA9Xdu7nihzCN3xJc54yDKmH67AYJbSUkbqmuysw==
+  dependencies:
+    underscore "1.9.1"
+    util "^0.12.0"
+    xdc3-core-helpers "1.3.13416"
+    xdc3-providers-http "1.3.13416"
+    xdc3-providers-ipc "1.3.13416"
+    xdc3-providers-ws "1.3.13416"
+
+xdc3-core-subscriptions@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-core-subscriptions/-/xdc3-core-subscriptions-1.3.13416.tgz#47544ad6fb0e02d06924d4a62e586f9bcbe4ee12"
+  integrity sha512-ooHrh7s5AXzC5SNsgbOiJzA3NbSf7f/nrhPjuvRoY+v++P/TJ7rHV0JyYDciJ+orWmbnz6FojjAOhFItTQOVxg==
+  dependencies:
+    eventemitter3 "4.0.4"
+    underscore "1.9.1"
+    xdc3-core-helpers "1.3.13416"
+
+xdc3-core@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-core/-/xdc3-core-1.3.13416.tgz#1d6c60f2aa714a3bf2a0eed3429848e15794df44"
+  integrity sha512-y7dozv9qZzq8A4ZM7YpKcCJkDySnCTN+9LxnRm5DUdn7GNEDk4dELkcDgwJ0Li6+08UOhyDc32c7xI8VfGTp1g==
+  dependencies:
+    "@types/bn.js" "^4.11.5"
+    "@types/node" "^12.12.6"
+    bignumber.js "^9.0.0"
+    xdc3-core-helpers "1.3.13416"
+    xdc3-core-method "1.3.13416"
+    xdc3-core-requestmanager "1.3.13416"
+    xdc3-utils "1.3.13416"
+
+xdc3-eth-abi@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-eth-abi/-/xdc3-eth-abi-1.3.13416.tgz#044d98bfd6982ae1be22271628f98b5b03866be5"
+  integrity sha512-tzIUsGN7Rh19F7cv9uTYG+4P9ISAGkxXuJXbGkFPZPVR1T3u5+tKH87xq02UlMlKTWR1j8ZOGIe2iACcifOjUg==
+  dependencies:
+    "@ethersproject/abi" "5.0.7"
+    underscore "1.9.1"
+    xdc3-utils "1.3.13416"
+
+xdc3-eth-accounts@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-eth-accounts/-/xdc3-eth-accounts-1.3.13416.tgz#b62f4f7731f665c89523cf15bef36375d5aa4e49"
+  integrity sha512-dokfC6o/uywbwgvIVorjrbwPFtAfUxe46M/hJq0foyw6MII0lEPi8Xrhx2OrMY82f1hLQfvP0PgVKWuVQ5S0QQ==
+  dependencies:
+    crypto-browserify "3.12.0"
+    eth-lib "0.2.8"
+    ethereumjs-common "^1.3.2"
+    ethereumjs-tx "^2.1.1"
+    scrypt-js "^3.0.1"
+    underscore "1.9.1"
+    uuid "3.3.2"
+    xdc3-core "1.3.13416"
+    xdc3-core-helpers "1.3.13416"
+    xdc3-core-method "1.3.13416"
+    xdc3-utils "1.3.13416"
+
+xdc3-eth-contract@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-eth-contract/-/xdc3-eth-contract-1.3.13416.tgz#e0fd715922c9c9c9eaab524a71854fe53aaf7396"
+  integrity sha512-X1aUpM+d5zXihrxunsWDFI+XqmJ2EzS7/lC0sjdbDjG5Nc6CmfNDo0r2BZszZUbMb5UCGFjkkuNGXHnTiaZ8lQ==
+  dependencies:
+    "@types/bn.js" "^4.11.5"
+    underscore "1.9.1"
+    xdc3-core "1.3.13416"
+    xdc3-core-helpers "1.3.13416"
+    xdc3-core-method "1.3.13416"
+    xdc3-core-promievent "1.3.13416"
+    xdc3-core-subscriptions "1.3.13416"
+    xdc3-eth-abi "1.3.13416"
+    xdc3-utils "1.3.13416"
+
+xdc3-eth-ens@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-eth-ens/-/xdc3-eth-ens-1.3.13416.tgz#07c12697fa8e4c4920697569c50cd519040bb6f8"
+  integrity sha512-OMrTvE3VJeE8AvBtKoQPSUhQtBH7uIDX1bXhFQfIIhQjsWX57e7LvqtyOh2QcNTTANbjChWO48ai8cVKkDJ+5Q==
+  dependencies:
+    content-hash "^2.5.2"
+    eth-ens-namehash "2.0.8"
+    underscore "1.9.1"
+    xdc3-core "1.3.13416"
+    xdc3-core-helpers "1.3.13416"
+    xdc3-core-promievent "1.3.13416"
+    xdc3-eth "1.3.13416"
+    xdc3-eth-abi "1.3.13416"
+    xdc3-eth-contract "1.3.13416"
+    xdc3-utils "1.3.13416"
+
+xdc3-eth-iban@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-eth-iban/-/xdc3-eth-iban-1.3.13416.tgz#34900fcb2ce1276295a2e611a9c6b125bd09e569"
+  integrity sha512-mialZF9F42Rp7Wrk2St/CXNrEU2/69aqVEjlgx/u63EsMoUguDoh8J6PyR+5gjhyyay0CAZuA4LUeXXv6YDTaA==
+  dependencies:
+    bn.js "^4.11.9"
+    xdc3-utils "1.3.13416"
+
+xdc3-eth-personal@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-eth-personal/-/xdc3-eth-personal-1.3.13416.tgz#3ee01f2cc17fc3906a592347aade12759593bf09"
+  integrity sha512-R2/+KAaZQLsLj8t3IuXhTn1jE21ywPKBQz9EYrlVs/7os7qIXb1CuLpMvFD0g4H9pPPCYlwfOW4mT1UMByJ2Bg==
+  dependencies:
+    "@types/node" "^12.12.6"
+    xdc3-core "1.3.13416"
+    xdc3-core-helpers "1.3.13416"
+    xdc3-core-method "1.3.13416"
+    xdc3-net "1.3.13416"
+    xdc3-utils "1.3.13416"
+
+xdc3-eth@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-eth/-/xdc3-eth-1.3.13416.tgz#9127568dbce23c32a30bac7bc65eb3e9ed79016c"
+  integrity sha512-PpsSSdSx0j7LxRTpLrOdl8jTDBxMJRwGLnUpxD5x7hRlm6LhulTHabmILDGngCO9o6ejzLuRC5gJJs4SAPcBPQ==
+  dependencies:
+    underscore "1.9.1"
+    xdc3-core "1.3.13416"
+    xdc3-core-helpers "1.3.13416"
+    xdc3-core-method "1.3.13416"
+    xdc3-core-subscriptions "1.3.13416"
+    xdc3-eth-abi "1.3.13416"
+    xdc3-eth-accounts "1.3.13416"
+    xdc3-eth-contract "1.3.13416"
+    xdc3-eth-ens "1.3.13416"
+    xdc3-eth-iban "1.3.13416"
+    xdc3-eth-personal "1.3.13416"
+    xdc3-net "1.3.13416"
+    xdc3-utils "1.3.13416"
+
+xdc3-net@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-net/-/xdc3-net-1.3.13416.tgz#e68fa2640346ad22f045a8740ecb8cabc97fb33f"
+  integrity sha512-JToMSyk4DdeMjXmnoGN3OhIttTaJSUNNb983y0txN26hqjxQByPdXX19e9dpu7VjVcJRNBPgLv0uYm/eF9WQ8A==
+  dependencies:
+    xdc3-core "1.3.13416"
+    xdc3-core-method "1.3.13416"
+    xdc3-utils "1.3.13416"
+
+xdc3-providers-http@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-providers-http/-/xdc3-providers-http-1.3.13416.tgz#68da703988bb659a3695eb7a26a6b1c5a93d7921"
+  integrity sha512-jLW7yuRqkH52PgTedRkZQwhuhixnjQ85cYGOv8MeEbkMA6A4o7+wcCPI1q+84hg+04qIQ5w831AjYmO/OdijMw==
+  dependencies:
+    xdc3-core-helpers "1.3.13416"
+    xhr2-cookies "1.1.0"
+
+xdc3-providers-ipc@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-providers-ipc/-/xdc3-providers-ipc-1.3.13416.tgz#1409a932231e2c9308454721d1097dac14524877"
+  integrity sha512-U8YrASJxI0oEE63rOmAKr5ZxSJsu95gaQC+h1KR6O5s/NhBGfr9nD0dusBDetjDLrNSkztqNrfDq/lGL7zyB4A==
+  dependencies:
+    oboe "2.1.5"
+    underscore "1.9.1"
+    xdc3-core-helpers "1.3.13416"
+
+xdc3-providers-ws@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-providers-ws/-/xdc3-providers-ws-1.3.13416.tgz#4bd521b4d15aed4c2a5e713938698c45db7c0987"
+  integrity sha512-g7twTPgOC+DgvZSgd42oKrYAZwBARaPe1fsrLj60l6KNfhbfss+Ul9S45K6A4WpIVdQabLwFtVZGklDEFYiBHg==
+  dependencies:
+    eventemitter3 "4.0.4"
+    underscore "1.9.1"
+    websocket "^1.0.32"
+    xdc3-core-helpers "1.3.13416"
+
+xdc3-shh@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-shh/-/xdc3-shh-1.3.13416.tgz#f9399b07228df3a0c112fd12282ed81133db3092"
+  integrity sha512-XvQtWHt5iEL7YfjH3TNBlWXcZOhw/haioJCKJeSflUZ5lOuMeNeevSkS59B4JHIadTlQZLDCl5WktgE+jSXXHQ==
+  dependencies:
+    xdc3-core "1.3.13416"
+    xdc3-core-method "1.3.13416"
+    xdc3-core-subscriptions "1.3.13416"
+    xdc3-net "1.3.13416"
+
+xdc3-utils@1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3-utils/-/xdc3-utils-1.3.13416.tgz#e2bbef4604e1647a989ae2e8af0d23d627601cb2"
+  integrity sha512-ap7AqyJ0WLGX0XsqP1dPZj8OeiGNMXvEPudLnNEYgsRb1Rm1zMl6+iBS34d9OVvp/9RFhuSDlY/KYF3pSEXg+w==
+  dependencies:
+    bn.js "^4.11.9"
+    eth-lib "0.2.8"
+    ethereum-bloom-filters "^1.0.6"
+    ethjs-unit "0.1.6"
+    number-to-bn "1.7.0"
+    randombytes "^2.1.0"
+    underscore "1.9.1"
+    utf8 "3.0.0"
+
+xdc3@^1.3.13416:
+  version "1.3.13416"
+  resolved "https://registry.yarnpkg.com/xdc3/-/xdc3-1.3.13416.tgz#3d448c2108cab0c073cdec9ec7132dd66ee11523"
+  integrity sha512-WaVdycXsaL4yVc7iok25cNqipw1X1reroP9eIfMZmCrKB68e9CeKDhMe9UI8Bl8coqWCmcCotMBz61PFAiiC5w==
+  dependencies:
+    xdc3-bzz "1.3.13416"
+    xdc3-core "1.3.13416"
+    xdc3-eth "1.3.13416"
+    xdc3-eth-personal "1.3.13416"
+    xdc3-net "1.3.13416"
+    xdc3-shh "1.3.13416"
+    xdc3-utils "1.3.13416"
+
 xhr-request-promise@^0.1.2:
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/xhr-request-promise/-/xhr-request-promise-0.1.3.tgz#2d5f4b16d8c6c893be97f1a62b0ed4cf3ca5f96c"

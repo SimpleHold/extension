@@ -27,6 +27,7 @@ import * as hedera from '@utils/currencies/hedera'
 import * as zilliqa from '@utils/currencies/zilliqa'
 import * as verge from '@utils/currencies/verge'
 import * as reddcoin from '@utils/currencies/reddcoin'
+import * as xinfin from '@utils/currencies/xinfin'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -79,6 +80,10 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (reddcoin.coins.indexOf(symbol) !== -1) {
       return reddcoin
+    }
+
+    if (xinfin.coins.indexOf(symbol) !== -1) {
+      return xinfin
     }
 
     return null
@@ -256,6 +261,10 @@ export const getNetworkFee = async ({
     if (bitcoinLike.coins.indexOf(symbol) !== -1) {
       return bitcoinLike.getNetworkFee(addressFrom, outputs, amount, customFee, symbol)
     }
+  }
+
+  if (xinfin.coins.indexOf(symbol) !== -1) {
+    return await xinfin.getNetworkFee()
   }
 
   if (isEthereumLike(symbol, tokenChain)) {

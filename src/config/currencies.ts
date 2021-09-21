@@ -21,6 +21,7 @@ import zilLogo from '@assets/currencies/zil.svg'
 import hbarLogo from '@assets/currencies/hbar.svg'
 import xvgLogo from '@assets/currencies/xvg.svg'
 import rddLogo from '@assets/currencies/rdd.svg'
+import xdcLogo from '@assets/currencies/xdc.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -232,6 +233,15 @@ const currencies: ICurrency[] = [
     background: '#E84148',
     chain: 'reddcoin',
     minSendAmount: 100000,
+    isCustomFee: false,
+  },
+  {
+    name: 'XinFin',
+    symbol: 'xdc',
+    logo: xdcLogo,
+    background: '#4A769A',
+    chain: 'xinfin',
+    minSendAmount: 1000000000000000,
     isCustomFee: false,
   },
 ]
