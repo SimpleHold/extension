@@ -138,3 +138,4 @@ declare const bitcoinsv: BitcoinLikeProvider
 declare const verge: BitcoinLikeProvider
 declare const Zilliqa: any
 declare const bitcore: any
+declare const vergecore: any

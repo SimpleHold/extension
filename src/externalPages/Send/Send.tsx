@@ -40,6 +40,7 @@ import {
 import { getItem, setItem, removeItem } from '@utils/storage'
 import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
 import { logEvent } from '@utils/amplitude'
+import { getUtxos as getVergeUtxos } from '@utils/currencies/verge'
 
 // Config
 import { getCurrency, ICurrency } from '@config/currencies'
@@ -140,6 +141,10 @@ const Send: React.FC = () => {
 
       if (toLower(state.selectedWallet.symbol) === 'doge') {
         onGetDogeUtxos()
+      }
+
+      if (toLower(state.selectedWallet.symbol) === 'xvg') {
+        onGetVergeUtxos()
       }
     }
   }, [debounced])
@@ -256,6 +261,12 @@ const Send: React.FC = () => {
     updateState({ utxosList })
   }
 
+  const onGetVergeUtxos = (): void => {
+    const utxosList = getVergeUtxos(state.outputs, state.address, state.amount)
+
+    updateState({ utxosList })
+  }
+
   const onGetNetworkFee = async (): Promise<void> => {
     if (!state.selectedWallet) {
       return
@@ -269,6 +280,10 @@ const Send: React.FC = () => {
 
     if (toLower(symbol) === 'doge') {
       onGetDogeUtxos()
+    }
+
+    if (toLower(symbol) === 'xvg') {
+      onGetVergeUtxos()
     }
 
     if (state.isStandingFee || !state.amount.length) {
@@ -649,7 +664,7 @@ const Send: React.FC = () => {
         !state.isFeeLoading &&
         !isCurrencyBalanceError
       ) {
-        if (!state.outputs.length) {
+        if (!state.utxosList.length) {
           const withOuputs = checkWithOutputs(state.currencyInfo.symbol)
 
           return withOuputs

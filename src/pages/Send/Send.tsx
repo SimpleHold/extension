@@ -37,6 +37,7 @@ import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
+import { getUtxos as getVergeUtxos } from '@utils/currencies/verge'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -154,6 +155,10 @@ const SendPage: React.FC = () => {
       if (symbol === 'doge') {
         onGetDogeUtxos()
       }
+
+      if (symbol === 'xvg') {
+        onGetVergeUtxos()
+      }
     }
   }, [debounced])
 
@@ -191,9 +196,19 @@ const SendPage: React.FC = () => {
     updateState({ utxosList })
   }
 
+  const onGetVergeUtxos = (): void => {
+    const utxosList = getVergeUtxos(state.outputs, state.address, state.amount)
+
+    updateState({ utxosList })
+  }
+
   const onGetNetworkFee = async (): Promise<void> => {
     if (symbol === 'doge') {
       onGetDogeUtxos()
+    }
+
+    if (symbol === 'xvg') {
+      onGetVergeUtxos()
     }
 
     if (state.amountErrorLabel) {
@@ -541,7 +556,7 @@ const SendPage: React.FC = () => {
       !state.isFeeLoading &&
       !isCurrencyBalanceError
     ) {
-      if (!state.outputs.length) {
+      if (!state.utxosList.length) {
         const withOuputs = checkWithOutputs(symbol)
 
         return withOuputs

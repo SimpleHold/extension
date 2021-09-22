@@ -45,6 +45,10 @@ export const fromSat = (value: number): number => {
   }
 }
 
+const getTimeStamp = () => {
+  return (Date.now() / 1000) | 0
+}
+
 export const createTransaction = (
   outputs: UnspentOutput[],
   to: string,
@@ -54,7 +58,20 @@ export const createTransaction = (
   privateKey: string
 ): string | null => {
   try {
-    return verge.createTransaction(outputs, to, amount, fee, changeAddress, privateKey).raw
+    const tx = new vergecore.Transaction()
+      .from(outputs)
+      .to(to, amount)
+      .fee(fee)
+      .change(changeAddress)
+
+    const txJson = tx.toJSON()
+
+    txJson.timestamp = getTimeStamp()
+    delete txJson.hash
+
+    const toJson = new vergecore.Transaction().fromObject(txJson)
+
+    return toJson.sign(new vergecore.PrivateKey.fromWIF(privateKey)).serialize()
   } catch {
     return null
   }
@@ -78,4 +95,39 @@ export const getTransactionLink = (hash: string): string => {
 
 export const getStandingFee = (): number => {
   return 0.1
+}
+
+const getFee = (
+  address: string,
+  outputs: UnspentOutput[],
+  amount: string,
+  feePerByte: number
+): number => {
+  try {
+    return verge.getFee(outputs, address, toSat(Number(amount)), address, feePerByte)
+  } catch {
+    return 0
+  }
+}
+
+export const getUtxos = (
+  outputs: UnspentOutput[],
+  address: string,
+  amount: string
+): UnspentOutput[] => {
+  const sortOutputs = outputs.sort((a, b) => a.satoshis - b.satoshis)
+  const utxos: UnspentOutput[] = []
+
+  for (const output of sortOutputs) {
+    const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
+    const transactionFeeBytes = getFee(address, utxos, amount, 1)
+
+    if (getUtxosValue >= toSat(Number(amount)) + transactionFeeBytes) {
+      break
+    }
+
+    utxos.push(output)
+  }
+
+  return utxos
 }
