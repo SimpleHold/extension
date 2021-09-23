@@ -406,7 +406,7 @@ export const checkWithOutputs = (symbol: string): boolean => {
   try {
     const provider = getProvider(symbol)
 
-    if (provider?.isWithOutputs) {
+    if (provider?.isWithOutputs || bitcoinLike.coins.indexOf(symbol) !== -1) {
       return true
     }
     return false
