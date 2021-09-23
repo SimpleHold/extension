@@ -20,7 +20,6 @@ import tronLogo from '@assets/currencies/trx.svg'
 import zilLogo from '@assets/currencies/zil.svg'
 import hbarLogo from '@assets/currencies/hbar.svg'
 import xvgLogo from '@assets/currencies/xvg.svg'
-import rddLogo from '@assets/currencies/rdd.svg'
 import xdcLogo from '@assets/currencies/xdc.svg'
 
 // Utils
@@ -223,15 +222,6 @@ const currencies: ICurrency[] = [
     logo: xvgLogo,
     background: '#6FBDDB',
     chain: 'verge',
-    minSendAmount: 100000,
-    isCustomFee: false,
-  },
-  {
-    name: 'ReddCoin',
-    symbol: 'rdd',
-    logo: rddLogo,
-    background: '#E84148',
-    chain: 'reddcoin',
     minSendAmount: 100000,
     isCustomFee: false,
   },

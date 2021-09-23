@@ -26,7 +26,6 @@ import * as tron from '@utils/currencies/tron'
 import * as hedera from '@utils/currencies/hedera'
 import * as zilliqa from '@utils/currencies/zilliqa'
 import * as verge from '@utils/currencies/verge'
-import * as reddcoin from '@utils/currencies/reddcoin'
 import * as xinfin from '@utils/currencies/xinfin'
 
 // Types
@@ -76,10 +75,6 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (verge.coins.indexOf(symbol) !== -1) {
       return verge
-    }
-
-    if (reddcoin.coins.indexOf(symbol) !== -1) {
-      return reddcoin
     }
 
     if (xinfin.coins.indexOf(symbol) !== -1) {
