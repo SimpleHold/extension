@@ -135,7 +135,5 @@ declare const dash: BitcoinLikeProvider
 declare const litecoin: BitcoinLikeProvider
 declare const dogecoin: BitcoinLikeProvider
 declare const bitcoinsv: BitcoinLikeProvider
-declare const verge: BitcoinLikeProvider
 declare const Zilliqa: any
 declare const bitcore: any
-declare const vergecore: any

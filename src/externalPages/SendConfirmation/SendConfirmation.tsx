@@ -462,7 +462,9 @@ const SendConfirmation: React.FC = () => {
               addressFrom,
               addressTo,
               getAmount(),
-              findWallet.privateKey
+              findWallet.privateKey,
+              parseNetworkFee,
+              outputs
             )
 
             if (createTx) {

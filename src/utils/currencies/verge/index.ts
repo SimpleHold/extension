@@ -1,9 +1,21 @@
+import * as vergeLib from 'vergejs-lib'
 import BigNumber from 'bignumber.js'
+import axios, { AxiosResponse } from 'axios'
+import { Buffer } from 'buffer'
+
+// Utils
+import { plus, minus } from '@utils/format'
+import { sendRawTransaction } from '@utils/api'
+
+// Types
+import { TInternalTxProps } from '../types'
 
 export const coins: string[] = ['xvg']
 export const isWithOutputs = true
+export const isInternalTx = true
 
 const ten6 = new BigNumber(10).pow(6)
+const network = vergeLib.networks.verge
 
 export const formatValue = (value: string | number, type: 'from' | 'to'): number => {
   if (type === 'from') {
@@ -15,7 +27,20 @@ export const formatValue = (value: string | number, type: 'from' | 'to'): number
 
 export const generateWallet = (): TGenerateAddress | null => {
   try {
-    return verge.generateWallet()
+    const keyPair = vergeLib.ECPair.makeRandom({ network })
+    const { address } = vergeLib.payments.p2pkh({
+      pubkey: keyPair.publicKey,
+      network,
+    })
+
+    if (address) {
+      return {
+        address,
+        privateKey: keyPair.toWIF().toString(),
+      }
+    }
+
+    return null
   } catch {
     return null
   }
@@ -23,55 +48,91 @@ export const generateWallet = (): TGenerateAddress | null => {
 
 export const importPrivateKey = (privateKey: string): string | null => {
   try {
-    return verge.importPrivateKey(privateKey)
+    const keyPair = vergeLib.ECPair.fromWIF(privateKey, network)
+
+    const { address } = vergeLib.payments.p2pkh({
+      pubkey: keyPair.publicKey,
+      network,
+    })
+
+    return address || null
   } catch {
     return null
   }
 }
 
-export const toSat = (value: number): number => {
+const getTxHex = async (txId: string): Promise<string | null> => {
   try {
-    return verge.toSat(value)
+    const { data }: AxiosResponse = await axios({
+      method: 'GET',
+      url: `https://verge-blockchain.info/api/tx/${txId}`,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data.hex
   } catch {
-    return 0
+    return null
   }
 }
 
-export const fromSat = (value: number): number => {
+export const createInternalTx = async ({
+  addressFrom,
+  addressTo,
+  amount,
+  privateKey,
+  networkFee,
+  outputs,
+}: TInternalTxProps): Promise<string | null> => {
   try {
-    return verge.fromSat(value)
-  } catch {
-    return 0
-  }
-}
+    if (!outputs?.length) {
+      return null
+    }
 
-const getTimeStamp = () => {
-  return (Date.now() / 1000) | 0
-}
+    const keyPair = vergeLib.ECPair.fromWIF(privateKey, network)
+    const psbt = new vergeLib.Psbt({ network })
 
-export const createTransaction = (
-  outputs: UnspentOutput[],
-  to: string,
-  amount: number,
-  fee: number,
-  changeAddress: string,
-  privateKey: string
-): string | null => {
-  try {
-    const tx = new vergecore.Transaction()
-      .from(outputs)
-      .to(to, amount)
-      .fee(fee)
-      .change(changeAddress)
+    const formatAmount = formatValue(amount, 'to')
 
-    const txJson = tx.toJSON()
+    for (const output of outputs) {
+      const { txId, outputIndex } = output
+      const txHex = await getTxHex(txId)
 
-    txJson.timestamp = getTimeStamp()
-    delete txJson.hash
+      if (!txHex) {
+        return null
+      }
 
-    const toJson = new vergecore.Transaction().fromObject(txJson)
+      psbt.addInput({
+        hash: txId,
+        index: outputIndex,
+        nonWitnessUtxo: Buffer.from(txHex, 'hex'),
+      })
+    }
 
-    return toJson.sign(new vergecore.PrivateKey.fromWIF(privateKey)).serialize()
+    psbt.addOutput({
+      address: addressTo,
+      value: formatAmount,
+    })
+
+    const totalOutputsAmount = outputs.reduce((a, b) => a + b.satoshis, 0)
+
+    const opReturnAmount = minus(totalOutputsAmount, plus(formatAmount, networkFee))
+
+    if (opReturnAmount !== 0) {
+      psbt.addOutput({
+        address: addressFrom,
+        value: opReturnAmount,
+      })
+    }
+
+    psbt.signAllInputs(keyPair)
+    psbt.validateSignaturesOfAllInputs()
+    psbt.finalizeAllInputs()
+    const transaction = psbt.extractTransaction()
+    const signedTransaction = transaction.toHex()
+
+    return await sendRawTransaction(signedTransaction, 'verge')
   } catch {
     return null
   }
@@ -79,7 +140,8 @@ export const createTransaction = (
 
 export const validateAddress = (address: string): boolean => {
   try {
-    return verge.isAddressValid(address)
+    vergeLib.address.toOutputScript(address, network)
+    return true
   } catch {
     return false
   }
@@ -97,19 +159,6 @@ export const getStandingFee = (): number => {
   return 0.1
 }
 
-const getFee = (
-  address: string,
-  outputs: UnspentOutput[],
-  amount: string,
-  feePerByte: number
-): number => {
-  try {
-    return verge.getFee(outputs, address, toSat(Number(amount)), address, feePerByte)
-  } catch {
-    return 0
-  }
-}
-
 export const getUtxos = (
   outputs: UnspentOutput[],
   address: string,
@@ -120,9 +169,7 @@ export const getUtxos = (
 
   for (const output of sortOutputs) {
     const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-    const transactionFeeBytes = getFee(address, utxos, amount, 1)
-
-    if (getUtxosValue >= toSat(Number(amount)) + transactionFeeBytes) {
+    if (getUtxosValue >= formatValue(Number(amount), 'to') + 0.1) {
       break
     }
 

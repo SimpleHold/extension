@@ -79,4 +79,6 @@ export type TInternalTxProps = {
   addressTo: string
   amount: number
   privateKey: string
+  networkFee: number
+  outputs?: UnspentOutput[]
 }

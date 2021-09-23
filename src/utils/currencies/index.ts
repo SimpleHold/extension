@@ -216,10 +216,6 @@ export const createTransaction = async ({
         return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
       }
 
-      if (verge.coins.indexOf(symbol) !== -1) {
-        return verge.createTransaction(outputs, to, amount, networkFee, from, privateKey)
-      }
-
       return bitcoinLike.createTransaction(
         outputs,
         to,
@@ -484,13 +480,23 @@ export const createInternalTx = async (
   addressFrom: string,
   addressTo: string,
   amount: number,
-  privateKey: string
+  privateKey: string,
+  networkFee: number,
+  outputs?: UnspentOutput[]
 ): Promise<string | null> => {
   try {
     const provider = getProvider(symbol)
 
     if (provider?.createInternalTx) {
-      return await provider.createInternalTx({ symbol, addressFrom, addressTo, amount, privateKey })
+      return await provider.createInternalTx({
+        symbol,
+        addressFrom,
+        addressTo,
+        amount,
+        privateKey,
+        networkFee,
+        outputs,
+      })
     }
 
     return null
