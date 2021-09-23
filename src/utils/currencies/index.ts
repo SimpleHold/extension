@@ -25,6 +25,8 @@ import * as nerve from '@utils/currencies/nerve'
 import * as tron from '@utils/currencies/tron'
 import * as hedera from '@utils/currencies/hedera'
 import * as zilliqa from '@utils/currencies/zilliqa'
+import * as verge from '@utils/currencies/verge'
+import * as xinfin from '@utils/currencies/xinfin'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -69,6 +71,14 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (zilliqa.coins.indexOf(symbol) !== -1) {
       return zilliqa
+    }
+
+    if (verge.coins.indexOf(symbol) !== -1) {
+      return verge
+    }
+
+    if (xinfin.coins.indexOf(symbol) !== -1) {
+      return xinfin
     }
 
     return null
@@ -244,6 +254,10 @@ export const getNetworkFee = async ({
     }
   }
 
+  if (xinfin.coins.indexOf(symbol) !== -1) {
+    return await xinfin.getNetworkFee()
+  }
+
   if (isEthereumLike(symbol, tokenChain)) {
     const { contractAddress, decimals } = ethLikeParams
 
@@ -392,7 +406,7 @@ export const checkWithOutputs = (symbol: string): boolean => {
   try {
     const provider = getProvider(symbol)
 
-    if (provider?.isWithOutputs) {
+    if (provider?.isWithOutputs || bitcoinLike.coins.indexOf(symbol) !== -1) {
       return true
     }
     return false
@@ -461,13 +475,23 @@ export const createInternalTx = async (
   addressFrom: string,
   addressTo: string,
   amount: number,
-  privateKey: string
+  privateKey: string,
+  networkFee: number,
+  outputs?: UnspentOutput[]
 ): Promise<string | null> => {
   try {
     const provider = getProvider(symbol)
 
     if (provider?.createInternalTx) {
-      return await provider.createInternalTx({ symbol, addressFrom, addressTo, amount, privateKey })
+      return await provider.createInternalTx({
+        symbol,
+        addressFrom,
+        addressTo,
+        amount,
+        privateKey,
+        networkFee,
+        outputs,
+      })
     }
 
     return null
