@@ -4,57 +4,60 @@ import { useHistory, useLocation } from 'react-router-dom'
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
-import NftCard from '@components/NftCard'
-
-// Utils
-import { getNft } from '@utils/api'
-
-// Types
-import { TNft } from '@utils/api/types'
-import { ICurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
 
-export interface ILocationState {
-  address: string
-  currency: ICurrency
+type TTrait = {
+  trait_type: string
+  value: string
+}
+
+interface ILocationState {
+  tokenId: number
+  name: string
+  smartContract: string
+  chain: string
+  image: string
+  traits?: TTrait[]
 }
 
 const NftPage: React.FC = () => {
   const history = useHistory()
   const {
-    state: { address, currency },
+    state: { tokenId, name, smartContract, chain, image, traits },
   } = useLocation<ILocationState>()
-
-  const [collection, setCollection] = React.useState<null | TNft[]>(null)
-
-  React.useEffect(() => {
-    onGetNft()
-  }, [])
-
-  const onGetNft = async (): Promise<void> => {
-    const data = await getNft(address, currency.chain)
-
-    setCollection(data)
-  }
 
   return (
     <Styles.Wrapper>
       <Cover />
       <Header withBack onBack={history.goBack} backTitle="Wallet" />
       <Styles.Container>
-        <Styles.Title>My NFT Collection</Styles.Title>
-        {collection?.length ? (
-          <Styles.List>
-            {collection.map((item: TNft, index: number) => {
-              const { name, tokenId, image } = item
+        <Styles.Title>
+          {name} {tokenId}
+        </Styles.Title>
+        <Styles.SubTitle>{name}</Styles.SubTitle>
+
+        <Styles.ContractInfo>
+          <Styles.ContractLabel>Smart Contract:</Styles.ContractLabel>
+          <Styles.ContractLink>{smartContract}</Styles.ContractLink>
+        </Styles.ContractInfo>
+
+        <Styles.Art src={image} alt="art" />
+
+        {traits?.length ? (
+          <Styles.Traits>
+            {traits.map((trait: TTrait) => {
+              const { trait_type, value } = trait
 
               return (
-                <NftCard key={`${name}/${index}`} name={name} tokenId={tokenId} image={image} />
+                <Styles.Trait key={trait_type}>
+                  <Styles.TraitType>{trait_type}</Styles.TraitType>
+                  <Styles.TraitValue>{value}</Styles.TraitValue>
+                </Styles.Trait>
               )
             })}
-          </Styles.List>
+          </Styles.Traits>
         ) : null}
       </Styles.Container>
     </Styles.Wrapper>
