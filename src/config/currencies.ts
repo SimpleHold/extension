@@ -21,6 +21,7 @@ import zilLogo from '@assets/currencies/zil.svg'
 import hbarLogo from '@assets/currencies/hbar.svg'
 import xvgLogo from '@assets/currencies/xvg.svg'
 import xdcLogo from '@assets/currencies/xdc.svg'
+import solLogo from '@assets/currencies/sol.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -233,6 +234,15 @@ const currencies: ICurrency[] = [
     chain: 'xinfin',
     minSendAmount: 1000000000000000,
     isCustomFee: false,
+  },
+  {
+    name: 'Solana',
+    symbol: 'sol',
+    logo: solLogo,
+    background: '#2CD9A0',
+    chain: 'solana',
+    minSendAmount: 1000000000000000, // Fix me
+    isCustomFee: false, // Fix me
   },
 ]
 

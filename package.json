@@ -28,6 +28,7 @@
     "@ledgerhq/hw-app-eth": "^6.1.0",
     "@ledgerhq/hw-app-xrp": "^6.1.0",
     "@ledgerhq/hw-transport-webusb": "^6.1.0",
+    "@solana/web3.js": "^1.29.0",
     "@thetalabs/theta-js": "^0.0.53",
     "amplitude-js": "^7.4.4",
     "axios": "^0.21.1",
