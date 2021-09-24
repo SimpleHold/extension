@@ -171,9 +171,16 @@ const routers: RouteProps[] = [
     }),
   },
   {
+    path: '/nft-collection',
+    component: Loadable({
+      loader: () => import('pages/NftCollection'),
+      loading: () => null,
+    }),
+  },
+  {
     path: '/nft',
     component: Loadable({
-      loader: () => import('@pages/Nft'),
+      loader: () => import('pages/Nft'),
       loading: () => null,
     }),
   },

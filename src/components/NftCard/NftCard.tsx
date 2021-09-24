@@ -7,13 +7,14 @@ interface Props {
   name: string
   tokenId: number
   image?: string
+  onView: () => void
 }
 
 const NftCard: React.FC<Props> = (props) => {
-  const { name, tokenId, image } = props
+  const { name, tokenId, image, onView } = props
 
   return (
-    <Styles.Container>
+    <Styles.Container onClick={onView}>
       <Styles.Row>
         {image ? <Styles.Image src={image} alt="image" /> : null}
         <Styles.Body>
