@@ -17,12 +17,7 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
-import {
-  generate,
-  importPrivateKey,
-  importRecoveryPhrase,
-  checkWithPhrase,
-} from '@utils/currencies'
+import { generate, checkWithPhrase } from '@utils/currencies'
 import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
 
@@ -100,7 +95,7 @@ const NewWallet: React.FC = () => {
       const generateAddress = await generate(symbol, chain)
 
       if (generateAddress) {
-        const { privateKey, mnemonic, isNotActivated } = generateAddress
+        const { privateKey, mnemonic, isNotActivated, address } = generateAddress
 
         const backup = getItem('backup')
 
@@ -108,54 +103,41 @@ const NewWallet: React.FC = () => {
           const decryptBackup = decrypt(backup, state.password)
 
           if (decryptBackup) {
-            let address
+            updateState({ isButtonLoading: false })
 
-            if (mnemonic) {
-              const tryImportPhrase = importRecoveryPhrase(symbol, mnemonic)
-              if (tryImportPhrase) {
-                address = tryImportPhrase.address
-              }
-            } else {
-              address = await importPrivateKey(symbol, privateKey, chain)
-            }
+            const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
+            const currenciesList = getCurrenciesList(getCurrencyInfo)
 
-            if (address || isNotActivated) {
-              updateState({ isButtonLoading: false })
+            const walletsList = addNewWallet(
+              address || '',
+              privateKey,
+              decryptBackup,
+              state.password,
+              currenciesList,
+              false,
+              chain,
+              tokenName,
+              contractAddress,
+              decimals,
+              mnemonic,
+              isNotActivated
+            )
 
-              const getCurrencyInfo = chain ? getCurrencyByChain(chain) : null
-              const currenciesList = getCurrenciesList(getCurrencyInfo)
+            if (walletsList) {
+              const walletAmount = JSON.parse(walletsList).filter(
+                (wallet: IWallet) => wallet.symbol === symbol
+              ).length
 
-              const walletsList = addNewWallet(
-                address || '',
-                privateKey,
-                decryptBackup,
-                state.password,
-                currenciesList,
-                false,
-                chain,
-                tokenName,
-                contractAddress,
-                decimals,
-                mnemonic,
-                isNotActivated
-              )
+              setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
-              if (walletsList) {
-                const walletAmount = JSON.parse(walletsList).filter(
-                  (wallet: IWallet) => wallet.symbol === symbol
-                ).length
+              logEvent({
+                name: ADD_ADDRESS_CONFIRM,
+              })
 
-                setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
+              setItem('backupStatus', 'notDownloaded')
 
-                logEvent({
-                  name: ADD_ADDRESS_CONFIRM,
-                })
-
-                setItem('backupStatus', 'notDownloaded')
-
-                updateState({ activeDrawer: 'success' })
-                return
-              }
+              updateState({ activeDrawer: 'success' })
+              return
             }
           }
         }
