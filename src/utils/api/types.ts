@@ -127,3 +127,11 @@ export type TFullTxInfo = {
   tokenSymbol?: string
   contractAddress?: string
 }
+
+export type TNft = {
+  tokenId: number
+  name: string
+  contractAddress: string
+  chain: string
+  image?: string
+}

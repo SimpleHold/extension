@@ -19,6 +19,7 @@ import {
   TFullTxHistoryResponse,
   TFullTxWallet,
   TFullTxInfo,
+  TNft,
 } from './types'
 
 export const getBalance = async (
@@ -531,5 +532,23 @@ export const getHederaAccountId = async (publicKey: string): Promise<string | nu
     return data.data
   } catch {
     return null
+  }
+}
+
+export const getNft = async (address: string, chain: string): Promise<TNft[]> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/nft`, {
+      params: {
+        address,
+        chain,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data.data
+  } catch {
+    return []
   }
 }

@@ -96,11 +96,18 @@ const WalletHeading: React.FC<Props> = (props) => {
     )
 
     if (['eth', 'bnb'].indexOf(symbol) !== -1 && !hardware) {
-      list.push({
-        icon: { source: plusCircleIcon, width: 18, height: 18 },
-        title: 'Add token',
-        key: 'addToken',
-      })
+      list.push(
+        {
+          icon: { source: plusCircleIcon, width: 18, height: 18 },
+          title: 'Add token',
+          key: 'addToken',
+        },
+        {
+          icon: { source: plusCircleIcon, width: 18, height: 18 },
+          title: 'View My NFT Collection',
+          key: 'viewNft',
+        }
+      )
     }
 
     setDropdownList(list)
