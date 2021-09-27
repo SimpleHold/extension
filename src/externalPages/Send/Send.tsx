@@ -338,7 +338,7 @@ const Send: React.FC = () => {
             if (getFee) {
               updateState({
                 feeValues: data.fees,
-                utxosList: getFee.utxos,
+                utxosList: getFee.utxos || [],
                 fee: getFee.value,
               })
             }
@@ -664,7 +664,7 @@ const Send: React.FC = () => {
         !state.isFeeLoading &&
         !isCurrencyBalanceError
       ) {
-        if (!state.utxosList.length) {
+        if (!state.utxosList?.length) {
           const withOuputs = checkWithOutputs(state.currencyInfo.symbol)
 
           return withOuputs

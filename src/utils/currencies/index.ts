@@ -444,8 +444,8 @@ export const getStandingFee = (symbol: string): number | null => {
   }
 }
 
-export const checkWithPhrase = (symbol: string): boolean => {
-  if (cardano.coins.indexOf(symbol) !== -1) {
+export const checkWithPhrase = (symbol: string, chain?: string): boolean => {
+  if (cardano.coins.indexOf(symbol) !== -1 && !chain) {
     return true
   }
 
