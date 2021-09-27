@@ -241,7 +241,7 @@ const currencies: ICurrency[] = [
     logo: solLogo,
     background: '#2CD9A0',
     chain: 'solana',
-    minSendAmount: 100000,
+    minSendAmount: 1000,
     isCustomFee: false,
   },
 ]
