@@ -91,14 +91,14 @@ export const generate = async (
   symbol: string,
   chain?: string
 ): Promise<TGenerateAddress | null> => {
+  if (isEthereumLike(symbol, chain)) {
+    return ethereumLike.generateAddress()
+  }
+
   const provider = getProvider(symbol)
 
   if (provider?.generateWallet) {
     return await provider.generateWallet()
-  }
-
-  if (isEthereumLike(symbol, chain)) {
-    return ethereumLike.generateAddress()
   }
 
   return bitcoinLike.generateWallet(symbol)
@@ -324,14 +324,14 @@ export const getExplorerLink = (
   tokenChain?: string,
   contractAddress?: string
 ) => {
+  if (isEthereumLike(symbol, tokenChain)) {
+    return ethereumLike.getExplorerLink(address, symbol, tokenChain, contractAddress)
+  }
+
   const provider = getProvider(symbol)
 
   if (provider?.getExplorerLink) {
     return provider.getExplorerLink(address)
-  }
-
-  if (isEthereumLike(symbol, tokenChain)) {
-    return ethereumLike.getExplorerLink(address, symbol, tokenChain, contractAddress)
   }
 
   return `https://blockchair.com/${chain}/address/${address}`
@@ -343,17 +343,17 @@ export const getTransactionLink = (
   chain: string,
   tokenChain?: string
 ): string => {
+  if (isEthereumLike(symbol, tokenChain)) {
+    return ethereumLike.getTransactionLink(hash, chain, tokenChain)
+  }
+
   const provider = getProvider(symbol)
 
   if (provider?.getTransactionLink) {
     return provider.getTransactionLink(hash)
   }
 
-  if (isEthereumLike(symbol, tokenChain)) {
-    return ethereumLike.getTransactionLink(hash, chain, tokenChain)
-  } else {
-    return `https://blockchair.com/${chain}/transaction/${hash}`
-  }
+  return `https://blockchair.com/${chain}/transaction/${hash}`
 }
 
 export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string => {
