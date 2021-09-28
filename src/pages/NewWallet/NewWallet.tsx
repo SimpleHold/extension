@@ -109,7 +109,7 @@ const NewWallet: React.FC = () => {
             const currenciesList = getCurrenciesList(getCurrencyInfo)
 
             const walletsList = addNewWallet(
-              address || '',
+              address,
               privateKey,
               decryptBackup,
               state.password,

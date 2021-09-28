@@ -96,14 +96,14 @@ export const generate = async (
   symbol: string,
   chain?: string
 ): Promise<TGenerateAddress | null> => {
+  if (isEthereumLike(symbol, chain)) {
+    return ethereumLike.generateAddress()
+  }
+
   const provider = getProvider(symbol)
 
   if (provider?.generateWallet) {
     return await provider.generateWallet()
-  }
-
-  if (isEthereumLike(symbol, chain)) {
-    return ethereumLike.generateAddress()
   }
 
   return bitcoinLike.generateWallet(symbol)
