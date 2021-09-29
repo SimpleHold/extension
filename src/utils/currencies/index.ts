@@ -504,3 +504,10 @@ export const createInternalTx = async (
     return null
   }
 }
+
+export const getContractUrl = (address: string, chain: string): string => {
+  if (chain === 'eth') {
+    return `https://etherscan.io/address/${address}`
+  }
+  return `https://bscscan.com/address/${address}`
+}

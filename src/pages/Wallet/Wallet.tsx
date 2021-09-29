@@ -242,11 +242,6 @@ const WalletPage: React.FC = () => {
         currency,
         address: state.address,
       })
-    } else if (key === 'viewNft') {
-      history.push('/nft-collection', {
-        currency,
-        address: state.address,
-      })
     }
   }
 

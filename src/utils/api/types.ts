@@ -135,3 +135,8 @@ export type TNft = {
   chain: string
   image?: string
 }
+
+export type TNFtWallets = {
+  address: string
+  chain: string
+}
