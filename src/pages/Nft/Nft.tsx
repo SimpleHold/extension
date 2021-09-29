@@ -109,7 +109,7 @@ const NftPage: React.FC = () => {
             </Styles.ContractButton>
           </Styles.ContractBlock>
 
-          <Button label="Add image" mt={20} onClick={onAddImage} />
+          {!image?.length ? <Button label="Add image" mt={20} onClick={onAddImage} /> : null}
         </Styles.Container>
       </Styles.Wrapper>
       <AddImageDrawer

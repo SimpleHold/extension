@@ -31,7 +31,7 @@ const SubTitle = styled.p`
 const EmptyImageRow = styled.div`
   margin: 20px 0 0 0;
   width: 100%;
-  height: 315px;
+  height: auto;
   background-color: #f2f4f8;
   border-radius: 16px;
   display: flex;
