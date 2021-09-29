@@ -6,9 +6,20 @@ const Container = styled.div`
   padding: 0 7.5px;
   margin-bottom: 15px;
   width: 50%;
+  height: fit-content;
+`
+
+const SkeletonRow = styled.div`
+  background-color: #ffffff;
+  border: 1px solid #dee1e9;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
 `
 
 const Row = styled.div`
+  background-color: #ffffff;
   border: 1px solid #dee1e9;
   width: 100%;
   display: flex;
@@ -18,18 +29,29 @@ const Row = styled.div`
   &:hover {
     cursor: pointer;
     border: 1px solid #3fbb7d;
+
+    .card-body {
+      background-color: #f8f9fb;
+    }
+
+    .card-name {
+      color: #3fbb7d;
+    }
   }
 `
 
 const Image = styled.img`
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 16px 16px 0 0;
 `
 
 const Body = styled.div`
-  padding: 14px 15px 20px 15px;
+  padding: 15px 15px 20px 15px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `
 
 const Name = styled.p`
@@ -50,6 +72,28 @@ const TokenId = styled.p`
   color: #7d7e8d;
 `
 
+const SkeletonImage = styled.div`
+  width: 100%;
+  height: 147px;
+  background-color: #f8f9fb;
+  border-radius: 16px 16px 0 0;
+`
+
+const EmptyImageRow = styled.div`
+  width: 100%;
+  height: 150px;
+  background-color: #f8f9fb;
+  border-radius: 16px 16px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const EmptyImage = styled.img`
+  width: 60px;
+  height: 60px;
+`
+
 const Styles = {
   Container,
   Row,
@@ -57,6 +101,10 @@ const Styles = {
   Body,
   Name,
   TokenId,
+  SkeletonImage,
+  EmptyImageRow,
+  EmptyImage,
+  SkeletonRow,
 }
 
 export default Styles
