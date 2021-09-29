@@ -2,6 +2,10 @@ import styled from 'styled-components'
 
 import background from '@assets/backgrounds/main.png'
 
+type TLinkProps = {
+  isActive?: boolean
+}
+
 const Container = styled.div`
   width: 100%;
   background-image: url(${background});
@@ -55,14 +59,6 @@ const Bottom = styled.div`
   justify-content: space-between;
 `
 
-const WalletsLabel = styled.p`
-  margin: 0;
-  font-weight: 500;
-  line-height: 19px;
-  color: #ffffff;
-  user-select: none;
-`
-
 const Actions = styled.div`
   display: flex;
   flex-direction: row;
@@ -108,6 +104,33 @@ const ButtonDot = styled.div`
   border-radius: 3px;
 `
 
+const Nav = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+`
+
+const Link = styled.p`
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: ${({ isActive }: TLinkProps) => (isActive ? '#FFFFFF' : 'rgba(255, 255, 255, 0.5)')};
+  margin: 0;
+
+  &:hover {
+    cursor: ${({ isActive }: TLinkProps) => (isActive ? 'default' : 'pointer')};
+    color: #ffffff;
+  }
+`
+
+const LinkDivider = styled.p`
+  margin: 0 3px 0 5px;
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 19px;
+  color: rgba(255, 255, 255, 0.5);
+`
+
 const Styles = {
   Container,
   Row,
@@ -118,10 +141,12 @@ const Styles = {
   TotalBalanceLabel,
   PendingBalanceRow,
   Bottom,
-  WalletsLabel,
   Actions,
   Button,
   ButtonDot,
+  Nav,
+  Link,
+  LinkDivider,
 }
 
 export default Styles

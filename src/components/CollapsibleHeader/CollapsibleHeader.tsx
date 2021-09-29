@@ -22,6 +22,7 @@ interface Props {
   isDrawersActive: boolean
   onViewTxHistory: () => void
   openFilters: () => void
+  onViewNFT: () => void
 }
 
 const CollapsibleHeader: React.FC<Props> = (props) => {
@@ -33,6 +34,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
     isDrawersActive,
     onViewTxHistory,
     openFilters,
+    onViewNFT,
   } = props
 
   const [latesScrollPosition, setLatestScrollPosition] = React.useState<number>(0)
@@ -66,7 +68,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
   const clockIconSize = Math.max(12, 23 - 0.1 * latesScrollPosition)
   const clockIconMarginLeft = Math.max(6, 10 - latesScrollPosition)
 
-  const walletsLabelFontSize = Math.max(0, 16 - 0.05 * latesScrollPosition)
+  const navHeight = Math.max(0, 19 - 0.05 * latesScrollPosition)
 
   const isFiltersActive = (): boolean => {
     return checkOneOfExist([
@@ -157,11 +159,11 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
         ) : null}
 
         <Styles.Bottom>
-          <Styles.WalletsLabel
-            style={{ fontSize: walletsLabelFontSize, opacity: latesScrollPosition > 50 ? 0 : 1 }}
-          >
-            Wallets
-          </Styles.WalletsLabel>
+          <Styles.Nav style={{ height: navHeight, opacity: latesScrollPosition > 50 ? 0 : 1 }}>
+            <Styles.Link isActive>Wallets</Styles.Link>
+            <Styles.LinkDivider>/</Styles.LinkDivider>
+            <Styles.Link onClick={onViewNFT}>Collectibles</Styles.Link>
+          </Styles.Nav>
           <Styles.Actions>
             <Styles.Button onClick={openFilters}>
               <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
