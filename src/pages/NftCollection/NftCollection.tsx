@@ -16,7 +16,6 @@ import { IWallet, getWallets } from '@utils/wallet'
 
 // Types
 import { TNft } from '@utils/api/types'
-import { ICurrency } from '@config/currencies'
 
 // Styles
 import Styles from './styles'
@@ -111,6 +110,7 @@ const NftCollectionPage: React.FC = () => {
               chain,
               image,
             }}
+            onView={onViewNft(item)}
           />
         )
       })}

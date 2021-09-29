@@ -52,6 +52,7 @@ const Body = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  border-radius: 0 0 16px 16px;
 `
 
 const Name = styled.p`

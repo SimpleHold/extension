@@ -30,7 +30,7 @@ type TTrait = {
 interface ILocationState {
   tokenId: number
   name: string
-  smartContract: string
+  contractAddress: string
   chain: string
   image?: string
   traits?: TTrait[]
@@ -40,18 +40,18 @@ const NftPage: React.FC = () => {
   const history = useHistory()
   const {
     state,
-    state: { tokenId, name, smartContract, chain, traits },
+    state: { tokenId, name, contractAddress, chain, traits = [] },
   } = useLocation<ILocationState>()
 
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'addImage'>(null)
-  const [image, setImage] = React.useState<undefined | string>(state.image)
+  const [image, setImage] = React.useState<undefined | string>(state?.image)
 
   const onAddImage = (): void => {
     setActiveDrawer('addImage')
   }
 
   const onViewContact = (): void => {
-    openWebPage(getContractUrl(smartContract, chain))
+    openWebPage(getContractUrl(contractAddress, chain))
   }
 
   const onCloseDrawer = (): void => {
@@ -102,7 +102,7 @@ const NftPage: React.FC = () => {
           <Styles.ContractBlock>
             <Styles.ContractBlockRow>
               <Styles.ContractBlockLabel>Smart Contract</Styles.ContractBlockLabel>
-              <Styles.ContractBlockLink>{short(smartContract, 25)}</Styles.ContractBlockLink>
+              <Styles.ContractBlockLink>{short(contractAddress, 25)}</Styles.ContractBlockLink>
             </Styles.ContractBlockRow>
             <Styles.ContractButton onClick={onViewContact}>
               <SVG src={linkIcon} width={12} height={12} />
