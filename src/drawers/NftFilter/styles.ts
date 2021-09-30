@@ -30,17 +30,18 @@ const GroupTitle = styled.p`
 
 const Actions = styled.div`
   padding: 30px 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
 `
 
 const GroupHeading = styled.div`
+  height: 20px;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-`
-
-const GroupBody = styled.div`
-  margin: 10px 0 0 0;
+  margin: 0 0 10px 0;
 `
 
 const NetworksList = styled.div`
@@ -139,7 +140,6 @@ const Styles = {
   GroupTitle,
   Actions,
   GroupHeading,
-  GroupBody,
   NetworksList,
   Network,
   NetworkTitle,
