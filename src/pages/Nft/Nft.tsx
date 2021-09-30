@@ -14,18 +14,17 @@ import AddImageDrawer from '@drawers/AddImage'
 import { getContractUrl } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
 import { short } from '@utils/format'
+import { addNFTImage } from '@utils/storage'
 
 // Assets
 import linkIcon from '@assets/icons/link.svg'
 import emptyNftImage from '@assets/icons/emptyNftImage.svg'
 
+// Types
+import { TTrait } from '@utils/api/types'
+
 // Styles
 import Styles from './styles'
-
-type TTrait = {
-  trait_type: string
-  value: string
-}
 
 interface ILocationState {
   tokenId: number
@@ -61,6 +60,8 @@ const NftPage: React.FC = () => {
   const updateImage = (newImage: string) => {
     setImage(newImage)
     setActiveDrawer(null)
+
+    addNFTImage(contractAddress, chain, tokenId, newImage)
   }
 
   const onErrorImageLoad = (): void => {

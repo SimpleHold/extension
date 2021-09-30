@@ -31,7 +31,7 @@ const SubTitle = styled.p`
 const EmptyImageRow = styled.div`
   margin: 20px 0 0 0;
   width: 100%;
-  height: auto;
+  height: 315px;
   background-color: #f2f4f8;
   border-radius: 16px;
   display: flex;
@@ -120,7 +120,6 @@ const EmptyImage = styled.img`
 
 const Image = styled.img`
   width: 100%;
-  height: 315px;
   object-fit: contain;
   margin: 20px 0 0 0;
   border-radius: 16px;
