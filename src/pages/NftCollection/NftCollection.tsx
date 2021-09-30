@@ -13,6 +13,8 @@ import NftFilterDrawer from '@drawers/NftFilter'
 // Utils
 import { getNft } from '@utils/api'
 import { IWallet, getWallets } from '@utils/wallet'
+import { checkOneOfExist, getItem, getNFTImage } from '@utils/storage'
+import { toLower } from '@utils/format'
 
 // Types
 import { TNft } from '@utils/api/types'
@@ -54,8 +56,42 @@ const NftCollectionPage: React.FC = () => {
     setCollection([])
   }
 
+  const filterWallets = (wallet: IWallet): IWallet | boolean => {
+    const getNetwork = getItem('nftFiltersNetwork')
+    const getAddresses = getItem('nftFiltersAddresses')
+
+    if (getNetwork && !getAddresses?.length) {
+      const formatNetwork = getNetwork === 'bsc' ? 'bnb' : getNetwork
+
+      return toLower(wallet.symbol) === toLower(formatNetwork)
+    }
+
+    if (getAddresses?.length) {
+      return JSON.parse(getAddresses).find(
+        (item: IWallet) =>
+          toLower(item.symbol) === toLower(wallet.symbol) &&
+          toLower(item.address) === toLower(wallet.address)
+      )
+    }
+
+    return wallet
+  }
+
+  const prepareData = (data: TNft[]): TNft[] => {
+    for (const item of data) {
+      const { contractAddress, chain, tokenId } = item
+      const getImage = getNFTImage(contractAddress, chain, tokenId)
+
+      if (getImage) {
+        item.image = getImage
+      }
+    }
+
+    return data
+  }
+
   const onGetNft = async (): Promise<void> => {
-    const mapWallets = wallets.map((wallet: IWallet) => {
+    const mapWallets = wallets.filter(filterWallets).map((wallet: IWallet) => {
       return {
         address: wallet.address,
         chain: wallet.symbol === 'bnb' ? 'bsc' : 'eth',
@@ -64,7 +100,7 @@ const NftCollectionPage: React.FC = () => {
 
     const data = await getNft(mapWallets)
 
-    setCollection(data)
+    setCollection(prepareData(data))
   }
 
   const onViewNft = (item: TNft) => (): void => {
@@ -117,6 +153,15 @@ const NftCollectionPage: React.FC = () => {
     </Styles.Content>
   )
 
+  const onApplyDrawer = (): void => {
+    onCloseDrawer()
+    onGetNft()
+  }
+
+  const isFiltersActive = (): boolean => {
+    return checkOneOfExist(['nftFiltersNetwork', 'nftFiltersAddresses'])
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -131,6 +176,7 @@ const NftCollectionPage: React.FC = () => {
           {wallets.length > 0 ? (
             <Styles.Button onClick={openFilters}>
               <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
+              {isFiltersActive() ? <Styles.ButtonDot /> : null}
             </Styles.Button>
           ) : null}
         </Styles.Tabs>
@@ -142,7 +188,11 @@ const NftCollectionPage: React.FC = () => {
           )}
         </Styles.Container>
       </Styles.Wrapper>
-      <NftFilterDrawer isActive={activeDrawer === 'filters'} onClose={onCloseDrawer} />
+      <NftFilterDrawer
+        isActive={activeDrawer === 'filters'}
+        onClose={onCloseDrawer}
+        onApply={onApplyDrawer}
+      />
     </>
   )
 }

@@ -117,6 +117,16 @@ const Content = styled.div`
   height: 470px;
 `
 
+const ButtonDot = styled.div`
+  width: 6px;
+  height: 6px;
+  background-color: #eb5757;
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border-radius: 3px;
+`
+
 const Styles = {
   Wrapper,
   Tabs,
@@ -130,6 +140,7 @@ const Styles = {
   NotFoundText,
   Loading,
   Content,
+  ButtonDot,
 }
 
 export default Styles

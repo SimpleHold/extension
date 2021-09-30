@@ -134,9 +134,15 @@ export type TNft = {
   contractAddress: string
   chain: string
   image?: string
+  traits?: TTrait[]
 }
 
 export type TNFtWallets = {
   address: string
   chain: string
+}
+
+export type TTrait = {
+  trait_type: string
+  value: string
 }
