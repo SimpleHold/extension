@@ -173,6 +173,10 @@ const Wallets: React.FC = () => {
     })
   }
 
+  const onViewNFT = (): void => {
+    history.push('/nft-collection')
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -184,6 +188,7 @@ const Wallets: React.FC = () => {
           isDrawersActive={state.activeDrawer !== null}
           onViewTxHistory={onViewTxHistory}
           openFilters={openFilters}
+          onViewNFT={onViewNFT}
         />
         {state.wallets !== null ? (
           <Styles.WalletsList>

@@ -27,6 +27,7 @@ import * as hedera from '@utils/currencies/hedera'
 import * as zilliqa from '@utils/currencies/zilliqa'
 import * as verge from '@utils/currencies/verge'
 import * as xinfin from '@utils/currencies/xinfin'
+import * as solana from '@utils/currencies/solana'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -79,6 +80,10 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (xinfin.coins.indexOf(symbol) !== -1) {
       return xinfin
+    }
+
+    if (solana.coins.indexOf(symbol) !== -1) {
+      return solana
     }
 
     return null
@@ -498,4 +503,11 @@ export const createInternalTx = async (
   } catch {
     return null
   }
+}
+
+export const getContractUrl = (address: string, chain: string): string => {
+  if (chain === 'eth') {
+    return `https://etherscan.io/address/${address}`
+  }
+  return `https://bscscan.com/address/${address}`
 }

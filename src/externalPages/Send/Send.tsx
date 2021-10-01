@@ -664,7 +664,7 @@ const Send: React.FC = () => {
         !state.isFeeLoading &&
         !isCurrencyBalanceError
       ) {
-        if (!state.utxosList?.length) {
+        if (!state?.utxosList?.length) {
           const withOuputs = checkWithOutputs(state.currencyInfo.symbol)
 
           return withOuputs

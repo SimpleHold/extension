@@ -556,7 +556,7 @@ const SendPage: React.FC = () => {
       !state.isFeeLoading &&
       !isCurrencyBalanceError
     ) {
-      if (!state.utxosList?.length) {
+      if (!state?.utxosList?.length) {
         const withOuputs = checkWithOutputs(symbol)
 
         return withOuputs

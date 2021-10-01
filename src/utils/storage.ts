@@ -66,3 +66,51 @@ export const checkOneOfExist = (keys: string[]): boolean => {
 export const removeCache = (): void => {
   removeMany(deletedDataOnLogout)
 }
+
+export const addNFTImage = (
+  contractAddress: string,
+  chain: string,
+  tokenId: number,
+  image: string
+) => {
+  const getImagesList = getJSON('nft')
+
+  const newImage = {
+    contractAddress,
+    chain,
+    image,
+    tokenId,
+  }
+
+  if (getImagesList) {
+    setItem('nft', JSON.stringify([...getImagesList, newImage]))
+  } else {
+    setItem('nft', JSON.stringify([newImage]))
+  }
+}
+
+type TNFtItem = {
+  contractAddress: string
+  chain: string
+  tokenId: number
+  image: string
+}
+
+export const getNFTImage = (
+  contractAddress: string,
+  chain: string,
+  tokenId: number
+): string | null => {
+  const getImagesList = getJSON('nft')
+
+  if (!getImagesList) {
+    return null
+  }
+
+  const findImage = getImagesList.find(
+    (item: TNFtItem) =>
+      item.chain === chain && item.contractAddress === contractAddress && item.tokenId === tokenId
+  )
+
+  return findImage?.image || null
+}
