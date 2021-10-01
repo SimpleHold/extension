@@ -3,6 +3,9 @@ import * as React from 'react'
 // Components
 import Skeleton from '@components/Skeleton'
 
+// Utils
+import { short } from '@utils/format'
+
 // Assets
 import emptyNftImage from '@assets/icons/emptyNftImage.svg'
 
@@ -59,7 +62,7 @@ const NftCard: React.FC<Props> = (props) => {
           )}
           <Styles.Body className="card-body">
             <Styles.Name className="card-name">{name}</Styles.Name>
-            <Styles.TokenId>{tokenId}</Styles.TokenId>
+            <Styles.TokenId>{short(`${tokenId}`, 8)}</Styles.TokenId>
           </Styles.Body>
         </Styles.Row>
       </Styles.Container>

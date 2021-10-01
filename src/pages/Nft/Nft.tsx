@@ -75,7 +75,7 @@ const NftPage: React.FC = () => {
         <Header withBack onBack={history.goBack} backTitle="Wallet" />
         <Styles.Container>
           <Styles.Title>
-            {name} {tokenId}
+            {name} {short(`${tokenId}`, 15)}
           </Styles.Title>
           <Styles.SubTitle>{name}</Styles.SubTitle>
           {image ? (
@@ -100,15 +100,17 @@ const NftPage: React.FC = () => {
             </Styles.Traits>
           ) : null}
 
-          <Styles.ContractBlock>
-            <Styles.ContractBlockRow>
-              <Styles.ContractBlockLabel>Smart Contract</Styles.ContractBlockLabel>
-              <Styles.ContractBlockLink>{short(contractAddress, 25)}</Styles.ContractBlockLink>
-            </Styles.ContractBlockRow>
-            <Styles.ContractButton onClick={onViewContact}>
-              <SVG src={linkIcon} width={12} height={12} />
-            </Styles.ContractButton>
-          </Styles.ContractBlock>
+          {contractAddress?.length ? (
+            <Styles.ContractBlock>
+              <Styles.ContractBlockRow>
+                <Styles.ContractBlockLabel>Smart Contract</Styles.ContractBlockLabel>
+                <Styles.ContractBlockLink>{short(contractAddress, 25)}</Styles.ContractBlockLink>
+              </Styles.ContractBlockRow>
+              <Styles.ContractButton onClick={onViewContact}>
+                <SVG src={linkIcon} width={12} height={12} />
+              </Styles.ContractButton>
+            </Styles.ContractBlock>
+          ) : null}
 
           {!image?.length ? <Button label="Add image" mt={20} onClick={onAddImage} /> : null}
         </Styles.Container>
