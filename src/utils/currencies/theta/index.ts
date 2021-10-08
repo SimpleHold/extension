@@ -76,7 +76,7 @@ export const createInternalTx = async ({
       symbol === 'tfuel' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
 
     const transaction = new thetajs.transactions.SendTransaction({
-      addressFrom,
+      from: addressFrom,
       outputs: [
         {
           address: addressTo,
