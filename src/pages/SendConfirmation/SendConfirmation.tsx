@@ -105,9 +105,9 @@ const SendConfirmation: React.FC = () => {
 
           const parseAmount =
             tokenChain && decimals
-              ? convertDecimals(getAmount(), decimals)
-              : formatUnit(symbol, getAmount(), 'to', chain, 'ether')
-          const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
+              ? +convertDecimals(getAmount(), decimals)
+              : +formatUnit(symbol, getAmount(), 'to', chain, 'ether')
+          const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
             ? await getWeb3TxParams(

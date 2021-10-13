@@ -176,7 +176,7 @@ export const getWeb3TxParams = async (
 export const getEtherNetworkFee = async (
   from: string,
   to: string,
-  value: number,
+  value: string,
   chain: string,
   tokenSymbol?: string,
   contractAddress?: string,

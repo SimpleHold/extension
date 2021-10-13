@@ -298,7 +298,7 @@ export const formatUnit = (
   type: 'from' | 'to',
   chain?: string,
   unit?: string
-): number => {
+): string | number => {
   try {
     const provider = getProvider(symbol)
 
