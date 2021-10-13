@@ -529,13 +529,13 @@ const SendPage: React.FC = () => {
       if (tokenChain) {
         minAmount = currency.minSendAmount || 0.001
       } else {
-        amount = formatUnit(symbol, getAmount(), 'to', chain, 'ether')
-        minAmount = formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
+        amount = +formatUnit(symbol, getAmount(), 'to', chain, 'ether')
+        minAmount = +formatUnit(symbol, currency.minSendAmount, 'from', chain, 'ether')
       }
 
       const minAmountWithFee = plus(minAmount, getMinAmountWithFee)
 
-      if (amount < currency.minSendAmount) {
+      if (Number(amount) < currency.minSendAmount) {
         return updateState({
           amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(symbol)}`,
         })

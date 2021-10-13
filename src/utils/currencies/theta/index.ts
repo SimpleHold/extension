@@ -53,10 +53,10 @@ export const getBalance = async (
     const { coins } = await provider.getAccount(address)
 
     if (coin === 'theta') {
-      return fromEther(coins.thetawei)
+      return +fromEther(coins.thetawei)
     }
 
-    return fromEther(coins.tfuelwei)
+    return +fromEther(coins.tfuelwei)
   } catch {
     return null
   }
