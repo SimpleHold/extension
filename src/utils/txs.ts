@@ -180,7 +180,7 @@ export const isShowSatismeter = (prevValue: number, value: number): boolean => {
     const { lastUpdate } = getStats
     const monthDiff = dayjs().diff(lastUpdate, 'month')
 
-    return (prevValue < 2 && value > 1) || monthDiff >= 3
+    return (prevValue < 1 && value > 0) || monthDiff >= 3
   }
 
   return false
