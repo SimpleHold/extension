@@ -19,6 +19,7 @@ import { ADDRESS_ACTION } from '@config/events'
 
 // Styles
 import Styles from './styles'
+import { openWebPage } from 'utils/extension'
 
 interface Props {
   openPage: (url: string) => () => void
@@ -59,10 +60,8 @@ const WalletCard: React.FC<Props> = (props) => {
     }
   }, [isCopied])
 
-  const copyAddress = (): void => {
-    copy(address)
-    setIsCopied(true)
-
+  const onExchange = (): void => {
+    openWebPage('https://simpleswap.io/?ref=2a7607295184')
     logEvent({
       name: ADDRESS_ACTION,
       properties: {
@@ -118,8 +117,8 @@ const WalletCard: React.FC<Props> = (props) => {
             <Styles.ActionButton onClick={openPage('/receive')}>
               <Styles.ActionName>Receive</Styles.ActionName>
             </Styles.ActionButton>
-            <Styles.ActionButton onClick={copyAddress}>
-              <Styles.ActionName>{isCopied ? 'Copied!' : 'Copy'}</Styles.ActionName>
+            <Styles.ActionButton onClick={onExchange}>
+              <Styles.ActionName>Exchange</Styles.ActionName>
             </Styles.ActionButton>
           </>
         )}
