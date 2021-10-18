@@ -25,6 +25,7 @@ const App: React.FC = () => {
     initAmplitude()
     preloadPages()
     getPlatformInfo()
+    browser.runtime.setUninstallURL(`https://simplehold.io/survey?=${getItem('clientId')}`)
   }, [])
 
   const getPlatformInfo = async (): Promise<void> => {
