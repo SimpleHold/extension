@@ -294,6 +294,10 @@ export const getNetworkFee = async ({
     return await getNetworkFeeRequest('ripple')
   }
 
+  if (harmony.coins.indexOf(symbol) !== -1) {
+    return await getNetworkFeeRequest('harmony')
+  }
+
   return null
 }
 
