@@ -47,26 +47,16 @@ const WalletCard: React.FC<Props> = (props) => {
     address,
     tokenName,
     isNotActivated,
-    onConfirmActivate,
+    onConfirmActivate
   } = props
-
-  const [isCopied, setIsCopied] = React.useState<boolean>(false)
-
-  React.useEffect(() => {
-    if (isCopied) {
-      setTimeout(() => {
-        setIsCopied(false)
-      }, 1000)
-    }
-  }, [isCopied])
 
   const onExchange = (): void => {
     openWebPage('https://simpleswap.io/?ref=2a7607295184')
     logEvent({
       name: ADDRESS_ACTION,
       properties: {
-        addressAction: 'copy',
-      },
+        addressAction: 'copy'
+      }
     })
   }
 
@@ -79,7 +69,7 @@ const WalletCard: React.FC<Props> = (props) => {
         <CurrencyLogo size={60} br={18} symbol={symbol} chain={chain} name={tokenName} />
         <Styles.WalletInfo>
           <Styles.BalanceRow>
-            <Skeleton width={173} height={balanceHeight} type="gray" isLoading={balance === null}>
+            <Skeleton width={173} height={balanceHeight} type='gray' isLoading={balance === null}>
               <Styles.Balance height={balanceHeight}>
                 {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
               </Styles.Balance>
@@ -94,7 +84,7 @@ const WalletCard: React.FC<Props> = (props) => {
             width={75}
             height={19}
             mt={estimatedMT}
-            type="gray"
+            type='gray'
             isLoading={estimated === null}
           >
             <Styles.Estimated mt={estimatedMT}>{`$ ${formatEstimated(
