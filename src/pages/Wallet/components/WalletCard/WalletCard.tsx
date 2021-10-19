@@ -1,7 +1,6 @@
 import * as React from 'react'
 import numeral from 'numeral'
 import SVG from 'react-inlinesvg'
-import copy from 'copy-to-clipboard'
 
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
@@ -55,7 +54,7 @@ const WalletCard: React.FC<Props> = (props) => {
     logEvent({
       name: ADDRESS_ACTION,
       properties: {
-        addressAction: 'copy'
+        addressAction: 'exchange'
       }
     })
   }
