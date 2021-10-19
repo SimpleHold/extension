@@ -3,3 +3,4 @@ node_modules
 extension
 *-error.log
 .env
+.idea/
