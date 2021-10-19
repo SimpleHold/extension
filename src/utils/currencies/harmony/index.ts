@@ -1,5 +1,5 @@
 import { Harmony } from '@harmony-js/core'
-import { generatePrivateKey, getAddressFromPrivateKey, getAddress, BN } from '@harmony-js/crypto'
+import { generatePrivateKey, getAddressFromPrivateKey, getAddress } from '@harmony-js/crypto'
 import {
   fromWei,
   Units,
@@ -22,9 +22,7 @@ export const formatValue = (value: string | number, type: 'from' | 'to'): number
   if (type === 'from') {
     return +fromWei(`${value}`, Units.one)
   }
-
-  const expected = toWei(new BN(`${value}`), Units.one)
-  return +numToStr(expected)
+  return +numToStr(toWei(`${value}`, Units.one))
 }
 
 export const generateWallet = async (): Promise<TGenerateAddress | null> => {
