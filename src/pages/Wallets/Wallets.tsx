@@ -21,7 +21,7 @@ import { setBadgeText, getBadgeText } from '@utils/extension'
 import { clear } from '@utils/storage'
 
 // Config
-import { ADD_ADDRESS, FILTERS_WATCH, HISTORY_WATCH, NFT_WATCH } from '@config/events'
+import { ADD_ADDRESS, FILTERS_WATCH, HISTORY_WATCH } from '@config/events'
 
 // Types
 import { ILocationState, IState } from './types'
@@ -175,10 +175,6 @@ const Wallets: React.FC = () => {
 
   const onViewNFT = (): void => {
     history.push('/nft-collection')
-
-    logEvent({
-      name: NFT_WATCH,
-    })
   }
 
   return (

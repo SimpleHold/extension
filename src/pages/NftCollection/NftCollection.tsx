@@ -21,6 +21,8 @@ import { TNft } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
+import { logEvent } from '@utils/amplitude'
+import { NFT_WATCH } from '@config/events'
 
 const NftCollectionPage: React.FC = () => {
   const history = useHistory()
@@ -31,6 +33,9 @@ const NftCollectionPage: React.FC = () => {
 
   React.useEffect(() => {
     getWalletsList()
+    logEvent({
+      name: NFT_WATCH,
+    })
   }, [])
 
   React.useEffect(() => {
