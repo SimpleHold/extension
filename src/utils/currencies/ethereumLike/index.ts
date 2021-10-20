@@ -39,16 +39,16 @@ export const importPrivateKey = (privateKey: string): string | null => {
   }
 }
 
-export const fromEther = (value: string): number => {
-  return +web3.utils.fromWei(value, 'ether')
+export const fromEther = (value: string | number): string => {
+  return web3.utils.fromWei(`${value}`, 'ether')
 }
 
-export const toEther = (value: string): number => {
-  return +web3.utils.toWei(value, 'ether')
+export const toEther = (value: string | number): string => {
+  return web3.utils.toWei(`${value}`, 'ether')
 }
 
-export const convertDecimals = (value: string | number, decimals: number): number => {
-  return +web3.utils
+export const convertDecimals = (value: string | number, decimals: number): string => {
+  return web3.utils
     .toBN(toEther(`${value}`))
     .div(
       web3.utils.toBN(

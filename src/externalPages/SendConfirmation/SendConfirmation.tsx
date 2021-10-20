@@ -109,8 +109,8 @@ const SendConfirmation: React.FC = () => {
           extraId,
         } = state.props
 
-        const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
-        const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
+        const parseAmount = +formatUnit(symbol, amount, 'to', chain, 'ether')
+        const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
         updateState({ ledgerDrawerState: 'reviewTx' })
 
@@ -306,8 +306,8 @@ const SendConfirmation: React.FC = () => {
         return updateState({ activeDrawer: 'wrongDevice' })
       }
 
-      const parseAmount = formatUnit(symbol, amount, 'to', chain, 'ether')
-      const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
+      const parseAmount = +formatUnit(symbol, amount, 'to', chain, 'ether')
+      const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
       let getTxId
 
@@ -426,9 +426,9 @@ const SendConfirmation: React.FC = () => {
 
           const parseAmount =
             tokenChain && decimals
-              ? convertDecimals(getAmount(), decimals)
-              : formatUnit(symbol, getAmount(), 'to', chain, 'ether')
-          const parseNetworkFee = formatUnit(symbol, networkFee, 'to', chain, 'ether')
+              ? +convertDecimals(getAmount(), decimals)
+              : +formatUnit(symbol, getAmount(), 'to', chain, 'ether')
+          const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
             ? await getWeb3TxParams(

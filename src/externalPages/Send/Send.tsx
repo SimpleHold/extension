@@ -613,14 +613,14 @@ const Send: React.FC = () => {
       if (state.selectedWallet?.chain) {
         minAmount = state.currencyInfo.minSendAmount || 0.001
       } else {
-        amount = formatUnit(
+        amount = +formatUnit(
           state.selectedWallet.symbol,
           getAmount(),
           'to',
           state.currencyInfo.chain,
           'ether'
         )
-        minAmount = formatUnit(
+        minAmount = +formatUnit(
           state.selectedWallet.symbol,
           state.currencyInfo.minSendAmount,
           'from',
