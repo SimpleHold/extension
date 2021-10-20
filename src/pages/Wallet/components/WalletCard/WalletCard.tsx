@@ -50,13 +50,13 @@ const WalletCard: React.FC<Props> = (props) => {
   } = props
 
   const onExchange = (): void => {
-    openWebPage('https://simpleswap.io/?ref=2a7607295184')
     logEvent({
       name: ADDRESS_ACTION,
       properties: {
         addressAction: 'exchange'
       }
     })
+    openWebPage('https://simpleswap.io/?ref=2a7607295184')
   }
 
   const balanceHeight = symbol.length > 4 ? 20 : 24
