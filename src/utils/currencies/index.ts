@@ -192,7 +192,7 @@ export const createTransaction = async ({
       if (gas && chainId && gasPrice && typeof nonce === 'number') {
         if (tokenChain && getContractAddress) {
           return await ethereumLike.transferToken({
-            value: `${amount}`,
+            value: amount,
             from,
             to,
             privateKey,

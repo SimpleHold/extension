@@ -149,7 +149,7 @@ export const getTokensBalance = async (
 export const getWeb3TxParams = async (
   from: string,
   to: string,
-  value: number,
+  value: string,
   chain?: string,
   contractAddress?: string
 ): Promise<Web3TxParams | null> => {

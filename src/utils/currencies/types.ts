@@ -19,7 +19,7 @@ export type TProvider = {
 export type TCreateTransactionProps = {
   from: string
   to: string
-  amount: number
+  amount: string
   privateKey: string
   symbol: string
   tokenChain?: string
