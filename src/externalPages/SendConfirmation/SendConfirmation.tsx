@@ -166,7 +166,7 @@ const SendConfirmation: React.FC = () => {
     extraId,
   }: TLedgerTxParams): Promise<string | null | ILedgerError> => {
     if (symbol === 'eth') {
-      const ethParams = await getWeb3TxParams(addressFrom, addressTo, amount, chain)
+      const ethParams = await getWeb3TxParams(addressFrom, addressTo, `${amount}`, chain)
 
       if (ethParams) {
         const { nonce, gas, gasPrice, chainId } = ethParams
@@ -312,7 +312,7 @@ const SendConfirmation: React.FC = () => {
       let getTxId
 
       if (toLower(symbol) === 'eth') {
-        const ethParams = await getWeb3TxParams(addressFrom, addressTo, parseAmount, chain)
+        const ethParams = await getWeb3TxParams(addressFrom, addressTo, `${parseAmount}`, chain)
 
         if (ethParams) {
           const { chainId, nonce, gas, gasPrice } = ethParams
@@ -434,7 +434,7 @@ const SendConfirmation: React.FC = () => {
             ? await getWeb3TxParams(
                 addressFrom,
                 addressTo,
-                parseAmount,
+                `${parseAmount}`,
                 chain || tokenChain,
                 contractAddress
               )
@@ -445,7 +445,7 @@ const SendConfirmation: React.FC = () => {
           const transactionData = {
             from: addressFrom,
             to: addressTo,
-            amount: parseAmount,
+            amount: `${parseAmount}`,
             privateKey: findWallet.privateKey,
             symbol,
             tokenChain,

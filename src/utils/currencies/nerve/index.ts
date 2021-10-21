@@ -114,7 +114,7 @@ const getInputsOutputs = (transferInfo: TTransferInfo, balanceInfo: TBalanceInfo
 export const createTransaction = async (
   fromAddress: string,
   toAddress: string,
-  amount: number,
+  amount: string,
   privateKey: string
 ): Promise<string | null> => {
   try {
@@ -127,7 +127,7 @@ export const createTransaction = async (
         {
           fromAddress,
           toAddress,
-          amount,
+          amount: Number(amount),
         },
         params
       )

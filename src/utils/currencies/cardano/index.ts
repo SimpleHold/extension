@@ -254,7 +254,7 @@ export const createTransaction = async (
   outputs: any[],
   from: string,
   to: string,
-  amount: number,
+  amount: string,
   privateKey: string
 ) => {
   try {
@@ -277,7 +277,7 @@ export const createTransaction = async (
         txBuilder.add_output(
           CardanoWasm.TransactionOutput.new(
             addressTo,
-            CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(`${amount}`))
+            CardanoWasm.Value.new(CardanoWasm.BigNum.from_str(amount))
           )
         )
 

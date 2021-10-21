@@ -28,6 +28,7 @@ import * as zilliqa from '@utils/currencies/zilliqa'
 import * as verge from '@utils/currencies/verge'
 import * as xinfin from '@utils/currencies/xinfin'
 import * as solana from '@utils/currencies/solana'
+import * as harmony from '@utils/currencies/harmony'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -38,6 +39,10 @@ export const isEthereumLike = (symbol: string, chain?: string): boolean => {
 
 const getProvider = (symbol: string): TProvider | null => {
   try {
+    if (harmony.coins.indexOf(symbol) !== -1) {
+      return harmony
+    }
+
     if (tron.coins.indexOf(symbol) !== -1) {
       return tron
     }
@@ -187,7 +192,7 @@ export const createTransaction = async ({
       if (gas && chainId && gasPrice && typeof nonce === 'number') {
         if (tokenChain && getContractAddress) {
           return await ethereumLike.transferToken({
-            value: `${amount}`,
+            value: amount,
             from,
             to,
             privateKey,
@@ -287,6 +292,10 @@ export const getNetworkFee = async ({
 
   if (ripple.coins.indexOf(symbol) !== -1) {
     return await getNetworkFeeRequest('ripple')
+  }
+
+  if (harmony.coins.indexOf(symbol) !== -1) {
+    return await getNetworkFeeRequest('harmony')
   }
 
   return null

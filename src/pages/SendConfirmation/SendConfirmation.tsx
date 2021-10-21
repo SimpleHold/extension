@@ -105,15 +105,15 @@ const SendConfirmation: React.FC = () => {
 
           const parseAmount =
             tokenChain && decimals
-              ? +convertDecimals(getAmount(), decimals)
-              : +formatUnit(symbol, getAmount(), 'to', chain, 'ether')
+              ? convertDecimals(getAmount(), decimals)
+              : formatUnit(symbol, getAmount(), 'to', chain, 'ether')
           const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
             ? await getWeb3TxParams(
                 addressFrom,
                 addressTo,
-                parseAmount,
+                `${parseAmount}`,
                 chain || tokenChain,
                 contractAddress
               )
@@ -124,7 +124,7 @@ const SendConfirmation: React.FC = () => {
           const transactionData = {
             from: addressFrom,
             to: addressTo,
-            amount: parseAmount,
+            amount: `${parseAmount}`,
             privateKey: findWallet.privateKey,
             symbol,
             tokenChain,
@@ -282,7 +282,7 @@ const SendConfirmation: React.FC = () => {
   }
 
   const getAmount = (): number => {
-    if (isIncludeFee) {
+    if (isIncludeFee && !tokenChain) {
       return minus(amount, networkFee)
     }
     return amount

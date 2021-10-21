@@ -1,7 +1,6 @@
 import * as React from 'react'
 import numeral from 'numeral'
 import SVG from 'react-inlinesvg'
-import copy from 'copy-to-clipboard'
 
 // Components
 import CurrencyLogo from '@components/CurrencyLogo'
@@ -19,6 +18,7 @@ import { ADDRESS_ACTION } from '@config/events'
 
 // Styles
 import Styles from './styles'
+import { openWebPage } from 'utils/extension'
 
 interface Props {
   openPage: (url: string) => () => void
@@ -46,29 +46,17 @@ const WalletCard: React.FC<Props> = (props) => {
     address,
     tokenName,
     isNotActivated,
-    onConfirmActivate,
+    onConfirmActivate
   } = props
 
-  const [isCopied, setIsCopied] = React.useState<boolean>(false)
-
-  React.useEffect(() => {
-    if (isCopied) {
-      setTimeout(() => {
-        setIsCopied(false)
-      }, 1000)
-    }
-  }, [isCopied])
-
-  const copyAddress = (): void => {
-    copy(address)
-    setIsCopied(true)
-
+  const onExchange = (): void => {
     logEvent({
       name: ADDRESS_ACTION,
       properties: {
-        addressAction: 'copy',
-      },
+        addressAction: 'exchange'
+      }
     })
+    openWebPage('https://simpleswap.io/?ref=2a7607295184')
   }
 
   const balanceHeight = symbol.length > 4 ? 20 : 24
@@ -80,7 +68,7 @@ const WalletCard: React.FC<Props> = (props) => {
         <CurrencyLogo size={60} br={18} symbol={symbol} chain={chain} name={tokenName} />
         <Styles.WalletInfo>
           <Styles.BalanceRow>
-            <Skeleton width={173} height={balanceHeight} type="gray" isLoading={balance === null}>
+            <Skeleton width={173} height={balanceHeight} type='gray' isLoading={balance === null}>
               <Styles.Balance height={balanceHeight}>
                 {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
               </Styles.Balance>
@@ -95,7 +83,7 @@ const WalletCard: React.FC<Props> = (props) => {
             width={75}
             height={19}
             mt={estimatedMT}
-            type="gray"
+            type='gray'
             isLoading={estimated === null}
           >
             <Styles.Estimated mt={estimatedMT}>{`$ ${formatEstimated(
@@ -118,8 +106,8 @@ const WalletCard: React.FC<Props> = (props) => {
             <Styles.ActionButton onClick={openPage('/receive')}>
               <Styles.ActionName>Receive</Styles.ActionName>
             </Styles.ActionButton>
-            <Styles.ActionButton onClick={copyAddress}>
-              <Styles.ActionName>{isCopied ? 'Copied!' : 'Copy'}</Styles.ActionName>
+            <Styles.ActionButton onClick={onExchange}>
+              <Styles.ActionName>Exchange</Styles.ActionName>
             </Styles.ActionButton>
           </>
         )}

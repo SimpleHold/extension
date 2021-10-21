@@ -181,7 +181,7 @@ export const getNetworkFee = (
 export const createTransaction = (
   outputs: UnspentOutput[],
   to: string,
-  amount: number,
+  amount: string,
   fee: number,
   changeAddress: string,
   privateKey: string,
@@ -191,7 +191,8 @@ export const createTransaction = (
     const provider = getProvider(symbol)
 
     if (provider) {
-      return provider.createTransaction(outputs, to, amount, fee, changeAddress, privateKey).raw
+      return provider.createTransaction(outputs, to, Number(amount), fee, changeAddress, privateKey)
+        .raw
     }
 
     return null
