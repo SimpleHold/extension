@@ -13,10 +13,11 @@ import { FIRST_ENTER, SESSION_START } from '@config/events'
 
 // Utils
 import { validateWallet } from '@utils/validate'
-import { init, logEvent } from '@utils/amplitude'
+import { init, logEvent, setUserProperties } from '@utils/amplitude'
 import { getItem, setItem } from '@utils/storage'
 import { getStats, updateStats } from '@utils/txs'
 import { setUserId } from '@utils/api'
+import { parseWalletsData } from '@utils/wallet'
 
 import { ToastContextProvider } from '@contexts/Toast/Toast'
 
@@ -68,6 +69,14 @@ const App: React.FC = () => {
       logEvent({
         name: FIRST_ENTER,
       })
+    }
+
+    let wallets = getItem('wallets')
+    const validateWallets = validateWallet(wallets)
+
+    if (validateWallets) {
+      const walletsData = parseWalletsData(wallets as string)
+      setUserProperties(walletsData)
     }
 
     logEvent({

@@ -131,7 +131,6 @@ export const getWallets = (): IWallet[] | null => {
 
     if (walletsList) {
       const parseWallets = JSON.parse(walletsList)
-
       return parseWallets
     }
     return null
@@ -469,5 +468,20 @@ export const activateAddress = (
 
       setItem('backup', encrypt(JSON.stringify(parseBackup), password))
     }
+  }
+}
+
+export const parseWalletsData = (wallets: string) => {
+  const addresses: IWallet[] = JSON.parse(wallets)
+  const addressesHid = addresses.filter(a => a.isHidden)
+  const addressesEmpty = addresses.filter(a => !a.balance && !a.balance_btc)
+  const parseSymbols = (wallets: IWallet[]): string => wallets.map(a => a.symbol).join()
+  return {
+    addresses: parseSymbols(addresses),
+    addressesCount: `${addresses.length}`,
+    addressesHid: parseSymbols(addressesHid),
+    addressesHidCount: `${addressesHid.length}`,
+    addressesEmpty: parseSymbols(addressesEmpty),
+    addressesEmptyCount: `${addressesEmpty.length}`,
   }
 }
