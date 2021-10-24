@@ -15,14 +15,28 @@ import { getNft } from '@utils/api'
 import { IWallet, getWallets } from '@utils/wallet'
 import { checkOneOfExist, getItem, getNFTImage } from '@utils/storage'
 import { toLower } from '@utils/format'
+import { logEvent } from '@utils/amplitude'
 
 // Types
 import { TNft } from '@utils/api/types'
 
+// Config
+import { NFT_WATCH } from '@config/events'
+
 // Styles
 import Styles from './styles'
-import { logEvent } from '@utils/amplitude'
-import { NFT_WATCH } from '@config/events'
+
+// Assets
+import halloweenNftImage from '@assets/icons/halloween/halloweenNft.svg'
+
+// Halloween
+const halloweenNft: TNft = {
+  tokenId: -11,
+  name: "Halloween",
+  image: halloweenNftImage,
+  chain: '',
+  contractAddress: '',
+}
 
 const NftCollectionPage: React.FC = () => {
   const history = useHistory()
@@ -137,6 +151,8 @@ const NftCollectionPage: React.FC = () => {
     </Styles.Loading>
   )
 
+  collection && collection.push(halloweenNft)
+
   const renderContent = () => (
     <Styles.Content>
       {collection?.map((item: TNft) => {
@@ -151,7 +167,7 @@ const NftCollectionPage: React.FC = () => {
               chain,
               image,
             }}
-            onView={onViewNft(item)}
+            onView={tokenId === -11? () => {} : onViewNft(item)} // Halloween
           />
         )
       })}

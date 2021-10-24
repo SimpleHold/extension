@@ -62,7 +62,8 @@ const NftCard: React.FC<Props> = (props) => {
           )}
           <Styles.Body className="card-body">
             <Styles.Name className="card-name">{name}</Styles.Name>
-            <Styles.TokenId>{short(`${tokenId}`, 8)}</Styles.TokenId>
+            {/*Halloween*/}
+            <Styles.TokenId>{tokenId === -11 ? '' : short(`${tokenId}`, 8)}</Styles.TokenId>
           </Styles.Body>
         </Styles.Row>
       </Styles.Container>
