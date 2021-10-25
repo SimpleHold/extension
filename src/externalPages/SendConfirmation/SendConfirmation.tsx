@@ -50,6 +50,7 @@ import useState from '@hooks/useState'
 
 // Assets
 import errorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
+import halloweenSendIcon from '@assets/icons/halloween/halloweenSendIcon.svg' // Halloween
 
 // Config
 import { TRANSACTION_CANCEL, TRANSACTION_CONFIRM, TRANSACTION_PASSWORD } from '@config/events'
@@ -612,6 +613,7 @@ const SendConfirmation: React.FC = () => {
           text="Your transaction has been successfully sent. You can check it here:"
           link={state.transactionLink}
           openFrom="browser"
+          icon={halloweenSendIcon}
           isCloseOnLinkClick
         />
         <FailDrawer

@@ -151,6 +151,24 @@ const CustomTokenBlock = styled(CurrencyBlock)`
   }
 `
 
+// Halloween
+type BooProps = {
+  show: boolean
+}
+
+const Boo = styled.span`
+  transition: 0.4s ease all;
+  position: absolute;
+  color: #7c49b0;
+  font-weight: 900;
+  font-size: 25px;
+  font-style: italic;
+  top: 25%;
+  left: 13%;
+  -webkit-text-stroke: 1.2px white;
+  opacity: ${({ show }: BooProps) => (show ? '1' : '0')};
+`
+
 const Styles = {
   Wrapper,
   Container,
@@ -165,6 +183,7 @@ const Styles = {
   CustomTokenLogo,
   CustomTokenLabel,
   CustomTokenBlock,
+  Boo,
 }
 
 export default Styles

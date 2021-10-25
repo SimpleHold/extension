@@ -27,12 +27,12 @@ import { NFT_WATCH } from '@config/events'
 import Styles from './styles'
 
 // Assets
-import halloweenNftImage from '@assets/icons/halloween/halloweenNft.svg'
+import halloweenNftImage from '@assets/icons/halloween/halloweenNft.png'
 
 // Halloween
 const halloweenNft: TNft = {
   tokenId: -11,
-  name: "Halloween",
+  name: "BOO!",
   image: halloweenNftImage,
   chain: '',
   contractAddress: '',
@@ -151,7 +151,7 @@ const NftCollectionPage: React.FC = () => {
     </Styles.Loading>
   )
 
-  collection && collection.push(halloweenNft)
+  collection && collection.push(halloweenNft) // Halloween
 
   const renderContent = () => (
     <Styles.Content>
@@ -160,6 +160,7 @@ const NftCollectionPage: React.FC = () => {
 
         return (
           <NftCard
+            key={(tokenId + name).slice(0, 10)}
             data={{
               tokenId,
               name,
