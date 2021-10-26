@@ -17,10 +17,11 @@ interface Props {
   disableClose?: boolean
   icon?: string
   isCloseOnLinkClick?: boolean
+  halloween?: boolean
 }
 
 const SuccessDrawer: React.FC<Props> = (props) => {
-  const { isActive, onClose, text, link, openFrom, disableClose, icon, isCloseOnLinkClick } = props
+  const { isActive, onClose, text, link, openFrom, disableClose, icon, isCloseOnLinkClick, halloween } = props
 
   const openLink = async (): Promise<void> => {
     await browser.tabs.create({
@@ -39,6 +40,7 @@ const SuccessDrawer: React.FC<Props> = (props) => {
       onClose={onClose}
       icon={icon || '../../assets/drawer/success.svg'}
       openFrom={openFrom}
+      halloween={halloween}
     >
       <Styles.Row>
         {text ? <Styles.Text>{text}</Styles.Text> : null}
