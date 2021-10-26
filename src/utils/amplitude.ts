@@ -2,6 +2,8 @@ import amplitudeSDK from 'amplitude-js'
 
 // Utils
 import { getItem } from '@utils/storage'
+import { validateWallet } from 'utils/validate'
+import { parseWalletsData } from 'utils/wallet'
 
 interface IEvent {
   name: string
@@ -20,7 +22,7 @@ export const logEvent = ({ name, properties = {} }: IEvent) => {
       TIME: new Date().toString(),
     },
   }
-
+  setUserAddressesProperties()
   amplitudeSDK.getInstance().logEvent(name, properties)
 }
 
@@ -29,4 +31,14 @@ export const setUserProperties = (properties: { [key: string]: string } = {}) =>
     ...properties,
     ID_CLIENT: getItem('clientId'),
   })
+}
+
+export const setUserAddressesProperties = () => {
+  const wallets = getItem('wallets')
+  const validateWallets = validateWallet(wallets)
+
+  if (validateWallets) {
+    const walletsData = parseWalletsData(wallets as string)
+    setUserProperties(walletsData)
+  }
 }

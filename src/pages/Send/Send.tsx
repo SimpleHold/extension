@@ -46,7 +46,7 @@ import useState from '@hooks/useState'
 // Config
 import { getToken } from '@config/tokens'
 import {
-  ADDRESS_SEND,
+  // ADDRESS_SEND,
   TRANSACTION_AUTO_FILL,
   TRANSACTION_START,
   TRANSACTION_CANCEL,
@@ -349,6 +349,7 @@ const SendPage: React.FC = () => {
       name: TRANSACTION_CANCEL,
       properties: {
         stage: 'send',
+        symbol,
       },
     })
 
@@ -366,6 +367,7 @@ const SendPage: React.FC = () => {
       name: TRANSACTION_AUTO_FILL,
       properties: {
         king: 'myWallet',
+        symbol,
       },
     })
   }
@@ -392,9 +394,9 @@ const SendPage: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    logEvent({
-      name: ADDRESS_SEND,
-    })
+    // logEvent({
+    //   name: ADDRESS_SEND,
+    // })
 
     if (state.timer) {
       clearTimeout(state.timer)
@@ -445,6 +447,7 @@ const SendPage: React.FC = () => {
       properties: {
         fee: state.isIncludeFee ? 'incl' : 'excl',
         speed: currency?.isCustomFee ? 'fixed' : state.feeType,
+        symbol,
       },
     })
   }
