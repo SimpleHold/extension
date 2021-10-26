@@ -63,7 +63,7 @@ export const convertDecimals = (value: string | number, decimals: number): strin
 
 export const createTransaction = async (
   to: string,
-  value: number,
+  value: string,
   gas: number,
   chainId: number,
   gasPrice: string,

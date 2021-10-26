@@ -85,7 +85,7 @@ export const validateAddress = (address: string) => {
 export const createTransaction = (
   outputs: UnspentOutput[],
   to: string,
-  amount: number,
+  amount: string,
   fee: number,
   changeAddress: string,
   privateKey: string
@@ -93,7 +93,7 @@ export const createTransaction = (
   try {
     const transaction = new neblioLib.Transaction()
       .from(outputs)
-      .to(to, amount)
+      .to(to, Number(amount))
       .fee(fee)
       .change(changeAddress)
       .sign(privateKey)
