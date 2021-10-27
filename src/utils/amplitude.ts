@@ -26,7 +26,7 @@ export const logEvent = ({ name, properties = {} }: IEvent) => {
   amplitudeSDK.getInstance().logEvent(name, properties)
 }
 
-export const setUserProperties = (properties: { [key: string]: string } = {}) => {
+export const setUserProperties = (properties: { [key: string]: any } = {}) => {
   amplitudeSDK.getInstance().setUserProperties({
     ...properties,
     ID_CLIENT: getItem('clientId'),
@@ -38,7 +38,7 @@ export const setUserAddressesProperties = () => {
   const validateWallets = validateWallet(wallets)
 
   if (validateWallets) {
-    const walletsData = parseWalletsData(wallets as string)
+    const walletsData = parseWalletsData(wallets)
     setUserProperties(walletsData)
   }
 }
