@@ -471,17 +471,18 @@ export const activateAddress = (
   }
 }
 
-export const parseWalletsData = (wallets: string) => {
+export const parseWalletsData = (wallets: string | null) => {
+  if (!wallets) return
   const addresses: IWallet[] = JSON.parse(wallets)
   const addressesHid = addresses.filter(a => a.isHidden)
   const addressesEmpty = addresses.filter(a => !a.balance && !a.balance_btc)
-  const parseSymbols = (wallets: IWallet[]): string => wallets.map(a => a.symbol).join()
+  const mapSymbols = (wallets: IWallet[]) => wallets.map(a => a.symbol)
   return {
-    addresses: parseSymbols(addresses),
-    addressesCount: `${addresses.length}`,
-    addressesHid: parseSymbols(addressesHid),
-    addressesHidCount: `${addressesHid.length}`,
-    addressesEmpty: parseSymbols(addressesEmpty),
-    addressesEmptyCount: `${addressesEmpty.length}`,
+    addresses_all: mapSymbols(addresses),
+    addresses_count: `${addresses.length}`,
+    addresses_hid: mapSymbols(addressesHid),
+    addresses_hid_count: `${addressesHid.length}`,
+    addresses_empty: mapSymbols(addressesEmpty),
+    addresses_empty_count: `${addressesEmpty.length}`,
   }
 }
