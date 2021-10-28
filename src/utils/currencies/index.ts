@@ -404,6 +404,10 @@ export const getExtraIdName = (symbol: string): null | string => {
   if (ripple.coins.indexOf(symbol) !== -1) {
     return ripple.extraIdName
   }
+
+  if (hedera.coins.indexOf(symbol) !== -1) {
+    return hedera.extraIdName
+  }
   return null
 }
 
@@ -491,7 +495,8 @@ export const createInternalTx = async (
   amount: number,
   privateKey: string,
   networkFee: number,
-  outputs?: UnspentOutput[]
+  outputs?: UnspentOutput[],
+  extraId?: string
 ): Promise<string | null> => {
   try {
     const provider = getProvider(symbol)
@@ -505,6 +510,7 @@ export const createInternalTx = async (
         privateKey,
         networkFee,
         outputs,
+        extraId,
       })
     }
 
