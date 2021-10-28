@@ -406,7 +406,7 @@ export const getExtraIdName = (symbol: string): null | string => {
   }
 
   if (hedera.coins.indexOf(symbol) !== -1) {
-    return ripple.extraIdName
+    return hedera.extraIdName
   }
   return null
 }
