@@ -464,7 +464,8 @@ const SendConfirmation: React.FC = () => {
               getAmount(),
               findWallet.privateKey,
               parseNetworkFee,
-              outputs
+              outputs,
+              extraId
             )
 
             if (createTx) {

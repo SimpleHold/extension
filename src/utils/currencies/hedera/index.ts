@@ -9,6 +9,7 @@ import { TInternalTxProps } from '../types'
 
 export const coins: string[] = ['hbar']
 export const isInternalTx = true
+export const extraIdName = 'Memo'
 
 export const formatValue = (value: string | number, type: 'from' | 'to'): number => {
   if (type === 'from') {
@@ -53,6 +54,7 @@ export const createInternalTx = async ({
   addressTo,
   amount,
   privateKey,
+  extraId,
 }: TInternalTxProps): Promise<string | null> => {
   try {
     const client = Client.forMainnet().setOperator(addressFrom, PrivateKey.fromString(privateKey))
@@ -60,6 +62,7 @@ export const createInternalTx = async ({
     const transferTransactionResponse = await new TransferTransaction()
       .addHbarTransfer(addressFrom, Hbar.from(-Math.abs(amount), HbarUnit.Hbar))
       .addHbarTransfer(addressTo, Hbar.from(Number(amount), HbarUnit.Hbar))
+      .setTransactionMemo(extraId || '')
       .execute(client)
 
     return Buffer.from(transferTransactionResponse.transactionHash).toString('hex')
