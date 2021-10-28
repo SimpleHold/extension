@@ -21,6 +21,7 @@ import ctsiLogo from '@assets/tokens/ctsi.svg'
 import zilLogo from '@assets/tokens/zil.svg'
 import sxpLogo from '@assets/tokens/sxp.svg'
 import xvsLogo from '@assets/tokens/xvs.svg'
+import linkLogo from '@assets/tokens/link.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -314,6 +315,28 @@ const tokens: IToken[] = [
     logo: zilLogo,
     background: '#EBBB4E',
     chain: 'bsc',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0xf8a0bf9cf54bb92f17374d9e9a321e6a111a51bd',
+    name: 'ChainLink Token',
+    symbol: 'link',
+    decimals: 18,
+    logo: linkLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x514910771af9ca656af840dff83e8264ecf986ca',
+    name: 'ChainLink Token',
+    symbol: 'link',
+    decimals: 18,
+    logo: linkLogo,
+    background: '#132BD8',
+    chain: 'eth',
     minSendAmount: 0.001,
     isCustomFee: true,
   },
