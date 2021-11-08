@@ -29,6 +29,7 @@ import * as verge from '@utils/currencies/verge'
 import * as xinfin from '@utils/currencies/xinfin'
 import * as solana from '@utils/currencies/solana'
 import * as harmony from '@utils/currencies/harmony'
+import * as vechain from '@utils/currencies/vechain'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -89,6 +90,10 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (solana.coins.indexOf(symbol) !== -1) {
       return solana
+    }
+
+    if (vechain.coins.indexOf(symbol) !== -1) {
+      return vechain
     }
 
     return null

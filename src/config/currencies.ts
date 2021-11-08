@@ -254,6 +254,24 @@ const currencies: ICurrency[] = [
     minSendAmount: 1000000000000000,
     isCustomFee: false,
   },
+  {
+    name: 'VeChain',
+    symbol: 'vet',
+    logo: oneLogo, // todo
+    background: '#50B2E1', //
+    chain: 'vechain',
+    minSendAmount: 1000000000000000, //
+    isCustomFee: false, //
+  },
+  {
+    name: 'VeThor',
+    symbol: 'vtho',
+    logo: oneLogo, // todo
+    background: '#50B2E1', //
+    chain: 'vechain',
+    minSendAmount: 1000000000000000, //
+    isCustomFee: false, //
+  },
 ]
 
 export const getCurrency = (symbol: string): ICurrency | undefined => {

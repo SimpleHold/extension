@@ -64,6 +64,7 @@
     "ripple-keypairs": "^1.0.3",
     "ripple-lib": "^1.9.5",
     "styled-components": "^5.2.1",
+    "thor-devkit": "^2.0.1",
     "trezor-connect": "8.1.29",
     "tronweb": "^4.0.0",
     "uuid": "^8.3.2",
