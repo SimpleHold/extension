@@ -93,6 +93,10 @@ const Settings: React.FC = () => {
     })
   }
 
+  const onScanQrCode = (): void => {
+    history.push('/scan-backup')
+  }
+
   const list: IList[] = [
     {
       isButton: true,
@@ -113,6 +117,16 @@ const Settings: React.FC = () => {
         height: 16,
       },
       onClick: () => openWebPage('https://simplehold.io/about'),
+    },
+    {
+      isButton: true,
+      title: 'Scan backup QR-code',
+      icon: {
+        source: linkIcon,
+        width: 16,
+        height: 16,
+      },
+      onClick: onScanQrCode,
     },
     {
       title: 'Use passcode',
