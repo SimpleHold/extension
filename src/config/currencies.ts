@@ -23,6 +23,8 @@ import xvgLogo from '@assets/currencies/xvg.svg'
 import xdcLogo from '@assets/currencies/xdc.svg'
 import solLogo from '@assets/currencies/sol.svg'
 import oneLogo from '@assets/currencies/one.svg'
+import vetLogo from '@assets/currencies/vet.svg'
+import vthoLogo from '@assets/currencies/vtho.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -257,20 +259,20 @@ const currencies: ICurrency[] = [
   {
     name: 'VeChain',
     symbol: 'vet',
-    logo: oneLogo, // todo
-    background: '#50B2E1', //
+    logo: vetLogo,
+    background: '#86A7FD', // linear-gradient(135deg, #D995FF 0%, #86A7FD 45.31%, #13C0FA 100%); todo
     chain: 'vechain',
-    minSendAmount: 1000000000000000, //
-    isCustomFee: false, //
+    minSendAmount: 100000000000000,
+    isCustomFee: false,
   },
   {
-    name: 'VeThor',
+    name: 'VeThor Token',
     symbol: 'vtho',
-    logo: oneLogo, // todo
-    background: '#50B2E1', //
-    chain: 'vechain',
-    minSendAmount: 1000000000000000, //
-    isCustomFee: false, //
+    logo: vthoLogo,
+    background: '#A5BADA',
+    chain: 'vethor',
+    minSendAmount: 100000000000000,
+    isCustomFee: false,
   },
 ]
 

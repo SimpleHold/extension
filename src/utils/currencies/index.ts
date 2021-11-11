@@ -184,6 +184,7 @@ export const createTransaction = async ({
     if (ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
       return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData, extraId)
     }
+
     if (cardano.coins.indexOf(symbol) !== -1 && outputs) {
       return await cardano.createTransaction(outputs, from, to, amount, privateKey)
     }

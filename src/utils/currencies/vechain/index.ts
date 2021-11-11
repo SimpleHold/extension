@@ -1,10 +1,10 @@
 import { Transaction, secp256k1, keccak256, address } from 'thor-devkit'
+import { thorify } from "thorify";
 import { Buffer } from 'buffer'
 import BigNumber from 'bignumber.js'
 import { TInternalTxProps } from 'utils/currencies/types'
-import thetajs from '@thetalabs/theta-js'
 
-export const coins: string[] = ['vet']
+export const coins: string[] = ['vet', 'vtho']
 
 
 
@@ -51,83 +51,56 @@ export const getTransactionLink = (hash: string): string => {
   return `https://explore.vechain.org/accounts/${hash}` // todo
 }
 
-export const validateAddress = (address: string): boolean => {
-  try {
-
-// no need?
-
-    return
-  } catch {
-    return false
-  }
-}
+// export const validateAddress = (address: string): boolean => {
+//   try {
+//
+// // ?
+//
+//     return null
+//   } catch {
+//     return false
+//   }
+// }
 
 // ************************** CreateTx
 
-const clauses =  [{
-  to: '0x7567d83b7b8d80addcb281a71d54fc7b3364ffed',
-  value: 10000,
-  data: '0x'
-}]
-
-// calc intrinsic gas
-const gas = Transaction.intrinsicGas(clauses)
-console.log(gas)
-// 21000
-
-let body: Transaction.Body = {
-  chainTag: 0x9a,
-  blockRef: '0x0000000000000000',
-  expiration: 32,
-  clauses: clauses,
-  gasPriceCoef: 128,
-  gas,
-  dependsOn: null,
-  nonce: 12345678
-}
-
-const tx = new Transaction(body)
-const signingHash = tx.signingHash()
-tx.signature = secp256k1.sign(signingHash, /* your private key */)
-
-const raw = tx.encode()
-const decoded = Transaction.decode(raw)
-
-// *******************************
-
-export const createInternalTx = async (
-  { symbol,
-    addressFrom,
-    addressTo,
-    amount,
-    privateKey
-  }: TInternalTxProps): Promise<string | null> => {
+export const createTransaction = async (
+  fromAddress: string,
+  toAddress: string,
+  amount: string,
+  privateKey: string
+): Promise<string | null> => {
   try {
-    const thetaWeiToSend =
-      symbol === 'theta' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
-    const tfuelWeiToSend =
-      symbol === 'tfuel' ? new BigNumber(amount).multipliedBy(ten18) : new BigNumber(0)
+    const clauses =  [{
+      to: toAddress,
+      value: amount,
+      data: '0x'
+    }]
 
-    const transaction = new thetajs.transactions.SendTransaction({
-      from: addressFrom,
-      outputs: [
-        {
-          address: addressTo,
-          thetaWei: thetaWeiToSend,
-          tfuelWei: tfuelWeiToSend
-        }
-      ]
-    })
+    const gas = Transaction.intrinsicGas(clauses)
 
-    const provider = new thetajs.providers.HttpProvider(thetajs.networks.ChainIds.Mainnet)
-    const wallet = new thetajs.Wallet(privateKey, provider)
-    const result = await wallet.sendTransaction(transaction)
-
-    if (result?.hash) {
-      return result.hash
+    let body: Transaction.Body = {
+      chainTag: 0x9a,
+      blockRef: '0x0000000000000000',
+      expiration: 32,
+      clauses: clauses,
+      gasPriceCoef: 128,
+      gas,
+      dependsOn: null,
+      nonce: 12345678 // todo
     }
-    return null
+
+    const tx = new Transaction(body)
+    const signingHash = tx.signingHash()
+    tx.signature = secp256k1.sign(signingHash, Buffer.from(privateKey, 'hex')) // todo
+
+    return tx.encode().toString('hex')
   } catch {
     return null
   }
 }
+
+
+// const raw = tx.encode()
+// const decoded = Transaction.decode(raw)
+
