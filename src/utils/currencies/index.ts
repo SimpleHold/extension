@@ -173,6 +173,10 @@ export const createTransaction = async ({
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
+    if (vechain.coins.indexOf(symbol) !== -1) {
+      return await vechain.createTransaction(from, to, amount, privateKey)
+    }
+
     if (nerve.coins.indexOf(symbol) !== -1) {
       return await nerve.createTransaction(from, to, amount, privateKey)
     }
@@ -268,6 +272,10 @@ export const getNetworkFee = async ({
     if (bitcoinLike.coins.indexOf(symbol) !== -1) {
       return bitcoinLike.getNetworkFee(addressFrom, outputs, amount, customFee, symbol)
     }
+  }
+
+  if (vechain.coins.indexOf(symbol) !== -1) {
+    return await vechain.getNetworkFee(addressFrom, addressTo, amount)
   }
 
   if (xinfin.coins.indexOf(symbol) !== -1) {
@@ -380,7 +388,11 @@ export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string
   try {
     if (theta.coins.indexOf(symbol) !== -1) {
       return 'tfuel'
-    } else if (tokenChain) {
+    }
+    if (vechain.coins.indexOf(symbol) !== -1) {
+      return 'vtho'
+    }
+    if (tokenChain) {
       return getCurrencyByChain(tokenChain)?.symbol || symbol
     }
     return getCurrency(symbol)?.symbol || symbol

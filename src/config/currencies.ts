@@ -260,7 +260,7 @@ const currencies: ICurrency[] = [
     name: 'VeChain',
     symbol: 'vet',
     logo: vetLogo,
-    background: '#86A7FD', // linear-gradient(135deg, #D995FF 0%, #86A7FD 45.31%, #13C0FA 100%); todo
+    background: '#86A7FD',
     chain: 'vechain',
     minSendAmount: 100000000000000,
     isCustomFee: false,

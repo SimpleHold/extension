@@ -30,7 +30,7 @@ const currencies: TCurrency[] = [
     mask: '^[X|7][0-9A-Za-z]{33}$',
   },
   {
-    coins: ['eth', 'etc', 'bsc', 'bnb', 'matic'],
+    coins: ['eth', 'etc', 'bsc', 'bnb', 'matic', 'vet', 'vtho'],
     mask: '^(0x)[0-9A-Fa-f]{40}$',
   },
   {

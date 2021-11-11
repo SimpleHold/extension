@@ -22,6 +22,7 @@ import { importPrivateKey } from '@utils/currencies'
 import { getTokensBalance } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
+import * as vechain from '@utils/currencies/vechain'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -142,9 +143,13 @@ const ImportPrivateKey: React.FC = () => {
   }
 
   const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
+    if (vechain.coins.indexOf(symbol) !== -1) {
+      return vechain.coins.sort((a: string, b: string) => b.indexOf(symbol) - a.indexOf(symbol))
+    }
     if (theta.coins.indexOf(symbol) !== -1) {
       return theta.coins.sort((a: string, b: string) => a.indexOf(symbol) - b.indexOf(symbol))
-    } else if (chain && getCurrencyInfo) {
+    }
+    if (chain && getCurrencyInfo) {
       return [symbol, getCurrencyInfo.symbol]
     }
     return [symbol]
