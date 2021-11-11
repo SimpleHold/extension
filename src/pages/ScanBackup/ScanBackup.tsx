@@ -32,9 +32,9 @@ const ScanBackup: React.FC = () => {
 
     socket.connect()
 
-    socket.on('private message', ({ content, from }) => {
+    socket.on('share-backup', ({ content, from }) => {
       if (content === backupHash) {
-        socket.emit('private message', {
+        socket.emit('share-backup', {
           content: getItem('backup'),
           to: from,
         })

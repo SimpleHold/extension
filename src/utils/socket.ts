@@ -1,6 +1,8 @@
 import { io } from 'socket.io-client'
 
-const URL = 'http://localhost:3000'
-const socket = io(URL, { autoConnect: false })
+// Config
+import config from '@config/index'
+
+const socket = io(config.serverUrl, { autoConnect: false })
 
 export default socket
