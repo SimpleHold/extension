@@ -146,3 +146,5 @@ export type TTrait = {
   trait_type: string
   value: string
 }
+
+export type TTonAddressState = 'unitialized' | 'active' | 'frozen'

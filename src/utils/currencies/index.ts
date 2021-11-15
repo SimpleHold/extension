@@ -29,6 +29,7 @@ import * as verge from '@utils/currencies/verge'
 import * as xinfin from '@utils/currencies/xinfin'
 import * as solana from '@utils/currencies/solana'
 import * as harmony from '@utils/currencies/harmony'
+import * as toncoin from '@utils/currencies/toncoin'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -89,6 +90,10 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (solana.coins.indexOf(symbol) !== -1) {
       return solana
+    }
+
+    if (toncoin.coins.indexOf(symbol) !== -1) {
+      return toncoin
     }
 
     return null
@@ -268,6 +273,14 @@ export const getNetworkFee = async ({
     return await xinfin.getNetworkFee()
   }
 
+  if (toncoin.coins.indexOf(symbol) !== -1 && !tokenChain) {
+    const networkFee = await toncoin.getNetworkFee(addressFrom, addressTo, +amount)
+
+    return {
+      networkFee,
+    }
+  }
+
   if (isEthereumLike(symbol, tokenChain)) {
     const { contractAddress, decimals } = ethLikeParams
 
@@ -383,10 +396,10 @@ export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string
   }
 }
 
-export const importRecoveryPhrase = (
+export const importRecoveryPhrase = async (
   symbol: string,
   recoveryPhrase: string
-): TGenerateAddress | null => {
+): Promise<TGenerateAddress | null> => {
   try {
     const provider = getProvider(symbol)
 
@@ -463,8 +476,14 @@ export const getStandingFee = (symbol: string): number | null => {
 }
 
 export const checkWithPhrase = (symbol: string, chain?: string): boolean => {
-  if (cardano.coins.indexOf(symbol) !== -1 && !chain) {
-    return true
+  if (!chain) {
+    if (cardano.coins.indexOf(symbol)) {
+      return true
+    }
+
+    if (toncoin.coins.indexOf(symbol)) {
+      return true
+    }
   }
 
   return false

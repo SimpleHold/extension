@@ -22,6 +22,7 @@ import zilLogo from '@assets/tokens/zil.svg'
 import sxpLogo from '@assets/tokens/sxp.svg'
 import xvsLogo from '@assets/tokens/xvs.svg'
 import linkLogo from '@assets/tokens/link.svg'
+import toncoinLogo from '@assets/tokens/toncoin.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -337,6 +338,28 @@ const tokens: IToken[] = [
     logo: linkLogo,
     background: '#132BD8',
     chain: 'eth',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x582d872a1b094fc48f5de31d3b73f2d9be47def1',
+    name: 'Wrapped TON Coin',
+    symbol: 'toncoin',
+    decimals: 9,
+    logo: toncoinLogo,
+    background: '#132BD8',
+    chain: 'eth',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x76A797A59Ba2C17726896976B7B3747BfD1d220f',
+    name: 'Wrapped TON Coin',
+    symbol: 'toncoin',
+    decimals: 9,
+    logo: toncoinLogo,
+    background: '#EBBB4E',
+    chain: 'bsc',
     minSendAmount: 0.001,
     isCustomFee: true,
   },
