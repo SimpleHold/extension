@@ -1,11 +1,16 @@
 import TonWeb from 'tonweb'
 import tonMnemonic from 'tonweb-mnemonic'
+import axios from 'axios'
 
 // Utils
-import { getTonAddressState } from '@utils/api'
+import { getTonAddressState, getEstimated } from '@utils/api'
+import { TAddressTxGroup, group as groupTxs } from '@utils/txs'
+import { getAbsoluteValue } from '@utils/format'
 
 // Types
 import { TInternalTxProps } from '../types'
+import { TAddressTx } from '@utils/api/types'
+import { TExplorerTx, TTxMsg } from './types'
 
 const nacl = TonWeb.utils.nacl
 const BN = TonWeb.utils.BN
@@ -180,4 +185,53 @@ export const createInternalTx = async ({
   } catch {
     return null
   }
+}
+
+const getAddressTxs = async (address: string): Promise<TExplorerTx[]> => {
+  try {
+    const { data } = await axios('https://toncenter.com/api/v2/getTransactions', {
+      params: {
+        address,
+      },
+    })
+
+    return data.result
+  } catch {
+    return []
+  }
+}
+
+const getTxAmount = (type: 'spend' | 'received', in_msg: TTxMsg, out_msgs: TTxMsg[]): number => {
+  if (type === 'received') {
+    return formatValue(in_msg.value, 'from')
+  }
+
+  return getAbsoluteValue(formatValue(out_msgs[0].value, 'from'), false)
+}
+
+export const getTxHistory = async (address: string): Promise<TAddressTxGroup[]> => {
+  const txs: TAddressTx[] = []
+
+  const addressTxs = await getAddressTxs(address)
+
+  if (addressTxs.length) {
+    for (const tx of addressTxs) {
+      const { transaction_id, utime, in_msg, out_msgs } = tx
+      const type = Number(in_msg.value) !== 0 ? 'received' : 'spend'
+      const amount = getTxAmount(type, in_msg, out_msgs)
+      const estimated = await getEstimated(amount, 'toncoin', 'usd')
+
+      txs.push({
+        type,
+        isPending: false,
+        date: new Date(utime * 1000).toISOString(),
+        hash: transaction_id.hash,
+        amount,
+        estimated,
+        disabled: true,
+      })
+    }
+  }
+
+  return groupTxs(txs)
 }

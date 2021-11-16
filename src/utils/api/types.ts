@@ -57,6 +57,7 @@ export type TAddressTx = {
   hash: string
   amount: number
   estimated: number
+  disabled?: boolean
 }
 
 export type TCustomFee = {

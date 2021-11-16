@@ -54,7 +54,7 @@ const TransactionHistory: React.FC<Props> = (props) => {
                   <Styles.TxDate>{dayjs(date).format('MMM D')}</Styles.TxDate>
                 </Styles.DateRow>
                 {data.map((tx: TAddressTx) => {
-                  const { type, date, hash, amount, estimated, isPending } = tx
+                  const { type, date, hash, amount, estimated, isPending, disabled } = tx
 
                   return (
                     <Transaction
@@ -67,6 +67,7 @@ const TransactionHistory: React.FC<Props> = (props) => {
                         estimated,
                         symbol,
                         isPending,
+                        disabled,
                       }}
                       openTx={openTx(hash)}
                     />

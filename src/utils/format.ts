@@ -79,3 +79,11 @@ export const formatEstimated = (
   }
   return value
 }
+
+export const getAbsoluteValue = (value: string | number, isPositive: boolean): number => {
+  if (isPositive) {
+    return Math.abs(+value)
+  }
+
+  return -Math.abs(+value)
+}

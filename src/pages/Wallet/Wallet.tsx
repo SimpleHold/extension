@@ -40,6 +40,7 @@ import {
   getExist as getExistTxs,
 } from '@utils/txs'
 import { logEvent } from '@utils/amplitude'
+import { getTxHistory as getTonCoinTxHistory } from '@utils/currencies/toncoin'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -169,12 +170,21 @@ const WalletPage: React.FC = () => {
     updateBalance(state.address, symbol, balance, balance_btc)
   }
 
+  const getTonTxHistory = async (): Promise<void> => {
+    const txHistory = await getTonCoinTxHistory(state.address)
+
+    updateState({ txHistory })
+  }
+
   const getTxHistory = async (): Promise<void> => {
     if (state.isNotActivated) {
       return updateState({ txHistory: [] })
     }
 
     if (currency) {
+      if (currency.symbol === 'toncoin' && !chain) {
+        return await getTonTxHistory()
+      }
       const data = await getTransactionHistory(
         currency.chain,
         state.address,

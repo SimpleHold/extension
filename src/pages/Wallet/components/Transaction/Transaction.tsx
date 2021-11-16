@@ -21,6 +21,7 @@ interface Props {
     estimated: number
     symbol: string
     isPending: boolean
+    disabled?: boolean
   }
   isLoading?: boolean
   openTx?: () => void
@@ -50,10 +51,10 @@ const Transaction: React.FC<Props> = (props) => {
   }
 
   if (data) {
-    const { type, date, hash, amount, estimated, symbol, isPending } = data
+    const { type, date, hash, amount, estimated, symbol, isPending, disabled } = data
 
     return (
-      <Styles.Container onClick={openTx}>
+      <Styles.Container onClick={() => (disabled ? null : openTx)} disabled={disabled}>
         <Styles.Row>
           <Styles.Info>
             <Styles.TypeRow>

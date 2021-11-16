@@ -17,11 +17,11 @@ const Container = styled.div`
     background-color: ${({ disabled }: TContainerProps) => (disabled ? '#FFFFFF' : '#F8F9FB')};
 
     .link-icon {
-      display: block;
+      display: ${({ disabled }: TContainerProps) => (disabled ? 'none' : 'block')};
     }
 
     .tx-hash {
-      color: #3fbb7d;
+      color: ${({ disabled }: TContainerProps) => (disabled ? '#1d1d22' : '#3fbb7d')};
     }
   }
 `
