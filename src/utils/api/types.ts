@@ -146,3 +146,7 @@ export type TTrait = {
   trait_type: string
   value: string
 }
+
+export type TVetTxParams = {
+  blockRef: string
+}

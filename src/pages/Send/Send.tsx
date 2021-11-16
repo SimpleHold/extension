@@ -608,7 +608,7 @@ const SendPage: React.FC = () => {
   }
 
   const isCurrencyBalanceError =
-    (tokenChain !== undefined || toLower(symbol) === 'theta') &&
+    (tokenChain !== undefined || toLower(symbol) === 'theta' || toLower(symbol) === 'vet') &&
     state.currencyBalance !== null &&
     !state.isFeeLoading &&
     state.fee > 0 &&

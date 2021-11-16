@@ -1,14 +1,23 @@
 import * as Devkit from 'thor-devkit'
 import { Buffer } from 'buffer'
 import BigNumber from 'bignumber.js'
+import Web3 from 'web3'
+import { thorify } from 'thorify'
 
 // Utils
-import { getBalance } from '@utils/api'
+import { getBalance, getVechainParams, getVechainFee } from '@utils/api'
+import { toLower, toUnit } from '@utils/format'
+
+// Config
+import contractABI from '@config/contractABI'
 
 // Types
 import { TGetFeeData } from '../types'
 
 const ten18 = new BigNumber(10).pow(18)
+const VTHO_CA = '0x0000000000000000000000000000456E65726779'
+const providerUrl = 'https://sync-mainnet.vechain.org'
+const web3Instance = thorify(new Web3(), providerUrl)
 
 export const coins: string[] = ['vet', 'vtho']
 
@@ -55,14 +64,32 @@ export const getTransactionLink = (hash: string): string => {
 export const getNetworkFee = async (
   from: string,
   to: string,
-  amount: string
+  amount: string,
+  chain: string
 ): Promise<TGetFeeData> => {
   try {
-    const balanceRequest = await getBalance(from, 'vechain')
+    const { balance: currencyBalance } = await getBalance(from, 'vechain')
+
+    if (chain === 'vechain') {
+      const fee = Devkit.Transaction.intrinsicGas([
+        {
+          to,
+          value: formatValue(amount, 'from'),
+          data: '0x',
+        },
+      ])
+
+      return {
+        networkFee: toUnit(fee, 5),
+        currencyBalance,
+      }
+    }
+
+    const networkFee = await getVechainFee(from, to, `${formatValue(amount, 'to')}`)
 
     return {
-      networkFee: 0.21,
-      currencyBalance: balanceRequest.balance,
+      networkFee,
+      currencyBalance,
     }
   } catch {
     return {
@@ -71,31 +98,61 @@ export const getNetworkFee = async (
   }
 }
 
-export const createTransaction = async (
-  fromAddress: string,
-  toAddress: string,
-  amount: string,
+const transferToken = async (
+  from: string,
+  to: string,
+  value: string,
   privateKey: string
 ): Promise<string | null> => {
+  const contract = new web3Instance.eth.Contract(contractABI, VTHO_CA, { from })
+  const data = contract.methods.transfer(to, value)
+
+  const { rawTransaction } = await web3Instance.eth.accounts.signTransaction(
+    {
+      to: VTHO_CA,
+      data: data.encodeABI(),
+    },
+    privateKey
+  )
+
+  return rawTransaction || null
+}
+
+export const createTransaction = async (
+  from: string,
+  to: string,
+  value: string,
+  privateKey: string,
+  symbol: string
+): Promise<string | null> => {
   try {
-    console.log('XXX', +formatValue(amount, 'to'))
+    if (toLower(symbol) === 'vtho') {
+      return await transferToken(from, to, value, privateKey)
+    }
+
     const clauses = [
       {
-        to: toAddress,
-        value: 1000000000,
+        to,
+        value,
         data: '0x',
       },
     ]
 
+    const txParams = await getVechainParams()
+
+    if (!txParams?.blockRef) {
+      return null
+    }
+
     const tx = new Devkit.Transaction({
-      chainTag: 0x9a,
-      blockRef: '0x0000000000000000',
+      chainTag: 74,
+      blockRef: txParams.blockRef,
+      clauses,
       expiration: 32,
-      clauses: clauses,
       gasPriceCoef: 128,
       gas: Devkit.Transaction.intrinsicGas(clauses),
       dependsOn: null,
-      nonce: 12345678,
+      nonce: +new Date(),
     })
     const signingHash = tx.signingHash()
     tx.signature = Devkit.secp256k1.sign(signingHash, Buffer.from(privateKey, 'hex'))

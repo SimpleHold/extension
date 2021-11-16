@@ -174,7 +174,7 @@ export const createTransaction = async ({
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
     if (vechain.coins.indexOf(symbol) !== -1) {
-      return await vechain.createTransaction(from, to, amount, privateKey)
+      return await vechain.createTransaction(from, to, amount, privateKey, symbol)
     }
 
     if (nerve.coins.indexOf(symbol) !== -1) {
@@ -275,7 +275,7 @@ export const getNetworkFee = async ({
   }
 
   if (vechain.coins.indexOf(symbol) !== -1) {
-    return await vechain.getNetworkFee(addressFrom, addressTo, amount)
+    return await vechain.getNetworkFee(addressFrom, addressTo, amount, chain)
   }
 
   if (xinfin.coins.indexOf(symbol) !== -1) {

@@ -79,3 +79,13 @@ export const formatEstimated = (
   }
   return value
 }
+
+export const toUnit = (value: string | number, zeros: number): number => {
+  const zerosBN = new BigNumber(10).pow(zeros)
+  return Number(new BigNumber(value).div(zerosBN))
+}
+
+export const fromUnit = (value: string | number, zeros: number): number => {
+  const zerosBN = new BigNumber(10).pow(zeros)
+  return Number(new BigNumber(value).multipliedBy(zerosBN))
+}

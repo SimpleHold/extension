@@ -644,7 +644,8 @@ const Send: React.FC = () => {
   const isCurrencyBalanceError =
     state.selectedWallet !== null &&
     (state.selectedWallet?.chain !== undefined ||
-      toLower(state.selectedWallet.symbol) === 'theta') &&
+      toLower(state.selectedWallet.symbol) === 'theta' ||
+      toLower(state.selectedWallet.symbol) === 'vet') &&
     state.currencyBalance !== null &&
     !state.isFeeLoading &&
     state.fee > 0 &&
