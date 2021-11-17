@@ -17,7 +17,8 @@
     "clipboardWrite",
     "clipboardRead",
     "cookies",
-    "*://*.simplehold.io/*"
+    "*://*.simplehold.io/*",
+    "*://sync-mainnet.vechain.org/*"
   ],
   "content_security_policy": "script-src 'self' 'wasm-eval'; object-src 'self'",
   "__chrome|firefox__author": "SimpleHold",
