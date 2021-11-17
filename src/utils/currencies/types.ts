@@ -14,6 +14,7 @@ export type TProvider = {
   isInternalTx?: boolean
   createInternalTx?: (props: TInternalTxProps) => Promise<string | null>
   isWithOutputs?: boolean
+  extraIdName?: string
 }
 
 export type TCreateTransactionProps = {

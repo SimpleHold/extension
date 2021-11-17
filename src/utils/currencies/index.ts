@@ -414,14 +414,9 @@ export const importRecoveryPhrase = async (
 }
 
 export const getExtraIdName = (symbol: string): null | string => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.extraIdName
-  }
+  const provider = getProvider(symbol)
 
-  if (hedera.coins.indexOf(symbol) !== -1) {
-    return hedera.extraIdName
-  }
-  return null
+  return provider?.extraIdName || null
 }
 
 export const generateExtraId = (symbol: string): null | string => {

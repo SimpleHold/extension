@@ -19,6 +19,7 @@ const RPC_URL = 'https://toncenter.com/api/v2/jsonRPC'
 
 export const coins: string[] = ['toncoin']
 export const isInternalTx = true
+export const extraIdName = 'Comment'
 
 export const generateWallet = async (): Promise<TGenerateAddress | null> => {
   try {
@@ -148,16 +149,12 @@ export const getNetworkFee = async (
   }
 }
 
-export interface SignKeyPair {
-  publicKey: Uint8Array
-  secretKey: Uint8Array
-}
-
 export const createInternalTx = async ({
   addressFrom,
   addressTo,
   amount,
   privateKey,
+  extraId,
 }: TInternalTxProps): Promise<string | null> => {
   try {
     const ton = new TonWeb(new TonWeb.HttpProvider(RPC_URL))
@@ -175,7 +172,7 @@ export const createInternalTx = async ({
       toAddress: addressTo,
       amount: formatValue(amount, 'to'),
       seqno,
-      payload: '',
+      payload: extraId,
       sendMode: 3,
     })
 
