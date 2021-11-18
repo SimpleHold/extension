@@ -32,7 +32,7 @@ import halloweenNftImage from '@assets/icons/halloween/halloweenNft.png'
 // Halloween
 const halloweenNft: TNft = {
   tokenId: -11,
-  name: "BOO!",
+  name: 'BOO!',
   image: halloweenNftImage,
   chain: '',
   contractAddress: '',
@@ -63,7 +63,8 @@ const NftCollectionPage: React.FC = () => {
 
     if (walletsList?.length) {
       const filterWallet = walletsList.filter(
-        (wallet: IWallet) => wallet.symbol === 'eth' || wallet.symbol === 'bnb'
+        (wallet: IWallet) =>
+          wallet.symbol === 'eth' || wallet.symbol === 'bnb' || wallet.symbol === 'matic'
       )
 
       if (filterWallet.length) {
@@ -109,11 +110,18 @@ const NftCollectionPage: React.FC = () => {
     return data
   }
 
+  const getChainFromSymbol = (symbol: string): string => {
+    if (symbol === 'bnb') {
+      return 'bsc'
+    }
+    return symbol
+  }
+
   const onGetNft = async (): Promise<void> => {
     const mapWallets = wallets.filter(filterWallets).map((wallet: IWallet) => {
       return {
         address: wallet.address,
-        chain: wallet.symbol === 'bnb' ? 'bsc' : 'eth',
+        chain: getChainFromSymbol(wallet.symbol),
       }
     })
 
@@ -168,7 +176,7 @@ const NftCollectionPage: React.FC = () => {
               chain,
               image,
             }}
-            onView={tokenId === -11? () => {} : onViewNft(item)} // Halloween
+            onView={tokenId === -11 ? () => {} : onViewNft(item)} // Halloween
           />
         )
       })}
