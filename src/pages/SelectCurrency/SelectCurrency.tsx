@@ -17,6 +17,7 @@ import { toLower } from '@utils/format'
 import { getWallets } from '@utils/wallet'
 import * as theta from '@utils/currencies/theta'
 import { getUrl, openWebPage } from '@utils/extension'
+import { getTokenStandart } from '@utils/currencies'
 
 // Config
 import { checkExistWallet } from '@config/tokens'
@@ -66,7 +67,7 @@ const SelectCurrency: React.FC = () => {
           chain,
           chainName: getNetwork.name,
           tokenName,
-          tokenStandart: toLower(getNetwork.chain) === 'bsc' ? 'BEP20' : 'ERC20',
+          tokenStandart: getTokenStandart(toLower(getNetwork.chain)),
         })
       }
 

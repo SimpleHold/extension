@@ -95,7 +95,7 @@ const WalletHeading: React.FC<Props> = (props) => {
       }
     )
 
-    if (['eth', 'bnb'].indexOf(symbol) !== -1 && !hardware) {
+    if (['eth', 'bnb', 'matic'].indexOf(symbol) !== -1 && !hardware) {
       list.push({
         icon: { source: plusCircleIcon, width: 18, height: 18 },
         title: 'Add token',

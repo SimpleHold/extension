@@ -472,13 +472,7 @@ export const getStandingFee = (symbol: string): number | null => {
 
 export const checkWithPhrase = (symbol: string, chain?: string): boolean => {
   if (!chain) {
-    if (cardano.coins.indexOf(symbol)) {
-      return true
-    }
-
-    if (toncoin.coins.indexOf(symbol)) {
-      return true
-    }
+    return cardano.coins.indexOf(symbol) !== -1 || toncoin.coins.indexOf(symbol) !== -1
   }
 
   return false
@@ -539,4 +533,12 @@ export const getContractUrl = (address: string, chain: string): string => {
     return `https://etherscan.io/address/${address}`
   }
   return `https://bscscan.com/address/${address}`
+}
+
+export const getTokenStandart = (chain?: string): string => {
+  if (chain === 'bsc') {
+    return 'BEP20'
+  }
+
+  return 'ERC20'
 }

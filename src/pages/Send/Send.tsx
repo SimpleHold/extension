@@ -242,7 +242,7 @@ const SendPage: React.FC = () => {
       },
       ethLikeParams: {
         contractAddress,
-        decimals: getTokenDecimals,
+        decimals: getTokenDecimals || decimals,
         fees: state.customFee,
       },
     })

@@ -18,6 +18,11 @@ const networks: IEthNetwork[] = [
     symbol: 'bnb',
     chain: 'bsc',
   },
+  {
+    name: 'Polygon',
+    symbol: 'matic',
+    chain: 'matic',
+  },
 ]
 
 export const getEthNetwork = (chain: string): IEthNetwork | undefined => {

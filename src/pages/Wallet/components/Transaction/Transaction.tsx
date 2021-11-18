@@ -54,7 +54,7 @@ const Transaction: React.FC<Props> = (props) => {
     const { type, date, hash, amount, estimated, symbol, isPending, disabled } = data
 
     return (
-      <Styles.Container onClick={() => (disabled ? null : openTx)} disabled={disabled}>
+      <Styles.Container onClick={openTx} disabled={disabled}>
         <Styles.Row>
           <Styles.Info>
             <Styles.TypeRow>

@@ -15,7 +15,7 @@ import Styles from './styles'
 interface Props {
   data: TAddressTxGroup[] | null
   symbol: string
-  openTx: (hash: string) => () => void
+  openTx: (hash: string, disabled?: boolean) => () => void
 }
 
 const TransactionHistory: React.FC<Props> = (props) => {
@@ -69,7 +69,7 @@ const TransactionHistory: React.FC<Props> = (props) => {
                         isPending,
                         disabled,
                       }}
-                      openTx={openTx(hash)}
+                      openTx={openTx(hash, disabled)}
                     />
                   )
                 })}
