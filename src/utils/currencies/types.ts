@@ -81,4 +81,5 @@ export type TInternalTxProps = {
   privateKey: string
   networkFee: number
   outputs?: UnspentOutput[]
+  extraId?: string
 }
