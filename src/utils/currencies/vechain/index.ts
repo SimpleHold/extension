@@ -16,7 +16,7 @@ import { TGetFeeData } from '../types'
 
 const ten18 = new BigNumber(10).pow(18)
 const VTHO_CA = '0x0000000000000000000000000000456E65726779'
-const providerUrl = 'https://sync-mainnet.vechain.org'
+const providerUrl = 'https://mainnet.veblocks.net/'
 const web3Instance = thorify(new Web3(), providerUrl)
 
 export const coins: string[] = ['vet', 'vtho']

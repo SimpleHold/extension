@@ -80,7 +80,6 @@ const WalletPage: React.FC = () => {
     state: { symbol, uuid, chain, contractAddress, tokenName, hardware, isHidden = false, name },
   } = useLocation<ILocationState>()
   const history = useHistory()
-
   const { state, updateState } = useState<IState>({
     ...initialState,
     isHiddenWallet: isHidden,

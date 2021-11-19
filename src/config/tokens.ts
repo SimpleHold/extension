@@ -21,6 +21,8 @@ import ctsiLogo from '@assets/tokens/ctsi.svg'
 import zilLogo from '@assets/tokens/zil.svg'
 import sxpLogo from '@assets/tokens/sxp.svg'
 import xvsLogo from '@assets/tokens/xvs.svg'
+import bntLogo from '@assets/tokens/bnt.svg'
+import audioLogo from '@assets/tokens/audio.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -317,6 +319,28 @@ const tokens: IToken[] = [
     minSendAmount: 0.001,
     isCustomFee: true,
   },
+  {
+    address: '0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c',
+    name: 'Bancor',
+    symbol: 'bnt',
+    decimals: 18,
+    logo: bntLogo,
+    background: '#132BD8',
+    chain: 'eth',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x18aaa7115705e8be94bffebde57af9bfc265b998',
+    name: 'Audius',
+    symbol: 'audio',
+    decimals: 18,
+    logo: audioLogo,
+    background: '#132BD8',
+    chain: 'eth',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  }
 ]
 
 export default tokens
