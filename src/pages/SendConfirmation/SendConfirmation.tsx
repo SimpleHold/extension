@@ -328,7 +328,6 @@ const SendConfirmation: React.FC = () => {
         onClose={closeSuccessDrawer}
         text="Your transaction has been successfully sent. You can check it here:"
         link={state.transactionLink}
-        halloween={true}
       />
 
       <FailDrawer
