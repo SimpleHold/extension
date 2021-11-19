@@ -16,7 +16,13 @@ import PrivateKeyDrawer from '@drawers/PrivateKey'
 import RenameWalletDrawer from '@drawers/RenameWallet'
 
 // Utils
-import { getBalance, getTxsInfo, getWarning, activateAccount } from '@utils/api'
+import {
+  getBalance,
+  getTxsInfo,
+  getWarning,
+  activateAccount,
+  getTransactionHistory,
+} from '@utils/api'
 import {
   IWallet,
   updateBalance,
@@ -26,7 +32,6 @@ import {
   getWallets,
   activateAddress,
 } from '@utils/wallet'
-import { getTransactionHistory } from '@utils/api'
 import { openWebPage } from '@utils/extension'
 import { getExplorerLink, getTransactionLink, checkWithPhrase } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
@@ -40,6 +45,7 @@ import {
   getExist as getExistTxs,
 } from '@utils/txs'
 import { logEvent } from '@utils/amplitude'
+import { getTxHistory as getTonCoinTxHistory } from '@utils/currencies/toncoin'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -77,7 +83,17 @@ const initialState: IState = {
 const WalletPage: React.FC = () => {
   const {
     state: locationState,
-    state: { symbol, uuid, chain, contractAddress, tokenName, hardware, isHidden = false, name },
+    state: {
+      symbol,
+      uuid,
+      chain,
+      contractAddress,
+      tokenName,
+      hardware,
+      isHidden = false,
+      name,
+      decimals = 0,
+    },
   } = useLocation<ILocationState>()
   const history = useHistory()
 
@@ -124,6 +140,8 @@ const WalletPage: React.FC = () => {
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const withPhrase = checkWithPhrase(symbol)
   const tokenSymbol = chain ? symbol : undefined
+  const isCustomToken =
+    !currency && chain !== undefined && contractAddress !== undefined && decimals > 0
 
   const getCurrentWallet = (): IWallet | undefined => {
     const walletsList = getWallets()
@@ -169,39 +187,59 @@ const WalletPage: React.FC = () => {
     updateBalance(state.address, symbol, balance, balance_btc)
   }
 
+  const getTonTxHistory = async (): Promise<void> => {
+    const txHistory = await getTonCoinTxHistory(state.address)
+
+    updateState({ txHistory })
+  }
+
+  const getCurrencyChain = (): string | null => {
+    if (isCustomToken && chain) {
+      return chain
+    }
+
+    if (currency) {
+      return currency.chain
+    }
+
+    return null
+  }
+
   const getTxHistory = async (): Promise<void> => {
     if (state.isNotActivated) {
       return updateState({ txHistory: [] })
     }
 
-    if (currency) {
+    if (currency?.symbol === 'toncoin' && !chain) {
+      return await getTonTxHistory()
+    }
+
+    const currencyChain = getCurrencyChain()
+
+    if (currencyChain) {
       const data = await getTransactionHistory(
-        currency.chain,
+        currencyChain,
         state.address,
         tokenSymbol,
         contractAddress
       )
 
       if (data.length) {
-        const compare = compareTxs(
-          state.address,
-          currency.chain,
-          data,
-          tokenSymbol,
-          contractAddress
-        )
+        const compare = compareTxs(state.address, currencyChain, data, tokenSymbol, contractAddress)
 
         if (compare.length) {
-          const getFullTxHistoryInfo = await getTxsInfo(currency.chain, state.address, compare)
-          saveTxs(state.address, currency.chain, getFullTxHistoryInfo, tokenSymbol, contractAddress)
+          const getFullTxHistoryInfo = await getTxsInfo(currencyChain, state.address, compare)
+          saveTxs(state.address, currencyChain, getFullTxHistoryInfo, tokenSymbol, contractAddress)
         }
       }
 
       const txHistory = groupTxs(
-        getExistTxs(state.address, currency.chain, tokenSymbol, contractAddress)
+        getExistTxs(state.address, currencyChain, tokenSymbol, contractAddress)
       )
 
       updateState({ txHistory })
+    } else {
+      updateState({ txHistory: [] })
     }
   }
 
@@ -232,8 +270,12 @@ const WalletPage: React.FC = () => {
         }`,
         confirmDrawerType: withPhrase ? 'showPhrase' : 'showPrivateKey',
       })
-    } else if (key === 'explorer' && currency) {
-      openWebPage(getExplorerLink(state.address, symbol, currency.chain, chain, contractAddress))
+    } else if (key === 'explorer') {
+      const currencyChain = getCurrencyChain()
+
+      if (currencyChain) {
+        openWebPage(getExplorerLink(state.address, symbol, currencyChain, chain, contractAddress))
+      }
     } else if (key === 'availability') {
       toggleVisibleWallet(state.address, symbol, !state.isHiddenWallet)
       updateState({ isHiddenWallet: !state.isHiddenWallet })
@@ -373,9 +415,15 @@ const WalletPage: React.FC = () => {
     })
   }
 
-  const openTx = (hash: string) => async (): Promise<void> => {
-    if (currency) {
-      await openWebPage(getTransactionLink(hash, symbol, currency.chain, chain))
+  const openTx = (hash: string, disabled?: boolean) => async (): Promise<void> => {
+    if (disabled) {
+      return
+    }
+
+    const currencyChain = getCurrencyChain()
+
+    if (currencyChain) {
+      await openWebPage(getTransactionLink(hash, symbol, currencyChain, chain))
     }
   }
 

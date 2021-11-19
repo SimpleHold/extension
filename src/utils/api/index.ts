@@ -21,6 +21,7 @@ import {
   TFullTxInfo,
   TNft,
   TNFtWallets,
+  TTonAddressState,
 } from './types'
 
 export const getBalance = async (
@@ -553,5 +554,19 @@ export const getNft = async (wallets: TNFtWallets[]): Promise<TNft[]> => {
     return data.data
   } catch {
     return []
+  }
+}
+
+export const getTonAddressState = async (address: string): Promise<TTonAddressState> => {
+  try {
+    const { data }: AxiosResponse = await axios('https://api.ton.sh/getAddressState', {
+      params: {
+        address,
+      },
+    })
+
+    return data.result
+  } catch {
+    return 'unitialized'
   }
 }

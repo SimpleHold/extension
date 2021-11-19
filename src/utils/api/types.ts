@@ -57,6 +57,7 @@ export type TAddressTx = {
   hash: string
   amount: number
   estimated: number
+  disabled?: boolean
 }
 
 export type TCustomFee = {
@@ -146,3 +147,5 @@ export type TTrait = {
   trait_type: string
   value: string
 }
+
+export type TTonAddressState = 'unitialized' | 'active' | 'frozen'

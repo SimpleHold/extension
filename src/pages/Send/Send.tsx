@@ -144,6 +144,12 @@ const SendPage: React.FC = () => {
     if (state.balance && state.balance > 0 && Number(state.amount) > 0 && state.fee === 0) {
       onGetNetworkFee()
     }
+
+    return () => {
+      if (state.timer) {
+        clearTimeout(state.timer)
+      }
+    }
   }, [state.balance])
 
   React.useEffect(() => {
@@ -158,6 +164,12 @@ const SendPage: React.FC = () => {
 
       if (symbol === 'xvg') {
         onGetVergeUtxos()
+      }
+    }
+
+    return () => {
+      if (state.timer) {
+        clearTimeout(state.timer)
       }
     }
   }, [debounced])
@@ -242,7 +254,7 @@ const SendPage: React.FC = () => {
       },
       ethLikeParams: {
         contractAddress,
-        decimals: getTokenDecimals,
+        decimals: getTokenDecimals || decimals,
         fees: state.customFee,
       },
     })

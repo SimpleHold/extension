@@ -65,7 +65,7 @@ const WalletName = styled.p`
   white-space: nowrap;
 `
 
-const Address = styled.div`
+const Address = styled.p`
   margin: 7px 0 0 0;
   font-size: 14px;
   line-height: 16px;
@@ -127,6 +127,13 @@ const ActivateLabel = styled.p`
   color: #3fbb7d;
 `
 
+const AddressRow = styled.div`
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+`
+
 const Styles = {
   Container,
   Row,
@@ -142,6 +149,7 @@ const Styles = {
   Estimated,
   ActivateBlock,
   ActivateLabel,
+  AddressRow,
 }
 
 export default Styles

@@ -47,7 +47,9 @@ export const generateWallet = (): TGenerateAddress | null => {
   }
 }
 
-export const importRecoveryPhrase = (recoveryPhrase: string): TGenerateAddress | null => {
+export const importRecoveryPhrase = async (
+  recoveryPhrase: string
+): Promise<TGenerateAddress | null> => {
   try {
     const entropy = bip39.mnemonicToEntropy(recoveryPhrase)
     const rootKey = CardanoWasm.Bip32PrivateKey.from_bip39_entropy(

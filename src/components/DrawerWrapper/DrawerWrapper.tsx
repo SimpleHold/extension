@@ -5,9 +5,6 @@ import SVG from 'react-inlinesvg'
 // Styles
 import Styles from './styles'
 
-// Assets
-import halloweenSendIcon from '@assets/icons/halloween/halloweenSendIcon.svg' // Halloween
-
 interface Props {
   title?: string
   children: React.ReactElement<any, any> | null
@@ -18,7 +15,6 @@ interface Props {
   withCloseIcon?: boolean
   padding?: string
   height?: number
-  halloween?: boolean
 }
 
 const BackgroundStyles = {
@@ -39,7 +35,6 @@ const DrawerWrapper: React.FC<Props> = (props) => {
     withCloseIcon,
     padding,
     height,
-    halloween
   } = props
 
   const nodeRef = React.useRef(null)
@@ -79,16 +74,11 @@ const DrawerWrapper: React.FC<Props> = (props) => {
               ...drawerStyle[state],
             }}
           >
-            {halloween
-              ? (
-                <Styles.IconRow>
-                  <SVG src={halloweenSendIcon} />
-                </Styles.IconRow>
-              ) : icon
-                ? (<Styles.IconRow>
-                  <Styles.Icon src={icon} alt='icon' />
-                </Styles.IconRow>)
-                : null
+            {icon
+              ? (<Styles.IconRow>
+                <Styles.Icon src={icon} alt='icon' />
+              </Styles.IconRow>)
+              : null
             }
             {title ? <Styles.Title>{title}</Styles.Title> : null}
 

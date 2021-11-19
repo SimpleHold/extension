@@ -166,7 +166,9 @@ const WalletCard: React.FC<Props> = (props) => {
               <Styles.ActivateLabel>Need activation</Styles.ActivateLabel>
             </Styles.ActivateBlock>
           ) : (
-            <Styles.Address>{address}</Styles.Address>
+            <Styles.AddressRow>
+              <Styles.Address>{address}</Styles.Address>
+            </Styles.AddressRow>
           )}
         </Styles.AddressInfo>
         {!isNotActivated ? (
