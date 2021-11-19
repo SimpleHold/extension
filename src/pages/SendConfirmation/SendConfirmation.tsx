@@ -330,7 +330,6 @@ const SendConfirmation: React.FC = () => {
           state.transactionLink.length ? 'You can check it here:' : ''
         }`}
         link={state.transactionLink}
-        halloween={true}
       />
 
       <FailDrawer
