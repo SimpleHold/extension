@@ -27,6 +27,8 @@ import wethLogo from '@assets/tokens/weth.svg'
 import croLogo from '@assets/tokens/cro.svg'
 import wbtcLogo from '@assets/tokens/wbtc.svg'
 import flameLogo from '@assets/tokens/flame.svg'
+import bntLogo from '@assets/tokens/bnt.svg'
+import audioLogo from '@assets/tokens/audio.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -446,6 +448,28 @@ const tokens: IToken[] = [
     logo: flameLogo,
     background: MATIC_TOKEN_BG,
     chain: 'matic',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c',
+    name: 'Bancor',
+    symbol: 'bnt',
+    decimals: 18,
+    logo: bntLogo,
+    background: ETH_TOKEN_BG,
+    chain: 'eth',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x18aaa7115705e8be94bffebde57af9bfc265b998',
+    name: 'Audius',
+    symbol: 'audio',
+    decimals: 18,
+    logo: audioLogo,
+    background: ETH_TOKEN_BG,
+    chain: 'eth',
     minSendAmount: 0.001,
     isCustomFee: true,
   },
