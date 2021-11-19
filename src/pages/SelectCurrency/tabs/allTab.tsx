@@ -15,9 +15,6 @@ import currencies, { ICurrency } from '@config/currencies'
 // Styles
 import Styles from '../styles'
 
-// Assets
-import booCoinLogo from '@assets/icons/halloween/booCoinLogo.svg'
-
 interface Props {
   onAddCustomToken: () => void
   onAddToken: (symbol: string, chain: string, tokenName: string) => () => void
@@ -38,28 +35,6 @@ const AllTab: React.FC<Props> = (props) => {
     }
     return token
   })
-
-  // Halloween
-  const [showBoo, setShowBoo] = React.useState(false)
-
-  const booCoin: IToken = {
-    name: 'Boo Coin',
-    symbol: 'BOO',
-    logo: booCoinLogo,
-    address: '',
-    decimals: 1,
-    background: '#ffffff00',
-    chain: '',
-    minSendAmount: 1,
-    isCustomFee: false
-  }
-  filterTokensList.unshift(booCoin)
-
-  const onClickBoo = () => {
-    setShowBoo(true)
-    setTimeout(() => setShowBoo(false), 450)
-  }
-  //
 
   const filterCurrenciesList = currencies.filter((currency: ICurrency) => {
     if (searchValue.length) {
@@ -104,14 +79,9 @@ const AllTab: React.FC<Props> = (props) => {
           return (
             <Styles.CurrencyBlock
               key={`${symbol}/${chain}`}
-              onClick={symbol === "BOO" ? onClickBoo : onAddToken(symbol, chain, name)}
+              onClick={onAddToken(symbol, chain, name)}
             >
-              {symbol === "BOO"
-                ? <div key={`boo${symbol}`} style={{position: 'relative'}}>
-                  <SVG src={token.logo} />
-                  <Styles.Boo show={showBoo}>Boo!</Styles.Boo>
-                </div>
-                : <CurrencyLogo symbol={symbol} size={40} br={10} chain={chain} />}
+              <CurrencyLogo symbol={symbol} size={40} br={10} chain={chain} />
               <Styles.CurrencyName>{name}</Styles.CurrencyName>
               <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
             </Styles.CurrencyBlock>
