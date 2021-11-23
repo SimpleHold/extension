@@ -558,7 +558,7 @@ const SendConfirmation: React.FC = () => {
     if (state.props) {
       const { amount, networkFee, isIncludeFee } = state.props
 
-      if (isIncludeFee === 'true') {
+      if (isIncludeFee === 'true' && (state.props.symbol === state.props.networkFeeSymbol)) {
         return minus(amount, networkFee)
       }
       return amount

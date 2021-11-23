@@ -283,7 +283,7 @@ const SendConfirmation: React.FC = () => {
   }
 
   const getAmount = (): number => {
-    if (isIncludeFee && !tokenChain) {
+    if (isIncludeFee && !tokenChain && (symbol === networkFeeSymbol)) {
       return minus(amount, networkFee)
     }
     return amount

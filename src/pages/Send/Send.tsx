@@ -366,7 +366,7 @@ const SendPage: React.FC = () => {
     logEvent({
       name: TRANSACTION_AUTO_FILL,
       properties: {
-        king: 'myWallet',
+        kind: 'myWallet',
         symbol,
       },
     })
@@ -471,7 +471,7 @@ const SendPage: React.FC = () => {
       logEvent({
         name: TRANSACTION_AUTO_FILL,
         properties: {
-          king: 'allFunds',
+          kind: 'allFunds',
         },
       })
     }
@@ -513,11 +513,10 @@ const SendPage: React.FC = () => {
     if (state.amount.length && Number(state.amount) + Number(fee) > availableBalance) {
       return setInsufficientError()
     }
-
     const getAmount = (): number => {
       let parseAmount = Number(state.amount)
+      if (state.isIncludeFee && (symbol === state.feeSymbol)) {
 
-      if (state.isIncludeFee) {
         parseAmount = parseAmount - state.fee
       }
 
@@ -527,7 +526,7 @@ const SendPage: React.FC = () => {
     if (currency) {
       let amount = getAmount()
       let minAmount: number = 0
-      const getMinAmountWithFee = state.isIncludeFee ? state.fee : 0
+      const getMinAmountWithFee = state.isIncludeFee && symbol === state.feeSymbol ? state.fee : 0
 
       if (tokenChain) {
         minAmount = currency.minSendAmount || 0.001
@@ -547,7 +546,7 @@ const SendPage: React.FC = () => {
   }
 
   const isButtonDisabled = (): boolean => {
-    const getAmount = state.isIncludeFee ? Number(state.amount) - state.fee : Number(state.amount)
+    const getAmount = state.isIncludeFee && (symbol === state.feeSymbol) ? Number(state.amount) - state.fee : Number(state.amount)
 
     if (
       validateAddress(symbol, state.address, tokenChain) &&
@@ -560,9 +559,9 @@ const SendPage: React.FC = () => {
       !isCurrencyBalanceError
     ) {
       if (!state?.utxosList?.length) {
-        const withOuputs = checkWithOutputs(symbol)
+        const withOutputs = checkWithOutputs(symbol)
 
-        return withOuputs
+        return withOutputs
       }
 
       if (state.fee === 0) {
@@ -608,7 +607,7 @@ const SendPage: React.FC = () => {
   }
 
   const isCurrencyBalanceError =
-    (tokenChain !== undefined || toLower(symbol) === 'theta' || toLower(symbol) === 'vet') &&
+    (tokenChain !== undefined || toLower(state.feeSymbol) !== toLower(symbol)) &&
     state.currencyBalance !== null &&
     !state.isFeeLoading &&
     state.fee > 0 &&
