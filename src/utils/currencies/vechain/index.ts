@@ -87,8 +87,11 @@ export const getNetworkFee = async (
 
     const networkFee = await getVechainFee(from, to, `${formatValue(amount, 'to')}`)
 
+    const vthoTransferPrice = 0.52
+    const fee = Math.ceil((networkFee + vthoTransferPrice) * 10000) / 10000
+
     return {
-      networkFee,
+      networkFee: fee,
       currencyBalance,
     }
   } catch {
