@@ -57,6 +57,7 @@ export type TAddressTx = {
   hash: string
   amount: number
   estimated: number
+  disabled?: boolean
 }
 
 export type TCustomFee = {
@@ -150,3 +151,5 @@ export type TTrait = {
 export type TVetTxParams = {
   blockRef: string
 }
+
+export type TTonAddressState = 'unitialized' | 'active' | 'frozen'

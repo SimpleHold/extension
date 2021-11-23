@@ -1,6 +1,6 @@
 {
   "name": "extension",
-  "version": "1.15.2",
+  "version": "1.16.0",
   "description": "extension",
   "private": false,
   "repository": "https://github.com/SimpleHold/extension.git",
@@ -66,6 +66,8 @@
     "styled-components": "^5.2.1",
     "thor-devkit": "^2.0.1",
     "thorify": "^1.5.7",
+    "tonweb": "^0.0.22",
+    "tonweb-mnemonic": "^0.0.2",
     "trezor-connect": "8.1.29",
     "tronweb": "^4.0.0",
     "uuid": "^8.3.2",

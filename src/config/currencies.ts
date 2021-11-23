@@ -25,6 +25,7 @@ import solLogo from '@assets/currencies/sol.svg'
 import oneLogo from '@assets/currencies/one.svg'
 import vetLogo from '@assets/currencies/vet.svg'
 import vthoLogo from '@assets/currencies/vtho.svg'
+import toncoinLogo from '@assets/currencies/toncoin.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -272,6 +273,15 @@ const currencies: ICurrency[] = [
     background: '#A5BADA',
     chain: 'vethor',
     minSendAmount: 100000000000000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Toncoin',
+    symbol: 'toncoin',
+    logo: toncoinLogo,
+    background: '#2D9DD5',
+    chain: 'toncoin',
+    minSendAmount: 1000,
     isCustomFee: false,
   },
 ]

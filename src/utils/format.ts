@@ -89,3 +89,11 @@ export const fromUnit = (value: string | number, zeros: number): number => {
   const zerosBN = new BigNumber(10).pow(zeros)
   return Number(new BigNumber(value).multipliedBy(zerosBN))
 }
+
+export const getAbsoluteValue = (value: string | number, isPositive: boolean): number => {
+  if (isPositive) {
+    return Math.abs(+value)
+  }
+
+  return -Math.abs(+value)
+}

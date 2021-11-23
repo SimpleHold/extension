@@ -326,7 +326,9 @@ const SendConfirmation: React.FC = () => {
       <SuccessDrawer
         isActive={state.activeDrawer === 'success'}
         onClose={closeSuccessDrawer}
-        text="Your transaction has been successfully sent. You can check it here:"
+        text={`Your transaction has been successfully sent. ${
+          state.transactionLink.length ? 'You can check it here:' : ''
+        }`}
         link={state.transactionLink}
       />
 

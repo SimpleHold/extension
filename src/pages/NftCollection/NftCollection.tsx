@@ -51,7 +51,8 @@ const NftCollectionPage: React.FC = () => {
 
     if (walletsList?.length) {
       const filterWallet = walletsList.filter(
-        (wallet: IWallet) => wallet.symbol === 'eth' || wallet.symbol === 'bnb'
+        (wallet: IWallet) =>
+          wallet.symbol === 'eth' || wallet.symbol === 'bnb' || wallet.symbol === 'matic'
       )
 
       if (filterWallet.length) {
@@ -97,11 +98,18 @@ const NftCollectionPage: React.FC = () => {
     return data
   }
 
+  const getChainFromSymbol = (symbol: string): string => {
+    if (symbol === 'bnb') {
+      return 'bsc'
+    }
+    return symbol
+  }
+
   const onGetNft = async (): Promise<void> => {
     const mapWallets = wallets.filter(filterWallets).map((wallet: IWallet) => {
       return {
         address: wallet.address,
-        chain: wallet.symbol === 'bnb' ? 'bsc' : 'eth',
+        chain: getChainFromSymbol(wallet.symbol),
       }
     })
 

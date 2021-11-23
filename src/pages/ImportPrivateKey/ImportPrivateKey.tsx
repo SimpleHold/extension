@@ -18,7 +18,7 @@ import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets } from '@
 import { decrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toLower, toUpper } from '@utils/format'
-import { importPrivateKey } from '@utils/currencies'
+import { importPrivateKey, getTokenStandart } from '@utils/currencies'
 import { getTokensBalance } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
@@ -133,7 +133,7 @@ const ImportPrivateKey: React.FC = () => {
             tokenName,
             contractAddress,
             decimals,
-            tokenStandart: toLower(chain) === 'bsc' ? 'BEP20' : 'ERC20',
+            tokenStandart: getTokenStandart(toLower(chain)),
           })
         }
       }

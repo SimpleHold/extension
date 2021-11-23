@@ -142,6 +142,11 @@ export const getExplorerLink = (
     if (parseChain === 'eth') {
       return `https://etherscan.io/token/${tokenAddress}?a=${address}`
     }
+
+    if (parseChain === 'matic') {
+      return `https://polygonscan.com/token/${tokenAddress}?a=${address}`
+    }
+
     return `https://bscscan.com/token/${tokenAddress}?a=${address}`
   } else {
     if (parseSymbol === 'eth') {

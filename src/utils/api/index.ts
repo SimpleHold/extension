@@ -22,6 +22,7 @@ import {
   TNft,
   TNFtWallets,
   TVetTxParams,
+  TTonAddressState,
 } from './types'
 
 export const getBalance = async (
@@ -587,5 +588,19 @@ export const getVechainFee = async (from: string, to: string, value: string): Pr
     return data.data
   } catch {
     return 0
+  }
+}
+
+export const getTonAddressState = async (address: string): Promise<TTonAddressState> => {
+  try {
+    const { data }: AxiosResponse = await axios('https://api.ton.sh/getAddressState', {
+      params: {
+        address,
+      },
+    })
+
+    return data.result
+  } catch {
+    return 'unitialized'
   }
 }

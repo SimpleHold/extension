@@ -45,6 +45,9 @@ const SendFormShared: React.FC<Props> = (props) => {
     }
 
     if (inputType === 'extraId') {
+      if (symbol !== 'xrp') {
+        return undefined
+      }
       return {
         label: 'Generate',
         onClick: onGenerateExtraId,
