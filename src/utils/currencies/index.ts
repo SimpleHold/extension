@@ -30,6 +30,7 @@ import * as xinfin from '@utils/currencies/xinfin'
 import * as solana from '@utils/currencies/solana'
 import * as harmony from '@utils/currencies/harmony'
 import * as toncoin from '@utils/currencies/toncoin'
+import * as digibyte from '@utils/currencies/digibyte'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -40,6 +41,10 @@ export const isEthereumLike = (symbol: string, chain?: string): boolean => {
 
 const getProvider = (symbol: string): TProvider | null => {
   try {
+    if (digibyte.coins.indexOf(symbol) !== -1) {
+      return digibyte
+    }
+
     if (harmony.coins.indexOf(symbol) !== -1) {
       return harmony
     }
@@ -184,9 +189,11 @@ export const createTransaction = async ({
     if (ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
       return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData, extraId)
     }
+
     if (cardano.coins.indexOf(symbol) !== -1 && outputs) {
       return await cardano.createTransaction(outputs, from, to, amount, privateKey)
     }
+
     if (isEthereumLike(symbol, tokenChain)) {
       const getContractAddress = contractAddress
         ? contractAddress
@@ -222,6 +229,10 @@ export const createTransaction = async ({
     }
 
     if (outputs?.length && networkFee) {
+      if (digibyte.coins.indexOf(symbol) !== -1) {
+        return digibyte.createTransaction(outputs, to, amount, networkFee, from, privateKey)
+      }
+
       if (neblio.coins.indexOf(symbol) !== -1) {
         return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
       }
@@ -255,6 +266,10 @@ export const getNetworkFee = async ({
 }: IGetFeeParams): Promise<TGetFeeData | null> => {
   if (btcLikeParams) {
     const { outputs, customFee } = btcLikeParams
+
+    if (digibyte.coins.indexOf(symbol) !== -1) {
+      return digibyte.getNetworkFee(addressFrom, outputs, amount)
+    }
 
     if (cardano.coins.indexOf(symbol) !== -1) {
       return cardano.getNetworkFee(outputs, amount)
