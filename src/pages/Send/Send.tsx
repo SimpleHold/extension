@@ -229,12 +229,14 @@ const SendPage: React.FC = () => {
 
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
 
+    let amount = Number(state.amount)
+
     const data = await getNetworkFee({
       symbol,
       addressFrom: state.selectedAddress,
       addressTo: state.address,
       chain,
-      amount: state.amount,
+      amount: `${amount}`,
       tokenChain,
       btcLikeParams: {
         outputs: state.outputs,
@@ -394,9 +396,8 @@ const SendPage: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    // logEvent({
-    //   name: ADDRESS_SEND,
-    // })
+
+    let amount = Number(state.amount)
 
     if (state.timer) {
       clearTimeout(state.timer)
@@ -408,7 +409,7 @@ const SendPage: React.FC = () => {
       setItem(
         'sendConfirmationData',
         JSON.stringify({
-          amount: Number(state.amount),
+          amount,
           symbol,
           networkFee: state.fee,
           networkFeeSymbol: state.feeSymbol,
@@ -426,7 +427,7 @@ const SendPage: React.FC = () => {
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
 
     history.push('/send-confirm', {
-      amount: Number(state.amount),
+      amount,
       symbol,
       networkFee: state.fee,
       networkFeeSymbol: state.feeSymbol,
@@ -505,7 +506,6 @@ const SendPage: React.FC = () => {
     if (state.amountErrorLabel) {
       updateState({ amountErrorLabel: null })
     }
-
     const availableBalance = getAvailableBalance()
 
     const fee = state.isIncludeFee ? 0 : state.fee

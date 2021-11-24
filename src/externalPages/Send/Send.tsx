@@ -300,12 +300,14 @@ const Send: React.FC = () => {
         updateState({ utxosList: [] })
       }
 
+      let amount = Number(state.amount)
+
       const data = await getNetworkFee({
         symbol,
         addressFrom: address,
         addressTo: state.address,
         chain: currencyInfo.chain,
-        amount: state.amount,
+        amount: `${amount}`,
         tokenChain: chain,
         btcLikeParams: {
           outputs: state.outputs,
@@ -498,6 +500,9 @@ const Send: React.FC = () => {
   }
 
   const onConfirm = async (): Promise<void> => {
+
+    let amount = Number(state.amount)
+
     const currenctTab = await getCurrentTab()
 
     const url = getUrl('send-confirmation.html')
@@ -508,7 +513,7 @@ const Send: React.FC = () => {
         : getCurrency(state.selectedWallet.symbol)
 
       const data = {
-        amount: Number(state.amount),
+        amount,
         symbol: state.selectedWallet.symbol,
         addressFrom: state.selectedWallet.address,
         addressTo: state.address,
