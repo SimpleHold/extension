@@ -591,7 +591,7 @@ const Send: React.FC = () => {
 
     const fee = state.isIncludeFee ? 0 : state.fee
 
-    if (state.amount.length && Number(state.amount) + Number(fee) > availableBalance) {
+    if (state.amount.length && Number(state.amount) + (state.selectedWallet?.symbol === state.feeSymbol ? Number(fee) : 0) > availableBalance) {
       return setInsufficientError()
     }
 

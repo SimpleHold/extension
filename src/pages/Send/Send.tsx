@@ -163,7 +163,7 @@ const SendPage: React.FC = () => {
   }, [debounced])
 
   React.useEffect(() => {
-    if (state.fee > 0 && !state.amountErrorLabel) {
+    if (state.fee > 0 && !state.amountErrorLabel && symbol === state.feeSymbol) {
       if (state.amount.length && Number(state.amount) + getNormalFee() > Number(state.balance)) {
         updateState({ amountErrorLabel: 'Insufficient funds' })
       }
@@ -510,7 +510,7 @@ const SendPage: React.FC = () => {
 
     const fee = state.isIncludeFee ? 0 : state.fee
 
-    if (state.amount.length && Number(state.amount) + Number(fee) > availableBalance) {
+    if (state.amount.length && Number(state.amount) + (symbol === state.feeSymbol ? Number(fee) : 0) > availableBalance) {
       return setInsufficientError()
     }
     const getAmount = (): number => {
