@@ -1,6 +1,7 @@
 import { Buffer } from 'buffer'
 import BigNumber from 'bignumber.js'
 import Web3 from 'web3'
+import * as Devkit from 'ravencore-lib'
 
 // Utils
 import { getBalance, getVechainParams, getVechainFee } from '@utils/api'
