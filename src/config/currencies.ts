@@ -26,6 +26,7 @@ import oneLogo from '@assets/currencies/one.svg'
 import vetLogo from '@assets/currencies/vet.svg'
 import vthoLogo from '@assets/currencies/vtho.svg'
 import toncoinLogo from '@assets/currencies/toncoin.svg'
+import ravencoinLogo from '@assets/currencies/rvn.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -284,6 +285,15 @@ const currencies: ICurrency[] = [
     minSendAmount: 1000,
     isCustomFee: false,
   },
+  {
+    name: 'Ravencoin',
+    symbol: 'rvn',
+    logo: ravencoinLogo,
+    background: '#B4B8CE',
+    chain: 'ravencoin',
+    minSendAmount: 1000, // todo
+    isCustomFee: false,
+  }
 ]
 
 export const getCurrency = (symbol: string): ICurrency | undefined => {
