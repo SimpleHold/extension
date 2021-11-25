@@ -84,8 +84,8 @@ export const getNetworkFee = async (
         currencyBalance
       }
     }
-
-    const networkFee = await getVechainFee(from, to, `${formatValue(amount, 'to')}`)
+    const safeRequestAmount = amount.length > 17 ? Number(amount.slice(0, 17)) : amount
+    const networkFee = await getVechainFee(from, to, `${formatValue(safeRequestAmount, 'to')}`)
 
     return {
       networkFee,

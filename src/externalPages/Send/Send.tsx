@@ -503,6 +503,20 @@ const Send: React.FC = () => {
 
     let amount = Number(state.amount)
 
+    // _vtho
+    if (toLower(state.selectedWallet?.symbol) === 'vtho') {
+      const safeGap = state.fee * 2
+      const balance = getAvailableBalance()
+      const isInsufficientBalance = balance - safeGap <= 0.001
+      if (isInsufficientBalance) {
+        updateState({ amountErrorLabel: `Min amount for this transfer is ${(balance + safeGap).toString().slice(0,6)}`})
+        return
+      }
+      if (amount + safeGap >= balance) {
+        amount -= state.fee
+      }
+    }
+
     const currenctTab = await getCurrentTab()
 
     const url = getUrl('send-confirmation.html')
