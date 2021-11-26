@@ -25,6 +25,7 @@ import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
+import { getTokenStandart } from '@utils/currencies'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -161,7 +162,7 @@ const AddCustomToken: React.FC = () => {
         tokenName,
         contractAddress: state.contractAddress,
         decimals,
-        tokenStandart: toLower(chain) === 'bsc' ? 'BEP20' : 'ERC20',
+        tokenStandart: getTokenStandart(toLower(chain)),
       }
 
       if (checkTokenWallets) {
@@ -225,7 +226,8 @@ const AddCustomToken: React.FC = () => {
             false,
             currency.chain,
             state.tokenInfo.name,
-            state.contractAddress
+            state.contractAddress,
+            state.tokenInfo.decimals
           )
 
           if (walletsList) {

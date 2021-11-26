@@ -15,7 +15,7 @@ import Styles from './styles'
 interface Props {
   data: TAddressTxGroup[] | null
   symbol: string
-  openTx: (hash: string) => () => void
+  openTx: (hash: string, disabled?: boolean) => () => void
 }
 
 const TransactionHistory: React.FC<Props> = (props) => {
@@ -53,12 +53,12 @@ const TransactionHistory: React.FC<Props> = (props) => {
                 <Styles.DateRow>
                   <Styles.TxDate>{dayjs(date).format('MMM D')}</Styles.TxDate>
                 </Styles.DateRow>
-                {data.map((tx: TAddressTx, index) => {
-                  const { type, date, hash, amount, estimated, isPending } = tx
+                {data.map((tx: TAddressTx) => {
+                  const { type, date, hash, amount, estimated, isPending, disabled } = tx
 
                   return (
                     <Transaction
-                      key={hash + index}
+                      key={hash}
                       data={{
                         type,
                         date,
@@ -67,8 +67,9 @@ const TransactionHistory: React.FC<Props> = (props) => {
                         estimated,
                         symbol,
                         isPending,
+                        disabled,
                       }}
-                      openTx={openTx(hash)}
+                      openTx={openTx(hash, disabled)}
                     />
                   )
                 })}
