@@ -148,4 +148,8 @@ export type TTrait = {
   value: string
 }
 
+export type TVetTxParams = {
+  blockRef: string
+}
+
 export type TTonAddressState = 'unitialized' | 'active' | 'frozen'

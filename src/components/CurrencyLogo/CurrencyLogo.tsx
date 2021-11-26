@@ -6,6 +6,7 @@ import { getToken } from '@config/tokens'
 
 // Utils
 import { toUpper } from '@utils/format'
+import { getToken as getLocalToken } from '@utils/localTokens'
 
 // Styles
 import Styles from './styles'
@@ -22,8 +23,24 @@ interface Props {
 const CurrencyLogo: React.FC<Props> = (props) => {
   const { size, symbol, br, chain, background, name } = props
 
+  const [logo, setLogo] = React.useState<string | null>(null)
+
   const getChainogo = chain ? getCurrencyByChain(chain) : null
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+
+  React.useEffect(() => {
+    checkLocalLogo()
+  }, [])
+
+  const checkLocalLogo = (): void => {
+    if (chain) {
+      const find = getLocalToken(chain, symbol)
+
+      if (find) {
+        setLogo(find.logo)
+      }
+    }
+  }
 
   return (
     <Styles.Container width={size} height={size}>
@@ -33,8 +50,10 @@ const CurrencyLogo: React.FC<Props> = (props) => {
         background={background || currency?.background || getChainogo?.background}
         br={br}
       >
-        {currency ? <Styles.Logo src={currency.logo} width={size / 2} height={size / 2} /> : null}
-        {!currency && name?.length ? (
+        {currency || logo ? (
+          <Styles.Logo src={logo || currency?.logo} width={size / 2} height={size / 2} />
+        ) : null}
+        {!currency && !logo && name?.length ? (
           <Styles.LetterLogo>{toUpper(name[0])}</Styles.LetterLogo>
         ) : null}
       </Styles.LogoRow>

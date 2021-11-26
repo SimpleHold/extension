@@ -7,10 +7,11 @@ import { toLower } from '@utils/format'
 import { getManifest, getUrl, openWebPage } from '@utils/extension'
 import { setItem, getJSON } from '@utils/storage'
 import { generateExtraId } from '@utils/currencies/ripple'
-import { getPhishingSites } from '@utils/api'
+import { getPhishingSites, getTokens } from '@utils/api'
 import { TPhishingSite } from '@utils/api/types'
 import { msToMin } from '@utils/dates'
 import { validateUrl } from '@utils/validate'
+import { compare } from '@utils/localTokens'
 
 // Types
 import { TPopupPosition } from './types'
@@ -285,6 +286,18 @@ const onGetPhishingSites = async () => {
   }
 }
 
+const onGetTokens = async (): Promise<void> => {
+  const tokens = await getTokens()
+
+  setTimeout(() => {
+    onGetTokens()
+  }, 600000)
+
+  if (tokens?.length) {
+    compare(tokens)
+  }
+}
+
 browser.runtime.onInstalled.addListener(() => {
   setTimeout(() => {
     generateContextMenu()
@@ -293,6 +306,8 @@ browser.runtime.onInstalled.addListener(() => {
   setTimeout(() => {
     onGetPhishingSites()
   }, 900000)
+
+  onGetTokens()
 })
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {

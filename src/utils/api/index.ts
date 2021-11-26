@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from 'axios'
 // Config
 import config from '@config/index'
 
+// Types
 import {
   IGetBalance,
   IGetContractInfo,
@@ -21,8 +22,10 @@ import {
   TFullTxInfo,
   TNft,
   TNFtWallets,
+  TVetTxParams,
   TTonAddressState,
 } from './types'
+import { IToken } from '@config/tokens'
 
 export const getBalance = async (
   address: string,
@@ -557,6 +560,39 @@ export const getNft = async (wallets: TNFtWallets[]): Promise<TNft[]> => {
   }
 }
 
+export const getVechainParams = async (): Promise<TVetTxParams | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/vechain/params`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data
+  } catch {
+    return null
+  }
+}
+
+export const getVechainFee = async (from: string, to: string, value: string): Promise<number> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/vechain/network-fee`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+        from,
+        to,
+        value,
+      },
+    })
+
+    return data.data
+  } catch {
+    return 0
+  }
+}
+
 export const getTonAddressState = async (address: string): Promise<TTonAddressState> => {
   try {
     const { data }: AxiosResponse = await axios('https://api.ton.sh/getAddressState', {
@@ -568,5 +604,15 @@ export const getTonAddressState = async (address: string): Promise<TTonAddressSt
     return data.result
   } catch {
     return 'unitialized'
+  }
+}
+
+export const getTokens = async (): Promise<IToken[] | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/tokens`)
+
+    return data.data
+  } catch {
+    return null
   }
 }
