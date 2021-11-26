@@ -5,6 +5,7 @@ declare module 'neblio-lib'
 declare module 'tronweb'
 declare module 'tonweb'
 declare module 'tonweb-mnemonic'
+declare module 'ravencore-lib'
 
 declare module 'nuls-sdk-js' {
   function newAddress(

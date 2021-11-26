@@ -31,6 +31,7 @@ import * as solana from '@utils/currencies/solana'
 import * as harmony from '@utils/currencies/harmony'
 import * as vechain from '@utils/currencies/vechain'
 import * as toncoin from '@utils/currencies/toncoin'
+// import * as ravencoin from '@utils/currencies/ravencoin'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -100,6 +101,10 @@ const getProvider = (symbol: string): TProvider | null => {
     if (toncoin.coins.indexOf(symbol) !== -1) {
       return toncoin
     }
+
+    // if (ravencoin.coins.indexOf(symbol) !== -1) {
+    //   return ravencoin
+    // }
 
     return null
   } catch {
