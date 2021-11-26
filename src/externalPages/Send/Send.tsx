@@ -300,12 +300,14 @@ const Send: React.FC = () => {
         updateState({ utxosList: [] })
       }
 
+      let amount = Number(state.amount)
+
       const data = await getNetworkFee({
         symbol,
         addressFrom: address,
         addressTo: state.address,
         chain: currencyInfo.chain,
-        amount: state.amount,
+        amount: `${amount}`,
         tokenChain: chain,
         btcLikeParams: {
           outputs: state.outputs,
@@ -498,6 +500,23 @@ const Send: React.FC = () => {
   }
 
   const onConfirm = async (): Promise<void> => {
+
+    let amount = Number(state.amount)
+
+    // _vtho
+    if (toLower(state.selectedWallet?.symbol) === 'vtho') {
+      const safeGap = state.fee * 2
+      const balance = getAvailableBalance()
+      const isInsufficientBalance = balance - safeGap <= 0.001
+      if (isInsufficientBalance) {
+        updateState({ amountErrorLabel: `Min amount for this transfer is ${(balance + safeGap).toString().slice(0,6)}`})
+        return
+      }
+      if (amount + safeGap >= balance) {
+        amount -= state.fee
+      }
+    }
+
     const currenctTab = await getCurrentTab()
 
     const url = getUrl('send-confirmation.html')
@@ -508,7 +527,7 @@ const Send: React.FC = () => {
         : getCurrency(state.selectedWallet.symbol)
 
       const data = {
-        amount: Number(state.amount),
+        amount,
         symbol: state.selectedWallet.symbol,
         addressFrom: state.selectedWallet.address,
         addressTo: state.address,
@@ -591,7 +610,7 @@ const Send: React.FC = () => {
 
     const fee = state.isIncludeFee ? 0 : state.fee
 
-    if (state.amount.length && Number(state.amount) + Number(fee) > availableBalance) {
+    if (state.amount.length && Number(state.amount) + (state.selectedWallet?.symbol === state.feeSymbol ? Number(fee) : 0) > availableBalance) {
       return setInsufficientError()
     }
 

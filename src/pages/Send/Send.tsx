@@ -31,7 +31,7 @@ import {
   getFee,
   getStandingFee,
   isEthereumLike,
-  checkWithZeroFee,
+  checkWithZeroFee
 } from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
@@ -49,7 +49,7 @@ import {
   // ADDRESS_SEND,
   TRANSACTION_AUTO_FILL,
   TRANSACTION_START,
-  TRANSACTION_CANCEL,
+  TRANSACTION_CANCEL
 } from '@config/events'
 
 // Types
@@ -83,12 +83,12 @@ const initialState: IState = {
   customFee: {
     slow: 0,
     average: 0,
-    fast: 0,
+    fast: 0
   },
   isIncludeFee: false,
   isStandingFee: false,
   feeValues: [],
-  timer: null,
+  timer: null
 }
 
 const SendPage: React.FC = () => {
@@ -103,8 +103,8 @@ const SendPage: React.FC = () => {
       address,
       walletName,
       hardware,
-      currency,
-    },
+      currency
+    }
   } = useLocation<ILocationState>()
   const history = useHistory()
 
@@ -113,7 +113,7 @@ const SendPage: React.FC = () => {
     selectedAddress: address,
     walletName,
     hardware,
-    backTitle: walletName,
+    backTitle: walletName
   })
 
   const debounced = useDebounce(state.amount, 1000)
@@ -144,12 +144,6 @@ const SendPage: React.FC = () => {
     if (state.balance && state.balance > 0 && Number(state.amount) > 0 && state.fee === 0) {
       onGetNetworkFee()
     }
-
-    return () => {
-      if (state.timer) {
-        clearTimeout(state.timer)
-      }
-    }
   }, [state.balance])
 
   React.useEffect(() => {
@@ -166,16 +160,10 @@ const SendPage: React.FC = () => {
         onGetVergeUtxos()
       }
     }
-
-    return () => {
-      if (state.timer) {
-        clearTimeout(state.timer)
-      }
-    }
   }, [debounced])
 
   React.useEffect(() => {
-    if (state.fee > 0 && !state.amountErrorLabel) {
+    if (state.fee > 0 && !state.amountErrorLabel && symbol === state.feeSymbol) {
       if (state.amount.length && Number(state.amount) + getNormalFee() > Number(state.balance)) {
         updateState({ amountErrorLabel: 'Insufficient funds' })
       }
@@ -241,22 +229,24 @@ const SendPage: React.FC = () => {
 
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
 
+    let amount = Number(state.amount)
+
     const data = await getNetworkFee({
       symbol,
       addressFrom: state.selectedAddress,
       addressTo: state.address,
       chain,
-      amount: state.amount,
+      amount: `${amount}`,
       tokenChain,
       btcLikeParams: {
         outputs: state.outputs,
-        customFee: state.customFee,
+        customFee: state.customFee
       },
       ethLikeParams: {
         contractAddress,
-        decimals: getTokenDecimals || decimals,
-        fees: state.customFee,
-      },
+        decimals: getTokenDecimals,
+        fees: state.customFee
+      }
     })
 
     updateState({ isFeeLoading: false })
@@ -280,7 +270,7 @@ const SendPage: React.FC = () => {
             updateState({
               feeValues: data.fees,
               utxosList: getFee.utxos || [],
-              fee: getFee.value,
+              fee: getFee.value
             })
           }
         }
@@ -328,7 +318,7 @@ const SendPage: React.FC = () => {
   const loadBalance = async (): Promise<void> => {
     updateState({
       balance: null,
-      estimated: null,
+      estimated: null
     })
 
     const { balance, balance_usd, balance_btc } = await getBalance(
@@ -341,7 +331,7 @@ const SendPage: React.FC = () => {
 
     updateState({
       balance,
-      estimated: balance_usd,
+      estimated: balance_usd
     })
 
     updateBalance(state.selectedAddress, symbol, balance, balance_btc)
@@ -361,8 +351,8 @@ const SendPage: React.FC = () => {
       name: TRANSACTION_CANCEL,
       properties: {
         stage: 'send',
-        symbol,
-      },
+        symbol
+      }
     })
 
     history.goBack()
@@ -379,8 +369,8 @@ const SendPage: React.FC = () => {
       name: TRANSACTION_AUTO_FILL,
       properties: {
         kind: 'myWallet',
-        symbol,
-      },
+        symbol
+      }
     })
   }
 
@@ -397,7 +387,7 @@ const SendPage: React.FC = () => {
       utxosList: [],
       currencyBalance: null,
       outputs: [],
-      feeValues: [],
+      feeValues: []
     })
 
     if (!state.isStandingFee) {
@@ -406,9 +396,22 @@ const SendPage: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    // logEvent({
-    //   name: ADDRESS_SEND,
-    // })
+
+    let amount = Number(state.amount)
+
+    // _vtho
+    if (toLower(symbol) === 'vtho') {
+      const safeGap = state.fee * 2
+      const balance = getAvailableBalance()
+      const isInsufficientBalance = balance - safeGap <= 0.001
+      if (isInsufficientBalance) {
+        updateState({ amountErrorLabel: `Min amount for this transfer is ${(balance + safeGap).toString().slice(0,6)}`})
+        return
+      }
+      if (amount + safeGap >= balance) {
+        amount -= state.fee
+      }
+    }
 
     if (state.timer) {
       clearTimeout(state.timer)
@@ -420,7 +423,7 @@ const SendPage: React.FC = () => {
       setItem(
         'sendConfirmationData',
         JSON.stringify({
-          amount: Number(state.amount),
+          amount,
           symbol,
           networkFee: state.fee,
           networkFeeSymbol: state.feeSymbol,
@@ -429,7 +432,7 @@ const SendPage: React.FC = () => {
           outputs: state.utxosList,
           chain,
           hardware,
-          extraId: state.extraId,
+          extraId: state.extraId
         })
       )
     }
@@ -438,7 +441,7 @@ const SendPage: React.FC = () => {
     const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : undefined
 
     history.push('/send-confirm', {
-      amount: Number(state.amount),
+      amount,
       symbol,
       networkFee: state.fee,
       networkFeeSymbol: state.feeSymbol,
@@ -451,7 +454,7 @@ const SendPage: React.FC = () => {
       decimals: getTokenDecimals || decimals,
       extraId: state.extraId,
       tokenName,
-      isIncludeFee: state.isIncludeFee,
+      isIncludeFee: state.isIncludeFee
     })
 
     logEvent({
@@ -459,8 +462,8 @@ const SendPage: React.FC = () => {
       properties: {
         fee: state.isIncludeFee ? 'incl' : 'excl',
         speed: currency?.isCustomFee ? 'fixed' : state.feeType,
-        symbol,
-      },
+        symbol
+      }
     })
   }
 
@@ -483,8 +486,8 @@ const SendPage: React.FC = () => {
       logEvent({
         name: TRANSACTION_AUTO_FILL,
         properties: {
-          kind: 'allFunds',
-        },
+          kind: 'allFunds'
+        }
       })
     }
   }
@@ -517,12 +520,11 @@ const SendPage: React.FC = () => {
     if (state.amountErrorLabel) {
       updateState({ amountErrorLabel: null })
     }
-
     const availableBalance = getAvailableBalance()
 
     const fee = state.isIncludeFee ? 0 : state.fee
 
-    if (state.amount.length && Number(state.amount) + Number(fee) > availableBalance) {
+    if (state.amount.length && Number(state.amount) + (symbol === state.feeSymbol ? Number(fee) : 0) > availableBalance) {
       return setInsufficientError()
     }
     const getAmount = (): number => {
@@ -551,7 +553,7 @@ const SendPage: React.FC = () => {
 
       if (Number(amount) < currency.minSendAmount) {
         return updateState({
-          amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(symbol)}`,
+          amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(symbol)}`
         })
       }
     }
@@ -679,8 +681,8 @@ const SendPage: React.FC = () => {
             />
           </Styles.Row>
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-            <Button label="Send" onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
+            <Button label='Cancel' isLight onClick={onCancel} mr={7.5} />
+            <Button label='Send' onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>

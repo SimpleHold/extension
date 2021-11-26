@@ -29,7 +29,7 @@ export const generateWallet = (): TGenerateAddress | null => {
 
     return {
       privateKey: privKey.toString('hex'),
-      address,
+      address
     }
   } catch {
     return null
@@ -68,35 +68,32 @@ export const getNetworkFee = async (
   chain: string
 ): Promise<TGetFeeData> => {
   try {
-    const { balance: currencyBalance } = await getBalance(from, 'vechain')
+    const { balance: currencyBalance } = await getBalance(from, 'vethor')
 
     if (chain === 'vechain') {
       const fee = Devkit.Transaction.intrinsicGas([
         {
           to,
           value: formatValue(amount, 'from'),
-          data: '0x',
-        },
+          data: '0x'
+        }
       ])
 
       return {
         networkFee: toUnit(fee, 5),
-        currencyBalance,
+        currencyBalance
       }
     }
-
-    const networkFee = await getVechainFee(from, to, `${formatValue(amount, 'to')}`)
-
-    const vthoTransferPrice = 0.52
-    const fee = Math.ceil((networkFee + vthoTransferPrice) * 10000) / 10000
+    const safeRequestAmount = amount.length > 17 ? Number(amount.slice(0, 17)) : amount
+    const networkFee = await getVechainFee(from, to, `${formatValue(safeRequestAmount, 'to')}`)
 
     return {
-      networkFee: fee,
-      currencyBalance,
+      networkFee,
+      currencyBalance
     }
   } catch {
     return {
-      networkFee: 0,
+      networkFee: 0
     }
   }
 }
@@ -109,11 +106,10 @@ const transferToken = async (
 ): Promise<string | null> => {
   const contract = new web3Instance.eth.Contract(contractABI, VTHO_CA, { from })
   const data = contract.methods.transfer(to, value)
-
   const { rawTransaction } = await web3Instance.eth.accounts.signTransaction(
     {
       to: VTHO_CA,
-      data: data.encodeABI(),
+      data: data.encodeABI()
     },
     privateKey
   )
@@ -137,8 +133,8 @@ export const createTransaction = async (
       {
         to,
         value,
-        data: '0x',
-      },
+        data: '0x'
+      }
     ]
 
     const txParams = await getVechainParams()
@@ -155,7 +151,7 @@ export const createTransaction = async (
       gasPriceCoef: 128,
       gas: Devkit.Transaction.intrinsicGas(clauses),
       dependsOn: null,
-      nonce: +new Date(),
+      nonce: +new Date()
     })
     const signingHash = tx.signingHash()
     tx.signature = Devkit.secp256k1.sign(signingHash, Buffer.from(privateKey, 'hex'))
