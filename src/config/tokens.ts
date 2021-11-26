@@ -22,13 +22,13 @@ import zilLogo from '@assets/tokens/zil.svg'
 import sxpLogo from '@assets/tokens/sxp.svg'
 import xvsLogo from '@assets/tokens/xvs.svg'
 import linkLogo from '@assets/tokens/link.svg'
+import bntLogo from '@assets/tokens/bnt.svg'
+import audioLogo from '@assets/tokens/audio.svg'
 import toncoinLogo from '@assets/tokens/toncoin.svg'
 import wethLogo from '@assets/tokens/weth.svg'
 import croLogo from '@assets/tokens/cro.svg'
 import wbtcLogo from '@assets/tokens/wbtc.svg'
 import flameLogo from '@assets/tokens/flame.svg'
-import bntLogo from '@assets/tokens/bnt.svg'
-import audioLogo from '@assets/tokens/audio.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -457,7 +457,7 @@ const tokens: IToken[] = [
     symbol: 'bnt',
     decimals: 18,
     logo: bntLogo,
-    background: ETH_TOKEN_BG,
+    background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
     isCustomFee: true,
@@ -468,11 +468,11 @@ const tokens: IToken[] = [
     symbol: 'audio',
     decimals: 18,
     logo: audioLogo,
-    background: ETH_TOKEN_BG,
+    background: '#132BD8',
     chain: 'eth',
     minSendAmount: 0.001,
     isCustomFee: true,
-  },
+  }
 ]
 
 export default tokens

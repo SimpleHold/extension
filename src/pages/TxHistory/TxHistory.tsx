@@ -219,7 +219,7 @@ const TxHistory: React.FC = () => {
                   <Styles.GroupDate>{dayjs(date).format('MMM D')}</Styles.GroupDate>
                 </Styles.GroupDateRow>
 
-                {data.map((tx: TFullTxInfo) => {
+                {data.map((tx: TFullTxInfo, index: number) => {
                   const {
                     hash,
                     amount,
@@ -232,13 +232,12 @@ const TxHistory: React.FC = () => {
                     contractAddress,
                     date,
                   } = tx
-
                   const walletName = getNameWallet(symbol, address)
                   const tokenChain = tokenSymbol ? chain : undefined
 
                   return (
                     <HistoryItem
-                      key={`${hash}/${date}/${amount}`}
+                      key={`${hash}/${date}/${amount}/${index}`}
                       data={{
                         symbol,
                         hash,

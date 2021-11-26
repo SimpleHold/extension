@@ -65,6 +65,8 @@
     "ripple-keypairs": "^1.0.3",
     "ripple-lib": "^1.9.5",
     "styled-components": "^5.2.1",
+    "thor-devkit": "^2.0.1",
+    "thorify": "^1.5.7",
     "tonweb": "^0.0.22",
     "tonweb-mnemonic": "^0.0.2",
     "trezor-connect": "8.1.29",

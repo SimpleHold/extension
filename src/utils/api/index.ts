@@ -22,6 +22,7 @@ import {
   TFullTxInfo,
   TNft,
   TNFtWallets,
+  TVetTxParams,
   TTonAddressState,
 } from './types'
 import { IToken } from '@config/tokens'
@@ -556,6 +557,39 @@ export const getNft = async (wallets: TNFtWallets[]): Promise<TNft[]> => {
     return data.data
   } catch {
     return []
+  }
+}
+
+export const getVechainParams = async (): Promise<TVetTxParams | null> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/vechain/params`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    return data
+  } catch {
+    return null
+  }
+}
+
+export const getVechainFee = async (from: string, to: string, value: string): Promise<number> => {
+  try {
+    const { data } = await axios.get(`${config.serverUrl}/transaction/vechain/network-fee`, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      params: {
+        from,
+        to,
+        value,
+      },
+    })
+
+    return data.data
+  } catch {
+    return 0
   }
 }
 
