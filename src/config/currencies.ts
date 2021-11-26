@@ -24,6 +24,7 @@ import xdcLogo from '@assets/currencies/xdc.svg'
 import solLogo from '@assets/currencies/sol.svg'
 import oneLogo from '@assets/currencies/one.svg'
 import toncoinLogo from '@assets/currencies/toncoin.svg'
+import digibyteLogo from '@assets/currencies/dgb.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -262,6 +263,15 @@ const currencies: ICurrency[] = [
     background: '#2D9DD5',
     chain: 'toncoin',
     minSendAmount: 1000,
+    isCustomFee: false,
+  },
+  {
+    name: 'DigiByte',
+    symbol: 'dgb',
+    logo: digibyteLogo,
+    background: '#4F86D4',
+    chain: 'digibyte',
+    minSendAmount: 100000,
     isCustomFee: false,
   },
 ]
