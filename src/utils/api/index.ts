@@ -3,6 +3,7 @@ import axios, { AxiosResponse } from 'axios'
 // Config
 import config from '@config/index'
 
+// Types
 import {
   IGetBalance,
   IGetContractInfo,
@@ -23,6 +24,7 @@ import {
   TNFtWallets,
   TTonAddressState,
 } from './types'
+import { IToken } from '@config/tokens'
 
 export const getBalance = async (
   address: string,
@@ -568,5 +570,15 @@ export const getTonAddressState = async (address: string): Promise<TTonAddressSt
     return data.result
   } catch {
     return 'unitialized'
+  }
+}
+
+export const getTokens = async (): Promise<IToken[] | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/tokens`)
+
+    return data.data
+  } catch {
+    return null
   }
 }

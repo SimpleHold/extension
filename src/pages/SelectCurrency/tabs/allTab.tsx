@@ -9,8 +9,10 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import { toUpper, toLower } from '@utils/format'
 
 // Config
-import tokens, { IToken } from '@config/tokens'
 import currencies, { ICurrency } from '@config/currencies'
+
+// Types
+import { IToken } from '@config/tokens'
 
 // Styles
 import Styles from '../styles'
@@ -19,10 +21,11 @@ interface Props {
   onAddCustomToken: () => void
   onAddToken: (symbol: string, chain: string, tokenName: string) => () => void
   onAddAddress: (symbol: string) => () => void
+  tokens: IToken[]
 }
 
 const AllTab: React.FC<Props> = (props) => {
-  const { onAddCustomToken, onAddToken, onAddAddress } = props
+  const { onAddCustomToken, onAddToken, onAddAddress, tokens } = props
 
   const [searchValue, setSearchValue] = React.useState<string>('')
 
