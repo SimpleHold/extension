@@ -5,7 +5,6 @@ declare module 'neblio-lib'
 declare module 'tronweb'
 declare module 'tonweb'
 declare module 'tonweb-mnemonic'
-declare module 'ravencore-lib'
 
 declare module 'nuls-sdk-js' {
   function newAddress(
@@ -138,5 +137,7 @@ declare const dash: BitcoinLikeProvider
 declare const litecoin: BitcoinLikeProvider
 declare const dogecoin: BitcoinLikeProvider
 declare const bitcoinsv: BitcoinLikeProvider
+declare const ravencoin: BitcoinLikeProvider
 declare const Zilliqa: any
 declare const bitcore: any
+declare const ravencore: any

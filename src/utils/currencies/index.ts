@@ -31,7 +31,6 @@ import * as solana from '@utils/currencies/solana'
 import * as harmony from '@utils/currencies/harmony'
 import * as vechain from '@utils/currencies/vechain'
 import * as toncoin from '@utils/currencies/toncoin'
-// import * as ravencoin from '@utils/currencies/ravencoin'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -42,6 +41,7 @@ export const isEthereumLike = (symbol: string, chain?: string): boolean => {
 
 const getProvider = (symbol: string): TProvider | null => {
   try {
+
     if (harmony.coins.indexOf(symbol) !== -1) {
       return harmony
     }
@@ -102,10 +102,6 @@ const getProvider = (symbol: string): TProvider | null => {
       return toncoin
     }
 
-    // if (ravencoin.coins.indexOf(symbol) !== -1) {
-    //   return ravencoin
-    // }
-
     return null
   } catch {
     return null
@@ -116,6 +112,10 @@ export const generate = async (
   symbol: string,
   chain?: string
 ): Promise<TGenerateAddress | null> => {
+
+  console.log('symbol', symbol)
+  console.log('chain', chain)
+
   if (isEthereumLike(symbol, chain)) {
     return ethereumLike.generateAddress()
   }
@@ -125,7 +125,7 @@ export const generate = async (
   if (provider?.generateWallet) {
     return await provider.generateWallet()
   }
-
+  console.log('bitcoinLike generate')
   return bitcoinLike.generateWallet(symbol)
 }
 
@@ -156,6 +156,8 @@ export const validateAddress = (symbol: string, address: string, tokenChain?: st
     }
 
     if (bitcoinLike.coins.indexOf(symbol) !== -1) {
+      const res = bitcoinLike.validateAddress(address, symbol)
+      console.log('validate address, res:', res)
       return bitcoinLike.validateAddress(address, symbol)
     }
 

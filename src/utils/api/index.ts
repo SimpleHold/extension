@@ -32,6 +32,7 @@ export const getBalance = async (
   contractAddress?: string,
   isFullBalance?: boolean
 ): Promise<IGetBalance> => {
+  console.log('in getBalance')
   try {
     const { data }: AxiosResponse = await axios(
       `${config.serverUrl}/wallet/balance/${chain}/${address}`,
