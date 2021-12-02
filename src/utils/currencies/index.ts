@@ -29,6 +29,9 @@ import * as verge from '@utils/currencies/verge'
 import * as xinfin from '@utils/currencies/xinfin'
 import * as solana from '@utils/currencies/solana'
 import * as harmony from '@utils/currencies/harmony'
+import * as vechain from '@utils/currencies/vechain'
+import * as toncoin from '@utils/currencies/toncoin'
+import * as digibyte from '@utils/currencies/digibyte'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -39,6 +42,10 @@ export const isEthereumLike = (symbol: string, chain?: string): boolean => {
 
 const getProvider = (symbol: string): TProvider | null => {
   try {
+    if (digibyte.coins.indexOf(symbol) !== -1) {
+      return digibyte
+    }
+
     if (harmony.coins.indexOf(symbol) !== -1) {
       return harmony
     }
@@ -89,6 +96,14 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (solana.coins.indexOf(symbol) !== -1) {
       return solana
+    }
+
+    if (vechain.coins.indexOf(symbol) !== -1) {
+      return vechain
+    }
+
+    if (toncoin.coins.indexOf(symbol) !== -1) {
+      return toncoin
     }
 
     return null
@@ -168,6 +183,10 @@ export const createTransaction = async ({
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
+    if (vechain.coins.indexOf(symbol) !== -1) {
+      return await vechain.createTransaction(from, to, amount, privateKey, symbol)
+    }
+
     if (nerve.coins.indexOf(symbol) !== -1) {
       return await nerve.createTransaction(from, to, amount, privateKey)
     }
@@ -179,9 +198,11 @@ export const createTransaction = async ({
     if (ripple.coins.indexOf(symbol) !== -1 && xrpTxData) {
       return await ripple.createTransaction(from, to, amount, privateKey, xrpTxData, extraId)
     }
+
     if (cardano.coins.indexOf(symbol) !== -1 && outputs) {
       return await cardano.createTransaction(outputs, from, to, amount, privateKey)
     }
+
     if (isEthereumLike(symbol, tokenChain)) {
       const getContractAddress = contractAddress
         ? contractAddress
@@ -217,6 +238,10 @@ export const createTransaction = async ({
     }
 
     if (outputs?.length && networkFee) {
+      if (digibyte.coins.indexOf(symbol) !== -1) {
+        return digibyte.createTransaction(outputs, to, amount, networkFee, from, privateKey)
+      }
+
       if (neblio.coins.indexOf(symbol) !== -1) {
         return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
       }
@@ -251,6 +276,10 @@ export const getNetworkFee = async ({
   if (btcLikeParams) {
     const { outputs, customFee } = btcLikeParams
 
+    if (digibyte.coins.indexOf(symbol) !== -1) {
+      return digibyte.getNetworkFee(addressFrom, outputs, amount)
+    }
+
     if (cardano.coins.indexOf(symbol) !== -1) {
       return cardano.getNetworkFee(outputs, amount)
     }
@@ -264,8 +293,20 @@ export const getNetworkFee = async ({
     }
   }
 
+  if (vechain.coins.indexOf(symbol) !== -1) {
+    return await vechain.getNetworkFee(addressFrom, addressTo, amount, chain)
+  }
+
   if (xinfin.coins.indexOf(symbol) !== -1) {
     return await xinfin.getNetworkFee()
+  }
+
+  if (toncoin.coins.indexOf(symbol) !== -1 && !tokenChain) {
+    const networkFee = await toncoin.getNetworkFee(addressFrom, addressTo, +amount)
+
+    return {
+      networkFee,
+    }
   }
 
   if (isEthereumLike(symbol, tokenChain)) {
@@ -374,7 +415,11 @@ export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string
   try {
     if (theta.coins.indexOf(symbol) !== -1) {
       return 'tfuel'
-    } else if (tokenChain) {
+    }
+    if (vechain.coins.indexOf(symbol) !== -1) {
+      return 'vtho'
+    }
+    if (tokenChain) {
       return getCurrencyByChain(tokenChain)?.symbol || symbol
     }
     return getCurrency(symbol)?.symbol || symbol
@@ -383,10 +428,10 @@ export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string
   }
 }
 
-export const importRecoveryPhrase = (
+export const importRecoveryPhrase = async (
   symbol: string,
   recoveryPhrase: string
-): TGenerateAddress | null => {
+): Promise<TGenerateAddress | null> => {
   try {
     const provider = getProvider(symbol)
 
@@ -401,14 +446,9 @@ export const importRecoveryPhrase = (
 }
 
 export const getExtraIdName = (symbol: string): null | string => {
-  if (ripple.coins.indexOf(symbol) !== -1) {
-    return ripple.extraIdName
-  }
+  const provider = getProvider(symbol)
 
-  if (hedera.coins.indexOf(symbol) !== -1) {
-    return hedera.extraIdName
-  }
-  return null
+  return provider?.extraIdName || null
 }
 
 export const generateExtraId = (symbol: string): null | string => {
@@ -463,8 +503,8 @@ export const getStandingFee = (symbol: string): number | null => {
 }
 
 export const checkWithPhrase = (symbol: string, chain?: string): boolean => {
-  if (cardano.coins.indexOf(symbol) !== -1 && !chain) {
-    return true
+  if (!chain) {
+    return cardano.coins.indexOf(symbol) !== -1 || toncoin.coins.indexOf(symbol) !== -1
   }
 
   return false
@@ -525,4 +565,12 @@ export const getContractUrl = (address: string, chain: string): string => {
     return `https://etherscan.io/address/${address}`
   }
   return `https://bscscan.com/address/${address}`
+}
+
+export const getTokenStandart = (chain?: string): string => {
+  if (chain === 'bsc') {
+    return 'BEP20'
+  }
+
+  return 'ERC20'
 }

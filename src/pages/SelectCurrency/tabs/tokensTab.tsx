@@ -8,7 +8,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 // Utils
 import { toUpper, toLower } from '@utils/format'
 
-// Config
+// Types
 import tokens, { IToken } from '@config/tokens'
 
 // Styles
@@ -17,6 +17,7 @@ import Styles from '../styles'
 interface Props {
   onAddCustomToken: () => void
   onAddToken: (symbol: string, chain: string, tokenName: string) => () => void
+  tokens: IToken[]
 }
 
 const TokensTab: React.FC<Props> = (props) => {

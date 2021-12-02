@@ -46,8 +46,8 @@ const ImportRecoveryPhrase: React.FC = () => {
     textareaInputRef.current?.focus()
   }, [])
 
-  const onImport = (): void => {
-    const data = importRecoveryPhrase(symbol, recoveryPhrase)
+  const onImport = async (): Promise<void> => {
+    const data = await importRecoveryPhrase(symbol, recoveryPhrase)
 
     if (data) {
       const checkExist = checkExistWallet(data.address, symbol)
@@ -61,12 +61,12 @@ const ImportRecoveryPhrase: React.FC = () => {
     return setErrorLabel('Invalid recovery phrase')
   }
 
-  const onConfirm = (): void => {
+  const onConfirm = async (): Promise<void> => {
     const backup = getItem('backup')
 
     if (backup) {
       const decryptBackup = decrypt(backup, password)
-      const recoveryData = importRecoveryPhrase(symbol, recoveryPhrase)
+      const recoveryData = await importRecoveryPhrase(symbol, recoveryPhrase)
 
       if (decryptBackup && recoveryData) {
         const { address, privateKey } = recoveryData

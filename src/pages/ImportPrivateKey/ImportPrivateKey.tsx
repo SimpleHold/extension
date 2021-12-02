@@ -18,10 +18,11 @@ import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets } from '@
 import { decrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toLower, toUpper } from '@utils/format'
-import { importPrivateKey } from '@utils/currencies'
+import { importPrivateKey, getTokenStandart } from '@utils/currencies'
 import { getTokensBalance } from '@utils/api'
 import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
+import * as vechain from '@utils/currencies/vechain'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -132,7 +133,7 @@ const ImportPrivateKey: React.FC = () => {
             tokenName,
             contractAddress,
             decimals,
-            tokenStandart: toLower(chain) === 'bsc' ? 'BEP20' : 'ERC20',
+            tokenStandart: getTokenStandart(toLower(chain)),
           })
         }
       }
@@ -142,9 +143,13 @@ const ImportPrivateKey: React.FC = () => {
   }
 
   const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
+    if (vechain.coins.indexOf(symbol) !== -1) {
+      return vechain.coins.sort((a: string, b: string) => b.indexOf(symbol) - a.indexOf(symbol))
+    }
     if (theta.coins.indexOf(symbol) !== -1) {
       return theta.coins.sort((a: string, b: string) => a.indexOf(symbol) - b.indexOf(symbol))
-    } else if (chain && getCurrencyInfo) {
+    }
+    if (chain && getCurrencyInfo) {
       return [symbol, getCurrencyInfo.symbol]
     }
     return [symbol]

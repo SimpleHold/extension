@@ -23,6 +23,10 @@ import xvgLogo from '@assets/currencies/xvg.svg'
 import xdcLogo from '@assets/currencies/xdc.svg'
 import solLogo from '@assets/currencies/sol.svg'
 import oneLogo from '@assets/currencies/one.svg'
+import vetLogo from '@assets/currencies/vet.svg'
+import vthoLogo from '@assets/currencies/vtho.svg'
+import toncoinLogo from '@assets/currencies/toncoin.svg'
+import digibyteLogo from '@assets/currencies/dgb.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -252,6 +256,42 @@ const currencies: ICurrency[] = [
     background: '#50B2E1',
     chain: 'harmony',
     minSendAmount: 1000000000000000,
+    isCustomFee: false,
+  },
+  {
+    name: 'VeChain',
+    symbol: 'vet',
+    logo: vetLogo,
+    background: '#86A7FD',
+    chain: 'vechain',
+    minSendAmount: 100000000000000,
+    isCustomFee: false,
+  },
+  {
+    name: 'VeThor Token',
+    symbol: 'vtho',
+    logo: vthoLogo,
+    background: '#A5BADA',
+    chain: 'vethor',
+    minSendAmount: 100000000000000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Toncoin',
+    symbol: 'toncoin',
+    logo: toncoinLogo,
+    background: '#2D9DD5',
+    chain: 'toncoin',
+    minSendAmount: 1000,
+    isCustomFee: false,
+  },
+  {
+    name: 'DigiByte',
+    symbol: 'dgb',
+    logo: digibyteLogo,
+    background: '#4F86D4',
+    chain: 'digibyte',
+    minSendAmount: 100000,
     isCustomFee: false,
   },
 ]

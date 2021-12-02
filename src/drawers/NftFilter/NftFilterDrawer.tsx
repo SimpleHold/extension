@@ -16,6 +16,7 @@ import { toLower } from '@utils/format'
 // Assets
 import ethLogo from '@assets/currencies/eth.svg'
 import bscLogo from '@assets/currencies/bnb.svg'
+import maticLogo from '@assets/currencies/matic.svg'
 
 // Styles
 import Styles from './styles'
@@ -46,6 +47,11 @@ const networks: TNetwork[] = [
     title: 'BSC',
     key: 'bsc',
     icon: bscLogo,
+  },
+  {
+    title: 'Polygon',
+    key: 'matic',
+    icon: maticLogo,
   },
 ]
 
@@ -93,7 +99,9 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
 
     if (walletsList) {
       const filterWallet = walletsList.filter(
-        (wallet: IWallet) => wallet.symbol === 'eth' || wallet.symbol === 'bnb'
+        (wallet: IWallet) =>
+          !wallet.chain &&
+          (wallet.symbol === 'eth' || wallet.symbol === 'bnb' || wallet.symbol === 'matic')
       )
 
       setWallets(filterWallet)
@@ -247,7 +255,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
               <GroupDropdown
                 title="Select addresses"
                 render={renderAddresses}
-                maxHeight={150}
+                maxHeight={100}
                 toggle={toggleWalletsDropdown}
                 renderRow={
                   selectedWallets.length && !isWalletsVisible ? (

@@ -134,8 +134,8 @@ export const save = (
     const getTxs = getJSON(walletKey)
 
     if (getTxs) {
-      const nonPendintTxs = txs.filter((tx: TAddressTx) => !tx.isPending)
-      const getNewTxs = nonPendintTxs.filter((newTx: TAddressTx) => {
+      const nonPendingTxs = txs.filter((tx: TAddressTx) => !tx.isPending)
+      const getNewTxs = nonPendingTxs.filter((newTx: TAddressTx) => {
         return !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(newTx.hash))
       })
 

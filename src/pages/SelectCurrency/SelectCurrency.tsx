@@ -17,10 +17,13 @@ import { toLower } from '@utils/format'
 import { getWallets } from '@utils/wallet'
 import * as theta from '@utils/currencies/theta'
 import { getUrl, openWebPage } from '@utils/extension'
+import { getTokenStandart } from '@utils/currencies'
+import { getTokens } from '@utils/localTokens'
 
 // Config
 import { checkExistWallet } from '@config/tokens'
 import networks, { IEthNetwork } from '@config/ethLikeNetworks'
+import tokens, { IToken } from '@config/tokens'
 
 // Styles
 import Styles from './styles'
@@ -29,6 +32,19 @@ const SelectCurrency: React.FC = () => {
   const history = useHistory()
 
   const [activeTabKey, setActiveTabKey] = React.useState<string>('all')
+  const [tokensList, setTokensList] = React.useState<IToken[]>(tokens)
+
+  React.useEffect(() => {
+    checkLocalTokens()
+  }, [])
+
+  const checkLocalTokens = (): void => {
+    const localTokens = getTokens()
+
+    if (localTokens.length) {
+      setTokensList((prev: IToken[]) => [...prev, ...localTokens])
+    }
+  }
 
   const getWarning = (symbol: string): string | undefined => {
     if (theta.coins.indexOf(symbol) !== -1) {
@@ -66,7 +82,7 @@ const SelectCurrency: React.FC = () => {
           chain,
           chainName: getNetwork.name,
           tokenName,
-          tokenStandart: toLower(getNetwork.chain) === 'bsc' ? 'BEP20' : 'ERC20',
+          tokenStandart: getTokenStandart(toLower(getNetwork.chain)),
         })
       }
 
@@ -102,6 +118,7 @@ const SelectCurrency: React.FC = () => {
           onAddCustomToken={onAddCustomToken}
           onAddToken={onAddToken}
           onAddAddress={onAddAddress}
+          tokens={tokensList}
         />
       ),
     },
@@ -113,7 +130,13 @@ const SelectCurrency: React.FC = () => {
     {
       title: 'Tokens',
       key: 'tokens',
-      renderItem: <TokensTab onAddCustomToken={onAddCustomToken} onAddToken={onAddToken} />,
+      renderItem: (
+        <TokensTab
+          onAddCustomToken={onAddCustomToken}
+          onAddToken={onAddToken}
+          tokens={tokensList}
+        />
+      ),
     },
     {
       title: 'Hardware',

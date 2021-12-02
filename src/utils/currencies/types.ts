@@ -7,13 +7,14 @@ export type TProvider = {
   importPrivateKey?: (privateKey: string) => string | null | Promise<string | null>
   getExplorerLink?: (address: string) => string
   getTransactionLink?: (hash: string) => string
-  importRecoveryPhrase?: (recoveryPhrase: string) => TGenerateAddress | null
+  importRecoveryPhrase?: (recoveryPhrase: string) => Promise<TGenerateAddress | null>
   generateExtraId?: () => string
   getStandingFee?: () => number | null
   formatValue: (value: string | number, type: 'from' | 'to') => number
   isInternalTx?: boolean
   createInternalTx?: (props: TInternalTxProps) => Promise<string | null>
   isWithOutputs?: boolean
+  extraIdName?: string
 }
 
 export type TCreateTransactionProps = {

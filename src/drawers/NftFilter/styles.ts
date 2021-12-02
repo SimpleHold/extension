@@ -48,6 +48,8 @@ const NetworksList = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  flex-wrap: wrap;
+  margin: 0 -5px;
 `
 
 const Network = styled.div`
@@ -59,6 +61,7 @@ const Network = styled.div`
   align-items: center;
   padding: 20px;
   padding-left: ${({ withIcon }: TNetworkProps) => (withIcon ? '15px' : '20px')};
+  margin: 0 5px;
 
   path {
     fill: ${({ isActive }: TNetworkProps) => (isActive ? '#3FBB7D' : '#BDC4D4')};
@@ -66,10 +69,6 @@ const Network = styled.div`
 
   p {
     color: ${({ isActive }: TNetworkProps) => (isActive ? '#3FBB7D' : '#7D7E8D')};
-  }
-
-  &:not(:first-child) {
-    margin: 0 0 0 10px;
   }
 
   &:hover {
@@ -82,6 +81,10 @@ const Network = styled.div`
     path {
       fill: #3fbb7d;
     }
+  }
+
+  &:last-child {
+    margin-top: 10px;
   }
 `
 

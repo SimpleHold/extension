@@ -558,7 +558,7 @@ const SendConfirmation: React.FC = () => {
     if (state.props) {
       const { amount, networkFee, isIncludeFee } = state.props
 
-      if (isIncludeFee === 'true') {
+      if (isIncludeFee === 'true' && (state.props.symbol === state.props.networkFeeSymbol)) {
         return minus(amount, networkFee)
       }
       return amount
@@ -610,7 +610,9 @@ const SendConfirmation: React.FC = () => {
         <SuccessDrawer
           isActive={state.activeDrawer === 'success'}
           onClose={closeSuccessDrawer}
-          text="Your transaction has been successfully sent. You can check it here:"
+          text={`Your transaction has been successfully sent. ${
+            state.transactionLink.length ? 'You can check it here:' : ''
+          }`}
           link={state.transactionLink}
           openFrom="browser"
           isCloseOnLinkClick

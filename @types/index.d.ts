@@ -3,6 +3,9 @@ declare module '*.svg'
 declare module '@thetalabs/theta-js'
 declare module 'neblio-lib'
 declare module 'tronweb'
+declare module 'tonweb'
+declare module 'tonweb-mnemonic'
+declare module 'digibyte-lib'
 
 declare module 'nuls-sdk-js' {
   function newAddress(
