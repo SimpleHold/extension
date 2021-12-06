@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom'
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 import QRCode from '@components/QRCode'
+import Button from '@components/Button'
 
 // Utils
 import { sha512hash } from '@utils/crypto'
@@ -51,11 +52,15 @@ const ScanBackup: React.FC = () => {
       <Cover />
       <Header withBack onBack={history.goBack} backTitle="Settings" />
       <Styles.Container>
-        {backupHash.length ? (
-          <Styles.Row>
-            <QRCode value={backupHash} size={250} />
-          </Styles.Row>
-        ) : null}
+        <Styles.Row>
+          {backupHash.length ? (
+            <Styles.QrCodeRow>
+              <QRCode value={backupHash} size={200} />
+            </Styles.QrCodeRow>
+          ) : null}
+          <Styles.Text>Scan the QR code to restore your mobile SimpleHold wallet</Styles.Text>
+        </Styles.Row>
+        <Button label="Close" onClick={history.goBack} />
       </Styles.Container>
     </Styles.Wrapper>
   )

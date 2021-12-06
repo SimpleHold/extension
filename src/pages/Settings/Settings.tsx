@@ -30,6 +30,7 @@ import useState from '@hooks/useState'
 // Icons
 import cloudIcon from '@assets/icons/cloud.svg'
 import linkIcon from '@assets/icons/link.svg'
+import qrCodeIcon from '@assets/icons/qrCode.svg'
 
 // Types
 import { IList, IState } from './types'
@@ -120,11 +121,11 @@ const Settings: React.FC = () => {
     },
     {
       isButton: true,
-      title: 'Scan backup QR-code',
+      title: 'Sign-in on mobile wallet',
       icon: {
-        source: linkIcon,
-        width: 16,
-        height: 16,
+        source: qrCodeIcon,
+        width: 18,
+        height: 18,
       },
       onClick: onScanQrCode,
     },
