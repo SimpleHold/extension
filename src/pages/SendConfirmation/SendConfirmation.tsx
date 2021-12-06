@@ -85,22 +85,24 @@ const SendConfirmation: React.FC = () => {
         symbol,
       },
     })
-
+    console.log('onConfirmDrawer')
     if (state.inputErrorLabel) {
       updateState({ inputErrorLabel: null })
     }
 
     const backup = getItem('backup')
-
+    console.log('1')
     if (backup) {
       const decryptBackup = decrypt(backup, state.password)
-
+      console.log('2')
       if (decryptBackup) {
+        console.log('3')
         const findWallet: IWallet | null = JSON.parse(decryptBackup).wallets.find(
           (wallet: IWallet) => wallet.address === addressFrom
         )
 
         if (findWallet?.privateKey) {
+          console.log('4')
           updateState({ isButtonLoading: true })
 
           const parseAmount =
@@ -160,17 +162,19 @@ const SendConfirmation: React.FC = () => {
               isButtonLoading: false,
             })
           }
-
+          console.log('5')
           const transaction = await createTransaction({
             ...transactionData,
             ...ethTxData,
             xrpTxData,
             extraId,
           })
-
+          console.log('6')
+          console.log(transaction)
           if (transaction) {
+            console.log('Send > in if')
             const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
-
+            console.log('sendTransaction', sendTransaction)
             if (sendTransaction) {
               return checkTransaction(sendTransaction)
             }

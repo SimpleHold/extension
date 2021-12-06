@@ -31,6 +31,7 @@ import * as solana from '@utils/currencies/solana'
 import * as harmony from '@utils/currencies/harmony'
 import * as vechain from '@utils/currencies/vechain'
 import * as toncoin from '@utils/currencies/toncoin'
+import * as ravencoin from '@utils/currencies/ravencoin'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -102,6 +103,10 @@ const getProvider = (symbol: string): TProvider | null => {
       return toncoin
     }
 
+    if (ravencoin.coins.indexOf(symbol) !== -1) {
+      return ravencoin
+    }
+
     return null
   } catch {
     return null
@@ -113,9 +118,6 @@ export const generate = async (
   chain?: string
 ): Promise<TGenerateAddress | null> => {
 
-  console.log('symbol', symbol)
-  console.log('chain', chain)
-
   if (isEthereumLike(symbol, chain)) {
     return ethereumLike.generateAddress()
   }
@@ -125,7 +127,6 @@ export const generate = async (
   if (provider?.generateWallet) {
     return await provider.generateWallet()
   }
-  console.log('bitcoinLike generate')
   return bitcoinLike.generateWallet(symbol)
 }
 
@@ -184,6 +185,24 @@ export const createTransaction = async ({
   xrpTxData,
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
+
+  console.log('in createTransaction')
+  console.log({from,
+    to,
+    amount,
+    privateKey,
+    symbol,
+    tokenChain,
+    outputs,
+    networkFee,
+    gas,
+    chainId,
+    gasPrice,
+    nonce,
+    contractAddress,
+    xrpTxData,
+    extraId})
+
   try {
     if (vechain.coins.indexOf(symbol) !== -1) {
       return await vechain.createTransaction(from, to, amount, privateKey, symbol)
@@ -204,6 +223,7 @@ export const createTransaction = async ({
     if (cardano.coins.indexOf(symbol) !== -1 && outputs) {
       return await cardano.createTransaction(outputs, from, to, amount, privateKey)
     }
+
     if (isEthereumLike(symbol, tokenChain)) {
       const getContractAddress = contractAddress
         ? contractAddress
@@ -239,8 +259,15 @@ export const createTransaction = async ({
     }
 
     if (outputs?.length && networkFee) {
+      console.log('in if (outputs?.length && networkFee)')
+
       if (neblio.coins.indexOf(symbol) !== -1) {
         return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
+      }
+
+      if (ravencoin.coins.indexOf(symbol) !== -1 && outputs) {
+        console.log('in if (ravencoin.coins.indexOf(symbol) !== -1 && outputs)')
+        return ravencoin.createTransaction(outputs, to, amount, networkFee, from, privateKey)
       }
 
       return bitcoinLike.createTransaction(
@@ -279,6 +306,10 @@ export const getNetworkFee = async ({
 
     if (neblio.coins.indexOf(symbol) !== -1) {
       return neblio.getNetworkFee(addressFrom, outputs, amount)
+    }
+
+    if (ravencoin.coins.indexOf(symbol) !== -1) {
+      return ravencoin.getNetworkFee(addressFrom, outputs, amount)
     }
 
     if (bitcoinLike.coins.indexOf(symbol) !== -1) {

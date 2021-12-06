@@ -3,7 +3,7 @@ import { TFeeResponse } from './types'
 import { TCustomFee } from '@utils/api/types'
 import { TCustomFees } from '../types'
 
-export const coins = ['btc', 'bch', 'bsv', 'ltc', 'doge', 'dash', 'rvn']
+export const coins = ['btc', 'bch', 'bsv', 'ltc', 'doge', 'dash']
 export const isWithOutputs = true
 
 const getProvider = (symbol: string): BitcoinLikeProvider | null => {
@@ -29,10 +29,6 @@ const getProvider = (symbol: string): BitcoinLikeProvider | null => {
 
   if (symbol === 'ltc') {
     return litecoin
-  }
-
-  if (symbol === 'rvn') {
-    return ravencoin
   }
 
   return null

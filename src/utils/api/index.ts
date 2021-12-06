@@ -243,6 +243,7 @@ export const getCardanoTransactionParams = async (): Promise<IAdaTrParams | null
 }
 
 export const getNetworkFee = async (type: string): Promise<IGetNetworkFeeResponse | null> => {
+  console.log('in api/index getNetworkFee')
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/${type}/network-fee`, {
       headers: {
