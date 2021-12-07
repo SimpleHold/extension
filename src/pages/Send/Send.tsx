@@ -123,7 +123,7 @@ const SendPage: React.FC = () => {
     getExtraId()
     getFeeSymbol()
     getCustomFee()
-    checkStangindFee()
+    checkStandingFee()
   }, [])
 
   React.useEffect(() => {
@@ -149,6 +149,7 @@ const SendPage: React.FC = () => {
   React.useEffect(() => {
     if (state.amount.length && Number(state.balance) > 0 && !state.amountErrorLabel) {
       if (!state.isStandingFee) {
+        console.log('in ueff if onGetNetworkFee')
         onGetNetworkFee()
       }
 
@@ -182,8 +183,10 @@ const SendPage: React.FC = () => {
     }
   }
 
-  const checkStangindFee = (): void => {
+  const checkStandingFee = (): void => {
     const data = getStandingFee(symbol)
+    console.log('in checkStanding, data:')
+    console.log(data)
 
     if (data) {
       updateState({ fee: data, isStandingFee: true })
@@ -561,7 +564,7 @@ const SendPage: React.FC = () => {
 
   const isButtonDisabled = (): boolean => {
     const getAmount = state.isIncludeFee && (symbol === state.feeSymbol) ? Number(state.amount) - state.fee : Number(state.amount)
-
+    console.log('1')
     if (
       validateAddress(symbol, state.address, tokenChain) &&
       state.amount.length &&
@@ -573,8 +576,11 @@ const SendPage: React.FC = () => {
       !isCurrencyBalanceError
     ) {
       if (!state?.utxosList?.length) {
+        console.log('state utxos:')
+        console.log(state.utxosList)
         const withOutputs = checkWithOutputs(symbol)
-
+        console.log('2')
+        console.log({ withOutputs })
         return withOutputs
       }
 
@@ -584,6 +590,7 @@ const SendPage: React.FC = () => {
 
       return false
     }
+    console.log('3')
     return true
   }
 

@@ -110,12 +110,17 @@ export const createTransaction = (
 
 export const getFee = (address: string, outputs: UnspentOutput[], amount: string): number => {
   console.log('in getFee')
+  console.log({address})
+  console.log({ outputs })
   try {
-    return new ravencore.Transaction()
+    const res = new ravencore.Transaction()
       .from(outputs)
       .to(address, formatValue(amount, 'to'))
       .change(address)
       .getFee()
+      // .toString().length * 1000000
+    console.log('getFee res', res)
+    return res
   } catch (err) {
     console.log('getFee err')
     console.log(err)
@@ -142,15 +147,12 @@ export const getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], 
   }
 
   const networkFee = formatValue(getFee(address, utxos, amount), 'from')
-
+  console.log('networkFee', networkFee)
   return {
     networkFee,
     utxos,
   }
 }
 
-// export const getStandingFee = (): number => {
-//   return 0.1
-// }
 
 
