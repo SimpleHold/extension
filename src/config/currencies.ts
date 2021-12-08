@@ -292,7 +292,7 @@ const currencies: ICurrency[] = [
     background: '#B4B8CE',
     chain: 'ravencoin',
     minSendAmount: 1000, // todo
-    isCustomFee: false,
+    isCustomFee: true,
   }
 ]
 

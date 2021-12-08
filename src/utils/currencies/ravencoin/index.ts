@@ -1,4 +1,7 @@
 import { toLower } from 'utils/format'
+import { TCustomFee } from 'utils/api/types'
+import { TCustomFees } from 'utils/currencies/types'
+import { TFeeResponse } from 'utils/currencies/bitcoinLike/types'
 
 export const coins: string[] = ['rvn']
 export const isWithOutputs = true
@@ -49,7 +52,7 @@ export const createTransaction = (
   fee: number,
   changeAddress: string,
   privateKey: string
-): string | null | any => { // todo fix any
+): string | null => {
   console.log('in rvn createTransaction')
   try {
     const transaction = new ravencore.Transaction()
@@ -78,57 +81,37 @@ export const createTransaction = (
   }
 }
 
-// export const getFee = (
-//   outputs: UnspentOutput[],
-//   to: string,
-//   amount: string,
-//   changeAddress: string,
-//   feePerByte: number
-// ): number => {
-//   console.log('in rvn getFee')
-//   console.log({outputs, to, amount, changeAddress, feePerByte})
-//   try {
-//     const tx = new ravencore.Transaction()
-//       .from(outputs)
-//       .to(to, amount)
-//       .change(changeAddress)
-//
-//     const transaction = tx.toString().length
-//
-//     console.log('transaction', transaction)
-//     const estFee = transaction * 0.00001
-//     console.log('estFee', estFee)
-//
-//     return formatValue(estFee, 'from')
-//
-//   } catch (err) {
-//     console.log('in rvn getFee catch')
-//     console.log(err)
-//     return 1337331 // todo
-//   }
-// }
 
-export const getFee = (address: string, outputs: UnspentOutput[], amount: string): number => {
+const getFeeType = (type: string): TFeeTypes => {
+  if (type === 'slow') {
+    return 'slow'
+  }
+  if (type === 'average') {
+    return 'average'
+  }
+
+  return 'fast'
+}
+
+export const getFee = (address: string, outputs: UnspentOutput[], amount: string): number | null => {
   console.log('in getFee')
   console.log({address})
   console.log({ outputs })
   try {
-    const res = new ravencore.Transaction()
+    return new ravencore.Transaction()
       .from(outputs)
       .to(address, formatValue(amount, 'to'))
       .change(address)
       .getFee()
-      // .toString().length * 1000000
-    console.log('getFee res', res)
-    return res
+
   } catch (err) {
     console.log('getFee err')
     console.log(err)
-    return 1337331 // todo
+    return null
   }
 }
 
-export const getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], amount: string) => {
+export const getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], amount: string): TFeeResponse | null => {
   console.log('in getNetworkFee')
 
   const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
@@ -139,18 +122,25 @@ export const getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], 
     const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
     const transactionFeeBytes = getFee(address, utxos, amount)
 
-    if (getUtxosValue >= formatValue(amount, 'to') + transactionFeeBytes) {
-      break
-    }
+    // if (getUtxosValue >= formatValue(amount, 'to') + transactionFeeBytes) {
+    //   break
+    // }
 
     utxos.push(output)
   }
 
-  const networkFee = formatValue(getFee(address, utxos, amount), 'from')
-  console.log('networkFee', networkFee)
+  const averageFee = formatValue(getFee(address, utxos, amount) || 0, 'from').toFixed(5)
+
+  const fees: TCustomFees[]  = [
+    {type: 'slow', utxos, value: +averageFee * 0.7},
+    {type: 'average', utxos, value: +averageFee},
+    {type: 'fast', utxos, value: +averageFee * 2}
+    ]
+
+  // const networkFee = formatValue(getFee(address, utxos, amount), 'from')
+  // console.log('networkFee', networkFee)
   return {
-    networkFee,
-    utxos,
+    fees
   }
 }
 
