@@ -94,15 +94,11 @@ const NewWallet: React.FC = () => {
   }
 
   const onConfirm = async (): Promise<void> => {
-    console.log('in onConfirm')
     if (validatePassword(state.password)) {
-      console.log('in if')
       updateState({ isButtonLoading: true })
 
       const generateAddress = await generate(symbol, chain)
-      console.log(generateAddress)
       if (generateAddress) {
-        console.log('address generated')
         const { privateKey, mnemonic, isNotActivated, address } = generateAddress
 
         const backup = getItem('backup')

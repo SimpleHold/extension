@@ -1,5 +1,7 @@
+// Utils
 import { toLower } from 'utils/format'
-import { TCustomFee } from 'utils/api/types'
+
+// Types
 import { TCustomFees } from 'utils/currencies/types'
 import { TFeeResponse } from 'utils/currencies/bitcoinLike/types'
 
@@ -12,7 +14,6 @@ export const formatValue = (value: string | number, type: 'from' | 'to'): number
   if (type === 'from') {
     return ravencore.Unit.fromSatoshis(formatValue).toBTC()
   }
-
   return ravencore.Unit.fromBTC(formatValue).toSatoshis()
 }
 
@@ -53,7 +54,6 @@ export const createTransaction = (
   changeAddress: string,
   privateKey: string
 ): string | null => {
-  console.log('in rvn createTransaction')
   try {
     const transaction = new ravencore.Transaction()
       .from(outputs)
@@ -62,25 +62,11 @@ export const createTransaction = (
       .change(changeAddress)
       .sign(privateKey)
 
-    console.log('raw')
-    const txToStr = transaction.toString()
-    console.log(txToStr)
-    console.log('length')
-    console.log(txToStr.length)
-
-    const res = {
-      raw: transaction.toString(),
-      hash: transaction.toObject().hash,
-    }
-    console.log(res)
     return transaction.toString()
-  } catch (err) {
-    console.log('in rvn createTransaction catch')
-    console.log(err)
+  } catch {
     return null
   }
 }
-
 
 const getFeeType = (type: string): TFeeTypes => {
   if (type === 'slow') {
@@ -89,60 +75,63 @@ const getFeeType = (type: string): TFeeTypes => {
   if (type === 'average') {
     return 'average'
   }
-
   return 'fast'
 }
 
-export const getFee = (address: string, outputs: UnspentOutput[], amount: string): number | null => {
-  console.log('in getFee')
-  console.log({address})
-  console.log({ outputs })
+export const getFee = (address: string, outputs: UnspentOutput[], amount: string, feePerByte: number): number => {
   try {
-    return new ravencore.Transaction()
+    const txLength = new ravencore.Transaction()
       .from(outputs)
       .to(address, formatValue(amount, 'to'))
       .change(address)
-      .getFee()
+      .toString()
+      .length
 
-  } catch (err) {
-    console.log('getFee err')
-    console.log(err)
-    return null
+    return txLength * feePerByte
+  } catch {
+    return 0
   }
 }
 
 export const getNetworkFee = (address: string, unspentOutputs: UnspentOutput[], amount: string): TFeeResponse | null => {
-  console.log('in getNetworkFee')
 
-  const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
-  const utxos: UnspentOutput[] = []
-  console.log('sort outputs')
-  console.log(sortOutputs)
-  for (const output of sortOutputs) {
-    const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
-    const transactionFeeBytes = getFee(address, utxos, amount)
-
-    // if (getUtxosValue >= formatValue(amount, 'to') + transactionFeeBytes) {
-    //   break
-    // }
-
-    utxos.push(output)
+  const fees: TCustomFees[] = []
+  const defaultFeePerKb = 1e7 // ravencore-lib default value
+  const feesPerKb = {
+    slow: defaultFeePerKb * 0.5,
+    average: defaultFeePerKb,
+    fast: defaultFeePerKb * 4
   }
 
-  const averageFee = formatValue(getFee(address, utxos, amount) || 0, 'from').toFixed(5)
+  for (const type in feesPerKb) {
+    const sortOutputs = unspentOutputs.sort((a, b) => a.satoshis - b.satoshis)
+    const utxos: UnspentOutput[] = []
 
-  const fees: TCustomFees[]  = [
-    {type: 'slow', utxos, value: +averageFee * 0.7},
-    {type: 'average', utxos, value: +averageFee},
-    {type: 'fast', utxos, value: +averageFee * 2}
-    ]
+    const feeType = getFeeType(type)
+    const feePerByte = feesPerKb[feeType] / 1e3
 
-  // const networkFee = formatValue(getFee(address, utxos, amount), 'from')
-  // console.log('networkFee', networkFee)
+    for (const output of sortOutputs) {
+      const getUtxosValue = utxos.reduce((a, b) => a + b.satoshis, 0)
+      const transactionFeeBytes = getFee(address, utxos, amount, feePerByte)
+      if (getUtxosValue >= formatValue(Number(amount) + transactionFeeBytes, 'to')) {
+        break
+      }
+
+      utxos.push(output)
+    }
+
+    const value = +formatValue(getFee(address, utxos, amount, feePerByte), 'from').toFixed(5)
+    fees.push({
+      type: feeType,
+      utxos,
+      value,
+    })
+  }
+
+  const filterFees = fees.filter((fee: TCustomFees) => fee?.utxos?.length)
+
   return {
-    fees
+    fees: filterFees
   }
 }
-
-
 

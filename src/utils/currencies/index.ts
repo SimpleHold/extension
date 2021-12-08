@@ -157,8 +157,6 @@ export const validateAddress = (symbol: string, address: string, tokenChain?: st
     }
 
     if (bitcoinLike.coins.indexOf(symbol) !== -1) {
-      const res = bitcoinLike.validateAddress(address, symbol)
-      console.log('validate address, res:', res)
       return bitcoinLike.validateAddress(address, symbol)
     }
 
@@ -185,23 +183,6 @@ export const createTransaction = async ({
   xrpTxData,
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
-
-  console.log('in createTransaction')
-  console.log({from,
-    to,
-    amount,
-    privateKey,
-    symbol,
-    tokenChain,
-    outputs,
-    networkFee,
-    gas,
-    chainId,
-    gasPrice,
-    nonce,
-    contractAddress,
-    xrpTxData,
-    extraId})
 
   try {
     if (vechain.coins.indexOf(symbol) !== -1) {
@@ -259,14 +240,12 @@ export const createTransaction = async ({
     }
 
     if (outputs?.length && networkFee) {
-      console.log('in if (outputs?.length && networkFee)')
 
       if (neblio.coins.indexOf(symbol) !== -1) {
         return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
       }
 
       if (ravencoin.coins.indexOf(symbol) !== -1 && outputs) {
-        console.log('in if (ravencoin.coins.indexOf(symbol) !== -1 && outputs)')
         return ravencoin.createTransaction(outputs, to, amount, networkFee, from, privateKey)
       }
 

@@ -35,12 +35,8 @@ const getProvider = (symbol: string): BitcoinLikeProvider | null => {
 }
 
 export const generateWallet = (symbol: string): TGenerateAddress | null => {
-  console.log('% in bitcoinLike generateWallet')
   try {
-    console.log('in try')
     const provider = getProvider(symbol)
-    console.log('got provider')
-    console.log(provider)
 
     if (provider) {
       return provider.generateWallet()
