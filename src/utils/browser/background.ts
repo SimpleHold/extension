@@ -11,7 +11,7 @@ import { getPhishingSites, getTokens } from '@utils/api'
 import { TPhishingSite } from '@utils/api/types'
 import { msToMin } from '@utils/dates'
 import { validateUrl } from '@utils/validate'
-import { compare } from '@utils/localTokens'
+import { addNew } from '@utils/localTokens'
 
 // Types
 import { TPopupPosition } from './types'
@@ -294,7 +294,7 @@ const onGetTokens = async (): Promise<void> => {
   }, 600000)
 
   if (tokens?.length) {
-    compare(tokens)
+    addNew(tokens)
   }
 }
 

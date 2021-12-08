@@ -5,31 +5,8 @@ import { toLower } from '@utils/format'
 // Types
 import { IToken } from '@config/tokens'
 
-export const compare = (tokens: IToken[]): void => {
-  const getTokens = getItem('tokens')
-
-  if (getTokens?.length) {
-    const parseTokens = JSON.parse(getTokens)
-
-    if (parseTokens?.length) {
-      const getNewTokens = tokens.filter((token: IToken) => {
-        const findBySymbol = parseTokens.find(
-          (item: IToken) => toLower(item.chain) === toLower(token.chain)
-        )
-        const findByAddress = parseTokens.find(
-          (item: IToken) => toLower(item.address) === toLower(token.address)
-        )
-
-        return !findBySymbol || !findByAddress
-      })
-
-      if (getNewTokens.length) {
-        setItem('tokens', JSON.stringify([...parseTokens, ...getNewTokens]))
-      }
-    }
-  } else {
-    setItem('tokens', JSON.stringify(tokens))
-  }
+export const addNew = (tokens: IToken[]): void => {
+  setItem('tokens', JSON.stringify(tokens))
 }
 
 export const getTokens = (): IToken[] => {

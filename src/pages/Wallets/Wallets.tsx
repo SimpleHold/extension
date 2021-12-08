@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
+import { List, ListRowProps, WindowScroller } from 'react-virtualized'
 
 // Components
 import WalletCard from '@components/WalletCard'
@@ -177,6 +178,56 @@ const Wallets: React.FC = () => {
     history.push('/nft-collection')
   }
 
+  const renderWallet = ({ index, style, key }: ListRowProps): React.ReactNode => {
+    const wallet = state.wallets?.[index]
+
+    if (wallet) {
+      const {
+        address,
+        symbol,
+        chain,
+        name,
+        contractAddress,
+        decimals,
+        isHidden,
+        uuid,
+        hardware,
+        isNotActivated,
+      } = wallet
+
+      const walletName = getNameWallet(wallet)
+
+      return (
+        <div
+          style={{
+            ...style,
+            ...Styles.ListItem,
+          }}
+          key={key}
+        >
+          <WalletCard
+            address={address}
+            chain={chain}
+            symbol={symbol.toLowerCase()}
+            name={name}
+            contractAddress={contractAddress}
+            decimals={decimals}
+            isHidden={isHidden}
+            sumBalance={sumBalance}
+            sumEstimated={sumEstimated}
+            sumPending={sumPending}
+            walletName={walletName}
+            uuid={uuid}
+            hardware={hardware}
+            isNotActivated={isNotActivated}
+          />
+        </div>
+      )
+    }
+
+    return null
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -190,59 +241,31 @@ const Wallets: React.FC = () => {
           openFilters={openFilters}
           onViewNFT={onViewNFT}
         />
-        {state.wallets !== null ? (
-          <Styles.WalletsList>
-            {state.wallets?.length
-              ? state.wallets.map((wallet: IWallet) => {
-                  const {
-                    address,
-                    symbol,
-                    chain,
-                    name,
-                    contractAddress,
-                    decimals,
-                    isHidden,
-                    uuid,
-                    hardware,
-                    isNotActivated,
-                  } = wallet
-
-                  const walletName = getNameWallet(wallet)
-
-                  return (
-                    <WalletCard
-                      key={`${symbol}/${address}/${chain}`}
-                      address={address}
-                      chain={chain}
-                      symbol={symbol.toLowerCase()}
-                      name={name}
-                      contractAddress={contractAddress}
-                      decimals={decimals}
-                      isHidden={isHidden}
-                      sumBalance={sumBalance}
-                      sumEstimated={sumEstimated}
-                      sumPending={sumPending}
-                      walletName={walletName}
-                      uuid={uuid}
-                      hardware={hardware}
-                      isNotActivated={isNotActivated}
-                    />
-                  )
-                })
-              : null}
-            {state.wallets.length === 0 ? (
-              <Styles.NotFound>Nothing was found for the specified parameters</Styles.NotFound>
-            ) : null}
-            <Styles.AddWalletButton onClick={onAddNewAddress}>
-              <SVG
-                src="../../assets/icons/plus.svg"
-                width={14}
-                height={14}
-                title="Add new wallet"
-              />
-            </Styles.AddWalletButton>
-          </Styles.WalletsList>
-        ) : null}
+        <Styles.WalletsList>
+          <WindowScroller>
+            {({ registerChild }) => (
+              <div ref={registerChild}>
+                <List
+                  style={Styles.List}
+                  height={310 * 2}
+                  rowCount={state.wallets?.length || 0}
+                  rowHeight={86}
+                  rowRenderer={renderWallet}
+                  width={375}
+                  overscanRowCount={50}
+                  noRowsRenderer={() => (
+                    <Styles.NotFound>
+                      Nothing was found for the specified parameters
+                    </Styles.NotFound>
+                  )}
+                />
+              </div>
+            )}
+          </WindowScroller>
+          <Styles.AddWalletButton onClick={onAddNewAddress}>
+            <SVG src="../../assets/icons/plus.svg" width={14} height={14} title="Add new wallet" />
+          </Styles.AddWalletButton>
+        </Styles.WalletsList>
       </Styles.Wrapper>
       <FilterWalletsDrawer
         isActive={state.activeDrawer === 'filters'}
