@@ -6901,6 +6901,17 @@ diffie-hellman@^5.0.0:
     miller-rabin "^4.0.0"
     randombytes "^2.0.0"
 
+"digibyte-lib@https://github.com/DigiByte-Core/digibyte-lib":
+  version "0.14.1"
+  resolved "https://github.com/DigiByte-Core/digibyte-lib#215f696481f7e7afd0b2fa19b00136a56093c168"
+  dependencies:
+    bn.js "=2.0.4"
+    bs58 "=2.0.0"
+    buffer-compare "=1.0.0"
+    elliptic "=3.0.3"
+    inherits "=2.0.1"
+    lodash "=3.10.1"
+
 dir-glob@^2.2.2:
   version "2.2.2"
   resolved "https://registry.yarnpkg.com/dir-glob/-/dir-glob-2.2.2.tgz#fa09f0694153c8918b18ba0deafae94769fc50c4"

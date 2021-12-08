@@ -27,6 +27,7 @@ import vetLogo from '@assets/currencies/vet.svg'
 import vthoLogo from '@assets/currencies/vtho.svg'
 import toncoinLogo from '@assets/currencies/toncoin.svg'
 import ravencoinLogo from '@assets/currencies/rvn.svg'
+import digibyteLogo from '@assets/currencies/dgb.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -286,12 +287,21 @@ const currencies: ICurrency[] = [
     isCustomFee: false,
   },
   {
+    name: 'DigiByte',
+    symbol: 'dgb',
+    logo: digibyteLogo,
+    background: '#4F86D4',
+    chain: 'digibyte',
+    minSendAmount: 100000,
+    isCustomFee: false,
+  },
+  {
     name: 'Ravencoin',
     symbol: 'rvn',
     logo: ravencoinLogo,
     background: '#B4B8CE',
     chain: 'ravencoin',
-    minSendAmount: 1000, // todo
+    minSendAmount: 1000,
     isCustomFee: true,
   }
 ]

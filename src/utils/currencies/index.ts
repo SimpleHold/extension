@@ -31,6 +31,7 @@ import * as solana from '@utils/currencies/solana'
 import * as harmony from '@utils/currencies/harmony'
 import * as vechain from '@utils/currencies/vechain'
 import * as toncoin from '@utils/currencies/toncoin'
+import * as digibyte from '@utils/currencies/digibyte'
 import * as ravencoin from '@utils/currencies/ravencoin'
 
 // Types
@@ -42,6 +43,9 @@ export const isEthereumLike = (symbol: string, chain?: string): boolean => {
 
 const getProvider = (symbol: string): TProvider | null => {
   try {
+    if (digibyte.coins.indexOf(symbol) !== -1) {
+      return digibyte
+    }
 
     if (harmony.coins.indexOf(symbol) !== -1) {
       return harmony
@@ -117,7 +121,6 @@ export const generate = async (
   symbol: string,
   chain?: string
 ): Promise<TGenerateAddress | null> => {
-
   if (isEthereumLike(symbol, chain)) {
     return ethereumLike.generateAddress()
   }
@@ -127,6 +130,7 @@ export const generate = async (
   if (provider?.generateWallet) {
     return await provider.generateWallet()
   }
+
   return bitcoinLike.generateWallet(symbol)
 }
 
@@ -183,7 +187,6 @@ export const createTransaction = async ({
   xrpTxData,
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
-
   try {
     if (vechain.coins.indexOf(symbol) !== -1) {
       return await vechain.createTransaction(from, to, amount, privateKey, symbol)
@@ -240,6 +243,9 @@ export const createTransaction = async ({
     }
 
     if (outputs?.length && networkFee) {
+      if (digibyte.coins.indexOf(symbol) !== -1) {
+        return digibyte.createTransaction(outputs, to, amount, networkFee, from, privateKey)
+      }
 
       if (neblio.coins.indexOf(symbol) !== -1) {
         return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
@@ -278,6 +284,10 @@ export const getNetworkFee = async ({
 }: IGetFeeParams): Promise<TGetFeeData | null> => {
   if (btcLikeParams) {
     const { outputs, customFee } = btcLikeParams
+
+    if (digibyte.coins.indexOf(symbol) !== -1) {
+      return digibyte.getNetworkFee(addressFrom, outputs, amount)
+    }
 
     if (cardano.coins.indexOf(symbol) !== -1) {
       return cardano.getNetworkFee(outputs, amount)

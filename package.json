@@ -1,6 +1,6 @@
 {
   "name": "extension",
-  "version": "1.16.0",
+  "version": "1.17.0",
   "description": "extension",
   "private": false,
   "repository": "https://github.com/SimpleHold/extension.git",
@@ -45,6 +45,7 @@
     "detect-browser": "^5.2.0",
     "lodash": "^4.17.21",
     "neblio-lib": "https://github.com/NeblioTeam/bitcore-lib#neblcore-lib",
+    "digibyte-lib": "https://github.com/DigiByte-Core/digibyte-lib",
     "nerve-sdk-js": "^1.0.8",
     "nuls-sdk-js": "^2.5.0",
     "numeral": "^2.0.6",
@@ -134,6 +135,7 @@
     "wext-manifest-webpack-plugin": "^1.2.1"
   },
   "resolutions": {
-    "neblio-lib/**/bn.js": "=2.0.4"
+    "neblio-lib/**/bn.js": "=2.0.4",
+    "digibyte-lib/**/bn.js": "=2.0.4"
   }
 }

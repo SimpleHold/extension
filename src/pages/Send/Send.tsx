@@ -123,7 +123,7 @@ const SendPage: React.FC = () => {
     getExtraId()
     getFeeSymbol()
     getCustomFee()
-    checkStandingFee()
+    checkStangindFee()
   }, [])
 
   React.useEffect(() => {
@@ -144,6 +144,12 @@ const SendPage: React.FC = () => {
     if (state.balance && state.balance > 0 && Number(state.amount) > 0 && state.fee === 0) {
       onGetNetworkFee()
     }
+
+    return () => {
+      if (state.timer) {
+        clearTimeout(state.timer)
+      }
+    }
   }, [state.balance])
 
   React.useEffect(() => {
@@ -158,6 +164,12 @@ const SendPage: React.FC = () => {
 
       if (symbol === 'xvg') {
         onGetVergeUtxos()
+      }
+    }
+
+    return () => {
+      if (state.timer) {
+        clearTimeout(state.timer)
       }
     }
   }, [debounced])
@@ -270,7 +282,7 @@ const SendPage: React.FC = () => {
             updateState({
               feeValues: data.fees,
               utxosList: getFee.utxos || [],
-              fee: getFee.value
+              fee: getFee.value,
             })
           }
         }
@@ -318,7 +330,7 @@ const SendPage: React.FC = () => {
   const loadBalance = async (): Promise<void> => {
     updateState({
       balance: null,
-      estimated: null
+      estimated: null,
     })
 
     const { balance, balance_usd, balance_btc } = await getBalance(
@@ -331,7 +343,7 @@ const SendPage: React.FC = () => {
 
     updateState({
       balance,
-      estimated: balance_usd
+      estimated: balance_usd,
     })
 
     updateBalance(state.selectedAddress, symbol, balance, balance_btc)
@@ -351,8 +363,8 @@ const SendPage: React.FC = () => {
       name: TRANSACTION_CANCEL,
       properties: {
         stage: 'send',
-        symbol
-      }
+        symbol,
+      },
     })
 
     history.goBack()
@@ -387,7 +399,7 @@ const SendPage: React.FC = () => {
       utxosList: [],
       currencyBalance: null,
       outputs: [],
-      feeValues: []
+      feeValues: [],
     })
 
     if (!state.isStandingFee) {
@@ -432,7 +444,7 @@ const SendPage: React.FC = () => {
           outputs: state.utxosList,
           chain,
           hardware,
-          extraId: state.extraId
+          extraId: state.extraId,
         })
       )
     }
@@ -454,7 +466,7 @@ const SendPage: React.FC = () => {
       decimals: getTokenDecimals || decimals,
       extraId: state.extraId,
       tokenName,
-      isIncludeFee: state.isIncludeFee
+      isIncludeFee: state.isIncludeFee,
     })
 
     logEvent({
@@ -462,8 +474,8 @@ const SendPage: React.FC = () => {
       properties: {
         fee: state.isIncludeFee ? 'incl' : 'excl',
         speed: currency?.isCustomFee ? 'fixed' : state.feeType,
-        symbol
-      }
+        symbol,
+      },
     })
   }
 
@@ -553,7 +565,7 @@ const SendPage: React.FC = () => {
 
       if (Number(amount) < currency.minSendAmount) {
         return updateState({
-          amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(symbol)}`
+          amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(symbol)}`,
         })
       }
     }
@@ -572,8 +584,8 @@ const SendPage: React.FC = () => {
       !isCurrencyBalanceError
     ) {
       if (!state?.utxosList?.length) {
-        const withOutputs = checkWithOutputs(symbol)
-        return withOutputs
+        const withOuputs = checkWithOutputs(symbol)
+        return withOuputs
       }
 
       if (state.fee === 0) {
@@ -679,8 +691,8 @@ const SendPage: React.FC = () => {
             />
           </Styles.Row>
           <Styles.Actions>
-            <Button label='Cancel' isLight onClick={onCancel} mr={7.5} />
-            <Button label='Send' onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
+            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
+            <Button label="Send" onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>
