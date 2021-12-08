@@ -123,7 +123,7 @@ const SendPage: React.FC = () => {
     getExtraId()
     getFeeSymbol()
     getCustomFee()
-    checkStangindFee()
+    checkStandingFee()
   }, [])
 
   React.useEffect(() => {
