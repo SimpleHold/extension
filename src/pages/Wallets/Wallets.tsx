@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
-import { List, ListRowProps, WindowScroller } from 'react-virtualized'
+import { List, ListRowProps, WindowScroller, ScrollParams } from 'react-virtualized'
 
 // Components
 import WalletCard from '@components/WalletCard'
@@ -11,7 +11,6 @@ import CollapsibleHeader from '@components/CollapsibleHeader'
 import FilterWalletsDrawer from '@drawers/FilterWallets'
 
 // Hooks
-import useScroll from '@hooks/useScroll'
 import useToastContext from '@hooks/useToastContext'
 import useState from '@hooks/useState'
 
@@ -36,6 +35,7 @@ const initialState: IState = {
   totalEstimated: null,
   pendingBalance: null,
   activeDrawer: null,
+  scrollPosition: 0,
 }
 
 const Wallets: React.FC = () => {
@@ -47,8 +47,8 @@ const Wallets: React.FC = () => {
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
   const [walletsPending, setWalletsPending] = React.useState<number[]>([])
 
-  const { scrollPosition } = useScroll()
   const addToast = useToastContext()
+  const walletsTop = Math.max(110, 290 - 1.25 * state.scrollPosition)
 
   React.useEffect(() => {
     getWalletsList()
@@ -228,11 +228,15 @@ const Wallets: React.FC = () => {
     return null
   }
 
+  const onScroll = ({ scrollTop }: ScrollParams): void => {
+    updateState({ scrollPosition: scrollTop })
+  }
+
   return (
     <>
       <Styles.Wrapper>
         <CollapsibleHeader
-          scrollPosition={scrollPosition}
+          scrollPosition={state.scrollPosition}
           balance={state.totalBalance}
           estimated={state.totalEstimated}
           pendingBalance={state.pendingBalance}
@@ -241,13 +245,14 @@ const Wallets: React.FC = () => {
           openFilters={openFilters}
           onViewNFT={onViewNFT}
         />
-        <Styles.WalletsList>
+        <Styles.WalletsList style={{ top: walletsTop }}>
           <WindowScroller>
             {({ registerChild }) => (
               <div ref={registerChild}>
                 <List
+                  onScroll={onScroll}
+                  height={600}
                   style={Styles.List}
-                  height={310 * 2}
                   rowCount={state.wallets?.length || 0}
                   rowHeight={86}
                   rowRenderer={renderWallet}

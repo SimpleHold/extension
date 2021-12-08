@@ -11,4 +11,5 @@ export interface IState {
   totalEstimated: null | number
   pendingBalance: null | number
   activeDrawer: null | 'filters'
+  scrollPosition: number
 }

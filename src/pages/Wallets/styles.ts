@@ -7,11 +7,6 @@ const Wrapper = styled.div`
 
 const WalletsList = styled.div`
   position: relative;
-  top: 290px;
-
-  .ReactVirtualized__List {
-    overflow: inherit !important;
-  }
 `
 
 const AddWalletButton = styled.div`
