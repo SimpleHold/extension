@@ -89,6 +89,7 @@ const SelectCurrency: React.FC = () => {
       return history.push('/new-wallet', {
         symbol,
         chain,
+        tokenName,
       })
     }
   }

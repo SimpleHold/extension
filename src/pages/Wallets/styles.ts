@@ -7,8 +7,6 @@ const Wrapper = styled.div`
 
 const WalletsList = styled.div`
   position: relative;
-  padding: 20px 30px;
-  top: 290px;
 `
 
 const AddWalletButton = styled.div`
@@ -32,17 +30,27 @@ const AddWalletButton = styled.div`
 `
 
 const NotFound = styled.p`
-  margin: 0;
+  margin: 0 30px;
   font-size: 16px;
   line-height: 23px;
   color: #7d7e8d;
 `
+
+const List = {
+  padding: '20px 0',
+}
+
+const ListItem = {
+  padding: '0 30px',
+}
 
 const Styles = {
   Wrapper,
   WalletsList,
   AddWalletButton,
   NotFound,
+  List,
+  ListItem,
 }
 
 export default Styles
