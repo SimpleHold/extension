@@ -55,7 +55,8 @@ const Bottom = styled.div`
   align-items: center;
   position: absolute;
   bottom: 10px;
-  width: calc(100% - 60px);
+  //width: calc(100% - 60px);
+  width: 315px;
   justify-content: space-between;
 `
 

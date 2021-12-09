@@ -36,6 +36,7 @@ import { IList, IState } from './types'
 
 // Styles
 import Styles from './styles'
+import { browser } from 'webextension-polyfill-ts'
 
 const initialState: IState = {
   activeDrawer: null,
@@ -93,7 +94,26 @@ const Settings: React.FC = () => {
     })
   }
 
+  const openInWindow = () => {
+    window.open(
+      browser.extension.getURL("popup.html"),
+      "SimpleHold Wallet",
+      "popup=yes,left=500,top=0,width=375,height=630,resizable=no,location=no,status=no,scrollbars=no"
+    );
+    window.close();
+  }
+
   const list: IList[] = [
+    {
+      isButton: true,
+      title: 'Open in a separate window',
+      icon: {
+        source: linkIcon,
+        width: 16,
+        height: 16,
+      },
+      onClick: openInWindow,
+    },
     {
       isButton: true,
       title: 'Download the backup',
@@ -173,7 +193,7 @@ const Settings: React.FC = () => {
             <Styles.Title>Settings</Styles.Title>
 
             <Styles.List>
-              {list.map((list: IList) => {
+              {list.map((list: IList, index) => {
                 const {
                   isButton,
                   title,
@@ -184,6 +204,10 @@ const Settings: React.FC = () => {
                   text,
                   onClick,
                 } = list
+
+                if (window.name && !index) {
+                  return null
+                }
 
                 return (
                   <Styles.ListItem key={title} isButton={isButton} onClick={onClick}>
