@@ -17,7 +17,7 @@ import { download as downloadBackup } from '@utils/backup'
 import { logEvent } from '@utils/amplitude'
 import { sha256hash } from '@utils/crypto'
 import { detectBrowser, detectOS } from '@utils/detect'
-import { getUrl, openWebPage } from '@utils/extension'
+import { getUrl, openAppInNewWindow, openWebPage } from '@utils/extension'
 import { getManifest } from '@utils/extension'
 import { getItem, setItem, removeItem, removeCache } from '@utils/storage'
 
@@ -31,13 +31,13 @@ import useState from '@hooks/useState'
 import cloudIcon from '@assets/icons/cloud.svg'
 import linkIcon from '@assets/icons/link.svg'
 import qrCodeIcon from '@assets/icons/qrCode.svg'
+import helpIcon from '@assets/icons/help.svg'
 
 // Types
 import { IList, IState } from './types'
 
 // Styles
 import Styles from './styles'
-import { browser } from 'webextension-polyfill-ts'
 
 const initialState: IState = {
   activeDrawer: null,
@@ -100,25 +100,10 @@ const Settings: React.FC = () => {
   }
 
   const openInWindow = () => {
-    window.open(
-      browser.extension.getURL("popup.html"),
-      "SimpleHold Wallet",
-      "popup=yes,left=500,top=0,width=375,height=630,resizable=no,location=no,status=no,scrollbars=no"
-    );
-    window.close();
+    openAppInNewWindow()
   }
 
   const list: IList[] = [
-    {
-      isButton: true,
-      title: 'Open in a separate window',
-      icon: {
-        source: linkIcon,
-        width: 16,
-        height: 16,
-      },
-      onClick: openInWindow,
-    },
     {
       isButton: true,
       title: 'Download the backup',
@@ -133,9 +118,9 @@ const Settings: React.FC = () => {
       isButton: true,
       title: 'Contact support',
       icon: {
-        source: linkIcon,
-        width: 16,
-        height: 16,
+        source: helpIcon,
+        width: 18,
+        height: 18,
       },
       onClick: () => openWebPage('https://simplehold.io/about'),
     },
@@ -148,6 +133,17 @@ const Settings: React.FC = () => {
         height: 18,
       },
       onClick: onScanQrCode,
+    },
+    {
+      isButton: true,
+      hideInWindowed: true,
+      title: 'Open in a new window',
+      icon: {
+        source: linkIcon,
+        width: 16,
+        height: 16,
+      },
+      onClick: openInWindow,
     },
     {
       title: 'Use passcode',
@@ -208,7 +204,7 @@ const Settings: React.FC = () => {
             <Styles.Title>Settings</Styles.Title>
 
             <Styles.List>
-              {list.map((list: IList, index) => {
+              {list.map((list: IList) => {
                 const {
                   isButton,
                   title,
@@ -220,7 +216,7 @@ const Settings: React.FC = () => {
                   onClick,
                 } = list
 
-                if (window.name && !index) {
+                if (window.name && list.hideInWindowed) {
                   return null
                 }
 
@@ -230,7 +226,9 @@ const Settings: React.FC = () => {
                       <Styles.ListTitleRow>
                         <Styles.ListTitle>{title}</Styles.ListTitle>
                         {withSwitch && switchValue !== undefined && onToggle ? (
-                          <Switch value={switchValue} onToggle={onToggle} />
+                          <Styles.IconRow>
+                            <Switch value={switchValue} onToggle={onToggle} />
+                          </Styles.IconRow>
                         ) : null}
                       </Styles.ListTitleRow>
                       {text ? <Styles.Text>{text}</Styles.Text> : null}
