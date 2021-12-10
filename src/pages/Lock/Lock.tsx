@@ -92,6 +92,7 @@ const Lock: React.FC = () => {
       removeCache()
 
       history.push('/welcome')
+      removeItem("isLocked")
     }
   }
 
