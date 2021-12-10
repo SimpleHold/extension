@@ -32,6 +32,7 @@ import * as harmony from '@utils/currencies/harmony'
 import * as vechain from '@utils/currencies/vechain'
 import * as toncoin from '@utils/currencies/toncoin'
 import * as digibyte from '@utils/currencies/digibyte'
+import * as ravencoin from '@utils/currencies/ravencoin'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -104,6 +105,10 @@ const getProvider = (symbol: string): TProvider | null => {
 
     if (toncoin.coins.indexOf(symbol) !== -1) {
       return toncoin
+    }
+
+    if (ravencoin.coins.indexOf(symbol) !== -1) {
+      return ravencoin
     }
 
     return null
@@ -246,6 +251,10 @@ export const createTransaction = async ({
         return neblio.createTransaction(outputs, to, amount, networkFee, from, privateKey)
       }
 
+      if (ravencoin.coins.indexOf(symbol) !== -1 && outputs) {
+        return ravencoin.createTransaction(outputs, to, amount, networkFee, from, privateKey)
+      }
+
       return bitcoinLike.createTransaction(
         outputs,
         to,
@@ -286,6 +295,10 @@ export const getNetworkFee = async ({
 
     if (neblio.coins.indexOf(symbol) !== -1) {
       return neblio.getNetworkFee(addressFrom, outputs, amount)
+    }
+
+    if (ravencoin.coins.indexOf(symbol) !== -1) {
+      return ravencoin.getNetworkFee(addressFrom, outputs, amount)
     }
 
     if (bitcoinLike.coins.indexOf(symbol) !== -1) {

@@ -98,7 +98,6 @@ const NewWallet: React.FC = () => {
       updateState({ isButtonLoading: true })
 
       const generateAddress = await generate(symbol, chain)
-
       if (generateAddress) {
         const { privateKey, mnemonic, isNotActivated, address } = generateAddress
 

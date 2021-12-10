@@ -603,7 +603,7 @@ export const getTonAddressState = async (address: string): Promise<TTonAddressSt
 
     return data.result
   } catch {
-    return 'unitialized'
+    return 'uninitialized'
   }
 }
 

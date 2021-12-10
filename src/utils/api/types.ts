@@ -152,4 +152,4 @@ export type TVetTxParams = {
   blockRef: string
 }
 
-export type TTonAddressState = 'unitialized' | 'active' | 'frozen'
+export type TTonAddressState = 'uninitialized' | 'active' | 'frozen'
