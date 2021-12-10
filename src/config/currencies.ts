@@ -27,6 +27,7 @@ import vetLogo from '@assets/currencies/vet.svg'
 import vthoLogo from '@assets/currencies/vtho.svg'
 import toncoinLogo from '@assets/currencies/toncoin.svg'
 import digibyteLogo from '@assets/currencies/dgb.svg'
+import cfxLogo from '@assets/currencies/cfx.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -292,6 +293,15 @@ const currencies: ICurrency[] = [
     background: '#4F86D4',
     chain: 'digibyte',
     minSendAmount: 100000,
+    isCustomFee: false,
+  },
+  {
+    name: 'Conflux',
+    symbol: 'cfx',
+    logo: cfxLogo,
+    background: '#6BBCCC',
+    chain: 'conflux',
+    minSendAmount: 1000000000000000,
     isCustomFee: false,
   },
 ]

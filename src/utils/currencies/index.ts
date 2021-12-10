@@ -32,6 +32,7 @@ import * as harmony from '@utils/currencies/harmony'
 import * as vechain from '@utils/currencies/vechain'
 import * as toncoin from '@utils/currencies/toncoin'
 import * as digibyte from '@utils/currencies/digibyte'
+import * as conflux from '@utils/currencies/conflux'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
@@ -42,6 +43,10 @@ export const isEthereumLike = (symbol: string, chain?: string): boolean => {
 
 const getProvider = (symbol: string): TProvider | null => {
   try {
+    if (conflux.coins.indexOf(symbol) !== -1) {
+      return conflux
+    }
+
     if (digibyte.coins.indexOf(symbol) !== -1) {
       return digibyte
     }
@@ -183,6 +188,10 @@ export const createTransaction = async ({
   extraId,
 }: TCreateTransactionProps): Promise<string | null> => {
   try {
+    if (conflux.coins.indexOf(symbol) !== -1) {
+      return await conflux.createTransaction(from, to, amount, privateKey)
+    }
+
     if (vechain.coins.indexOf(symbol) !== -1) {
       return await vechain.createTransaction(from, to, amount, privateKey, symbol)
     }
@@ -299,6 +308,10 @@ export const getNetworkFee = async ({
 
   if (xinfin.coins.indexOf(symbol) !== -1) {
     return await xinfin.getNetworkFee()
+  }
+
+  if (conflux.coins.indexOf(symbol) !== -1) {
+    return await conflux.getNetworkFee()
   }
 
   if (toncoin.coins.indexOf(symbol) !== -1 && !tokenChain) {
