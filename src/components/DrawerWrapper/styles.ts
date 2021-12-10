@@ -35,6 +35,7 @@ const Drawer = styled.div`
   z-index: 101;
   left: 0;
   bottom: 0;
+  min-width: 315px;
   width: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? '315px' : '100%')};
   transition: transform 250ms;
 `

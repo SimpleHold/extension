@@ -64,7 +64,6 @@ const Settings: React.FC = () => {
   const checkBrowserAndOS = () => {
     const os = detectOS()
     const browser = detectBrowser()
-
     if (os === 'macos' && browser === 'chrome') {
       updateState({ isDownloadManually: true })
     }
