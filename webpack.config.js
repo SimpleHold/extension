@@ -140,6 +140,7 @@ const config = {
       ),
     },
   },
+
   module: {
     rules: [
       {

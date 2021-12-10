@@ -85,16 +85,13 @@ const SendConfirmation: React.FC = () => {
         symbol,
       },
     })
-
     if (state.inputErrorLabel) {
       updateState({ inputErrorLabel: null })
     }
 
     const backup = getItem('backup')
-
     if (backup) {
       const decryptBackup = decrypt(backup, state.password)
-
       if (decryptBackup) {
         const findWallet: IWallet | null = JSON.parse(decryptBackup).wallets.find(
           (wallet: IWallet) => wallet.address === addressFrom
@@ -111,12 +108,12 @@ const SendConfirmation: React.FC = () => {
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
             ? await getWeb3TxParams(
-                addressFrom,
-                addressTo,
-                `${parseAmount}`,
-                chain || tokenChain,
-                contractAddress
-              )
+              addressFrom,
+              addressTo,
+              `${parseAmount}`,
+              chain || tokenChain,
+              contractAddress
+            )
             : {}
 
           const xrpTxData = symbol === 'xrp' ? await getXrpTxParams(addressFrom) : {}
@@ -160,17 +157,14 @@ const SendConfirmation: React.FC = () => {
               isButtonLoading: false,
             })
           }
-
           const transaction = await createTransaction({
             ...transactionData,
             ...ethTxData,
             xrpTxData,
             extraId,
           })
-
           if (transaction) {
             const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
-
             if (sendTransaction) {
               return checkTransaction(sendTransaction)
             }

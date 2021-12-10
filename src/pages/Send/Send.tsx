@@ -123,7 +123,7 @@ const SendPage: React.FC = () => {
     getExtraId()
     getFeeSymbol()
     getCustomFee()
-    checkStangindFee()
+    checkStandingFee()
   }, [])
 
   React.useEffect(() => {
@@ -194,7 +194,7 @@ const SendPage: React.FC = () => {
     }
   }
 
-  const checkStangindFee = (): void => {
+  const checkStandingFee = (): void => {
     const data = getStandingFee(symbol)
 
     if (data) {
@@ -551,7 +551,7 @@ const SendPage: React.FC = () => {
 
     if (currency) {
       let amount = getAmount()
-      let minAmount: number = 0
+      let minAmount: number
       const getMinAmountWithFee = state.isIncludeFee && symbol === state.feeSymbol ? state.fee : 0
 
       if (tokenChain) {
@@ -573,7 +573,6 @@ const SendPage: React.FC = () => {
 
   const isButtonDisabled = (): boolean => {
     const getAmount = state.isIncludeFee && (symbol === state.feeSymbol) ? Number(state.amount) - state.fee : Number(state.amount)
-
     if (
       validateAddress(symbol, state.address, tokenChain) &&
       state.amount.length &&
@@ -586,7 +585,6 @@ const SendPage: React.FC = () => {
     ) {
       if (!state?.utxosList?.length) {
         const withOuputs = checkWithOutputs(symbol)
-
         return withOuputs
       }
 

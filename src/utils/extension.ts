@@ -14,6 +14,15 @@ export const openWebPage = async (url: string): Promise<void> => {
   await browser.tabs.create({ url })
 }
 
+export const openAppInNewWindow = (): void => {
+  window.open(
+    getUrl("popup.html"),
+    "SimpleHold Wallet",
+    "popup=yes,left=500,top=0,width=375,height=630,resizable=no,location=no,status=no,scrollbars=no"
+  );
+  window.close();
+}
+
 export const setBadgeBackgroundColor = (color: string) => {
   browser.browserAction.setBadgeBackgroundColor({ color })
 }

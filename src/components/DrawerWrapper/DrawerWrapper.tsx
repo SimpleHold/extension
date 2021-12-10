@@ -39,6 +39,8 @@ const DrawerWrapper: React.FC<Props> = (props) => {
 
   const nodeRef = React.useRef(null)
 
+  const isWindowedMode = window.location.pathname === "/popup.html" && window.name !== ''
+
   const drawerStyle = {
     entering: {
       transform: `translate3d(0, ${openFrom === 'browser' ? '80px' : '100%'}, 0)`,
@@ -67,6 +69,7 @@ const DrawerWrapper: React.FC<Props> = (props) => {
             openFrom={openFrom}
           />
           <Styles.Drawer
+            isWindowedMode={isWindowedMode}
             openFrom={openFrom}
             padding={padding}
             height={height}

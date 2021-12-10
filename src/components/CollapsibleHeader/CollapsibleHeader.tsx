@@ -45,7 +45,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
     }
   }, [scrollPosition, isDrawersActive])
 
-  const сontainerHeight = Math.max(110, 290 - 1.25 * latesScrollPosition)
+  const containerHeight = Math.max(110, 290 - 1.25 * latesScrollPosition)
 
   const balanceRowMarginTop = Math.max(3, 50 - latesScrollPosition)
   const balanceFontSize = Math.max(16, 36 - 0.2 * latesScrollPosition)
@@ -79,9 +79,8 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
       'activeSortType',
     ])
   }
-
   return (
-    <Styles.Container style={{ height: сontainerHeight }}>
+    <Styles.Container style={{ height: containerHeight }}>
       <Header />
 
       <Styles.Row>
