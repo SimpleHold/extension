@@ -58,7 +58,7 @@ const Header: React.FC<Props> = (props) => {
     <Styles.Container withBorder={withBorder} borderColor={borderColor} isAbsolute={isAbsolute}>
       <Styles.LogoRow>
         <Styles.Logo color={logoColor}>
-          <SVG src="../../assets/logo.svg" width={30} height={30} title="SimleHold" />
+          <SVG src="../../assets/logo.svg" width={30} height={30} title="SimpleHold" />
         </Styles.Logo>
       </Styles.LogoRow>
       <Styles.Row>

@@ -10,6 +10,7 @@ export interface IList {
   onClick?: () => void
   withSwitch?: boolean
   switchValue?: boolean
+  hideInWindowed?: boolean
   onToggle?: () => void
 }
 
