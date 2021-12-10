@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
+import { List, ListRowProps, WindowScroller, ScrollParams } from 'react-virtualized'
 
 // Components
 import WalletCard from '@components/WalletCard'
@@ -10,7 +11,6 @@ import CollapsibleHeader from '@components/CollapsibleHeader'
 import FilterWalletsDrawer from '@drawers/FilterWallets'
 
 // Hooks
-import useScroll from '@hooks/useScroll'
 import useToastContext from '@hooks/useToastContext'
 import useState from '@hooks/useState'
 
@@ -35,6 +35,7 @@ const initialState: IState = {
   totalEstimated: null,
   pendingBalance: null,
   activeDrawer: null,
+  scrollPosition: 0,
 }
 
 const Wallets: React.FC = () => {
@@ -46,8 +47,8 @@ const Wallets: React.FC = () => {
   const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
   const [walletsPending, setWalletsPending] = React.useState<number[]>([])
 
-  const { scrollPosition } = useScroll()
   const addToast = useToastContext()
+  const walletsTop = Math.max(110, 290 - 1.25 * state.scrollPosition)
 
   React.useEffect(() => {
     getWalletsList()
@@ -177,11 +178,65 @@ const Wallets: React.FC = () => {
     history.push('/nft-collection')
   }
 
+  const renderWallet = ({ index, style, key }: ListRowProps): React.ReactNode => {
+    const wallet = state.wallets?.[index]
+
+    if (wallet) {
+      const {
+        address,
+        symbol,
+        chain,
+        name,
+        contractAddress,
+        decimals,
+        isHidden,
+        uuid,
+        hardware,
+        isNotActivated,
+      } = wallet
+
+      const walletName = getNameWallet(wallet)
+
+      return (
+        <div
+          style={{
+            ...style,
+            ...Styles.ListItem,
+          }}
+          key={key}
+        >
+          <WalletCard
+            address={address}
+            chain={chain}
+            symbol={symbol.toLowerCase()}
+            name={name}
+            contractAddress={contractAddress}
+            decimals={decimals}
+            isHidden={isHidden}
+            sumBalance={sumBalance}
+            sumEstimated={sumEstimated}
+            sumPending={sumPending}
+            walletName={walletName}
+            uuid={uuid}
+            hardware={hardware}
+            isNotActivated={isNotActivated}
+          />
+        </div>
+      )
+    }
+
+    return null
+  }
+
+  const onScroll = ({ scrollTop }: ScrollParams): void => {
+    updateState({ scrollPosition: scrollTop })
+  }
+
   return (
     <>
       <Styles.Wrapper>
         <CollapsibleHeader
-          scrollPosition={scrollPosition}
+          scrollPosition={state.scrollPosition}
           balance={state.totalBalance}
           estimated={state.totalEstimated}
           pendingBalance={state.pendingBalance}
@@ -190,59 +245,32 @@ const Wallets: React.FC = () => {
           openFilters={openFilters}
           onViewNFT={onViewNFT}
         />
-        {state.wallets !== null ? (
-          <Styles.WalletsList>
-            {state.wallets?.length
-              ? state.wallets.map((wallet: IWallet) => {
-                  const {
-                    address,
-                    symbol,
-                    chain,
-                    name,
-                    contractAddress,
-                    decimals,
-                    isHidden,
-                    uuid,
-                    hardware,
-                    isNotActivated,
-                  } = wallet
-
-                  const walletName = getNameWallet(wallet)
-
-                  return (
-                    <WalletCard
-                      key={`${symbol}/${address}/${chain}`}
-                      address={address}
-                      chain={chain}
-                      symbol={symbol.toLowerCase()}
-                      name={name}
-                      contractAddress={contractAddress}
-                      decimals={decimals}
-                      isHidden={isHidden}
-                      sumBalance={sumBalance}
-                      sumEstimated={sumEstimated}
-                      sumPending={sumPending}
-                      walletName={walletName}
-                      uuid={uuid}
-                      hardware={hardware}
-                      isNotActivated={isNotActivated}
-                    />
-                  )
-                })
-              : null}
-            {state.wallets.length === 0 ? (
-              <Styles.NotFound>Nothing was found for the specified parameters</Styles.NotFound>
-            ) : null}
-            <Styles.AddWalletButton onClick={onAddNewAddress}>
-              <SVG
-                src="../../assets/icons/plus.svg"
-                width={14}
-                height={14}
-                title="Add new wallet"
-              />
-            </Styles.AddWalletButton>
-          </Styles.WalletsList>
-        ) : null}
+        <Styles.WalletsList style={{ top: walletsTop }}>
+          <WindowScroller>
+            {({ registerChild }) => (
+              <div ref={registerChild}>
+                <List
+                  onScroll={onScroll}
+                  height={600}
+                  style={Styles.List}
+                  rowCount={state.wallets?.length || 0}
+                  rowHeight={86}
+                  rowRenderer={renderWallet}
+                  width={375}
+                  overscanRowCount={50}
+                  noRowsRenderer={() => (
+                    <Styles.NotFound>
+                      Nothing was found for the specified parameters
+                    </Styles.NotFound>
+                  )}
+                />
+              </div>
+            )}
+          </WindowScroller>
+          <Styles.AddWalletButton onClick={onAddNewAddress}>
+            <SVG src="../../assets/icons/plus.svg" width={14} height={14} title="Add new wallet" />
+          </Styles.AddWalletButton>
+        </Styles.WalletsList>
       </Styles.Wrapper>
       <FilterWalletsDrawer
         isActive={state.activeDrawer === 'filters'}

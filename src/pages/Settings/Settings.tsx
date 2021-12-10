@@ -30,6 +30,7 @@ import useState from '@hooks/useState'
 // Icons
 import cloudIcon from '@assets/icons/cloud.svg'
 import linkIcon from '@assets/icons/link.svg'
+import qrCodeIcon from '@assets/icons/qrCode.svg'
 
 // Types
 import { IList, IState } from './types'
@@ -64,6 +65,7 @@ const Settings: React.FC = () => {
   const checkBrowserAndOS = () => {
     const os = detectOS()
     const browser = detectBrowser()
+
     if (os === 'macos' && browser === 'chrome') {
       updateState({ isDownloadManually: true })
     }
@@ -91,6 +93,10 @@ const Settings: React.FC = () => {
       activeDrawer: 'passcode',
       passcodeDrawerType: getPasscode !== null ? 'remove' : 'create',
     })
+  }
+
+  const onScanQrCode = (): void => {
+    history.push('/scan-backup')
   }
 
   const openInWindow = () => {
@@ -132,6 +138,16 @@ const Settings: React.FC = () => {
         height: 16,
       },
       onClick: () => openWebPage('https://simplehold.io/about'),
+    },
+    {
+      isButton: true,
+      title: 'Sign-in on mobile wallet',
+      icon: {
+        source: qrCodeIcon,
+        width: 18,
+        height: 18,
+      },
+      onClick: onScanQrCode,
     },
     {
       title: 'Use passcode',
