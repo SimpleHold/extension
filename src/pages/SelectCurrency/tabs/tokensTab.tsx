@@ -9,7 +9,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import { toUpper, toLower } from '@utils/format'
 
 // Types
-import tokens, { IToken } from '@config/tokens'
+import { IToken } from '@config/tokens'
 
 // Styles
 import Styles from '../styles'
@@ -21,7 +21,7 @@ interface Props {
 }
 
 const TokensTab: React.FC<Props> = (props) => {
-  const { onAddCustomToken, onAddToken } = props
+  const { onAddCustomToken, onAddToken, tokens } = props
 
   const [searchValue, setSearchValue] = React.useState<string>('')
 

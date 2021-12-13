@@ -17,7 +17,7 @@ import { download as downloadBackup } from '@utils/backup'
 import { logEvent } from '@utils/amplitude'
 import { sha256hash } from '@utils/crypto'
 import { detectBrowser, detectOS } from '@utils/detect'
-import { getUrl, openWebPage } from '@utils/extension'
+import { getUrl, openAppInNewWindow, openWebPage } from '@utils/extension'
 import { getManifest } from '@utils/extension'
 import { getItem, setItem, removeItem, removeCache } from '@utils/storage'
 
@@ -30,6 +30,8 @@ import useState from '@hooks/useState'
 // Icons
 import cloudIcon from '@assets/icons/cloud.svg'
 import linkIcon from '@assets/icons/link.svg'
+import qrCodeIcon from '@assets/icons/qrCode.svg'
+import helpIcon from '@assets/icons/help.svg'
 
 // Types
 import { IList, IState } from './types'
@@ -93,6 +95,14 @@ const Settings: React.FC = () => {
     })
   }
 
+  const onScanQrCode = (): void => {
+    history.push('/scan-backup')
+  }
+
+  const openInWindow = () => {
+    openAppInNewWindow()
+  }
+
   const list: IList[] = [
     {
       isButton: true,
@@ -108,11 +118,32 @@ const Settings: React.FC = () => {
       isButton: true,
       title: 'Contact support',
       icon: {
+        source: helpIcon,
+        width: 18,
+        height: 18,
+      },
+      onClick: () => openWebPage('https://simplehold.io/about'),
+    },
+    {
+      isButton: true,
+      title: 'Sign-in on mobile wallet',
+      icon: {
+        source: qrCodeIcon,
+        width: 18,
+        height: 18,
+      },
+      onClick: onScanQrCode,
+    },
+    {
+      isButton: true,
+      hideInWindowed: true,
+      title: 'Open in a new window',
+      icon: {
         source: linkIcon,
         width: 16,
         height: 16,
       },
-      onClick: () => openWebPage('https://simplehold.io/about'),
+      onClick: openInWindow,
     },
     {
       title: 'Use passcode',
@@ -185,13 +216,19 @@ const Settings: React.FC = () => {
                   onClick,
                 } = list
 
+                if (window.name && list.hideInWindowed) {
+                  return null
+                }
+
                 return (
                   <Styles.ListItem key={title} isButton={isButton} onClick={onClick}>
                     <Styles.ListItemRow>
                       <Styles.ListTitleRow>
                         <Styles.ListTitle>{title}</Styles.ListTitle>
                         {withSwitch && switchValue !== undefined && onToggle ? (
-                          <Switch value={switchValue} onToggle={onToggle} />
+                          <Styles.IconRow>
+                            <Switch value={switchValue} onToggle={onToggle} />
+                          </Styles.IconRow>
                         ) : null}
                       </Styles.ListTitleRow>
                       {text ? <Styles.Text>{text}</Styles.Text> : null}

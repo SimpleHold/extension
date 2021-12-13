@@ -26,7 +26,17 @@ const App: React.FC = () => {
     preloadPages()
     getPlatformInfo()
     browser.runtime.setUninstallURL(`https://simplehold.io/survey?id=${getItem('clientId')}`)
+
+    if (window.name) {
+      window.onresize = () => {
+        const height = window.outerHeight
+        const width = window.outerWidth
+        if (width === 375 && height === 630) return;
+        setTimeout(() => window.resizeTo(375, 630), 1000)
+      }
+    }
   }, [])
+
 
   const getPlatformInfo = async (): Promise<void> => {
     const info = await browser.runtime.getPlatformInfo()

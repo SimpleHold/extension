@@ -4,6 +4,7 @@ type TDrawerProps = {
   openFrom?: string
   padding?: string
   height?: number
+  isWindowedMode?: boolean
 }
 
 type TBackgroundProps = {
@@ -36,6 +37,7 @@ const Drawer = styled.div`
   left: 0;
   bottom: 0;
   width: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? '315px' : '100%')};
+  min-width: ${({ isWindowedMode }: TDrawerProps) => (isWindowedMode ? `375px` : 'initial')};
   transition: transform 250ms;
 `
 

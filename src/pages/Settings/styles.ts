@@ -38,7 +38,7 @@ const ListItem = styled.div`
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: ${({ isButton }: TListItemProps) => (isButton ? `15px 0` : '20px 0')};
+  padding: 15px 0;
   height: ${({ isButton }: TListItemProps) => (isButton ? `60px` : 'auto')};
   border-bottom: 1px solid #f2f4f8;
 
@@ -80,7 +80,8 @@ const IconRow = styled.div`
   justify-content: center;
 `
 
-const Text = styled.p`
+  const Text = styled.p`
+  padding-right: 40px;
   margin: 5px 0 0 0;
   font-size: 14px;
   line-height: 20px;
@@ -125,7 +126,7 @@ const Styles = {
   Text,
   ExtensionInfo,
   CopyRight,
-  Version,
+  Version
 }
 
 export default Styles

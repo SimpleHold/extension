@@ -177,6 +177,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
 
         return (
           <DropdownCurrency
+            key={`${symbol}/${chain}`}
             symbol={symbol}
             name={name}
             chain={chain}
