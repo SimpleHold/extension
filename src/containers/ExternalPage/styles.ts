@@ -102,15 +102,15 @@ const Logo = styled.div`
   path {
     fill: ${({ headerStyle }: TLogoProps) => headerStyle === 'green' && "#fff"};
 
-    &:nth-child(2) {
+    &:nth-of-type(1) {
       opacity: ${({ headerStyle }: TLogoProps) => headerStyle === 'green' ? 0.38 : 1};
     };
 
-    &:nth-child(3) {
+    &:nth-of-type(2) {
       opacity: ${({ headerStyle }: TLogoProps) => headerStyle === 'green' ? 0.68 : 1};
     };
 
-    &:nth-child(4) {
+    &:nth-of-type(3) {
       opacity: ${({ headerStyle }: TLogoProps) => headerStyle === 'green' ? 0.49 : 1};
     };
   }
