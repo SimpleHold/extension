@@ -2,8 +2,8 @@ import amplitudeSDK from 'amplitude-js'
 
 // Utils
 import { getItem } from '@utils/storage'
-import { validateWallet } from 'utils/validate'
-import { parseWalletsData } from 'utils/wallet'
+import { validateWallet } from '@utils/validate'
+import { parseWalletsData } from '@utils/wallet'
 
 interface IEvent {
   name: string

@@ -9,6 +9,7 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { toUpper, price, formatEstimated } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
+import { openWebPage } from '@utils/extension'
 
 // Assets
 import refreshIcon from '@assets/icons/refresh.svg'
@@ -18,7 +19,6 @@ import { ADDRESS_ACTION } from '@config/events'
 
 // Styles
 import Styles from './styles'
-import { openWebPage } from 'utils/extension'
 
 interface Props {
   openPage: (url: string) => () => void

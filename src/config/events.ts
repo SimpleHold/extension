@@ -2,7 +2,6 @@ export const FIRST_ENTER = 'FIRST_ENTER'
 export const SESSION_START = 'SESSION_START'
 export const LOCK = 'LOCK'
 export const LOG_OUT_CACHE = 'LOG_OUT_CACHE'
-export const BACKUP_SETTINGS = 'BACKUP_SETTINGS'
 export const PASSWORD_AFTER_LOG_OUT = 'PASSWORD_AFTER_LOG_OUT'
 export const SUCCESS_ENTER = 'SUCCESS_ENTER'
 
@@ -53,3 +52,8 @@ export const NPS_FINISH = 'NPS_FINISH'
 
 // Hardware
 export const HARDWARE_CONNECT = 'HARDWARE_CONNECT'
+
+// Settings
+export const BACKUP_SETTINGS = 'BACKUP_SETTINGS'
+export const SETTINGS_SIGN_IN = 'SETTINGS_SIGN_IN'
+export const SETTINGS_NEWTAB = 'SETTINGS_NEWTAB'

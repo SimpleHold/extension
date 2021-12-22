@@ -1,9 +1,9 @@
 // Utils
-import { toLower } from 'utils/format'
+import { toLower } from '@utils/format'
 
 // Types
-import { TCustomFees } from 'utils/currencies/types'
-import { TFeeResponse } from 'utils/currencies/bitcoinLike/types'
+import { TCustomFees } from '@utils/currencies/types'
+import { TFeeResponse } from '@utils/currencies/bitcoinLike/types'
 
 export const coins: string[] = ['rvn']
 export const isWithOutputs = true
