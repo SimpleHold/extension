@@ -16,7 +16,7 @@ interface Props {
   withBack?: boolean
   backTitle?: string
   noActions?: boolean
-  logoColor?: string
+  whiteLogo?: boolean
   onBack?: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
   withBorder?: boolean
   activePage?: string
@@ -29,7 +29,7 @@ const Header: React.FC<Props> = (props) => {
     withBack,
     backTitle,
     noActions,
-    logoColor = '#FFFFFF',
+    whiteLogo,
     onBack,
     withBorder,
     activePage,
@@ -57,8 +57,8 @@ const Header: React.FC<Props> = (props) => {
   return (
     <Styles.Container withBorder={withBorder} borderColor={borderColor} isAbsolute={isAbsolute}>
       <Styles.LogoRow>
-        <Styles.Logo color={logoColor}>
-          <SVG src="../../assets/logo.svg" width={30} height={30} title="SimpleHold" />
+        <Styles.Logo whiteLogo={whiteLogo}>
+          <SVG src="../../assets/logoNew.svg" width={30} height={30} title="SimpleHold" />
         </Styles.Logo>
       </Styles.LogoRow>
       <Styles.Row>

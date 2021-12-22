@@ -114,7 +114,7 @@ const ImportRecoveryPhrase: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Add address" />
+        <Header withBack onBack={history.goBack} backTitle="Add address" whiteLogo/>
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Import recovery phrase</Styles.Title>

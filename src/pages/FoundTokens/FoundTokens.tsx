@@ -134,7 +134,7 @@ const FoundTokens: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Import private key" />
+        <Header withBack onBack={history.goBack} backTitle="Import private key" whiteLogo/>
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Found tokens</Styles.Title>

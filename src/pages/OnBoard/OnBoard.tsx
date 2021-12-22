@@ -125,7 +125,6 @@ const OnBoard: React.FC = () => {
     <Styles.Wrapper theme={theme}>
       <Header
         noActions
-        logoColor="#3FBB7D"
         withBorder
         borderColor={theme === 'swapspace' ? 'rgba(234, 234, 234, 0.2)' : undefined}
         isAbsolute

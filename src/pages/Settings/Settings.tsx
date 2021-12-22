@@ -211,7 +211,7 @@ const Settings: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle="Back" onBack={history.goBack} activePage="settings" />
+        <Header withBack backTitle="Back" onBack={history.goBack} activePage="settings" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Settings</Styles.Title>

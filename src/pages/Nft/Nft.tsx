@@ -72,7 +72,7 @@ const NftPage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Wallet" />
+        <Header withBack onBack={history.goBack} backTitle="Wallet" whiteLogo/>
         <Styles.Container>
           <Styles.Title>
             {name} {short(`${tokenId}`, 15)}

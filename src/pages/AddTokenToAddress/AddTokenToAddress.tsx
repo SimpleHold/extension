@@ -164,7 +164,7 @@ const AddTokenToAddress: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Select currency" />
+        <Header withBack onBack={history.goBack} backTitle="Select currency" whiteLogo/>
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Add to {toUpper(chain)} address</Styles.Title>

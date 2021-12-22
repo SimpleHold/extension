@@ -285,7 +285,7 @@ const TxHistory: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle="Home" onBack={history.goBack} />
+        <Header withBack backTitle="Home" onBack={history.goBack} whiteLogo />
         <Styles.Container>
           <Styles.Heading>
             <Styles.Title>History</Styles.Title>

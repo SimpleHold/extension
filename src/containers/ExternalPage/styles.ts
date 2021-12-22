@@ -100,7 +100,19 @@ const Logo = styled.div`
   align-items: center;
 
   path {
-    fill: ${({ headerStyle }: TLogoProps) => (headerStyle === 'green' ? '#ffffff' : '#3fbb7d')};
+    fill: ${({ headerStyle }: TLogoProps) => headerStyle === 'green' && "#fff"};
+
+    &:nth-child(2) {
+      opacity: ${({ headerStyle }: TLogoProps) => headerStyle === 'green' ? 0.38 : 1};
+    };
+
+    &:nth-child(3) {
+      opacity: ${({ headerStyle }: TLogoProps) => headerStyle === 'green' ? 0.68 : 1};
+    };
+
+    &:nth-child(4) {
+      opacity: ${({ headerStyle }: TLogoProps) => headerStyle === 'green' ? 0.49 : 1};
+    };
   }
 `
 

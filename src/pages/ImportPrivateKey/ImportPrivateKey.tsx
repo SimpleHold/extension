@@ -220,7 +220,7 @@ const ImportPrivateKey: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Add address" />
+        <Header withBack onBack={history.goBack} backTitle="Add address" whiteLogo/>
         <Styles.Container>
           <Styles.Heading>
             <Styles.Title>Import a private key</Styles.Title>

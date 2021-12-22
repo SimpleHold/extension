@@ -155,7 +155,7 @@ const SelectToken: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Receive" />
+        <Header withBack onBack={history.goBack} backTitle="Receive" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Select token</Styles.Title>

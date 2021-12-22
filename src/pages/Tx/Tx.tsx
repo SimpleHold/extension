@@ -114,7 +114,7 @@ const TxHistory: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle="History" onBack={history.goBack} />
+        <Header withBack backTitle="History" onBack={history.goBack} whiteLogo />
         <Styles.Container>
           <Styles.Body>
             {state.isLoadingError ? (

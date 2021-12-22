@@ -150,7 +150,7 @@ const SelectCurrency: React.FC = () => {
     <Styles.Wrapper>
       <Cover />
       {CurrenciesTab}
-      <Header withBack onBack={history.goBack} backTitle="Wallets" />
+      <Header withBack onBack={history.goBack} backTitle="Wallets" whiteLogo />
       <Styles.Container>
         <Tabs tabs={tabs} activeTabKey={activeTabKey} onSelectTab={onSelectTab} />
       </Styles.Container>

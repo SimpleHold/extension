@@ -50,7 +50,7 @@ const ScanBackup: React.FC = () => {
   return (
     <Styles.Wrapper>
       <Cover />
-      <Header withBack onBack={history.goBack} backTitle="Settings" />
+      <Header withBack onBack={history.goBack} backTitle="Settings" whiteLogo />
       <Styles.Container>
         <Styles.Row>
           {backupHash.length ? (
