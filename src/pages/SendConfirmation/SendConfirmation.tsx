@@ -287,7 +287,7 @@ const SendConfirmation: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle="Send" onBack={history.goBack} />
+        <Header withBack backTitle="Send" onBack={history.goBack} whiteLogo />
         <Styles.Body>
           <SendConfirmShared
             amount={getAmount()}

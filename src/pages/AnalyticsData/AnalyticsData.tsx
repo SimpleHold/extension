@@ -31,7 +31,7 @@ const AnalyticsData: React.FC = () => {
 
   return (
     <Styles.Wrapper>
-      <Header noActions logoColor="#3FBB7D" withBorder />
+      <Header noActions withBorder />
       <Styles.Container>
         <Styles.Row>
           <Styles.Title>Analytics data</Styles.Title>

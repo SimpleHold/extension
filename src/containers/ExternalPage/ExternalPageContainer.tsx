@@ -229,7 +229,7 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
         {headerStyle === 'green' ? <Cover /> : null}
         <Styles.Header className="sh-header" isDraggable={isDraggable}>
           <Styles.Logo headerStyle={headerStyle}>
-            <SVG src="../../assets/logo.svg" width={30} height={24} />
+            <SVG src="../../assets/logoNew.svg" width={30} height={24} />
           </Styles.Logo>
           <Styles.HeaderRow withBack={backPageTitle !== undefined && backPageUrl !== undefined}>
             {backPageTitle && backPageUrl ? (

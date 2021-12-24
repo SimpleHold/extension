@@ -7,7 +7,7 @@ type TContainerProps = {
 }
 
 type TLogoProps = {
-  color: string
+  whiteLogo?: boolean
 }
 
 type TNavItemProps = {
@@ -39,7 +39,19 @@ const Logo = styled.div`
   height: 30px;
 
   path {
-    fill: ${({ color }: TLogoProps) => color};
+    fill: ${({ whiteLogo }: TLogoProps) => whiteLogo && "#fff"};
+    
+    &:nth-child(2) {
+      opacity: ${({ whiteLogo }: TLogoProps) => whiteLogo ? 0.38 : 1};
+    };
+
+    &:nth-child(3) {
+      opacity: ${({ whiteLogo }: TLogoProps) => whiteLogo ? 0.68 : 1};
+    };
+
+    &:nth-child(4) {
+      opacity: ${({ whiteLogo }: TLogoProps) => whiteLogo ? 0.49 : 1};
+    };
   }
 `
 

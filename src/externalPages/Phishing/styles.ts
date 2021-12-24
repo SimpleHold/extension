@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import logo from '@assets/fullLogo.svg'
+import logo from '@assets/fullLogoNew.svg'
 import illustrate from '@assets/illustrate/phishing.svg'
 import shieldIcons from '@assets/icons/shield.svg'
 

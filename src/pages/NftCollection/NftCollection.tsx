@@ -182,7 +182,7 @@ const NftCollectionPage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header />
+        <Header whiteLogo/>
         <Styles.Tabs>
           <Styles.Nav>
             <Styles.Link onClick={history.goBack}>Wallets</Styles.Link>

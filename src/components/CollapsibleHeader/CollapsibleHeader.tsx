@@ -81,7 +81,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
   }
   return (
     <Styles.Container style={{ height: containerHeight }}>
-      <Header />
+      <Header whiteLogo/>
 
       <Styles.Row>
         <Styles.TotalBalanceLabel

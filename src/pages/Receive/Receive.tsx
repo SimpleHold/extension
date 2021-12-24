@@ -75,7 +75,7 @@ const ReceivePage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle={walletName} />
+        <Header withBack onBack={history.goBack} backTitle={walletName} whiteLogo/>
         <Styles.Container>
           <Styles.Row>
             <Styles.Receive>

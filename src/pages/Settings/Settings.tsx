@@ -22,7 +22,13 @@ import { getManifest } from '@utils/extension'
 import { getItem, setItem, removeItem, removeCache } from '@utils/storage'
 
 // Config
-import { BACKUP_SETTINGS, PASSCODE_ENABLED, PASSCODE_DISABLED } from '@config/events'
+import {
+  BACKUP_SETTINGS,
+  PASSCODE_ENABLED,
+  PASSCODE_DISABLED,
+  SETTINGS_SIGN_IN,
+  SETTINGS_NEWTAB
+} from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -96,10 +102,17 @@ const Settings: React.FC = () => {
   }
 
   const onScanQrCode = (): void => {
+    logEvent({
+      name: SETTINGS_SIGN_IN,
+    })
+
     history.push('/scan-backup')
   }
 
   const openInWindow = () => {
+    logEvent({
+      name: SETTINGS_NEWTAB,
+    })
     openAppInNewWindow()
   }
 
@@ -198,7 +211,7 @@ const Settings: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle="Back" onBack={history.goBack} activePage="settings" />
+        <Header withBack backTitle="Back" onBack={history.goBack} activePage="settings" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Settings</Styles.Title>

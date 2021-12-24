@@ -446,7 +446,7 @@ const WalletPage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Home" />
+        <Header withBack onBack={history.goBack} backTitle="Home" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Heading

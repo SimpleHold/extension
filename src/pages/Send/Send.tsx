@@ -641,7 +641,7 @@ const SendPage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle={state.backTitle} />
+        <Header withBack onBack={history.goBack} backTitle={state.backTitle} whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <WalletCardShared

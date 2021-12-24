@@ -92,6 +92,7 @@ const Lock: React.FC = () => {
       removeCache()
 
       history.push('/welcome')
+      removeItem("isLocked")
     }
   }
 
@@ -110,7 +111,7 @@ const Lock: React.FC = () => {
   return (
     <>
       <Styles.Wrapper>
-        <Header noActions logoColor="#3FBB7D" withBorder />
+        <Header noActions withBorder />
         <Styles.Container>
           <Styles.Image src="../../assets/illustrate/lock.svg" alt="lock" />
           <Styles.Title>Welcome back!</Styles.Title>
