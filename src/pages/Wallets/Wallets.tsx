@@ -206,6 +206,7 @@ const Wallets: React.FC = () => {
           key={key}
         >
           <WalletCard
+            key={uuid}
             address={address}
             chain={chain}
             symbol={symbol.toLowerCase()}
