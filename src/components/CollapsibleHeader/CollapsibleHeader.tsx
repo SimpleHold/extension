@@ -26,18 +26,14 @@ interface Props {
 }
 
 const areEqual = (prevProps: Props, nextProps: Props): boolean => {
-
-  const keys = Object.keys(nextProps) as Array<keyof Props>
-  let equal = true
-
-  for (let key of keys) {
-    if (typeof nextProps[key] === 'function') continue
-    if (prevProps[key] !== nextProps[key]) equal = false
-  }
-
-  const isBalanceReady = nextProps.balance !== null && nextProps.estimated !== null
-  const shouldRerender = !equal && isBalanceReady
-  return !shouldRerender
+  return (
+    prevProps.scrollPosition === nextProps.scrollPosition &&
+    prevProps.isDrawersActive === nextProps.isDrawersActive &&
+    prevProps.pendingBalance === nextProps.pendingBalance &&
+    prevProps.balance === nextProps.balance &&
+    prevProps.estimated === nextProps.estimated &&
+    nextProps.balance === null || nextProps.estimated === null
+  )
 }
 
 const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
@@ -193,5 +189,6 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
     </Styles.Container>
   )
 }, areEqual)
+
 
 export default CollapsibleHeader
