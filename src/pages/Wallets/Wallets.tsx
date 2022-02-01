@@ -158,25 +158,25 @@ const Wallets: React.FC = () => {
     return ''
   }
 
-  const onViewTxHistory = (): void => {
+  const onViewTxHistory = React.useCallback((): void => {
     history.push('/tx-history')
 
     logEvent({
       name: HISTORY_WATCH,
     })
-  }
+  }, [])
 
-  const openFilters = (): void => {
+  const openFilters = React.useCallback((): void => {
     updateState({ activeDrawer: 'filters' })
 
     logEvent({
       name: FILTERS_WATCH,
     })
-  }
+  }, [])
 
-  const onViewNFT = (): void => {
+  const onViewNFT = React.useCallback((): void => {
     history.push('/nft-collection')
-  }
+  }, [])
 
   const renderWallet = ({ index, style, key }: ListRowProps): React.ReactNode => {
     const wallet = state.wallets?.[index]

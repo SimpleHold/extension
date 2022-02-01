@@ -25,7 +25,22 @@ interface Props {
   onViewNFT: () => void
 }
 
-const CollapsibleHeader: React.FC<Props> = (props) => {
+const areEqual = (prevProps: Props, nextProps: Props): boolean => {
+
+  const keys = Object.keys(nextProps) as Array<keyof Props>
+  let equal = true
+
+  for (let key of keys) {
+    if (typeof nextProps[key] === 'function') continue
+    if (prevProps[key] !== nextProps[key]) equal = false
+  }
+
+  const isBalanceReady = nextProps.balance !== null && nextProps.estimated !== null
+  const shouldRerender = !equal && isBalanceReady
+  return !shouldRerender
+}
+
+const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
   const {
     scrollPosition,
     balance,
@@ -37,7 +52,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
     onViewNFT,
   } = props
 
-  const [latesScrollPosition, setLatestScrollPosition] = React.useState<number>(0)
+  const [latestScrollPosition, setLatestScrollPosition] = React.useState<number>(0)
 
   React.useEffect(() => {
     if (!isDrawersActive) {
@@ -45,30 +60,30 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
     }
   }, [scrollPosition, isDrawersActive])
 
-  const containerHeight = Math.max(110, 290 - 1.25 * latesScrollPosition)
+  const containerHeight = Math.max(110, 290 - 1.25 * latestScrollPosition)
 
-  const balanceRowMarginTop = Math.max(3, 50 - latesScrollPosition)
-  const balanceFontSize = Math.max(16, 36 - 0.2 * latesScrollPosition)
-  const balanceLineHeight = Math.max(19, 36 - 0.1 * latesScrollPosition)
+  const balanceRowMarginTop = Math.max(3, 50 - latestScrollPosition)
+  const balanceFontSize = Math.max(16, 36 - 0.2 * latestScrollPosition)
+  const balanceLineHeight = Math.max(19, 36 - 0.1 * latestScrollPosition)
 
-  const estimatedFontSize = Math.max(14, 20 - 0.2 * latesScrollPosition)
-  const estimatedLineHeight = Math.max(16, 23 - 0.1 * latesScrollPosition)
-  const estimatedMarginTop = Math.max(2, 11 - latesScrollPosition)
+  const estimatedFontSize = Math.max(14, 20 - 0.2 * latestScrollPosition)
+  const estimatedLineHeight = Math.max(16, 23 - 0.1 * latestScrollPosition)
+  const estimatedMarginTop = Math.max(2, 11 - latestScrollPosition)
 
-  const totalBalanceOpacity = Math.max(0, 1 - 0.1 * latesScrollPosition)
-  const totalBalanceTop = Math.max(0, 70 - latesScrollPosition)
-  const totalBalanceHeight = Math.max(0, 19 - latesScrollPosition)
+  const totalBalanceOpacity = Math.max(0, 1 - 0.1 * latestScrollPosition)
+  const totalBalanceTop = Math.max(0, 70 - latestScrollPosition)
+  const totalBalanceHeight = Math.max(0, 19 - latestScrollPosition)
 
-  const pendingBalanceRowHeight = Math.max(0, 30 - 0.05 * latesScrollPosition)
-  const pendingBalanceRowOpacity = Math.max(0, 1 - 0.05 * latesScrollPosition)
-  const pendingBalanceRowMarginTop = Math.max(0, 10 - 0.05 * latesScrollPosition)
+  const pendingBalanceRowHeight = Math.max(0, 30 - 0.05 * latestScrollPosition)
+  const pendingBalanceRowOpacity = Math.max(0, 1 - 0.05 * latestScrollPosition)
+  const pendingBalanceRowMarginTop = Math.max(0, 10 - 0.05 * latestScrollPosition)
 
-  const balanceSkeletonWidth = Math.max(150, 250 - latesScrollPosition)
+  const balanceSkeletonWidth = Math.max(150, 250 - latestScrollPosition)
 
-  const clockIconSize = Math.max(12, 23 - 0.1 * latesScrollPosition)
-  const clockIconMarginLeft = Math.max(6, 10 - latesScrollPosition)
+  const clockIconSize = Math.max(12, 23 - 0.1 * latestScrollPosition)
+  const clockIconMarginLeft = Math.max(6, 10 - latestScrollPosition)
 
-  const navHeight = Math.max(0, 19 - 0.05 * latesScrollPosition)
+  const navHeight = Math.max(0, 19 - 0.05 * latestScrollPosition)
 
   const isFiltersActive = (): boolean => {
     return checkOneOfExist([
@@ -79,9 +94,10 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
       'activeSortType',
     ])
   }
+
   return (
     <Styles.Container style={{ height: containerHeight }}>
-      <Header whiteLogo/>
+      <Header whiteLogo />
 
       <Styles.Row>
         <Styles.TotalBalanceLabel
@@ -106,7 +122,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
             >
               {numeral(balance).format('0.[000000]')} BTC
             </Styles.Balance>
-            {latesScrollPosition > 80 && pendingBalance !== null && Number(pendingBalance) > 0 ? (
+            {latestScrollPosition > 80 && pendingBalance !== null && Number(pendingBalance) > 0 ? (
               <Styles.ClockIcon
                 style={{
                   width: clockIconSize,
@@ -158,7 +174,7 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
         ) : null}
 
         <Styles.Bottom>
-          <Styles.Nav style={{ height: navHeight, opacity: latesScrollPosition > 50 ? 0 : 1 }}>
+          <Styles.Nav style={{ height: navHeight, opacity: latestScrollPosition > 50 ? 0 : 1 }}>
             <Styles.Link isActive>Wallets</Styles.Link>
             <Styles.LinkDivider>/</Styles.LinkDivider>
             <Styles.Link onClick={onViewNFT}>Collectibles</Styles.Link>
@@ -176,6 +192,6 @@ const CollapsibleHeader: React.FC<Props> = (props) => {
       </Styles.Row>
     </Styles.Container>
   )
-}
+}, areEqual)
 
 export default CollapsibleHeader
