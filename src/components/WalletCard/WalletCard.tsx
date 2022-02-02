@@ -25,6 +25,7 @@ import clockIcon from '@assets/icons/clock.svg'
 
 // Styles
 import Styles from './styles'
+import { TWalletAmountData } from 'pages/Wallets/types'
 
 interface Props {
   address: string
@@ -34,9 +35,9 @@ interface Props {
   contractAddress?: string
   decimals?: number
   isHidden?: boolean
-  sumBalance?: (balance: number) => void
-  sumEstimated?: (estimated: number) => void
-  sumPending?: (pending: number) => void
+  sumBalance?: (walletData: TWalletAmountData) => void
+  sumEstimated?: (walletData: TWalletAmountData) => void
+  sumPending?: (walletData: TWalletAmountData) => void
   handleClick?: () => void
   walletName: string
   uuid: string
@@ -52,7 +53,7 @@ const emptyData = {
   pending_btc: 0,
 }
 
-const WalletCard: React.FC<Props> = (props) => {
+const WalletCard: React.FC<Props> = React.memo((props) => {
   const {
     address,
     symbol,
@@ -101,20 +102,14 @@ const WalletCard: React.FC<Props> = (props) => {
     }
 
     setBalance(balance)
-    if (sumBalance) {
-      sumBalance(balance_btc)
-    }
+    sumBalance && sumBalance({ uuid, symbol, amount: balance_btc })
     updateBalance(address, symbol, balance, balance_btc)
 
     setPendingBalance(pending)
-    if (sumPending) {
-      sumPending(pending_btc)
-    }
+    sumPending && sumPending({ uuid, symbol, amount: pending_btc })
 
     setEstimated(balance_usd)
-    if (sumEstimated) {
-      sumEstimated(balance_usd)
-    }
+    sumEstimated && sumEstimated({ uuid, symbol, amount: balance_usd })
   }
 
   const openWallet = (): void => {
@@ -203,6 +198,6 @@ const WalletCard: React.FC<Props> = (props) => {
       </Styles.Row>
     </Styles.Container>
   )
-}
+})
 
 export default WalletCard

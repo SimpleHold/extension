@@ -26,13 +26,13 @@ interface Props {
 }
 
 const areEqual = (prevProps: Props, nextProps: Props): boolean => {
+  if (nextProps.balance === null || nextProps.estimated === null) return true
   return (
     prevProps.scrollPosition === nextProps.scrollPosition &&
     prevProps.isDrawersActive === nextProps.isDrawersActive &&
     prevProps.pendingBalance === nextProps.pendingBalance &&
     prevProps.balance === nextProps.balance &&
-    prevProps.estimated === nextProps.estimated &&
-    nextProps.balance === null || nextProps.estimated === null
+    prevProps.estimated === nextProps.estimated
   )
 }
 
@@ -123,7 +123,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
                 style={{
                   width: clockIconSize,
                   height: clockIconSize,
-                  marginLeft: clockIconMarginLeft,
+                  marginLeft: clockIconMarginLeft
                 }}
               >
                 <SVG
