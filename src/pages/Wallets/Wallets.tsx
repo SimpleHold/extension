@@ -94,7 +94,7 @@ const Wallets: React.FC = () => {
   }, [walletsPending, state.pendingBalance])
 
   React.useEffect(() => {
-    if (state.wallets && state.wallets.length && state.totalBalance !== null && state.totalEstimated !== null ) {
+    if (state.wallets && state.wallets.length && walletsBalance.length && walletsBalance.length >= state.wallets.length) {
       const getFilteredSum = (arr: TWalletAmountData[]) => arr
         .filter(filterBySymbol)
         .reduce((acc, wallet) => acc + wallet.amount, 0)
@@ -105,7 +105,7 @@ const Wallets: React.FC = () => {
         pendingBalance: getFilteredSum(walletsPending)
       })
     }
-  }, [state.wallets])
+  }, [state.wallets, walletsPending, walletsEstimated, walletsBalance])
 
   const filterBySymbol = (walletAmount: TWalletAmountData) => {
     const data = getItem('selectedCurrenciesFilter')
@@ -122,7 +122,12 @@ const Wallets: React.FC = () => {
   }
 
   const getWalletsList = () => {
-    updateState({ wallets: null })
+    updateState({
+      wallets: null,
+      totalBalance: null,
+      totalEstimated: null,
+      pendingBalance: null
+    })
     const walletsList = getWallets()
 
     if (walletsList) {
@@ -174,25 +179,25 @@ const Wallets: React.FC = () => {
     return ''
   }
 
-  const onViewTxHistory = (): void => {
+  const onViewTxHistory = React.useCallback((): void => {
     history.push('/tx-history')
 
     logEvent({
       name: HISTORY_WATCH
     })
-  }
+  }, [])
 
-  const openFilters = (): void => {
+  const openFilters = React.useCallback((): void => {
     updateState({ activeDrawer: 'filters' })
 
     logEvent({
       name: FILTERS_WATCH
     })
-  }
+  }, [])
 
-  const onViewNFT = (): void => {
+  const onViewNFT = React.useCallback((): void => {
     history.push('/nft-collection')
-  }
+  }, [])
 
   const renderWallet = ({ index, style, key }: ListRowProps): React.ReactNode => {
     const wallet = state.wallets?.[index]

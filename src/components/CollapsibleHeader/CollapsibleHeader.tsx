@@ -25,17 +25,6 @@ interface Props {
   onViewNFT: () => void
 }
 
-const areEqual = (prevProps: Props, nextProps: Props): boolean => {
-  if (nextProps.balance === null || nextProps.estimated === null) return true
-  return (
-    prevProps.scrollPosition === nextProps.scrollPosition &&
-    prevProps.isDrawersActive === nextProps.isDrawersActive &&
-    prevProps.pendingBalance === nextProps.pendingBalance &&
-    prevProps.balance === nextProps.balance &&
-    prevProps.estimated === nextProps.estimated
-  )
-}
-
 const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
   const {
     scrollPosition,
@@ -188,7 +177,6 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
       </Styles.Row>
     </Styles.Container>
   )
-}, areEqual)
-
+})
 
 export default CollapsibleHeader
