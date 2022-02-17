@@ -8,6 +8,7 @@ type TLinkProps = {
 
 const Container = styled.div`
   width: 100%;
+  // background-color: firebrick;
   background-image: url(${background});
   background-repeat: no-repeat;
   position: fixed;
