@@ -138,7 +138,9 @@ const NewWallet: React.FC = () => {
                 name: ADD_ADDRESS_CONFIRM,
               })
 
-              setItem('backupStatus', 'notDownloaded')
+              if (symbol !== "hbar") {
+                setItem('backupStatus', 'notDownloaded')
+              }
 
               updateState({ activeDrawer: 'success' })
               return
@@ -152,6 +154,9 @@ const NewWallet: React.FC = () => {
   }
 
   const onDownloadBackup = (): void => {
+    if (symbol === "hbar") {
+      return history.push('/wallets')
+    }
     return history.replace('/download-backup', {
       password: state.password,
       from: 'newWallet',

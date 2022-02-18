@@ -14,6 +14,8 @@ import Warning from '@components/Warning'
 import ConfirmDrawer from '@drawers/Confirm'
 import PrivateKeyDrawer from '@drawers/PrivateKey'
 import RenameWalletDrawer from '@drawers/RenameWallet'
+import SuccessDrawer from '@drawers/Success'
+
 
 // Utils
 import {
@@ -318,7 +320,7 @@ const WalletPage: React.FC = () => {
 
           if (findWallet) {
             const { privateKey } = findWallet
-            let getPubKey: string | null = null
+            let getPubKey: string | null
 
             try {
               getPubKey = PrivateKey.fromString(`${privateKey}`).publicKey.toString()
@@ -335,7 +337,7 @@ const WalletPage: React.FC = () => {
                 return updateState({
                   isDrawerButtonLoading: false,
                   isNotActivated: false,
-                  activeDrawer: null,
+                  activeDrawer: "success",
                   password: '',
                   address: getAddress,
                 })
@@ -411,6 +413,13 @@ const WalletPage: React.FC = () => {
       properties: {
         addressAction: 'renameWallet',
       },
+    })
+  }
+
+  const onDownloadBackup = (): void => {
+    return history.replace('/download-backup', {
+      password: state.password,
+      from: 'newWallet'
     })
   }
 
@@ -493,7 +502,7 @@ const WalletPage: React.FC = () => {
             ) : null}
             {state.isNotActivated ? (
               <Warning
-                text={`You need activate your ${toUpper(symbol)} address.`}
+                text={`You need to activate your ${toUpper(symbol)} address.`}
                 color="#7D7E8D"
                 br={8}
                 mt={10}
@@ -517,6 +526,11 @@ const WalletPage: React.FC = () => {
         inputLabel="Enter password"
         textInputType="password"
         inputErrorLabel={state.passwordErrorLabel}
+      />
+      <SuccessDrawer
+        isActive={state.activeDrawer === 'success'}
+        onClose={onDownloadBackup}
+        text="The new address has been successfully activated!"
       />
       <PrivateKeyDrawer
         isMnemonic={withPhrase}
