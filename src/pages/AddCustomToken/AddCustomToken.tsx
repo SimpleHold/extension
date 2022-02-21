@@ -25,7 +25,7 @@ import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
-import { getTokenStandart } from '@utils/currencies'
+import { getTokenStandard } from '@utils/currencies'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -162,7 +162,7 @@ const AddCustomToken: React.FC = () => {
         tokenName,
         contractAddress: state.contractAddress,
         decimals,
-        tokenStandart: getTokenStandart(toLower(chain)),
+        tokenStandart: getTokenStandard(toLower(chain)),
       }
 
       if (checkTokenWallets) {

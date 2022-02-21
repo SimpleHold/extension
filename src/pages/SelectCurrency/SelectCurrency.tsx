@@ -16,7 +16,7 @@ import HardwareTab from './tabs/hardwareTab'
 import { toLower } from '@utils/format'
 import { getWallets } from '@utils/wallet'
 import { getUrl, openWebPage } from '@utils/extension'
-import { getTokenStandart } from '@utils/currencies'
+import { getTokenStandard } from '@utils/currencies'
 import { getTokens } from '@utils/localTokens'
 import * as theta from '@utils/currencies/theta'
 import * as vechain from '@utils/currencies/vechain'
@@ -89,7 +89,7 @@ const SelectCurrency: React.FC = () => {
           chain,
           chainName: getNetwork.name,
           tokenName,
-          tokenStandart: getTokenStandart(toLower(getNetwork.chain)),
+          tokenStandart: getTokenStandard(toLower(getNetwork.chain)),
         })
       }
 

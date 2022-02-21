@@ -7,6 +7,7 @@ const Container = styled.div`
   margin-bottom: 15px;
   width: 50%;
   height: fit-content;
+  transition: all 0.2s ease-in-out;
 `
 
 const SkeletonRow = styled.div`
@@ -25,6 +26,7 @@ const Row = styled.div`
   display: flex;
   flex-direction: column;
   border-radius: 16px;
+  transition: all 0.1s ease-in-out;
 
   &:hover {
     cursor: pointer;
@@ -53,6 +55,7 @@ const Body = styled.div`
   flex-direction: column;
   align-items: center;
   border-radius: 0 0 16px 16px;
+  transition: all 0.1s ease-in-out;
 `
 
 const Name = styled.p`
@@ -62,6 +65,7 @@ const Name = styled.p`
   line-height: 19px;
   text-align: center;
   text-transform: capitalize;
+  transition: all 0.1s ease-in-out;
   color: #1d1d22;
 `
 

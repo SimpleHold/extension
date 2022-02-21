@@ -574,13 +574,16 @@ export const createInternalTx = async (
 }
 
 export const getContractUrl = (address: string, chain: string): string => {
+  if (chain === 'sol') {
+    return `https://explorer.solana.com/address/${address}`
+  }
   if (chain === 'eth') {
     return `https://etherscan.io/address/${address}`
   }
   return `https://bscscan.com/address/${address}`
 }
 
-export const getTokenStandart = (chain?: string): string => {
+export const getTokenStandard = (chain?: string): string => {
   if (chain === 'bsc') {
     return 'BEP20'
   }

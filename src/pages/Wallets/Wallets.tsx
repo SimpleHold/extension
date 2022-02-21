@@ -29,6 +29,7 @@ import { TCurrency } from 'drawers/FilterWallets/types'
 
 // Styles
 import Styles from './styles'
+import { TNft } from 'utils/api/types'
 
 const initialState: IState = {
   wallets: null,
