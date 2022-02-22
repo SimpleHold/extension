@@ -5,7 +5,16 @@ import BigNumber from 'bignumber.js'
 import { TAccount } from './types'
 import { TInternalTxProps } from '../types'
 
-const tronWeb = new TronWeb({ fullHost: 'https://api.trongrid.io' })
+let devKit: any = {}
+
+const tronWeb: any = new Proxy({}, {
+  get(target, key) {
+    if (!(key in devKit)) {
+      devKit = new TronWeb({ fullHost: 'https://api.trongrid.io' })
+    }
+    return devKit[key]
+  }
+})
 
 export const coins: string[] = ['trx']
 export const isInternalTx = true
