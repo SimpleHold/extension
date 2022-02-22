@@ -262,7 +262,7 @@ const Settings: React.FC = () => {
             </Styles.List>
 
             <Styles.ExtensionInfo>
-              <Styles.CopyRight>© 2021 SimpleHold</Styles.CopyRight>
+              <Styles.CopyRight>© 2022 SimpleHold</Styles.CopyRight>
               <Styles.Version>Version {state.version}</Styles.Version>
             </Styles.ExtensionInfo>
           </Styles.Row>
