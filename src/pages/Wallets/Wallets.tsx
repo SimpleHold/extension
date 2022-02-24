@@ -18,16 +18,18 @@ import useState from '@hooks/useState'
 import { IWallet, getWallets, sortWallets, filterWallets, getWalletName } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import { setBadgeText, getBadgeText } from '@utils/extension'
-import { clear } from '@utils/storage'
+import { clear, getItem } from '@utils/storage'
 
 // Config
 import { ADD_ADDRESS, FILTERS_WATCH, HISTORY_WATCH } from '@config/events'
 
 // Types
-import { ILocationState, IState } from './types'
+import { ILocationState, IState, TWalletAmountData } from './types'
+import { TCurrency } from 'drawers/FilterWallets/types'
 
 // Styles
 import Styles from './styles'
+import { TNft } from 'utils/api/types'
 
 const initialState: IState = {
   wallets: null,
@@ -35,7 +37,7 @@ const initialState: IState = {
   totalEstimated: null,
   pendingBalance: null,
   activeDrawer: null,
-  scrollPosition: 0,
+  scrollPosition: 0
 }
 
 const Wallets: React.FC = () => {
@@ -43,9 +45,9 @@ const Wallets: React.FC = () => {
   const { state: locationState } = useLocation<ILocationState>()
   const { state, updateState } = useState<IState>(initialState)
 
-  const [walletsBalance, setWalletsBalance] = React.useState<number[]>([])
-  const [walletsEstimated, setWalletsEstimated] = React.useState<number[]>([])
-  const [walletsPending, setWalletsPending] = React.useState<number[]>([])
+  const [walletsBalance, setWalletsBalance] = React.useState<TWalletAmountData[]>([])
+  const [walletsEstimated, setWalletsEstimated] = React.useState<TWalletAmountData[]>([])
+  const [walletsPending, setWalletsPending] = React.useState<TWalletAmountData[]>([])
 
   const addToast = useToastContext()
   const walletsTop = Math.max(110, 290 - 1.25 * state.scrollPosition)
@@ -63,7 +65,7 @@ const Wallets: React.FC = () => {
     ) {
       updateState({
         totalBalance: 0,
-        totalEstimated: 0,
+        totalEstimated: 0
       })
     }
   }, [state.wallets, state.totalBalance, state.totalEstimated])
@@ -74,23 +76,43 @@ const Wallets: React.FC = () => {
     }
   }, [locationState])
 
-  React.useEffect(() => {
-    if (walletsBalance.length === state.wallets?.length && state.totalBalance === null) {
-      updateState({ totalBalance: walletsBalance.reduce((a, b) => a + b, 0) })
+  const updateBalance = ( arr: TWalletAmountData[], key: 'totalBalance' | 'totalEstimated' | 'pendingBalance' ) => {
+    if (arr.length === state.wallets?.length && state[key] === null) {
+      updateState({ [key]: arr.reduce((acc, walletData) => acc + walletData.amount, 0) })
     }
+  }
+
+  React.useEffect(() => {
+    updateBalance(walletsBalance, "totalBalance")
   }, [walletsBalance, state.totalBalance])
 
   React.useEffect(() => {
-    if (walletsEstimated.length === state.wallets?.length && state.totalEstimated === null) {
-      updateState({ totalEstimated: walletsEstimated.reduce((a, b) => a + b, 0) })
-    }
+    updateBalance(walletsEstimated, "totalEstimated")
   }, [walletsEstimated, state.totalEstimated])
 
   React.useEffect(() => {
-    if (walletsPending.length === state.wallets?.length && state.pendingBalance === null) {
-      updateState({ pendingBalance: walletsPending.reduce((a, b) => a + b, 0) })
-    }
+    updateBalance(walletsPending, "pendingBalance")
   }, [walletsPending, state.pendingBalance])
+
+  React.useEffect(() => {
+    if (state.wallets && state.wallets.length && walletsBalance.length && walletsBalance.length >= state.wallets.length) {
+      const getFilteredSum = (arr: TWalletAmountData[]) => arr
+        .filter(filterBySymbol)
+        .reduce((acc, wallet) => acc + wallet.amount, 0)
+
+      updateState({
+        totalBalance: getFilteredSum(walletsBalance),
+        totalEstimated: getFilteredSum(walletsEstimated),
+        pendingBalance: getFilteredSum(walletsPending)
+      })
+    }
+  }, [state.wallets, walletsPending, walletsEstimated, walletsBalance])
+
+  const filterBySymbol = (walletAmount: TWalletAmountData) => {
+    const data = getItem('selectedCurrenciesFilter')
+    const selected = data ? JSON.parse(data) : null
+    return selected ? selected.find((currency: TCurrency) => currency.symbol === walletAmount.symbol) : true
+  }
 
   const checkBadgeText = async () => {
     const text = await getBadgeText()
@@ -101,8 +123,12 @@ const Wallets: React.FC = () => {
   }
 
   const getWalletsList = () => {
-    updateState({ wallets: null })
-
+    updateState({
+      wallets: null,
+      totalBalance: null,
+      totalEstimated: null,
+      pendingBalance: null
+    })
     const walletsList = getWallets()
 
     if (walletsList) {
@@ -115,23 +141,21 @@ const Wallets: React.FC = () => {
 
   const onAddNewAddress = (): void => {
     logEvent({
-      name: ADD_ADDRESS,
+      name: ADD_ADDRESS
     })
 
     history.push('/select-currency')
   }
 
-  const sumBalance = (amount: number) => {
-    setWalletsBalance((prevArray: number[]) => [...prevArray, amount])
+  const getSum = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (wallet: TWalletAmountData) => {
+    setStateCallback((prevArray: TWalletAmountData[]) => {
+      return prevArray.find((existingWallet) => existingWallet.uuid === wallet.uuid) ? prevArray : [ ...prevArray, wallet ]
+    })
   }
 
-  const sumEstimated = (amount: number) => {
-    setWalletsEstimated((prevArray: number[]) => [...prevArray, amount])
-  }
-
-  const sumPending = (amount: number) => {
-    setWalletsPending((prevArray: number[]) => [...prevArray, amount])
-  }
+  const sumBalance = React.useCallback(getSum(setWalletsBalance), [])
+  const sumEstimated = React.useCallback(getSum(setWalletsEstimated), [])
+  const sumPending = React.useCallback(getSum(setWalletsPending), [])
 
   const onCloseDrawer = (): void => {
     updateState({ activeDrawer: null })
@@ -151,32 +175,30 @@ const Wallets: React.FC = () => {
 
     if (walletsList) {
       const { symbol, uuid, hardware, chain, name } = wallet
-
       return getWalletName(walletsList, symbol, uuid, hardware, chain, name)
     }
-
     return ''
   }
 
-  const onViewTxHistory = (): void => {
+  const onViewTxHistory = React.useCallback((): void => {
     history.push('/tx-history')
 
     logEvent({
-      name: HISTORY_WATCH,
+      name: HISTORY_WATCH
     })
-  }
+  }, [])
 
-  const openFilters = (): void => {
+  const openFilters = React.useCallback((): void => {
     updateState({ activeDrawer: 'filters' })
 
     logEvent({
-      name: FILTERS_WATCH,
+      name: FILTERS_WATCH
     })
-  }
+  }, [])
 
-  const onViewNFT = (): void => {
+  const onViewNFT = React.useCallback((): void => {
     history.push('/nft-collection')
-  }
+  }, [])
 
   const renderWallet = ({ index, style, key }: ListRowProps): React.ReactNode => {
     const wallet = state.wallets?.[index]
@@ -192,7 +214,7 @@ const Wallets: React.FC = () => {
         isHidden,
         uuid,
         hardware,
-        isNotActivated,
+        isNotActivated
       } = wallet
 
       const walletName = getNameWallet(wallet)
@@ -201,11 +223,12 @@ const Wallets: React.FC = () => {
         <div
           style={{
             ...style,
-            ...Styles.ListItem,
+            ...Styles.ListItem
           }}
           key={key}
         >
           <WalletCard
+            key={uuid}
             address={address}
             chain={chain}
             symbol={symbol.toLowerCase()}
@@ -229,7 +252,7 @@ const Wallets: React.FC = () => {
   }
 
   const onScroll = ({ scrollTop }: ScrollParams): void => {
-    updateState({ scrollPosition: scrollTop })
+    updateState({ scrollPosition: scrollTop < 155 ? scrollTop : 155 })
   }
 
   return (
@@ -268,7 +291,7 @@ const Wallets: React.FC = () => {
             )}
           </WindowScroller>
           <Styles.AddWalletButton onClick={onAddNewAddress}>
-            <SVG src="../../assets/icons/plus.svg" width={14} height={14} title="Add new wallet" />
+            <SVG src='../../assets/icons/plus.svg' width={14} height={14} title='Add new wallet' />
           </Styles.AddWalletButton>
         </Styles.WalletsList>
       </Styles.Wrapper>

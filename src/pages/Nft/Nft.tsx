@@ -49,7 +49,7 @@ const NftPage: React.FC = () => {
     setActiveDrawer('addImage')
   }
 
-  const onViewContact = (): void => {
+  const onViewContract = (): void => {
     openWebPage(getContractUrl(contractAddress, chain))
   }
 
@@ -106,7 +106,7 @@ const NftPage: React.FC = () => {
                 <Styles.ContractBlockLabel>Smart Contract</Styles.ContractBlockLabel>
                 <Styles.ContractBlockLink>{short(contractAddress, 25)}</Styles.ContractBlockLink>
               </Styles.ContractBlockRow>
-              <Styles.ContractButton onClick={onViewContact}>
+              <Styles.ContractButton onClick={onViewContract}>
                 <SVG src={linkIcon} width={12} height={12} />
               </Styles.ContractButton>
             </Styles.ContractBlock>

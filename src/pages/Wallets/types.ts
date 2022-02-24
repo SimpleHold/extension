@@ -13,3 +13,9 @@ export interface IState {
   activeDrawer: null | 'filters'
   scrollPosition: number
 }
+
+export type TWalletAmountData = {
+  symbol: string
+  uuid: string
+  amount: number
+}

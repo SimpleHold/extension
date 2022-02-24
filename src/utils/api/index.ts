@@ -553,7 +553,6 @@ export const getNft = async (wallets: TNFtWallets[]): Promise<TNft[]> => {
         },
       }
     )
-
     return data.data
   } catch {
     return []

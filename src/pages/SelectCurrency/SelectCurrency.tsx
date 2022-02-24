@@ -15,10 +15,11 @@ import HardwareTab from './tabs/hardwareTab'
 // Utils
 import { toLower } from '@utils/format'
 import { getWallets } from '@utils/wallet'
-import * as theta from '@utils/currencies/theta'
 import { getUrl, openWebPage } from '@utils/extension'
-import { getTokenStandart } from '@utils/currencies'
+import { getTokenStandard } from '@utils/currencies'
 import { getTokens } from '@utils/localTokens'
+import * as theta from '@utils/currencies/theta'
+import * as vechain from '@utils/currencies/vechain'
 
 // Config
 import { checkExistWallet } from '@config/tokens'
@@ -53,6 +54,12 @@ const SelectCurrency: React.FC = () => {
       } address. The same address for ${
         toLower(symbol) === 'theta' ? 'TFuel' : 'Theta'
       } will also be added to your wallet.`
+    } else if (vechain.coins.indexOf(symbol) !== -1) {
+      return `You are trying to add a new ${
+        toLower(symbol) === 'vet' ? 'VeChain' : 'VeThor'
+      } address. The same address for ${
+        toLower(symbol) === 'vet' ? 'VeThor' : 'VeChain'
+      } will also be added to your wallet.`
     }
     return undefined
   }
@@ -82,7 +89,7 @@ const SelectCurrency: React.FC = () => {
           chain,
           chainName: getNetwork.name,
           tokenName,
-          tokenStandart: getTokenStandart(toLower(getNetwork.chain)),
+          tokenStandart: getTokenStandard(toLower(getNetwork.chain)),
         })
       }
 

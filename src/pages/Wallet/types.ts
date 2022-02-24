@@ -19,7 +19,7 @@ export interface IState {
   balance: null | number
   estimated: null | number
   txHistory: TAddressTxGroup[] | null
-  activeDrawer: null | 'confirm' | 'privateKey' | 'renameWallet'
+  activeDrawer: null | 'confirm' | 'privateKey' | 'renameWallet' | 'success'
   isBalanceRefreshing: boolean
   password: string
   passwordErrorLabel: null | string
