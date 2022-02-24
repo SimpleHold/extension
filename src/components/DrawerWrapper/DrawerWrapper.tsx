@@ -67,6 +67,7 @@ const DrawerWrapper: React.FC<Props> = (props) => {
               ...BackgroundStyles[state],
             }}
             openFrom={openFrom}
+            isWindowedMode={isWindowedMode}
           />
           <Styles.Drawer
             isWindowedMode={isWindowedMode}

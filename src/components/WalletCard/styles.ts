@@ -2,12 +2,9 @@ import styled from 'styled-components'
 
 type TRowProps = {
   gridColumns: string
-  place?: string
 }
 
 const Wrapper = styled.div`
-  padding: 0;
-
   &:hover {
     .container {
       cursor: pointer;

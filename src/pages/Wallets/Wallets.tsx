@@ -242,7 +242,6 @@ const Wallets: React.FC = () => {
             uuid={uuid}
             hardware={hardware}
             isNotActivated={isNotActivated}
-            place={'walletsList'}
           />
         </div>
       )
@@ -276,7 +275,7 @@ const Wallets: React.FC = () => {
                   onScroll={onScroll}
                   height={600}
                   style={Styles.List}
-                  rowCount={state.wallets?.length || 0}
+                  rowCount={state.wallets?.length && state.wallets.length + 2|| 0}
                   rowHeight={86}
                   rowRenderer={renderWallet}
                   width={375}
@@ -290,10 +289,10 @@ const Wallets: React.FC = () => {
               </div>
             )}
           </WindowScroller>
+        </Styles.WalletsList>
           <Styles.AddWalletButton onClick={onAddNewAddress}>
             <SVG src='../../assets/icons/plus.svg' width={14} height={14} title='Add new wallet' />
           </Styles.AddWalletButton>
-        </Styles.WalletsList>
       </Styles.Wrapper>
       <FilterWalletsDrawer
         isActive={state.activeDrawer === 'filters'}

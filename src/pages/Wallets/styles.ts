@@ -15,7 +15,7 @@ const AddWalletButton = styled.div`
   border-radius: 20px;
   background-color: #3fbb7d;
   filter: drop-shadow(0px 2px 10px rgba(125, 126, 141, 0.3));
-  position: fixed;
+  position: absolute;
   bottom: 20px;
   right: 30px;
   display: flex;
