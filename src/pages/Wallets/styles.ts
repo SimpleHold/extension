@@ -2,11 +2,11 @@ import styled from 'styled-components'
 
 const Wrapper = styled.div`
   height: 600px;
-  background-color: #f2f4f8;
 `
 
 const WalletsList = styled.div`
   position: relative;
+  background-color: #f2f4f8;
 `
 
 const AddWalletButton = styled.div`

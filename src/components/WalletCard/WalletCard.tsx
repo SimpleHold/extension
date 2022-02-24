@@ -43,6 +43,7 @@ interface Props {
   uuid: string
   hardware?: THardware
   isNotActivated?: boolean
+  place?: string
 }
 
 const emptyData = {
@@ -70,6 +71,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     uuid,
     hardware,
     isNotActivated,
+    place
   } = props
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
@@ -140,7 +142,8 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   }
 
   return (
-    <Styles.Container onClick={openWallet}>
+    <Styles.Wrapper onClick={openWallet}>
+    <Styles.Container className={'container'}>
       <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
       <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>
         <Styles.AddressInfo>
@@ -197,6 +200,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
         ) : null}
       </Styles.Row>
     </Styles.Container>
+    </Styles.Wrapper>
   )
 })
 

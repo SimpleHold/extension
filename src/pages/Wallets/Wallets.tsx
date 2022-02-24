@@ -29,7 +29,6 @@ import { TCurrency } from 'drawers/FilterWallets/types'
 
 // Styles
 import Styles from './styles'
-import { TNft } from 'utils/api/types'
 
 const initialState: IState = {
   wallets: null,
@@ -243,6 +242,7 @@ const Wallets: React.FC = () => {
             uuid={uuid}
             hardware={hardware}
             isNotActivated={isNotActivated}
+            place={'walletsList'}
           />
         </div>
       )
