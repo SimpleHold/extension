@@ -50,7 +50,7 @@ import { getTxHistory as getTonCoinTxHistory } from '@utils/currencies/toncoin'
 
 // Config
 import { getCurrency } from '@config/currencies'
-import { getSharedTokenCa, getToken } from '@config/tokens'
+import { getSharedToken, getToken } from '@config/tokens'
 import { ADDRESS_ACTION } from '@config/events'
 
 // Hooks
@@ -251,15 +251,16 @@ const WalletPage: React.FC = () => {
       },
     })
 
-    const sharedTokenCA = getSharedTokenCa(symbol, chain)
+    const sharedToken = getSharedToken(symbol, chain)
 
     history.push(url, {
       ...locationState,
       walletName: state.walletName,
       tokenChain: chain,
-      chain: sharedTokenCA ? chain : currency?.chain,
+      chain: sharedToken ? chain : currency?.chain,
       currency,
       address: state.address,
+      decimals: sharedToken ? sharedToken.decimals : decimals,
     })
   }
 

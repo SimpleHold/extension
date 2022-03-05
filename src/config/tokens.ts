@@ -560,18 +560,16 @@ export const getUnusedAddressesForToken = (
   return addresses
 }
 
-export const getSharedTokenCa = (symbol: string, chain?: string): string | undefined => {
+export const getSharedToken = (symbol: string, chain?: string): IToken | undefined => {
   try {
     const getTokens = getItem('tokens')
 
     if (getTokens) {
       const parse: IToken[] = JSON.parse(getTokens)
 
-      return (
-        parse.find(
-          (token: IToken) =>
-            toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain)
-        )?.address || undefined
+      return parse.find(
+        (token: IToken) =>
+          toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain)
       )
     }
 

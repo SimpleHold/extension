@@ -239,7 +239,9 @@ const SendPage: React.FC = () => {
       updateState({ utxosList: [] })
     }
 
-    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
+    const getTokenDecimals = tokenChain
+      ? getToken(symbol, tokenChain)?.decimals || decimals
+      : decimals
 
     let amount = Number(state.amount)
 

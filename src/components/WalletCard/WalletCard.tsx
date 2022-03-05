@@ -14,7 +14,7 @@ import { updateBalance, THardware, getLatestBalance } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 
 // Config
-import { getSharedTokenCa, getToken } from '@config/tokens'
+import { getSharedToken, getToken } from '@config/tokens'
 import { getCurrency } from '@config/currencies'
 import { BALANCE_CHANGED, ADDRESS_WATCH } from '@config/events'
 
@@ -71,8 +71,8 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     isNotActivated,
   } = props
 
-  const sharedTokenCA = getSharedTokenCa(symbol, chain)
-  const contractAddress = props.contractAddress || sharedTokenCA
+  const sharedToken = getSharedToken(symbol, chain)
+  const contractAddress = props.contractAddress || sharedToken?.address || undefined
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const tokenSymbol = chain ? symbol : undefined
