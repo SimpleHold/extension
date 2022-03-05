@@ -33,6 +33,7 @@ import audioLogo from '@assets/tokens/audio.svg'
 // Utils
 import { IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
+import { getItem } from '@utils/storage'
 
 // Config
 import { getCurrencyByChain } from '@config/currencies'
@@ -557,4 +558,25 @@ export const getUnusedAddressesForToken = (
   }
 
   return addresses
+}
+
+export const getSharedTokenCa = (symbol: string, chain?: string): string | undefined => {
+  try {
+    const getTokens = getItem('tokens')
+
+    if (getTokens) {
+      const parse: IToken[] = JSON.parse(getTokens)
+
+      return (
+        parse.find(
+          (token: IToken) =>
+            toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain)
+        )?.address || undefined
+      )
+    }
+
+    return undefined
+  } catch {
+    return undefined
+  }
 }
