@@ -194,6 +194,12 @@ const WalletPage: React.FC = () => {
   }
 
   const getCurrencyChain = (): string | null => {
+    const sharedToken = getSharedToken(symbol, chain)
+
+    if (sharedToken) {
+      return sharedToken.chain
+    }
+
     if (isCustomToken && chain) {
       return chain
     }
