@@ -108,12 +108,12 @@ const SendConfirmation: React.FC = () => {
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
             ? await getWeb3TxParams(
-              addressFrom,
-              addressTo,
-              `${parseAmount}`,
-              chain || tokenChain,
-              contractAddress
-            )
+                addressFrom,
+                addressTo,
+                `${parseAmount}`,
+                chain || tokenChain,
+                contractAddress
+              )
             : {}
 
           const xrpTxData = symbol === 'xrp' ? await getXrpTxParams(addressFrom) : {}
@@ -157,6 +157,7 @@ const SendConfirmation: React.FC = () => {
               isButtonLoading: false,
             })
           }
+
           const transaction = await createTransaction({
             ...transactionData,
             ...ethTxData,
@@ -277,7 +278,7 @@ const SendConfirmation: React.FC = () => {
   }
 
   const getAmount = (): number => {
-    if (isIncludeFee && !tokenChain && (symbol === networkFeeSymbol)) {
+    if (isIncludeFee && !tokenChain && symbol === networkFeeSymbol) {
       return minus(amount, networkFee)
     }
     return amount
