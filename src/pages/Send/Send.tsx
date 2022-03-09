@@ -31,7 +31,7 @@ import {
   getFee,
   getStandingFee,
   isEthereumLike,
-  checkWithZeroFee
+  checkWithZeroFee,
 } from '@utils/currencies'
 import { logEvent } from '@utils/amplitude'
 import { setItem } from '@utils/storage'
@@ -49,7 +49,7 @@ import {
   // ADDRESS_SEND,
   TRANSACTION_AUTO_FILL,
   TRANSACTION_START,
-  TRANSACTION_CANCEL
+  TRANSACTION_CANCEL,
 } from '@config/events'
 
 // Types
@@ -83,12 +83,12 @@ const initialState: IState = {
   customFee: {
     slow: 0,
     average: 0,
-    fast: 0
+    fast: 0,
   },
   isIncludeFee: false,
   isStandingFee: false,
   feeValues: [],
-  timer: null
+  timer: null,
 }
 
 const SendPage: React.FC = () => {
@@ -103,8 +103,8 @@ const SendPage: React.FC = () => {
       address,
       walletName,
       hardware,
-      currency
-    }
+      currency,
+    },
   } = useLocation<ILocationState>()
   const history = useHistory()
 
@@ -113,7 +113,7 @@ const SendPage: React.FC = () => {
     selectedAddress: address,
     walletName,
     hardware,
-    backTitle: walletName
+    backTitle: walletName,
   })
 
   const debounced = useDebounce(state.amount, 1000)
@@ -239,7 +239,9 @@ const SendPage: React.FC = () => {
       updateState({ utxosList: [] })
     }
 
-    const getTokenDecimals = tokenChain ? getToken(symbol, tokenChain)?.decimals : decimals
+    const getTokenDecimals = tokenChain
+      ? getToken(symbol, tokenChain)?.decimals || decimals
+      : decimals
 
     let amount = Number(state.amount)
 
@@ -252,13 +254,13 @@ const SendPage: React.FC = () => {
       tokenChain,
       btcLikeParams: {
         outputs: state.outputs,
-        customFee: state.customFee
+        customFee: state.customFee,
       },
       ethLikeParams: {
         contractAddress,
         decimals: getTokenDecimals,
-        fees: state.customFee
-      }
+        fees: state.customFee,
+      },
     })
 
     updateState({ isFeeLoading: false })
@@ -381,8 +383,8 @@ const SendPage: React.FC = () => {
       name: TRANSACTION_AUTO_FILL,
       properties: {
         kind: 'myWallet',
-        symbol
-      }
+        symbol,
+      },
     })
   }
 
@@ -408,7 +410,6 @@ const SendPage: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-
     let amount = Number(state.amount)
 
     // _vtho
@@ -417,7 +418,11 @@ const SendPage: React.FC = () => {
       const balance = getAvailableBalance()
       const isInsufficientBalance = balance - safeGap <= 0.001
       if (isInsufficientBalance) {
-        updateState({ amountErrorLabel: `Min amount for this transfer is ${(balance + safeGap).toString().slice(0,6)}`})
+        updateState({
+          amountErrorLabel: `Min amount for this transfer is ${(balance + safeGap)
+            .toString()
+            .slice(0, 6)}`,
+        })
         return
       }
       if (amount + safeGap >= balance) {
@@ -498,8 +503,8 @@ const SendPage: React.FC = () => {
       logEvent({
         name: TRANSACTION_AUTO_FILL,
         properties: {
-          kind: 'allFunds'
-        }
+          kind: 'allFunds',
+        },
       })
     }
   }
@@ -536,13 +541,15 @@ const SendPage: React.FC = () => {
 
     const fee = state.isIncludeFee ? 0 : state.fee
 
-    if (state.amount.length && Number(state.amount) + (symbol === state.feeSymbol ? Number(fee) : 0) > availableBalance) {
+    if (
+      state.amount.length &&
+      Number(state.amount) + (symbol === state.feeSymbol ? Number(fee) : 0) > availableBalance
+    ) {
       return setInsufficientError()
     }
     const getAmount = (): number => {
       let parseAmount = Number(state.amount)
-      if (state.isIncludeFee && (symbol === state.feeSymbol)) {
-
+      if (state.isIncludeFee && symbol === state.feeSymbol) {
         parseAmount = parseAmount - state.fee
       }
 
@@ -572,7 +579,10 @@ const SendPage: React.FC = () => {
   }
 
   const isButtonDisabled = (): boolean => {
-    const getAmount = state.isIncludeFee && (symbol === state.feeSymbol) ? Number(state.amount) - state.fee : Number(state.amount)
+    const getAmount =
+      state.isIncludeFee && symbol === state.feeSymbol
+        ? Number(state.amount) - state.fee
+        : Number(state.amount)
     if (
       validateAddress(symbol, state.address, tokenChain) &&
       state.amount.length &&

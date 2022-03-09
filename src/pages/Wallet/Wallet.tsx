@@ -16,7 +16,6 @@ import PrivateKeyDrawer from '@drawers/PrivateKey'
 import RenameWalletDrawer from '@drawers/RenameWallet'
 import SuccessDrawer from '@drawers/Success'
 
-
 // Utils
 import {
   getBalance,
@@ -51,7 +50,7 @@ import { getTxHistory as getTonCoinTxHistory } from '@utils/currencies/toncoin'
 
 // Config
 import { getCurrency } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getSharedToken, getToken } from '@config/tokens'
 import { ADDRESS_ACTION } from '@config/events'
 
 // Hooks
@@ -195,6 +194,12 @@ const WalletPage: React.FC = () => {
   }
 
   const getCurrencyChain = (): string | null => {
+    const sharedToken = getSharedToken(symbol, chain)
+
+    if (sharedToken) {
+      return sharedToken.chain
+    }
+
     if (isCustomToken && chain) {
       return chain
     }
@@ -252,13 +257,16 @@ const WalletPage: React.FC = () => {
       },
     })
 
+    const sharedToken = getSharedToken(symbol, chain)
+
     history.push(url, {
       ...locationState,
       walletName: state.walletName,
       tokenChain: chain,
-      chain: currency?.chain,
+      chain: sharedToken ? chain : currency?.chain,
       currency,
       address: state.address,
+      decimals: sharedToken ? sharedToken.decimals : decimals,
     })
   }
 
@@ -337,7 +345,7 @@ const WalletPage: React.FC = () => {
                 return updateState({
                   isDrawerButtonLoading: false,
                   isNotActivated: false,
-                  activeDrawer: "success",
+                  activeDrawer: 'success',
                   password: '',
                   address: getAddress,
                 })
@@ -419,7 +427,7 @@ const WalletPage: React.FC = () => {
   const onDownloadBackup = (): void => {
     return history.replace('/download-backup', {
       password: state.password,
-      from: 'newWallet'
+      from: 'newWallet',
     })
   }
 

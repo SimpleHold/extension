@@ -112,7 +112,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
                 style={{
                   width: clockIconSize,
                   height: clockIconSize,
-                  marginLeft: clockIconMarginLeft
+                  marginLeft: clockIconMarginLeft,
                 }}
               >
                 <SVG

@@ -25,7 +25,7 @@ import { ADD_ADDRESS, FILTERS_WATCH, HISTORY_WATCH } from '@config/events'
 
 // Types
 import { ILocationState, IState, TWalletAmountData } from './types'
-import { TCurrency } from 'drawers/FilterWallets/types'
+import { TCurrency } from '@drawers/FilterWallets/types'
 
 // Styles
 import Styles from './styles'
@@ -36,7 +36,7 @@ const initialState: IState = {
   totalEstimated: null,
   pendingBalance: null,
   activeDrawer: null,
-  scrollPosition: 0
+  scrollPosition: 0,
 }
 
 const Wallets: React.FC = () => {
@@ -64,7 +64,7 @@ const Wallets: React.FC = () => {
     ) {
       updateState({
         totalBalance: 0,
-        totalEstimated: 0
+        totalEstimated: 0,
       })
     }
   }, [state.wallets, state.totalBalance, state.totalEstimated])
@@ -75,34 +75,41 @@ const Wallets: React.FC = () => {
     }
   }, [locationState])
 
-  const updateBalance = ( arr: TWalletAmountData[], key: 'totalBalance' | 'totalEstimated' | 'pendingBalance' ) => {
+  const updateBalance = (
+    arr: TWalletAmountData[],
+    key: 'totalBalance' | 'totalEstimated' | 'pendingBalance'
+  ) => {
     if (arr.length === state.wallets?.length && state[key] === null) {
       updateState({ [key]: arr.reduce((acc, walletData) => acc + walletData.amount, 0) })
     }
   }
 
   React.useEffect(() => {
-    updateBalance(walletsBalance, "totalBalance")
+    updateBalance(walletsBalance, 'totalBalance')
   }, [walletsBalance, state.totalBalance])
 
   React.useEffect(() => {
-    updateBalance(walletsEstimated, "totalEstimated")
+    updateBalance(walletsEstimated, 'totalEstimated')
   }, [walletsEstimated, state.totalEstimated])
 
   React.useEffect(() => {
-    updateBalance(walletsPending, "pendingBalance")
+    updateBalance(walletsPending, 'pendingBalance')
   }, [walletsPending, state.pendingBalance])
 
   React.useEffect(() => {
-    if (state.wallets && state.wallets.length && walletsBalance.length && walletsBalance.length >= state.wallets.length) {
-      const getFilteredSum = (arr: TWalletAmountData[]) => arr
-        .filter(filterBySymbol)
-        .reduce((acc, wallet) => acc + wallet.amount, 0)
+    if (
+      state.wallets &&
+      state.wallets.length &&
+      walletsBalance.length &&
+      walletsBalance.length >= state.wallets.length
+    ) {
+      const getFilteredSum = (arr: TWalletAmountData[]) =>
+        arr.filter(filterBySymbol).reduce((acc, wallet) => acc + wallet.amount, 0)
 
       updateState({
         totalBalance: getFilteredSum(walletsBalance),
         totalEstimated: getFilteredSum(walletsEstimated),
-        pendingBalance: getFilteredSum(walletsPending)
+        pendingBalance: getFilteredSum(walletsPending),
       })
     }
   }, [state.wallets, walletsPending, walletsEstimated, walletsBalance])
@@ -110,7 +117,9 @@ const Wallets: React.FC = () => {
   const filterBySymbol = (walletAmount: TWalletAmountData) => {
     const data = getItem('selectedCurrenciesFilter')
     const selected = data ? JSON.parse(data) : null
-    return selected ? selected.find((currency: TCurrency) => currency.symbol === walletAmount.symbol) : true
+    return selected
+      ? selected.find((currency: TCurrency) => currency.symbol === walletAmount.symbol)
+      : true
   }
 
   const checkBadgeText = async () => {
@@ -126,7 +135,7 @@ const Wallets: React.FC = () => {
       wallets: null,
       totalBalance: null,
       totalEstimated: null,
-      pendingBalance: null
+      pendingBalance: null,
     })
     const walletsList = getWallets()
 
@@ -140,15 +149,19 @@ const Wallets: React.FC = () => {
 
   const onAddNewAddress = (): void => {
     logEvent({
-      name: ADD_ADDRESS
+      name: ADD_ADDRESS,
     })
 
     history.push('/select-currency')
   }
 
-  const getSum = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (wallet: TWalletAmountData) => {
+  const getSum = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (
+    wallet: TWalletAmountData
+  ) => {
     setStateCallback((prevArray: TWalletAmountData[]) => {
-      return prevArray.find((existingWallet) => existingWallet.uuid === wallet.uuid) ? prevArray : [ ...prevArray, wallet ]
+      return prevArray.find((existingWallet) => existingWallet.uuid === wallet.uuid)
+        ? prevArray
+        : [...prevArray, wallet]
     })
   }
 
@@ -183,7 +196,7 @@ const Wallets: React.FC = () => {
     history.push('/tx-history')
 
     logEvent({
-      name: HISTORY_WATCH
+      name: HISTORY_WATCH,
     })
   }, [])
 
@@ -191,7 +204,7 @@ const Wallets: React.FC = () => {
     updateState({ activeDrawer: 'filters' })
 
     logEvent({
-      name: FILTERS_WATCH
+      name: FILTERS_WATCH,
     })
   }, [])
 
@@ -213,7 +226,7 @@ const Wallets: React.FC = () => {
         isHidden,
         uuid,
         hardware,
-        isNotActivated
+        isNotActivated,
       } = wallet
 
       const walletName = getNameWallet(wallet)
@@ -222,7 +235,7 @@ const Wallets: React.FC = () => {
         <div
           style={{
             ...style,
-            ...Styles.ListItem
+            ...Styles.ListItem,
           }}
           key={key}
         >
@@ -291,7 +304,7 @@ const Wallets: React.FC = () => {
           </WindowScroller>
         </Styles.WalletsList>
           <Styles.AddWalletButton onClick={onAddNewAddress}>
-            <SVG src='../../assets/icons/plus.svg' width={14} height={14} title='Add new wallet' />
+            <SVG src="../../assets/icons/plus.svg" width={14} height={14} title="Add new wallet" />
           </Styles.AddWalletButton>
       </Styles.Wrapper>
       <FilterWalletsDrawer
