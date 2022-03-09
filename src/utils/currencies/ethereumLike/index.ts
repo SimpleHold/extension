@@ -12,7 +12,7 @@ import { TransferTokenOptions } from './types'
 
 const web3 = new Web3()
 
-export const coins: string[] = ['eth', 'etc', 'bnb', 'matic']
+export const coins: string[] = ['eth', 'etc', 'bnb', 'matic', 'ftm']
 
 export const toHex = (value: number): string => {
   return web3.utils.toHex(value)

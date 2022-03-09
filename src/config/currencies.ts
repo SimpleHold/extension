@@ -1,4 +1,5 @@
 // Currencies logo
+import logoPlaceholder from '@assets/currencies/_logoPlaceholder.svg'
 import bitcoinLogo from '@assets/currencies/btc.svg'
 import bitcoinCashLogo from '@assets/currencies/bch.svg'
 import bitcoinSVLogo from '@assets/currencies/bsv.svg'
@@ -301,6 +302,15 @@ const currencies: ICurrency[] = [
     logo: ravencoinLogo,
     background: '#B4B8CE',
     chain: 'ravencoin',
+    minSendAmount: 1000,
+    isCustomFee: true,
+  },
+  {
+    name: 'Fantom',
+    symbol: 'ftm',
+    logo: logoPlaceholder,
+    background: 'red',
+    chain: 'ftm',
     minSendAmount: 1000,
     isCustomFee: true,
   }
