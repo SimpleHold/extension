@@ -1,5 +1,8 @@
 import amplitudeSDK from 'amplitude-js'
 
+// Config
+import config from "@config/index"
+
 // Utils
 import { getItem } from '@utils/storage'
 import { validateWallet } from '@utils/validate'
@@ -11,10 +14,12 @@ interface IEvent {
 }
 
 export const init = (apiKey: string, clientId: string) => {
+  if (config.isDevMode) return; // dev
   amplitudeSDK.getInstance().init(apiKey, clientId)
 }
 
 export const logEvent = ({ name, properties = {} }: IEvent) => {
+  if (config.isDevMode) return; // dev
   properties = {
     ...properties,
     ...{

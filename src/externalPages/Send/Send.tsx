@@ -509,7 +509,8 @@ const Send: React.FC = () => {
       const balance = getAvailableBalance()
       const isInsufficientBalance = balance - safeGap <= 0.001
       if (isInsufficientBalance) {
-        updateState({ amountErrorLabel: `Min amount for this transfer is ${(balance + safeGap).toString().slice(0,6)}`})
+        const minValue = (balance + safeGap).toString().slice(0, 6)
+        updateState({ amountErrorLabel: `Min amount for this transfer is ${minValue}`})
         return
       }
       if (amount + safeGap >= balance) {
@@ -517,11 +518,11 @@ const Send: React.FC = () => {
       }
     }
 
-    const currenctTab = await getCurrentTab()
+    const currentTab = await getCurrentTab()
 
     const url = getUrl('send-confirmation.html')
 
-    if (currenctTab?.id && state.selectedWallet) {
+    if (currentTab?.id && state.selectedWallet) {
       const currency = state.selectedWallet?.chain
         ? getToken(state.selectedWallet.symbol, state.selectedWallet.chain)
         : getCurrency(state.selectedWallet.symbol)
@@ -561,7 +562,7 @@ const Send: React.FC = () => {
       if (state.isDraggable) {
         location.href = `${url}?isDraggable=true`
       } else {
-        await updateTab(currenctTab.id, {
+        await updateTab(currentTab.id, {
           url,
         })
       }

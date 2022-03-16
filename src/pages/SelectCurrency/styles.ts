@@ -32,8 +32,10 @@ const CurrencyBlock = styled.div`
   flex-direction: column;
   align-items: center;
   overflow: hidden;
+  transition: 0.1s ease;
 
   &:hover {
+    transition: none;
     cursor: pointer;
     background-color: #f8f9fb;
     border: 1px solid #3fbb7d;

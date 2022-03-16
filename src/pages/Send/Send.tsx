@@ -418,10 +418,9 @@ const SendPage: React.FC = () => {
       const balance = getAvailableBalance()
       const isInsufficientBalance = balance - safeGap <= 0.001
       if (isInsufficientBalance) {
+        const minValue = (balance + safeGap).toString().slice(0, 6)
         updateState({
-          amountErrorLabel: `Min amount for this transfer is ${(balance + safeGap)
-            .toString()
-            .slice(0, 6)}`,
+          amountErrorLabel: `Min amount for this transfer is ${minValue}`,
         })
         return
       }

@@ -125,7 +125,6 @@ const TxHistory: React.FC = () => {
     }
 
     const getSavedHistory = getFullHistory()
-
     if (getSavedHistory.length) {
       updateState({ txGroups: groupHistory(getSavedHistory) })
     } else {

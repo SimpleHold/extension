@@ -303,7 +303,7 @@ const tokens: IToken[] = [
     symbol: 'sxp',
     decimals: 18,
     logo: sxpLogo,
-    background: ETH_TOKEN_BG,
+    background: BSC_TOKEN_BG,
     chain: 'bsc',
     minSendAmount: 0.001,
     isCustomFee: true,

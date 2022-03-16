@@ -9,7 +9,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { toUpper, numberFriendly, formatEstimated } from '@utils/format'
+import { toUpper, numberFriendly, formatEstimated, getFormatBalance } from '@utils/format'
 import { updateBalance, THardware, getLatestBalance } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 
@@ -140,7 +140,9 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
       hardware
     })
   }
-
+  if (address.slice(0,5) === '7rWBd') { // dev
+    console.log(balance)
+  }
   return (
     <Styles.Wrapper onClick={openWallet}>
       <Styles.Container className={'container'}>
@@ -178,9 +180,9 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
                       <SVG src={clockIcon} width={12} height={12} />
                     </Styles.PendingIcon>
                   ) : null}
-                  <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
-                    symbol
-                  )}`}</Styles.Balance>
+                  <Styles.Balance>
+                    {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
+                  </Styles.Balance>
                 </Styles.BalanceRow>
               </Skeleton>
               <Skeleton
