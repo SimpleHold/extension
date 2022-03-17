@@ -1,3 +1,5 @@
+// Tokens logo
+import logoPlaceholder from '@assets/currencies/_logoPlaceholder.svg'
 import usdtLogo from '@assets/tokens/usdt.svg'
 import usdcLogo from '@assets/tokens/usdc.svg'
 import daiLogo from '@assets/tokens/dai.svg'
@@ -29,6 +31,10 @@ import wbtcLogo from '@assets/tokens/wbtc.svg'
 import flameLogo from '@assets/tokens/flame.svg'
 import bntLogo from '@assets/tokens/bnt.svg'
 import audioLogo from '@assets/tokens/audio.svg'
+import fbtcLogo from '@assets/tokens/fbtc.svg'
+import fethLogo from '@assets/tokens/feth.svg'
+import staLogo from '@assets/tokens/sta.svg'
+import wstaLogo from '@assets/tokens/wsta.svg'
 
 // Utils
 import { IWallet } from '@utils/wallet'
@@ -53,6 +59,7 @@ export interface IToken {
 const ETH_TOKEN_BG = '#132BD8'
 const BSC_TOKEN_BG = '#EBBB4E'
 const MATIC_TOKEN_BG = '#9767E9'
+const FTM_TOKEN_BG = '#13B5EC'
 
 const tokens: IToken[] = [
   {
@@ -471,6 +478,61 @@ const tokens: IToken[] = [
     logo: audioLogo,
     background: ETH_TOKEN_BG,
     chain: 'eth',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x89D5e71E275B4bE094Df9551627BCF4E3b24cE22',
+    name: 'Statera',
+    symbol: 'sta',
+    decimals: 18,
+    logo: staLogo,
+    background: FTM_TOKEN_BG,
+    chain: 'ftm',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0xCEeBDE49eC95E21F7eE63C5c6f98CaB3519570de',
+    name: 'Wrapped STA',
+    symbol: 'wsta',
+    decimals: 18,
+    logo: wstaLogo,
+    background: FTM_TOKEN_BG,
+    chain: 'ftm',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0xe1146b9AC456fCbB60644c36Fd3F868A9072fc6E',
+    name: 'fBTC',
+    symbol: 'fbtc',
+    decimals: 18,
+    logo: fbtcLogo,
+    background: FTM_TOKEN_BG,
+    chain: 'ftm',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x658b0c7613e890EE50B8C4BC6A3f41ef411208aD',
+    name: 'fETH',
+    symbol: 'feth',
+    decimals: 18,
+    logo: fethLogo,
+    background: FTM_TOKEN_BG,
+    chain: 'ftm',
+    minSendAmount: 0.001,
+    isCustomFee: true,
+  },
+  {
+    address: '0x04068DA6C83AFCFA0e13ba15A6696662335D5B75',
+    name: 'USD Coin',
+    symbol: 'usdc',
+    decimals: 6,
+    logo: usdcLogo,
+    background: FTM_TOKEN_BG,
+    chain: 'ftm',
     minSendAmount: 0.001,
     isCustomFee: true,
   },
