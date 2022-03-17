@@ -140,9 +140,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
       hardware
     })
   }
-  if (address.slice(0,5) === '7rWBd') { // dev
-    console.log(balance)
-  }
+
   return (
     <Styles.Wrapper onClick={openWallet}>
       <Styles.Container className={'container'}>

@@ -163,7 +163,6 @@ export const validateAddress = (symbol: string, address: string, tokenChain?: st
     if (bitcoinLike.coins.indexOf(symbol) !== -1) {
       return bitcoinLike.validateAddress(address, symbol)
     }
-
     return addressValidate(symbol, address, tokenChain)
   } catch {
     return false

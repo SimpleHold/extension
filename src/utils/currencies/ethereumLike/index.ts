@@ -169,6 +169,8 @@ export const getTransactionLink = (hash: string, chain: string, tokenChain?: str
     return `https://bscscan.com/tx/${hash}`
   } else if (parseChain === 'matic') {
     return `https://polygonscan.com/tx/${hash}`
+  } else if (parseChain === 'ftm') {
+    return `https://ftmscan.com/tx/${hash}`
   }
 
   return `https://blockscout.com/etc/mainnet/tx/${hash}/internal-transactions`

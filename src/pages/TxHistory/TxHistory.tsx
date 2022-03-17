@@ -86,6 +86,7 @@ const TxHistory: React.FC = () => {
 
   const onGetTxHistory = async (): Promise<void> => {
     updateState({ txGroups: null, isNotFound: false })
+    const st0 = performance.now()
 
     const getFilteredWallets = state.wallets.filter(filterWallets)
     const mapWallets: TTxWallet[] = getFilteredWallets.map((wallet: IWallet) => {
@@ -99,13 +100,20 @@ const TxHistory: React.FC = () => {
         contractAddress,
       }
     })
+    console.log('getFilteredWallets took:', performance.now() - st0)
 
+    const st1 = performance.now()
     const data = await getFullTxHistory(mapWallets)
-
+    console.log('getFullTxHistory took:', performance.now() - st1)
     if (data.length) {
+      const st2 = performance.now()
+
       const compare = compareFullHistory(data)
+      console.log('compareFullHistory took:', performance.now() - st2)
 
       if (compare.length) {
+        const st3 = performance.now()
+
         const mapData: TFullTxWallet[] = data.map((item: TTxAddressItem) => {
           const { chain, address, txs, symbol, tokenSymbol, contractAddress } = item
 
@@ -118,9 +126,17 @@ const TxHistory: React.FC = () => {
             contractAddress,
           }
         })
+        console.log('mapData took:', performance.now() - st3)
+        const st4 = performance.now()
 
         const fullTxsInfo = await getFullTxHistoryInfo(mapData)
+        console.log('getFullTxHistoryInfo took:', performance.now() - st4)
+        const st5 = performance.now()
+
         saveFullHistory(fullTxsInfo)
+        console.log('saveFullHistory took:', performance.now() - st5)
+        console.log('TOTAL:', performance.now() - st0)
+        console.log('------------------')
       }
     }
 

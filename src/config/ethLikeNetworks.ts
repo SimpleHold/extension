@@ -23,6 +23,11 @@ const networks: IEthNetwork[] = [
     symbol: 'matic',
     chain: 'matic',
   },
+  {
+    name: 'Fantom Opera',
+    symbol: 'ftm',
+    chain: 'ftm',
+  },
 ]
 
 export const getEthNetwork = (chain: string): IEthNetwork | undefined => {

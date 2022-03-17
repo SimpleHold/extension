@@ -486,7 +486,7 @@ export const getToken = (symbol: string, chain: string) => {
 }
 
 export const validateContractAddress = (address: string, chain: string): boolean => {
-  if (chain === 'eth' || chain === 'bsc' || chain === 'matic') {
+  if (chain === 'eth' || chain === 'bsc' || chain === 'matic' || chain === 'ftm') {
     return new RegExp('^(0x)[0-9A-Fa-f]{40}$').test(address)
   }
   return false
