@@ -51,12 +51,12 @@ export type TPhishingSite = {
 }
 
 export type TAddressTx = {
-  type: 'spend' | 'received'
-  isPending: boolean
-  date: string
   hash: string
   amount: number
   estimated: number
+  type: 'spend' | 'received'
+  isPending: boolean
+  date: string
   disabled?: boolean
 }
 

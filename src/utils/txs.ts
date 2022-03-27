@@ -51,7 +51,7 @@ export const group = (txs: TAddressTx[]): TAddressTxGroup[] => {
   for (const i in result) {
     data.push({
       date: i,
-      data: result[i],
+      data: result[i]
     })
   }
 
@@ -76,7 +76,7 @@ export const groupHistory = (txs: TFullTxInfo[]): THistoryTxGroup[] => {
   for (const i in result) {
     data.push({
       date: i,
-      data: result[i],
+      data: result[i]
     })
   }
 
@@ -91,10 +91,12 @@ export const compare = (
   contractAddress?: string
 ): string[] => {
   const getTxs = getJSON(getWalletKey(address, chain, tokenSymbol, contractAddress))
-
   if (getTxs?.length) {
     return txs.filter(
-      (hash: string) => !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(hash))
+      (hash: string) => {
+        const txExists = getTxs.find((tx: TAddressTx) => (toLower(tx.hash) === toLower(hash)) && !tx.isPending)
+        return !txExists
+      }
     )
   }
 
@@ -132,12 +134,24 @@ export const save = (
   if (findWalletStorage) {
     const getTxs = getJSON(walletKey)
     if (getTxs) {
-      const nonPendingTxs = txs.filter((tx: TAddressTx) => !tx.isPending)
-      const getNewTxs = nonPendingTxs.filter((newTx: TAddressTx) => {
+      const getNewTxs = txs.filter((newTx: TAddressTx) => {
         return !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(newTx.hash))
       })
-      if (getNewTxs.length) {
-        setItem(walletKey, JSON.stringify([...getTxs, ...getNewTxs]))
+      let pendingUpdated = false
+      const getUpdatedPendingTxs = getTxs.map((tx: TAddressTx) => {
+        const match = txs.find((newTx: TAddressTx) => {
+          const hashMatch = toLower(newTx.hash) === toLower(tx.hash)
+          const pendingStatusUpdated = tx.isPending && !newTx.isPending
+          const isUpdated = hashMatch && pendingStatusUpdated
+          if (isUpdated) {
+            pendingUpdated = true
+          }
+          return isUpdated
+        })
+        return match ? { ...tx, isPending: false } : tx
+      })
+      if (getNewTxs.length || pendingUpdated) {
+        setItem(walletKey, JSON.stringify([...getUpdatedPendingTxs, ...getNewTxs]))
       }
     } else {
       setItem(walletKey, JSON.stringify(txs))
@@ -165,7 +179,7 @@ export const updateStats = (): void => {
     'txs_stats',
     JSON.stringify({
       amount: newAmount,
-      lastUpdate: new Date().getTime(),
+      lastUpdate: new Date().getTime()
     })
   )
 }
@@ -194,10 +208,16 @@ export const compareFullHistory = (items: TTxAddressItem[]): TTxAddressItem[] =>
 
       const findTxs = item.txs.filter((i) =>
         getHistory.find(
-          (ii: TFullTxInfo) => ii.hash !== i || ii.symbol !== symbol || ii.chain !== chain
+          (ii: TFullTxInfo) => {
+            const hashMatch = ii.hash === i
+            const symbolMatch = ii.symbol === symbol
+            const chainMatch = ii.chain === chain
+            const isPending = ii.isPending
+            const fullMatch = hashMatch && symbolMatch && chainMatch && isPending
+            return !fullMatch
+          }
         )
       )
-
       if (findTxs.length) {
         data.push({
           address,
@@ -205,7 +225,7 @@ export const compareFullHistory = (items: TTxAddressItem[]): TTxAddressItem[] =>
           symbol,
           txs: findTxs,
           tokenSymbol,
-          contractAddress,
+          contractAddress
         })
       }
     }
@@ -218,17 +238,28 @@ export const compareFullHistory = (items: TTxAddressItem[]): TTxAddressItem[] =>
 
 export const saveFullHistory = (txs: TFullTxInfo[]): void => {
   const getHistory = getJSON('full_history')
-
   if (getHistory?.length) {
-    const nonPendintTxs = txs.filter((tx: TFullTxInfo) => !tx.isPending)
-    const getNewTxs = nonPendintTxs.filter((newTx: TFullTxInfo) => {
-      return !getHistory.find(
-        (tx: TFullTxInfo) =>
-          toLower(tx.hash) === toLower(newTx.hash) && toLower(tx.chain) === toLower(newTx.chain)
-      )
+    const getNewTxs = txs.filter((newTx: TFullTxInfo) => {
+      return !getHistory.find((tx: TFullTxInfo) => {
+        const hashMatch = toLower(tx.hash) === toLower(newTx.hash)
+        const amountMatch = tx.amount === newTx.amount
+        const addressMatch = tx.address === newTx.address
+        return hashMatch && amountMatch && addressMatch
+      })
     })
-
-    setItem('full_history', JSON.stringify([...getHistory, ...getNewTxs]))
+    let hasPendingUpdates = false
+    const getUpdatedPendingTxs = getHistory.map((tx: TFullTxInfo) => {
+      const match = txs.find((newTx: TFullTxInfo) => {
+        const hashMatch = toLower(newTx.hash) === toLower(tx.hash)
+        const pendingStatusUpdated = tx.isPending !== newTx.isPending
+        if (pendingStatusUpdated) {
+          hasPendingUpdates = true
+        }
+        return hashMatch && pendingStatusUpdated
+      })
+      return match ? { ...tx, isPending: false } : tx
+    })
+    setItem('full_history', JSON.stringify([...getUpdatedPendingTxs, ...getNewTxs]))
   } else {
     setItem('full_history', JSON.stringify(txs))
   }

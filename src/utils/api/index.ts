@@ -449,19 +449,23 @@ export const getFullTxHistory = async (wallets: TTxWallet[]): Promise<TTxAddress
         },
       }
     )
-
     return data?.data || []
   } catch {
     return []
   }
 }
 
-export const getFullTxHistoryInfo = async (wallets: TFullTxWallet[]): Promise<TFullTxInfo[]> => {
+export type TGetFullTxHistoryOptions = {
+  delay?: number
+}
+
+export const getFullTxHistoryInfo = async ( wallets: TFullTxWallet[], options: TGetFullTxHistoryOptions = {} ): Promise<TFullTxInfo[]> => {
   try {
     const { data }: AxiosResponse = await axios.post(
       `${config.serverUrl}/transaction/full-history-info`,
       {
         wallets,
+        options
       },
       {
         headers: {
@@ -469,7 +473,6 @@ export const getFullTxHistoryInfo = async (wallets: TFullTxWallet[]): Promise<TF
         },
       }
     )
-
     return data?.data || []
   } catch {
     return []

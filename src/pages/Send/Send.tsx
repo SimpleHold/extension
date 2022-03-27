@@ -349,7 +349,7 @@ const SendPage: React.FC = () => {
       estimated: balance_usd,
     })
 
-    updateBalance(state.selectedAddress, symbol, balance, balance_btc)
+    updateBalance({address: state.selectedAddress, symbol, balance, balance_btc})
   }
 
   const getWalletsList = (): void => {

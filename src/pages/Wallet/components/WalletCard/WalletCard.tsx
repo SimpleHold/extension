@@ -49,6 +49,20 @@ const WalletCard: React.FC<Props> = (props) => {
     onConfirmActivate
   } = props
 
+  const [balanceWidth, setBalanceWidth] = React.useState(undefined)
+  const [estimatedWidth, setEstimatedWidth] = React.useState(undefined)
+
+  const balanceWidthRef: any = React.useRef(null)
+  const estimatedWidthRef: any = React.useRef(null)
+
+  React.useEffect(() => {
+    const balanceWidth = balanceWidthRef.current?.clientWidth
+    const estimatedWidth = estimatedWidthRef.current?.clientWidth
+    balanceWidth && setBalanceWidth(balanceWidth)
+    estimatedWidth && setEstimatedWidth(estimatedWidth)
+  }, [isBalanceRefreshing, balance, estimated])
+
+
   const onExchange = (): void => {
     logEvent({
       name: ADDRESS_ACTION,
@@ -68,8 +82,8 @@ const WalletCard: React.FC<Props> = (props) => {
         <CurrencyLogo size={60} br={18} symbol={symbol} chain={chain} name={tokenName} />
         <Styles.WalletInfo>
           <Styles.BalanceRow>
-            <Skeleton width={173} height={balanceHeight} type='gray' isLoading={balance === null}>
-              <Styles.Balance height={balanceHeight}>
+            <Skeleton width={balanceWidth || 173} height={balanceHeight} type='gray' isLoading={balance === null}>
+              <Styles.Balance ref={balanceWidthRef} height={balanceHeight}>
                 {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
               </Styles.Balance>
             </Skeleton>
@@ -80,13 +94,13 @@ const WalletCard: React.FC<Props> = (props) => {
             ) : null}
           </Styles.BalanceRow>
           <Skeleton
-            width={75}
+            width={estimatedWidth || 75}
             height={19}
             mt={estimatedMT}
             type='gray'
             isLoading={estimated === null}
           >
-            <Styles.Estimated mt={estimatedMT}>{`$ ${formatEstimated(
+            <Styles.Estimated ref={estimatedWidthRef} mt={estimatedMT}>{`$ ${formatEstimated(
               estimated,
               price(estimated)
             )}`}</Styles.Estimated>

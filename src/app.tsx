@@ -15,10 +15,12 @@ import { FIRST_ENTER, SESSION_START } from '@config/events'
 import { validateWallet } from '@utils/validate'
 import { init, logEvent } from '@utils/amplitude'
 import { getItem, setItem } from '@utils/storage'
-import { getStats, updateStats } from '@utils/txs'
+import { getFullHistory, getStats, updateStats } from '@utils/txs'
 import { setUserId } from '@utils/api'
 
 import { ToastContextProvider } from '@contexts/Toast/Toast'
+import { updateTxsHistory } from 'utils/history' // todo default export
+
 
 const App: React.FC = () => {
   React.useEffect(() => {
@@ -36,7 +38,7 @@ const App: React.FC = () => {
         }
         const height = window.outerHeight
         const width = window.outerWidth
-        if (width === 375 && height === 630) return;
+        if (width === 375 && height === 630) return
         id = +setTimeout(() => window.resizeTo(375, 630), 1000)
       }
     }
@@ -81,12 +83,12 @@ const App: React.FC = () => {
       setItem('clientId', clientId)
 
       logEvent({
-        name: FIRST_ENTER,
+        name: FIRST_ENTER
       })
     }
 
     logEvent({
-      name: SESSION_START,
+      name: SESSION_START
     })
 
     checkTxsStats()
@@ -122,11 +124,22 @@ const App: React.FC = () => {
     return validateWallets ? '/wallets' : '/welcome'
   }
 
+  const initialPage = getInitialPage()
+
+  React.useEffect(() => {
+    if (initialPage === '/wallets') {
+      const savedHistory = getFullHistory()
+      if (!savedHistory.length) {
+        updateTxsHistory()
+      }
+    }
+  }, [])
+
   return (
     <>
       <GlobalStyles />
       <ToastContextProvider>
-        <Router initialEntries={[getInitialPage()]}>
+        <Router initialEntries={[initialPage]}>
           <Switch>
             {routes.map((route: RouteProps, index: number) => (
               <Route key={index} path={route.path} component={route.component} />

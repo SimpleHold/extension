@@ -6,6 +6,7 @@ type TRefreshButtonProps = {
 
 type TBalanceProps = {
   height: number
+  show?: boolean
 }
 
 type TEstimatedProps = {
@@ -93,6 +94,7 @@ const Balance = styled.p`
 `
 
 const Estimated = styled.p`
+  width: fit-content;
   margin: 0;
   margin-top: ${({ mt }: TEstimatedProps) => `${mt}px`};
   font-size: 16px;

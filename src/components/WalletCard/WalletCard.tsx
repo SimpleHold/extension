@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
-import numeral from 'numeral'
 import SVG from 'react-inlinesvg'
 
 // Components
@@ -10,8 +9,17 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getBalance } from '@utils/api'
 import { toUpper, numberFriendly, formatEstimated, getFormatBalance } from '@utils/format'
-import { updateBalance, THardware, getLatestBalance } from '@utils/wallet'
+import {
+  updateBalance,
+  THardware,
+  getLatestBalance,
+  updateLastActive,
+  getWalletChain, getBalanceChange, getBalancePrecision
+} from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
+import { TTxWallet } from '@utils/api/types'
+import updateTxsHistory from '@utils/history'
+
 
 // Config
 import { getSharedToken, getToken } from '@config/tokens'
@@ -25,7 +33,9 @@ import clockIcon from '@assets/icons/clock.svg'
 
 // Styles
 import Styles from './styles'
-import { TWalletAmountData } from 'pages/Wallets/types'
+
+// Types
+import { TWalletAmountData } from '@pages/Wallets/types'
 
 interface Props {
   address: string
@@ -68,7 +78,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     walletName,
     uuid,
     hardware,
-    isNotActivated,
+    isNotActivated
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
@@ -83,35 +93,52 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   const [estimated, setEstimated] = React.useState<number | null>(null)
   const [pendingBalance, setPendingBalance] = React.useState<number>(0)
 
+  const walletData: TTxWallet = {
+    chain: getWalletChain(symbol, chain),
+    contractAddress,
+    symbol,
+    address,
+    tokenSymbol
+  }
+
   React.useEffect(() => {
     fetchBalance()
   }, [])
 
   const fetchBalance = async (): Promise<void> => {
+
     const { balance, balance_usd, balance_btc, pending, pending_btc } = isNotActivated
       ? emptyData
       : await getBalance(address, currency?.chain || chain, tokenSymbol, contractAddress)
 
-    const latestBalance = getLatestBalance(address, chain)
+    const { latestBalance, lastPendingStatus } = getLatestBalance(address, chain, symbol)
 
-    if (latestBalance !== null && latestBalance !== balance) {
-      logEvent({
-        name: BALANCE_CHANGED,
-        properties: {
-          symbol
-        }
-      })
-    }
+    const precision = getBalancePrecision(symbol)
+    const isBalanceChanged = getBalanceChange(latestBalance, balance, precision)
+    const isPendingStatusChanged = !!lastPendingStatus !== !!pending
 
     setBalance(balance)
     sumBalance && sumBalance({ uuid, symbol, amount: balance_btc })
-    updateBalance(address, symbol, balance, balance_btc)
 
     setPendingBalance(pending)
     sumPending && sumPending({ uuid, symbol, amount: pending_btc })
 
     setEstimated(balance_usd)
     sumEstimated && sumEstimated({ uuid, symbol, amount: balance_usd })
+
+    if (isBalanceChanged || isPendingStatusChanged) {
+
+      logEvent({
+        name: BALANCE_CHANGED,
+        properties: {
+          symbol
+        }
+      })
+
+      await updateTxsHistory({ updateSingleWallet: walletData })
+      updateBalance({ address, symbol, balance, balance_btc, pending })
+      updateLastActive(address, chain)
+    }
   }
 
   const openWallet = (): void => {
@@ -143,6 +170,10 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
 
   return (
     <Styles.Wrapper onClick={openWallet}>
+      <div style={{ width: 20, height: 20, backgroundColor: 'blue', position: 'absolute' }} onClick={(e) => {
+        e.stopPropagation()
+        updateTxsHistory({ updateSingleWallet: walletData })
+      }} />
       <Styles.Container className={'container'}>
         <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
         <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>

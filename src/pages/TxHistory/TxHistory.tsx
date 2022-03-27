@@ -15,18 +15,18 @@ import Spinner from '@components/Spinner'
 import HistoryFilterDrawer from '@drawers/HistoryFilter'
 
 // Utils
-import { IWallet, getWallets, getWalletChain, getWalletName } from '@utils/wallet'
-import { getFullTxHistory, getFullTxHistoryInfo } from '@utils/api'
-import { groupHistory, THistoryTxGroup } from '@utils/txs'
+import { getWalletName, getWallets, IWallet } from '@utils/wallet'
+import { getFullHistory, groupHistory, THistoryTxGroup } from '@utils/txs'
 import { toLower } from '@utils/format'
 import { checkOneOfExist, getItem } from '@utils/storage'
-import { compareFullHistory, saveFullHistory, getFullHistory } from '@utils/txs'
+import { updateTxsHistory } from 'utils/history'
+
 
 // Hooks
 import useState from '@hooks/useState'
 
 // Types
-import { TTxAddressItem, TFullTxWallet, TFullTxInfo, TTxWallet } from '@utils/api/types'
+import { TFullTxInfo } from '@utils/api/types'
 import { IState, TTxData } from './types'
 import { TCurrency } from '@drawers/HistoryFilter/types'
 
@@ -37,7 +37,7 @@ const initialState: IState = {
   activeDrawer: null,
   txGroups: null,
   wallets: [],
-  isNotFound: false,
+  isNotFound: false
 }
 
 const TxHistory: React.FC = () => {
@@ -47,11 +47,14 @@ const TxHistory: React.FC = () => {
 
   React.useEffect(() => {
     getWalletList()
+    const handler = () => getSavedHistory()
+    window.addEventListener('historyFetchComplete', handler)
+    return () => window.removeEventListener('historyFetchComplete', handler)
   }, [])
 
   React.useEffect(() => {
     if (state.wallets.length && state.txGroups === null) {
-      onGetTxHistory()
+      getSavedHistory()
     }
   }, [state.wallets, state.txGroups])
 
@@ -84,65 +87,21 @@ const TxHistory: React.FC = () => {
     return wallet
   }
 
+  const getSavedHistory = () => {
+    const savedHistory = getFullHistory()
+    if (savedHistory.length) {
+      updateState({ txGroups: groupHistory(savedHistory) })
+    }
+  }
+
   const onGetTxHistory = async (): Promise<void> => {
     updateState({ txGroups: null, isNotFound: false })
-    const st0 = performance.now()
 
-    const getFilteredWallets = state.wallets.filter(filterWallets)
-    const mapWallets: TTxWallet[] = getFilteredWallets.map((wallet: IWallet) => {
-      const { address, chain, symbol, contractAddress } = wallet
+    await updateTxsHistory({ filterFn: filterWallets })
+    const savedHistory = getFullHistory()
 
-      return {
-        address,
-        chain: getWalletChain(symbol, chain),
-        symbol,
-        tokenSymbol: chain ? symbol : undefined,
-        contractAddress,
-      }
-    })
-    console.log('getFilteredWallets took:', performance.now() - st0)
-
-    const st1 = performance.now()
-    const data = await getFullTxHistory(mapWallets)
-    console.log('getFullTxHistory took:', performance.now() - st1)
-    if (data.length) {
-      const st2 = performance.now()
-
-      const compare = compareFullHistory(data)
-      console.log('compareFullHistory took:', performance.now() - st2)
-
-      if (compare.length) {
-        const st3 = performance.now()
-
-        const mapData: TFullTxWallet[] = data.map((item: TTxAddressItem) => {
-          const { chain, address, txs, symbol, tokenSymbol, contractAddress } = item
-
-          return {
-            chain,
-            address,
-            symbol,
-            txs,
-            tokenSymbol,
-            contractAddress,
-          }
-        })
-        console.log('mapData took:', performance.now() - st3)
-        const st4 = performance.now()
-
-        const fullTxsInfo = await getFullTxHistoryInfo(mapData)
-        console.log('getFullTxHistoryInfo took:', performance.now() - st4)
-        const st5 = performance.now()
-
-        saveFullHistory(fullTxsInfo)
-        console.log('saveFullHistory took:', performance.now() - st5)
-        console.log('TOTAL:', performance.now() - st0)
-        console.log('------------------')
-      }
-    }
-
-    const getSavedHistory = getFullHistory()
-    if (getSavedHistory.length) {
-      updateState({ txGroups: groupHistory(getSavedHistory) })
+    if (savedHistory.length) {
+      updateState({ txGroups: groupHistory(savedHistory) })
     } else {
       updateState({ isNotFound: true })
     }
@@ -198,7 +157,7 @@ const TxHistory: React.FC = () => {
     <Styles.Loading>
       <Styles.Group>
         <Styles.GroupDateRow>
-          <Skeleton width={50} height={16} br={5} type="gray" isLoading />
+          <Skeleton width={50} height={16} br={5} type='gray' isLoading />
         </Styles.GroupDateRow>
         {Array(7)
           .fill('loading')
@@ -229,7 +188,7 @@ const TxHistory: React.FC = () => {
             const { date, data } = group
 
             return (
-              <Styles.Group key={date}>
+              <Styles.Group key={`${date}${index}`}>
                 <Styles.GroupDateRow>
                   <Styles.GroupDate>{dayjs(date).format('MMM D')}</Styles.GroupDate>
                 </Styles.GroupDateRow>
@@ -245,11 +204,10 @@ const TxHistory: React.FC = () => {
                     address,
                     tokenSymbol,
                     contractAddress,
-                    date,
+                    date
                   } = tx
                   const walletName = getNameWallet(symbol, address)
                   const tokenChain = tokenSymbol ? chain : undefined
-
                   return (
                     <HistoryItem
                       key={`${hash}/${date}/${amount}/${index}`}
@@ -260,7 +218,7 @@ const TxHistory: React.FC = () => {
                         amount,
                         estimated,
                         isPending,
-                        tokenChain,
+                        tokenChain
                       }}
                       onClick={openTx({
                         symbol,
@@ -269,7 +227,7 @@ const TxHistory: React.FC = () => {
                         hash,
                         tokenChain,
                         tokenSymbol,
-                        contractAddress,
+                        contractAddress
                       })}
                     />
                   )
@@ -300,12 +258,12 @@ const TxHistory: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle="Home" onBack={history.goBack} whiteLogo />
+        <Header withBack backTitle='Home' onBack={history.goBack} whiteLogo />
         <Styles.Container>
           <Styles.Heading>
             <Styles.Title>History</Styles.Title>
             <Styles.Button onClick={openFilters}>
-              <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
+              <SVG src='../../assets/icons/sort.svg' width={18} height={14} />
               {isFiltersActive() ? <Styles.ButtonDot /> : null}
             </Styles.Button>
           </Styles.Heading>
