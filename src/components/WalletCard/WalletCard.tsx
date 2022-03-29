@@ -82,7 +82,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
-  const contractAddress = props.contractAddress || sharedToken?.address || undefined
+  const contractAddress = props.contractAddress || sharedToken?.address || (chain ? getToken(symbol, chain)?.address : undefined)
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const tokenSymbol = chain ? symbol : undefined
