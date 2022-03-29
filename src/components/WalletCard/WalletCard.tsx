@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
-import numeral from 'numeral'
 import SVG from 'react-inlinesvg'
 
 // Components
@@ -25,7 +24,9 @@ import clockIcon from '@assets/icons/clock.svg'
 
 // Styles
 import Styles from './styles'
-import { TWalletAmountData } from 'pages/Wallets/types'
+
+// Types
+import { TWalletAmountData } from '@pages/Wallets/types'
 
 interface Props {
   address: string
@@ -72,7 +73,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
-  const contractAddress = props.contractAddress || sharedToken?.address || undefined
+  const contractAddress = props.contractAddress || sharedToken?.address || (chain ? getToken(symbol, chain)?.address : undefined)
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const tokenSymbol = chain ? symbol : undefined

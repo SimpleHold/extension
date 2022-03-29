@@ -147,7 +147,12 @@ export const getExplorerLink = (
       return `https://polygonscan.com/token/${tokenAddress}?a=${address}`
     }
 
+    if (parseChain === 'ftm') {
+      return `https://ftmscan.com/token/${tokenAddress}?a=${address}`
+    }
+
     return `https://bscscan.com/token/${tokenAddress}?a=${address}`
+
   } else {
     if (parseSymbol === 'eth') {
       return `https://etherscan.io/address/${address}`
@@ -155,6 +160,8 @@ export const getExplorerLink = (
       return `https://bscscan.com/address/${address}`
     } else if (parseSymbol === 'matic') {
       return `https://polygonscan.com/address/${address}`
+    } else if (parseSymbol === 'ftm') {
+      return `https://ftmscan.com/address/${address}`
     }
     return `https://blockscout.com/etc/mainnet/address/${address}/transactions`
   }

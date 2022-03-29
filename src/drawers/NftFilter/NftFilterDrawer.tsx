@@ -17,6 +17,7 @@ import { toLower } from '@utils/format'
 import ethLogo from '@assets/currencies/eth.svg'
 import bscLogo from '@assets/currencies/bnb.svg'
 import maticLogo from '@assets/currencies/matic.svg'
+import solLogo from '@assets/currencies/sol.svg'
 
 // Styles
 import Styles from './styles'
@@ -52,6 +53,11 @@ const networks: TNetwork[] = [
     title: 'Polygon',
     key: 'matic',
     icon: maticLogo,
+  },
+  {
+    title: 'Solana',
+    key: 'sol',
+    icon: solLogo,
   },
 ]
 
@@ -101,7 +107,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
       const filterWallet = walletsList.filter(
         (wallet: IWallet) =>
           !wallet.chain &&
-          (wallet.symbol === 'eth' || wallet.symbol === 'bnb' || wallet.symbol === 'matic')
+          (wallet.symbol === 'eth' || wallet.symbol === 'bnb' || wallet.symbol === 'matic' || wallet.symbol === 'sol')
       )
 
       setWallets(filterWallet)
