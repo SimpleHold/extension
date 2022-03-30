@@ -139,7 +139,7 @@ const WalletPage: React.FC = () => {
   React.useEffect(() => {
     let id: number
     if (walletPendingStatus) {
-      const isReady = checkIfTimeHasPassed(lastRefreshHistoryTimestamp, { seconds: 15 })
+      const isReady = checkIfTimeHasPassed(lastRefreshHistoryTimestamp, { seconds: 15 }) // todo getTimeDiff()
       id = +setInterval(() => {
         if (isReady) {
           getTxHistory().then(loadBalance)

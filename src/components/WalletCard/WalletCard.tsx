@@ -170,10 +170,6 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
 
   return (
     <Styles.Wrapper onClick={openWallet}>
-      <div style={{ width: 20, height: 20, backgroundColor: 'blue', position: 'absolute' }} onClick={(e) => {
-        e.stopPropagation()
-        updateTxsHistory({ updateSingleWallet: walletData })
-      }} />
       <Styles.Container className={'container'}>
         <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
         <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>
