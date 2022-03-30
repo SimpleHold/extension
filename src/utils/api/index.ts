@@ -388,7 +388,6 @@ export const getTxsInfo = async (
 export const getCustomFee = async (chain: string): Promise<TCustomFee | null> => {
   try {
     const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/fee/${chain}`)
-
     return data.data
   } catch {
     return null

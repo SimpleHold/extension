@@ -32,6 +32,7 @@ import { TCurrency } from '@drawers/HistoryFilter/types'
 
 // Styles
 import Styles from './styles'
+import { checkIfTimePassed } from 'utils/dates'
 
 const initialState: IState = {
   activeDrawer: null,
@@ -54,7 +55,15 @@ const TxHistory: React.FC = () => {
 
   React.useEffect(() => {
     if (state.wallets.length && state.txGroups === null) {
-      getSavedHistory()
+      const lastHistoryUpdate = getItem('lastFullHistoryUpdate')
+      const fetchRequired = lastHistoryUpdate
+        ? checkIfTimePassed(+lastHistoryUpdate, {seconds: 30})
+        : true
+      if (fetchRequired) {
+        onGetTxHistory()
+      } else {
+        getSavedHistory()
+      }
     }
   }, [state.wallets, state.txGroups])
 

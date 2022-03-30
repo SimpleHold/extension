@@ -19,7 +19,7 @@ import { getFullHistory, getStats, updateStats } from '@utils/txs'
 import { setUserId } from '@utils/api'
 
 import { ToastContextProvider } from '@contexts/Toast/Toast'
-import { updateTxsHistory } from 'utils/history' // todo default export
+import { updateTxsHistory } from '@utils/history'
 
 
 const App: React.FC = () => {

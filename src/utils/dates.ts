@@ -1,5 +1,3 @@
-import { getItem } from 'utils/storage'
-
 export const msToMin = (ms: number): number => {
   return Math.round(((ms % 86400000) % 3600000) / 60000)
 }
@@ -22,8 +20,8 @@ export const toMs = ({ weeks, days, hours, minutes, seconds }: TTime) => {
   return ( w + d + h + m + s ) * 1000
 }
 
-export const checkIfTimeHasPassed = (timestamp: number, time: TTime) => {
-  if (!timestamp) return false;
-  const diff = Date.now() - Number(timestamp)
-  return diff < toMs(time)
+export const checkIfTimePassed = (timestamp: number, time: TTime) => {
+  if (!timestamp) return true;
+  const diff = Date.now() - timestamp
+  return diff > toMs(time)
 }

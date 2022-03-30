@@ -26,7 +26,6 @@ import {
   getTransactionHistory
 } from '@utils/api'
 import {
-  IWallet,
   updateBalance,
   renameWallet,
   toggleVisibleWallet,
@@ -48,7 +47,7 @@ import {
 } from '@utils/txs'
 import { logEvent } from '@utils/amplitude'
 import { getTxHistory as getTonCoinTxHistory } from '@utils/currencies/toncoin'
-import { checkIfTimeHasPassed, toMs } from '@utils/dates'
+import { checkIfTimePassed, toMs } from '@utils/dates'
 import { updateTxsHistory } from '@utils/history'
 
 // Config
@@ -61,6 +60,7 @@ import useState from '@hooks/useState'
 
 // Types
 import { ILocationState, IState } from './types'
+import { IWallet } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -113,7 +113,7 @@ const WalletPage: React.FC = () => {
   const [isIdle, setIsIdle] = React.useState(false)
 
   useIdleTimer({
-    timeout: toMs({ minutes: 5}),
+    timeout: toMs({ minutes: 1}),
     onActive: () => setIsIdle(false),
     onIdle: () => setIsIdle(true)
   })
@@ -139,7 +139,7 @@ const WalletPage: React.FC = () => {
   React.useEffect(() => {
     let id: number
     if (walletPendingStatus) {
-      const isReady = checkIfTimeHasPassed(lastRefreshHistoryTimestamp, { seconds: 15 }) // todo getTimeDiff()
+      const isReady = checkIfTimePassed(lastRefreshHistoryTimestamp, { seconds: 15 })
       id = +setInterval(() => {
         if (isReady) {
           getTxHistory().then(loadBalance)
@@ -216,7 +216,7 @@ const WalletPage: React.FC = () => {
 
     setPendingBalance(pending)
     updateState({ balance, estimated: balance_usd })
-    // updateBalance({ address: state.address, symbol, balance, balance_btc, pending })
+    updateBalance({ address: state.address, symbol, balance, balance_btc, balance_usd, pending })
   }
 
   const getTonTxHistory = async (): Promise<void> => {
@@ -347,7 +347,7 @@ const WalletPage: React.FC = () => {
       setTimeout(loadBalance, 1000)
 
       if (walletPendingStatus) {
-        const isReady = Date.now() - lastRefreshHistoryTimestamp > 15000
+        const isReady = checkIfTimePassed(lastRefreshHistoryTimestamp, { seconds: 15 })
         isReady && getTxHistory()
       }
 
@@ -515,7 +515,6 @@ const WalletPage: React.FC = () => {
         <Cover />
         <Header withBack onBack={history.goBack} backTitle='Home' whiteLogo />
         <Styles.Container>
-          <div style={{position: 'absolute', color: 'red', fontWeight: 'bold'}}>{walletPendingStatus ? 'PENDING' : 'NOT PENDING'}</div>
           <Styles.Row>
             <Heading
               symbol={symbol}

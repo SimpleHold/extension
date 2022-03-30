@@ -313,7 +313,7 @@ const currencies: ICurrency[] = [
     background: '#13B5EC',
     chain: 'ftm',
     minSendAmount: 1000,
-    isCustomFee: false,
+    isCustomFee: true,
   }
 ]
 

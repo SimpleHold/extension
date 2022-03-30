@@ -1,8 +1,13 @@
-import { TFullTxWallet, TTxAddressItem, TTxWallet } from 'utils/api/types'
-import { getWalletChain, getWallets, IWallet } from 'utils/wallet'
-import { getFullTxHistory, getFullTxHistoryInfo, TGetFullTxHistoryOptions } from 'utils/api'
-import { compareFullHistory, saveFullHistory } from 'utils/txs'
+// Utils
+import { getWalletChain, getWallets } from '@utils/wallet'
+import { getFullTxHistory, getFullTxHistoryInfo } from '@utils/api'
+import { compareFullHistory, saveFullHistory } from '@utils/txs'
+import { setItem } from '@utils/storage'
 
+// Types
+import { IWallet } from '@utils/wallet'
+import { TFullTxWallet, TTxAddressItem, TTxWallet } from '@utils/api/types'
+import { TGetFullTxHistoryOptions } from '@utils/api'
 
 export type THistoryUpdateOptions = {
   latest?: number
@@ -76,6 +81,7 @@ export const updateTxsHistory = async (
       const fullTxsInfo = await getFullTxHistoryInfo(mapData, fetchOptions)
       saveFullHistory(fullTxsInfo)
       if (!updateSingleWallet) {
+        setItem('lastFullHistoryUpdate', `${Date.now()}`)
         window.dispatchEvent(new CustomEvent('historyFetchComplete'))
       }
       return !!(fullTxsInfo && fullTxsInfo.length)

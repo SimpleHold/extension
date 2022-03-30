@@ -20,7 +20,7 @@ import AboutFeeDrawer from '@drawers/AboutFee'
 import { toLower, toUpper, plus } from '@utils/format'
 import { validateMany } from '@utils/validate'
 import { getBalance, getUnspentOutputs } from '@utils/api'
-import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
+import { updateBalance, getWallets } from '@utils/wallet'
 import {
   getExtraIdName,
   checkWithOutputs,
@@ -55,6 +55,7 @@ import {
 
 // Types
 import { ILocationState, IState, TFeeValue } from './types'
+import { THardware, IWallet } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -349,7 +350,7 @@ const SendPage: React.FC = () => {
       estimated: balance_usd,
     })
 
-    updateBalance({address: state.selectedAddress, symbol, balance, balance_btc})
+    updateBalance({address: state.selectedAddress, symbol, balance, balance_btc, balance_usd})
   }
 
   const getWalletsList = (): void => {
