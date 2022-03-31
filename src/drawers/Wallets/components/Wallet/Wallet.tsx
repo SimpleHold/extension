@@ -65,7 +65,7 @@ const Wallet: React.FC<Props> = (props) => {
     )
 
     setBalance(balance)
-    updateBalance(address, symbol, balance, balance_btc)
+    updateBalance({address, symbol, balance, balance_btc, balance_usd, pending})
     setPendingBalance(pending)
     setEstimated(balance_usd)
   }

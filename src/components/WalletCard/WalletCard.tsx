@@ -9,8 +9,16 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getBalance } from '@utils/api'
 import { toUpper, numberFriendly, formatEstimated, getFormatBalance } from '@utils/format'
-import { updateBalance, THardware, getLatestBalance } from '@utils/wallet'
+import {
+  updateBalance,
+  getLatestBalance,
+  updateLast,
+  getWalletChain, getBalanceChange, getBalancePrecision
+} from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
+import updateTxsHistory from '@utils/history'
+import { checkIfTimePassed } from '@utils/dates'
+
 
 // Config
 import { getSharedToken, getToken } from '@config/tokens'
@@ -27,6 +35,9 @@ import Styles from './styles'
 
 // Types
 import { TWalletAmountData } from '@pages/Wallets/types'
+import { TTxWallet } from '@utils/api/types'
+import { THardware } from '@utils/wallet'
+
 
 interface Props {
   address: string
@@ -69,7 +80,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     walletName,
     uuid,
     hardware,
-    isNotActivated,
+    isNotActivated
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
@@ -84,35 +95,63 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   const [estimated, setEstimated] = React.useState<number | null>(null)
   const [pendingBalance, setPendingBalance] = React.useState<number>(0)
 
+  const walletData: TTxWallet = {
+    chain: getWalletChain(symbol, chain),
+    contractAddress,
+    symbol,
+    address,
+    tokenSymbol
+  }
+
   React.useEffect(() => {
-    fetchBalance()
+    loadBalance()
   }, [])
 
-  const fetchBalance = async (): Promise<void> => {
-    const { balance, balance_usd, balance_btc, pending, pending_btc } = isNotActivated
-      ? emptyData
-      : await getBalance(address, currency?.chain || chain, tokenSymbol, contractAddress)
+  const loadBalance = async (): Promise<void> => {
+    const savedData = getLatestBalance(address, chain, symbol)
 
-    const latestBalance = getLatestBalance(address, chain)
+    const isFetchReady = checkIfTimePassed(savedData.lastBalanceCheck || 0, { seconds: 20 })
+    const isFullData = !Object.entries(savedData).find(v => v[1] === null)
 
-    if (latestBalance !== null && latestBalance !== balance) {
+    let data = isNotActivated ? emptyData : savedData
+
+    const isFetchRequired = !isNotActivated && (isFetchReady || !isFullData)
+
+    if (isFetchRequired) {
+      updateLast('lastBalanceCheck', address, chain)
+
+      const fetchedData = await getBalance(address, currency?.chain || chain, tokenSymbol, contractAddress)
+      data = { ...data, ...fetchedData }
+    }
+
+    const { balance, balance_usd, balance_btc, pending, pending_btc } = data
+
+    setBalance(balance)
+    sumBalance && sumBalance({ uuid, symbol, amount: balance_btc || 0 })
+
+    setPendingBalance(pending || 0)
+    sumPending && sumPending({ uuid, symbol, amount: pending_btc || 0 })
+
+    setEstimated(balance_usd)
+    sumEstimated && sumEstimated({ uuid, symbol, amount: balance_usd || 0 })
+
+    const precision = getBalancePrecision(symbol)
+    const isBalanceChanged = getBalanceChange(savedData.balance, balance || 0, precision)
+    const isPendingStatusChanged = !!savedData.pending !== !!pending
+
+    if (isBalanceChanged || isPendingStatusChanged) {
+
       logEvent({
         name: BALANCE_CHANGED,
         properties: {
           symbol
         }
       })
+
+      await updateTxsHistory({ updateSingleWallet: walletData })
+      updateBalance({ address, symbol, balance, balance_btc, pending: pending, balance_usd, pending_btc: pending_btc })
+      updateLast('lastActive', address, chain)
     }
-
-    setBalance(balance)
-    sumBalance && sumBalance({ uuid, symbol, amount: balance_btc })
-    updateBalance(address, symbol, balance, balance_btc)
-
-    setPendingBalance(pending)
-    sumPending && sumPending({ uuid, symbol, amount: pending_btc })
-
-    setEstimated(balance_usd)
-    sumEstimated && sumEstimated({ uuid, symbol, amount: balance_usd })
   }
 
   const openWallet = (): void => {

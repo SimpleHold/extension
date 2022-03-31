@@ -59,7 +59,6 @@ const TransactionHistory: React.FC<Props> = (props) => {
                 </Styles.DateRow>
                 {data.sort(sortByDate).map((tx: TAddressTx) => {
                   const { type, date, hash, amount, estimated, isPending, disabled } = tx
-
                   return (
                     <Transaction
                       key={hash}

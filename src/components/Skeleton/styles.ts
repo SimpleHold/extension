@@ -2,8 +2,8 @@ import styled, { keyframes } from 'styled-components'
 
 type TContainerProps = {
   type: 'light' | 'gray'
-  width: number
   height: number
+  width?: number
   mt?: number
   br: number
   mb?: number
@@ -27,7 +27,7 @@ const getBackground = (type: 'light' | 'gray'): string => {
 }
 
 const Container = styled.div`
-  width: ${({ width }: TContainerProps) => `${width}px`};
+  width: ${({ width }: TContainerProps) => width ? `${width}px` : 'auto'};
   height: ${({ height }: TContainerProps) => `${height}px`};
   margin-top: ${({ mt }: TContainerProps) => (mt ? `${mt}px` : '0')};
   margin-bottom: ${({ mb }: TContainerProps) => (mb ? `${mb}px` : '0')};

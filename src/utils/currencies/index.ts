@@ -323,7 +323,6 @@ export const getNetworkFee = async ({
 
   if (isEthereumLike(symbol, tokenChain)) {
     const { contractAddress, decimals } = ethLikeParams
-
     const value = decimals
       ? ethereumLike.convertDecimals(amount, decimals)
       : ethereumLike.toEther(amount)

@@ -17,7 +17,7 @@ import FeedbackDrawer from '@drawers/Feedback'
 // Utils
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { IWallet } from '@utils/wallet'
+import { getWalletChain, IWallet, updateBalance } from '@utils/wallet'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
 import {
@@ -44,6 +44,8 @@ import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
+import { checkIsLoadingFlag, updateTxsHistory } from 'utils/history'
+import { TTxWallet } from 'utils/api/types'
 
 const initialState: IState = {
   activeDrawer: null,

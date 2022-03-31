@@ -107,3 +107,9 @@ export const getFormatBalance = (balance: string | number | null) => {
   }
   return numeral(balance).format('0.[000000]')
 }
+
+export const toFixedWithoutRound = (n: number, digits: number): number => {
+  const regEx = new RegExp('^-?\\d+(?:\.\\d{0,' + (digits || -1) + '})?');
+  const match = n.toString().match(regEx)
+  return match ? +match[0] : n
+}

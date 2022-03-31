@@ -5,8 +5,8 @@ import Styles from './styles'
 
 interface Props {
   type: 'light' | 'gray'
-  width: number
   height: number
+  width?: number
   mt?: number
   br?: number
   isLoading: boolean
