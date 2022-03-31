@@ -18,6 +18,7 @@ import AboutFeeDrawer from '@drawers/AboutFee'
 
 // Utils
 import { toLower, toUpper, plus } from '@utils/format'
+import { validateMany } from '@utils/validate'
 import { getBalance, getUnspentOutputs } from '@utils/api'
 import { THardware, updateBalance, getWallets, IWallet } from '@utils/wallet'
 import {
@@ -418,10 +419,9 @@ const SendPage: React.FC = () => {
       const balance = getAvailableBalance()
       const isInsufficientBalance = balance - safeGap <= 0.001
       if (isInsufficientBalance) {
+        const minValue = (balance + safeGap).toString().slice(0, 6)
         updateState({
-          amountErrorLabel: `Min amount for this transfer is ${(balance + safeGap)
-            .toString()
-            .slice(0, 6)}`,
+          amountErrorLabel: `Min amount for this transfer is ${minValue}`,
         })
         return
       }
@@ -583,16 +583,20 @@ const SendPage: React.FC = () => {
       state.isIncludeFee && symbol === state.feeSymbol
         ? Number(state.amount) - state.fee
         : Number(state.amount)
-    if (
-      validateAddress(symbol, state.address, tokenChain) &&
-      state.amount.length &&
-      getAmount > 0 &&
-      state.addressErrorLabel === null &&
-      state.amountErrorLabel === null &&
-      Number(state.balance) > 0 &&
-      !state.isFeeLoading &&
-      !isCurrencyBalanceError
-    ) {
+
+    const checks = {
+      isAddressValid: validateAddress(symbol, state.address, tokenChain),
+      isAmount: state.amount.length && getAmount > 0,
+      isAddressErrorLabelNull: state.addressErrorLabel === null,
+      isAmountErrorLabelNull: state.amountErrorLabel === null,
+      isBalance: Number(state.balance) > 0,
+      isFeeLoaded: !state.isFeeLoading,
+      isCurrencyBalanceErrorNull: !isCurrencyBalanceError
+    }
+
+    const checksPassed = validateMany(checks)
+
+    if (checksPassed) {
       if (!state?.utxosList?.length) {
         const withOuputs = checkWithOutputs(symbol)
         return withOuputs

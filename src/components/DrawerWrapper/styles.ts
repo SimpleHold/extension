@@ -14,7 +14,7 @@ type TBackgroundProps = {
 const Wrapper = styled.div``
 
 const Background = styled.div`
-  position: ${({ openFrom }: TBackgroundProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
+  position: ${({ openFrom, isWindowedMode }: TBackgroundProps & TDrawerProps) => (openFrom === 'browser' || isWindowedMode ? 'absolute' : 'fixed')};
   backdrop-filter: blur(2px);
   z-index: 100;
   background-color: rgba(29, 29, 34, 0.2);
@@ -31,7 +31,7 @@ const Drawer = styled.div`
   border-radius: 16px 16px 0px 0px;
   padding: ${({ padding }: TDrawerProps) => padding || '30px'};
   word-break: break-word;
-  position: ${({ openFrom }: TDrawerProps) => (openFrom === 'browser' ? 'absolute' : 'fixed')};
+  position: ${({ openFrom, isWindowedMode }: TDrawerProps) => (openFrom === 'browser' || isWindowedMode ? 'absolute' : 'fixed')};
   height: ${({ height }: TDrawerProps) => (height ? `${height}px` : 'auto')};
   z-index: 101;
   left: 0;

@@ -12,7 +12,7 @@ import { TransferTokenOptions } from './types'
 
 const web3 = new Web3()
 
-export const coins: string[] = ['eth', 'etc', 'bnb', 'matic']
+export const coins: string[] = ['eth', 'etc', 'bnb', 'matic', 'ftm']
 
 export const toHex = (value: number): string => {
   return web3.utils.toHex(value)
@@ -147,7 +147,12 @@ export const getExplorerLink = (
       return `https://polygonscan.com/token/${tokenAddress}?a=${address}`
     }
 
+    if (parseChain === 'ftm') {
+      return `https://ftmscan.com/token/${tokenAddress}?a=${address}`
+    }
+
     return `https://bscscan.com/token/${tokenAddress}?a=${address}`
+
   } else {
     if (parseSymbol === 'eth') {
       return `https://etherscan.io/address/${address}`
@@ -155,6 +160,8 @@ export const getExplorerLink = (
       return `https://bscscan.com/address/${address}`
     } else if (parseSymbol === 'matic') {
       return `https://polygonscan.com/address/${address}`
+    } else if (parseSymbol === 'ftm') {
+      return `https://ftmscan.com/address/${address}`
     }
     return `https://blockscout.com/etc/mainnet/address/${address}/transactions`
   }
@@ -169,6 +176,8 @@ export const getTransactionLink = (hash: string, chain: string, tokenChain?: str
     return `https://bscscan.com/tx/${hash}`
   } else if (parseChain === 'matic') {
     return `https://polygonscan.com/tx/${hash}`
+  } else if (parseChain === 'ftm') {
+    return `https://ftmscan.com/tx/${hash}`
   }
 
   return `https://blockscout.com/etc/mainnet/tx/${hash}/internal-transactions`

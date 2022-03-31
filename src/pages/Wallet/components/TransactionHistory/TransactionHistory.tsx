@@ -18,8 +18,12 @@ interface Props {
   openTx: (hash: string, disabled?: boolean) => () => void
 }
 
+type TSort = { date: string }
+
 const TransactionHistory: React.FC<Props> = (props) => {
   const { data, symbol, openTx } = props
+
+  const sortByDate = (a: TSort, b: TSort) => new Date(b.date).getTime() - new Date(a.date).getTime()
 
   return (
     <Styles.Container>
@@ -45,7 +49,7 @@ const TransactionHistory: React.FC<Props> = (props) => {
       ) : null}
 
       {data !== null && data.length > 0
-        ? data.map((group: TAddressTxGroup) => {
+        ? data.sort(sortByDate).map((group: TAddressTxGroup) => {
             const { date, data } = group
 
             return (
@@ -53,7 +57,7 @@ const TransactionHistory: React.FC<Props> = (props) => {
                 <Styles.DateRow>
                   <Styles.TxDate>{dayjs(date).format('MMM D')}</Styles.TxDate>
                 </Styles.DateRow>
-                {data.map((tx: TAddressTx) => {
+                {data.sort(sortByDate).map((tx: TAddressTx) => {
                   const { type, date, hash, amount, estimated, isPending, disabled } = tx
 
                   return (

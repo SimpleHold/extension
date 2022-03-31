@@ -297,9 +297,10 @@ const WalletPage: React.FC = () => {
   }
 
   const onRefreshBalance = (): void => {
+    if (state.isBalanceRefreshing) return;
     if (state.balance !== null && state.estimated !== null) {
       updateState({ balance: null, estimated: null, isBalanceRefreshing: true })
-      loadBalance()
+      setTimeout(loadBalance, 1000)
 
       logEvent({
         name: ADDRESS_ACTION,

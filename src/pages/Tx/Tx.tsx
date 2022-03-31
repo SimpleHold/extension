@@ -121,7 +121,7 @@ const TxHistory: React.FC = () => {
               <Styles.ErrorBlock>
                 <Styles.ErrorLoadingIcon />
                 <Styles.ErrorLoadingText>
-                  Failed to load transaction info. Plase try again
+                  Failed to load transaction info. Please try again
                 </Styles.ErrorLoadingText>
               </Styles.ErrorBlock>
             ) : (

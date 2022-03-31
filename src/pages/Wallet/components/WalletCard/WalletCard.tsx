@@ -7,7 +7,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { toUpper, price, formatEstimated } from '@utils/format'
+import { toUpper, price, formatEstimated, getFormatBalance } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { openWebPage } from '@utils/extension'
 
@@ -70,7 +70,7 @@ const WalletCard: React.FC<Props> = (props) => {
           <Styles.BalanceRow>
             <Skeleton width={173} height={balanceHeight} type='gray' isLoading={balance === null}>
               <Styles.Balance height={balanceHeight}>
-                {numeral(balance).format('0.[000000]')} {toUpper(symbol)}
+                {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
               </Styles.Balance>
             </Skeleton>
             {!isNotActivated ? (

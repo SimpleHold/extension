@@ -5,8 +5,19 @@ const GlobalStyle = createGlobalStyle`
 		box-sizing: border-box;
   }
   
+  html {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  
   body {
+    position: relative;
     width: 375px;
+    max-height: 600px;
+    overflow: hidden;
     padding: 0;
     margin: 0;
     background-color: #f8f8f8;

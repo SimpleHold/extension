@@ -36,7 +36,7 @@ const initialState: IState = {
   totalEstimated: null,
   pendingBalance: null,
   activeDrawer: null,
-  scrollPosition: 0,
+  scrollPosition: 0
 }
 
 const Wallets: React.FC = () => {
@@ -64,7 +64,7 @@ const Wallets: React.FC = () => {
     ) {
       updateState({
         totalBalance: 0,
-        totalEstimated: 0,
+        totalEstimated: 0
       })
     }
   }, [state.wallets, state.totalBalance, state.totalEstimated])
@@ -109,7 +109,7 @@ const Wallets: React.FC = () => {
       updateState({
         totalBalance: getFilteredSum(walletsBalance),
         totalEstimated: getFilteredSum(walletsEstimated),
-        pendingBalance: getFilteredSum(walletsPending),
+        pendingBalance: getFilteredSum(walletsPending)
       })
     }
   }, [state.wallets, walletsPending, walletsEstimated, walletsBalance])
@@ -135,7 +135,7 @@ const Wallets: React.FC = () => {
       wallets: null,
       totalBalance: null,
       totalEstimated: null,
-      pendingBalance: null,
+      pendingBalance: null
     })
     const walletsList = getWallets()
 
@@ -149,7 +149,7 @@ const Wallets: React.FC = () => {
 
   const onAddNewAddress = (): void => {
     logEvent({
-      name: ADD_ADDRESS,
+      name: ADD_ADDRESS
     })
 
     history.push('/select-currency')
@@ -196,7 +196,7 @@ const Wallets: React.FC = () => {
     history.push('/tx-history')
 
     logEvent({
-      name: HISTORY_WATCH,
+      name: HISTORY_WATCH
     })
   }, [])
 
@@ -204,7 +204,7 @@ const Wallets: React.FC = () => {
     updateState({ activeDrawer: 'filters' })
 
     logEvent({
-      name: FILTERS_WATCH,
+      name: FILTERS_WATCH
     })
   }, [])
 
@@ -226,7 +226,7 @@ const Wallets: React.FC = () => {
         isHidden,
         uuid,
         hardware,
-        isNotActivated,
+        isNotActivated
       } = wallet
 
       const walletName = getNameWallet(wallet)
@@ -235,7 +235,7 @@ const Wallets: React.FC = () => {
         <div
           style={{
             ...style,
-            ...Styles.ListItem,
+            ...Styles.ListItem
           }}
           key={key}
         >
@@ -267,6 +267,13 @@ const Wallets: React.FC = () => {
     updateState({ scrollPosition: scrollTop < 155 ? scrollTop : 155 })
   }
 
+  const getRowCount = () => {
+    const length = state.wallets?.length
+    if (!length) return 0
+    if (length <= 3) return length
+    return Math.max(length + 2, 8)
+  }
+
   return (
     <>
       <Styles.Wrapper>
@@ -288,7 +295,7 @@ const Wallets: React.FC = () => {
                   onScroll={onScroll}
                   height={600}
                   style={Styles.List}
-                  rowCount={state.wallets?.length || 0}
+                  rowCount={getRowCount()}
                   rowHeight={86}
                   rowRenderer={renderWallet}
                   width={375}
@@ -302,10 +309,10 @@ const Wallets: React.FC = () => {
               </div>
             )}
           </WindowScroller>
-          <Styles.AddWalletButton onClick={onAddNewAddress}>
-            <SVG src="../../assets/icons/plus.svg" width={14} height={14} title="Add new wallet" />
-          </Styles.AddWalletButton>
         </Styles.WalletsList>
+        <Styles.AddWalletButton onClick={onAddNewAddress}>
+          <SVG src='../../assets/icons/plus.svg' width={14} height={14} title='Add new wallet' />
+        </Styles.AddWalletButton>
       </Styles.Wrapper>
       <FilterWalletsDrawer
         isActive={state.activeDrawer === 'filters'}

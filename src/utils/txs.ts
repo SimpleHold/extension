@@ -129,16 +129,13 @@ export const save = (
   const walletKey = getWalletKey(address, chain, tokenSymbol, contractAddress)
 
   const findWalletStorage = getItem(walletKey)
-
   if (findWalletStorage) {
     const getTxs = getJSON(walletKey)
-
     if (getTxs) {
       const nonPendingTxs = txs.filter((tx: TAddressTx) => !tx.isPending)
       const getNewTxs = nonPendingTxs.filter((newTx: TAddressTx) => {
         return !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(newTx.hash))
       })
-
       if (getNewTxs.length) {
         setItem(walletKey, JSON.stringify([...getTxs, ...getNewTxs]))
       }

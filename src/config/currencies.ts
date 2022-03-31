@@ -1,4 +1,5 @@
 // Currencies logo
+import logoPlaceholder from '@assets/currencies/_logoPlaceholder.svg'
 import bitcoinLogo from '@assets/currencies/btc.svg'
 import bitcoinCashLogo from '@assets/currencies/bch.svg'
 import bitcoinSVLogo from '@assets/currencies/bsv.svg'
@@ -28,6 +29,7 @@ import vthoLogo from '@assets/currencies/vtho.svg'
 import toncoinLogo from '@assets/currencies/toncoin.svg'
 import ravencoinLogo from '@assets/currencies/rvn.svg'
 import digibyteLogo from '@assets/currencies/dgb.svg'
+import ftmLogo from '@assets/currencies/ftm.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -303,6 +305,15 @@ const currencies: ICurrency[] = [
     chain: 'ravencoin',
     minSendAmount: 1000,
     isCustomFee: true,
+  },
+  {
+    name: 'Fantom',
+    symbol: 'ftm',
+    logo: ftmLogo,
+    background: '#13B5EC',
+    chain: 'ftm',
+    minSendAmount: 1000,
+    isCustomFee: false,
   }
 ]
 

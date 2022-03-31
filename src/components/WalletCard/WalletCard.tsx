@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
-import numeral from 'numeral'
 import SVG from 'react-inlinesvg'
 
 // Components
@@ -9,7 +8,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { getBalance } from '@utils/api'
-import { toUpper, numberFriendly, formatEstimated } from '@utils/format'
+import { toUpper, numberFriendly, formatEstimated, getFormatBalance } from '@utils/format'
 import { updateBalance, THardware, getLatestBalance } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 
@@ -25,7 +24,9 @@ import clockIcon from '@assets/icons/clock.svg'
 
 // Styles
 import Styles from './styles'
-import { TWalletAmountData } from 'pages/Wallets/types'
+
+// Types
+import { TWalletAmountData } from '@pages/Wallets/types'
 
 interface Props {
   address: string
@@ -50,7 +51,7 @@ const emptyData = {
   balance_usd: 0,
   balance_btc: 0,
   pending: 0,
-  pending_btc: 0,
+  pending_btc: 0
 }
 
 const WalletCard: React.FC<Props> = React.memo((props) => {
@@ -72,7 +73,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
-  const contractAddress = props.contractAddress || sharedToken?.address || undefined
+  const contractAddress = props.contractAddress || sharedToken?.address || (chain ? getToken(symbol, chain)?.address : undefined)
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
   const tokenSymbol = chain ? symbol : undefined
@@ -98,8 +99,8 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
       logEvent({
         name: BALANCE_CHANGED,
         properties: {
-          symbol,
-        },
+          symbol
+        }
       })
     }
 
@@ -122,8 +123,8 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     logEvent({
       name: ADDRESS_WATCH,
       properties: {
-        symbol,
-      },
+        symbol
+      }
     })
 
     history.push('/wallet', {
@@ -137,68 +138,70 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
       isHidden,
       walletName,
       uuid,
-      hardware,
+      hardware
     })
   }
 
   return (
-    <Styles.Container onClick={openWallet}>
-      <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
-      <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>
-        <Styles.AddressInfo>
-          <Styles.CurrencyInfo>
-            {hardware ? (
-              <Styles.HardwareIconRow className="hardware-icon">
-                <SVG
-                  src={hardware.type === 'ledger' ? ledgerLogo : trezorLogo}
-                  width={12}
-                  height={12}
-                />
-              </Styles.HardwareIconRow>
-            ) : null}
-            <Styles.WalletName className="wallet-name">{walletName}</Styles.WalletName>
-          </Styles.CurrencyInfo>
-          {isNotActivated ? (
-            <Styles.ActivateBlock>
-              <Styles.ActivateLabel>Need activation</Styles.ActivateLabel>
-            </Styles.ActivateBlock>
-          ) : (
-            <Styles.AddressRow>
-              <Styles.Address>{address}</Styles.Address>
-            </Styles.AddressRow>
-          )}
-        </Styles.AddressInfo>
-        {!isNotActivated ? (
-          <Styles.Balances>
-            <Skeleton width={110} height={16} type="gray" br={4} isLoading={balance === null}>
-              <Styles.BalanceRow>
-                {pendingBalance !== 0 ? (
-                  <Styles.PendingIcon>
-                    <SVG src={clockIcon} width={12} height={12} />
-                  </Styles.PendingIcon>
-                ) : null}
-                <Styles.Balance>{`${numeral(balance).format('0.[000000]')} ${toUpper(
-                  symbol
-                )}`}</Styles.Balance>
-              </Styles.BalanceRow>
-            </Skeleton>
-            <Skeleton
-              width={80}
-              height={16}
-              type="gray"
-              mt={7}
-              br={4}
-              isLoading={estimated === null}
-            >
-              <Styles.Estimated>{`$ ${formatEstimated(
-                estimated,
-                numberFriendly(estimated)
-              )}`}</Styles.Estimated>
-            </Skeleton>
-          </Styles.Balances>
-        ) : null}
-      </Styles.Row>
-    </Styles.Container>
+    <Styles.Wrapper onClick={openWallet}>
+      <Styles.Container className={'container'}>
+        <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
+        <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>
+          <Styles.AddressInfo>
+            <Styles.CurrencyInfo>
+              {hardware ? (
+                <Styles.HardwareIconRow className='hardware-icon'>
+                  <SVG
+                    src={hardware.type === 'ledger' ? ledgerLogo : trezorLogo}
+                    width={12}
+                    height={12}
+                  />
+                </Styles.HardwareIconRow>
+              ) : null}
+              <Styles.WalletName className='wallet-name'>{walletName}</Styles.WalletName>
+            </Styles.CurrencyInfo>
+            {isNotActivated ? (
+              <Styles.ActivateBlock>
+                <Styles.ActivateLabel>Need activation</Styles.ActivateLabel>
+              </Styles.ActivateBlock>
+            ) : (
+              <Styles.AddressRow>
+                <Styles.Address>{address}</Styles.Address>
+              </Styles.AddressRow>
+            )}
+          </Styles.AddressInfo>
+          {!isNotActivated ? (
+            <Styles.Balances>
+              <Skeleton width={110} height={16} type='gray' br={4} isLoading={balance === null}>
+                <Styles.BalanceRow>
+                  {pendingBalance !== 0 ? (
+                    <Styles.PendingIcon>
+                      <SVG src={clockIcon} width={12} height={12} />
+                    </Styles.PendingIcon>
+                  ) : null}
+                  <Styles.Balance>
+                    {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
+                  </Styles.Balance>
+                </Styles.BalanceRow>
+              </Skeleton>
+              <Skeleton
+                width={80}
+                height={16}
+                type='gray'
+                mt={7}
+                br={4}
+                isLoading={estimated === null}
+              >
+                <Styles.Estimated>{`$ ${formatEstimated(
+                  estimated,
+                  numberFriendly(estimated)
+                )}`}</Styles.Estimated>
+              </Skeleton>
+            </Styles.Balances>
+          ) : null}
+        </Styles.Row>
+      </Styles.Container>
+    </Styles.Wrapper>
   )
 })
 

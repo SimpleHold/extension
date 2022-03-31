@@ -27,12 +27,17 @@ const App: React.FC = () => {
     getPlatformInfo()
     browser.runtime.setUninstallURL(`https://simplehold.io/survey?id=${getItem('clientId')}`)
 
+    let id: null | number = null
+
     if (window.name) {
       window.onresize = () => {
+        if (id) {
+          clearTimeout(id)
+        }
         const height = window.outerHeight
         const width = window.outerWidth
         if (width === 375 && height === 630) return;
-        setTimeout(() => window.resizeTo(375, 630), 1000)
+        id = +setTimeout(() => window.resizeTo(375, 630), 1000)
       }
     }
   }, [])

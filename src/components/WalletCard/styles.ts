@@ -4,6 +4,25 @@ type TRowProps = {
   gridColumns: string
 }
 
+const Wrapper = styled.div`
+  &:hover {
+    .container {
+      cursor: pointer;
+      margin: 0 -10px 6px 10px;
+
+      .wallet-name {
+        color: #3fbb7d;
+      }
+
+      .hardware-icon {
+        path {
+          fill: #3fbb7d;
+        }
+      }
+    }
+  }
+`
+
 const Container = styled.div`
   background-color: #ffffff;
   border-radius: 16px;
@@ -14,21 +33,6 @@ const Container = styled.div`
   align-items: center;
   padding: 20px;
   user-select: none;
-
-  &:hover {
-    cursor: pointer;
-    margin: 0 -10px 6px 10px;
-
-    .wallet-name {
-      color: #3fbb7d;
-    }
-
-    .hardware-icon {
-      path {
-        fill: #3fbb7d;
-      }
-    }
-  }
 `
 
 const Row = styled.div`
@@ -135,6 +139,7 @@ const AddressRow = styled.div`
 `
 
 const Styles = {
+  Wrapper,
   Container,
   Row,
   AddressInfo,
@@ -149,7 +154,7 @@ const Styles = {
   Estimated,
   ActivateBlock,
   ActivateLabel,
-  AddressRow,
+  AddressRow
 }
 
 export default Styles

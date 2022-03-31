@@ -49,7 +49,7 @@ const NetworksList = styled.div`
   flex-direction: row;
   align-items: center;
   flex-wrap: wrap;
-  margin: 0 -5px;
+  row-gap: 10px;
 `
 
 const Network = styled.div`
@@ -81,10 +81,6 @@ const Network = styled.div`
     path {
       fill: #3fbb7d;
     }
-  }
-
-  &:last-child {
-    margin-top: 10px;
   }
 `
 

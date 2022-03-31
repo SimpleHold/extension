@@ -99,9 +99,7 @@ const TxHistory: React.FC = () => {
         contractAddress,
       }
     })
-
     const data = await getFullTxHistory(mapWallets)
-
     if (data.length) {
       const compare = compareFullHistory(data)
 
@@ -118,14 +116,12 @@ const TxHistory: React.FC = () => {
             contractAddress,
           }
         })
-
         const fullTxsInfo = await getFullTxHistoryInfo(mapData)
         saveFullHistory(fullTxsInfo)
       }
     }
 
     const getSavedHistory = getFullHistory()
-
     if (getSavedHistory.length) {
       updateState({ txGroups: groupHistory(getSavedHistory) })
     } else {

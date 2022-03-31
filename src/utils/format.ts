@@ -1,4 +1,5 @@
 import BigNumber from 'bignumber.js'
+import numeral from 'numeral'
 
 export const minus = (from: number, to: number): number => {
   return new BigNumber(from).minus(new BigNumber(to)).toNumber()
@@ -96,4 +97,13 @@ export const getAbsoluteValue = (value: string | number, isPositive: boolean): n
   }
 
   return -Math.abs(+value)
+}
+
+export const getFormatBalance = (balance: string | number | null) => {
+  if (balance === null) return null;
+  if (balance === 0) return '0';
+  if (Math.abs(+balance) < 0.000001) {
+    return '< 0.000001'
+  }
+  return numeral(balance).format('0.[000000]')
 }
