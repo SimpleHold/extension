@@ -30,6 +30,7 @@ import toncoinLogo from '@assets/currencies/toncoin.svg'
 import ravencoinLogo from '@assets/currencies/rvn.svg'
 import digibyteLogo from '@assets/currencies/dgb.svg'
 import ftmLogo from '@assets/currencies/ftm.svg'
+import xnoLogo from '@assets/currencies/xno.svg'
 
 // Utils
 import { toLower } from '@utils/format'
@@ -314,6 +315,15 @@ const currencies: ICurrency[] = [
     chain: 'ftm',
     minSendAmount: 1000,
     isCustomFee: true,
+  },
+  {
+    name: 'Nano',
+    symbol: 'xno',
+    logo: xnoLogo,
+    background: '#209CE9',
+    chain: 'xno',
+    minSendAmount: 1000000000000000,
+    isCustomFee: false,
   }
 ]
 

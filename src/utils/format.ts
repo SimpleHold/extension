@@ -31,7 +31,7 @@ export const numberFriendly = (amount: number | null): number | string => {
   const abbrev = 'KMB'
 
   const round = (n: number, precision: number) => {
-    var prec = Math.pow(10, precision)
+    const prec = Math.pow(10, precision)
     return Math.round(n * prec) / prec
   }
 

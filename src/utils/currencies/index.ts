@@ -8,10 +8,13 @@ import {
   getEtherNetworkFee,
   getThetaNetworkFee,
   getNetworkFee as getNetworkFeeRequest,
-  getCustomFee,
+  getCustomFee, requestBalance
 } from '@utils/api'
-import { TCustomFee } from '@utils/api/types'
 import { toLower } from '@utils/format'
+
+// Types
+import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
+import { IGetBalance, TCustomFee } from '@utils/api/types'
 
 // Currencies
 import * as ethereumLike from '@utils/currencies/ethereumLike'
@@ -33,12 +36,26 @@ import * as vechain from '@utils/currencies/vechain'
 import * as toncoin from '@utils/currencies/toncoin'
 import * as digibyte from '@utils/currencies/digibyte'
 import * as ravencoin from '@utils/currencies/ravencoin'
-
-// Types
-import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
+import * as nano from '@utils/currencies/nano'
 
 export const isEthereumLike = (symbol: string, chain?: string): boolean => {
   return ethereumLike.coins.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
+}
+
+export const getBalance = async (
+  symbol: string,
+  address: string,
+  chain?: string,
+  tokenSymbol?: string,
+  contractAddress?: string,
+  isFullBalance?: boolean
+): Promise<IGetBalance> => {
+
+  if (['xno'].indexOf(symbol) !== -1) {
+    nano.updateWalletActivationStatus(address)
+  }
+
+  return await requestBalance(address, chain, tokenSymbol, contractAddress, isFullBalance)
 }
 
 const getProvider = (symbol: string): TProvider | null => {
@@ -111,9 +128,25 @@ const getProvider = (symbol: string): TProvider | null => {
       return ravencoin
     }
 
+    if (nano.coins.indexOf(symbol) !== -1) {
+      return nano
+    }
+
+
     return null
   } catch {
     return null
+  }
+}
+
+
+export const activateWallet = async (chain: string, publicKey: string, privateKey?: string): Promise<any | null> => {
+  if (chain === 'xno') {
+    if (!privateKey) return null;
+    return await nano.activateWallet(chain, publicKey, privateKey)
+  }
+  if (chain === 'hedera') {
+    return await hedera.activateWallet(chain, publicKey)
   }
 }
 
@@ -205,6 +238,10 @@ export const createTransaction = async ({
 
     if (cardano.coins.indexOf(symbol) !== -1 && outputs) {
       return await cardano.createTransaction(outputs, from, to, amount, privateKey)
+    }
+
+    if (nano.coins.indexOf(symbol) !== -1) {
+      return await nano.createTransaction(from, to, amount, privateKey)
     }
 
     if (isEthereumLike(symbol, tokenChain)) {
@@ -523,6 +560,9 @@ export const checkWithPhrase = (symbol: string, chain?: string): boolean => {
 
 export const checkWithZeroFee = (symbol: string): boolean => {
   if (nerve.coins.indexOf(symbol) !== -1) {
+    return true
+  }
+  if (nano.coins.indexOf(symbol) !== -1) {
     return true
   }
 

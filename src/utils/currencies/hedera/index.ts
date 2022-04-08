@@ -2,7 +2,7 @@ import { PrivateKey, Hbar, HbarUnit, Client, TransferTransaction } from '@hashgr
 import { Buffer } from 'buffer'
 
 // Utils
-import { getHederaAccountId } from '@utils/api'
+import { activateAccount, getHederaAccountId } from '@utils/api'
 
 // Types
 import { TInternalTxProps } from '../types'
@@ -70,6 +70,12 @@ export const createInternalTx = async ({
     return null
   }
 }
+
+export const activateWallet = async (chain: string, publicKey: string) => {
+  const res = await activateAccount<string>(chain, publicKey)
+  return res
+}
+
 
 export const validateAddress = (address: string): boolean => {
   try {

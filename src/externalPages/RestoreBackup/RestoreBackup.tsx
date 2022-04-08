@@ -21,7 +21,7 @@ import SuccessDrawer from '@drawers/Success'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { validate as validateBackup } from '@utils/backup'
+import { setTempData, validate as validateBackup } from '@utils/backup'
 import { setBadgeBackgroundColor, setBadgeText } from '@utils/extension'
 import { getItem, setItem, removeItem } from '@utils/storage'
 
@@ -47,7 +47,7 @@ const initialState: IState = {
   activeDrawer: null,
   password: '',
   passwordErrorLabel: null,
-  isPageActive: false,
+  isPageActive: false
 }
 
 const RestoreBackup: React.FC = () => {
@@ -77,7 +77,7 @@ const RestoreBackup: React.FC = () => {
 
   const onConfirm = (): void => {
     logEvent({
-      name: START_RESTORE_CONFIRM,
+      name: START_RESTORE_CONFIRM
     })
 
     updateState({ activeDrawer: 'confirm' })
@@ -85,7 +85,7 @@ const RestoreBackup: React.FC = () => {
 
   const onConfirmRestore = (): void => {
     logEvent({
-      name: START_RESTORE_PASSWORD,
+      name: START_RESTORE_PASSWORD
     })
 
     if (state.passwordErrorLabel) {
@@ -108,6 +108,7 @@ const RestoreBackup: React.FC = () => {
           setItem('backup', state.backupData)
           setItem('wallets', getWalletsList)
           removeItem('manualRestoreBackup')
+          setTempData(state.password)
 
           setBadgeBackgroundColor('#EB5757')
           setBadgeText('1')
@@ -137,7 +138,7 @@ const RestoreBackup: React.FC = () => {
   }
 
   return (
-    <ExternalPageContainer onClose={onClose} headerStyle="white">
+    <ExternalPageContainer onClose={onClose} headerStyle='white'>
       <>
         <Styles.Body>
           <Styles.Title>Restore</Styles.Title>
@@ -151,9 +152,9 @@ const RestoreBackup: React.FC = () => {
           <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
 
           <Styles.Actions>
-            <Button label="Cancel" onClick={onClose} isLight mr={7.5} />
+            <Button label='Cancel' onClick={onClose} isLight mr={7.5} />
             <Button
-              label="Confirm"
+              label='Confirm'
               onClick={onConfirm}
               disabled={!state.backupData.length || !state.isAgreed}
               ml={7.5}
@@ -163,7 +164,7 @@ const RestoreBackup: React.FC = () => {
           <Styles.DividerLine />
 
           <Styles.QuestionBlock>
-            <SVG src="../../assets/icons/ask.svg" width={15} height={15} title="ask" />
+            <SVG src='../../assets/icons/ask.svg' width={15} height={15} title='ask' />
             <Styles.Question>Why I see this page?</Styles.Question>
           </Styles.QuestionBlock>
 
@@ -176,28 +177,28 @@ const RestoreBackup: React.FC = () => {
         <ConfirmDrawer
           isActive={state.activeDrawer === 'confirm'}
           onClose={onCloseDrawer}
-          title="Enter the password to restore your wallet"
+          title='Enter the password to restore your wallet'
           textInputValue={state.password}
           onChangeText={setPassword}
           onConfirm={onConfirmRestore}
-          textInputType="password"
-          inputLabel="Enter password"
+          textInputType='password'
+          inputLabel='Enter password'
           isButtonDisabled={!validatePassword(state.password)}
           inputErrorLabel={state.passwordErrorLabel}
-          openFrom="browser"
+          openFrom='browser'
         />
         <FailDrawer
           isActive={state.activeDrawer === 'fail'}
           onClose={onCloseDrawer}
-          text="The backup file is broken. We cannot restore your wallet. Check your backup file and try again."
-          openFrom="browser"
+          text='The backup file is broken. We cannot restore your wallet. Check your backup file and try again.'
+          openFrom='browser'
         />
         <SuccessDrawer
           isActive={state.activeDrawer === 'success'}
           onClose={() => null}
           icon={puzzleIcon}
-          text="We successfully restored your wallet. Go to the extension by clicking on the SimpleHold icon in the extensions menu and enjoy your crypto!"
-          openFrom="browser"
+          text='We successfully restored your wallet. Go to the extension by clicking on the SimpleHold icon in the extensions menu and enjoy your crypto!'
+          openFrom='browser'
           disableClose
         />
       </>

@@ -20,7 +20,8 @@ export type THistoryTxGroup = {
   data: TFullTxInfo[]
 }
 
-const getWalletKey = (
+
+export const getWalletKey = (
   address: string,
   chain: string,
   tokenSymbol?: string,
@@ -247,15 +248,22 @@ export const saveFullHistory = (txs: TFullTxInfo[]): void => {
         return hashMatch && amountMatch && addressMatch
       })
     })
-    let hasPendingUpdates = false
-    const getUpdatedPendingTxs = getHistory.map((tx: TFullTxInfo) => {
+    // let hasPendingUpdates = false
+    const formatHistory = getHistory.filter((tx: TFullTxInfo) => {
+      if (toLower(tx.symbol) === "xno") {
+        return !tx.isPending
+      }
+      return tx
+    })
+    const getUpdatedPendingTxs = formatHistory.map((tx: TFullTxInfo) => {
       const match = txs.find((newTx: TFullTxInfo) => {
         const hashMatch = toLower(newTx.hash) === toLower(tx.hash)
+        const addressMatch = toLower(newTx.address) === toLower(tx.address)
         const pendingStatusUpdated = tx.isPending !== newTx.isPending
-        if (pendingStatusUpdated) {
-          hasPendingUpdates = true
-        }
-        return hashMatch && pendingStatusUpdated
+        // if (pendingStatusUpdated) {
+        //   hasPendingUpdates = true
+        // }
+        return hashMatch && addressMatch && pendingStatusUpdated
       })
       return match ? { ...tx, isPending: false } : tx
     })

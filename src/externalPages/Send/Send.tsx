@@ -21,7 +21,8 @@ import NetworkFeeShared from '@shared/NetworkFee'
 
 // Utils
 import { getWallets, IWallet, getWalletName } from '@utils/wallet'
-import { getBalance, getUnspentOutputs } from '@utils/api'
+import { getUnspentOutputs } from '@utils/api'
+import { getBalance } from '@utils/currencies'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import { toLower, toUpper, plus } from '@utils/format'
 import {
@@ -436,6 +437,7 @@ const Send: React.FC = () => {
 
       if (getCurrencyInfo) {
         const { balance, balance_usd } = await getBalance(
+          symbol,
           address,
           getCurrencyInfo?.chain,
           chain ? symbol : undefined,

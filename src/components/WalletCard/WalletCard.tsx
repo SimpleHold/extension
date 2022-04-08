@@ -7,7 +7,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { getBalance } from '@utils/api'
+import { getBalance } from '@utils/currencies'
 import { toUpper, numberFriendly, formatEstimated, getFormatBalance } from '@utils/format'
 import {
   updateBalance,
@@ -37,6 +37,7 @@ import Styles from './styles'
 import { TWalletAmountData } from '@pages/Wallets/types'
 import { TTxWallet } from '@utils/api/types'
 import { THardware } from '@utils/wallet'
+import { receiveAllPendingTxs, updateWalletActivationStatus } from 'utils/currencies/nano'
 
 
 interface Props {
@@ -94,6 +95,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   const [balance, setBalance] = React.useState<number | null>(null)
   const [estimated, setEstimated] = React.useState<number | null>(null)
   const [pendingBalance, setPendingBalance] = React.useState<number>(0)
+  const [notActivatedStatus, setActivationStatus] = React.useState<boolean>(!!isNotActivated)
 
   const walletData: TTxWallet = {
     chain: getWalletChain(symbol, chain),
@@ -104,8 +106,19 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   }
 
   React.useEffect(() => {
+    checkActivatedStatus()
     loadBalance()
   }, [])
+
+  const checkActivatedStatus = () => {
+    if (symbol === 'xno') {
+      updateWalletActivationStatus(address).then(res => {
+        if (res) {
+          setActivationStatus(true)
+        }
+      })
+    }
+  }
 
   const loadBalance = async (): Promise<void> => {
     const savedData = getLatestBalance(address, chain, symbol)
@@ -113,14 +126,14 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     const isFetchReady = checkIfTimePassed(savedData.lastBalanceCheck || 0, { seconds: 20 })
     const isFullData = !Object.entries(savedData).find(v => v[1] === null)
 
-    let data = isNotActivated ? emptyData : savedData
+    let data = notActivatedStatus ? emptyData : savedData
 
-    const isFetchRequired = !isNotActivated && (isFetchReady || !isFullData)
+    const isFetchRequired = !notActivatedStatus && (isFetchReady || !isFullData)
 
     if (isFetchRequired) {
       updateLast('lastBalanceCheck', address, chain)
 
-      const fetchedData = await getBalance(address, currency?.chain || chain, tokenSymbol, contractAddress)
+      const fetchedData = await getBalance(symbol, address, currency?.chain || chain, tokenSymbol, contractAddress)
       data = { ...data, ...fetchedData }
     }
 
@@ -147,6 +160,10 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
           symbol
         }
       })
+
+      if (symbol === 'xno') {
+        await receiveAllPendingTxs(address)
+      }
 
       await updateTxsHistory({ updateSingleWallet: walletData })
       updateBalance({ address, symbol, balance, balance_btc, pending: pending, balance_usd, pending_btc: pending_btc })
@@ -185,7 +202,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     <Styles.Wrapper onClick={openWallet}>
       <Styles.Container className={'container'}>
         <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
-        <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>
+        <Styles.Row gridColumns={notActivatedStatus ? 'auto' : 'repeat(2,1fr)'}>
           <Styles.AddressInfo>
             <Styles.CurrencyInfo>
               {hardware ? (
@@ -199,7 +216,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
               ) : null}
               <Styles.WalletName className='wallet-name'>{walletName}</Styles.WalletName>
             </Styles.CurrencyInfo>
-            {isNotActivated ? (
+            {notActivatedStatus ? (
               <Styles.ActivateBlock>
                 <Styles.ActivateLabel>Need activation</Styles.ActivateLabel>
               </Styles.ActivateBlock>
@@ -209,7 +226,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
               </Styles.AddressRow>
             )}
           </Styles.AddressInfo>
-          {!isNotActivated ? (
+          {!notActivatedStatus ? (
             <Styles.Balances>
               <Skeleton width={110} height={16} type='gray' br={4} isLoading={balance === null}>
                 <Styles.BalanceRow>

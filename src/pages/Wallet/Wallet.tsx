@@ -19,7 +19,7 @@ import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import {
-  getBalance,
+  requestBalance,
   getTxsInfo,
   getWarning,
   activateAccount,
@@ -33,6 +33,7 @@ import {
   getWallets,
   activateAddress, getWalletChain
 } from '@utils/wallet'
+import { activateWallet, getBalance } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
 import { getExplorerLink, getTransactionLink, checkWithPhrase } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
@@ -48,7 +49,7 @@ import {
 import { logEvent } from '@utils/amplitude'
 import { getTxHistory as getTonCoinTxHistory } from '@utils/currencies/toncoin'
 import { checkIfTimePassed, toMs } from '@utils/dates'
-import { updateTxsHistory } from '@utils/history'
+import { removeTempTxs, updateTxsHistory } from '@utils/history'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -64,6 +65,8 @@ import { IWallet } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
+import * as nano from 'utils/currencies/nano'
+import { receiveAllPendingTxs } from '@utils/currencies/nano'
 
 const initialState: IState = {
   balance: null,
@@ -119,6 +122,7 @@ const WalletPage: React.FC = () => {
   })
 
   React.useEffect(() => {
+    receivePendingTxs()
     loadBalance()
     getTxHistory()
     getName()
@@ -201,6 +205,13 @@ const WalletPage: React.FC = () => {
     }
   }
 
+  const receivePendingTxs = async (): Promise<void> => {
+    if (!state.address) return;
+    if (symbol?.toLowerCase() === 'xno') {
+      receiveAllPendingTxs(state.address)
+    }
+  }
+
   const loadBalance = async (): Promise<void> => {
     if (state.isNotActivated) {
       updateState({ balance: 0, estimated: 0 })
@@ -208,6 +219,7 @@ const WalletPage: React.FC = () => {
     }
 
     const { balance, balance_usd, balance_btc, pending } = await getBalance(
+      symbol,
       state.address,
       currency?.chain || chain,
       tokenSymbol,
@@ -256,6 +268,16 @@ const WalletPage: React.FC = () => {
     const currencyChain = getCurrencyChain()
 
     if (currencyChain) {
+      const walletData = {
+        chain: getWalletChain(symbol, chain),
+        address: state.address,
+        symbol,
+        tokenSymbol,
+        contractAddress
+      }
+
+      removeTempTxs(walletData)
+
       const data = await getTransactionHistory(
         currencyChain,
         state.address,
@@ -267,14 +289,8 @@ const WalletPage: React.FC = () => {
         const compare = compareTxs(state.address, currencyChain, data, tokenSymbol, contractAddress)
         if (compare.length) {
           const getFullTxHistoryInfo = await getTxsInfo(currencyChain, state.address, compare)
+
           saveTxs(state.address, currencyChain, getFullTxHistoryInfo, tokenSymbol, contractAddress)
-          const walletData = {
-            chain: getWalletChain(symbol, chain),
-            address: state.address,
-            symbol,
-            tokenSymbol,
-            contractAddress
-          }
           updateTxsHistory({ updateSingleWallet: walletData })
         }
       }
@@ -387,8 +403,8 @@ const WalletPage: React.FC = () => {
             }
 
             if (getPubKey) {
-              const getAddress = await activateAccount('hedera', getPubKey)
-
+              const parsedChain = symbol === 'hbar' ? 'hedera' : 'xno'
+              const getAddress = await activateWallet(parsedChain, getPubKey, privateKey)
               if (getAddress) {
                 activateAddress(uuid, getAddress, decryptBackup, state.password)
 
@@ -525,6 +541,7 @@ const WalletPage: React.FC = () => {
               hardware={hardware}
               isHidden={state.isHiddenWallet}
             />
+
             <WalletCard
               openPage={openPage}
               symbol={symbol}
