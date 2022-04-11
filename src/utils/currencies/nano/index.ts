@@ -14,7 +14,6 @@ import {
 } from '@utils/currencies/nano/types'
 import { IWallet } from '@utils/wallet'
 
-
 // Types
 import { BlockRepresentation, ConvertParams } from 'nanocurrency'
 
@@ -38,7 +37,6 @@ export const generateWallet = async (): Promise<TGenerateAddress | null> => {
     return null
   }
 }
-
 
 export const formatValue = (value: string | number, type: 'from' | 'to'): string => {
   return nano.convert(`${value}`, <ConvertParams>{

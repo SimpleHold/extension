@@ -19,10 +19,8 @@ import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import {
-  requestBalance,
   getTxsInfo,
   getWarning,
-  activateAccount,
   getTransactionHistory
 } from '@utils/api'
 import {
@@ -391,7 +389,8 @@ const WalletPage: React.FC = () => {
               if (symbol.toLowerCase() === 'xno') {
                 const res = await receiveAllPendingTxs(state.address, privateKey)
                 if (res) {
-                  getTxHistory()
+                  await getTxHistory()
+                  setWalletPendingStatus(false)
                   return updateState({
                     isDrawerButtonLoading: false,
                     activeDrawer: 'txsReceivedSuccess',
