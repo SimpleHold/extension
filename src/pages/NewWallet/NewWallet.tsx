@@ -34,7 +34,6 @@ import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
-import { setTempData } from 'utils/backup'
 
 const initialState: IState = {
   activeDrawer: null,
@@ -141,9 +140,6 @@ const NewWallet: React.FC = () => {
 
               if (['xno', 'hbar'].indexOf(symbol) !== -1) {
                 setItem('backupStatus', 'notDownloaded')
-                if (symbol ==='xno') {
-                  setTempData(state.password)
-                }
               }
 
               updateState({ activeDrawer: 'success' })

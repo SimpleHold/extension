@@ -161,10 +161,6 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
         }
       })
 
-      if (symbol === 'xno') {
-        await receiveAllPendingTxs(address)
-      }
-
       await updateTxsHistory({ updateSingleWallet: walletData })
       updateBalance({ address, symbol, balance, balance_btc, pending: pending, balance_usd, pending_btc: pending_btc })
       updateLast('lastActive', address, chain)

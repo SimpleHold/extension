@@ -2,22 +2,21 @@ import * as nano from 'nanocurrency'
 
 // Utils
 import { activateAccount, getNanoPow, sendNanoRpcRequest } from '@utils/api'
-import { getItem, setItem } from '@utils/storage'
-import { decrypt, encrypt } from '@utils/crypto'
+import { setItem } from '@utils/storage'
 import { getWallets } from '@utils/wallet'
-import { toLower } from '@utils/format'
-
-// Types
-import { BlockRepresentation, ConvertParams } from 'nanocurrency'
-import { IWallet } from '@utils/wallet'
 import {
   TAccountInfo,
   TActivateData,
-  TBlockInfo, TProcessBlock,
+  TBlockInfo,
+  TProcessBlock,
   TReceivableResponse,
   TReceiveBlock
 } from '@utils/currencies/nano/types'
+import { IWallet } from '@utils/wallet'
 
+
+// Types
+import { BlockRepresentation, ConvertParams } from 'nanocurrency'
 
 export const coins: string[] = ['xno']
 
@@ -87,10 +86,8 @@ export const getPubKeyFromPriv = (privateKey: string): string | null => {
   }
 }
 
-export const receiveAllPendingTxs = async (address: string): Promise<boolean> => {
+export const receiveAllPendingTxs = async (address: string, privKey: string): Promise<boolean> => {
   try {
-    const privKey = await getXnoTempData(address)
-    if (!privKey) return false
     let isReceived = false
     const pubKey = nano.derivePublicKey(privKey)
     const response = await getReceivableBlocks(address)
@@ -106,8 +103,7 @@ export const receiveAllPendingTxs = async (address: string): Promise<boolean> =>
       }
     }
     return isReceived
-  } catch (err) {
-    console.error(err)
+  } catch {
     return false
   }
 
@@ -284,57 +280,6 @@ export const createTransaction = async (
       return hash
     }
     return null
-  } catch (err) {
-    console.error(err)
-    return null
-  }
-}
-
-export const setXnoTempData = (key: string) => {
-  const backup = getItem('backup')
-  if (backup?.length) {
-    const decryptBackup = decrypt(backup, key)
-    if (!decryptBackup) return
-    const parseBackup = JSON.parse(decryptBackup)
-    const xnoWallets: IWallet[] = parseBackup?.wallets?.filter(
-      (wallet: IWallet) => toLower(wallet.symbol) === 'xno'
-    )
-    if (xnoWallets?.length) {
-      const arr = []
-      const tempData = getItem('tempData')
-      const parsedData = tempData ? JSON.parse(tempData) : []
-      for (const wallet of xnoWallets) {
-        const { privateKey: k, address } = wallet
-        if (!k) return
-        const a = address
-          .toLowerCase()
-          .replace('xrb_', 'nano_')
-        const data = encrypt(k, a)
-        arr.push(data)
-      }
-      const newData = JSON.stringify([...parsedData, ...arr])
-      setItem('tempData', newData)
-    }
-  }
-}
-
-export const getXnoTempData = async (address: string): Promise<string | null> => {
-  const tempData = getItem('tempData')
-  if (!tempData) return null
-  const parsedData = JSON.parse(tempData)
-  for (const item of parsedData) {
-    const res = await getTempItem(address, item)
-    if (res) return res
-  }
-  return null
-}
-
-const getTempItem = async (key: string, item: string): Promise<string | null> => {
-  try {
-    const a = key
-      .toLowerCase()
-      .replace('xrb_', 'nano_')
-    return decrypt(item, a)
   } catch {
     return null
   }

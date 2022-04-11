@@ -88,8 +88,7 @@ export const updateTxsHistory = async (
       return !!(fullTxsInfo && fullTxsInfo.length)
     }
     return false
-  } catch (err) {
-    console.error(err)
+  } catch {
     return false
   } finally {
     setIsLoadingFlag(false)

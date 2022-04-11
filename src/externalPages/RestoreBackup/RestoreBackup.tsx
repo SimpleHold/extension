@@ -21,7 +21,7 @@ import SuccessDrawer from '@drawers/Success'
 import { logEvent } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { setTempData, validate as validateBackup } from '@utils/backup'
+import { validate as validateBackup } from '@utils/backup'
 import { setBadgeBackgroundColor, setBadgeText } from '@utils/extension'
 import { getItem, setItem, removeItem } from '@utils/storage'
 
@@ -108,7 +108,6 @@ const RestoreBackup: React.FC = () => {
           setItem('backup', state.backupData)
           setItem('wallets', getWalletsList)
           removeItem('manualRestoreBackup')
-          setTempData(state.password)
 
           setBadgeBackgroundColor('#EB5757')
           setBadgeText('1')

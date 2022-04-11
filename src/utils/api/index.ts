@@ -473,8 +473,7 @@ export const getFullTxHistoryInfo = async ( wallets: TFullTxWallet[], options: T
       }
     )
     return data?.data || []
-  } catch (err) {
-    console.log(err)
+  } catch {
     return []
   }
 }

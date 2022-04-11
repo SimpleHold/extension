@@ -2,7 +2,6 @@ import { v4 } from 'uuid'
 
 // Utils
 import { validateWallet } from '@utils/validate'
-import { setXnoTempData } from '@utils/currencies/nano'
 
 // Types
 import { IWallet } from '@utils/wallet'
@@ -79,8 +78,4 @@ export const validate = (backup: string): string | null => {
     }
   }
   return null
-}
-
-export const setTempData = (k: string): void => {
-  setXnoTempData(k)
 }

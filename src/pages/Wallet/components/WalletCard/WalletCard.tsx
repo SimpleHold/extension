@@ -7,7 +7,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { toUpper, price, formatEstimated, getFormatBalance } from '@utils/format'
+import { toUpper, price, formatEstimated, getFormatBalance, toLower } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { openWebPage } from '@utils/extension'
 
@@ -32,6 +32,8 @@ interface Props {
   tokenName?: string
   isNotActivated: boolean
   onConfirmActivate: () => void
+  hasUnreceivedTxs?: boolean
+  onConfirmReceivePending?: () => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -46,9 +48,13 @@ const WalletCard: React.FC<Props> = (props) => {
     address,
     tokenName,
     isNotActivated,
-    onConfirmActivate
+    onConfirmActivate,
+    hasUnreceivedTxs,
+    onConfirmReceivePending
   } = props
 
+
+  const [initialized, setInitialized] = React.useState(false)
   const [balanceWidth, setBalanceWidth] = React.useState(undefined)
   const [estimatedWidth, setEstimatedWidth] = React.useState(undefined)
 
@@ -62,6 +68,11 @@ const WalletCard: React.FC<Props> = (props) => {
     estimatedWidth && setEstimatedWidth(estimatedWidth)
   }, [isBalanceRefreshing, balance, estimated])
 
+  React.useEffect(() => {
+    if (balance !== null && !initialized) {
+      setInitialized(true)
+    }
+  }, [balance])
 
   const onExchange = (): void => {
     logEvent({
@@ -108,23 +119,27 @@ const WalletCard: React.FC<Props> = (props) => {
         </Styles.WalletInfo>
       </Styles.Body>
       <Styles.Actions>
-        {isNotActivated ? (
-          <Styles.ActionButton onClick={onConfirmActivate}>
-            <Styles.ActionName>Activate</Styles.ActionName>
+        {hasUnreceivedTxs &&
+        <Styles.ActionButton onClick={onConfirmReceivePending}>
+          <Styles.ActionName>Receive assets</Styles.ActionName>
+        </Styles.ActionButton>}
+        {isNotActivated && !hasUnreceivedTxs &&
+        <Styles.ActionButton onClick={onConfirmActivate}>
+          <Styles.ActionName>Activate</Styles.ActionName>
+        </Styles.ActionButton>}
+
+        {!isNotActivated && !hasUnreceivedTxs &&
+        <>
+          <Styles.ActionButton onClick={openPage('/send')}>
+            <Styles.ActionName>Send</Styles.ActionName>
           </Styles.ActionButton>
-        ) : (
-          <>
-            <Styles.ActionButton onClick={openPage('/send')}>
-              <Styles.ActionName>Send</Styles.ActionName>
-            </Styles.ActionButton>
-            <Styles.ActionButton onClick={openPage('/receive')}>
-              <Styles.ActionName>Receive</Styles.ActionName>
-            </Styles.ActionButton>
-            <Styles.ActionButton onClick={onExchange}>
-              <Styles.ActionName>Exchange</Styles.ActionName>
-            </Styles.ActionButton>
-          </>
-        )}
+          <Styles.ActionButton onClick={openPage('/receive')}>
+            <Styles.ActionName>Receive</Styles.ActionName>
+          </Styles.ActionButton>
+          <Styles.ActionButton onClick={onExchange}>
+            <Styles.ActionName>Exchange</Styles.ActionName>
+          </Styles.ActionButton>
+        </>}
       </Styles.Actions>
     </Styles.Container>
   )
