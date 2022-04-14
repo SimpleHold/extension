@@ -621,7 +621,7 @@ export const getTokens = async (): Promise<IToken[] | null> => {
 export const sendNanoRpcRequest = async <T>(input: any): Promise<T | null> => {
   try {
     const { data }: AxiosResponse = await axios.post(
-      `${config.serverUrl}/wallet/nano/rpc`,
+      `${config.serverUrl}/rpc/nano`,
       { input },
       {
         headers: {
@@ -639,7 +639,7 @@ export const getNanoPow = async (hash: string, type: string): Promise<string | n
   try {
     const input = { hash, type }
     const { data } = await axios.post(
-      `${config.serverUrl}/transaction/nano/pow`,
+      `${config.serverUrl}/rpc/nano/pow`,
       { input },
       {
         headers: {

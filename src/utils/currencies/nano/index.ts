@@ -4,20 +4,52 @@ import * as nano from 'nanocurrency'
 import { activateAccount, getNanoPow, sendNanoRpcRequest } from '@utils/api'
 import { setItem } from '@utils/storage'
 import { getWallets } from '@utils/wallet'
+
+// Types
+import { BlockRepresentation, ConvertParams } from 'nanocurrency'
 import {
   TAccountInfo,
   TActivateData,
   TBlockInfo,
-  TProcessBlock,
+  TProcessBlock, TQueueRequest,
   TReceivableResponse,
-  TReceiveBlock
+  TReceiveBlock, TRequestHandler, TRpcRequest
 } from '@utils/currencies/nano/types'
 import { IWallet } from '@utils/wallet'
 
-// Types
-import { BlockRepresentation, ConvertParams } from 'nanocurrency'
-
 export const coins: string[] = ['xno']
+
+const requestHandler: TRequestHandler = {
+  _queue: [],
+  _inProgress: false,
+  add(request: TQueueRequest) {
+    this._queue.push(request)
+    if (!this._inProgress) {
+      this.run()
+    }
+  },
+
+  async run() {
+    while (this._queue.length) {
+      this._inProgress = true
+      const item = this._queue.shift()
+      if (!item) break;
+      const { request, resolver } = item
+      request().then(result => {
+        resolver(result)
+      })
+      await new Promise(res => setTimeout(res, 200))
+    }
+    this._inProgress = false
+  }
+}
+
+export const sendThrottledRequest = async <T>(input: any): Promise<T | null> => {
+  const request: TRpcRequest = () => sendNanoRpcRequest(input)
+  return await new Promise(async (resolver) => {
+    requestHandler.add({request, resolver})
+  })
+}
 
 export const generateWallet = async (): Promise<TGenerateAddress | null> => {
   try {
@@ -118,7 +150,7 @@ const processBlock = async (block: BlockRepresentation, subtype: string): Promis
     subtype: subtype,
     block: block
   }
-  return await sendNanoRpcRequest<TProcessBlock>(input)
+  return await sendThrottledRequest<TProcessBlock>(input)
 }
 
 
@@ -128,7 +160,7 @@ const getBlockInfo = async (hash: string): Promise<TBlockInfo | null> => {
     json_block: true,
     hash: hash
   }
-  return await sendNanoRpcRequest<TBlockInfo>(input)
+  return await sendThrottledRequest<TBlockInfo>(input)
 }
 
 const getAccountInfo = async (address: string, representative = true): Promise<TAccountInfo | null> => {
@@ -137,7 +169,7 @@ const getAccountInfo = async (address: string, representative = true): Promise<T
     representative: representative,
     account: address
   }
-  return await sendNanoRpcRequest<TAccountInfo>(input)
+  return await sendThrottledRequest<TAccountInfo>(input)
 }
 
 const getReceivableBlocks = async (address: string, count = undefined, threshold = undefined): Promise<TReceivableResponse | null> => {
@@ -147,7 +179,7 @@ const getReceivableBlocks = async (address: string, count = undefined, threshold
     count: count,
     threshold: threshold
   }
-  return await sendNanoRpcRequest<TReceivableResponse>(input)
+  return await sendThrottledRequest<TReceivableResponse>(input)
 }
 
 export const activateWallet = async (chain: string, pubKey: string, privKey: string): Promise<string | null> => {
