@@ -1,5 +1,4 @@
 import * as React from 'react'
-import numeral from 'numeral'
 import SVG from 'react-inlinesvg'
 
 // Components
@@ -7,7 +6,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { toUpper, price, formatEstimated, getFormatBalance, toLower } from '@utils/format'
+import { toUpper, price, formatEstimated, getFormatBalance } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { openWebPage } from '@utils/extension'
 
@@ -119,13 +118,15 @@ const WalletCard: React.FC<Props> = (props) => {
         </Styles.WalletInfo>
       </Styles.Body>
       <Styles.Actions>
-        {hasUnreceivedTxs &&
-        <Styles.ActionButton onClick={onConfirmReceivePending}>
-          <Styles.ActionName>Receive assets</Styles.ActionName>
-        </Styles.ActionButton>}
-        {isNotActivated && !hasUnreceivedTxs &&
+
+        {isNotActivated &&
         <Styles.ActionButton onClick={onConfirmActivate}>
           <Styles.ActionName>Activate</Styles.ActionName>
+        </Styles.ActionButton>}
+
+        {hasUnreceivedTxs && !isNotActivated &&
+        <Styles.ActionButton onClick={onConfirmReceivePending}>
+          <Styles.ActionName>Receive assets</Styles.ActionName>
         </Styles.ActionButton>}
 
         {!isNotActivated && !hasUnreceivedTxs &&

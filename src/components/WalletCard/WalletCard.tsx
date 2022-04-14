@@ -7,6 +7,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
+import { updateWalletActivationStatus } from '@utils/currencies/nano'
 import { getBalance } from '@utils/currencies'
 import { toUpper, numberFriendly, formatEstimated, getFormatBalance } from '@utils/format'
 import {
@@ -37,7 +38,6 @@ import Styles from './styles'
 import { TWalletAmountData } from '@pages/Wallets/types'
 import { TTxWallet } from '@utils/api/types'
 import { THardware } from '@utils/wallet'
-import { receiveAllPendingTxs, updateWalletActivationStatus } from 'utils/currencies/nano'
 
 
 interface Props {
@@ -214,7 +214,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
             </Styles.CurrencyInfo>
             {notActivatedStatus ? (
               <Styles.ActivateBlock>
-                <Styles.ActivateLabel>Need activation</Styles.ActivateLabel>
+                <Styles.ActivateLabel>Activation is required</Styles.ActivateLabel>
               </Styles.ActivateBlock>
             ) : (
               <Styles.AddressRow>

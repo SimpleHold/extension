@@ -19,6 +19,8 @@ import { IWallet } from '@utils/wallet'
 
 export const coins: string[] = ['xno']
 
+const RPC_CALL_DELAY = 200
+
 const requestHandler: TRequestHandler = {
   _queue: [],
   _inProgress: false,
@@ -38,7 +40,7 @@ const requestHandler: TRequestHandler = {
       request().then(result => {
         resolver(result)
       })
-      await new Promise(res => setTimeout(res, 200))
+      await new Promise(res => setTimeout(res, RPC_CALL_DELAY))
     }
     this._inProgress = false
   }
@@ -56,10 +58,11 @@ export const generateWallet = async (): Promise<TGenerateAddress | null> => {
     const seed = await nano.generateSeed()
     const privateKey = nano.deriveSecretKey(seed, 0)
     const publicKey = nano.derivePublicKey(privateKey)
-    const address = nano.deriveAddress(publicKey).replace('xrb_', 'nano_')
+    const address = nano.deriveAddress(publicKey)
+    const formatAddress = getFormatAddress(address)
     if (address) {
       return {
-        address,
+        address: formatAddress,
         privateKey,
         isNotActivated: true
       }
@@ -68,6 +71,13 @@ export const generateWallet = async (): Promise<TGenerateAddress | null> => {
   } catch {
     return null
   }
+}
+
+const getFormatAddress = (address: string) => {
+  if (address.slice(0, 3).toLowerCase() === 'xrb') {
+    return 'nano' + address.slice(3)
+  }
+  return address
 }
 
 export const formatValue = (value: string | number, type: 'from' | 'to'): string => {
@@ -124,9 +134,9 @@ export const receiveAllPendingTxs = async (address: string, privKey: string): Pr
 
     if (!response) return false
 
-    const blocks_receivable = response.blocks
+    const receivableBlocks = response.blocks
 
-    for (const link of blocks_receivable) {
+    for (const link of receivableBlocks) {
       let response = await receiveBlock({ address, pubKey, privKey, blockHash: link })
       if (response && response.hash !== undefined) {
         isReceived = true
@@ -147,8 +157,8 @@ const processBlock = async (block: BlockRepresentation, subtype: string): Promis
   const input = {
     action: 'process',
     json_block: true,
-    subtype: subtype,
-    block: block
+    subtype,
+    block
   }
   return await sendThrottledRequest<TProcessBlock>(input)
 }
@@ -158,7 +168,7 @@ const getBlockInfo = async (hash: string): Promise<TBlockInfo | null> => {
   const input = {
     action: 'block_info',
     json_block: true,
-    hash: hash
+    hash
   }
   return await sendThrottledRequest<TBlockInfo>(input)
 }
@@ -166,8 +176,8 @@ const getBlockInfo = async (hash: string): Promise<TBlockInfo | null> => {
 const getAccountInfo = async (address: string, representative = true): Promise<TAccountInfo | null> => {
   const input = {
     action: 'account_info',
-    representative: representative,
-    account: address
+    account: address,
+    representative
   }
   return await sendThrottledRequest<TAccountInfo>(input)
 }
@@ -176,8 +186,8 @@ const getReceivableBlocks = async (address: string, count = undefined, threshold
   const input = {
     action: 'receivable',
     account: address,
-    count: count,
-    threshold: threshold
+    count,
+    threshold
   }
   return await sendThrottledRequest<TReceivableResponse>(input)
 }
@@ -190,9 +200,10 @@ export const activateWallet = async (chain: string, pubKey: string, privKey: str
 
     if (data) {
       const { hash, representative } = data
-      const address = nano.deriveAddress(pubKeyFromPriv).replace('xrb_', 'nano_')
+      const address = nano.deriveAddress(pubKeyFromPriv)
+      const formatAddress = getFormatAddress(address)
       const result = await receiveBlock({
-        address,
+        address: formatAddress,
         pubKey: pubKeyFromPriv,
         privKey,
         blockHash: hash,
@@ -241,34 +252,47 @@ export const updateWalletActivationStatus = async (address: string): Promise<boo
   }
 }
 
-const receiveBlock = async ({ address, pubKey, privKey, blockHash, walletActivation }: TReceiveBlock) => {
+const receiveBlock = async ({ address, pubKey, privKey, blockHash, walletActivation }: TReceiveBlock): Promise<TProcessBlock | null> => {
+  try {
   const link = blockHash
   const blockInfo = await getBlockInfo(link)
-  const account = await getAccountInfo(address)
-  if (!account || !blockInfo) return
   let subtype = 'receive'
-  let representative = account.representative
-  let previous = account.frontier
-  let old_balance = account.balance
-  let work_input = account.frontier
 
-  if (walletActivation) {
-    old_balance = '0'
-    previous = '0'.padStart(64, '0')
-    representative = walletActivation.representative
-    work_input = pubKey
-  }
+  if (!blockInfo) return null;
 
-  const work = await getNanoPow(work_input, subtype)
-  const new_balance = stringAdd(old_balance, blockInfo.amount)
+    let representative: string
+    let previous: string
+    let oldBalance: string
+    let workInput: string
+
+    if (walletActivation) {
+      representative = walletActivation.representative
+      workInput = pubKey
+      oldBalance = '0';
+      previous = '0'.padStart(64, '0');
+    } else {
+      const account = await getAccountInfo(address)
+      if (!account) return null;
+      representative = account.representative
+      previous = account.frontier
+      oldBalance = account.balance
+      workInput = account.frontier
+    }
+
+  const work = await getNanoPow(workInput, subtype)
+  const balance = stringAdd(oldBalance, blockInfo.amount)
   const block = nano.createBlock(privKey, {
     work,
     previous,
     representative,
-    balance: new_balance,
+    balance,
     link
   })
   return await processBlock(block.block, subtype)
+  } catch {
+    return null
+  }
+
 }
 
 export const stringSub = (n1: string, n2: string, pad = 0) => {
@@ -292,15 +316,15 @@ export const createTransaction = async (
     const link = toAddress
     const representative = account.representative
     const previous = account.frontier
-    const old_balance = account.balance
+    const oldBalance = account.balance
     const workInput = account.frontier
     const work = await getNanoPow(workInput, subtype)
-    const new_balance = stringSub(old_balance, amount)
+    const balance = stringSub(oldBalance, amount)
     const block = nano.createBlock(privateKey, {
       work,
       previous,
       representative,
-      balance: new_balance,
+      balance,
       link
     })
 
