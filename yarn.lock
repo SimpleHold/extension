@@ -10592,6 +10592,14 @@ nano-json-stream-parser@^0.1.2:
   resolved "https://registry.yarnpkg.com/nano-json-stream-parser/-/nano-json-stream-parser-0.1.2.tgz#0cc8f6d0e2b622b479c40d499c46d64b755c6f5f"
   integrity sha1-DMj20OK2IrR5xA1JnEbWS3Vcb18=
 
+nanocurrency@^2.5.0:
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/nanocurrency/-/nanocurrency-2.5.0.tgz#968659daadfa23150afc44a296fa3b211ffe9380"
+  integrity sha512-zMDlgBCML0vMGvldsZN1Np93vwiMjaBLCkOM2tXv0LNIpty8HghDMZiNRzfBPkP70oRhRU+hOpVCEpTzZK5gDQ==
+  dependencies:
+    bignumber.js "^9.0.0"
+    blakejs "^1.1.0"
+
 nanoid@3.1.20:
   version "3.1.20"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.1.20.tgz#badc263c6b1dcf14b71efaa85f6ab4c1d6cfc788"

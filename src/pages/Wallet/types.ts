@@ -19,7 +19,7 @@ export interface IState {
   balance: null | number
   estimated: null | number
   txHistory: TAddressTxGroup[] | null
-  activeDrawer: null | 'confirm' | 'privateKey' | 'renameWallet' | 'success'
+  activeDrawer: null | 'confirm' | 'privateKey' | 'renameWallet' | 'success' | 'txsReceivedSuccess'
   isBalanceRefreshing: boolean
   password: string
   passwordErrorLabel: null | string
@@ -28,7 +28,7 @@ export interface IState {
   isHiddenWallet: boolean
   warning: null | string
   confirmDrawerTitle: string
-  confirmDrawerType: 'showPhrase' | 'showPrivateKey' | 'activateWallet' | null
+  confirmDrawerType: 'showPhrase' | 'showPrivateKey' | 'activateWallet' | 'receivePendingTxs' | null
   isDrawerButtonLoading: boolean
   isNotActivated: boolean
   address: string

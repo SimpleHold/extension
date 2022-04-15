@@ -14,7 +14,7 @@ import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets } from '@utils/wallet'
+import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets, activateAddress } from '@utils/wallet'
 import { decrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toLower, toUpper } from '@utils/format'
@@ -37,6 +37,7 @@ import { ITokensBalance } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
+import { getActivationStatus } from 'utils/currencies/nano'
 
 const initialState: IState = {
   privateKey: '',
@@ -91,6 +92,7 @@ const ImportPrivateKey: React.FC = () => {
       if (chain && !isSkipFindTokens) {
         return await findAddressTokens(getAddress, state.privateKey)
       }
+
       return updateState({ activeDrawer: 'confirm' })
     }
 
@@ -177,7 +179,7 @@ const ImportPrivateKey: React.FC = () => {
             chain,
             tokenName,
             contractAddress,
-            decimals
+            decimals,
           )
 
           if (walletsList) {

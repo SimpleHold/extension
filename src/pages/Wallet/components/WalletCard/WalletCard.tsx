@@ -1,5 +1,4 @@
 import * as React from 'react'
-import numeral from 'numeral'
 import SVG from 'react-inlinesvg'
 
 // Components
@@ -32,6 +31,8 @@ interface Props {
   tokenName?: string
   isNotActivated: boolean
   onConfirmActivate: () => void
+  hasUnreceivedTxs?: boolean
+  onConfirmReceivePending?: () => void
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -46,9 +47,13 @@ const WalletCard: React.FC<Props> = (props) => {
     address,
     tokenName,
     isNotActivated,
-    onConfirmActivate
+    onConfirmActivate,
+    hasUnreceivedTxs,
+    onConfirmReceivePending
   } = props
 
+
+  const [initialized, setInitialized] = React.useState(false)
   const [balanceWidth, setBalanceWidth] = React.useState(undefined)
   const [estimatedWidth, setEstimatedWidth] = React.useState(undefined)
 
@@ -62,6 +67,11 @@ const WalletCard: React.FC<Props> = (props) => {
     estimatedWidth && setEstimatedWidth(estimatedWidth)
   }, [isBalanceRefreshing, balance, estimated])
 
+  React.useEffect(() => {
+    if (balance !== null && !initialized) {
+      setInitialized(true)
+    }
+  }, [balance])
 
   const onExchange = (): void => {
     logEvent({
@@ -108,23 +118,29 @@ const WalletCard: React.FC<Props> = (props) => {
         </Styles.WalletInfo>
       </Styles.Body>
       <Styles.Actions>
-        {isNotActivated ? (
-          <Styles.ActionButton onClick={onConfirmActivate}>
-            <Styles.ActionName>Activate</Styles.ActionName>
+
+        {isNotActivated &&
+        <Styles.ActionButton onClick={onConfirmActivate}>
+          <Styles.ActionName>Activate</Styles.ActionName>
+        </Styles.ActionButton>}
+
+        {hasUnreceivedTxs && !isNotActivated &&
+        <Styles.ActionButton onClick={onConfirmReceivePending}>
+          <Styles.ActionName>Receive assets</Styles.ActionName>
+        </Styles.ActionButton>}
+
+        {!isNotActivated && !hasUnreceivedTxs &&
+        <>
+          <Styles.ActionButton onClick={openPage('/send')}>
+            <Styles.ActionName>Send</Styles.ActionName>
           </Styles.ActionButton>
-        ) : (
-          <>
-            <Styles.ActionButton onClick={openPage('/send')}>
-              <Styles.ActionName>Send</Styles.ActionName>
-            </Styles.ActionButton>
-            <Styles.ActionButton onClick={openPage('/receive')}>
-              <Styles.ActionName>Receive</Styles.ActionName>
-            </Styles.ActionButton>
-            <Styles.ActionButton onClick={onExchange}>
-              <Styles.ActionName>Exchange</Styles.ActionName>
-            </Styles.ActionButton>
-          </>
-        )}
+          <Styles.ActionButton onClick={openPage('/receive')}>
+            <Styles.ActionName>Receive</Styles.ActionName>
+          </Styles.ActionButton>
+          <Styles.ActionButton onClick={onExchange}>
+            <Styles.ActionName>Exchange</Styles.ActionName>
+          </Styles.ActionButton>
+        </>}
       </Styles.Actions>
     </Styles.Container>
   )

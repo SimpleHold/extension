@@ -25,7 +25,7 @@ const CurrencyLogo: React.FC<Props> = (props) => {
 
   const [logo, setLogo] = React.useState<string | null>(null)
 
-  const getChainogo = chain ? getCurrencyByChain(chain) : null
+  const getChainLogo = chain ? getCurrencyByChain(chain) : null
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
   React.useEffect(() => {
@@ -47,7 +47,7 @@ const CurrencyLogo: React.FC<Props> = (props) => {
       <Styles.LogoRow
         width={size}
         height={size}
-        background={background || currency?.background || getChainogo?.background}
+        background={background || currency?.background || getChainLogo?.background}
         br={br}
       >
         {currency || logo ? (
@@ -57,9 +57,9 @@ const CurrencyLogo: React.FC<Props> = (props) => {
           <Styles.LetterLogo>{toUpper(name[0])}</Styles.LetterLogo>
         ) : null}
       </Styles.LogoRow>
-      {getChainogo ? (
+      {getChainLogo ? (
         <Styles.TokenRow size={size}>
-          <Styles.TokenLogo size={size} src={getChainogo.logo} />
+          <Styles.TokenLogo size={size} src={getChainLogo.logo} />
         </Styles.TokenRow>
       ) : null}
     </Styles.Container>

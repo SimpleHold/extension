@@ -7,7 +7,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { getBalance } from '@utils/api'
+import { getBalance } from '@utils/currencies'
 import { toUpper, numberFriendly, short, formatEstimated } from '@utils/format'
 import { updateBalance, THardware } from '@utils/wallet'
 
@@ -58,6 +58,7 @@ const Wallet: React.FC<Props> = (props) => {
 
   const fetchBalance = async (): Promise<void> => {
     const { balance, balance_usd, balance_btc, pending } = await getBalance(
+      symbol,
       address,
       currency?.chain || chain,
       chain ? symbol : undefined,

@@ -10,7 +10,7 @@ export type TProvider = {
   importRecoveryPhrase?: (recoveryPhrase: string) => Promise<TGenerateAddress | null>
   generateExtraId?: () => string
   getStandingFee?: () => number | null
-  formatValue: (value: string | number, type: 'from' | 'to') => number
+  formatValue: (value: string | number, type: 'from' | 'to') => number | string
   isInternalTx?: boolean
   createInternalTx?: (props: TInternalTxProps) => Promise<string | null>
   isWithOutputs?: boolean

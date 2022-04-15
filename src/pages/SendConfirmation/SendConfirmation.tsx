@@ -119,7 +119,6 @@ const SendConfirmation: React.FC = () => {
             : {}
 
           const xrpTxData = symbol === 'xrp' ? await getXrpTxParams(addressFrom) : {}
-
           const transactionData = {
             from: addressFrom,
             to: addressTo,
@@ -159,14 +158,18 @@ const SendConfirmation: React.FC = () => {
               isButtonLoading: false,
             })
           }
-
           const transaction = await createTransaction({
             ...transactionData,
             ...ethTxData,
             xrpTxData,
             extraId,
           })
+
           if (transaction) {
+            if (symbol === 'xno') {
+              return checkTransaction(transaction)
+            }
+
             const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
             if (sendTransaction) {
               return checkTransaction(sendTransaction)

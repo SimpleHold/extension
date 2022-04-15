@@ -19,10 +19,8 @@ import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import {
-  getBalance,
   getTxsInfo,
   getWarning,
-  activateAccount,
   getTransactionHistory
 } from '@utils/api'
 import {
@@ -33,6 +31,7 @@ import {
   getWallets,
   activateAddress, getWalletChain
 } from '@utils/wallet'
+import { activateWallet, getBalance } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
 import { getExplorerLink, getTransactionLink, checkWithPhrase } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
@@ -48,7 +47,8 @@ import {
 import { logEvent } from '@utils/amplitude'
 import { getTxHistory as getTonCoinTxHistory } from '@utils/currencies/toncoin'
 import { checkIfTimePassed, toMs } from '@utils/dates'
-import { updateTxsHistory } from '@utils/history'
+import { removeTempTxs, updateTxsHistory } from '@utils/history'
+import { receiveAllPendingTxs } from '@utils/currencies/nano'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -113,7 +113,7 @@ const WalletPage: React.FC = () => {
   const [isIdle, setIsIdle] = React.useState(false)
 
   useIdleTimer({
-    timeout: toMs({ minutes: 1}),
+    timeout: toMs({ minutes: 1 }),
     onActive: () => setIsIdle(false),
     onIdle: () => setIsIdle(true)
   })
@@ -143,7 +143,8 @@ const WalletPage: React.FC = () => {
       id = +setInterval(() => {
         if (isReady) {
           getTxHistory().then(loadBalance)
-        }}, toMs({ seconds: isIdle ? 60 : 15 }))
+        }
+      }, toMs({ seconds: isIdle ? 60 : 15 }))
     }
     return () => clearInterval(id)
   }, [isIdle, walletPendingStatus])
@@ -208,6 +209,7 @@ const WalletPage: React.FC = () => {
     }
 
     const { balance, balance_usd, balance_btc, pending } = await getBalance(
+      symbol,
       state.address,
       currency?.chain || chain,
       tokenSymbol,
@@ -256,6 +258,16 @@ const WalletPage: React.FC = () => {
     const currencyChain = getCurrencyChain()
 
     if (currencyChain) {
+      const walletData = {
+        chain: getWalletChain(symbol, chain),
+        address: state.address,
+        symbol,
+        tokenSymbol,
+        contractAddress
+      }
+
+      removeTempTxs(walletData)
+
       const data = await getTransactionHistory(
         currencyChain,
         state.address,
@@ -267,14 +279,8 @@ const WalletPage: React.FC = () => {
         const compare = compareTxs(state.address, currencyChain, data, tokenSymbol, contractAddress)
         if (compare.length) {
           const getFullTxHistoryInfo = await getTxsInfo(currencyChain, state.address, compare)
+
           saveTxs(state.address, currencyChain, getFullTxHistoryInfo, tokenSymbol, contractAddress)
-          const walletData = {
-            chain: getWalletChain(symbol, chain),
-            address: state.address,
-            symbol,
-            tokenSymbol,
-            contractAddress
-          }
           updateTxsHistory({ updateSingleWallet: walletData })
         }
       }
@@ -341,7 +347,7 @@ const WalletPage: React.FC = () => {
   }
 
   const onRefreshBalance = (): void => {
-    if (state.isBalanceRefreshing) return;
+    if (state.isBalanceRefreshing) return
     if (state.balance !== null && state.estimated !== null) {
       updateState({ balance: null, estimated: null, isBalanceRefreshing: true })
       setTimeout(loadBalance, 1000)
@@ -359,6 +365,52 @@ const WalletPage: React.FC = () => {
       })
     }
   }
+
+  const onReceivePendingTxs = async (): Promise<void> => {
+    updateState({ isDrawerButtonLoading: true })
+
+    if (validatePassword(state.password)) {
+      const backup = getItem('backup')
+
+      if (backup?.length) {
+        const decryptBackup = decrypt(backup, state.password)
+
+        if (decryptBackup) {
+          const parseBackup = JSON.parse(decryptBackup)
+
+          const findWallet: IWallet | undefined = parseBackup?.wallets?.find(
+            (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+          )
+
+          if (findWallet) {
+            const { privateKey } = findWallet
+
+            if (privateKey) {
+              if (symbol.toLowerCase() === 'xno') {
+                const res = await receiveAllPendingTxs(state.address, privateKey)
+                if (res) {
+                  await getTxHistory()
+                  setWalletPendingStatus(false)
+                  return updateState({
+                    isDrawerButtonLoading: false,
+                    activeDrawer: 'txsReceivedSuccess',
+                    password: ''
+                  })
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return updateState({
+        passwordErrorLabel: 'Error occurred',
+        isDrawerButtonLoading: false
+      })
+    }
+    updateState({ passwordErrorLabel: 'Password is not valid', isDrawerButtonLoading: false })
+  }
+
 
   const onActivateWallet = async (): Promise<void> => {
     updateState({ isDrawerButtonLoading: true })
@@ -387,8 +439,8 @@ const WalletPage: React.FC = () => {
             }
 
             if (getPubKey) {
-              const getAddress = await activateAccount('hedera', getPubKey)
-
+              const parsedChain = symbol === 'hbar' ? 'hedera' : 'xno'
+              const getAddress = await activateWallet(parsedChain, getPubKey, privateKey)
               if (getAddress) {
                 activateAddress(uuid, getAddress, decryptBackup, state.password)
 
@@ -417,6 +469,9 @@ const WalletPage: React.FC = () => {
   const onConfirmDrawer = async (): Promise<void> => {
     if (state.confirmDrawerType === 'activateWallet') {
       return await onActivateWallet()
+    }
+    if (state.confirmDrawerType === 'receivePendingTxs') {
+      return await onReceivePendingTxs()
     }
     if (state.passwordErrorLabel) {
       updateState({ passwordErrorLabel: null })
@@ -509,6 +564,17 @@ const WalletPage: React.FC = () => {
     })
   }
 
+  const onConfirmReceivePending = (): void => {
+    updateState({
+      activeDrawer: 'confirm',
+      confirmDrawerTitle: 'Please enter your password to receive incoming transactions',
+      confirmDrawerType: 'receivePendingTxs'
+    })
+  }
+
+  const hasUnreceivedTxs = Boolean(symbol.toLowerCase() === 'xno' && walletPendingStatus)
+  const onConfirmReceivePendingTxs = hasUnreceivedTxs ? onConfirmReceivePending : undefined
+
   return (
     <>
       <Styles.Wrapper>
@@ -525,6 +591,7 @@ const WalletPage: React.FC = () => {
               hardware={hardware}
               isHidden={state.isHiddenWallet}
             />
+
             <WalletCard
               openPage={openPage}
               symbol={symbol}
@@ -537,6 +604,8 @@ const WalletPage: React.FC = () => {
               tokenName={tokenName}
               isNotActivated={state.isNotActivated}
               onConfirmActivate={onConfirmActivate}
+              hasUnreceivedTxs={hasUnreceivedTxs}
+              onConfirmReceivePending={onConfirmReceivePendingTxs}
             />
             {state.balance !== null && state.balance < 20 && toLower(symbol) === 'xrp' ? (
               <Warning
@@ -589,6 +658,11 @@ const WalletPage: React.FC = () => {
         isActive={state.activeDrawer === 'success'}
         onClose={onDownloadBackup}
         text='The new address has been successfully activated!'
+      />
+      <SuccessDrawer
+        isActive={state.activeDrawer === 'txsReceivedSuccess'}
+        onClose={onCloseDrawer}
+        text='All incoming transactions have been received!'
       />
       <PrivateKeyDrawer
         isMnemonic={withPhrase}

@@ -1,13 +1,14 @@
 // Utils
-import { getWalletChain, getWallets } from '@utils/wallet'
+import { filterWallets, getWalletChain, getWallets } from '@utils/wallet'
 import { getFullTxHistory, getFullTxHistoryInfo } from '@utils/api'
-import { compareFullHistory, saveFullHistory } from '@utils/txs'
-import { setItem } from '@utils/storage'
+import { compareFullHistory, getWalletKey, saveFullHistory } from '@utils/txs'
+import { getItem, getJSON, setItem } from '@utils/storage'
 
 // Types
 import { IWallet } from '@utils/wallet'
-import { TFullTxWallet, TTxAddressItem, TTxWallet } from '@utils/api/types'
+import { TAddressTx, TFullTxInfo, TFullTxWallet, TTxAddressItem, TTxWallet } from '@utils/api/types'
 import { TGetFullTxHistoryOptions } from '@utils/api'
+import { toLower } from 'utils/format'
 
 export type THistoryUpdateOptions = {
   latest?: number
@@ -32,12 +33,11 @@ export const updateTxsHistory = async (
     fetchOptions
   }: THistoryUpdateOptions = {}): Promise<boolean> => {
   try {
-    if (checkIsLoadingFlag()) return false;
+    if (checkIsLoadingFlag()) return false
 
     setIsLoadingFlag(true)
 
     let payload: TTxWallet[]
-
     if (updateSingleWallet) {
       payload = [updateSingleWallet]
     } else {
@@ -58,6 +58,8 @@ export const updateTxsHistory = async (
       })
     }
 
+    // removeTempTxs(payload)
+
     const data = await getFullTxHistory(payload)
 
     if (!data.length) return false
@@ -77,7 +79,6 @@ export const updateTxsHistory = async (
           contractAddress
         }
       })
-
       const fullTxsInfo = await getFullTxHistoryInfo(mapData, fetchOptions)
       saveFullHistory(fullTxsInfo)
       if (!updateSingleWallet) {
@@ -87,8 +88,7 @@ export const updateTxsHistory = async (
       return !!(fullTxsInfo && fullTxsInfo.length)
     }
     return false
-  } catch (err) {
-    console.error(err)
+  } catch {
     return false
   } finally {
     setIsLoadingFlag(false)
@@ -96,3 +96,28 @@ export const updateTxsHistory = async (
 }
 
 export default updateTxsHistory
+
+
+export const removeTempTxs = (wallets: TTxWallet[] | TTxWallet) => {
+  const formatWallets = Array.isArray(wallets) ? wallets : [wallets]
+  for (const wallet of formatWallets) {
+    const { address, chain, contractAddress, symbol } = wallet
+    if (['xno'].indexOf(symbol) !== -1) {
+      // const getTokenSymbol = chain ? symbol : undefined
+      // const getChain = getWalletChain(symbol, chain)
+      const walletKey = getWalletKey(address, 'xno')
+      const walletTxs = getJSON(walletKey)
+      if (walletTxs?.length) {
+        const nonPendingTxs = walletTxs.filter((tx: TAddressTx) => !tx.isPending)
+        setItem(walletKey, JSON.stringify(nonPendingTxs))
+      }
+      const fullHistory = getJSON('full_history')
+      if (fullHistory?.length) {
+        const filteredTxs = fullHistory.filter((tx: TFullTxInfo) => {
+          return !(tx.symbol === symbol && tx.isPending);
+        })
+        setItem('full_history', JSON.stringify(filteredTxs))
+      }
+    }
+  }
+}

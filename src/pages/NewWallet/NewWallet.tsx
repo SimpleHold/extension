@@ -18,8 +18,8 @@ import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
 import { generate, checkWithPhrase } from '@utils/currencies'
-import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
+import * as theta from '@utils/currencies/theta'
 import * as vechain from '@utils/currencies/vechain'
 
 // Config
@@ -138,7 +138,7 @@ const NewWallet: React.FC = () => {
                 name: ADD_ADDRESS_CONFIRM,
               })
 
-              if (symbol !== "hbar") {
+              if (['xno', 'hbar'].indexOf(symbol) !== -1) {
                 setItem('backupStatus', 'notDownloaded')
               }
 
@@ -154,7 +154,7 @@ const NewWallet: React.FC = () => {
   }
 
   const onDownloadBackup = (): void => {
-    if (symbol === "hbar") {
+    if (['xno', 'hbar'].indexOf(symbol) !== -1) {
       return history.push('/wallets')
     }
     return history.replace('/download-backup', {

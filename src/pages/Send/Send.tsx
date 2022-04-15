@@ -19,7 +19,8 @@ import AboutFeeDrawer from '@drawers/AboutFee'
 // Utils
 import { toLower, toUpper, plus } from '@utils/format'
 import { validateMany } from '@utils/validate'
-import { getBalance, getUnspentOutputs } from '@utils/api'
+import { getBalance } from '@utils/currencies'
+import { getUnspentOutputs } from '@utils/api'
 import { updateBalance, getWallets } from '@utils/wallet'
 import {
   getExtraIdName,
@@ -338,6 +339,7 @@ const SendPage: React.FC = () => {
     })
 
     const { balance, balance_usd, balance_btc } = await getBalance(
+      symbol,
       state.selectedAddress,
       currency?.chain || tokenChain,
       tokenChain ? symbol : undefined,

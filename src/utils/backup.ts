@@ -1,8 +1,10 @@
 import { v4 } from 'uuid'
 
 // Utils
-import { IWallet } from '@utils/wallet'
 import { validateWallet } from '@utils/validate'
+
+// Types
+import { IWallet } from '@utils/wallet'
 
 const pjson = require('../../package.json')
 
@@ -45,7 +47,6 @@ export const generate = (currencies: TGenerateCurrency[]): { [key: string]: stri
     wallets.push(data)
     backup.wallets.push({ ...data, ...{ privateKey, mnemonic } })
   }
-
   return {
     backup: JSON.stringify(backup),
     wallets: JSON.stringify(wallets),

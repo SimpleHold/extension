@@ -27,7 +27,7 @@ import {
 } from './types'
 import { IToken } from '@config/tokens'
 
-export const getBalance = async (
+export const requestBalance = async (
   address: string,
   chain?: string,
   tokenSymbol?: string,
@@ -504,7 +504,7 @@ export const getHistoryTxInfo = async (
   }
 }
 
-export const activateAccount = async (chain: string, publicKey: string): Promise<string | null> => {
+export const activateAccount = async <T>(chain: string, publicKey: string): Promise<T | null> => {
   try {
     const { data }: AxiosResponse = await axios.post(
       `${config.serverUrl}/wallet/activate`,
@@ -612,6 +612,41 @@ export const getTokens = async (): Promise<IToken[] | null> => {
   try {
     const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/tokens`)
 
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const sendNanoRpcRequest = async <T>(input: any): Promise<T | null> => {
+  try {
+    const { data }: AxiosResponse = await axios.post(
+      `${config.serverUrl}/rpc/nano`,
+      { input },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
+    return data.data
+  } catch {
+    return null
+  }
+}
+
+export const getNanoPow = async (hash: string, type: string): Promise<string | null> => {
+  try {
+    const input = { hash, type }
+    const { data } = await axios.post(
+      `${config.serverUrl}/rpc/nano/pow`,
+      { input },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
     return data.data
   } catch {
     return null
