@@ -30,6 +30,7 @@ import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
+import { getTokens } from 'utils/localTokens'
 
 const initialState: IState = {
   searchValue: '',
@@ -51,6 +52,18 @@ const SelectToken: React.FC = () => {
   React.useEffect(() => {
     getTokensList()
   }, [])
+
+  React.useEffect(() => {
+    checkLocalTokens()
+  }, [])
+
+  const checkLocalTokens = (): void => {
+    const localTokens = getTokens()
+
+    if (localTokens.length) {
+      updateState({ tokensList: [...state.tokensList, ...localTokens] })
+    }
+  }
 
   const getTokensList = (): void => {
     const wallets = getWallets()

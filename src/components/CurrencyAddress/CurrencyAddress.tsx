@@ -33,7 +33,7 @@ const CurrencyAddress: React.FC<Props> = (props) => {
   const currency = getCurrency(symbol)
 
   const onGetBalance = async (): Promise<void> => {
-    const request = await getBalance(symbol, address, currency?.chain)
+    const request = await getBalance({symbol, address, chain: currency?.chain})
 
     setBalance(request.balance)
   }

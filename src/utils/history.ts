@@ -1,5 +1,5 @@
 // Utils
-import { filterWallets, getWalletChain, getWallets } from '@utils/wallet'
+import { filterWallets, getWalletChain, getWallets, TGetWalletsOptions } from '@utils/wallet'
 import { getFullTxHistory, getFullTxHistoryInfo } from '@utils/api'
 import { compareFullHistory, getWalletKey, saveFullHistory } from '@utils/txs'
 import { getItem, getJSON, setItem } from '@utils/storage'
@@ -8,11 +8,9 @@ import { getItem, getJSON, setItem } from '@utils/storage'
 import { IWallet } from '@utils/wallet'
 import { TAddressTx, TFullTxInfo, TFullTxWallet, TTxAddressItem, TTxWallet } from '@utils/api/types'
 import { TGetFullTxHistoryOptions } from '@utils/api'
-import { toLower } from 'utils/format'
 
 export type THistoryUpdateOptions = {
-  latest?: number
-  filterFn?: (wallet: IWallet) => IWallet
+  getWalletsOptions?: TGetWalletsOptions
   updateSingleWallet?: TTxWallet
   fetchOptions?: TGetFullTxHistoryOptions
 }
@@ -27,8 +25,7 @@ export const checkIsLoadingFlag = () => {
 
 export const updateTxsHistory = async (
   {
-    latest,
-    filterFn,
+    getWalletsOptions,
     updateSingleWallet,
     fetchOptions
   }: THistoryUpdateOptions = {}): Promise<boolean> => {
@@ -36,15 +33,16 @@ export const updateTxsHistory = async (
     if (checkIsLoadingFlag()) return false
 
     setIsLoadingFlag(true)
+    const { applyFilters, latest } = getWalletsOptions || {}
 
     let payload: TTxWallet[]
     if (updateSingleWallet) {
       payload = [updateSingleWallet]
     } else {
-      let wallets = getWallets(filterFn ? undefined : latest) || []
+      let wallets = getWallets({ }) || []
       if (!wallets.length) return false
-      if (filterFn) {
-        wallets = wallets.filter(filterFn)
+      if (applyFilters) {
+        wallets = wallets.filter(filterWallets)
       }
       payload = wallets.map((wallet: IWallet) => {
         const { address, chain, symbol, contractAddress } = wallet

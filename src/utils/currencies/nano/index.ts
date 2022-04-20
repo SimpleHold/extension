@@ -231,27 +231,6 @@ export const getActivationStatus = async (address: string): Promise<boolean> => 
   }
 }
 
-export const updateWalletActivationStatus = async (address: string): Promise<boolean> => {
-  try {
-    const wallets = getWallets()
-    if (wallets?.length) {
-      const findWallet = wallets.find(
-        (wallet: IWallet) => wallet.address === address
-      )
-      if (!findWallet || !findWallet.isNotActivated) return false
-      const isActivated = await getActivationStatus(address)
-      if (isActivated) {
-        findWallet.isNotActivated = false
-        setItem('wallets', JSON.stringify(wallets))
-        return true
-      }
-    }
-    return false
-  } catch {
-    return false
-  }
-}
-
 const receiveBlock = async ({ address, pubKey, privKey, blockHash, walletActivation }: TReceiveBlock): Promise<TProcessBlock | null> => {
   try {
   const link = blockHash

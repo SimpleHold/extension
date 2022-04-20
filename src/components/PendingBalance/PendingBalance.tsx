@@ -34,6 +34,9 @@ const PendingBalance: React.FC<Props> = (props) => {
     setUSDValue(data)
   }
 
+  const formatUsdValue = numeral(USDValue).format('0.[00000000]')
+  const isValidFormatUsd = !Number.isNaN(formatUsdValue) && formatUsdValue !== 'NaN'
+
   if (USDValue !== 0) {
     return (
       <Styles.Container type={type}>
@@ -48,10 +51,8 @@ const PendingBalance: React.FC<Props> = (props) => {
             {toUpper(symbol)}
           </Styles.Pending>
           <Skeleton width={56} height={14} isLoading={USDValue === null} type={type}>
-            {USDValue ? (
-              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${numeral(USDValue).format(
-                '0.[00000000]'
-              )}`}</Styles.USDValue>
+            {USDValue && isValidFormatUsd ? (
+              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${formatUsdValue}`}</Styles.USDValue>
             ) : null}
           </Skeleton>
         </Styles.Row>

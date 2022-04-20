@@ -3,7 +3,7 @@ import SVG from 'react-inlinesvg'
 import copy from 'copy-to-clipboard'
 
 // Utils
-import { short, formatEstimated, price } from '@utils/format'
+import { short, getFormatEstimated, price } from '@utils/format'
 
 // Assets
 import copyIcon from '@assets/icons/copy.svg'
@@ -42,7 +42,7 @@ const Address: React.FC<Props> = (props) => {
       <Styles.Address className="address">{short(address, 28)}</Styles.Address>
       <Styles.Info>
         <Styles.Amount>{`${amount} ${symbol}`}</Styles.Amount>
-        <Styles.Estimated>{`$ ${formatEstimated(estimated, price(estimated))}`}</Styles.Estimated>
+        <Styles.Estimated>{`$ ${getFormatEstimated(estimated, price(estimated))}`}</Styles.Estimated>
       </Styles.Info>
 
       <Styles.Button className="button">

@@ -1,3 +1,5 @@
+import { TTime } from 'utils/dates'
+
 export interface IGetBalance {
   balance: number
   balance_usd: number
@@ -153,3 +155,20 @@ export type TVetTxParams = {
 }
 
 export type TTonAddressState = 'uninitialized' | 'active' | 'frozen'
+
+export type TGetBalanceProps = {
+  symbol: string
+  address: string
+  chain?: string
+  tokenSymbol?: string
+  contractAddress?: string
+  isFullBalance?: boolean
+}
+
+export type TGetBalanceOptions = {
+  force?: boolean
+  responseTimeLimit?: number
+  requestDebounceTime?: TTime
+}
+
+export type TGetBalance = (props: TGetBalanceProps, options?: TGetBalanceOptions) => Promise<IGetBalance>

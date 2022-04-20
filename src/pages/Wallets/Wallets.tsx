@@ -15,10 +15,18 @@ import useToastContext from '@hooks/useToastContext'
 import useState from '@hooks/useState'
 
 // Utils
-import { IWallet, getWallets, sortWallets, filterWallets, getWalletName } from '@utils/wallet'
+import {
+  IWallet,
+  getWallets,
+  sortWallets,
+  filterWallets,
+  getWalletName,
+  getSavedTotalBalance, updateWalletsBalances
+} from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import { setBadgeText, getBadgeText } from '@utils/extension'
 import { clear, getItem } from '@utils/storage'
+import { getBalance } from '@utils/currencies'
 
 // Config
 import { ADD_ADDRESS, FILTERS_WATCH, HISTORY_WATCH } from '@config/events'
@@ -77,10 +85,10 @@ const Wallets: React.FC = () => {
 
   const updateBalance = (
     arr: TWalletAmountData[],
-    key: 'totalBalance' | 'totalEstimated' | 'pendingBalance'
+    type: 'totalBalance' | 'totalEstimated' | 'pendingBalance'
   ) => {
-    if (arr.length === state.wallets?.length && state[key] === null) {
-      updateState({ [key]: arr.reduce((acc, walletData) => acc + walletData.amount, 0) })
+    if (arr.length === state.wallets?.length && state[type] === null) {
+      updateState({ [type]: arr.reduce((acc, walletData) => acc + walletData.amount, 0) })
     }
   }
 
@@ -130,7 +138,9 @@ const Wallets: React.FC = () => {
     }
   }
 
-  const getWalletsList = () => {
+
+
+  const getWalletsList = async () => {
     updateState({
       wallets: null,
       totalBalance: null,
@@ -140,7 +150,13 @@ const Wallets: React.FC = () => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      updateState({ wallets: walletsList.filter(filterWallets).sort(sortWallets) })
+      const wallets = walletsList.filter(filterWallets).sort(sortWallets)
+      updateState({ wallets })
+      console.log('WALLETS:', wallets)
+      await updateWalletsBalances(wallets)
+
+      const initialBalance = getSavedTotalBalance(wallets)
+      updateState({ ...initialBalance })
     } else {
       clear()
       history.push('/welcome')
@@ -155,7 +171,7 @@ const Wallets: React.FC = () => {
     history.push('/select-currency')
   }
 
-  const getSum = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (
+  const addWalletBalance = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (
     wallet: TWalletAmountData
   ) => {
     setStateCallback((prevArray: TWalletAmountData[]) => {
@@ -165,9 +181,9 @@ const Wallets: React.FC = () => {
     })
   }
 
-  const sumBalance = React.useCallback(getSum(setWalletsBalance), [])
-  const sumEstimated = React.useCallback(getSum(setWalletsEstimated), [])
-  const sumPending = React.useCallback(getSum(setWalletsPending), [])
+  const sumBalanceCallback = React.useCallback(addWalletBalance(setWalletsBalance), [])
+  const sumEstimatedCallback = React.useCallback(addWalletBalance(setWalletsEstimated), [])
+  const sumPendingCallback = React.useCallback(addWalletBalance(setWalletsPending), [])
 
   const onCloseDrawer = (): void => {
     updateState({ activeDrawer: null })
@@ -248,9 +264,9 @@ const Wallets: React.FC = () => {
             contractAddress={contractAddress}
             decimals={decimals}
             isHidden={isHidden}
-            sumBalance={sumBalance}
-            sumEstimated={sumEstimated}
-            sumPending={sumPending}
+            sumBalance={sumBalanceCallback}
+            sumEstimated={sumEstimatedCallback}
+            sumPending={sumPendingCallback}
             walletName={walletName}
             uuid={uuid}
             hardware={hardware}
@@ -299,7 +315,7 @@ const Wallets: React.FC = () => {
                   rowHeight={86}
                   rowRenderer={renderWallet}
                   width={375}
-                  overscanRowCount={50}
+                  overscanRowCount={2}
                   noRowsRenderer={() => (
                     <Styles.NotFound>
                       Nothing was found for the specified parameters

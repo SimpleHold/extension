@@ -209,11 +209,8 @@ const WalletPage: React.FC = () => {
     }
 
     const { balance, balance_usd, balance_btc, pending } = await getBalance(
-      symbol,
-      state.address,
-      currency?.chain || chain,
-      tokenSymbol,
-      contractAddress
+      {symbol, address: state.address, chain: currency?.chain || chain, tokenSymbol, contractAddress },
+      {force: true}
     )
 
     setPendingBalance(pending)

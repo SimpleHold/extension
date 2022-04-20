@@ -6,6 +6,7 @@ import { toLower, toFixedWithoutRound } from '@utils/format'
 import { encrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
 import { toMs } from '@utils/dates'
+import { getBalance } from '@utils/currencies'
 
 // Config
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
@@ -73,6 +74,11 @@ type TBalanceData = {
 
 type TBalancePrecisions = {
   [key: string]: number
+}
+
+type TBalanceUpdate = TBalanceData & {
+  address: string,
+  symbol: string,
 }
 
 const sortByBalance = (a: IWallet, b: IWallet, isAscending: boolean) => {
@@ -145,25 +151,36 @@ export const filterWallets = (wallet: IWallet) => {
   return filterByZeroBalance && filterByHidden && filterByCurrency
 }
 
-export const getWallets = (latest?: number): IWallet[] | null => {
+export type TGetWalletsOptions = {
+  latest?: number
+  applyFilters?: boolean
+}
+
+export const getWallets = (options: TGetWalletsOptions = {}): IWallet[] | null => {
   try {
     const walletsList = getItem('wallets')
+    const { latest, applyFilters } = options
 
     if (walletsList) {
-      const parseWallets: IWallet[] = JSON.parse(walletsList)
+      let parseWallets: IWallet[] = JSON.parse(walletsList)
+
+      if (applyFilters) {
+        parseWallets = parseWallets.filter(filterWallets)
+      }
 
       if (latest) {
         const latestWallets = parseWallets
           .filter(({ lastActive }) => {
             if (!lastActive) return false
-            const isExpired = Date.now() - lastActive > toMs({ hours: 24 * 7 }) // One week
-            return isExpired
+            const isInactive = Date.now() - lastActive > toMs({ weeks: 1 })
+            return isInactive
           })
           .sort((a, b) => (a.lastActive || 0) - (b.lastActive || 0))
         if (latestWallets.length >= latest) {
           return latestWallets.slice(0, latest)
         }
       }
+
       return parseWallets
     }
     return null
@@ -188,13 +205,6 @@ export const getBalanceChange = (latestBalance: number | null, balance: number, 
   return formatLatest - formatNew
 }
 
-
-type TBalanceUpdate = TBalanceData & {
-  address: string,
-  symbol: string,
-}
-
-
 export const updateBalance = (data: TBalanceUpdate, precision?: number): void => {
   const { address, symbol, balance, balance_btc, balance_usd, pending, pending_btc } = data
   const wallets = getWallets()
@@ -213,6 +223,29 @@ export const updateBalance = (data: TBalanceUpdate, precision?: number): void =>
     findWallet.lastBalanceCheck = Date.now()
     setItem('wallets', JSON.stringify(wallets))
   }
+}
+
+export const updateWalletsBalances = async (wallets: IWallet[]) => {
+  const queue = []
+  wallets = wallets.reverse()
+  for (const wallet of wallets) {
+    const { symbol, address, chain } = wallet
+    queue.push(getBalance({ symbol, address, chain }, { responseTimeLimit: 8000 }))
+  }
+  return await Promise.all(queue)
+}
+
+export const getSavedTotalBalance = (wallets: IWallet[]) => {
+  let totalBalance = 0
+  let totalEstimated = 0
+  let pendingBalance = 0
+  for (const wallet of wallets) {
+    const { balance_btc, balance_usd, pending_btc } = wallet
+    if (balance_btc) totalBalance += balance_btc
+    if (balance_usd) totalEstimated += balance_usd
+    if (pending_btc) pendingBalance += pending_btc
+  }
+  return { totalBalance, totalEstimated, pendingBalance }
 }
 
 export const getLatestBalance = (address: string, chain?: string, symbol?: string): TBalanceData => {
@@ -236,9 +269,9 @@ export const getLatestBalance = (address: string, chain?: string, symbol?: strin
     )
 
     if (findWallet) {
-      if (findWallet.balance !== undefined) data.balance = findWallet.balance;
-      if (findWallet.balance_usd !== undefined) data.balance_usd = findWallet.balance_usd;
-      if (findWallet.balance_btc !== undefined) data.balance_btc = findWallet.balance_btc;
+      if (findWallet.balance !== undefined) data.balance = findWallet.balance
+      if (findWallet.balance_usd !== undefined) data.balance_usd = findWallet.balance_usd
+      if (findWallet.balance_btc !== undefined) data.balance_btc = findWallet.balance_btc
       data.pending = findWallet.pending
       data.pending_btc = findWallet.pending_btc
       data.lastBalanceCheck = findWallet.lastBalanceCheck

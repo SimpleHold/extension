@@ -339,12 +339,16 @@ const SendPage: React.FC = () => {
     })
 
     const { balance, balance_usd, balance_btc } = await getBalance(
-      symbol,
-      state.selectedAddress,
-      currency?.chain || tokenChain,
-      tokenChain ? symbol : undefined,
-      contractAddress,
-      true
+      {
+        symbol,
+        address: state.selectedAddress,
+        chain: currency?.chain || tokenChain,
+        tokenSymbol: tokenChain ? symbol : undefined,
+        contractAddress,
+        isFullBalance: true
+      }, {
+        force: true
+      }
     )
 
     updateState({

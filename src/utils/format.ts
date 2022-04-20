@@ -71,10 +71,11 @@ export const short = (data: string, max: number): string => {
     : data
 }
 
-export const formatEstimated = (
+export const getFormatEstimated = (
   estimated: number | null,
   value: number | string
-): number | string => {
+): number | string | null => {
+  if (estimated === undefined) return null
   if (estimated !== 0 && estimated !== null && estimated < 0.01) {
     return '< 0.01'
   }
