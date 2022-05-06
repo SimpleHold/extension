@@ -8,8 +8,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { getBalance } from '@utils/currencies'
-import { toUpper, numberFriendly, short, formatEstimated } from '@utils/format'
-import { updateBalance, THardware } from '@utils/wallet'
+import { toUpper, numberFriendly, short, getFormatEstimated } from '@utils/format'
 
 // Config
 import { getToken } from '@config/tokens'
@@ -19,6 +18,9 @@ import { getCurrency } from '@config/currencies'
 import ledgerLogo from '@assets/icons/ledger.svg'
 import trezorLogo from '@assets/icons/trezor.svg'
 import clockIcon from '@assets/icons/clock.svg'
+
+// Types
+import { THardware } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -43,7 +45,7 @@ const Wallet: React.FC<Props> = (props) => {
     name,
     hardware,
     contractAddress,
-    onClickWallet,
+    onClickWallet
   } = props
 
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
@@ -57,16 +59,17 @@ const Wallet: React.FC<Props> = (props) => {
   }, [])
 
   const fetchBalance = async (): Promise<void> => {
-    const { balance, balance_usd, balance_btc, pending } = await getBalance(
-      symbol,
-      address,
-      currency?.chain || chain,
-      chain ? symbol : undefined,
-      contractAddress
+    const { balance, balance_usd, pending } = await getBalance(
+      {
+        symbol,
+        address,
+        chain: currency?.chain || chain,
+        tokenSymbol: chain ? symbol : undefined,
+        contractAddress
+      }, { responseTimeLimit: undefined }
     )
 
     setBalance(balance)
-    updateBalance({address, symbol, balance, balance_btc, balance_usd, pending})
     setPendingBalance(pending)
     setEstimated(balance_usd)
   }
@@ -78,7 +81,7 @@ const Wallet: React.FC<Props> = (props) => {
         <Styles.WalletInfo>
           <Styles.WalletNameRow>
             {hardware ? (
-              <Styles.HardwareIconRow className="hardware-icon">
+              <Styles.HardwareIconRow className='hardware-icon'>
                 <SVG
                   src={hardware.type === 'ledger' ? ledgerLogo : trezorLogo}
                   width={12}
@@ -86,12 +89,12 @@ const Wallet: React.FC<Props> = (props) => {
                 />
               </Styles.HardwareIconRow>
             ) : null}
-            <Styles.WalletName className="wallet-name">{walletName}</Styles.WalletName>
+            <Styles.WalletName className='wallet-name'>{walletName}</Styles.WalletName>
           </Styles.WalletNameRow>
           <Styles.Address>{short(address, 12)}</Styles.Address>
         </Styles.WalletInfo>
         <Styles.Balances>
-          <Skeleton width={110} height={16} type="gray" br={4} isLoading={balance === null}>
+          <Skeleton width={110} height={16} type='gray' br={4} isLoading={balance === null}>
             <Styles.BalanceRow>
               {pendingBalance !== 0 ? (
                 <Styles.PendingIcon>
@@ -103,8 +106,8 @@ const Wallet: React.FC<Props> = (props) => {
               )}`}</Styles.Balance>
             </Styles.BalanceRow>
           </Skeleton>
-          <Skeleton width={80} height={17} type="gray" mt={7} br={4} isLoading={estimated === null}>
-            <Styles.Estimated>{`$ ${formatEstimated(
+          <Skeleton width={80} height={17} type='gray' mt={7} br={4} isLoading={estimated === null}>
+            <Styles.Estimated>{`$ ${getFormatEstimated(
               estimated,
               numberFriendly(estimated)
             )}`}</Styles.Estimated>

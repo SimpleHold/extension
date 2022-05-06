@@ -21,7 +21,7 @@ import { toLower, toUpper, plus } from '@utils/format'
 import { validateMany } from '@utils/validate'
 import { getBalance } from '@utils/currencies'
 import { getUnspentOutputs } from '@utils/api'
-import { updateBalance, getWallets } from '@utils/wallet'
+import { getWallets } from '@utils/wallet'
 import {
   getExtraIdName,
   checkWithOutputs,
@@ -338,21 +338,23 @@ const SendPage: React.FC = () => {
       estimated: null,
     })
 
-    const { balance, balance_usd, balance_btc } = await getBalance(
-      symbol,
-      state.selectedAddress,
-      currency?.chain || tokenChain,
-      tokenChain ? symbol : undefined,
-      contractAddress,
-      true
+    const { balance, balance_usd } = await getBalance(
+      {
+        symbol,
+        address: state.selectedAddress,
+        chain: currency?.chain || tokenChain,
+        tokenSymbol: tokenChain ? symbol : undefined,
+        contractAddress,
+        isFullBalance: true
+      }, {
+        force: true
+      }
     )
 
     updateState({
       balance,
       estimated: balance_usd,
     })
-
-    updateBalance({address: state.selectedAddress, symbol, balance, balance_btc, balance_usd})
   }
 
   const getWalletsList = (): void => {

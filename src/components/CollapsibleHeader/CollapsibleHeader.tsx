@@ -9,7 +9,7 @@ import PendingBalance from '@components/PendingBalance'
 
 // Utils
 import { checkOneOfExist } from '@utils/storage'
-import { formatEstimated, price } from '@utils/format'
+import { getFormatEstimated, price } from '@utils/format'
 
 // Styles
 import Styles from './styles'
@@ -69,6 +69,8 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
   const clockIconMarginLeft = Math.max(6, 10 - latestScrollPosition)
 
   const navHeight = Math.max(0, 19 - 0.05 * latestScrollPosition)
+
+  const formatEstimated = getFormatEstimated(estimated, price(estimated))
 
   const isFiltersActive = (): boolean => {
     return checkOneOfExist([
@@ -141,7 +143,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
                 lineHeight: `${estimatedLineHeight}px`,
               }}
             >
-              {`$ ${formatEstimated(estimated, price(estimated))}`}
+              {`$ ${formatEstimated}`}
             </Styles.Estimated>
           ) : null}
         </Skeleton>

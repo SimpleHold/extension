@@ -30,6 +30,7 @@ import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
+import { getTokens } from 'utils/localTokens'
 
 const initialState: IState = {
   searchValue: '',
@@ -51,6 +52,18 @@ const SelectToken: React.FC = () => {
   React.useEffect(() => {
     getTokensList()
   }, [])
+
+  React.useEffect(() => {
+    checkLocalTokens()
+  }, [])
+
+  const checkLocalTokens = (): void => {
+    const localTokens = getTokens()
+
+    if (localTokens.length) {
+      updateState({ tokensList: [...state.tokensList, ...localTokens] })
+    }
+  }
 
   const getTokensList = (): void => {
     const wallets = getWallets()
@@ -174,11 +187,12 @@ const SelectToken: React.FC = () => {
             ) : null}
 
             <Styles.TokensList>
-              {filterTokensList.map((token: IToken) => {
+              {filterTokensList.map((token: IToken, index) => {
                 const { name, symbol, chain } = token
 
+
                 return (
-                  <Styles.TokenBlock key={symbol} onClick={() => onAddToken(symbol)}>
+                  <Styles.TokenBlock key={`${symbol}/${chain}/${index}`} onClick={() => onAddToken(symbol)}>
                     <CurrencyLogo symbol={symbol} size={40} br={10} chain={chain} />
                     <Styles.TokenName>{name}</Styles.TokenName>
                     <Styles.TokenSymbol>{toUpper(symbol)}</Styles.TokenSymbol>

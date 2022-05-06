@@ -56,17 +56,3 @@ export type TReceivableResponse = {
 export type TProcessBlock = {
   hash: string
 }
-
-export type TRpcRequest = <T>() => Promise<T | null>
-
-export type TQueueRequest = {
-  request: TRpcRequest
-  resolver: any //
-}
-
-export type TRequestHandler = {
-  _queue: TQueueRequest[]
-  _inProgress: boolean
-  add(request: TQueueRequest): void
-  run(): void
-}

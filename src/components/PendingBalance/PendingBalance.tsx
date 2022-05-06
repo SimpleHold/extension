@@ -6,7 +6,7 @@ import numeral from 'numeral'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { price, toUpper } from '@utils/format'
+import { toUpper } from '@utils/format'
 import { getEstimated } from '@utils/api'
 
 // Styles
@@ -34,6 +34,9 @@ const PendingBalance: React.FC<Props> = (props) => {
     setUSDValue(data)
   }
 
+  const formatUsdValue = numeral(USDValue).format('0.[00000000]')
+  const isValidFormatUsd = !Number.isNaN(formatUsdValue) && formatUsdValue !== 'NaN'
+
   if (USDValue !== 0) {
     return (
       <Styles.Container type={type}>
@@ -49,9 +52,7 @@ const PendingBalance: React.FC<Props> = (props) => {
           </Styles.Pending>
           <Skeleton width={56} height={14} isLoading={USDValue === null} type={type}>
             {USDValue ? (
-              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${numeral(USDValue).format(
-                '0.[00000000]'
-              )}`}</Styles.USDValue>
+              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${isValidFormatUsd ? formatUsdValue : '< 0.000001'}`}</Styles.USDValue>
             ) : null}
           </Skeleton>
         </Styles.Row>

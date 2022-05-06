@@ -1,9 +1,12 @@
+import { TTime } from 'utils/dates'
+
 export interface IGetBalance {
   balance: number
   balance_usd: number
   balance_btc: number
   pending: number
   pending_btc: number
+  isBalanceError?: boolean
 }
 
 export interface IGetContractInfo {
@@ -153,3 +156,20 @@ export type TVetTxParams = {
 }
 
 export type TTonAddressState = 'uninitialized' | 'active' | 'frozen'
+
+export type TGetBalanceWalletProps = {
+  symbol: string
+  address: string
+  chain?: string
+  tokenSymbol?: string
+  contractAddress?: string
+  isFullBalance?: boolean
+}
+
+export type TGetBalanceOptions = {
+  force?: boolean
+  responseTimeLimit?: number
+  requestDebounceTime?: TTime
+}
+
+export type TGetBalance = (props: TGetBalanceWalletProps, options?: TGetBalanceOptions) => Promise<IGetBalance>

@@ -23,7 +23,7 @@ import checkCopyIcon from '@assets/icons/checkCopy.svg'
 import clockIcon from '@assets/icons/clock.svg'
 
 // Utils
-import { short, toUpper, formatEstimated, price } from '@utils/format'
+import { short, toUpper, getFormatEstimated, price } from '@utils/format'
 import { getTransactionLink, getNetworkFeeSymbol } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
 import { getHistoryTxInfo } from '@utils/api'
@@ -157,7 +157,7 @@ const TxHistory: React.FC = () => {
                     >
                       {state.txInfo ? (
                         <Styles.Estimated>
-                          {`$ ${state.txInfo.estimated > 0 ? '+' : ''} ${formatEstimated(
+                          {`$ ${state.txInfo.estimated > 0 ? '+' : ''} ${getFormatEstimated(
                             state.txInfo.estimated,
                             price(state.txInfo.estimated)
                           )}`}
@@ -193,7 +193,7 @@ const TxHistory: React.FC = () => {
                         >
                           {state.txInfo ? (
                             <Styles.InfoText>
-                              {`$ ${formatEstimated(
+                              {`$ ${getFormatEstimated(
                                 state.txInfo.feeEstimated,
                                 price(state.txInfo.feeEstimated)
                               )}`}

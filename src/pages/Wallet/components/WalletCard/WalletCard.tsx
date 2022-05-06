@@ -6,7 +6,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { toUpper, price, formatEstimated, getFormatBalance } from '@utils/format'
+import { toUpper, price, getFormatEstimated, getFormatBalance } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 import { openWebPage } from '@utils/extension'
 
@@ -110,7 +110,7 @@ const WalletCard: React.FC<Props> = (props) => {
             type='gray'
             isLoading={estimated === null}
           >
-            <Styles.Estimated ref={estimatedWidthRef} mt={estimatedMT}>{`$ ${formatEstimated(
+            <Styles.Estimated ref={estimatedWidthRef} mt={estimatedMT}>{`$ ${getFormatEstimated(
               estimated,
               price(estimated)
             )}`}</Styles.Estimated>

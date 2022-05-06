@@ -106,7 +106,7 @@ const TxHistory: React.FC = () => {
   const onGetTxHistory = async (): Promise<void> => {
     updateState({ txGroups: null, isNotFound: false })
 
-    await updateTxsHistory({ filterFn: filterWallets })
+    await updateTxsHistory({ getWalletsOptions: { applyFilters: true } })
     const savedHistory = getFullHistory()
 
     if (savedHistory.length) {

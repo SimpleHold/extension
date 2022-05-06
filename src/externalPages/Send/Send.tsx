@@ -437,12 +437,16 @@ const Send: React.FC = () => {
 
       if (getCurrencyInfo) {
         const { balance, balance_usd } = await getBalance(
-          symbol,
-          address,
-          getCurrencyInfo?.chain,
-          chain ? symbol : undefined,
-          contractAddress,
-          true
+          {
+            symbol,
+            address,
+            chain: getCurrencyInfo?.chain,
+            tokenSymbol: chain ? symbol : undefined,
+            contractAddress,
+            isFullBalance: true
+          }, {
+            force: true
+          }
         )
 
         updateState({ balance, estimated: balance_usd })

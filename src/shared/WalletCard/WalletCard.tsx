@@ -11,7 +11,7 @@ import Wallet from '@drawers/Wallets/components/Wallet'
 import useVisible from '@hooks/useVisible'
 
 // Utils
-import { toUpper, price, toLower, short, formatEstimated } from '@utils/format'
+import { toUpper, price, toLower, short, getFormatEstimated } from '@utils/format'
 import { getWalletName, IWallet, THardware } from '@utils/wallet'
 
 // Assets
@@ -127,7 +127,7 @@ const WalletCard: React.FC<Props> = (props) => {
               mt={7}
               isLoading={estimated === null}
             >
-              <Styles.Estimated>{`$ ${formatEstimated(
+              <Styles.Estimated>{`$ ${getFormatEstimated(
                 estimated,
                 price(estimated)
               )}`}</Styles.Estimated>

@@ -11,10 +11,12 @@ import {
   getCustomFee, requestBalance
 } from '@utils/api'
 import { toLower } from '@utils/format'
+import { getLatestBalance, getWalletChain, updateBalance } from '@utils/wallet'
+import { checkIfTimePassed } from '@utils/dates'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
-import { IGetBalance, TCustomFee } from '@utils/api/types'
+import { TCustomFee, TGetBalanceOptions, TGetBalanceWalletProps } from '@utils/api/types'
 
 // Currencies
 import * as ethereumLike from '@utils/currencies/ethereumLike'
@@ -38,24 +40,66 @@ import * as digibyte from '@utils/currencies/digibyte'
 import * as ravencoin from '@utils/currencies/ravencoin'
 import * as nano from '@utils/currencies/nano'
 
-export const isEthereumLike = (symbol: string, chain?: string): boolean => {
-  return ethereumLike.coins.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
+const emptyData = {
+  balance: 0,
+  balance_usd: 0,
+  balance_btc: 0,
+  pending: 0,
+  pending_btc: 0
 }
 
-export const getBalance = async (
-  symbol: string,
-  address: string,
-  chain?: string,
-  tokenSymbol?: string,
-  contractAddress?: string,
-  isFullBalance?: boolean
-): Promise<IGetBalance> => {
+const defaultOptions = {
+  responseTimeLimit: 8000,
+  requestDebounceTime: { seconds: 20 }
+}
 
-  if (['xno'].indexOf(symbol) !== -1) {
-    nano.updateWalletActivationStatus(address)
+export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBalanceOptions = {}) => {
+  const { symbol, address, chain, tokenSymbol, contractAddress, isFullBalance } = wallet
+
+  if (!address) return { ...emptyData, isBalanceError: true }
+
+  const { force, responseTimeLimit, requestDebounceTime } = { ...defaultOptions, ...options }
+
+  const getChain = getWalletChain(symbol, chain) || chain
+  const savedData = getLatestBalance(address, chain, symbol)
+
+  const localData = { ...emptyData, ...savedData }
+  const isFetchReady = force || checkIfTimePassed(savedData.lastBalanceCheck || 0, requestDebounceTime)
+
+  if (!isFetchReady) return localData
+
+  let fetchedData = {}
+  let timerId: number | undefined
+  let timer = null
+
+  try {
+    const request = requestBalance(address, getChain, tokenSymbol, contractAddress, isFullBalance)
+      .then(data => {
+        fetchedData = data
+        if (!data.isBalanceError) {
+          updateBalance({ address, symbol, ...data })
+        }
+      })
+
+    const isTimer = !(force || !responseTimeLimit)
+
+    if (isTimer) {
+      timer = new Promise(resolve => {
+        timerId = +setTimeout(resolve, responseTimeLimit)
+      })
+    }
+
+    await Promise.race(timer ? [request, timer] : [request])
+    return { ...localData, ...fetchedData }
+  } catch {
+    return localData
+  } finally {
+    timerId && clearTimeout(timerId)
   }
+}
 
-  return await requestBalance(address, chain, tokenSymbol, contractAddress, isFullBalance)
+export const isEthereumLike = (symbol: string, chain?: string): boolean => {
+  return ethereumLike.coins.indexOf(symbol) !== -1 || typeof chain !== 'undefined'
 }
 
 const getProvider = (symbol: string): TProvider | null => {
@@ -132,7 +176,6 @@ const getProvider = (symbol: string): TProvider | null => {
       return nano
     }
 
-
     return null
   } catch {
     return null
@@ -142,7 +185,7 @@ const getProvider = (symbol: string): TProvider | null => {
 
 export const activateWallet = async (chain: string, publicKey: string, privateKey?: string): Promise<any | null> => {
   if (chain === 'xno') {
-    if (!privateKey) return null;
+    if (!privateKey) return null
     return await nano.activateWallet(chain, publicKey, privateKey)
   }
   if (chain === 'hedera') {
@@ -203,22 +246,22 @@ export const validateAddress = (symbol: string, address: string, tokenChain?: st
 }
 
 export const createTransaction = async ({
-  from,
-  to,
-  amount,
-  privateKey,
-  symbol,
-  tokenChain,
-  outputs,
-  networkFee,
-  gas,
-  chainId,
-  gasPrice,
-  nonce,
-  contractAddress,
-  xrpTxData,
-  extraId,
-}: TCreateTransactionProps): Promise<string | null> => {
+                                          from,
+                                          to,
+                                          amount,
+                                          privateKey,
+                                          symbol,
+                                          tokenChain,
+                                          outputs,
+                                          networkFee,
+                                          gas,
+                                          chainId,
+                                          gasPrice,
+                                          nonce,
+                                          contractAddress,
+                                          xrpTxData,
+                                          extraId
+                                        }: TCreateTransactionProps): Promise<string | null> => {
   try {
     if (vechain.coins.indexOf(symbol) !== -1) {
       return await vechain.createTransaction(from, to, amount, privateKey, symbol)
@@ -248,8 +291,8 @@ export const createTransaction = async ({
       const getContractAddress = contractAddress
         ? contractAddress
         : tokenChain
-        ? getToken(symbol, tokenChain)?.address
-        : undefined
+          ? getToken(symbol, tokenChain)?.address
+          : undefined
 
       if (gas && chainId && gasPrice && typeof nonce === 'number') {
         if (tokenChain && getContractAddress) {
@@ -262,7 +305,7 @@ export const createTransaction = async ({
             gas,
             nonce,
             chainId,
-            contractAddress: getContractAddress,
+            contractAddress: getContractAddress
           })
         }
         return await ethereumLike.createTransaction(
@@ -309,15 +352,15 @@ export const createTransaction = async ({
 }
 
 export const getNetworkFee = async ({
-  symbol,
-  addressFrom,
-  addressTo,
-  chain,
-  amount,
-  tokenChain,
-  btcLikeParams,
-  ethLikeParams,
-}: IGetFeeParams): Promise<TGetFeeData | null> => {
+                                      symbol,
+                                      addressFrom,
+                                      addressTo,
+                                      chain,
+                                      amount,
+                                      tokenChain,
+                                      btcLikeParams,
+                                      ethLikeParams
+                                    }: IGetFeeParams): Promise<TGetFeeData | null> => {
   if (btcLikeParams) {
     const { outputs, customFee } = btcLikeParams
 
@@ -354,7 +397,7 @@ export const getNetworkFee = async ({
     const networkFee = await toncoin.getNetworkFee(addressFrom, addressTo, +amount)
 
     return {
-      networkFee,
+      networkFee
     }
   }
 
@@ -486,7 +529,6 @@ export const importRecoveryPhrase = async (
     if (provider?.importRecoveryPhrase) {
       return provider.importRecoveryPhrase(recoveryPhrase)
     }
-
     return null
   } catch {
     return null
@@ -554,7 +596,6 @@ export const checkWithPhrase = (symbol: string, chain?: string): boolean => {
   if (!chain) {
     return cardano.coins.indexOf(symbol) !== -1 || toncoin.coins.indexOf(symbol) !== -1
   }
-
   return false
 }
 
@@ -571,12 +612,7 @@ export const checkWithZeroFee = (symbol: string): boolean => {
 
 export const checkIsInternalTx = (symbol: string): boolean => {
   const provider = getProvider(symbol)
-
-  if (provider?.isInternalTx) {
-    return true
-  }
-
-  return false
+  return !!provider?.isInternalTx
 }
 
 export const createInternalTx = async (
@@ -601,7 +637,7 @@ export const createInternalTx = async (
         privateKey,
         networkFee,
         outputs,
-        extraId,
+        extraId
       })
     }
 

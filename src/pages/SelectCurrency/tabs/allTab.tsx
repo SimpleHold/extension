@@ -65,23 +65,23 @@ const AllTab: React.FC<Props> = (props) => {
       ) : null}
 
       <Styles.CurrenciesList>
-        {filterCurrenciesList.map((currency: ICurrency) => {
+        {filterCurrenciesList.map((currency: ICurrency, index) => {
           const { name, symbol } = currency
 
           return (
-            <Styles.CurrencyBlock key={symbol} onClick={onAddAddress(symbol)}>
+            <Styles.CurrencyBlock key={`${symbol}/${index}`} onClick={onAddAddress(symbol)}>
               <CurrencyLogo symbol={symbol} size={40} br={10} />
               <Styles.CurrencyName>{name}</Styles.CurrencyName>
               <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>
             </Styles.CurrencyBlock>
           )
         })}
-        {filterTokensList.map((token: IToken) => {
+        {filterTokensList.map((token: IToken, index) => {
           const { name, symbol, chain } = token
 
           return (
             <Styles.CurrencyBlock
-              key={`${symbol}/${chain}`}
+              key={`${symbol}/${chain}/${index}`}
               onClick={onAddToken(symbol, chain, name)}
             >
               <CurrencyLogo symbol={symbol} size={40} br={10} chain={chain} />
