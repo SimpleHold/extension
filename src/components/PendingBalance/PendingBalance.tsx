@@ -6,7 +6,7 @@ import numeral from 'numeral'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { price, toUpper } from '@utils/format'
+import { toUpper } from '@utils/format'
 import { getEstimated } from '@utils/api'
 
 // Styles
@@ -51,8 +51,8 @@ const PendingBalance: React.FC<Props> = (props) => {
             {toUpper(symbol)}
           </Styles.Pending>
           <Skeleton width={56} height={14} isLoading={USDValue === null} type={type}>
-            {USDValue && isValidFormatUsd ? (
-              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${formatUsdValue}`}</Styles.USDValue>
+            {USDValue ? (
+              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${isValidFormatUsd ? formatUsdValue : '< 0.000001'}`}</Styles.USDValue>
             ) : null}
           </Skeleton>
         </Styles.Row>

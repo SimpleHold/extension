@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import SVG from 'react-inlinesvg'
-import { List, ListRowProps, WindowScroller, ScrollParams } from 'react-virtualized'
+import { List, ListRowProps, ScrollParams, WindowScroller } from 'react-virtualized'
 
 // Components
 import WalletCard from '@components/WalletCard'
@@ -16,24 +16,22 @@ import useState from '@hooks/useState'
 
 // Utils
 import {
-  IWallet,
-  getWallets,
-  sortWallets,
-  filterWallets,
+  getFilteredSum,
+  getFilteredWallets,
   getWalletName,
-  getSavedTotalBalance, updateWalletsBalances
+  getWallets,
+  updateWalletsBalances
 } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
-import { setBadgeText, getBadgeText } from '@utils/extension'
-import { clear, getItem } from '@utils/storage'
-import { getBalance } from '@utils/currencies'
+import { getBadgeText, setBadgeText } from '@utils/extension'
+import { clear } from '@utils/storage'
 
 // Config
 import { ADD_ADDRESS, FILTERS_WATCH, HISTORY_WATCH } from '@config/events'
 
 // Types
 import { ILocationState, IState, TWalletAmountData } from './types'
-import { TCurrency } from '@drawers/FilterWallets/types'
+import { IWallet } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -111,23 +109,16 @@ const Wallets: React.FC = () => {
       walletsBalance.length &&
       walletsBalance.length >= state.wallets.length
     ) {
-      const getFilteredSum = (arr: TWalletAmountData[]) =>
-        arr.filter(filterBySymbol).reduce((acc, wallet) => acc + wallet.amount, 0)
-
-      updateState({
-        totalBalance: getFilteredSum(walletsBalance),
-        totalEstimated: getFilteredSum(walletsEstimated),
-        pendingBalance: getFilteredSum(walletsPending)
-      })
+      calculateBalances()
     }
   }, [state.wallets, walletsPending, walletsEstimated, walletsBalance])
 
-  const filterBySymbol = (walletAmount: TWalletAmountData) => {
-    const data = getItem('selectedCurrenciesFilter')
-    const selected = data ? JSON.parse(data) : null
-    return selected
-      ? selected.find((currency: TCurrency) => currency.symbol === walletAmount.symbol)
-      : true
+  const calculateBalances = () => {
+    updateState({
+      totalBalance: getFilteredSum(walletsBalance),
+      totalEstimated: getFilteredSum(walletsEstimated),
+      pendingBalance: getFilteredSum(walletsPending)
+    })
   }
 
   const checkBadgeText = async () => {
@@ -138,8 +129,6 @@ const Wallets: React.FC = () => {
     }
   }
 
-
-
   const getWalletsList = async () => {
     updateState({
       wallets: null,
@@ -147,16 +136,12 @@ const Wallets: React.FC = () => {
       totalEstimated: null,
       pendingBalance: null
     })
-    const walletsList = getWallets()
+    const wallets = getFilteredWallets()
 
-    if (walletsList) {
-      const wallets = walletsList.filter(filterWallets).sort(sortWallets)
+    if (wallets.length) {
       updateState({ wallets })
-      console.log('WALLETS:', wallets)
       await updateWalletsBalances(wallets)
-
-      const initialBalance = getSavedTotalBalance(wallets)
-      updateState({ ...initialBalance })
+      setInitialBalance(wallets)
     } else {
       clear()
       history.push('/welcome')
@@ -171,7 +156,22 @@ const Wallets: React.FC = () => {
     history.push('/select-currency')
   }
 
-  const addWalletBalance = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (
+  const setInitialBalance = (wallets: IWallet[]) => {
+    let walletsBalance: TWalletAmountData[] = []
+    let walletsPending: TWalletAmountData[] = []
+    let walletsEstimated: TWalletAmountData[] = []
+    for (const wallet of wallets) {
+      const { balance_btc, balance_usd, pending_btc, symbol, uuid } = wallet
+      walletsBalance.push({ symbol, uuid, amount: balance_btc || 0 })
+      walletsPending.push({ symbol, uuid, amount: pending_btc || 0 })
+      walletsEstimated.push({ symbol, uuid, amount: balance_usd || 0 })
+    }
+    setWalletsBalance(walletsBalance)
+    setWalletsPending(walletsPending)
+    setWalletsEstimated(walletsEstimated)
+  }
+
+  const sumWalletBalance = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (
     wallet: TWalletAmountData
   ) => {
     setStateCallback((prevArray: TWalletAmountData[]) => {
@@ -181,9 +181,9 @@ const Wallets: React.FC = () => {
     })
   }
 
-  const sumBalanceCallback = React.useCallback(addWalletBalance(setWalletsBalance), [])
-  const sumEstimatedCallback = React.useCallback(addWalletBalance(setWalletsEstimated), [])
-  const sumPendingCallback = React.useCallback(addWalletBalance(setWalletsPending), [])
+  const sumBalanceCallback = React.useCallback(sumWalletBalance(setWalletsBalance), [])
+  const sumEstimatedCallback = React.useCallback(sumWalletBalance(setWalletsEstimated), [])
+  const sumPendingCallback = React.useCallback(sumWalletBalance(setWalletsPending), [])
 
   const onCloseDrawer = (): void => {
     updateState({ activeDrawer: null })
@@ -315,7 +315,7 @@ const Wallets: React.FC = () => {
                   rowHeight={86}
                   rowRenderer={renderWallet}
                   width={375}
-                  overscanRowCount={2}
+                  overscanRowCount={0}
                   noRowsRenderer={() => (
                     <Styles.NotFound>
                       Nothing was found for the specified parameters

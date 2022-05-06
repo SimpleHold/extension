@@ -2,7 +2,7 @@ import { v4 } from 'uuid'
 
 // Utils
 import { validateWallet } from '@utils/validate'
-import { toLower, toFixedWithoutRound } from '@utils/format'
+import { toFixedWithoutRound, toLower } from '@utils/format'
 import { encrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
 import { toMs } from '@utils/dates'
@@ -10,10 +10,12 @@ import { getBalance } from '@utils/currencies'
 
 // Config
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getToken, getTokenContractAddress } from '@config/tokens'
 
 // Types
 import { TBackup } from '@utils/backup'
+import { TWalletAmountData } from 'pages/Wallets/types'
+import { TCurrency } from 'drawers/FilterWallets/types'
 
 export type THardware = {
   path: string
@@ -43,6 +45,11 @@ export interface IWallet {
   walletName?: string
   hardware?: THardware
   isNotActivated?: boolean
+  lastActive?: number
+  lastBalanceCheck?: number
+}
+
+export type TUpdateLast = {
   lastActive?: number
   lastBalanceCheck?: number
 }
@@ -144,7 +151,7 @@ export const filterWallets = (wallet: IWallet) => {
   const filterByCurrency = selectedCurrencies
     ? JSON.parse(selectedCurrencies).some(
       (i: TSelectedWalletFilter) =>
-        toLower(i.symbol) === toLower(wallet.symbol) && toLower(i.chain) === toLower(wallet.chain)
+        toLower(i.symbol) === toLower(wallet.symbol) && toLower(i.chain) === toLower(wallet.chain),
     )
     : wallet
 
@@ -191,12 +198,12 @@ export const getWallets = (options: TGetWalletsOptions = {}): IWallet[] | null =
 
 export const getBalancePrecision = (symbol: string): number | undefined => {
   const precisions: TBalancePrecisions = {
-    vtho: 3
+    vtho: 3,
   }
   return precisions[symbol]
 }
 
-export const getBalanceChange = (latestBalance: number | null, balance: number, precisionDigits: number = 7) => {
+export const getBalanceDiff = (latestBalance: number | null, balance: number, precisionDigits: number = 7) => {
   const formatLatest = toFixedWithoutRound(latestBalance || 0, precisionDigits)
   const formatNew = toFixedWithoutRound(balance, precisionDigits)
   if (latestBalance === null && formatNew) {
@@ -210,7 +217,7 @@ export const updateBalance = (data: TBalanceUpdate, precision?: number): void =>
   const wallets = getWallets()
   const findWallet = wallets?.find(
     (wallet: IWallet) =>
-      toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol)
+      toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol),
   )
 
   if (findWallet) {
@@ -222,30 +229,25 @@ export const updateBalance = (data: TBalanceUpdate, precision?: number): void =>
     findWallet.balance_usd = balance_usd
     findWallet.lastBalanceCheck = Date.now()
     setItem('wallets', JSON.stringify(wallets))
+    updateLast('lastBalanceCheck', address, symbol)
   }
 }
 
 export const updateWalletsBalances = async (wallets: IWallet[]) => {
   const queue = []
-  wallets = wallets.reverse()
   for (const wallet of wallets) {
-    const { symbol, address, chain } = wallet
-    queue.push(getBalance({ symbol, address, chain }, { responseTimeLimit: 8000 }))
+    let { symbol, address, chain } = wallet
+    const walletData = {
+      symbol,
+      address,
+      chain,
+      contractAddress: chain ? wallet.contractAddress || getTokenContractAddress(symbol, chain) : undefined,
+      tokenSymbol: chain ? symbol : undefined,
+    }
+    const request = getBalance(walletData)
+    queue.push(request)
   }
   return await Promise.all(queue)
-}
-
-export const getSavedTotalBalance = (wallets: IWallet[]) => {
-  let totalBalance = 0
-  let totalEstimated = 0
-  let pendingBalance = 0
-  for (const wallet of wallets) {
-    const { balance_btc, balance_usd, pending_btc } = wallet
-    if (balance_btc) totalBalance += balance_btc
-    if (balance_usd) totalEstimated += balance_usd
-    if (pending_btc) pendingBalance += pending_btc
-  }
-  return { totalBalance, totalEstimated, pendingBalance }
 }
 
 export const getLatestBalance = (address: string, chain?: string, symbol?: string): TBalanceData => {
@@ -257,7 +259,7 @@ export const getLatestBalance = (address: string, chain?: string, symbol?: strin
     balance_btc: 0,
     pending: 0,
     pending_btc: 0,
-    lastBalanceCheck: undefined
+    lastBalanceCheck: undefined,
   }
 
   if (wallets) {
@@ -265,7 +267,7 @@ export const getLatestBalance = (address: string, chain?: string, symbol?: strin
       (wallet: IWallet) =>
         toLower(wallet.address) === toLower(address)
         && toLower(wallet.chain) === toLower(chain)
-        && toLower(wallet.symbol) === toLower(symbol)
+        && toLower(wallet.symbol) === toLower(symbol),
     )
 
     if (findWallet) {
@@ -290,7 +292,7 @@ export const checkExistWallet = (address: string, symbol: string, chain?: string
         (wallet: IWallet) =>
           toLower(wallet.address) === toLower(address) &&
           toLower(wallet.symbol) === toLower(symbol) &&
-          toLower(wallet.chain) === toLower(chain)
+          toLower(wallet.chain) === toLower(chain),
       ) !== undefined
 
     if (chain) {
@@ -301,7 +303,7 @@ export const checkExistWallet = (address: string, symbol: string, chain?: string
           wallets.find(
             (wallet: IWallet) =>
               toLower(wallet.address) === toLower(address) &&
-              toLower(wallet.symbol) === toLower(getCurrency.symbol)
+              toLower(wallet.symbol) === toLower(getCurrency.symbol),
           ) !== undefined
 
         return checkExistChainWallet || checkExistWallet
@@ -324,7 +326,7 @@ export const addNew = (
   contractAddress?: string,
   decimals?: number,
   mnemonic?: string | null,
-  isNotActivated?: boolean
+  isNotActivated?: boolean,
 ): string | null => {
   const parseBackup = JSON.parse(decryptBackup)
 
@@ -356,7 +358,7 @@ export const addNew = (
         contractAddress: getContractAddress,
         decimals: getDecimals,
         createdAt: new Date(),
-        isNotActivated
+        isNotActivated,
       }
 
       parseWallets.push(data)
@@ -376,7 +378,7 @@ export const toggleVisibleWallet = (address: string, symbol: string, isHidden: b
   if (wallets) {
     const findWallet = wallets.find(
       (wallet: IWallet) =>
-        toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol)
+        toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol),
     )
 
     if (findWallet) {
@@ -393,7 +395,7 @@ export const addHardwareWallet = (
   deviceId: string,
   backup: string,
   password: string,
-  firstAddresses?: THardwareFirstAddress[]
+  firstAddresses?: THardwareFirstAddress[],
 ): string | null => {
   try {
     const parseBackup = JSON.parse(backup)
@@ -405,7 +407,7 @@ export const addHardwareWallet = (
 
       if (firstAddresses?.length) {
         const findFirstAddress = firstAddresses.find(
-          (address: THardwareFirstAddress) => toLower(address.symbol) === toLower(symbol)
+          (address: THardwareFirstAddress) => toLower(address.symbol) === toLower(symbol),
         )
 
         if (findFirstAddress) {
@@ -433,8 +435,8 @@ export const addHardwareWallet = (
             path,
             label: hardwareLabel,
             type,
-            deviceId: getDeviceId(symbol)
-          }
+            deviceId: getDeviceId(symbol),
+          },
         }
 
         parseWallets.push(data)
@@ -443,12 +445,12 @@ export const addHardwareWallet = (
         const getHardwareWalelts = parseWallets.filter(
           (wallet: IWallet) =>
             wallet.hardware?.type === type &&
-            toLower(wallet?.hardware?.deviceId) === toLower(deviceId)
+            toLower(wallet?.hardware?.deviceId) === toLower(deviceId),
         )
         const getBackupHardwareWalelts: IWallet[] = parseBackup.wallets.filter(
           (wallet: IWallet) =>
             wallet.hardware?.type === type &&
-            toLower(wallet?.hardware?.deviceId) === toLower(deviceId)
+            toLower(wallet?.hardware?.deviceId) === toLower(deviceId),
         )
 
         if (getHardwareWalelts.length) {
@@ -484,7 +486,7 @@ export const getWalletName = (
   uuid: string,
   hardware?: THardware,
   chain?: string,
-  name?: string
+  name?: string,
 ): string => {
   if (hardware) {
     return hardware.label
@@ -510,7 +512,7 @@ export const renameWallet = (uuid: string, name: string) => {
 
   if (wallets) {
     const findWalletIndex = wallets.findIndex(
-      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid),
     )
 
     if (findWalletIndex !== -1) {
@@ -533,7 +535,7 @@ export const getWalletChain = (symbol: string, chain?: string): string => {
 export const getUnique = (wallets: IWallet[]): IWallet[] => {
   return wallets.filter(
     (v, i, a) =>
-      a.findIndex((wallet: IWallet) => wallet.symbol === v.symbol && wallet.chain === v.chain) === i
+      a.findIndex((wallet: IWallet) => wallet.symbol === v.symbol && wallet.chain === v.chain) === i,
   )
 }
 
@@ -545,13 +547,13 @@ export const activateAddress = (
   uuid: string,
   address: string,
   backup: string,
-  password: string
+  password: string,
 ): void => {
   const wallets = getWallets()
 
   if (wallets) {
     const findWalletIndex = wallets.findIndex(
-      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid),
     )
 
     if (findWalletIndex !== -1) {
@@ -565,7 +567,7 @@ export const activateAddress = (
 
   if (parseBackup) {
     const findWalletIndex = parseBackup.wallets.findIndex(
-      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+      (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid),
     )
 
     if (findWalletIndex !== -1) {
@@ -589,23 +591,23 @@ export const parseWalletsData = (wallets: string | null) => {
     addresses_hid: mapSymbols(addressesHid),
     addresses_hid_count: `${addressesHid.length}`,
     addresses_empty: mapSymbols(addressesEmpty),
-    addresses_empty_count: `${addressesEmpty.length}`
+    addresses_empty_count: `${addressesEmpty.length}`,
   }
 }
 
-export const updateLast = (key: keyof IWallet, address: string, chain?: string): boolean => {
+export const updateLast = (key: keyof TUpdateLast, address: string, symbol: string): boolean => {
   const wallets = getWallets()
 
   if (wallets) {
     let isUpdated = false
     const mapWallets = wallets.map(
       (wallet: IWallet) => {
-        if (toLower(wallet.address) === toLower(address) && toLower(wallet.chain) === toLower(chain)) {
+        if (toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol)) {
           isUpdated = true
           return { ...wallet, [key]: Date.now() }
         }
         return wallet
-      }
+      },
     )
 
     if (isUpdated) {
@@ -614,4 +616,23 @@ export const updateLast = (key: keyof IWallet, address: string, chain?: string):
     }
   }
   return false
+}
+
+export const getFilteredSum = (arr: TWalletAmountData[]) =>
+  arr.filter(filterBySymbol).reduce((acc, wallet) => acc + wallet.amount, 0)
+
+export const filterBySymbol = (walletAmount: TWalletAmountData) => {
+  const data = getItem('selectedCurrenciesFilter')
+  const selected = data ? JSON.parse(data) : null
+  return selected
+    ? selected.find((currency: TCurrency) => toLower(currency.symbol) === toLower(walletAmount.symbol))
+    : true
+}
+
+export const getFilteredWallets = (): IWallet[] => {
+  const walletsList = getWallets()
+  if (walletsList) {
+    return walletsList.filter(filterWallets).sort(sortWallets)
+  }
+  return []
 }

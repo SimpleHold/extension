@@ -21,7 +21,6 @@ import { setUserId } from '@utils/api'
 import { ToastContextProvider } from '@contexts/Toast/Toast'
 import { updateTxsHistory } from '@utils/history'
 
-
 const App: React.FC = () => {
   React.useEffect(() => {
     initAmplitude()
@@ -43,7 +42,6 @@ const App: React.FC = () => {
       }
     }
   }, [])
-
 
   const getPlatformInfo = async (): Promise<void> => {
     const info = await browser.runtime.getPlatformInfo()

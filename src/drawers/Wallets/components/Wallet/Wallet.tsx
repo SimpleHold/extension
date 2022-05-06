@@ -9,7 +9,6 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getBalance } from '@utils/currencies'
 import { toUpper, numberFriendly, short, getFormatEstimated } from '@utils/format'
-import { updateBalance, THardware } from '@utils/wallet'
 
 // Config
 import { getToken } from '@config/tokens'
@@ -19,6 +18,9 @@ import { getCurrency } from '@config/currencies'
 import ledgerLogo from '@assets/icons/ledger.svg'
 import trezorLogo from '@assets/icons/trezor.svg'
 import clockIcon from '@assets/icons/clock.svg'
+
+// Types
+import { THardware } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -57,20 +59,19 @@ const Wallet: React.FC<Props> = (props) => {
   }, [])
 
   const fetchBalance = async (): Promise<void> => {
-    const { balance, balance_usd, balance_btc, pending } = await getBalance(
+    const { balance, balance_usd, pending } = await getBalance(
       {
         symbol,
         address,
         chain: currency?.chain || chain,
         tokenSymbol: chain ? symbol : undefined,
         contractAddress
-      }
+      }, { responseTimeLimit: undefined }
     )
 
     setBalance(balance)
     setPendingBalance(pending)
     setEstimated(balance_usd)
-    updateBalance({ address, symbol, balance, balance_btc, balance_usd, pending })
   }
 
   return (

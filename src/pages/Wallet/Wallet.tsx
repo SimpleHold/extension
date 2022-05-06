@@ -24,7 +24,6 @@ import {
   getTransactionHistory
 } from '@utils/api'
 import {
-  updateBalance,
   renameWallet,
   toggleVisibleWallet,
   getWalletName,
@@ -208,14 +207,13 @@ const WalletPage: React.FC = () => {
       return
     }
 
-    const { balance, balance_usd, balance_btc, pending } = await getBalance(
-      {symbol, address: state.address, chain: currency?.chain || chain, tokenSymbol, contractAddress },
-      {force: true}
+    const { balance, balance_usd, pending } = await getBalance(
+      { symbol, address: state.address, chain: currency?.chain || chain, tokenSymbol, contractAddress },
+      { force: true }
     )
 
     setPendingBalance(pending)
     updateState({ balance, estimated: balance_usd })
-    updateBalance({ address: state.address, symbol, balance, balance_btc, balance_usd, pending })
   }
 
   const getTonTxHistory = async (): Promise<void> => {

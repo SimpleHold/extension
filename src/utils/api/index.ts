@@ -5,25 +5,25 @@ import config from '@config/index'
 
 // Types
 import {
+  IAdaTrParams,
   IGetBalance,
   IGetContractInfo,
-  ITokensBalance,
-  Web3TxParams,
   IGetNetworkFeeResponse,
-  IAdaTrParams,
-  TPhishingSite,
+  ITokensBalance,
   TAddressTx,
   TCustomFee,
-  TTxWallet,
-  THistoryTx,
-  TTxAddressItem,
   TFullTxHistoryResponse,
-  TFullTxWallet,
   TFullTxInfo,
+  TFullTxWallet,
+  THistoryTx,
   TNft,
   TNFtWallets,
-  TVetTxParams,
+  TPhishingSite,
   TTonAddressState,
+  TTxAddressItem,
+  TTxWallet,
+  TVetTxParams,
+  Web3TxParams
 } from './types'
 import { IToken } from '@config/tokens'
 
@@ -53,6 +53,7 @@ export const requestBalance = async (
       balance_btc: 0,
       pending: 0,
       pending_btc: 0,
+      isBalanceError: true
     }
   }
 }

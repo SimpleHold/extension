@@ -10,7 +10,7 @@ import Skeleton from '@components/Skeleton'
 import { getBalance } from '@utils/currencies'
 import { toUpper, numberFriendly, getFormatEstimated, getFormatBalance } from '@utils/format'
 import {
-  getWalletChain, getBalanceChange, getBalancePrecision
+  getWalletChain, getBalanceDiff, getBalancePrecision
 } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import updateTxsHistory from '@utils/history'
@@ -32,7 +32,6 @@ import Styles from './styles'
 import { TWalletAmountData } from '@pages/Wallets/types'
 import { TTxWallet } from '@utils/api/types'
 import { THardware } from '@utils/wallet'
-
 
 interface Props {
   address: string
@@ -103,7 +102,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   }, [])
 
   const loadBalance = async (): Promise<void> => {
-    const savedData = await getBalance({ symbol, address, chain, tokenSymbol, contractAddress })
+    const savedData = await getBalance({ symbol, address, chain, tokenSymbol, contractAddress }, {responseTimeLimit: 8000})
     const data = isNotActivated ? emptyData : savedData
 
     const { balance, balance_usd, balance_btc, pending, pending_btc } = data
@@ -118,7 +117,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     sumEstimated && sumEstimated({ uuid, symbol, amount: balance_usd || 0 })
 
     const precision = getBalancePrecision(symbol)
-    const isBalanceChanged = getBalanceChange(savedData.balance, balance || 0, precision)
+    const isBalanceChanged = getBalanceDiff(savedData.balance, balance || 0, precision)
     const isPendingStatusChanged = !!savedData.pending !== !!pending
 
     if (isBalanceChanged || isPendingStatusChanged) {

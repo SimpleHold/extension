@@ -11,12 +11,12 @@ import {
   getCustomFee, requestBalance
 } from '@utils/api'
 import { toLower } from '@utils/format'
-import { getLatestBalance, getWalletChain, updateBalance, updateLast } from '@utils/wallet'
+import { getLatestBalance, getWalletChain, updateBalance } from '@utils/wallet'
 import { checkIfTimePassed } from '@utils/dates'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
-import { TCustomFee, TGetBalance, TGetBalanceOptions, TGetBalanceProps } from '@utils/api/types'
+import { TCustomFee, TGetBalanceOptions, TGetBalanceWalletProps } from '@utils/api/types'
 
 // Currencies
 import * as ethereumLike from '@utils/currencies/ethereumLike'
@@ -49,48 +49,49 @@ const emptyData = {
 }
 
 const defaultOptions = {
-  responseTimeLimit: 2000,
+  responseTimeLimit: 8000,
   requestDebounceTime: { seconds: 20 }
 }
 
-export const getBalance = async (props: TGetBalanceProps, options: TGetBalanceOptions = {}) => {
-  const { symbol, address, chain, tokenSymbol, contractAddress, isFullBalance } = props
+export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBalanceOptions = {}) => {
+  const { symbol, address, chain, tokenSymbol, contractAddress, isFullBalance } = wallet
+
+  if (!address) return { ...emptyData, isBalanceError: true }
+
   const { force, responseTimeLimit, requestDebounceTime } = { ...defaultOptions, ...options }
 
-  if (!address) return emptyData
   const getChain = getWalletChain(symbol, chain) || chain
   const savedData = getLatestBalance(address, chain, symbol)
-  console.log('------')
-  console.log(symbol, ' ', address, 'savedData:', savedData)
-  const localData = { ...emptyData, ...savedData }
-  const isFetchReady = force
-    ? true
-    : checkIfTimePassed(savedData.lastBalanceCheck || 0, requestDebounceTime)
 
-  if (!isFetchReady) {
-    console.log('returning local !isFetchReady')
-    return localData
-  }
+  const localData = { ...emptyData, ...savedData }
+  const isFetchReady = force || checkIfTimePassed(savedData.lastBalanceCheck || 0, requestDebounceTime)
+
+  if (!isFetchReady) return localData
 
   let fetchedData = {}
   let timerId: number | undefined
+  let timer = null
 
   try {
-    const request = requestBalance(address, getChain, tokenSymbol, contractAddress, isFullBalance).then(data => {
-      fetchedData = data
-      updateBalance({ address, symbol, ...data })
-      updateLast('lastBalanceCheck', address, getChain)
-    })
-    const timer = force || !responseTimeLimit
-      ? null
-      : new Promise(res => {
-        timerId = +setTimeout(res, responseTimeLimit)
+    const request = requestBalance(address, getChain, tokenSymbol, contractAddress, isFullBalance)
+      .then(data => {
+        fetchedData = data
+        if (!data.isBalanceError) {
+          updateBalance({ address, symbol, ...data })
+        }
       })
+
+    const isTimer = !(force || !responseTimeLimit)
+
+    if (isTimer) {
+      timer = new Promise(resolve => {
+        timerId = +setTimeout(resolve, responseTimeLimit)
+      })
+    }
+
     await Promise.race(timer ? [request, timer] : [request])
     return { ...localData, ...fetchedData }
-
   } catch {
-    console.log('in catch getBalance')
     return localData
   } finally {
     timerId && clearTimeout(timerId)
@@ -174,7 +175,6 @@ const getProvider = (symbol: string): TProvider | null => {
     if (nano.coins.indexOf(symbol) !== -1) {
       return nano
     }
-
 
     return null
   } catch {
@@ -529,7 +529,6 @@ export const importRecoveryPhrase = async (
     if (provider?.importRecoveryPhrase) {
       return provider.importRecoveryPhrase(recoveryPhrase)
     }
-
     return null
   } catch {
     return null
@@ -597,7 +596,6 @@ export const checkWithPhrase = (symbol: string, chain?: string): boolean => {
   if (!chain) {
     return cardano.coins.indexOf(symbol) !== -1 || toncoin.coins.indexOf(symbol) !== -1
   }
-
   return false
 }
 
@@ -614,12 +612,7 @@ export const checkWithZeroFee = (symbol: string): boolean => {
 
 export const checkIsInternalTx = (symbol: string): boolean => {
   const provider = getProvider(symbol)
-
-  if (provider?.isInternalTx) {
-    return true
-  }
-
-  return false
+  return !!provider?.isInternalTx
 }
 
 export const createInternalTx = async (

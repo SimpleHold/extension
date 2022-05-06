@@ -543,7 +543,7 @@ export default tokens
 export const getToken = (symbol: string, chain: string) => {
   return tokens.find(
     (token: IToken) =>
-      toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain)
+      toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain),
   )
 }
 
@@ -557,13 +557,13 @@ export const validateContractAddress = (address: string, chain: string): boolean
 export const checkExistWallet = (
   walletsList: IWallet[],
   symbol: string,
-  chain: string
+  chain: string,
 ): boolean => {
   const getCurrencyInfo = getCurrencyByChain(chain)
 
   if (getCurrencyInfo) {
     const getWalletsByChain = walletsList.filter(
-      (wallet) => toLower(wallet.symbol) === toLower(getCurrencyInfo.symbol)
+      (wallet) => toLower(wallet.symbol) === toLower(getCurrencyInfo.symbol),
     )
 
     if (getWalletsByChain.length) {
@@ -576,7 +576,7 @@ export const checkExistWallet = (
           (walletItem: IWallet) =>
             toLower(walletItem.address) === toLower(address) &&
             toLower(walletItem.symbol) === toLower(symbol) &&
-            toLower(walletItem?.chain) === toLower(chain)
+            toLower(walletItem?.chain) === toLower(chain),
         )
 
         if (!findExist && !hardware) {
@@ -593,14 +593,14 @@ export const checkExistWallet = (
 export const getUnusedAddressesForToken = (
   walletsList: IWallet[],
   symbol: string,
-  chain: string
+  chain: string,
 ): string[] => {
   const addresses: string[] = []
   const getCurrencyInfo = getCurrencyByChain(chain)
 
   if (getCurrencyInfo) {
     const filterWallets = walletsList.filter(
-      (wallet: IWallet) => toLower(wallet.symbol) === toLower(getCurrencyInfo.symbol)
+      (wallet: IWallet) => toLower(wallet.symbol) === toLower(getCurrencyInfo.symbol),
     )
 
     for (const wallet of filterWallets) {
@@ -610,7 +610,7 @@ export const getUnusedAddressesForToken = (
         (walletItem: IWallet) =>
           toLower(walletItem.address) === toLower(address) &&
           toLower(walletItem.symbol) === toLower(symbol) &&
-          toLower(walletItem.chain) === toLower(getCurrencyInfo.chain)
+          toLower(walletItem.chain) === toLower(getCurrencyInfo.chain),
       )
 
       if (!findExist && !hardware) {
@@ -622,6 +622,20 @@ export const getUnusedAddressesForToken = (
   return addresses
 }
 
+export const getSharedTokens = (): IToken[] => {
+  try {
+    const getTokens = getItem('tokens')
+
+    if (getTokens) {
+      return JSON.parse(getTokens)
+    }
+
+    return []
+  } catch {
+    return []
+  }
+}
+
 export const getSharedToken = (symbol: string, chain?: string): IToken | undefined => {
   try {
     const getTokens = getItem('tokens')
@@ -631,7 +645,7 @@ export const getSharedToken = (symbol: string, chain?: string): IToken | undefin
 
       return parse.find(
         (token: IToken) =>
-          toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain)
+          toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain),
       )
     }
 
@@ -639,4 +653,9 @@ export const getSharedToken = (symbol: string, chain?: string): IToken | undefin
   } catch {
     return undefined
   }
+}
+
+export const getTokenContractAddress = (symbol: string, chain: string): string | undefined => {
+  const token = getSharedToken(symbol, chain)
+  return token?.address || (chain ? getToken(symbol, chain)?.address : undefined)
 }
