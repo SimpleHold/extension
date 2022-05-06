@@ -57,12 +57,12 @@ const TokensTab: React.FC<Props> = (props) => {
           </Styles.CustomTokenLogo>
           <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
         </Styles.CustomTokenBlock>
-        {filterTokensList.map((token: IToken) => {
+        {filterTokensList.map((token: IToken, index) => {
           const { name, symbol, chain } = token
 
           return (
             <Styles.CurrencyBlock
-              key={`${symbol}/${chain}`}
+              key={`${symbol}/${chain}/${index}`}
               onClick={onAddToken(symbol, chain, name)}
             >
               <CurrencyLogo symbol={symbol} size={40} br={10} chain={chain} />

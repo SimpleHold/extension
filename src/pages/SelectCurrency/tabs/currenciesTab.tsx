@@ -46,11 +46,11 @@ const CurrenciesTab: React.FC<Props> = (props) => {
       ) : null}
 
       <Styles.CurrenciesList>
-        {filterCurrenciesList.map((currency: ICurrency) => {
+        {filterCurrenciesList.map((currency: ICurrency, index) => {
           const { name, symbol } = currency
 
           return (
-            <Styles.CurrencyBlock key={symbol} onClick={onAddAddress(symbol)}>
+            <Styles.CurrencyBlock key={`${symbol}/${index}`} onClick={onAddAddress(symbol)}>
               <CurrencyLogo symbol={symbol} size={40} br={10} />
               <Styles.CurrencyName>{name}</Styles.CurrencyName>
               <Styles.CurrencySymbol>{toUpper(symbol)}</Styles.CurrencySymbol>

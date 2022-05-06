@@ -187,11 +187,12 @@ const SelectToken: React.FC = () => {
             ) : null}
 
             <Styles.TokensList>
-              {filterTokensList.map((token: IToken) => {
+              {filterTokensList.map((token: IToken, index) => {
                 const { name, symbol, chain } = token
 
+
                 return (
-                  <Styles.TokenBlock key={symbol} onClick={() => onAddToken(symbol)}>
+                  <Styles.TokenBlock key={`${symbol}/${chain}/${index}`} onClick={() => onAddToken(symbol)}>
                     <CurrencyLogo symbol={symbol} size={40} br={10} chain={chain} />
                     <Styles.TokenName>{name}</Styles.TokenName>
                     <Styles.TokenSymbol>{toUpper(symbol)}</Styles.TokenSymbol>
