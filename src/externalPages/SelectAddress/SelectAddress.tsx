@@ -11,7 +11,7 @@ import WalletCard from '@components/WalletCard'
 import CurrenciesDropdown from '@components/CurrenciesDropdown'
 
 // Utils
-import { getWalletName, getWallets, IWallet } from '@utils/wallet'
+import { generateWalletName, getWallets, IWallet } from '@utils/wallet'
 import { toLower, toUpper } from '@utils/format'
 import { getItem, removeItem } from '@utils/storage'
 
@@ -276,7 +276,7 @@ const SelectAddress: React.FC = () => {
 
                 const walletName =
                   wallet.walletName ||
-                  getWalletName(filterWallets, symbol, uuid, hardware, chain, name)
+                  generateWalletName(filterWallets, symbol, uuid, hardware, chain, name)
 
                 return (
                   <WalletCard

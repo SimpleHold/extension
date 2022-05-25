@@ -14,14 +14,20 @@ import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets, activateAddress } from '@utils/wallet'
+import {
+  checkExistWallet,
+  addNew as addNewWallet,
+  IWallet,
+  getWallets,
+  setPolicyPopupStatus,
+} from '@utils/wallet'
 import { decrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
 import { toLower, toUpper } from '@utils/format'
 import { importPrivateKey, getTokenStandard } from '@utils/currencies'
 import { getTokensBalance } from '@utils/api'
-import * as theta from '@utils/currencies/theta'
 import { getItem, setItem } from '@utils/storage'
+import * as theta from '@utils/currencies/theta'
 import * as vechain from '@utils/currencies/vechain'
 
 // Hooks
@@ -37,7 +43,6 @@ import { ITokensBalance } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
-import { getActivationStatus } from 'utils/currencies/nano'
 
 const initialState: IState = {
   privateKey: '',
@@ -190,6 +195,7 @@ const ImportPrivateKey: React.FC = () => {
             ).length
             setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
+            setPolicyPopupStatus()
             return updateState({ activeDrawer: 'success' })
           }
         }

@@ -15,6 +15,7 @@ export interface ILocationState {
   decimals?: number
   hardware: THardware
   currency: ICurrency | IToken
+  isRedirect?: boolean
 }
 
 export type TFeeValue = {

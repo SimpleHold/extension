@@ -15,13 +15,13 @@ type TNavItemProps = {
 }
 
 const Container = styled.div`
-  padding: 15px 30px;
+  padding: 15px 25px;
   display: flex;
   flex-direction: row;
   align-items: center;
   width: 100%;
   border-bottom: ${({ withBorder, borderColor }: TContainerProps) =>
-    withBorder ? `0.5px solid ${borderColor || '#EAEAEA'}` : 'none'};
+          withBorder ? `0.5px solid ${borderColor || '#EAEAEA'}` : 'none'};
   z-index: 100;
   position: ${({ isAbsolute }: TContainerProps) => (isAbsolute ? 'absolute' : 'relative')};
 `
@@ -39,19 +39,22 @@ const Logo = styled.div`
   height: 30px;
 
   path {
-    fill: ${({ whiteLogo }: TLogoProps) => whiteLogo && "#fff"};
-    
+    fill: ${({ whiteLogo }: TLogoProps) => whiteLogo && '#fff'};
+
     &:nth-child(2) {
       opacity: ${({ whiteLogo }: TLogoProps) => whiteLogo ? 0.38 : 1};
-    };
+    }
+  ;
 
     &:nth-child(3) {
       opacity: ${({ whiteLogo }: TLogoProps) => whiteLogo ? 0.68 : 1};
-    };
+    }
+  ;
 
     &:nth-child(4) {
       opacity: ${({ whiteLogo }: TLogoProps) => whiteLogo ? 0.49 : 1};
-    };
+    }
+  ;
   }
 `
 
@@ -73,7 +76,7 @@ const NavItem = styled.div`
   border-radius: 15px;
 
   path {
-    fill: ${({ isActive }: TNavItemProps) => (isActive ? '#3fbb7d' : '#FFFFFF')};
+    fill: ${({ isActive }: TNavItemProps) => (isActive ? '#3fbb7d' : '#C5EBD8')};
   }
 
   &:not(:last-child) {
@@ -96,6 +99,10 @@ const Navigate = styled.div`
   flex-direction: row;
   align-items: center;
   overflow: hidden;
+
+  * {
+    transition: 0.2s ease;
+  }
 
   path {
     fill: #ffffff;

@@ -20,7 +20,7 @@ import eyeIcon from '@assets/icons/eye.svg'
 import eyeVisibleIcon from '@assets/icons/eyeVisible.svg'
 
 // Types
-import { TDropdowbList } from '@components/DropDown/DropDown'
+import { TDropdownList } from '@components/DropDown/DropDown'
 import { THardware } from '@utils/wallet'
 
 // Styles
@@ -49,14 +49,14 @@ const WalletHeading: React.FC<Props> = (props) => {
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 
-  const [dropdownList, setDropdownList] = React.useState<TDropdowbList[]>([])
+  const [dropdownList, setDropdownList] = React.useState<TDropdownList[]>([])
 
   React.useEffect(() => {
     getDropdownList()
   }, [isHidden])
 
   const getDropdownList = (): void => {
-    const list: TDropdowbList[] = []
+    const list: TDropdownList[] = []
 
     if (!hardware) {
       if (withPhrase) {

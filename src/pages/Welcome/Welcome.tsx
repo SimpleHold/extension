@@ -21,7 +21,7 @@ import { WELCOME, START_CREATE, START_RESTORE, FIRST_ENTER } from '@config/event
 // Styles
 import Styles from './styles'
 
-const Wallets: React.FC = () => {
+const Welcome: React.FC = () => {
   const [isManualRestore, setManualRestore] = React.useState<boolean>(false)
   const history = useHistory()
 
@@ -139,4 +139,4 @@ const Wallets: React.FC = () => {
   )
 }
 
-export default Wallets
+export default Welcome

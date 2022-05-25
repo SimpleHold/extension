@@ -10,14 +10,14 @@ const Tabs: React.FC<Props> = (props) => {
   const { tabs, activeTabKey, onSelectTab } = props
 
   return (
-    <Styles.Container>
-      <Styles.Tabs>
+    <Styles.Container className={'tabs-container'}>
+      <Styles.Tabs className={'tabs'}>
         {tabs.map((tab: TTab) => {
           const { title, key, badge } = tab
           const isActive = activeTabKey === key
 
           return (
-            <Styles.Tab key={key} onClick={onSelectTab(key)} isActive={isActive}>
+            <Styles.Tab key={key} onClick={onSelectTab(key)} isActive={isActive} className={'tab'}>
               <Styles.TabRow>
                 <Styles.TabTitle>{title}</Styles.TabTitle>
                 {badge !== undefined ? (

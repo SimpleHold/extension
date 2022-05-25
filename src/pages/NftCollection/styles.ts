@@ -73,9 +73,10 @@ const Button = styled.div`
 `
 
 const Container = styled.div`
-  background-color: #f2f4f8;
-  height: 490px;
-  padding: 20px 30px;
+  border-radius: 16px 16px 0 0;
+  background-color: #fff;
+  height: 540px;
+  padding: 12px 16px 0;
 `
 
 const NotFound = styled.div`
@@ -127,6 +128,12 @@ const ButtonDot = styled.div`
   border-radius: 3px;
 `
 
+const Controls = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+`
+
 const Styles = {
   Wrapper,
   Tabs,
@@ -141,6 +148,7 @@ const Styles = {
   Loading,
   Content,
   ButtonDot,
+  Controls
 }
 
 export default Styles

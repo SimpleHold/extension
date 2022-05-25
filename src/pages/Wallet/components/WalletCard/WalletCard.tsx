@@ -33,6 +33,7 @@ interface Props {
   onConfirmActivate: () => void
   hasUnreceivedTxs?: boolean
   onConfirmReceivePending?: () => void
+  isRedirect?: string
 }
 
 const WalletCard: React.FC<Props> = (props) => {
@@ -49,7 +50,8 @@ const WalletCard: React.FC<Props> = (props) => {
     isNotActivated,
     onConfirmActivate,
     hasUnreceivedTxs,
-    onConfirmReceivePending
+    onConfirmReceivePending,
+    isRedirect
   } = props
 
 
@@ -72,6 +74,10 @@ const WalletCard: React.FC<Props> = (props) => {
       setInitialized(true)
     }
   }, [balance])
+
+  React.useEffect(() => {
+    isRedirect && openPage(isRedirect)()
+  }, [isRedirect])
 
   const onExchange = (): void => {
     logEvent({

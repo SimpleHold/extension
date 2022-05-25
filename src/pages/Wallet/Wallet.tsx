@@ -26,9 +26,9 @@ import {
 import {
   renameWallet,
   toggleVisibleWallet,
-  getWalletName,
+  generateWalletName,
   getWallets,
-  activateAddress, getWalletChain
+  activateAddress, getWalletChain, getWalletName,
 } from '@utils/wallet'
 import { activateWallet, getBalance } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
@@ -80,13 +80,14 @@ const initialState: IState = {
   confirmDrawerType: null,
   isDrawerButtonLoading: false,
   isNotActivated: false,
-  address: ''
+  address: '',
 }
 
 const WalletPage: React.FC = () => {
   const {
     state: locationState,
     state: {
+      isRedirect,
       symbol,
       uuid,
       chain,
@@ -194,11 +195,34 @@ const WalletPage: React.FC = () => {
 
       if (findWallet) {
         const walletName =
-          findWallet.walletName || getWalletName(walletsList, symbol, uuid, hardware, chain, name)
+          findWallet.walletName || generateWalletName(walletsList, symbol, uuid, hardware, chain, name)
 
         updateState({ walletName })
       }
     }
+  }
+
+  const openPage = (url: string) => () => {
+    logEvent({
+      name: ADDRESS_ACTION,
+      properties: {
+        addressAction: url === '/send' ? 'send' : 'receive'
+      }
+    })
+
+    const sharedToken = getSharedToken(symbol, chain)
+    const walletName = getWalletName({uuid, symbol, hardware, chain, name, address: state.address})
+
+    history.push(url, {
+      ...locationState,
+      walletName: state.walletName || walletName,
+      tokenChain: chain,
+      chain: sharedToken ? chain : currency?.chain,
+      currency,
+      address: state.address,
+      decimals: sharedToken ? sharedToken.decimals : decimals,
+      isRedirect: !!isRedirect
+    })
   }
 
   const loadBalance = async (): Promise<void> => {
@@ -292,27 +316,6 @@ const WalletPage: React.FC = () => {
     } else {
       updateState({ txHistory: [] })
     }
-  }
-
-  const openPage = (url: string) => () => {
-    logEvent({
-      name: ADDRESS_ACTION,
-      properties: {
-        addressAction: url === '/send' ? 'send' : 'receive'
-      }
-    })
-
-    const sharedToken = getSharedToken(symbol, chain)
-
-    history.push(url, {
-      ...locationState,
-      walletName: state.walletName,
-      tokenChain: chain,
-      chain: sharedToken ? chain : currency?.chain,
-      currency,
-      address: state.address,
-      decimals: sharedToken ? sharedToken.decimals : decimals
-    })
   }
 
   const onSelectDropdown = (key: string) => {
@@ -601,6 +604,7 @@ const WalletPage: React.FC = () => {
               onConfirmActivate={onConfirmActivate}
               hasUnreceivedTxs={hasUnreceivedTxs}
               onConfirmReceivePending={onConfirmReceivePendingTxs}
+              isRedirect={isRedirect}
             />
             {state.balance !== null && state.balance < 20 && toLower(symbol) === 'xrp' ? (
               <Warning

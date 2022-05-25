@@ -20,21 +20,21 @@ import SendFormShared from '@shared/SendForm'
 import NetworkFeeShared from '@shared/NetworkFee'
 
 // Utils
-import { getWallets, IWallet, getWalletName } from '@utils/wallet'
+import { toLower, toUpper, plus } from '@utils/format'
+import { getWallets, IWallet, generateWalletName } from '@utils/wallet'
 import { getUnspentOutputs } from '@utils/api'
 import { getBalance } from '@utils/currencies'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
-import { toLower, toUpper, plus } from '@utils/format'
 import {
+  getExtraIdName,
+  checkWithOutputs,
+  getNetworkFeeSymbol,
   validateAddress,
   formatUnit,
-  getNetworkFeeSymbol,
-  getExtraIdName,
-  generateExtraId,
   getNetworkFee,
+  generateExtraId,
   getFee,
   getStandingFee,
-  checkWithOutputs,
   isEthereumLike,
   checkWithZeroFee,
 } from '@utils/currencies'
@@ -802,7 +802,7 @@ const Send: React.FC = () => {
 
       const walletName =
         state.selectedWallet.walletName ||
-        getWalletName(state.walletsList, symbol, uuid, hardware, chain, name)
+        generateWalletName(state.walletsList, symbol, uuid, hardware, chain, name)
 
       updateState({ walletName })
     }

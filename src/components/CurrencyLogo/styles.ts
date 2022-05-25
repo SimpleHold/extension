@@ -35,7 +35,7 @@ const LogoRow = styled.div`
   height: ${({ height }: TLogoRowProps) => `${height}px`};
   background: ${({ background }: TLogoRowProps) =>
     `linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.1) 100%), ${background};`};
-  border-radius: ${({ br }: TLogoRowProps) => (br ? `${br}px` : '13px')};
+  border-radius: ${({ br }: TLogoRowProps) => (br ? `${br}px` : '16px')};
   display: flex;
   align-items: center;
   justify-content: center;

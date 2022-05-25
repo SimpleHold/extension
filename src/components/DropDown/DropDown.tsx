@@ -4,7 +4,7 @@ import SVG from 'react-inlinesvg'
 // Styles
 import Styles from './styles'
 
-export type TDropdowbList = {
+export type TDropdownList = {
   icon: {
     source: string
     width: number
@@ -17,7 +17,7 @@ export type TDropdowbList = {
 interface Props {
   isVisible: boolean
   dropDownRef: React.RefObject<HTMLDivElement>
-  list: TDropdowbList[]
+  list: TDropdownList[]
   onClick: (key: string) => void
 }
 
@@ -30,7 +30,7 @@ const DropDown: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container isVisible={isVisible} ref={dropDownRef}>
-      {list.map((item: TDropdowbList) => {
+      {list.map((item: TDropdownList) => {
         const { icon, title, key } = item
 
         return (

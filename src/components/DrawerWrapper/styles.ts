@@ -9,6 +9,7 @@ type TDrawerProps = {
 
 type TBackgroundProps = {
   openFrom?: string
+  withoutDimScreen?: boolean
 }
 
 const Wrapper = styled.div``
@@ -24,11 +25,12 @@ const Background = styled.div`
   height: 100%;
   transition: opacity 250ms;
   border-radius: ${({ openFrom }: TBackgroundProps) => (openFrom === 'browser' ? '16px' : '0')};
+  display: ${({ withoutDimScreen }: TBackgroundProps) => withoutDimScreen ? 'none' : 'initial'};;
 `
 
 const Drawer = styled.div`
   background-color: #ffffff;
-  border-radius: 16px 16px 0px 0px;
+  border-radius: 16px 16px 0 0;
   padding: ${({ padding }: TDrawerProps) => padding || '30px'};
   word-break: break-word;
   position: ${({ openFrom, isWindowedMode }: TDrawerProps) => (openFrom === 'browser' || isWindowedMode ? 'absolute' : 'fixed')};
@@ -42,7 +44,12 @@ const Drawer = styled.div`
 `
 
 const Title = styled.p`
+  padding: 0 15px;
   margin: 0;
+  position: absolute;
+  top: 15px;
+  left: 0;
+  right: 0;
   font-style: normal;
   font-weight: 500;
   font-size: 20px;
@@ -69,8 +76,8 @@ const CloseIconRow = styled.div`
   align-items: center;
   justify-content: center;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
 
   path {
     fill: #cccccc;
