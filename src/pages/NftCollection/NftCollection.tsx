@@ -24,7 +24,7 @@ import { openWebPage } from '@utils/extension'
 import { TNft } from '@utils/api/types'
 
 // Config
-import { ADDRESS_ACTION, HISTORY_WATCH, NFT_WATCH } from '@config/events'
+import { ADDRESS_ACTION, HISTORY_WATCH, NFT_WATCH, TOUCH_EXCHANGE } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -153,6 +153,11 @@ const NftCollectionPage: React.FC = () => {
         addressAction: 'exchange',
       },
     })
+
+    logEvent({
+      name: TOUCH_EXCHANGE,
+    })
+
     openWebPage('https://simpleswap.io/?ref=2a7607295184')
   }
 

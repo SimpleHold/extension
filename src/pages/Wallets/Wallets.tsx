@@ -30,7 +30,7 @@ import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
 import { checkOneOfExist, clear, removeItem } from '@utils/storage'
 
 // Config
-import { ADD_ADDRESS, ADDRESS_ACTION, FILTERS_WATCH, HISTORY_WATCH } from '@config/events'
+import { ADD_ADDRESS, ADDRESS_ACTION, FILTERS_WATCH, HISTORY_WATCH, TOUCH_EXCHANGE } from '@config/events'
 
 // Types
 import { ILocationState, IState, TWalletAmountData } from './types'
@@ -241,6 +241,11 @@ const Wallets: React.FC = () => {
         addressAction: 'exchange'
       }
     })
+
+    logEvent({
+      name: TOUCH_EXCHANGE,
+    })
+
     openWebPage('https://simpleswap.io/?ref=2a7607295184')
   }
 

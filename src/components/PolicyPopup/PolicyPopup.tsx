@@ -5,6 +5,9 @@ import SVG from 'react-inlinesvg'
 import documentsIcon from '@assets/icons/documentsIcon.svg'
 import arrowIcon from '@assets/icons/arrowRight.svg'
 
+// Config
+import { ANALYTICS_OK } from '@config/events'
+
 // Components
 import Popup from '@components/Popup'
 import Button from '@components/Button'
@@ -12,6 +15,7 @@ import Button from '@components/Button'
 // Utils
 import { openWebPage } from '@utils/extension'
 import { setItem } from '@utils/storage'
+import { logEvent } from '@utils/amplitude'
 
 // Styles
 import Styles from './styles'
@@ -30,10 +34,25 @@ const PolicyPopup: React.FC<Props> = ({ onBlur, onClose }) => {
 
   const onClickAgree = () => {
     setItem('analytics', 'agreed')
+
+    logEvent({
+      name: ANALYTICS_OK,
+      properties: {
+        option: "ok"
+      }
+    })
     onClose()
   }
 
-  const onClickRefuse = () => onClose()
+  const onClickLater = () => {
+    logEvent({
+      name: ANALYTICS_OK,
+      properties: {
+        option: "later"
+      }
+    })
+    onClose()
+  }
 
   return (
     <Popup>
@@ -64,7 +83,7 @@ const PolicyPopup: React.FC<Props> = ({ onBlur, onClose }) => {
         </Styles.Links>
         <Styles.Buttons>
           <Button label={'Agree'} onClick={onClickAgree} />
-          <Button label={'Maybe later'} onClick={onClickRefuse} />
+          <Button label={'Maybe later'} onClick={onClickLater} />
         </Styles.Buttons>
       </Styles.Wrapper>
     </Popup>

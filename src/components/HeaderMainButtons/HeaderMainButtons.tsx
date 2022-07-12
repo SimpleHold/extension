@@ -2,7 +2,7 @@ import * as React from 'react'
 import { CSSTransition } from 'react-transition-group'
 
 // Config
-import { ADDRESS_ACTION } from 'config/events'
+import { ADDRESS_ACTION, TOUCH_EXCHANGE } from 'config/events'
 
 // Assets
 import sendIcon from '@assets/icons/sendIconMainNew.svg'
@@ -31,6 +31,11 @@ const HeaderMainButtons: React.FC<TProps> = ({ isCollapsed, onClickSend, onClick
         addressAction: 'exchange'
       }
     })
+
+    logEvent({
+      name: TOUCH_EXCHANGE,
+    })
+
     openWebPage('https://simpleswap.io/?ref=2a7607295184')
   }
 

@@ -106,6 +106,13 @@ const WelcomeNew: React.FC = () => {
       name: START_CREATE,
     })
 
+    logEvent({
+      name: ONBOARDING,
+      properties: {
+        option: "new"
+      }
+    })
+
     if (getItem('manualRestoreBackup')) {
       removeItem('manualRestoreBackup')
     }
@@ -115,8 +122,12 @@ const WelcomeNew: React.FC = () => {
 
   const onRestoreWallet = () => {
     logEvent({
-      name: START_RESTORE,
+      name: ONBOARDING,
+      properties: {
+        option: "file"
+      }
     })
+
     if (isManualRestore) {
       setItem('manualRestoreBackup', 'active')
       return openWebPage(getUrl('restore-backup.html'))
@@ -127,12 +138,6 @@ const WelcomeNew: React.FC = () => {
 
   React.useEffect(() => {
     getCookies()
-  }, [])
-
-  React.useEffect(() => {
-    logEvent({
-      name: ONBOARDING,
-    })
   }, [])
 
   const getCookies = async () => {
