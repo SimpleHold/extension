@@ -8,6 +8,7 @@ const Wrapper = styled.div`
   height: 600px;
   transition: 0.5s ease;
   background-color: #3FBB7D;
+  position: relative;
 `
 
 const WalletsListContainer = styled.div`

@@ -26,7 +26,7 @@ import { logEvent } from '@utils/amplitude'
 import useState from '@hooks/useState'
 
 // Config
-import { HARDWARE_CONNECT } from '@config/events'
+import { CONNECT_HARDWARE_WALLET } from '@config/events'
 
 // Types
 import { TSelectedAddress, IState } from './types'
@@ -76,7 +76,7 @@ const ConnectLedger: React.FC = () => {
     window.close()
 
     logEvent({
-      name: HARDWARE_CONNECT,
+      name: CONNECT_HARDWARE_WALLET,
       properties: {
         kind: 'ledger',
         result: 'close',
@@ -88,7 +88,7 @@ const ConnectLedger: React.FC = () => {
     const ledgerTransport = await requestTransport()
 
     logEvent({
-      name: HARDWARE_CONNECT,
+      name: CONNECT_HARDWARE_WALLET,
       properties: {
         kind: 'ledger',
         result: 'success',

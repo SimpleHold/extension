@@ -17,7 +17,7 @@ import FeedbackDrawer from '@drawers/Feedback'
 // Utils
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { getWalletChain, IWallet, updateBalance } from '@utils/wallet'
+import { IWallet } from '@utils/wallet'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import { logEvent } from '@utils/amplitude'
 import {
@@ -34,18 +34,22 @@ import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
 import { minus } from '@utils/format'
 
 // Config
-import { TRANSACTION_CANCEL, TRANSACTION_CONFIRM, TRANSACTION_PASSWORD } from '@config/events'
+import {
+  SEND_CANCEL,
+  SEND_CONFIRMED,
+  SEND_SUCCESS,
+  SEND_PASS,
+} from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
+import useDebounce from '@hooks/useDebounce'
 
 // Types
 import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
-import { checkIsLoadingFlag, updateTxsHistory } from 'utils/history'
-import { TTxWallet } from 'utils/api/types'
 
 const initialState: IState = {
   activeDrawer: null,
@@ -54,6 +58,7 @@ const initialState: IState = {
   transactionLink: '',
   isButtonLoading: false,
   failText: '',
+  logCaptured: false
 }
 
 const SendConfirmation: React.FC = () => {
@@ -80,13 +85,28 @@ const SendConfirmation: React.FC = () => {
 
   const { state, updateState } = useState<IState>(initialState)
 
+  const debouncedPassword = useDebounce(state.password, 3000)
+
+  React.useEffect(() => {
+    if (debouncedPassword) {
+      updateState({ logCaptured: true })
+      logEvent({
+        name: SEND_PASS
+      })
+    }
+  }, [debouncedPassword])
+
   const onConfirmDrawer = async (): Promise<void> => {
+    if (!state.logCaptured) {
+      logEvent({
+        name: SEND_PASS
+      })
+    }
+
     logEvent({
-      name: TRANSACTION_PASSWORD,
-      properties: {
-        symbol,
-      },
+      name: SEND_CONFIRMED,
     })
+
     if (state.inputErrorLabel) {
       updateState({ inputErrorLabel: null })
     }
@@ -146,6 +166,10 @@ const SendConfirmation: React.FC = () => {
             )
 
             if (createTx) {
+              logEvent({
+                name: SEND_SUCCESS
+              })
+
               return updateState({
                 activeDrawer: 'success',
                 transactionLink: getTransactionLink(createTx, symbol, chain, tokenChain),
@@ -218,9 +242,9 @@ const SendConfirmation: React.FC = () => {
 
   const onCancel = (): void => {
     logEvent({
-      name: TRANSACTION_CANCEL,
+      name: SEND_CANCEL,
       properties: {
-        stage: 'confirm',
+        step: 'send_confirm',
       },
     })
 
@@ -228,21 +252,14 @@ const SendConfirmation: React.FC = () => {
   }
 
   const onConfirm = (): void => {
-    logEvent({
-      name: TRANSACTION_CONFIRM,
-      properties: {
-        stage: 'confirmation',
-      },
-    })
-
     updateState({ activeDrawer: 'confirm' })
   }
 
   const onCloseConfirmDrawer = (): void => {
     logEvent({
-      name: TRANSACTION_CANCEL,
+      name: SEND_CANCEL,
       properties: {
-        stage: 'password',
+        step: 'password',
       },
     })
 

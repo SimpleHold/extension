@@ -7,7 +7,7 @@ import { logEvent } from '@utils/amplitude'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
-import { LOCK } from '@config/events'
+import { LOGOUT_SELECT } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -50,7 +50,7 @@ const Header: React.FC<Props> = (props) => {
     const isPasscodeEnabled = getItem('passcode') !== null
 
     logEvent({
-      name: LOCK,
+      name: LOGOUT_SELECT,
     })
 
     return openPage(isPasscodeEnabled ? '/enter-passcode' : '/lock')

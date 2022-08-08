@@ -30,7 +30,13 @@ import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
 import { checkOneOfExist, clear, removeItem } from '@utils/storage'
 
 // Config
-import { ADD_ADDRESS, ADDRESS_ACTION, FILTERS_WATCH, HISTORY_WATCH, TOUCH_EXCHANGE } from '@config/events'
+import {
+  ADD_ADDRESS,
+  FILTERS_SELECT,
+  HISTORY_SELECT,
+  MAIN_HOME, RECEIVE_SELECT,
+  EXCHANGE_SELECT,
+} from '@config/events'
 
 // Types
 import { ILocationState, IState, TWalletAmountData } from './types'
@@ -70,6 +76,9 @@ const Wallets: React.FC = () => {
   React.useEffect(() => {
     getWalletsList()
     checkBadgeText()
+    logEvent({
+      name: MAIN_HOME
+    })
   }, [])
 
   React.useEffect(() => {
@@ -227,7 +236,7 @@ const Wallets: React.FC = () => {
   const onViewTxHistory = React.useCallback((): void => {
     history.push('/tx-history')
     logEvent({
-      name: HISTORY_WATCH,
+      name: HISTORY_SELECT,
     })
   }, [])
 
@@ -237,20 +246,18 @@ const Wallets: React.FC = () => {
 
   const onClickSwap = (): void => {
     logEvent({
-      name: ADDRESS_ACTION,
-      properties: {
-        addressAction: 'exchange'
-      }
-    })
-
-    logEvent({
-      name: TOUCH_EXCHANGE,
+      name: EXCHANGE_SELECT,
     })
 
     openWebPage('https://simpleswap.io/?ref=2a7607295184')
   }
 
   const setListOnClickHandler = (type: 'send' | 'receive') => () => {
+    if (type === "receive") {
+      logEvent({
+        name: RECEIVE_SELECT
+      })
+    }
     setListType(type)
     showSelectCurrencyDrawer()
   }
@@ -259,7 +266,10 @@ const Wallets: React.FC = () => {
     updateState({ activeDrawer: 'filters' })
 
     logEvent({
-      name: FILTERS_WATCH,
+      name: FILTERS_SELECT,
+      properties: {
+        type: "wallets"
+      }
     })
   }, [])
 

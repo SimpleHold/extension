@@ -10,31 +10,27 @@ const Animations = styled.div`
 
   .buttons-enter {
     opacity: 0;
-    //background-color: orange;
   }
 
   .buttons-enter-active {
     opacity: 1;
     transition: all 400ms;
-    //background-color: chartreuse;
   }
 
   .buttons-exit {
     opacity: 1;
-    //background-color: blue;
   }
 
   .buttons-exit-active {
 
     opacity: 0;
-    //background-color: red;
     transition: all 200ms;
   }
 `
 
 const Container = styled.div`
-  position: fixed;
-  top: 197px;
+  position: absolute;
+  top: 45px;
 
   display: flex;
   flex-direction: row;

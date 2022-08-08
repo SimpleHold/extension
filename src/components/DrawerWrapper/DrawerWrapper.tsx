@@ -81,7 +81,7 @@ const DrawerWrapper: React.FC<Props> = (props) => {
               ...drawerStyle[state],
             }}
           >
-            <div style={{width: "100%", height: '25px'}}/>
+            {title && title.length > 30 || icon ? <div style={{width: "100%", height: '25px'}}/> : null}
             {icon
               ? (<Styles.IconRow>
                 <Styles.Icon src={icon} alt='icon' />

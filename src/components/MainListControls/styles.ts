@@ -44,13 +44,11 @@ const Animations = styled.div`
   
   .unfolded-exit-active {
     opacity: 0;
-    transition: all 200ms;
+    transition: all 180ms;
   }
 `
 
 const ListContainer = styled.div`
-  background-color: mediumpurple;
-  position: relative;
   width: 100%;
   height: 40px;
 `

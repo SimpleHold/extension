@@ -48,7 +48,7 @@ const PolicyPopup: React.FC<Props> = ({ onBlur, onClose }) => {
     logEvent({
       name: ANALYTICS_OK,
       properties: {
-        option: "later"
+        option: "skip"
       }
     })
     onClose()

@@ -24,7 +24,7 @@ import { openWebPage } from '@utils/extension'
 import { TNft } from '@utils/api/types'
 
 // Config
-import { ADDRESS_ACTION, HISTORY_WATCH, NFT_WATCH, TOUCH_EXCHANGE } from '@config/events'
+import { HISTORY_SELECT, MAIN_SELECT_NFT, EXCHANGE_SELECT, FILTERS_SELECT } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -40,7 +40,7 @@ const NftCollectionPage: React.FC = () => {
   React.useEffect(() => {
     getWalletsList()
     logEvent({
-      name: NFT_WATCH,
+      name: MAIN_SELECT_NFT,
     })
   }, [])
 
@@ -132,13 +132,19 @@ const NftCollectionPage: React.FC = () => {
   }
 
   const openFilters = (): void => {
+    logEvent({
+      name: FILTERS_SELECT,
+      properties: {
+        type: "nfts"
+      }
+    })
     setActiveDrawer('filters')
   }
 
   const onViewTxHistory = React.useCallback((): void => {
     history.push('/tx-history')
     logEvent({
-      name: HISTORY_WATCH,
+      name: HISTORY_SELECT,
     })
   }, [])
 
@@ -148,14 +154,7 @@ const NftCollectionPage: React.FC = () => {
 
   const onClickSwap = (): void => {
     logEvent({
-      name: ADDRESS_ACTION,
-      properties: {
-        addressAction: 'exchange',
-      },
-    })
-
-    logEvent({
-      name: TOUCH_EXCHANGE,
+      name: EXCHANGE_SELECT,
     })
 
     openWebPage('https://simpleswap.io/?ref=2a7607295184')

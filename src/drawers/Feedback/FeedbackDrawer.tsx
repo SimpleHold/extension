@@ -14,7 +14,7 @@ import { logEvent } from '@utils/amplitude'
 import useState from '@hooks/useState'
 
 // Config
-import { NPS_GET, NPS_FINISH } from '@config/events'
+import { NPS_CONFIRM, NPS_COMMENT, NPS_SCORE, NPS_OUT } from '@config/events'
 
 // Types
 import { IProps, IState } from './types'
@@ -34,17 +34,16 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
 
   const { state, updateState } = useState<IState>(initialState)
 
-  React.useEffect(() => {
-    if (isActive) {
-      logEvent({
-        name: NPS_GET,
-      })
-    }
-  }, [isActive])
-
   const onClickGrade = (rating: number) => (): void => {
     if (state.rating !== rating && !state.isLoading) {
       updateState({ rating })
+
+      logEvent({
+        name: NPS_SCORE,
+        properties: {
+          score: rating,
+        },
+      })
     }
   }
 
@@ -56,8 +55,17 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
 
       await sendFeedback(clientId, state.feedback, state.rating)
 
+      if (state.feedback) {
+        logEvent({
+          name: NPS_COMMENT,
+          properties: {
+            comment: state.feedback,
+          },
+        })
+      }
+
       logEvent({
-        name: NPS_FINISH,
+        name: NPS_CONFIRM,
         properties: {
           rating: state.rating,
         },
@@ -71,11 +79,30 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
     updateState({ feedback })
   }
 
+  const onClickClose = () => {
+    if (state.feedback) {
+      logEvent({
+        name: NPS_COMMENT,
+        properties: {
+          comment: state.feedback,
+        },
+      })
+    }
+
+    if (!state.isSent) {
+      logEvent({
+        name: NPS_OUT
+      })
+    }
+
+    onClose()
+  }
+
   return (
     <DrawerWrapper
       title={state.isSent ? 'Thank you for your feedback!' : 'How likely are you to recommend us?'}
       isActive={isActive}
-      onClose={onClose}
+      onClose={onClickClose}
       withCloseIcon
       icon={state.isSent ? '../../assets/drawer/success.svg' : undefined}
       openFrom={openFrom}

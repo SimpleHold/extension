@@ -52,7 +52,7 @@ import { receiveAllPendingTxs } from '@utils/currencies/nano'
 // Config
 import { getCurrency } from '@config/currencies'
 import { getSharedToken, getToken } from '@config/tokens'
-import { ADDRESS_ACTION } from '@config/events'
+import { REFRESH_BALANCE } from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -202,13 +202,7 @@ const WalletPage: React.FC = () => {
     }
   }
 
-  const openPage = (url: string) => () => {
-    logEvent({
-      name: ADDRESS_ACTION,
-      properties: {
-        addressAction: url === '/send' ? 'send' : 'receive'
-      }
-    })
+  const openPage = (url: string, stateData: {[key: string]: any} = {}) => () => {
 
     const sharedToken = getSharedToken(symbol, chain)
     const walletName = getWalletName({uuid, symbol, hardware, chain, name, address: state.address})
@@ -221,7 +215,8 @@ const WalletPage: React.FC = () => {
       currency,
       address: state.address,
       decimals: sharedToken ? sharedToken.decimals : decimals,
-      isRedirect: !!isRedirect
+      isRedirect: !!isRedirect,
+      ...stateData
     })
   }
 
@@ -356,10 +351,7 @@ const WalletPage: React.FC = () => {
       }
 
       logEvent({
-        name: ADDRESS_ACTION,
-        properties: {
-          addressAction: 'refreshBalance'
-        }
+        name: REFRESH_BALANCE,
       })
     }
   }
@@ -518,13 +510,6 @@ const WalletPage: React.FC = () => {
   const onRenameWallet = (walletName: string) => (): void => {
     updateState({ activeDrawer: null, walletName })
     renameWallet(uuid, walletName)
-
-    logEvent({
-      name: ADDRESS_ACTION,
-      properties: {
-        addressAction: 'renameWallet'
-      }
-    })
   }
 
   const onDownloadBackup = (): void => {
@@ -591,7 +576,7 @@ const WalletPage: React.FC = () => {
             />
 
             <WalletCard
-              openPage={openPage}
+              getOpenPage={openPage}
               symbol={symbol}
               chain={chain}
               balance={state.balance}

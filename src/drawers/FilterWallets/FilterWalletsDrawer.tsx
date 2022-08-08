@@ -293,7 +293,13 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
   }
 
   const onReset = (): void => {
-    removeMany(['hiddenWalletsFilter', 'zeroBalancesFilter', 'selectedCurrenciesFilter'])
+    removeMany([
+      'selectedCurrenciesFilter',
+      'hiddenWalletsFilter',
+      'zeroBalancesFilter',
+      'activeSortKey',
+      'activeSortType',
+    ])
     updateState(initialState)
     onApply()
   }

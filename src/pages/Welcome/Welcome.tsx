@@ -16,7 +16,7 @@ import { getPhishingSites } from '@utils/api'
 
 // Config
 import config from '@config/index'
-import { WELCOME, START_CREATE, START_RESTORE, FIRST_ENTER } from '@config/events'
+import { ONBOARDING_CREATE_NEW_WALLET, START_RESTORE, GENERAL_FIRST_ENTER } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -57,18 +57,14 @@ const Welcome: React.FC = () => {
       setItem('clientId', clientId)
 
       logEvent({
-        name: FIRST_ENTER,
+        name: GENERAL_FIRST_ENTER,
       })
     }
-
-    logEvent({
-      name: WELCOME,
-    })
   }
 
   const onCreateWallet = (): void => {
     logEvent({
-      name: START_CREATE,
+      name: ONBOARDING_CREATE_NEW_WALLET,
     })
 
     if (getItem('manualRestoreBackup')) {

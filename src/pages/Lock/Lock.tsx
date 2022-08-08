@@ -15,10 +15,10 @@ import { download as downloadBackup } from '@utils/backup'
 import { validatePassword } from '@utils/validate'
 import { logEvent } from '@utils/amplitude'
 import { openWebPage } from '@utils/extension'
-import { getItem, removeItem, removeCache } from '@utils/storage'
+import { getItem, removeCache, removeItem } from '@utils/storage'
 
 // Config
-import { LOG_OUT_CACHE, PASSWORD_AFTER_LOG_OUT, SUCCESS_ENTER } from '@config/events'
+import { SUPPORT_SELECT } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -38,10 +38,6 @@ const Lock: React.FC = () => {
   const textInputRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
-    logEvent({
-      name: PASSWORD_AFTER_LOG_OUT,
-    })
-
     textInputRef.current?.focus()
   }, [])
 
@@ -57,12 +53,6 @@ const Lock: React.FC = () => {
         const decryptWallet = decrypt(backup, password)
 
         if (decryptWallet) {
-          logEvent({
-            name: SUCCESS_ENTER,
-            properties: {
-              security: 'password',
-            },
-          })
           removeItem('isLocked')
           return history.replace('/wallets', {
             status: state?.status,
@@ -85,10 +75,6 @@ const Lock: React.FC = () => {
     if (backup) {
       downloadBackup(backup)
 
-      logEvent({
-        name: LOG_OUT_CACHE,
-      })
-
       removeCache()
 
       history.push('/welcome')
@@ -106,6 +92,16 @@ const Lock: React.FC = () => {
 
   const onCloseDrawer = (): void => {
     setActiveDrawer(null)
+  }
+
+  const onContactSupport = () => {
+    logEvent({
+      name: SUPPORT_SELECT,
+      properties: {
+        page: "lock"
+      }
+    })
+    openWebPage('https://simplehold.io/about')
   }
 
   return (
@@ -131,7 +127,7 @@ const Lock: React.FC = () => {
 
           <Styles.Links>
             <Styles.Link onClick={onLogout}>Download a backup and log out</Styles.Link>
-            <Styles.Link onClick={() => openWebPage('https://simplehold.io/about')}>
+            <Styles.Link onClick={onContactSupport}>
               Contact support
             </Styles.Link>
           </Styles.Links>

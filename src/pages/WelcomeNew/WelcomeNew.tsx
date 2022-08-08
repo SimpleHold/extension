@@ -7,7 +7,7 @@ import Header from '@components/Header'
 import Button from '@components/Button'
 
 // Config
-import { FIRST_ENTER, ONBOARDING, START_CREATE, START_RESTORE, WELCOME } from '@config/events'
+import { GENERAL_FIRST_ENTER, ONBOARDING_CREATE_NEW_WALLET } from '@config/events'
 import config from 'config'
 
 // Assets
@@ -19,7 +19,7 @@ import swapSpaceIllustrate from '@assets/theme/swapspace/1.svg'
 // Utils
 import { init, logEvent } from '@utils/amplitude'
 import { getItem, removeItem, setItem } from '@utils/storage'
-import { getAllCookies, Cookie, openWebPage, getUrl } from '@utils/extension'
+import { Cookie, getAllCookies, getUrl, openWebPage } from '@utils/extension'
 import { toLower } from '@utils/format'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getPhishingSites } from '@utils/api'
@@ -92,25 +92,14 @@ const WelcomeNew: React.FC = () => {
       setItem('clientId', clientId)
 
       logEvent({
-        name: FIRST_ENTER,
+        name: GENERAL_FIRST_ENTER,
       })
     }
-
-    logEvent({
-      name: WELCOME,
-    })
   }
 
   const onCreateWallet = (): void => {
     logEvent({
-      name: START_CREATE,
-    })
-
-    logEvent({
-      name: ONBOARDING,
-      properties: {
-        option: "new"
-      }
+      name: ONBOARDING_CREATE_NEW_WALLET,
     })
 
     if (getItem('manualRestoreBackup')) {
@@ -121,13 +110,6 @@ const WelcomeNew: React.FC = () => {
   }
 
   const onRestoreWallet = () => {
-    logEvent({
-      name: ONBOARDING,
-      properties: {
-        option: "file"
-      }
-    })
-
     if (isManualRestore) {
       setItem('manualRestoreBackup', 'active')
       return openWebPage(getUrl('restore-backup.html'))

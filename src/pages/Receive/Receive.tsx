@@ -23,6 +23,8 @@ import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
+import { RECEIVE_COPY_ADDRESS } from 'config/events'
+import { logEvent } from 'utils/amplitude'
 
 const initialState: IState = {
   isCopied: false,
@@ -57,6 +59,9 @@ const ReceivePage: React.FC = () => {
   const onCopyAddress = (): void => {
     copy(address)
     updateState({ isCopied: true })
+    logEvent({
+      name: RECEIVE_COPY_ADDRESS
+    })
   }
 
   const onCloseDrawer = (): void => {

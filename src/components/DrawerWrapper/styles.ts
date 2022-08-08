@@ -12,7 +12,8 @@ type TBackgroundProps = {
   withoutDimScreen?: boolean
 }
 
-const Wrapper = styled.div``
+const Wrapper = styled.div`
+`
 
 const Background = styled.div`
   position: ${({ openFrom, isWindowedMode }: TBackgroundProps & TDrawerProps) => (openFrom === 'browser' || isWindowedMode ? 'absolute' : 'fixed')};
@@ -45,7 +46,6 @@ const Drawer = styled.div`
 
 const Title = styled.p`
   padding: 0 15px;
-  margin: 0;
   position: absolute;
   top: 15px;
   left: 0;
@@ -55,6 +55,8 @@ const Title = styled.p`
   font-size: 20px;
   line-height: 23px;
   text-align: center;
+  max-width: 325px;
+  margin: 0 auto;
   color: #1d1d22;
 `
 

@@ -14,13 +14,13 @@ import { openWebPage } from '@utils/extension'
 import refreshIcon from '@assets/icons/refresh.svg'
 
 // Config
-import { ADDRESS_ACTION } from '@config/events'
+import { EXCHANGE_SELECT } from '@config/events'
 
 // Styles
 import Styles from './styles'
 
 interface Props {
-  openPage: (url: string) => () => void
+  getOpenPage: (url: string, stateData?: {[key: string]: any}) => () => void
   symbol: string
   chain?: string
   balance: null | number
@@ -38,7 +38,7 @@ interface Props {
 
 const WalletCard: React.FC<Props> = (props) => {
   const {
-    openPage,
+    getOpenPage,
     symbol,
     chain,
     balance,
@@ -76,17 +76,18 @@ const WalletCard: React.FC<Props> = (props) => {
   }, [balance])
 
   React.useEffect(() => {
-    isRedirect && openPage(isRedirect)()
+    isRedirect && getOpenPage(isRedirect, {isRedirect: !!isRedirect})()
   }, [isRedirect])
 
   const onExchange = (): void => {
     logEvent({
-      name: ADDRESS_ACTION,
-      properties: {
-        addressAction: 'exchange'
-      }
+      name: EXCHANGE_SELECT,
     })
     openWebPage('https://simpleswap.io/?ref=2a7607295184')
+  }
+
+  const onReceive = (): void => {
+    getOpenPage('/receive')()
   }
 
   const balanceHeight = symbol.length > 4 ? 20 : 24
@@ -137,10 +138,10 @@ const WalletCard: React.FC<Props> = (props) => {
 
         {!isNotActivated && !hasUnreceivedTxs &&
         <>
-          <Styles.ActionButton onClick={openPage('/send')}>
+          <Styles.ActionButton onClick={getOpenPage('/send')}>
             <Styles.ActionName>Send</Styles.ActionName>
           </Styles.ActionButton>
-          <Styles.ActionButton onClick={openPage('/receive')}>
+          <Styles.ActionButton onClick={onReceive}>
             <Styles.ActionName>Receive</Styles.ActionName>
           </Styles.ActionButton>
           <Styles.ActionButton onClick={onExchange}>

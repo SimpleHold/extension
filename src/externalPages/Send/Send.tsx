@@ -46,7 +46,12 @@ import { getUtxos as getVergeUtxos } from '@utils/currencies/verge'
 // Config
 import { getCurrency, ICurrency } from '@config/currencies'
 import { getToken } from '@config/tokens'
-import { TRANSACTION_AUTO_FILL, TRANSACTION_START, TRANSACTION_CANCEL } from '@config/events'
+import {
+  SEND_SELECT,
+  SEND_CANCEL,
+  SEND_RECIPIENT_ADDRESS,
+  SEND_ENTERED_AMOUNT, SEND_CHOOSE_FEE,
+} from '@config/events'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -148,6 +153,11 @@ const Send: React.FC = () => {
         onGetVergeUtxos()
       }
     }
+
+    logEvent({
+      name: SEND_ENTERED_AMOUNT
+    })
+
   }, [debounced])
 
   React.useEffect(() => {
@@ -492,9 +502,9 @@ const Send: React.FC = () => {
     }
 
     logEvent({
-      name: TRANSACTION_CANCEL,
+      name: SEND_CANCEL,
       properties: {
-        stage: 'send',
+        step: 'enter_address',
       },
     })
 
@@ -552,7 +562,7 @@ const Send: React.FC = () => {
       }
 
       logEvent({
-        name: TRANSACTION_START,
+        name: SEND_SELECT,
         properties: {
           fee: state.isIncludeFee ? 'incl' : 'excl',
           speed: currency?.isCustomFee ? 'fixed' : state.feeType,
@@ -596,6 +606,10 @@ const Send: React.FC = () => {
     if (!state.fee && Number(state.amount) > 0 && !state.amountErrorLabel) {
       onGetNetworkFee()
     }
+
+    logEvent({
+      name: SEND_RECIPIENT_ADDRESS
+    })
   }
 
   const getAvailableBalance = (): number => {
@@ -730,13 +744,6 @@ const Send: React.FC = () => {
   const onSendAll = (): void => {
     if (state.balance) {
       updateState({ amount: `${state.balance}`, isIncludeFee: true })
-
-      logEvent({
-        name: TRANSACTION_AUTO_FILL,
-        properties: {
-          kind: 'allFunds',
-        },
-      })
     }
   }
 
@@ -756,13 +763,6 @@ const Send: React.FC = () => {
 
   const openWalletsDrawer = (): void => {
     updateState({ activeDrawer: 'wallets' })
-
-    logEvent({
-      name: TRANSACTION_AUTO_FILL,
-      properties: {
-        kind: 'myWallet',
-      },
-    })
   }
 
   const setFeeType = (feeType: TFeeTypes): void => {
@@ -777,6 +777,10 @@ const Send: React.FC = () => {
     if (getFee) {
       updateState({ utxosList: getFee.utxos, fee: getFee.value })
     }
+
+    logEvent({
+      name: SEND_CHOOSE_FEE
+    })
   }
 
   const showFeeDrawer = (): void => {
