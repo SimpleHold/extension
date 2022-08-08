@@ -76,9 +76,9 @@ export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBa
     const request = requestBalance(address, getChain, tokenSymbol, contractAddress, isFullBalance)
       .then(data => {
         fetchedData = data
-        if (!data.isBalanceError) {
+        // if (!data.isBalanceError) {
           updateBalance({ address, symbol, ...data })
-        }
+        // }
       })
 
     const isTimer = !(force || !responseTimeLimit)

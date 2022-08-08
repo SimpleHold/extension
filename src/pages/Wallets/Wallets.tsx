@@ -136,11 +136,12 @@ const Wallets: React.FC = () => {
       totalEstimated: null,
       pendingBalance: null
     })
-    const wallets = getFilteredWallets()
+    let wallets = getFilteredWallets()
 
     if (wallets.length) {
       updateState({ wallets })
       await updateWalletsBalances(wallets)
+      wallets = getFilteredWallets()
       setInitialBalance(wallets)
     } else {
       clear()
