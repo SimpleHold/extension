@@ -6,93 +6,59 @@ import numeral from 'numeral'
 import Header from '@components/Header'
 import Skeleton from '@components/Skeleton'
 import PendingBalance from '@components/PendingBalance'
+import HeaderMainButtons from '@components/HeaderMainButtons'
 
 // Utils
-import { checkOneOfExist } from '@utils/storage'
 import { getFormatEstimated, price } from '@utils/format'
 
 // Styles
 import Styles from './styles'
 
 interface Props {
-  scrollPosition: number
+  isCollapsed: boolean
   balance: null | number
   estimated: null | number
   pendingBalance: null | number
-  isDrawersActive: boolean
-  onViewTxHistory: () => void
-  openFilters: () => void
-  onViewNFT: () => void
+  onClickReceive: () => void
+  onClickSend: () => void
 }
 
 const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
   const {
-    scrollPosition,
+    isCollapsed,
     balance,
     estimated,
     pendingBalance,
-    isDrawersActive,
-    onViewTxHistory,
-    openFilters,
-    onViewNFT,
+    onClickReceive,
+    onClickSend,
   } = props
 
-  const [latestScrollPosition, setLatestScrollPosition] = React.useState<number>(0)
+  const containerHeight = isCollapsed ? 123 : 276
 
-  React.useEffect(() => {
-    if (!isDrawersActive) {
-      setLatestScrollPosition(scrollPosition)
-    }
-  }, [scrollPosition, isDrawersActive])
+  const balanceRowMarginTop = isCollapsed ? 3 : 15
+  const balanceFontSize = isCollapsed ? 16 : 36
+  const balanceLineHeight = isCollapsed ? 19 : 36
 
-  const containerHeight = Math.max(110, 290 - 1.25 * latestScrollPosition)
+  const estimatedFontSize = isCollapsed ? 14 : 20
+  const estimatedLineHeight = isCollapsed ? 16 : 25
+  const estimatedMarginTop = isCollapsed ? 2 : 8
 
-  const balanceRowMarginTop = Math.max(3, 50 - latestScrollPosition)
-  const balanceFontSize = Math.max(16, 36 - 0.2 * latestScrollPosition)
-  const balanceLineHeight = Math.max(19, 36 - 0.1 * latestScrollPosition)
+  const pendingBalanceRowHeight = isCollapsed ? 30 : 30
+  const pendingBalanceRowOpacity = isCollapsed ? 0 : 1
+  const pendingBalanceRowMarginTop = isCollapsed ? 0 : 10
 
-  const estimatedFontSize = Math.max(14, 20 - 0.2 * latestScrollPosition)
-  const estimatedLineHeight = Math.max(16, 23 - 0.1 * latestScrollPosition)
-  const estimatedMarginTop = Math.max(2, 11 - latestScrollPosition)
+  const balanceSkeletonWidth = isCollapsed ? 150 : 250
 
-  const totalBalanceOpacity = Math.max(0, 1 - 0.1 * latestScrollPosition)
-  const totalBalanceTop = Math.max(0, 70 - latestScrollPosition)
-  const totalBalanceHeight = Math.max(0, 19 - latestScrollPosition)
-
-  const pendingBalanceRowHeight = Math.max(0, 30 - 0.05 * latestScrollPosition)
-  const pendingBalanceRowOpacity = Math.max(0, 1 - 0.05 * latestScrollPosition)
-  const pendingBalanceRowMarginTop = Math.max(0, 10 - 0.05 * latestScrollPosition)
-
-  const balanceSkeletonWidth = Math.max(150, 250 - latestScrollPosition)
-
-  const clockIconSize = Math.max(12, 23 - 0.1 * latestScrollPosition)
-  const clockIconMarginLeft = Math.max(6, 10 - latestScrollPosition)
-
-  const navHeight = Math.max(0, 19 - 0.05 * latestScrollPosition)
+  const clockIconSize = isCollapsed ? 12 : 23
+  const clockIconMarginLeft = isCollapsed ? 6 : 10
 
   const formatEstimated = getFormatEstimated(estimated, price(estimated))
 
-  const isFiltersActive = (): boolean => {
-    return checkOneOfExist([
-      'selectedCurrenciesFilter',
-      'hiddenWalletsFilter',
-      'zeroBalancesFilter',
-      'activeSortKey',
-      'activeSortType',
-    ])
-  }
-
   return (
     <Styles.Container style={{ height: containerHeight }}>
-      <Header whiteLogo />
+      <Header isHomePage whiteLogo />
 
       <Styles.Row>
-        <Styles.TotalBalanceLabel
-          style={{ opacity: totalBalanceOpacity, top: totalBalanceTop, height: totalBalanceHeight }}
-        >
-          Total balance
-        </Styles.TotalBalanceLabel>
-
         <Skeleton
           width={balanceSkeletonWidth}
           height={balanceFontSize}
@@ -109,7 +75,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
             >
               {numeral(balance).format('0.[000000]')} BTC
             </Styles.Balance>
-            {latestScrollPosition > 80 && pendingBalance !== null && Number(pendingBalance) > 0 ? (
+            {isCollapsed && (pendingBalance !== null) && (Number(pendingBalance) > 0) ? (
               <Styles.ClockIcon
                 style={{
                   width: clockIconSize,
@@ -118,7 +84,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
                 }}
               >
                 <SVG
-                  src="../../assets/icons/clock.svg"
+                  src='../../assets/icons/clockIconPending.svg'
                   width={clockIconSize}
                   height={clockIconSize}
                 />
@@ -132,8 +98,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
           height={estimatedLineHeight}
           isLoading={estimated === null}
           mt={estimatedMarginTop}
-          type="light"
-          mb={10}
+          type='light'
         >
           {estimated !== null ? (
             <Styles.Estimated
@@ -143,12 +108,13 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
                 lineHeight: `${estimatedLineHeight}px`,
               }}
             >
-              {`$ ${formatEstimated}`}
+              <span className={'usdSign'}>$</span>
+              <span className={'amount'}>{formatEstimated}</span>
             </Styles.Estimated>
           ) : null}
         </Skeleton>
 
-        {pendingBalance !== null ? (
+        {pendingBalance !== null && (Number(pendingBalance) > 0) ? (
           <Styles.PendingBalanceRow
             style={{
               height: pendingBalanceRowHeight,
@@ -156,26 +122,14 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
               marginTop: pendingBalanceRowMarginTop,
             }}
           >
-            <PendingBalance pending={pendingBalance} type="light" symbol="btc" />
+            <PendingBalance pending={pendingBalance} type='light' symbol='btc' />
           </Styles.PendingBalanceRow>
         ) : null}
 
-        <Styles.Bottom>
-          <Styles.Nav style={{ height: navHeight, opacity: latestScrollPosition > 50 ? 0 : 1 }}>
-            <Styles.Link isActive>Wallets</Styles.Link>
-            <Styles.LinkDivider>/</Styles.LinkDivider>
-            <Styles.Link onClick={onViewNFT}>Collectibles</Styles.Link>
-          </Styles.Nav>
-          <Styles.Actions>
-            <Styles.Button onClick={openFilters}>
-              <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
-              {isFiltersActive() ? <Styles.ButtonDot /> : null}
-            </Styles.Button>
-            <Styles.Button onClick={onViewTxHistory}>
-              <SVG src="../../assets/icons/tx.svg" width={14.06} height={14} />
-            </Styles.Button>
-          </Styles.Actions>
-        </Styles.Bottom>
+        <HeaderMainButtons isCollapsed={!isCollapsed}
+                           onClickReceive={onClickReceive}
+                           onClickSend={onClickSend}
+        />
       </Styles.Row>
     </Styles.Container>
   )

@@ -7,7 +7,7 @@ import RadioButton from '@components/RadioButton'
 // Config
 import { getToken } from '@config/tokens'
 
-// Uitls
+// Utils
 import { toUpper } from '@utils/format'
 
 // Styles

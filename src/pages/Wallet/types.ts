@@ -12,6 +12,7 @@ export interface ILocationState {
   tokenName?: string
   decimals?: number
   isHidden?: boolean
+  isRedirect?: string
   hardware: THardware
 }
 

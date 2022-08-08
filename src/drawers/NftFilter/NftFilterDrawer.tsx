@@ -153,22 +153,6 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     return wallet
   }
 
-  const getNameWallet = (wallet: IWallet): string => {
-    if (wallet.walletName) {
-      return wallet.walletName
-    }
-
-    const walletsList = getWallets()
-
-    if (walletsList) {
-      const { symbol, uuid, hardware, chain, name } = wallet
-
-      return getWalletName(walletsList, symbol, uuid, hardware, chain, name)
-    }
-
-    return ''
-  }
-
   const onToggleAddress = (isActive: boolean, wallet: IWallet) => (): void => {
     if (isActive) {
       const list = selectedWallets.filter((item: IWallet) => item.uuid !== wallet.uuid)
@@ -182,7 +166,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     <>
       {wallets.filter(filterWallets).map((wallet: IWallet) => {
         const { symbol, address, chain, name, uuid } = wallet
-        const walletName = getNameWallet(wallet)
+        const walletName = getWalletName(wallet)
         const isActive =
           selectedWallets.find((wallet: IWallet) => wallet.uuid === uuid) !== undefined
 

@@ -30,6 +30,7 @@ const Button: React.FC<Props> = (props) => {
 
   return (
     <Styles.Container
+      className={'button'}
       disabled={disabled || isLoading}
       isLight={isLight}
       mr={mr}
@@ -43,7 +44,7 @@ const Button: React.FC<Props> = (props) => {
           <SVG src={icon} width={16} height={16} />
         </Styles.IconRow>
       ) : null}
-      {isLoading ? <Spinner size={24} /> : <Styles.Label>{label}</Styles.Label>}
+      {isLoading ? <Spinner size={24} /> : <Styles.Label className={'label'}>{label}</Styles.Label>}
     </Styles.Container>
   )
 }

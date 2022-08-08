@@ -106,13 +106,13 @@ const App: React.FC = () => {
     if (getItem('isLocked')) {
       return getItem('passcode') !== null ? '/enter-passcode' : '/lock'
     }
-    if (getItem('onBoard') !== 'passed') {
-      return '/onboard'
-    }
-
-    if (getItem('analytics') !== 'agreed') {
-      return '/analytics-data'
-    }
+    // if (getItem('onBoard') !== 'passed') {
+    //   return '/onboard'
+    // }
+    //
+    // if (getItem('analytics') !== 'agreed') {
+    //   return '/analytics-data'
+    // }
 
     if (getItem('backupStatus') === 'notDownloaded') {
       return '/download-backup'

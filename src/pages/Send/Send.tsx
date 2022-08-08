@@ -107,6 +107,7 @@ const SendPage: React.FC = () => {
       walletName,
       hardware,
       currency,
+      isRedirect,
     },
   } = useLocation<ILocationState>()
   const history = useHistory()
@@ -345,10 +346,10 @@ const SendPage: React.FC = () => {
         chain: currency?.chain || tokenChain,
         tokenSymbol: tokenChain ? symbol : undefined,
         contractAddress,
-        isFullBalance: true
+        isFullBalance: true,
       }, {
-        force: true
-      }
+        force: true,
+      },
     )
 
     updateState({
@@ -455,7 +456,7 @@ const SendPage: React.FC = () => {
           chain,
           hardware,
           extraId: state.extraId,
-        })
+        }),
       )
     }
 
@@ -596,7 +597,7 @@ const SendPage: React.FC = () => {
       isAmountErrorLabelNull: state.amountErrorLabel === null,
       isBalance: Number(state.balance) > 0,
       isFeeLoaded: !state.isFeeLoading,
-      isCurrencyBalanceErrorNull: !isCurrencyBalanceError
+      isCurrencyBalanceErrorNull: !isCurrencyBalanceError,
     }
 
     const checksPassed = validateMany(checks)
@@ -656,11 +657,19 @@ const SendPage: React.FC = () => {
     state.fee > 0 &&
     state.fee > state.currencyBalance
 
+  const onBack = () => {
+    isRedirect
+      ? history.push('/wallets')
+      : history.goBack()
+  }
+
+  const backTitle = isRedirect ? 'Home' : state.backTitle
+
   return (
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle={state.backTitle} whiteLogo />
+        <Header withBack onBack={onBack} backTitle={backTitle} whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <WalletCardShared
@@ -710,8 +719,8 @@ const SendPage: React.FC = () => {
             />
           </Styles.Row>
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-            <Button label="Send" onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
+            <Button label='Cancel' isLight onClick={onCancel} mr={7.5} />
+            <Button label='Send' onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>

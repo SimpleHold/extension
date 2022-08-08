@@ -15,7 +15,7 @@ import SuccessDrawer from '@drawers/Success'
 import { logEvent, setUserProperties } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { addNew as addNewWallet, IWallet } from '@utils/wallet'
+import { addNew as addNewWallet, IWallet, setPolicyPopupStatus } from '@utils/wallet'
 import { toUpper } from '@utils/format'
 import { generate, checkWithPhrase } from '@utils/currencies'
 import { getItem, setItem } from '@utils/storage'
@@ -124,12 +124,12 @@ const NewWallet: React.FC = () => {
               contractAddress,
               decimals,
               mnemonic,
-              isNotActivated
+              isNotActivated,
             )
 
             if (walletsList) {
               const walletAmount = JSON.parse(walletsList).filter(
-                (wallet: IWallet) => wallet.symbol === symbol
+                (wallet: IWallet) => wallet.symbol === symbol,
               ).length
 
               setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
@@ -142,6 +142,7 @@ const NewWallet: React.FC = () => {
                 setItem('backupStatus', 'notDownloaded')
               }
 
+              setPolicyPopupStatus()
               updateState({ activeDrawer: 'success' })
               return
             }
@@ -183,7 +184,7 @@ const NewWallet: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle={backTitle || 'Select currency'} whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle={backTitle || 'Select currency'} whiteLogo />
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
@@ -199,10 +200,10 @@ const NewWallet: React.FC = () => {
               <Styles.Action onClick={onImportPhrase}>
                 <Styles.ActionIcon>
                   <SVG
-                    src="../../assets/icons/phrase.svg"
+                    src='../../assets/icons/phrase.svg'
                     width={16}
                     height={16}
-                    title="Import a recovery phrase"
+                    title='Import a recovery phrase'
                   />
                 </Styles.ActionIcon>
                 <Styles.ActionName>Import a recovery phrase</Styles.ActionName>
@@ -211,10 +212,10 @@ const NewWallet: React.FC = () => {
               <Styles.Action onClick={onImportPrivateKey}>
                 <Styles.ActionIcon>
                   <SVG
-                    src="../../assets/icons/import.svg"
+                    src='../../assets/icons/import.svg'
                     width={18}
                     height={18}
-                    title="Import a private key"
+                    title='Import a private key'
                   />
                 </Styles.ActionIcon>
                 <Styles.ActionName>Import a private key</Styles.ActionName>
@@ -224,10 +225,10 @@ const NewWallet: React.FC = () => {
             <Styles.Action onClick={onGenerateAddress}>
               <Styles.ActionIcon>
                 <SVG
-                  src="../../assets/icons/plusCircle.svg"
+                  src='../../assets/icons/plusCircle.svg'
                   width={20}
                   height={20}
-                  title="Generate a new address"
+                  title='Generate a new address'
                 />
               </Styles.ActionIcon>
               <Styles.ActionName>Generate a new address</Styles.ActionName>
@@ -238,20 +239,20 @@ const NewWallet: React.FC = () => {
       <ConfirmDrawer
         isActive={state.activeDrawer === 'confirm'}
         onClose={onCloseDrawer}
-        title="Please enter your password to add a new address"
-        inputLabel="Enter password"
+        title='Please enter your password to add a new address'
+        inputLabel='Enter password'
         textInputValue={state.password}
         isButtonDisabled={!validatePassword(state.password)}
         onConfirm={onConfirm}
         onChangeText={setPassword}
-        textInputType="password"
+        textInputType='password'
         inputErrorLabel={state.errorLabel}
         isButtonLoading={state.isButtonLoading}
       />
       <SuccessDrawer
         isActive={state.activeDrawer === 'success'}
         onClose={onDownloadBackup}
-        text="The new address has been successfully added!"
+        text='The new address has been successfully added!'
       />
     </>
   )

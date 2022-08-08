@@ -11,7 +11,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import SelectedWallets from './components/SelectedWallets'
 
 // Utils
-import { getWallets, IWallet, getWalletName, getUnique, sortAlphabetically } from '@utils/wallet'
+import { getWallets, IWallet, getUnique, sortAlphabetically, getWalletName } from '@utils/wallet'
 import { getItem, checkOneOfExist, removeItem, setItem, removeMany } from '@utils/storage'
 import { toLower } from '@utils/format'
 
@@ -171,22 +171,6 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     </>
   )
 
-  const getNameWallet = (wallet: IWallet): string => {
-    if (wallet.walletName) {
-      return wallet.walletName
-    }
-
-    const walletsList = getWallets()
-
-    if (walletsList) {
-      const { symbol, uuid, hardware, chain, name } = wallet
-
-      return getWalletName(walletsList, symbol, uuid, hardware, chain, name)
-    }
-
-    return ''
-  }
-
   const onToggleAddress = (isActive: boolean, wallet: IWallet) => (): void => {
     if (isActive) {
       const selectedWallets = state.selectedWallets.filter(
@@ -216,7 +200,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     <>
       {state.wallets.filter(filterWallets).map((wallet: IWallet) => {
         const { symbol, address, chain, name, uuid } = wallet
-        const walletName = getNameWallet(wallet)
+        const walletName = getWalletName(wallet)
         const isActive =
           state.selectedWallets.find((wallet: IWallet) => wallet.uuid === uuid) !== undefined
 

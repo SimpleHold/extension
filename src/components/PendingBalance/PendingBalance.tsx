@@ -41,7 +41,7 @@ const PendingBalance: React.FC<Props> = (props) => {
     return (
       <Styles.Container type={type}>
         <Styles.IconRow>
-          <SVG src="../../assets/icons/clock.svg" width={16} height={16} />
+          <SVG src="../../assets/icons/clockIconPending.svg" width={16} height={16} />
         </Styles.IconRow>
         <Styles.Row>
           <Styles.Pending>

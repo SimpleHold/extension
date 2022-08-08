@@ -5,7 +5,7 @@ import DrawerWrapper from '@components/DrawerWrapper'
 import Wallet from './components/Wallet'
 
 // Utils
-import { IWallet, getWalletName } from '@utils/wallet'
+import { IWallet, generateWalletName } from '@utils/wallet'
 import { toLower } from '@utils/format'
 
 // Styles
@@ -39,7 +39,7 @@ const WalletsDrawer: React.FC<Props> = (props) => {
           const { symbol, chain, name, address, hardware, uuid, contractAddress } = wallet
 
           const walletName =
-            wallet.walletName || getWalletName(wallets, symbol, uuid, hardware, chain, name)
+            wallet.walletName || generateWalletName(wallets, symbol, uuid, hardware, chain, name)
 
           return (
             <Wallet

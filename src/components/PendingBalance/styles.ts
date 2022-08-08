@@ -7,18 +7,13 @@ type TContainerProps = {
 const Container = styled.div`
   background-color: ${({ type }: TContainerProps) =>
     type === 'light' ? 'rgba(255, 255, 255, 0.2)' : '#F8F8F8'};
-  border-radius: 5px;
+  border-radius: 15px;
   display: inline-flex;
   flex-direction: row;
   align-items: center;
 
   p {
     color: ${({ type }: TContainerProps) => (type === 'light' ? '#ffffff' : '#7D7E8D')};
-  }
-
-  div:last-child {
-    border-left: ${({ type }: TContainerProps) =>
-      `1px solid ${type === 'light' ? '#38b175' : '#EAEAEA'}`};
   }
 
   svg {
@@ -37,21 +32,26 @@ const Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 8px 15px;
+  padding: 8px 15px 8px 0;
 `
 
 const Pending = styled.p`
   margin: 0 10px 0 0;
+  line-height: 14px;
+  font-family: Roboto, sans-serif;
+  font-style: normal;
   font-weight: 500;
   font-size: 12px;
-  line-height: 14px;
+  color: #FFFFFF;
+  text-transform: capitalize;
 `
 
 const USDValue = styled.p`
-  margin: 0;
-  font-weight: normal;
-  font-size: 12px;
   line-height: 14px;
+  font-family: Roboto, sans-serif;
+  font-style: normal;
+  font-size: 12px;
+  color: #FFFFFF;
 `
 
 const Styles = {

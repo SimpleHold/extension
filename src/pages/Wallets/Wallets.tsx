@@ -1,14 +1,17 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import SVG from 'react-inlinesvg'
-import { List, ListRowProps, ScrollParams, WindowScroller } from 'react-virtualized'
+import { ScrollParams } from 'react-virtualized'
 
 // Components
-import WalletCard from '@components/WalletCard'
 import CollapsibleHeader from '@components/CollapsibleHeader'
+import BottomMenuBar from '@components/BottomMenuBar'
+import MainListControls from '@components/MainListControls'
+import WalletsList from '@components/WalletsList'
+import PolicyPopup from '@components/PolicyPopup'
 
 // Drawers
 import FilterWalletsDrawer from '@drawers/FilterWallets'
+import SelectCurrencyDrawer from '@drawers/SelectCurrency'
 
 // Hooks
 import useToastContext from '@hooks/useToastContext'
@@ -18,20 +21,19 @@ import useState from '@hooks/useState'
 import {
   getFilteredSum,
   getFilteredWallets,
-  getWalletName,
-  getWallets,
-  updateWalletsBalances
+  getPolicyPopupStatus,
+  IWallet,
+  updateWalletsBalances,
 } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
-import { getBadgeText, setBadgeText } from '@utils/extension'
-import { clear } from '@utils/storage'
+import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
+import { checkOneOfExist, clear, removeItem } from '@utils/storage'
 
 // Config
-import { ADD_ADDRESS, FILTERS_WATCH, HISTORY_WATCH } from '@config/events'
+import { ADD_ADDRESS, ADDRESS_ACTION, FILTERS_WATCH, HISTORY_WATCH, TOUCH_EXCHANGE } from '@config/events'
 
 // Types
 import { ILocationState, IState, TWalletAmountData } from './types'
-import { IWallet } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -42,10 +44,11 @@ const initialState: IState = {
   totalEstimated: null,
   pendingBalance: null,
   activeDrawer: null,
-  scrollPosition: 0
+  scrollPosition: 0,
 }
 
 const Wallets: React.FC = () => {
+
   const history = useHistory()
   const { state: locationState } = useLocation<ILocationState>()
   const { state, updateState } = useState<IState>(initialState)
@@ -54,8 +57,15 @@ const Wallets: React.FC = () => {
   const [walletsEstimated, setWalletsEstimated] = React.useState<TWalletAmountData[]>([])
   const [walletsPending, setWalletsPending] = React.useState<TWalletAmountData[]>([])
 
+  const [isHeaderCollapsed, setIsHeaderCollapsed] = React.useState(false)
+  const [isListScrollable, setIsListScrollable] = React.useState(false)
+
+  const [listType, setListType] = React.useState<'send' | 'receive' | null>(null)
+  const [isShowNft, setIsShowFfts] = React.useState(false)
+  const [showPolicyPopup, setShowPolicyPopup] = React.useState(false)
+
   const addToast = useToastContext()
-  const walletsTop = Math.max(110, 290 - 1.25 * state.scrollPosition)
+  const walletsTop = isHeaderCollapsed ? 120 : 278
 
   React.useEffect(() => {
     getWalletsList()
@@ -70,7 +80,7 @@ const Wallets: React.FC = () => {
     ) {
       updateState({
         totalBalance: 0,
-        totalEstimated: 0
+        totalEstimated: 0,
       })
     }
   }, [state.wallets, state.totalBalance, state.totalEstimated])
@@ -83,7 +93,7 @@ const Wallets: React.FC = () => {
 
   const updateBalance = (
     arr: TWalletAmountData[],
-    type: 'totalBalance' | 'totalEstimated' | 'pendingBalance'
+    type: 'totalBalance' | 'totalEstimated' | 'pendingBalance',
   ) => {
     if (arr.length === state.wallets?.length && state[type] === null) {
       updateState({ [type]: arr.reduce((acc, walletData) => acc + walletData.amount, 0) })
@@ -113,11 +123,31 @@ const Wallets: React.FC = () => {
     }
   }, [state.wallets, walletsPending, walletsEstimated, walletsBalance])
 
+  React.useEffect(() => {
+    const showPopup = getPolicyPopupStatus()
+    setShowPolicyPopup(showPopup)
+    removeItem('policyPopup')
+  }, [])
+
+  React.useEffect(() => {
+    setTimeout(() => setIsListScrollable(isHeaderCollapsed), 500)
+  }, [isHeaderCollapsed])
+
+  React.useEffect(() => {
+    toggleScroll(isListScrollable ? 'on' : 'off')
+  }, [isListScrollable])
+
+  React.useEffect(() => {
+    toggleScroll('off')
+  }, [])
+
+  const showSelectCurrencyDrawer = () => updateState({ activeDrawer: 'select_currency' })
+
   const calculateBalances = () => {
     updateState({
       totalBalance: getFilteredSum(walletsBalance),
+      pendingBalance: getFilteredSum(walletsPending),
       totalEstimated: getFilteredSum(walletsEstimated),
-      pendingBalance: getFilteredSum(walletsPending)
     })
   }
 
@@ -134,7 +164,7 @@ const Wallets: React.FC = () => {
       wallets: null,
       totalBalance: null,
       totalEstimated: null,
-      pendingBalance: null
+      pendingBalance: null,
     })
     let wallets = getFilteredWallets()
 
@@ -151,9 +181,8 @@ const Wallets: React.FC = () => {
 
   const onAddNewAddress = (): void => {
     logEvent({
-      name: ADD_ADDRESS
+      name: ADD_ADDRESS,
     })
-
     history.push('/select-currency')
   }
 
@@ -173,7 +202,7 @@ const Wallets: React.FC = () => {
   }
 
   const sumWalletBalance = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (
-    wallet: TWalletAmountData
+    wallet: TWalletAmountData,
   ) => {
     setStateCallback((prevArray: TWalletAmountData[]) => {
       return prevArray.find((existingWallet) => existingWallet.uuid === wallet.uuid)
@@ -195,33 +224,42 @@ const Wallets: React.FC = () => {
     getWalletsList()
   }
 
-  const getNameWallet = (wallet: IWallet): string => {
-    if (wallet.walletName) {
-      return wallet.walletName
-    }
-
-    const walletsList = getWallets()
-
-    if (walletsList) {
-      const { symbol, uuid, hardware, chain, name } = wallet
-      return getWalletName(walletsList, symbol, uuid, hardware, chain, name)
-    }
-    return ''
-  }
-
   const onViewTxHistory = React.useCallback((): void => {
     history.push('/tx-history')
-
     logEvent({
-      name: HISTORY_WATCH
+      name: HISTORY_WATCH,
     })
   }, [])
+
+  const openPage = React.useCallback((page: string): void => {
+    history.push(page)
+  }, [])
+
+  const onClickSwap = (): void => {
+    logEvent({
+      name: ADDRESS_ACTION,
+      properties: {
+        addressAction: 'exchange'
+      }
+    })
+
+    logEvent({
+      name: TOUCH_EXCHANGE,
+    })
+
+    openWebPage('https://simpleswap.io/?ref=2a7607295184')
+  }
+
+  const setListOnClickHandler = (type: 'send' | 'receive') => () => {
+    setListType(type)
+    showSelectCurrencyDrawer()
+  }
 
   const openFilters = React.useCallback((): void => {
     updateState({ activeDrawer: 'filters' })
 
     logEvent({
-      name: FILTERS_WATCH
+      name: FILTERS_WATCH,
     })
   }, [])
 
@@ -229,113 +267,94 @@ const Wallets: React.FC = () => {
     history.push('/nft-collection')
   }, [])
 
-  const renderWallet = ({ index, style, key }: ListRowProps): React.ReactNode => {
-    const wallet = state.wallets?.[index]
-
-    if (wallet) {
-      const {
-        address,
-        symbol,
-        chain,
-        name,
-        contractAddress,
-        decimals,
-        isHidden,
-        uuid,
-        hardware,
-        isNotActivated
-      } = wallet
-
-      const walletName = getNameWallet(wallet)
-
-      return (
-        <div
-          style={{
-            ...style,
-            ...Styles.ListItem
-          }}
-          key={key}
-        >
-          <WalletCard
-            key={uuid}
-            address={address}
-            chain={chain}
-            symbol={symbol.toLowerCase()}
-            name={name}
-            contractAddress={contractAddress}
-            decimals={decimals}
-            isHidden={isHidden}
-            sumBalance={sumBalanceCallback}
-            sumEstimated={sumEstimatedCallback}
-            sumPending={sumPendingCallback}
-            walletName={walletName}
-            uuid={uuid}
-            hardware={hardware}
-            isNotActivated={isNotActivated}
-          />
-        </div>
-      )
-    }
-
-    return null
-  }
-
   const onScroll = ({ scrollTop }: ScrollParams): void => {
     updateState({ scrollPosition: scrollTop < 155 ? scrollTop : 155 })
   }
 
-  const getRowCount = () => {
-    const length = state.wallets?.length
-    if (!length) return 0
-    if (length <= 3) return length
-    return Math.max(length + 2, 8)
+  const onWheel = (e: React.WheelEvent<HTMLDivElement>): void => {
+    const offset = e?.deltaY
+    if (offset > 20) {
+      setIsHeaderCollapsed(true)
+    }
+    if (offset < 0 && state.scrollPosition === 0) {
+      setIsHeaderCollapsed(false)
+      toggleScroll('off')
+    }
+  }
+
+  const scrollHandler = React.useCallback(e => e.preventDefault(), [])
+
+  const toggleScroll = (toggle: 'on' | 'off') => {
+    const list = document.getElementsByClassName('ReactVirtualized__List')[0]
+    const events = ['mousewheel', 'touchmove']
+    const method = toggle === 'off' ? 'addEventListener' : 'removeEventListener'
+    events.forEach(event => list?.[method](event, scrollHandler, false))
+  }
+
+  const isFiltersActive = (): boolean => {
+    return checkOneOfExist([
+      'selectedCurrenciesFilter',
+      'hiddenWalletsFilter',
+      'zeroBalancesFilter',
+      'activeSortKey',
+      'activeSortType',
+    ])
+  }
+
+  const listControlsProps = {
+    onSwitch: () => {
+      setIsShowFfts(true)
+      onViewNFT()
+    },
+    isFiltersActive: isFiltersActive(),
+    openFilters,
+    showNft: isShowNft,
+    onAddNewAddress
   }
 
   return (
     <>
       <Styles.Wrapper>
         <CollapsibleHeader
-          scrollPosition={state.scrollPosition}
+          isCollapsed={isHeaderCollapsed}
           balance={state.totalBalance}
           estimated={state.totalEstimated}
           pendingBalance={state.pendingBalance}
-          isDrawersActive={state.activeDrawer !== null}
-          onViewTxHistory={onViewTxHistory}
-          openFilters={openFilters}
-          onViewNFT={onViewNFT}
+          onClickReceive={setListOnClickHandler('receive')}
+          onClickSend={setListOnClickHandler('send')}
         />
-        <Styles.WalletsList style={{ top: walletsTop }}>
-          <WindowScroller>
-            {({ registerChild }) => (
-              <div ref={registerChild}>
-                <List
-                  onScroll={onScroll}
-                  height={600}
-                  style={Styles.List}
-                  rowCount={getRowCount()}
-                  rowHeight={86}
-                  rowRenderer={renderWallet}
-                  width={375}
-                  overscanRowCount={0}
-                  noRowsRenderer={() => (
-                    <Styles.NotFound>
-                      Nothing was found for the specified parameters
-                    </Styles.NotFound>
-                  )}
-                />
-              </div>
-            )}
-          </WindowScroller>
-        </Styles.WalletsList>
-        <Styles.AddWalletButton onClick={onAddNewAddress}>
-          <SVG src='../../assets/icons/plus.svg' width={14} height={14} title='Add new wallet' />
-        </Styles.AddWalletButton>
+        <Styles.WalletsListContainer style={{ top: walletsTop, zIndex: 2}} isUnfolded={isHeaderCollapsed} onWheel={onWheel}>
+          <MainListControls controlsProps={listControlsProps} isListUnfolded={isHeaderCollapsed}/>
+          <WalletsList wallets={state.wallets}
+                       onScroll={onScroll}
+                       sumBalanceCallback={sumBalanceCallback}
+                       sumEstimatedCallback={sumEstimatedCallback}
+                       sumPendingCallback={sumPendingCallback}/>
+        </Styles.WalletsListContainer>
+
       </Styles.Wrapper>
       <FilterWalletsDrawer
         isActive={state.activeDrawer === 'filters'}
         onClose={onCloseDrawer}
         onApply={onApplyDrawer}
       />
+      <SelectCurrencyDrawer
+        wallets={state.wallets}
+        isActive={state.activeDrawer === 'select_currency'}
+        onClose={onCloseDrawer}
+        isRedirect={`/${listType}`}
+      >
+        <div>drawer content</div>
+      </SelectCurrencyDrawer>
+      <BottomMenuBar onViewTxHistory={onViewTxHistory}
+                     onOpenSettings={() => openPage('/settings')}
+                     onClickWallets={() => openPage('/wallets')}
+                     onClickSwap={onClickSwap}
+      />
+      {showPolicyPopup
+        ? <PolicyPopup onClose={() => setShowPolicyPopup(false)}/>
+        : null
+      }
     </>
   )
 }

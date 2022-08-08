@@ -3,6 +3,10 @@ import { createGlobalStyle } from 'styled-components'
 const GlobalStyle = createGlobalStyle`
   * {
 		box-sizing: border-box;
+    ::selection {
+      background-color: #ffffff;
+      color: #3fbb7d;
+    }
   }
   
   html {
@@ -20,8 +24,8 @@ const GlobalStyle = createGlobalStyle`
     overflow: hidden;
     padding: 0;
     margin: 0;
-    background-color: #f8f8f8;
-    font-family: 'Roboto', sans-serif;
+    //background-color: #f8f8f8;
+    font-family: Roboto, sans-serif;
     
     * {
       max-width: 375px;
