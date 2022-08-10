@@ -31,6 +31,7 @@ import { IState } from './types'
 
 // Styles
 import Styles from './styles'
+import { toLower } from 'utils/format'
 
 const initialState: IState = {
   isInvalidFile: false,
@@ -50,8 +51,10 @@ const RestoreWallet: React.FC = () => {
     updateState({ isInvalidFile: false, backupData: '' })
 
     const text = await acceptedFiles[0]?.text()
+    const fileExt = acceptedFiles[0].name.split(".").pop()
+    const isAcceptedExt = ["txt", "dat"].indexOf(toLower(fileExt) as string) !== -1
 
-    if (text?.length > 0 && acceptedFiles[0].name.indexOf('.dat') !== -1) {
+    if (text?.length > 0 && isAcceptedExt) {
       updateState({ backupData: text })
     } else {
       updateState({ isInvalidFile: true })

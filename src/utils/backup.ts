@@ -5,6 +5,7 @@ import { validateWallet } from '@utils/validate'
 
 // Types
 import { IWallet } from '@utils/wallet'
+import { padTo2Digits } from 'utils/format'
 
 const pjson = require('../../package.json')
 
@@ -53,10 +54,23 @@ export const generate = (currencies: TGenerateCurrency[]): { [key: string]: stri
   }
 }
 
+const createBackupFileName = (fileExtension: string) => {
+  const d = new Date()
+
+  const minutes = padTo2Digits(d.getMinutes())
+  const hours = padTo2Digits(d.getHours())
+  const dd = padTo2Digits(d.getDate())
+  const mm = padTo2Digits(d.getMonth() + 1)
+  const yyyy = d.getFullYear()
+
+  return `SimpleHold_backup_${mm}.${dd}.${yyyy}_${hours}-${minutes}.${fileExtension}`
+}
+
 export const download = (backup: string): void => {
   const element = document.createElement('a')
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(backup))
-  element.setAttribute('download', 'backup.dat')
+
+  element.setAttribute('download', createBackupFileName("txt"))
   element.style.display = 'none'
   document.body.appendChild(element)
   element.click()
