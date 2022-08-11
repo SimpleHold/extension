@@ -13,13 +13,15 @@ interface IEvent {
   properties?: { [key: string]: string | number }
 }
 
+const isDisabled = (getItem('analytics') !== 'agreed') || config.isDevMode
+
 export const init = (apiKey: string, clientId: string) => {
-  if (config.isDevMode) return; // dev
+  if (isDisabled) return;
   amplitudeSDK.getInstance().init(apiKey, clientId)
 }
 
 export const logEvent = ({ name, properties = {} }: IEvent) => {
-  if (config.isDevMode) return; // dev
+  if (isDisabled) return;
   properties = {
     ...properties,
     ...{

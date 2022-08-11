@@ -14,7 +14,7 @@ import { logEvent } from '@utils/amplitude'
 import { getItem, removeItem } from '@utils/storage'
 
 // Config
-import { PASSCODE_LOCKED_INVALID, PASSCODE_LOCKED_FORGOT, SUCCESS_ENTER } from '@config/events'
+import { LOG_IN_PASSCODE } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -59,20 +59,13 @@ const EnterPasscode: React.FC = () => {
       removeItem('isLocked')
 
       logEvent({
-        name: SUCCESS_ENTER,
-        properties: {
-          security: 'code',
-        },
+        name: LOG_IN_PASSCODE,
       })
 
       history.replace('/wallets')
     } else {
       setIsError(true)
       setPasscode('')
-
-      logEvent({
-        name: PASSCODE_LOCKED_INVALID,
-      })
     }
   }
 
@@ -82,10 +75,6 @@ const EnterPasscode: React.FC = () => {
     })
 
     removeItem('passcode')
-
-    logEvent({
-      name: PASSCODE_LOCKED_FORGOT,
-    })
   }
 
   const onSubmitForm = (e: React.FormEvent) => {

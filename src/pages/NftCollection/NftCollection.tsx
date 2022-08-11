@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
-import SVG from 'react-inlinesvg'
 
 // Components
 import Cover from '@components/Cover'
 import Header from '@components/Header'
 import NftCard from '@components/NftCard'
+import BottomMenuBar from '@components/BottomMenuBar'
+import MenuSwitch from '@components/MenuSwitch'
+import FiltersButton from '@components/FiltersButton'
 
 // Drawers
 import NftFilterDrawer from '@drawers/NftFilter'
@@ -16,12 +18,13 @@ import { IWallet, getWallets } from '@utils/wallet'
 import { checkOneOfExist, getItem, getNFTImage } from '@utils/storage'
 import { toLower } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
+import { openWebPage } from '@utils/extension'
 
 // Types
 import { TNft } from '@utils/api/types'
 
 // Config
-import { NFT_WATCH } from '@config/events'
+import { HISTORY_SELECT, MAIN_SELECT_NFT, EXCHANGE_SELECT, FILTERS_SELECT } from '@config/events'
 
 // Styles
 import Styles from './styles'
@@ -32,11 +35,12 @@ const NftCollectionPage: React.FC = () => {
   const [activeDrawer, setActiveDrawer] = React.useState<null | 'filters'>(null)
   const [collection, setCollection] = React.useState<null | TNft[]>(null)
   const [wallets, setWallets] = React.useState<IWallet[]>([])
+  const [switchPosition, setSwitchPosition] = React.useState<'wallets' | 'nfts'>('nfts')
 
   React.useEffect(() => {
     getWalletsList()
     logEvent({
-      name: NFT_WATCH,
+      name: MAIN_SELECT_NFT,
     })
   }, [])
 
@@ -55,7 +59,7 @@ const NftCollectionPage: React.FC = () => {
           wallet.symbol === 'eth'
           || wallet.symbol === 'bnb'
           || wallet.symbol === 'matic'
-          || wallet.symbol === 'sol'
+          || wallet.symbol === 'sol',
       )
 
       if (filterWallet.length) {
@@ -79,7 +83,7 @@ const NftCollectionPage: React.FC = () => {
       return JSON.parse(getAddresses).find(
         (item: IWallet) =>
           toLower(item.symbol) === toLower(wallet.symbol) &&
-          toLower(item.address) === toLower(wallet.address)
+          toLower(item.address) === toLower(wallet.address),
       )
     }
 
@@ -128,8 +132,34 @@ const NftCollectionPage: React.FC = () => {
   }
 
   const openFilters = (): void => {
+    logEvent({
+      name: FILTERS_SELECT,
+      properties: {
+        type: "nfts"
+      }
+    })
     setActiveDrawer('filters')
   }
+
+  const onViewTxHistory = React.useCallback((): void => {
+    history.push('/tx-history')
+    logEvent({
+      name: HISTORY_SELECT,
+    })
+  }, [])
+
+  const openPage = React.useCallback((page: string): void => {
+    history.push(page)
+  }, [])
+
+  const onClickSwap = (): void => {
+    logEvent({
+      name: EXCHANGE_SELECT,
+    })
+
+    openWebPage('https://simpleswap.io/?ref=2a7607295184')
+  }
+
 
   const renderNotFound = () => (
     <Styles.NotFound>
@@ -147,6 +177,15 @@ const NftCollectionPage: React.FC = () => {
         ))}
     </Styles.Loading>
   )
+
+  const onViewWallets = React.useCallback((): void => {
+    history.push('/wallets')
+  }, [])
+
+  const onSwitch = () => {
+    setSwitchPosition('wallets')
+    onViewWallets()
+  }
 
   const renderContent = () => (
     <Styles.Content>
@@ -183,21 +222,14 @@ const NftCollectionPage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header whiteLogo/>
-        <Styles.Tabs>
-          <Styles.Nav>
-            <Styles.Link onClick={history.goBack}>Wallets</Styles.Link>
-            <Styles.LinkDivider>/</Styles.LinkDivider>
-            <Styles.Link isActive>Collectibles</Styles.Link>
-          </Styles.Nav>
-          {wallets.length > 0 ? (
-            <Styles.Button onClick={openFilters}>
-              <SVG src="../../assets/icons/sort.svg" width={18} height={14} />
-              {isFiltersActive() ? <Styles.ButtonDot /> : null}
-            </Styles.Button>
-          ) : null}
-        </Styles.Tabs>
+        <Header whiteLogo withBack isHomePage />
         <Styles.Container>
+          <Styles.Controls>
+            <MenuSwitch isRightPosition={switchPosition === 'nfts'} onSwitch={onSwitch} />
+            {wallets.length > 0 ? (
+              <FiltersButton isFiltersActive={isFiltersActive()} onClick={openFilters} />
+            ) : null}
+          </Styles.Controls>
           {collection === null ? (
             renderLoading()
           ) : (
@@ -209,6 +241,11 @@ const NftCollectionPage: React.FC = () => {
         isActive={activeDrawer === 'filters'}
         onClose={onCloseDrawer}
         onApply={onApplyDrawer}
+      />
+      <BottomMenuBar onViewTxHistory={onViewTxHistory}
+                     onOpenSettings={() => openPage('/settings')}
+                     onClickWallets={() => openPage('/wallets')}
+                     onClickSwap={onClickSwap}
       />
     </>
   )

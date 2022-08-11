@@ -7,13 +7,14 @@ import { logEvent } from '@utils/amplitude'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
-import { LOCK } from '@config/events'
+import { LOGOUT_SELECT } from '@config/events'
 
 // Styles
 import Styles from './styles'
 
 interface Props {
   withBack?: boolean
+  isHomePage?: boolean
   backTitle?: string
   noActions?: boolean
   whiteLogo?: boolean
@@ -27,6 +28,7 @@ interface Props {
 const Header: React.FC<Props> = (props) => {
   const {
     withBack,
+    isHomePage,
     backTitle,
     noActions,
     whiteLogo,
@@ -48,7 +50,7 @@ const Header: React.FC<Props> = (props) => {
     const isPasscodeEnabled = getItem('passcode') !== null
 
     logEvent({
-      name: LOCK,
+      name: LOGOUT_SELECT,
     })
 
     return openPage(isPasscodeEnabled ? '/enter-passcode' : '/lock')
@@ -62,25 +64,28 @@ const Header: React.FC<Props> = (props) => {
         </Styles.Logo>
       </Styles.LogoRow>
       <Styles.Row>
-        {withBack && onBack && backTitle ? (
+        {isHomePage || (withBack && onBack && backTitle) ? (
           <Styles.Navigate onClick={onBack}>
             <Styles.BackIconRow>
-              <SVG src="../../assets/icons/arrow.svg" width={6} height={10} title="Back" />
+              {isHomePage
+                ? <SVG src="../../assets/icons/navigationHomeIconNew.svg" width={10} height={10} title={'Home'} />
+                : <SVG src="../../assets/icons/arrow.svg" width={6} height={10} title={'Back'} />
+              }
             </Styles.BackIconRow>
-            <Styles.NavigateTitle>{backTitle}</Styles.NavigateTitle>
+            <Styles.NavigateTitle>{isHomePage ? 'Home' : backTitle}</Styles.NavigateTitle>
           </Styles.Navigate>
         ) : null}
         {!noActions ? (
           <Styles.Nav>
             <Styles.NavItem onClick={lockWallet}>
-              <SVG src="../../assets/icons/lock.svg" width={13} height={16} title="Lock wallet" />
+              <SVG src="../../assets/icons/lockIconNew.svg" width={14} height={15} title="Lock wallet" />
             </Styles.NavItem>
-            <Styles.NavItem
-              onClick={() => (activePage === 'settings' ? null : openPage('/settings'))}
-              isActive={activePage === 'settings'}
-            >
-              <SVG src="../../assets/icons/settings.svg" width={16} height={16} title="Settings" />
-            </Styles.NavItem>
+            {/*<Styles.NavItem*/}
+            {/*  onClick={() => (activePage === 'settings' ? null : openPage('/settings'))}*/}
+            {/*  isActive={activePage === 'settings'}*/}
+            {/*>*/}
+            {/*  <SVG src="../../assets/icons/settings.svg" width={16} height={16} title="Settings" />*/}
+            {/*</Styles.NavItem>*/}
           </Styles.Nav>
         ) : null}
       </Styles.Row>

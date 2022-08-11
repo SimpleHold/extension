@@ -23,11 +23,11 @@ import { getItem, setItem, removeItem, removeCache } from '@utils/storage'
 
 // Config
 import {
-  BACKUP_SETTINGS,
-  PASSCODE_ENABLED,
-  PASSCODE_DISABLED,
-  SETTINGS_SIGN_IN,
-  SETTINGS_NEWTAB
+  SETTINGS_BACKUP,
+  SETTINGS_SIGN_IN_MOBILE,
+  SETTINGS_OPEN_WINDOW,
+  SUPPORT_SELECT,
+  SETTINGS_SELECT, SETTINGS_TOGGLE_PASSCODE,
 } from '@config/events'
 
 // Hooks
@@ -63,6 +63,12 @@ const Settings: React.FC = () => {
     getManifestInfo()
   }, [])
 
+  React.useEffect(() => {
+    logEvent({
+      name: SETTINGS_SELECT,
+    })
+  }, [])
+
   const getManifestInfo = () => {
     const { version } = getManifest()
     updateState({ version })
@@ -85,7 +91,7 @@ const Settings: React.FC = () => {
 
       if (backup) {
         logEvent({
-          name: BACKUP_SETTINGS,
+          name: SETTINGS_BACKUP,
         })
         downloadBackup(backup)
       }
@@ -103,7 +109,7 @@ const Settings: React.FC = () => {
 
   const onScanQrCode = (): void => {
     logEvent({
-      name: SETTINGS_SIGN_IN,
+      name: SETTINGS_SIGN_IN_MOBILE,
     })
 
     history.push('/scan-backup')
@@ -111,7 +117,7 @@ const Settings: React.FC = () => {
 
   const openInWindow = () => {
     logEvent({
-      name: SETTINGS_NEWTAB,
+      name: SETTINGS_OPEN_WINDOW,
     })
     openAppInNewWindow()
   }
@@ -135,7 +141,15 @@ const Settings: React.FC = () => {
         width: 18,
         height: 18,
       },
-      onClick: () => openWebPage('https://simplehold.io/about'),
+      onClick: () => {
+        logEvent({
+          name: SUPPORT_SELECT,
+          properties: {
+            page: "settings"
+          }
+        })
+        openWebPage('https://simplehold.io/about')
+      },
     },
     {
       isButton: true,
@@ -183,7 +197,10 @@ const Settings: React.FC = () => {
         updateState({ activeDrawer: null, passcodeDrawerType: 'create' })
 
         logEvent({
-          name: PASSCODE_DISABLED,
+          name: SETTINGS_TOGGLE_PASSCODE,
+          properties: {
+            is_enable: "no"
+          }
         })
       } else {
         updateState({ isPasscodeError: true })
@@ -194,7 +211,10 @@ const Settings: React.FC = () => {
       updateState({ activeDrawer: null, passcodeDrawerType: 'remove' })
 
       logEvent({
-        name: PASSCODE_ENABLED,
+        name: SETTINGS_TOGGLE_PASSCODE,
+        properties: {
+          is_enable: "yes"
+        }
       })
     }
   }

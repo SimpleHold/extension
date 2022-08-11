@@ -114,3 +114,7 @@ export const toFixedWithoutRound = (n: number, digits: number): number => {
   const match = n.toString().match(regEx)
   return match ? +match[0] : n
 }
+
+export const padTo2Digits = (n: number) => {
+  return n.toString().padStart(2, '0');
+}

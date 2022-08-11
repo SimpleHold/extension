@@ -35,7 +35,7 @@ import errorConnectTrezorImage from '@assets/illustrate/errorConnectTrezor.svg'
 
 // Config
 import { getCurrency } from '@config/currencies'
-import { HARDWARE_CONNECT } from '@config/events'
+import { CONNECT_HARDWARE_WALLET } from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -97,7 +97,7 @@ const ConnectTrezor: React.FC = () => {
     window.close()
 
     logEvent({
-      name: HARDWARE_CONNECT,
+      name: CONNECT_HARDWARE_WALLET,
       properties: {
         kind: 'trezor',
         result: 'close',
@@ -211,7 +211,7 @@ const ConnectTrezor: React.FC = () => {
           })
 
           logEvent({
-            name: HARDWARE_CONNECT,
+            name: CONNECT_HARDWARE_WALLET,
             properties: {
               kind: 'trezor',
               result: 'success',

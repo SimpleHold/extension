@@ -12,7 +12,7 @@ import useVisible from '@hooks/useVisible'
 
 // Utils
 import { toUpper, price, toLower, short, getFormatEstimated } from '@utils/format'
-import { getWalletName, IWallet, THardware } from '@utils/wallet'
+import { generateWalletName, IWallet, THardware } from '@utils/wallet'
 
 // Assets
 import ledgerLogo from '@assets/icons/ledger.svg'
@@ -140,7 +140,7 @@ const WalletCard: React.FC<Props> = (props) => {
           const { symbol, chain, name, address, hardware, uuid, contractAddress } = wallet
 
           const walletName =
-            wallet.walletName || getWalletName(wallets, symbol, uuid, hardware, chain, name)
+            wallet.walletName || generateWalletName(wallets, symbol, uuid, hardware, chain, name)
 
           return (
             <Wallet

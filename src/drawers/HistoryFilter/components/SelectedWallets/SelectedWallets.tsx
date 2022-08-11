@@ -6,7 +6,7 @@ import timesIcon from '@assets/icons/times.svg'
 import arrowIcon from '@assets/icons/arrow.svg'
 
 // Types
-import { IWallet, getWallets, getWalletName } from '@utils/wallet'
+import { IWallet, getWalletName } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -19,27 +19,11 @@ interface Props {
 const SelectedWallets: React.FC<Props> = (props) => {
   const { wallets, onRemove } = props
 
-  const getNameWallet = (wallet: IWallet): string => {
-    if (wallet.walletName) {
-      return wallet.walletName
-    }
-
-    const walletsList = getWallets()
-
-    if (walletsList) {
-      const { symbol, uuid, hardware, chain, name } = wallet
-
-      return getWalletName(walletsList, symbol, uuid, hardware, chain, name)
-    }
-
-    return ''
-  }
-
   return (
     <Styles.Container>
       <Styles.WalletsList>
         {wallets.slice(0, 3).map((wallet: IWallet) => {
-          const walletName = getNameWallet(wallet)
+          const walletName = getWalletName(wallet)
 
           return (
             <Styles.Wallet key={walletName}>

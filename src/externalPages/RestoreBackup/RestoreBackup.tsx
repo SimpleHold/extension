@@ -39,6 +39,7 @@ import puzzleIcon from '../../assets/modalIcons/puzzle.svg'
 
 // Styles
 import Styles from './styles'
+import { toLower } from 'utils/format'
 
 const initialState: IState = {
   isAgreed: true,
@@ -63,8 +64,10 @@ const RestoreBackup: React.FC = () => {
     updateState({ isFileBroken: false, backupData: '' })
 
     const text = await acceptedFiles[0]?.text()
+    const fileExt = acceptedFiles[0].name.split(".").pop()
+    const isAcceptedExt = ["txt", "dat"].indexOf(toLower(fileExt) as string) !== -1
 
-    if (text?.length > 0 && acceptedFiles[0].name.indexOf('.dat') !== -1) {
+    if (text?.length > 0 && isAcceptedExt) {
       updateState({ backupData: text })
     } else {
       updateState({ isFileBroken: true })

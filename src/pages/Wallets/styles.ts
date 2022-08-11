@@ -1,12 +1,24 @@
 import styled from 'styled-components'
 
+type TProps = {
+  isUnfolded?: boolean
+}
+
 const Wrapper = styled.div`
   height: 600px;
+  transition: 0.5s ease;
+  background-color: #3FBB7D;
+  position: relative;
 `
 
-const WalletsList = styled.div`
+const WalletsListContainer = styled.div`
   position: relative;
-  background-color: #f2f4f8;
+  transition: 0.5s ease;
+
+  .ReactVirtualized__List {
+    transition: 0.4s ease-in;
+    padding-top: ${({ isUnfolded }: TProps) => isUnfolded ? '0 !important;' : '56px !important;'};
+  }
 `
 
 const AddWalletButton = styled.div`
@@ -29,28 +41,10 @@ const AddWalletButton = styled.div`
   }
 `
 
-const NotFound = styled.p`
-  margin: 0 30px;
-  font-size: 16px;
-  line-height: 23px;
-  color: #7d7e8d;
-`
-
-const List = {
-  padding: '20px 0',
-}
-
-const ListItem = {
-  padding: '0 30px',
-}
-
 const Styles = {
   Wrapper,
-  WalletsList,
+  WalletsListContainer,
   AddWalletButton,
-  NotFound,
-  List,
-  ListItem,
 }
 
 export default Styles

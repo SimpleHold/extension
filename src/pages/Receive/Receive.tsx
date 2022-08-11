@@ -23,6 +23,8 @@ import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
+import { RECEIVE_COPY_ADDRESS } from 'config/events'
+import { logEvent } from 'utils/amplitude'
 
 const initialState: IState = {
   isCopied: false,
@@ -32,7 +34,7 @@ const initialState: IState = {
 
 const ReceivePage: React.FC = () => {
   const {
-    state: { address, symbol, walletName, currency },
+    state: { address, symbol, walletName, currency, isRedirect },
   } = useLocation<ILocationState>()
   const history = useHistory()
 
@@ -57,6 +59,9 @@ const ReceivePage: React.FC = () => {
   const onCopyAddress = (): void => {
     copy(address)
     updateState({ isCopied: true })
+    logEvent({
+      name: RECEIVE_COPY_ADDRESS
+    })
   }
 
   const onCloseDrawer = (): void => {
@@ -71,11 +76,19 @@ const ReceivePage: React.FC = () => {
     }
   }
 
+  const onBack = () => {
+    isRedirect
+      ? history.push('/wallets')
+      : history.goBack()
+  }
+
+  const backTitle = isRedirect ? 'Home' : walletName
+
   return (
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle={walletName} whiteLogo/>
+        <Header withBack onBack={onBack} backTitle={backTitle} whiteLogo/>
         <Styles.Container>
           <Styles.Row>
             <Styles.Receive>

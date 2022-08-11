@@ -15,6 +15,7 @@ interface Props {
   withCloseIcon?: boolean
   padding?: string
   height?: number
+  withoutDimScreen?: boolean
 }
 
 const BackgroundStyles = {
@@ -35,11 +36,12 @@ const DrawerWrapper: React.FC<Props> = (props) => {
     withCloseIcon,
     padding,
     height,
+    withoutDimScreen,
   } = props
 
   const nodeRef = React.useRef(null)
 
-  const isWindowedMode = window.location.pathname === "/popup.html" && window.name !== ''
+  const isWindowedMode = window.location.pathname === '/popup.html' && window.name !== ''
 
   const drawerStyle = {
     entering: {
@@ -68,6 +70,7 @@ const DrawerWrapper: React.FC<Props> = (props) => {
             }}
             openFrom={openFrom}
             isWindowedMode={isWindowedMode}
+            withoutDimScreen={withoutDimScreen}
           />
           <Styles.Drawer
             isWindowedMode={isWindowedMode}
@@ -78,17 +81,20 @@ const DrawerWrapper: React.FC<Props> = (props) => {
               ...drawerStyle[state],
             }}
           >
+            {title && title.length > 30 || icon ? <div style={{width: "100%", height: '25px'}}/> : null}
             {icon
               ? (<Styles.IconRow>
                 <Styles.Icon src={icon} alt='icon' />
               </Styles.IconRow>)
               : null
             }
-            {title ? <Styles.Title>{title}</Styles.Title> : null}
+            {title
+              ? <Styles.Title>{title}</Styles.Title>
+              : null}
 
             {withCloseIcon ? (
               <Styles.CloseIconRow onClick={onClose}>
-                <SVG src="../../assets/icons/times.svg" width={16} height={16} />
+                <SVG src='../../assets/icons/times.svg' width={16} height={16} />
               </Styles.CloseIconRow>
             ) : null}
             {children}

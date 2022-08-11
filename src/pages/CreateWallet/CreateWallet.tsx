@@ -19,7 +19,7 @@ import { getAllCookies, Cookie } from '@utils/extension'
 import * as theta from '@utils/currencies/theta'
 
 // Config
-import { START_PASSWORD } from '@config/events'
+import { ONBOARDING_CREATE_NEW_WALLET_PASSES } from '@config/events'
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
@@ -111,7 +111,7 @@ const Wallets: React.FC = () => {
 
   const onConfirm = async (): Promise<void> => {
     logEvent({
-      name: START_PASSWORD,
+      name: ONBOARDING_CREATE_NEW_WALLET_PASSES,
     })
 
     let data = []
@@ -135,9 +135,9 @@ const Wallets: React.FC = () => {
     setItem('wallets', wallets)
     setItem('backupStatus', 'notDownloaded')
 
-    setUserProperties({
-      NUMBER_WALLET_BTC: '1',
-    })
+    // setUserProperties({
+    //   NUMBER_WALLET_BTC: '1',
+    // })
 
     history.replace('/download-backup')
   }

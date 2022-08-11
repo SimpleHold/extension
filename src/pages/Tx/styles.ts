@@ -96,7 +96,7 @@ const CopyButton = styled.div`
   width: 30px;
   height: 30px;
   border-radius: 15px;
-  background-color: #f2f4f8;
+  //background-color: #f2f4f8;
   display: flex;
   align-items: center;
   justify-content: center;

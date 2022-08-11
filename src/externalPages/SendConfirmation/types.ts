@@ -38,6 +38,7 @@ export interface IState {
   ledgerTransport: Transport | null
   ledgerDrawerState: 'wrongDevice' | 'wrongApp' | 'connectionFailed' | 'reviewTx' | null
   isDraggable: boolean
+  logCaptured: boolean
 }
 
 export type TLedgerTxParams = {

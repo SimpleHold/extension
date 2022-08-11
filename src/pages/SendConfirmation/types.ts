@@ -22,4 +22,5 @@ export interface IState {
   transactionLink: string
   isButtonLoading: boolean
   failText: string
+  logCaptured: boolean
 }

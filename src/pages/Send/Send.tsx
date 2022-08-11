@@ -48,10 +48,8 @@ import useState from '@hooks/useState'
 // Config
 import { getToken } from '@config/tokens'
 import {
-  // ADDRESS_SEND,
-  TRANSACTION_AUTO_FILL,
-  TRANSACTION_START,
-  TRANSACTION_CANCEL,
+  SEND_SELECT,
+  SEND_CANCEL, SEND_RECIPIENT_ADDRESS, SEND_ENTERED_AMOUNT, SEND_CHOOSE_FEE,
 } from '@config/events'
 
 // Types
@@ -107,6 +105,7 @@ const SendPage: React.FC = () => {
       walletName,
       hardware,
       currency,
+      isRedirect,
     },
   } = useLocation<ILocationState>()
   const history = useHistory()
@@ -169,6 +168,10 @@ const SendPage: React.FC = () => {
         onGetVergeUtxos()
       }
     }
+
+    logEvent({
+      name: SEND_ENTERED_AMOUNT
+    })
 
     return () => {
       if (state.timer) {
@@ -345,10 +348,10 @@ const SendPage: React.FC = () => {
         chain: currency?.chain || tokenChain,
         tokenSymbol: tokenChain ? symbol : undefined,
         contractAddress,
-        isFullBalance: true
+        isFullBalance: true,
       }, {
-        force: true
-      }
+        force: true,
+      },
     )
 
     updateState({
@@ -368,9 +371,9 @@ const SendPage: React.FC = () => {
 
   const onCancel = (): void => {
     logEvent({
-      name: TRANSACTION_CANCEL,
+      name: SEND_CANCEL,
       properties: {
-        stage: 'send',
+        step: 'enter_address',
         symbol,
       },
     })
@@ -384,14 +387,6 @@ const SendPage: React.FC = () => {
 
   const openWalletsDrawer = (): void => {
     updateState({ activeDrawer: 'wallets' })
-
-    logEvent({
-      name: TRANSACTION_AUTO_FILL,
-      properties: {
-        kind: 'myWallet',
-        symbol,
-      },
-    })
   }
 
   const onClickDrawerWallet = (address: string) => (): void => {
@@ -455,7 +450,7 @@ const SendPage: React.FC = () => {
           chain,
           hardware,
           extraId: state.extraId,
-        })
+        }),
       )
     }
 
@@ -480,7 +475,7 @@ const SendPage: React.FC = () => {
     })
 
     logEvent({
-      name: TRANSACTION_START,
+      name: SEND_SELECT,
       properties: {
         fee: state.isIncludeFee ? 'incl' : 'excl',
         speed: currency?.isCustomFee ? 'fixed' : state.feeType,
@@ -504,13 +499,6 @@ const SendPage: React.FC = () => {
   const onSendAll = (): void => {
     if (state.balance) {
       updateState({ amount: `${getAvailableBalance()}`, isIncludeFee: true })
-
-      logEvent({
-        name: TRANSACTION_AUTO_FILL,
-        properties: {
-          kind: 'allFunds',
-        },
-      })
     }
   }
 
@@ -526,6 +514,10 @@ const SendPage: React.FC = () => {
     if (toLower(state.address) === toLower(state.selectedAddress)) {
       updateState({ addressErrorLabel: 'Address same as sender' })
     }
+
+    logEvent({
+      name: SEND_RECIPIENT_ADDRESS
+    })
   }
 
   const getAvailableBalance = (): number => {
@@ -596,15 +588,15 @@ const SendPage: React.FC = () => {
       isAmountErrorLabelNull: state.amountErrorLabel === null,
       isBalance: Number(state.balance) > 0,
       isFeeLoaded: !state.isFeeLoading,
-      isCurrencyBalanceErrorNull: !isCurrencyBalanceError
+      isCurrencyBalanceErrorNull: !isCurrencyBalanceError,
     }
 
     const checksPassed = validateMany(checks)
 
     if (checksPassed) {
       if (!state?.utxosList?.length) {
-        const withOuputs = checkWithOutputs(symbol)
-        return withOuputs
+        const withOutputs = checkWithOutputs(symbol)
+        return withOutputs
       }
 
       if (state.fee === 0) {
@@ -639,6 +631,10 @@ const SendPage: React.FC = () => {
     if (getFee) {
       updateState({ utxosList: getFee.utxos, fee: getFee.value })
     }
+
+    logEvent({
+      name: SEND_CHOOSE_FEE
+    })
   }
 
   const showFeeDrawer = (): void => {
@@ -656,11 +652,19 @@ const SendPage: React.FC = () => {
     state.fee > 0 &&
     state.fee > state.currencyBalance
 
+  const onBack = () => {
+    isRedirect
+      ? history.push('/wallets')
+      : history.goBack()
+  }
+
+  const backTitle = isRedirect ? 'Home' : state.backTitle
+
   return (
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle={state.backTitle} whiteLogo />
+        <Header withBack onBack={onBack} backTitle={backTitle} whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <WalletCardShared
@@ -710,8 +714,8 @@ const SendPage: React.FC = () => {
             />
           </Styles.Row>
           <Styles.Actions>
-            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
-            <Button label="Send" onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
+            <Button label='Cancel' isLight onClick={onCancel} mr={7.5} />
+            <Button label='Send' onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>

@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import background from '@assets/backgrounds/main.png'
+import background from '@assets/backgrounds/mainBgNew.png'
 
 type TLinkProps = {
   isActive?: boolean
@@ -12,30 +12,62 @@ const Container = styled.div`
   background-repeat: no-repeat;
   position: fixed;
   z-index: 2;
+  
+  &,* {
+    transition: 0.5s ease;
+  }
 `
 
 const Row = styled.div`
   padding-left: 30px;
   padding-right: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `
 
 const BalanceRow = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
 `
 
 const Balance = styled.p`
   margin: 0;
-  font-weight: 500;
   color: #ffffff;
+  font-family: Inter, sans-serif;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 34px;
+  line-height: 36px;
 `
 
-const ClockIcon = styled.div``
+const ClockIcon = styled.div`
+  opacity: 0.5;
+`
 
 const Estimated = styled.p`
   margin: 0;
-  color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-wrap: nowrap;
+  span {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    font-family: Inter, sans-serif;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 19px;
+    line-height: 25px;
+    text-align: center;
+    color: #C5EBD8;
+    &.usdSign {
+      font-family: Roboto, sans-serif;
+      margin-right: 4px;
+    }
+  }
+  
 `
 
 const TotalBalanceLabel = styled.p`
@@ -47,7 +79,11 @@ const TotalBalanceLabel = styled.p`
   user-select: none;
 `
 
-const PendingBalanceRow = styled.div``
+const PendingBalanceRow = styled.div`
+  display: flex;
+  justify-content: center;
+  transition: 0.3s ease;
+`
 
 const Bottom = styled.div`
   display: flex;
@@ -105,6 +141,7 @@ const ButtonDot = styled.div`
 `
 
 const Nav = styled.div`
+  transition: 0.3s ease;
   display: flex;
   flex-direction: row;
   align-items: center;

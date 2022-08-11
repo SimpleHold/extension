@@ -32,7 +32,7 @@ const TransactionHistory: React.FC<Props> = (props) => {
       {data === null ? (
         <Styles.TxGroup>
           <Styles.DateRow>
-            <Skeleton width={50} height={16} type="gray" isLoading />
+            <Skeleton width={50} height={16} type='gray' isLoading />
           </Styles.DateRow>
           <Transaction isLoading />
           <Transaction isLoading />
@@ -50,35 +50,35 @@ const TransactionHistory: React.FC<Props> = (props) => {
 
       {data !== null && data.length > 0
         ? data.sort(sortByDate).map((group: TAddressTxGroup) => {
-            const { date, data } = group
+          const { date, data } = group
 
-            return (
-              <Styles.TxGroup key={date}>
-                <Styles.DateRow>
-                  <Styles.TxDate>{dayjs(date).format('MMM D')}</Styles.TxDate>
-                </Styles.DateRow>
-                {data.sort(sortByDate).map((tx: TAddressTx, index) => {
-                  const { type, date, hash, amount, estimated, isPending, disabled } = tx
-                  return (
-                    <Transaction
-                      key={`${hash}/${index}`}
-                      data={{
-                        type,
-                        date,
-                        hash,
-                        amount,
-                        estimated,
-                        symbol,
-                        isPending,
-                        disabled,
-                      }}
-                      openTx={openTx(hash, disabled)}
-                    />
-                  )
-                })}
-              </Styles.TxGroup>
-            )
-          })
+          return (
+            <Styles.TxGroup key={date}>
+              <Styles.DateRow>
+                <Styles.TxDate>{dayjs(date).format('MMM D')}</Styles.TxDate>
+              </Styles.DateRow>
+              {data.sort(sortByDate).map((tx: TAddressTx, index) => {
+                const { type, date, hash, amount, estimated, isPending, disabled } = tx
+                return (
+                  <Transaction
+                    key={`${hash}/${index}`}
+                    data={{
+                      type,
+                      date,
+                      hash,
+                      amount,
+                      estimated,
+                      symbol,
+                      isPending,
+                      disabled,
+                    }}
+                    openTx={openTx(hash, disabled)}
+                  />
+                )
+              })}
+            </Styles.TxGroup>
+          )
+        })
         : null}
     </Styles.Container>
   )

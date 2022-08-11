@@ -480,7 +480,7 @@ export const addHardwareWallet = (
   }
 }
 
-export const getWalletName = (
+export const generateWalletName = (
   wallets: IWallet[],
   symbol: string,
   uuid: string,
@@ -506,6 +506,21 @@ export const getWalletName = (
 
   return symbol
 }
+
+export const getWalletName = (wallet: IWallet): string => {
+  if (wallet.walletName) {
+    return wallet.walletName
+  }
+
+  const walletsList = getWallets()
+
+  if (walletsList) {
+    const { symbol, uuid, hardware, chain, name } = wallet
+    return generateWalletName(walletsList, symbol, uuid, hardware, chain, name)
+  }
+  return ''
+}
+
 
 export const renameWallet = (uuid: string, name: string) => {
   const wallets = getWallets()
@@ -635,4 +650,13 @@ export const getFilteredWallets = (): IWallet[] => {
     return walletsList.filter(filterWallets).sort(sortWallets)
   }
   return []
+}
+
+export const getPolicyPopupStatus = (): boolean => {
+  return getItem('policyPopup') === 'show'
+}
+
+export const setPolicyPopupStatus = () => {
+  if (getItem('analytics') === 'agreed') return
+  setItem('policyPopup', 'show')
 }

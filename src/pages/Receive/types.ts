@@ -7,6 +7,7 @@ export interface ILocationState {
   symbol: string
   walletName: string
   currency: ICurrency | IToken
+  isRedirect?: boolean
 }
 
 export interface IState {

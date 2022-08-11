@@ -15,12 +15,12 @@ import Spinner from '@components/Spinner'
 import HistoryFilterDrawer from '@drawers/HistoryFilter'
 
 // Utils
-import { getWalletName, getWallets, IWallet } from '@utils/wallet'
+import { generateWalletName, getWallets, IWallet } from '@utils/wallet'
 import { getFullHistory, groupHistory, THistoryTxGroup } from '@utils/txs'
 import { toLower } from '@utils/format'
 import { checkOneOfExist, getItem } from '@utils/storage'
-import { updateTxsHistory } from 'utils/history'
-
+import { updateTxsHistory } from '@utils/history'
+import { checkIfTimePassed } from '@utils/dates'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -32,7 +32,6 @@ import { TCurrency } from '@drawers/HistoryFilter/types'
 
 // Styles
 import Styles from './styles'
-import { checkIfTimePassed } from 'utils/dates'
 
 const initialState: IState = {
   activeDrawer: null,
@@ -73,27 +72,6 @@ const TxHistory: React.FC = () => {
     if (wallets?.length) {
       updateState({ wallets })
     }
-  }
-
-  const filterWallets = (wallet: IWallet): IWallet => {
-    const getCurrencies = getItem('txHistoryCurrencies')
-    const getAddresses = getItem('txHistoryAddresses')
-
-    if (getCurrencies?.length && !getAddresses) {
-      return JSON.parse(getCurrencies).find(
-        (currency: TCurrency) => toLower(currency.symbol) === toLower(wallet.symbol)
-      )
-    }
-
-    if (getAddresses?.length) {
-      return JSON.parse(getAddresses).find(
-        (item: IWallet) =>
-          toLower(item.symbol) === toLower(wallet.symbol) &&
-          toLower(item.address) === toLower(wallet.address)
-      )
-    }
-
-    return wallet
   }
 
   const getSavedHistory = () => {
@@ -144,7 +122,7 @@ const TxHistory: React.FC = () => {
           return walletName
         }
 
-        return getWalletName(walletsList, symbol, uuid, hardware, chain, name)
+        return generateWalletName(walletsList, symbol, uuid, hardware, chain, name)
       }
     }
 

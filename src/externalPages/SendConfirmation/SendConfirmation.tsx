@@ -47,12 +47,18 @@ import { logEvent } from '@utils/amplitude'
 
 // Hooks
 import useState from '@hooks/useState'
+import useDebounce from '@hooks/useDebounce'
 
 // Assets
 import errorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
 
 // Config
-import { TRANSACTION_CANCEL, TRANSACTION_CONFIRM, TRANSACTION_PASSWORD } from '@config/events'
+import {
+  SEND_CANCEL,
+  SEND_CONFIRMED,
+  SEND_SUCCESS,
+  SEND_PASS,
+} from '@config/events'
 
 // Types
 import { IState, TLedgerTxParams } from './types'
@@ -72,6 +78,7 @@ const initialState: IState = {
   ledgerTransport: null,
   ledgerDrawerState: null,
   isDraggable: false,
+  logCaptured: false
 }
 
 const SendConfirmation: React.FC = () => {
@@ -93,6 +100,16 @@ const SendConfirmation: React.FC = () => {
       createLedgerTx()
     }
   }, [state.ledgerTransport])
+
+  const debouncedPassword = useDebounce(state.password, 3000)
+
+  React.useEffect(() => {
+    if (debouncedPassword) {
+      logEvent({
+        name: SEND_PASS
+      })
+    }
+  }, [])
 
   const createLedgerTx = async (): Promise<void> => {
     try {
@@ -218,9 +235,9 @@ const SendConfirmation: React.FC = () => {
     }
 
     logEvent({
-      name: TRANSACTION_CANCEL,
+      name: SEND_CANCEL,
       properties: {
-        stage: 'confirm',
+        step: 'send_confirm',
       },
     })
 
@@ -236,11 +253,14 @@ const SendConfirmation: React.FC = () => {
       updateState({ activeDrawer: null })
     }
 
+    if (!state.logCaptured) {
+      logEvent({
+        name: SEND_PASS
+      })
+    }
+
     logEvent({
-      name: TRANSACTION_CONFIRM,
-      properties: {
-        stage: state.props?.hardware ? 'hConfirmation' : 'confirmation',
-      },
+      name: SEND_CONFIRMED,
     })
 
     if (state.props?.hardware) {
@@ -339,6 +359,11 @@ const SendConfirmation: React.FC = () => {
       }
 
       if (getTxId) {
+
+        logEvent({
+          name: SEND_SUCCESS
+        })
+
         return updateState({
           activeDrawer: 'success',
           transactionLink: getTransactionLink(getTxId, symbol, chain),
@@ -353,9 +378,9 @@ const SendConfirmation: React.FC = () => {
     updateState({ activeDrawer: null })
 
     logEvent({
-      name: TRANSACTION_CANCEL,
+      name: SEND_CANCEL,
       properties: {
-        stage: 'password',
+        step: 'password',
       },
     })
 
@@ -407,12 +432,6 @@ const SendConfirmation: React.FC = () => {
         extraId,
       } = state.props
 
-      logEvent({
-        name: TRANSACTION_PASSWORD,
-        properties: {
-          symbol,
-        },
-      })
 
       const decryptBackup = decrypt(backup, state.password)
 

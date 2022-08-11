@@ -18,12 +18,12 @@ import updateTxsHistory from '@utils/history'
 // Config
 import { getSharedToken, getToken } from '@config/tokens'
 import { getCurrency } from '@config/currencies'
-import { BALANCE_CHANGED, ADDRESS_WATCH } from '@config/events'
+import { GENERAL_BALANCE_CHANGE, MAIN_SELECT_WALLET } from '@config/events'
 
 // Assets
 import ledgerLogo from '@assets/icons/ledger.svg'
 import trezorLogo from '@assets/icons/trezor.svg'
-import clockIcon from '@assets/icons/clock.svg'
+import clockIcon from '@assets/icons/clockIconPending.svg'
 
 // Styles
 import Styles from './styles'
@@ -49,6 +49,7 @@ interface Props {
   uuid: string
   hardware?: THardware
   isNotActivated?: boolean
+  isRedirect?: string
 }
 
 const emptyData = {
@@ -74,7 +75,8 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     walletName,
     uuid,
     hardware,
-    isNotActivated
+    isNotActivated,
+    isRedirect
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
@@ -117,17 +119,20 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     sumEstimated && sumEstimated({ uuid, symbol, amount: balance_usd || 0 })
 
     const precision = getBalancePrecision(symbol)
-    const isBalanceChanged = getBalanceDiff(savedData.balance, balance || 0, precision)
+    const balanceDiff = getBalanceDiff(savedData.balance, balance || 0, precision)
     const isPendingStatusChanged = !!savedData.pending !== !!pending
 
-    if (isBalanceChanged || isPendingStatusChanged) {
+    if (balanceDiff || isPendingStatusChanged) {
 
-      logEvent({
-        name: BALANCE_CHANGED,
-        properties: {
-          symbol
-        }
-      })
+      if (balanceDiff) {
+        logEvent({
+          name: GENERAL_BALANCE_CHANGE,
+          properties: {
+            symbol,
+            dynamics: balanceDiff > 0 ? "pos" : "neg"
+          }
+        })
+      }
 
       await updateTxsHistory({ updateSingleWallet: walletData })
     }
@@ -139,7 +144,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     }
 
     logEvent({
-      name: ADDRESS_WATCH,
+      name: MAIN_SELECT_WALLET,
       properties: {
         symbol
       }
@@ -156,12 +161,13 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
       isHidden,
       walletName,
       uuid,
-      hardware
+      hardware,
+      isRedirect
     })
   }
 
   return (
-    <Styles.Wrapper onClick={openWallet}>
+    <Styles.Wrapper onClick={openWallet} className={'walletCard'}>
       <Styles.Container className={'container'}>
         <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
         <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>
@@ -192,14 +198,14 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
             <Styles.Balances>
               <Skeleton width={110} height={16} type='gray' br={4} isLoading={balance === null}>
                 <Styles.BalanceRow>
-                  {pendingBalance !== 0 ? (
-                    <Styles.PendingIcon>
-                      <SVG src={clockIcon} width={12} height={12} />
-                    </Styles.PendingIcon>
-                  ) : null}
                   <Styles.Balance>
                     {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
                   </Styles.Balance>
+                  {pendingBalance !== 0 ? (
+                    <Styles.PendingIcon>
+                      <SVG src={clockIcon} width={16} height={16} />
+                    </Styles.PendingIcon>
+                  ) : null}
                 </Styles.BalanceRow>
               </Skeleton>
               <Skeleton

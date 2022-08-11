@@ -10,7 +10,7 @@ export interface IState {
   totalBalance: null | number
   totalEstimated: null | number
   pendingBalance: null | number
-  activeDrawer: null | 'filters'
+  activeDrawer: null | 'filters' | 'select_currency'
   scrollPosition: number
 }
 

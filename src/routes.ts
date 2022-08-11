@@ -40,7 +40,7 @@ const routers: RouteProps[] = [
   {
     path: '/welcome',
     component: Loadable({
-      loader: () => import('@pages/Welcome'),
+      loader: () => import('@pages/WelcomeNew'),
       loading: () => null,
     }),
   },
@@ -86,13 +86,13 @@ const routers: RouteProps[] = [
       loading: () => null,
     }),
   },
-  {
-    path: '/onboard',
-    component: Loadable({
-      loader: () => import('@pages/OnBoard'),
-      loading: () => null,
-    }),
-  },
+  // {
+  //   path: '/onboard',
+  //   component: Loadable({
+  //     loader: () => import('@pages/OnBoard'),
+  //     loading: () => null,
+  //   }),
+  // },
   {
     path: '/lock',
     component: Loadable({

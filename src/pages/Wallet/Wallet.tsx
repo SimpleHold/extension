@@ -26,9 +26,9 @@ import {
 import {
   renameWallet,
   toggleVisibleWallet,
-  getWalletName,
+  generateWalletName,
   getWallets,
-  activateAddress, getWalletChain
+  activateAddress, getWalletChain, getWalletName,
 } from '@utils/wallet'
 import { activateWallet, getBalance } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
@@ -52,7 +52,7 @@ import { receiveAllPendingTxs } from '@utils/currencies/nano'
 // Config
 import { getCurrency } from '@config/currencies'
 import { getSharedToken, getToken } from '@config/tokens'
-import { ADDRESS_ACTION } from '@config/events'
+import { REFRESH_BALANCE } from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -80,13 +80,14 @@ const initialState: IState = {
   confirmDrawerType: null,
   isDrawerButtonLoading: false,
   isNotActivated: false,
-  address: ''
+  address: '',
 }
 
 const WalletPage: React.FC = () => {
   const {
     state: locationState,
     state: {
+      isRedirect,
       symbol,
       uuid,
       chain,
@@ -194,11 +195,29 @@ const WalletPage: React.FC = () => {
 
       if (findWallet) {
         const walletName =
-          findWallet.walletName || getWalletName(walletsList, symbol, uuid, hardware, chain, name)
+          findWallet.walletName || generateWalletName(walletsList, symbol, uuid, hardware, chain, name)
 
         updateState({ walletName })
       }
     }
+  }
+
+  const openPage = (url: string, stateData: {[key: string]: any} = {}) => () => {
+
+    const sharedToken = getSharedToken(symbol, chain)
+    const walletName = getWalletName({uuid, symbol, hardware, chain, name, address: state.address})
+
+    history.push(url, {
+      ...locationState,
+      walletName: state.walletName || walletName,
+      tokenChain: chain,
+      chain: sharedToken ? chain : currency?.chain,
+      currency,
+      address: state.address,
+      decimals: sharedToken ? sharedToken.decimals : decimals,
+      isRedirect: !!isRedirect,
+      ...stateData
+    })
   }
 
   const loadBalance = async (): Promise<void> => {
@@ -294,27 +313,6 @@ const WalletPage: React.FC = () => {
     }
   }
 
-  const openPage = (url: string) => () => {
-    logEvent({
-      name: ADDRESS_ACTION,
-      properties: {
-        addressAction: url === '/send' ? 'send' : 'receive'
-      }
-    })
-
-    const sharedToken = getSharedToken(symbol, chain)
-
-    history.push(url, {
-      ...locationState,
-      walletName: state.walletName,
-      tokenChain: chain,
-      chain: sharedToken ? chain : currency?.chain,
-      currency,
-      address: state.address,
-      decimals: sharedToken ? sharedToken.decimals : decimals
-    })
-  }
-
   const onSelectDropdown = (key: string) => {
     if (key === 'recoveryPhrase' || key === 'privateKey') {
       updateState({
@@ -353,10 +351,7 @@ const WalletPage: React.FC = () => {
       }
 
       logEvent({
-        name: ADDRESS_ACTION,
-        properties: {
-          addressAction: 'refreshBalance'
-        }
+        name: REFRESH_BALANCE,
       })
     }
   }
@@ -515,13 +510,6 @@ const WalletPage: React.FC = () => {
   const onRenameWallet = (walletName: string) => (): void => {
     updateState({ activeDrawer: null, walletName })
     renameWallet(uuid, walletName)
-
-    logEvent({
-      name: ADDRESS_ACTION,
-      properties: {
-        addressAction: 'renameWallet'
-      }
-    })
   }
 
   const onDownloadBackup = (): void => {
@@ -588,7 +576,7 @@ const WalletPage: React.FC = () => {
             />
 
             <WalletCard
-              openPage={openPage}
+              getOpenPage={openPage}
               symbol={symbol}
               chain={chain}
               balance={state.balance}
@@ -601,6 +589,7 @@ const WalletPage: React.FC = () => {
               onConfirmActivate={onConfirmActivate}
               hasUnreceivedTxs={hasUnreceivedTxs}
               onConfirmReceivePending={onConfirmReceivePendingTxs}
+              isRedirect={isRedirect}
             />
             {state.balance !== null && state.balance < 20 && toLower(symbol) === 'xrp' ? (
               <Warning

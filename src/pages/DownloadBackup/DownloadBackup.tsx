@@ -11,11 +11,11 @@ import { download as downloadBackup } from '@utils/backup'
 import { logEvent } from '@utils/amplitude'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
-import { getItem, removeItem } from '@utils/storage'
+import { getItem, removeItem, setItem } from '@utils/storage'
 
 // Config
 import {
-  START_BACKUP,
+  ONBOARDING_BACKUP,
   ADD_ADDRESS_GENERATE_BACKUP,
   ADD_ADDRESS_IMPORT_BACKUP,
 } from '@config/events'
@@ -60,13 +60,14 @@ const DownloadBackup: React.FC = () => {
       })
     } else {
       logEvent({
-        name: START_BACKUP,
+        name: ONBOARDING_BACKUP,
       })
     }
     const backup = getItem('backup')
 
     if (backup) {
       downloadBackup(backup)
+      setItem("initialBackup", "downloaded")
       removeItem('backupStatus')
       history.replace('/wallets')
     }
