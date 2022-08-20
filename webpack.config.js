@@ -233,7 +233,7 @@ const config = {
           maxSize: 3500 * 1000,
           chunks(chunk) {
             return (
-              chunk.name !== 'background' &&
+              !(chunk.name === 'background' && targetBrowser !== 'firefox') &&
               chunk.name !== 'contentScript' &&
               chunk.name !== 'trezor' &&
               chunk.name !== 'inpage' &&
