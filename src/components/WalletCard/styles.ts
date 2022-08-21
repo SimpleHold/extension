@@ -66,7 +66,7 @@ const WalletName = styled.p`
   overflow: hidden;
   white-space: nowrap;
   font-style: normal;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 16px;
   line-height: 19px;
   display: flex;

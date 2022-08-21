@@ -38,7 +38,7 @@ const Balance = styled.p`
   color: #ffffff;
   font-family: Inter, sans-serif;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 500;
   font-size: 34px;
   line-height: 36px;
 `
@@ -57,7 +57,7 @@ const Estimated = styled.p`
     justify-content: center;
     font-family: Inter, sans-serif;
     font-style: normal;
-    font-weight: 600;
+    font-weight: 500;
     font-size: 19px;
     line-height: 25px;
     text-align: center;

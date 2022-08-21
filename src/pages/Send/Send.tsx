@@ -377,8 +377,15 @@ const SendPage: React.FC = () => {
         symbol,
       },
     })
+    onGoBack()
+  }
 
-    history.goBack()
+  const onGoBack = () => {
+    if (isRedirect) {
+      history.push("/wallets")
+    } else {
+      history.goBack()
+    }
   }
 
   const onCloseDrawer = (): void => {
