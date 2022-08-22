@@ -8,14 +8,15 @@ import {
   getEtherNetworkFee,
   getThetaNetworkFee,
   getNetworkFee as getNetworkFeeRequest,
-  getCustomFee, requestBalance
+  getCustomFee, requestBalance,
 } from '@utils/api'
 import { toLower } from '@utils/format'
 import { getLatestBalance, getWalletChain, updateBalance } from '@utils/wallet'
 import { checkIfTimePassed } from '@utils/dates'
+import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey } from '@utils/amplitude'
 
 // Types
-import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData } from './types'
+import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData, TCreateInternalTxProps } from './types'
 import { TCustomFee, TGetBalanceOptions, TGetBalanceWalletProps } from '@utils/api/types'
 
 // Currencies
@@ -45,12 +46,12 @@ const emptyData = {
   balance_usd: 0,
   balance_btc: 0,
   pending: 0,
-  pending_btc: 0
+  pending_btc: 0,
 }
 
 const defaultOptions = {
   responseTimeLimit: 8000,
-  requestDebounceTime: { seconds: 20 }
+  requestDebounceTime: { seconds: 20 },
 }
 
 export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBalanceOptions = {}) => {
@@ -77,7 +78,7 @@ export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBa
       .then(data => {
         fetchedData = data
         // if (!data.isBalanceError) {
-          updateBalance({ address, symbol, ...data })
+        updateBalance({ address, symbol, ...data })
         // }
       })
 
@@ -195,36 +196,46 @@ export const activateWallet = async (chain: string, publicKey: string, privateKe
 
 export const generate = async (
   symbol: string,
-  chain?: string
+  chain?: string,
 ): Promise<TGenerateAddress | null> => {
-  if (isEthereumLike(symbol, chain)) {
-    return ethereumLike.generateAddress()
+  try {
+    if (isEthereumLike(symbol, chain)) {
+      return ethereumLike.generateAddress()
+    }
+
+    const provider = getProvider(symbol)
+
+    if (provider?.generateWallet) {
+      return await provider.generateWallet()
+    }
+
+    return bitcoinLike.generateWallet(symbol)
+  } catch (err) {
+    logErrorGenerateAddress(`${err}`, symbol, chain)
+    return null
   }
-
-  const provider = getProvider(symbol)
-
-  if (provider?.generateWallet) {
-    return await provider.generateWallet()
-  }
-
-  return bitcoinLike.generateWallet(symbol)
 }
 
 export const importPrivateKey = async (
   symbol: string,
   privateKey: string,
-  chain?: string
+  chain?: string,
 ): Promise<string | null> => {
-  const provider = getProvider(symbol)
+  try {
+    const provider = getProvider(symbol)
 
-  if (provider?.importPrivateKey) {
-    return await provider.importPrivateKey(privateKey)
-  }
+    if (provider?.importPrivateKey) {
+      return await provider.importPrivateKey(privateKey)
+    }
 
-  if (isEthereumLike(symbol, chain)) {
-    return ethereumLike.importPrivateKey(privateKey)
-  } else {
-    return bitcoinLike.importPrivateKey(privateKey, symbol)
+    if (isEthereumLike(symbol, chain)) {
+      return ethereumLike.importPrivateKey(privateKey)
+    } else {
+      return bitcoinLike.importPrivateKey(privateKey, symbol)
+    }
+  } catch (err) {
+    logErrorImportPrivateKey(`${err}`, symbol, chain)
+    return null
   }
 }
 
@@ -260,7 +271,7 @@ export const createTransaction = async ({
                                           nonce,
                                           contractAddress,
                                           xrpTxData,
-                                          extraId
+                                          extraId,
                                         }: TCreateTransactionProps): Promise<string | null> => {
   try {
     if (vechain.coins.indexOf(symbol) !== -1) {
@@ -305,7 +316,7 @@ export const createTransaction = async ({
             gas,
             nonce,
             chainId,
-            contractAddress: getContractAddress
+            contractAddress: getContractAddress,
           })
         }
         return await ethereumLike.createTransaction(
@@ -315,7 +326,7 @@ export const createTransaction = async ({
           chainId,
           gasPrice,
           nonce,
-          privateKey
+          privateKey,
         )
       }
       return null
@@ -341,12 +352,13 @@ export const createTransaction = async ({
         networkFee,
         from,
         privateKey,
-        symbol
+        symbol,
       )
     }
 
     return null
-  } catch {
+  } catch (err) {
+    logErrorCreateTx(`${err}`, symbol, tokenChain)
     return null
   }
 }
@@ -359,7 +371,7 @@ export const getNetworkFee = async ({
                                       amount,
                                       tokenChain,
                                       btcLikeParams,
-                                      ethLikeParams
+                                      ethLikeParams,
                                     }: IGetFeeParams): Promise<TGetFeeData | null> => {
   if (btcLikeParams) {
     const { outputs, customFee } = btcLikeParams
@@ -397,7 +409,7 @@ export const getNetworkFee = async ({
     const networkFee = await toncoin.getNetworkFee(addressFrom, addressTo, +amount)
 
     return {
-      networkFee
+      networkFee,
     }
   }
 
@@ -414,7 +426,7 @@ export const getNetworkFee = async ({
       tokenChain || chain,
       tokenChain ? symbol : undefined,
       contractAddress,
-      decimals
+      decimals,
     )
   }
 
@@ -438,7 +450,7 @@ export const formatUnit = (
   value: string | number,
   type: 'from' | 'to',
   chain?: string,
-  unit?: string
+  unit?: string,
 ): string | number => {
   try {
     const provider = getProvider(symbol)
@@ -468,7 +480,7 @@ export const getExplorerLink = (
   symbol: string,
   chain: string,
   tokenChain?: string,
-  contractAddress?: string
+  contractAddress?: string,
 ) => {
   if (isEthereumLike(symbol, tokenChain)) {
     return ethereumLike.getExplorerLink(address, symbol, tokenChain, contractAddress)
@@ -487,7 +499,7 @@ export const getTransactionLink = (
   hash: string,
   symbol: string,
   chain: string,
-  tokenChain?: string
+  tokenChain?: string,
 ): string => {
   if (isEthereumLike(symbol, tokenChain)) {
     return ethereumLike.getTransactionLink(hash, chain, tokenChain)
@@ -521,7 +533,7 @@ export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string
 
 export const importRecoveryPhrase = async (
   symbol: string,
-  recoveryPhrase: string
+  recoveryPhrase: string,
 ): Promise<TGenerateAddress | null> => {
   try {
     const provider = getProvider(symbol)
@@ -554,10 +566,8 @@ export const checkWithOutputs = (symbol: string): boolean => {
   try {
     const provider = getProvider(symbol)
 
-    if (provider?.isWithOutputs || bitcoinLike.coins.indexOf(symbol) !== -1) {
-      return true
-    }
-    return false
+    return provider?.isWithOutputs || bitcoinLike.coins.indexOf(symbol) !== -1;
+
   } catch {
     return false
   }
@@ -615,16 +625,17 @@ export const checkIsInternalTx = (symbol: string): boolean => {
   return !!provider?.isInternalTx
 }
 
-export const createInternalTx = async (
-  symbol: string,
-  addressFrom: string,
-  addressTo: string,
-  amount: number,
-  privateKey: string,
-  networkFee: number,
-  outputs?: UnspentOutput[],
-  extraId?: string
-): Promise<string | null> => {
+export const createInternalTx = async ({
+                                         symbol,
+                                         addressFrom,
+                                         addressTo,
+                                         amount,
+                                         privateKey,
+                                         networkFee,
+                                         outputs,
+                                         extraId,
+                                         tokenChain,
+                                       }: TCreateInternalTxProps): Promise<string | null> => {
   try {
     const provider = getProvider(symbol)
 
@@ -637,12 +648,13 @@ export const createInternalTx = async (
         privateKey,
         networkFee,
         outputs,
-        extraId
+        extraId,
       })
     }
 
     return null
-  } catch {
+  } catch (err) {
+    logErrorCreateTx(`${err}`, symbol, tokenChain)
     return null
   }
 }

@@ -54,3 +54,7 @@ export const SETTINGS_TOGGLE_PASSCODE = 'settings_toggle_passcode'
 export const START_RESTORE = 'start_restore'
 export const START_RESTORE_CONFIRM = 'start_restore_confirm'
 export const START_RESTORE_PASSWORD = 'start_restore_password'
+
+export const ERROR_CREATE_TX = 'error_create_tx'
+export const ERROR_GENERATE_ADDRESS = 'error_generate_address'
+export const ERROR_IMPORT_PRIVATE_KEY = 'error_import_private_key'

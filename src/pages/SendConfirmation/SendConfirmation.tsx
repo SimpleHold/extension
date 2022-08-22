@@ -58,7 +58,7 @@ const initialState: IState = {
   transactionLink: '',
   isButtonLoading: false,
   failText: '',
-  logCaptured: false
+  logCaptured: false,
 }
 
 const SendConfirmation: React.FC = () => {
@@ -91,7 +91,7 @@ const SendConfirmation: React.FC = () => {
     if (debouncedPassword) {
       updateState({ logCaptured: true })
       logEvent({
-        name: SEND_PASS
+        name: SEND_PASS,
       })
     }
   }, [debouncedPassword])
@@ -99,7 +99,7 @@ const SendConfirmation: React.FC = () => {
   const onConfirmDrawer = async (): Promise<void> => {
     if (!state.logCaptured) {
       logEvent({
-        name: SEND_PASS
+        name: SEND_PASS,
       })
     }
 
@@ -116,7 +116,7 @@ const SendConfirmation: React.FC = () => {
       const decryptBackup = decrypt(backup, state.password)
       if (decryptBackup) {
         const findWallet: IWallet | null = JSON.parse(decryptBackup).wallets.find(
-          (wallet: IWallet) => wallet.address === addressFrom
+          (wallet: IWallet) => wallet.address === addressFrom,
         )
 
         if (findWallet?.privateKey) {
@@ -130,12 +130,12 @@ const SendConfirmation: React.FC = () => {
 
           const ethTxData = isEthereumLike(symbol, tokenChain)
             ? await getWeb3TxParams(
-                addressFrom,
-                addressTo,
-                `${parseAmount}`,
-                chain || tokenChain,
-                contractAddress
-              )
+              addressFrom,
+              addressTo,
+              `${parseAmount}`,
+              chain || tokenChain,
+              contractAddress,
+            )
             : {}
 
           const xrpTxData = symbol === 'xrp' ? await getXrpTxParams(addressFrom) : {}
@@ -154,20 +154,22 @@ const SendConfirmation: React.FC = () => {
           const isInternalTx = checkIsInternalTx(symbol)
 
           if (isInternalTx) {
-            const createTx = await createInternalTx(
-              symbol,
-              addressFrom,
-              addressTo,
-              getAmount(),
-              findWallet.privateKey,
-              parseNetworkFee,
-              outputs,
-              extraId
+            const createTx = await createInternalTx({
+                symbol,
+                addressFrom,
+                addressTo,
+                amount: getAmount(),
+                privateKey: findWallet.privateKey,
+                networkFee: parseNetworkFee,
+                outputs,
+                extraId,
+                tokenChain,
+              },
             )
 
             if (createTx) {
               logEvent({
-                name: SEND_SUCCESS
+                name: SEND_SUCCESS,
               })
 
               return updateState({
@@ -310,7 +312,7 @@ const SendConfirmation: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle="Send" onBack={history.goBack} whiteLogo />
+        <Header withBack backTitle='Send' onBack={history.goBack} whiteLogo />
         <Styles.Body>
           <SendConfirmShared
             amount={getAmount()}
@@ -329,9 +331,9 @@ const SendConfirmation: React.FC = () => {
       <ConfirmDrawer
         isActive={state.activeDrawer === 'confirm'}
         onClose={onCloseConfirmDrawer}
-        title="Confirm the sending"
-        inputLabel="Enter password"
-        textInputType="password"
+        title='Confirm the sending'
+        inputLabel='Enter password'
+        textInputType='password'
         textInputValue={state.password}
         inputErrorLabel={state.inputErrorLabel}
         onChangeText={setPassword}

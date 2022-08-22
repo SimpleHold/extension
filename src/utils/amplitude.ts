@@ -7,6 +7,8 @@ import config from "@config/index"
 import { getItem } from '@utils/storage'
 import { validateWallet } from '@utils/validate'
 import { parseWalletsData } from '@utils/wallet'
+import { ERROR_CREATE_TX, ERROR_GENERATE_ADDRESS, ERROR_IMPORT_PRIVATE_KEY } from 'config/events'
+import { prop } from 'vergejs-lib/types/payments/lazy'
 
 interface IEvent {
   name: string
@@ -48,4 +50,60 @@ export const setUserAddressesProperties = () => {
     const walletsData = parseWalletsData(wallets)
     setUserProperties(walletsData)
   }
+}
+
+
+// Log errors
+export const logErrorCreateTx = (
+  error: string,
+  symbol: string,
+  tokenChain?: string,
+) => {
+
+  const properties = {
+    error,
+    symbol,
+    ...(tokenChain && {tokenChain})
+  }
+
+  logEvent({
+    name: ERROR_CREATE_TX,
+    properties
+  })
+}
+
+export const logErrorGenerateAddress = (
+  error: string,
+  symbol: string,
+  chain?: string,
+) => {
+
+  const properties = {
+    error,
+    symbol,
+    ...(chain && {chain})
+  }
+
+  logEvent({
+    name: ERROR_GENERATE_ADDRESS,
+    properties
+  })
+}
+
+export const logErrorImportPrivateKey = (
+  error: string,
+  symbol: string,
+  chain?: string,
+) => {
+
+  const properties = {
+    error,
+    symbol,
+    ...(chain && {chain})
+  }
+
+  logEvent({
+    name: ERROR_IMPORT_PRIVATE_KEY,
+    properties
+  })
 }

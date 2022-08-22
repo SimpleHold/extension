@@ -39,6 +39,18 @@ export type TCreateTransactionProps = {
   extraId?: string
 }
 
+export type TCreateInternalTxProps = {
+  symbol: string,
+  addressFrom: string,
+  addressTo: string,
+  amount: number,
+  privateKey: string,
+  networkFee: number,
+  outputs?: UnspentOutput[],
+  extraId?: string,
+  tokenChain?: string
+}
+
 export interface IGetFeeParams {
   symbol: string
   addressFrom: string
