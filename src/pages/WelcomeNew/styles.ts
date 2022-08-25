@@ -87,8 +87,8 @@ const Row = styled.div`
 `
 
 const Illustrate = styled.img`
-  width: 162px;
-  height: 162px;
+  width: 230px;
+  height: 200px;
 `
 
 const Title = styled.p`

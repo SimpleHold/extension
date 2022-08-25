@@ -11,7 +11,7 @@ import { GENERAL_FIRST_ENTER, ONBOARDING_CREATE_NEW_WALLET } from '@config/event
 import config from 'config'
 
 // Assets
-import illustrate from '@assets/illustrate/onboardingIllustration.svg'
+import illustrate from '@assets/illustrate/onboardingIllustrate.png'
 
 // SwapSpace
 import swapSpaceIllustrate from '@assets/theme/swapspace/1.svg'
@@ -147,7 +147,6 @@ const WelcomeNew: React.FC = () => {
       <Styles.Container className='container'>
         <Styles.Row>
           <Styles.Illustrate
-            className='slide'
             src={themes[theme][0].image}
             alt='illustrate'
           />

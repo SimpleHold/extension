@@ -74,17 +74,14 @@ const App: React.FC = () => {
 
   const initAmplitude = (): void => {
     const clientId = getItem('clientId') || v4()
-
     init(config.apiKey.amplitude, clientId)
 
     if (!getItem('clientId')) {
       setItem('clientId', clientId)
-
       logEvent({
         name: GENERAL_FIRST_ENTER
       })
     }
-
     logEvent({
       name: GENERAL_START_SESSION
     })

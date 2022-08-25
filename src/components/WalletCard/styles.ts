@@ -24,15 +24,20 @@ const Wrapper = styled.div`
 `
 
 const Container = styled.div`
-  background-color: #ffffff;
-  border-radius: 16px;
-  margin: 0 0 6px 0;
   transition: all 0.2s ease-in-out;
+  margin: 0 0 6px 0;
+  padding: 10px 20px 0;
+`
+
+const Card = styled.div`
+  background-color: #ffffff;
+  border-radius: 16px 16px 0 0;
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 20px;
   user-select: none;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #F3F3F3;
 `
 
 const Row = styled.div`
@@ -154,6 +159,7 @@ const AddressRow = styled.div`
 const Styles = {
   Wrapper,
   Container,
+  Card,
   Row,
   AddressInfo,
   CurrencyInfo,
@@ -167,7 +173,7 @@ const Styles = {
   Estimated,
   ActivateBlock,
   ActivateLabel,
-  AddressRow
+  AddressRow,
 }
 
 export default Styles
