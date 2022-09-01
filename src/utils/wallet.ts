@@ -196,6 +196,17 @@ export const getWallets = (options: TGetWalletsOptions = {}): IWallet[] | null =
   }
 }
 
+export const getSingleWallet = (address: string, symbol: string, wallets?: IWallet[] | null) => {
+  if (!wallets) {
+    wallets = getWallets()
+  }
+
+  return wallets?.find(
+    (wallet: IWallet) =>
+      toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol),
+  )
+}
+
 export const getBalancePrecision = (symbol: string): number | undefined => {
   const precisions: TBalancePrecisions = {
     vtho: 3,
@@ -209,16 +220,13 @@ export const getBalanceDiff = (latestBalance: number | null, balance: number, pr
   if (latestBalance === null && formatNew) {
     return formatNew
   }
-  return formatLatest - formatNew
+  return formatNew - formatLatest
 }
 
 export const updateBalance = (data: TBalanceUpdate, precision?: number): void => {
   const { address, symbol, balance, balance_btc, balance_usd, pending, pending_btc } = data
   const wallets = getWallets()
-  const findWallet = wallets?.find(
-    (wallet: IWallet) =>
-      toLower(wallet.address) === toLower(address) && toLower(wallet.symbol) === toLower(symbol),
-  )
+  const findWallet = getSingleWallet(address, symbol, wallets)
 
   if (findWallet) {
     findWallet.walletPendingStatus = !!pending
@@ -250,7 +258,7 @@ export const updateWalletsBalances = async (wallets: IWallet[]) => {
   return await Promise.all(queue)
 }
 
-export const getLatestBalance = (address: string, chain?: string, symbol?: string): TBalanceData => {
+export const getLatestBalance = (address: string, symbol: string): TBalanceData => {
   const wallets = getWallets()
 
   let data: TBalanceData = {
@@ -263,12 +271,7 @@ export const getLatestBalance = (address: string, chain?: string, symbol?: strin
   }
 
   if (wallets) {
-    const findWallet = wallets.find(
-      (wallet: IWallet) =>
-        toLower(wallet.address) === toLower(address)
-        && toLower(wallet.chain) === toLower(chain)
-        && toLower(wallet.symbol) === toLower(symbol),
-    )
+    const findWallet = getSingleWallet(address, symbol, wallets)
 
     if (findWallet) {
       if (findWallet.balance !== undefined) data.balance = findWallet.balance
@@ -650,13 +653,4 @@ export const getFilteredWallets = (): IWallet[] => {
     return walletsList.filter(filterWallets).sort(sortWallets)
   }
   return []
-}
-
-export const getPolicyPopupStatus = (): boolean => {
-  return getItem('policyPopup') === 'show'
-}
-
-export const setPolicyPopupStatus = () => {
-  if (getItem('analytics') === 'agreed') return
-  setItem('policyPopup', 'show')
 }

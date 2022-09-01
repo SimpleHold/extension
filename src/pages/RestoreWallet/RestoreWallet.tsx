@@ -4,7 +4,6 @@ import { useHistory } from 'react-router-dom'
 // Components
 import Header from '@components/Header'
 import Button from '@components/Button'
-import AgreeTerms from '@components/AgreeTerms'
 
 // Shared
 import RestoreWalletShared from '@shared/RestoreWallet'
@@ -19,6 +18,7 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { validate as validateBackup } from '@utils/backup'
 import { setItem } from '@utils/storage'
+import { toLower } from '@utils/format'
 
 // Config
 import { START_RESTORE_CONFIRM, START_RESTORE_PASSWORD } from '@config/events'
@@ -31,7 +31,6 @@ import { IState } from './types'
 
 // Styles
 import Styles from './styles'
-import { toLower } from 'utils/format'
 
 const initialState: IState = {
   isInvalidFile: false,
@@ -105,10 +104,6 @@ const RestoreWallet: React.FC = () => {
     updateState({ activeDrawer: null })
   }
 
-  const toggleAgreed = (): void => {
-    updateState({ isAgreed: !state.isAgreed })
-  }
-
   const setPassword = (password: string): void => {
     updateState({ password })
   }
@@ -128,7 +123,6 @@ const RestoreWallet: React.FC = () => {
               onDrop={onDrop}
             />
 
-            <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
           </Styles.Row>
           <Styles.Actions>
             <Button label="Cancel" onClick={history.goBack} isLight mr={7.5} />

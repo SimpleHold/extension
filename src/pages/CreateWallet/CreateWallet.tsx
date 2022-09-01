@@ -6,11 +6,10 @@ import Header from '@components/Header'
 import TextInput from '@components/TextInput'
 import Button from '@components/Button'
 import Link from '@components/Link'
-import AgreeTerms from '@components/AgreeTerms'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { logEvent, setUserProperties } from '@utils/amplitude'
+import { logEvent } from '@utils/amplitude'
 import { generate as generateBackup } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
 import { generate as generateAddress } from '@utils/currencies'
@@ -19,7 +18,6 @@ import { getAllCookies, Cookie } from '@utils/extension'
 import * as theta from '@utils/currencies/theta'
 
 // Config
-import { ONBOARDING_CREATE_NEW_WALLET_PASSES } from '@config/events'
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
 import { getToken } from '@config/tokens'
 
@@ -31,6 +29,7 @@ import { IState } from './types'
 
 // Styles
 import Styles from './styles'
+import { ONBOARDING_CREATE_NEW_WALLET_PASSES } from 'config/events'
 
 const initialState: IState = {
   password: '',
@@ -110,6 +109,7 @@ const Wallets: React.FC = () => {
     state.password.length < 7 || state.password !== state.confirmPassword || !state.isAgreed
 
   const onConfirm = async (): Promise<void> => {
+
     logEvent({
       name: ONBOARDING_CREATE_NEW_WALLET_PASSES,
     })
@@ -180,10 +180,6 @@ const Wallets: React.FC = () => {
     updateState({ confirmPassword })
   }
 
-  const toggleAgreed = (): void => {
-    updateState({ isAgreed: !state.isAgreed })
-  }
-
   return (
     <Styles.Wrapper>
       <Header noActions withBorder />
@@ -218,7 +214,6 @@ const Wallets: React.FC = () => {
             errorLabel={state.confirmPasswordErrorLabel}
             onBlurInput={onBlurConfirmPassword}
           />
-          <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
           <Styles.Actions>
             <Button label="Back" onClick={history.goBack} isLight mr={7.5} />
             <Button label="Confirm" onClick={onConfirm} disabled={isButtonDisabled} ml={7.5} />

@@ -1,13 +1,14 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { v4 } from 'uuid'
+import { browser, Tabs } from 'webextension-polyfill-ts'
 
 // Components
 import Header from '@components/Header'
 import Button from '@components/Button'
 
 // Config
-import { GENERAL_FIRST_ENTER, ONBOARDING_CREATE_NEW_WALLET } from '@config/events'
+import { GENERAL_FIRST_ENTER, ONBOARDING_BACKUP, ONBOARDING_CREATE_NEW_WALLET } from '@config/events'
 import config from 'config'
 
 // Assets
@@ -41,7 +42,7 @@ const themes: TTheme = {
       image: illustrate,
       title: 'Welcome to SimpleHold Wallet!',
       description:
-        'SimpleHold is your gate to cryptocurrency holdings. Store, send, receive and exchange safely and easily with SimpleHold!',
+        'Store, send, receive and exchange safely and easily with SimpleHold!',
     },
   ],
   swapspace: [
@@ -61,7 +62,7 @@ const WelcomeNew: React.FC = () => {
   const [isManualRestore, setManualRestore] = React.useState<boolean>(false)
 
   const os = detectOS()
-  const browser = detectBrowser()
+  const browserName = detectBrowser()
 
   React.useEffect(() => {
     checkManualRestore()
@@ -78,7 +79,7 @@ const WelcomeNew: React.FC = () => {
   }
 
   const checkManualRestore = () => {
-    if (((os === 'macos' && browser === 'chrome') || browser === 'firefox') && !isManualRestore) {
+    if (((os === 'macos' && browserName === 'chrome') || browserName === 'firefox') && !isManualRestore) {
       setManualRestore(true)
     }
   }
@@ -110,6 +111,10 @@ const WelcomeNew: React.FC = () => {
   }
 
   const onRestoreWallet = () => {
+    logEvent({
+      name: ONBOARDING_BACKUP,
+    })
+
     if (isManualRestore) {
       setItem('manualRestoreBackup', 'active')
       return openWebPage(getUrl('restore-backup.html'))
@@ -134,6 +139,14 @@ const WelcomeNew: React.FC = () => {
         setTheme('swapspace')
       }
     }
+  }
+
+  const openTerms = (): Promise<Tabs.Tab> => {
+    return browser.tabs.create({ url: 'https://simplehold.io/terms' })
+  }
+
+  const openPrivacy = (): Promise<Tabs.Tab> => {
+    return browser.tabs.create({ url: 'https://simplehold.io/privacy' })
   }
 
   return (
@@ -164,6 +177,12 @@ const WelcomeNew: React.FC = () => {
                 <Styles.HoverActionText className={'action-text'}>The link will open in a new tab</Styles.HoverActionText>
               ) : null}
             </Styles.RestoreButtonContainer>
+            <Styles.Text>
+              By proceeding, you agree to the<br/>
+              <Styles.TermsLink onClick={openTerms}>Terms of Use</Styles.TermsLink>
+              {' and '}
+              <Styles.TermsLink onClick={openPrivacy}>Privacy policy</Styles.TermsLink>
+            </Styles.Text>
           </Styles.Buttons>
         </Styles.Footer>
       </Styles.Container>

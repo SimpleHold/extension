@@ -11,7 +11,6 @@ export const SEND_SUCCESS = 'send_success'
 export const ONBOARDING_CREATE_NEW_WALLET = 'onboarding_create_new_wallet'
 export const ONBOARDING_CREATE_NEW_WALLET_PASSES = 'onboarding_create_new_wallet_passes'
 export const ONBOARDING_BACKUP = 'onboarding_backup'
-export const ONBOARDING_PASS = 'onboarding_pass'
 
 // Main
 export const MAIN_HOME = 'main_home'

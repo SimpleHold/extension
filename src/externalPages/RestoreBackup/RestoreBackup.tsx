@@ -6,7 +6,6 @@ import SVG from 'react-inlinesvg'
 import ExternalPageContainer from '@containers/ExternalPage'
 
 // Components
-import AgreeTerms from '@components/AgreeTerms'
 import Button from '@components/Button'
 
 // Shared
@@ -24,6 +23,7 @@ import { decrypt } from '@utils/crypto'
 import { validate as validateBackup } from '@utils/backup'
 import { setBadgeBackgroundColor, setBadgeText } from '@utils/extension'
 import { getItem, setItem, removeItem } from '@utils/storage'
+import { toLower } from '@utils/format'
 
 // Config
 import { START_RESTORE_CONFIRM, START_RESTORE_PASSWORD } from '@config/events'
@@ -39,7 +39,6 @@ import puzzleIcon from '../../assets/modalIcons/puzzle.svg'
 
 // Styles
 import Styles from './styles'
-import { toLower } from 'utils/format'
 
 const initialState: IState = {
   isAgreed: true,
@@ -127,10 +126,6 @@ const RestoreBackup: React.FC = () => {
     updateState({ activeDrawer: null })
   }
 
-  const toggleAgreed = (): void => {
-    updateState({ isAgreed: !state.isAgreed })
-  }
-
   const setPassword = (password: string): void => {
     updateState({ password })
   }
@@ -150,8 +145,6 @@ const RestoreBackup: React.FC = () => {
             isFileUploaded={state.backupData.length > 0}
             onDrop={onDrop}
           />
-
-          <AgreeTerms isAgreed={state.isAgreed} setIsAgreed={toggleAgreed} mt={20} />
 
           <Styles.Actions>
             <Button label='Cancel' onClick={onClose} isLight mr={7.5} />

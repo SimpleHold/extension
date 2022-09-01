@@ -15,7 +15,6 @@ import { getItem, removeItem, setItem } from '@utils/storage'
 
 // Config
 import {
-  ONBOARDING_BACKUP,
   ADD_ADDRESS_GENERATE_BACKUP,
   ADD_ADDRESS_IMPORT_BACKUP,
 } from '@config/events'
@@ -50,24 +49,24 @@ const DownloadBackup: React.FC = () => {
   }
 
   const downloadFile = () => {
-    if (isDownloadManually) {
-      return openWebPage(getUrl('download-backup.html'))
-    }
     if (state?.from) {
       logEvent({
         name:
           state?.from === 'privateKey' ? ADD_ADDRESS_IMPORT_BACKUP : ADD_ADDRESS_GENERATE_BACKUP,
       })
-    } else {
-      logEvent({
-        name: ONBOARDING_BACKUP,
-      })
     }
+
+    if (isDownloadManually) {
+      setTimeout(() => openWebPage(getUrl('download-backup.html')), 1000)
+    }
+
     const backup = getItem('backup')
 
     if (backup) {
       downloadBackup(backup)
-      setItem("initialBackup", "downloaded")
+      if (getItem("initialBackup")) {
+        setItem("initialBackup", "downloaded")
+      }
       removeItem('backupStatus')
       history.replace('/wallets')
     }

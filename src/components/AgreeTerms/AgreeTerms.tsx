@@ -21,7 +21,7 @@ const AgreeTerms: React.FC<Props> = (props) => {
   }
 
   return (
-    <Styles.Container onClick={setIsAgreed} mt={mt}>
+    <Styles.Container mt={mt}>
       <CheckBox value={isAgreed} onClick={setIsAgreed} />
       <Styles.Text>
         I have read and agreed with the{' '}

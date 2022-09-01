@@ -9,16 +9,13 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getBalance } from '@utils/currencies'
 import { toUpper, numberFriendly, getFormatEstimated, getFormatBalance } from '@utils/format'
-import {
-  getWalletChain, getBalanceDiff, getBalancePrecision,
-} from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
-import updateTxsHistory from '@utils/history'
+import { THardware } from '@utils/wallet'
 
 // Config
 import { getSharedToken, getToken } from '@config/tokens'
 import { getCurrency } from '@config/currencies'
-import { GENERAL_BALANCE_CHANGE, MAIN_SELECT_WALLET } from '@config/events'
+import { MAIN_SELECT_WALLET } from '@config/events'
 
 // Assets
 import ledgerLogo from '@assets/icons/ledger.svg'
@@ -30,8 +27,6 @@ import Styles from './styles'
 
 // Types
 import { TWalletAmountData } from '@pages/Wallets/types'
-import { TTxWallet } from '@utils/api/types'
-import { THardware } from '@utils/wallet'
 
 interface Props {
   address: string
@@ -91,14 +86,6 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   const [estimated, setEstimated] = React.useState<number | null>(null)
   const [pendingBalance, setPendingBalance] = React.useState<number>(0)
 
-  const walletData: TTxWallet = {
-    chain: getWalletChain(symbol, chain),
-    contractAddress,
-    symbol,
-    address,
-    tokenSymbol,
-  }
-
   React.useEffect(() => {
     loadBalance()
   }, [])
@@ -123,25 +110,6 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
 
     setEstimated(balance_usd)
     sumEstimated && sumEstimated({ uuid, symbol, amount: balance_usd || 0 })
-
-    const precision = getBalancePrecision(symbol)
-    const balanceDiff = getBalanceDiff(savedData.balance, balance || 0, precision)
-    const isPendingStatusChanged = !!savedData.pending !== !!pending
-
-    if (balanceDiff || isPendingStatusChanged) {
-
-      if (balanceDiff) {
-        logEvent({
-          name: GENERAL_BALANCE_CHANGE,
-          properties: {
-            symbol,
-            dynamics: balanceDiff > 0 ? 'pos' : 'neg',
-          },
-        })
-      }
-
-      await updateTxsHistory({ updateSingleWallet: walletData })
-    }
   }
 
   const openWallet = (): void => {

@@ -11,9 +11,16 @@ import {
   getCustomFee, requestBalance,
 } from '@utils/api'
 import { toLower } from '@utils/format'
-import { getLatestBalance, getWalletChain, updateBalance } from '@utils/wallet'
+import {
+  getBalanceDiff,
+  getBalancePrecision,
+  getLatestBalance,
+  getSingleWallet,
+  getWalletChain,
+  updateBalance,
+} from '@utils/wallet'
 import { checkIfTimePassed } from '@utils/dates'
-import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey } from '@utils/amplitude'
+import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey, logEvent } from '@utils/amplitude'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData, TCreateInternalTxProps } from './types'
@@ -40,6 +47,8 @@ import * as toncoin from '@utils/currencies/toncoin'
 import * as digibyte from '@utils/currencies/digibyte'
 import * as ravencoin from '@utils/currencies/ravencoin'
 import * as nano from '@utils/currencies/nano'
+import { GENERAL_BALANCE_CHANGE } from 'config/events'
+import updateTxsHistory from 'utils/history'
 
 const emptyData = {
   balance: 0,
@@ -62,8 +71,7 @@ export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBa
   const { force, responseTimeLimit, requestDebounceTime } = { ...defaultOptions, ...options }
 
   const getChain = getWalletChain(symbol, chain) || chain
-  const savedData = getLatestBalance(address, chain, symbol)
-
+  const savedData = getLatestBalance(address, symbol)
   const localData = { ...emptyData, ...savedData }
   const isFetchReady = force || checkIfTimePassed(savedData.lastBalanceCheck || 0, requestDebounceTime)
 
@@ -74,12 +82,39 @@ export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBa
   let timer = null
 
   try {
-    const request = requestBalance(address, getChain, tokenSymbol, contractAddress, isFullBalance)
+    const request = requestBalance(address, getChain, tokenSymbol, contractAddress, isFullBalance) // todo add axios timeout
       .then(data => {
         fetchedData = data
-        // if (!data.isBalanceError) {
+        const precision = getBalancePrecision(symbol)
+        const balanceDiff = getBalanceDiff(savedData.balance, data.balance || 0, precision)
+        const isPendingStatusChanged = !!savedData.pending !== !!data.pending
+
+        if (balanceDiff || isPendingStatusChanged) {
+          if (balanceDiff) {
+            const wallet = getSingleWallet(address, symbol)
+
+            if (wallet?.lastBalanceCheck) {
+              logEvent({
+                name: GENERAL_BALANCE_CHANGE,
+                properties: {
+                  symbol,
+                  dynamics: balanceDiff > 0 ? 'pos' : 'neg',
+                },
+              })
+            }
+          }
+
+          updateTxsHistory({
+            updateSingleWallet: {
+              chain: getWalletChain(symbol, chain),
+              address,
+              symbol,
+              tokenSymbol,
+              contractAddress,
+            },
+          })
+        }
         updateBalance({ address, symbol, ...data })
-        // }
       })
 
     const isTimer = !(force || !responseTimeLimit)
@@ -566,7 +601,7 @@ export const checkWithOutputs = (symbol: string): boolean => {
   try {
     const provider = getProvider(symbol)
 
-    return provider?.isWithOutputs || bitcoinLike.coins.indexOf(symbol) !== -1;
+    return provider?.isWithOutputs || bitcoinLike.coins.indexOf(symbol) !== -1
 
   } catch {
     return false

@@ -9,7 +9,7 @@ import routes from './routes'
 import GlobalStyles from './styles/global'
 
 import config from '@config/index'
-import { GENERAL_FIRST_ENTER, GENERAL_START_SESSION, ONBOARDING_PASS } from '@config/events'
+import { GENERAL_FIRST_ENTER, GENERAL_START_SESSION } from '@config/events'
 
 // Utils
 import { validateWallet } from '@utils/validate'
@@ -78,6 +78,7 @@ const App: React.FC = () => {
 
     if (!getItem('clientId')) {
       setItem('clientId', clientId)
+      setItem("initialBackup", "not_downloaded")
       logEvent({
         name: GENERAL_FIRST_ENTER
       })
@@ -86,10 +87,7 @@ const App: React.FC = () => {
       name: GENERAL_START_SESSION
     })
 
-    if (getItem("initialBackup")) {
-      logEvent({
-        name: ONBOARDING_PASS
-      })
+    if (getItem("initialBackup") === "downloaded") {
       removeItem("initialBackup")
     }
 
@@ -110,13 +108,6 @@ const App: React.FC = () => {
     if (getItem('isLocked')) {
       return getItem('passcode') !== null ? '/enter-passcode' : '/lock'
     }
-    // if (getItem('onBoard') !== 'passed') {
-    //   return '/onboard'
-    // }
-    //
-    // if (getItem('analytics') !== 'agreed') {
-    //   return '/analytics-data'
-    // }
 
     if (getItem('backupStatus') === 'notDownloaded') {
       return '/download-backup'

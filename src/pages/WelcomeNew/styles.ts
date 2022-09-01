@@ -75,7 +75,6 @@ const Wrapper = styled.div`
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
   height: 540px;
   margin: 60px 0 0 0;
 `
@@ -162,6 +161,7 @@ const Buttons = styled.div`
   justify-content: space-between;
   width: 100%;
   height: 108px;
+  margin-top: 4px;
 
   .button {
     border: none;
@@ -206,11 +206,33 @@ const HoverActionText = styled.span`
   opacity: 0;
   user-select: none;
   position: absolute;
-  bottom: 10px;
+  bottom: 7px;
   left: 0;
   right: 0;
   text-align: center;
   transition: 0.2s ease;
+`
+
+const Text = styled.p`
+  margin: auto;
+  font-size: 14px;
+  line-height: 16px;
+  color: #7d7e8d;
+  position: absolute;
+  bottom: 30px;
+  left: 0;
+  right: 0;
+  text-align: center;
+`
+
+const TermsLink = styled.span`
+  color: #3fbb7d;
+  transition: 200ms ease;
+
+  &:hover {
+    opacity: 0.8;
+    cursor: pointer;
+  }
 `
 
 const Styles = {
@@ -228,6 +250,8 @@ const Styles = {
   Buttons,
   RestoreButtonContainer,
   HoverActionText,
+  Text,
+  TermsLink
 }
 
 export default Styles

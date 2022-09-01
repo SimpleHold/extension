@@ -2,20 +2,19 @@ import amplitudeSDK from 'amplitude-js'
 
 // Config
 import config from "@config/index"
+import { ERROR_CREATE_TX, ERROR_GENERATE_ADDRESS, ERROR_IMPORT_PRIVATE_KEY } from '@config/events'
 
 // Utils
 import { getItem } from '@utils/storage'
 import { validateWallet } from '@utils/validate'
 import { parseWalletsData } from '@utils/wallet'
-import { ERROR_CREATE_TX, ERROR_GENERATE_ADDRESS, ERROR_IMPORT_PRIVATE_KEY } from 'config/events'
-import { prop } from 'vergejs-lib/types/payments/lazy'
 
 interface IEvent {
   name: string
   properties?: { [key: string]: string | number }
 }
 
-const isDisabled = (getItem('analytics') !== 'agreed') || config.isDevMode
+const isDisabled = config.isDevMode
 
 export const init = (apiKey: string, clientId: string) => {
   if (isDisabled) return;

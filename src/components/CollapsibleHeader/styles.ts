@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import background from '@assets/backgrounds/mainBgNew.png'
+import background from '@assets/backgrounds/main.png'
 
 type TLinkProps = {
   isActive?: boolean

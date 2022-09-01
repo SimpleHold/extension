@@ -7,7 +7,6 @@ import CollapsibleHeader from '@components/CollapsibleHeader'
 import BottomMenuBar from '@components/BottomMenuBar'
 import MainListControls from '@components/MainListControls'
 import WalletsList from '@components/WalletsList'
-import PolicyPopup from '@components/PolicyPopup'
 
 // Drawers
 import FilterWalletsDrawer from '@drawers/FilterWallets'
@@ -21,13 +20,12 @@ import useState from '@hooks/useState'
 import {
   getFilteredSum,
   getFilteredWallets,
-  getPolicyPopupStatus,
   IWallet,
   updateWalletsBalances,
 } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
-import { checkOneOfExist, clear, removeItem } from '@utils/storage'
+import { checkOneOfExist, clear } from '@utils/storage'
 
 // Config
 import {
@@ -68,7 +66,6 @@ const Wallets: React.FC = () => {
 
   const [listType, setListType] = React.useState<'send' | 'receive' | null>(null)
   const [isShowNft, setIsShowFfts] = React.useState(false)
-  const [showPolicyPopup, setShowPolicyPopup] = React.useState(false)
 
   const addToast = useToastContext()
   const walletsTop = isHeaderCollapsed ? 120 : 278
@@ -131,12 +128,6 @@ const Wallets: React.FC = () => {
       calculateBalances()
     }
   }, [state.wallets, walletsPending, walletsEstimated, walletsBalance])
-
-  React.useEffect(() => {
-    const showPopup = getPolicyPopupStatus()
-    setShowPolicyPopup(showPopup)
-    removeItem('policyPopup')
-  }, [])
 
   React.useEffect(() => {
     setTimeout(() => setIsListScrollable(isHeaderCollapsed), 500)
@@ -361,10 +352,6 @@ const Wallets: React.FC = () => {
                      onClickWallets={() => openPage('/wallets')}
                      onClickSwap={onClickSwap}
       />
-      {showPolicyPopup
-        ? <PolicyPopup onClose={() => setShowPolicyPopup(false)}/>
-        : null
-      }
     </>
   )
 }
