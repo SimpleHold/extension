@@ -15,7 +15,7 @@ import SuccessDrawer from '@drawers/Success'
 // Utils
 import { importRecoveryPhrase } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
-import { checkExistWallet, addNew as addNewWallet, IWallet, setPolicyPopupStatus } from '@utils/wallet'
+import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { getItem, setItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
@@ -91,7 +91,6 @@ const ImportRecoveryPhrase: React.FC = () => {
             (wallet: IWallet) => wallet.symbol === symbol
           ).length
           setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
-          setPolicyPopupStatus()
           return setActiveDrawer('success')
         }
       }

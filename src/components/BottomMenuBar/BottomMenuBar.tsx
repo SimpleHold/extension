@@ -4,10 +4,10 @@ import * as React from 'react'
 import Styles from './styles'
 
 // Assets
-import walletIcon from '@assets/icons/walletIconNew.svg'
-import swapIcon from '@assets/icons/swapIconNew.svg'
-import clockIcon from '@assets/icons/clockIconMenu.svg'
-import settingsIcon from '@assets/icons/settingsIconNew.svg'
+import walletsIcon from '@assets/icons/bottomBar/wallet.svg'
+import swapIcon from '@assets/icons/bottomBar/swap.svg'
+import historyIcon from '@assets/icons/bottomBar/book.svg'
+import settingsIcon from '@assets/icons/bottomBar/settings.svg'
 import SVG from 'react-inlinesvg'
 
 interface Props {
@@ -17,11 +17,17 @@ interface Props {
   onClickSwap: () => void
 }
 
-type TTabs = 'wallets' | 'swap' | 'history' | 'settings'
+type TTabTitle = 'wallets' | 'swap' | 'history' | 'settings'
+
+type TTab = {
+  title: TTabTitle
+  icon: string
+  onClick: () => void
+}
 
 const BottomMenuBar: React.FC<Props> = (props) => {
 
-  const [activeTab, setActiveTab] = React.useState<TTabs>('wallets')
+  const [activeTab, setActiveTab] = React.useState<TTabTitle>('wallets')
 
   const {
     onClickWallets,
@@ -50,20 +56,40 @@ const BottomMenuBar: React.FC<Props> = (props) => {
     onOpenSettings()
   }
 
+  const tabs: TTab[] = [
+    {
+      title: 'wallets',
+      icon: walletsIcon,
+      onClick: onWallets
+    },
+    {
+      title: 'swap',
+      icon: swapIcon,
+      onClick: onSwap
+    },
+    {
+      title: 'history',
+      icon: historyIcon,
+      onClick: onHistory
+    },
+    {
+      title: 'settings',
+      icon: settingsIcon,
+      onClick: onSettings
+    }
+  ]
+
   return (
     <Styles.Container>
-      <Styles.Button onClick={onWallets} isActive={activeTab === 'wallets'}>
-        <SVG src={walletIcon} width={24} height={24} />
-      </Styles.Button>
-      <Styles.Button onClick={onSwap} isActive={activeTab === 'swap'}>
-        <SVG src={swapIcon} width={24} height={24} />
-      </Styles.Button>
-      <Styles.Button onClick={onHistory} isActive={activeTab === 'history'}>
-        <SVG src={clockIcon} width={24} height={24} />
-      </Styles.Button>
-      <Styles.Button onClick={onSettings} isActive={activeTab === 'settings'}>
-        <SVG src={settingsIcon} width={24} height={24} />
-      </Styles.Button>
+      {tabs.map((tab) => {
+        const {title, icon, onClick} = tab
+        const isActive = activeTab === title
+
+        return <Styles.Button key={`${title}`} onClick={onClick} isActive={isActive}>
+          <SVG src={icon} width={24} height={24} />
+          <Styles.Label isActive={isActive}>{title}</Styles.Label>
+        </Styles.Button>
+      })}
     </Styles.Container>
   )
 }

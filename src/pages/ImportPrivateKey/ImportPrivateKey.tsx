@@ -19,7 +19,6 @@ import {
   addNew as addNewWallet,
   IWallet,
   getWallets,
-  setPolicyPopupStatus,
 } from '@utils/wallet'
 import { decrypt } from '@utils/crypto'
 import { setUserProperties } from '@utils/amplitude'
@@ -195,7 +194,6 @@ const ImportPrivateKey: React.FC = () => {
             ).length
             setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
-            setPolicyPopupStatus()
             return updateState({ activeDrawer: 'success' })
           }
         }

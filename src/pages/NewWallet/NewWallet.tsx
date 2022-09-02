@@ -15,7 +15,7 @@ import SuccessDrawer from '@drawers/Success'
 import { logEvent, setUserProperties } from '@utils/amplitude'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
-import { addNew as addNewWallet, IWallet, setPolicyPopupStatus } from '@utils/wallet'
+import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
 import { generate, checkWithPhrase } from '@utils/currencies'
 import { getItem, setItem } from '@utils/storage'
@@ -142,7 +142,6 @@ const NewWallet: React.FC = () => {
                 setItem('backupStatus', 'notDownloaded')
               }
 
-              setPolicyPopupStatus()
               updateState({ activeDrawer: 'success' })
               return
             }

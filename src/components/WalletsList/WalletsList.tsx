@@ -97,7 +97,7 @@ const WalletsList: React.FC<IWalletsList> = (props) => {
               height={600}
               style={Styles.List}
               rowCount={getRowCount()}
-              rowHeight={64}
+              rowHeight={70}
               rowRenderer={renderWallet}
               width={375}
               overscanRowCount={0}

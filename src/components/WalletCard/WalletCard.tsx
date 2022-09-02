@@ -9,16 +9,13 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { getBalance } from '@utils/currencies'
 import { toUpper, numberFriendly, getFormatEstimated, getFormatBalance } from '@utils/format'
-import {
-  getWalletChain, getBalanceDiff, getBalancePrecision
-} from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
-import updateTxsHistory from '@utils/history'
+import { THardware } from '@utils/wallet'
 
 // Config
 import { getSharedToken, getToken } from '@config/tokens'
 import { getCurrency } from '@config/currencies'
-import { GENERAL_BALANCE_CHANGE, MAIN_SELECT_WALLET } from '@config/events'
+import { MAIN_SELECT_WALLET } from '@config/events'
 
 // Assets
 import ledgerLogo from '@assets/icons/ledger.svg'
@@ -30,8 +27,6 @@ import Styles from './styles'
 
 // Types
 import { TWalletAmountData } from '@pages/Wallets/types'
-import { TTxWallet } from '@utils/api/types'
-import { THardware } from '@utils/wallet'
 
 interface Props {
   address: string
@@ -57,7 +52,7 @@ const emptyData = {
   balance_usd: 0,
   balance_btc: 0,
   pending: 0,
-  pending_btc: 0
+  pending_btc: 0,
 }
 
 const WalletCard: React.FC<Props> = React.memo((props) => {
@@ -76,7 +71,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     uuid,
     hardware,
     isNotActivated,
-    isRedirect
+    isRedirect,
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
@@ -91,20 +86,18 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   const [estimated, setEstimated] = React.useState<number | null>(null)
   const [pendingBalance, setPendingBalance] = React.useState<number>(0)
 
-  const walletData: TTxWallet = {
-    chain: getWalletChain(symbol, chain),
-    contractAddress,
-    symbol,
-    address,
-    tokenSymbol
-  }
-
   React.useEffect(() => {
     loadBalance()
   }, [])
 
   const loadBalance = async (): Promise<void> => {
-    const savedData = await getBalance({ symbol, address, chain, tokenSymbol, contractAddress }, {responseTimeLimit: 8000})
+    const savedData = await getBalance({
+      symbol,
+      address,
+      chain,
+      tokenSymbol,
+      contractAddress,
+    }, { responseTimeLimit: 8000 })
     const data = isNotActivated ? emptyData : savedData
 
     const { balance, balance_usd, balance_btc, pending, pending_btc } = data
@@ -117,25 +110,6 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
 
     setEstimated(balance_usd)
     sumEstimated && sumEstimated({ uuid, symbol, amount: balance_usd || 0 })
-
-    const precision = getBalancePrecision(symbol)
-    const balanceDiff = getBalanceDiff(savedData.balance, balance || 0, precision)
-    const isPendingStatusChanged = !!savedData.pending !== !!pending
-
-    if (balanceDiff || isPendingStatusChanged) {
-
-      if (balanceDiff) {
-        logEvent({
-          name: GENERAL_BALANCE_CHANGE,
-          properties: {
-            symbol,
-            dynamics: balanceDiff > 0 ? "pos" : "neg"
-          }
-        })
-      }
-
-      await updateTxsHistory({ updateSingleWallet: walletData })
-    }
   }
 
   const openWallet = (): void => {
@@ -146,8 +120,8 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     logEvent({
       name: MAIN_SELECT_WALLET,
       properties: {
-        symbol
-      }
+        symbol,
+      },
     })
 
     history.push('/wallet', {
@@ -162,68 +136,70 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
       walletName,
       uuid,
       hardware,
-      isRedirect
+      isRedirect,
     })
   }
 
   return (
     <Styles.Wrapper onClick={openWallet} className={'walletCard'}>
       <Styles.Container className={'container'}>
-        <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
-        <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>
-          <Styles.AddressInfo>
-            <Styles.CurrencyInfo>
-              {hardware ? (
-                <Styles.HardwareIconRow className='hardware-icon'>
-                  <SVG
-                    src={hardware.type === 'ledger' ? ledgerLogo : trezorLogo}
-                    width={12}
-                    height={12}
-                  />
-                </Styles.HardwareIconRow>
-              ) : null}
-              <Styles.WalletName className='wallet-name'>{walletName}</Styles.WalletName>
-            </Styles.CurrencyInfo>
-            {isNotActivated ? (
-              <Styles.ActivateBlock>
-                <Styles.ActivateLabel>Activation is required</Styles.ActivateLabel>
-              </Styles.ActivateBlock>
-            ) : (
-              <Styles.AddressRow>
-                <Styles.Address>{address}</Styles.Address>
-              </Styles.AddressRow>
-            )}
-          </Styles.AddressInfo>
-          {!isNotActivated ? (
-            <Styles.Balances>
-              <Skeleton width={110} height={16} type='gray' br={4} isLoading={balance === null}>
-                <Styles.BalanceRow>
-                  <Styles.Balance>
-                    {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
-                  </Styles.Balance>
-                  {pendingBalance !== 0 ? (
-                    <Styles.PendingIcon>
-                      <SVG src={clockIcon} width={16} height={16} />
-                    </Styles.PendingIcon>
-                  ) : null}
-                </Styles.BalanceRow>
-              </Skeleton>
-              <Skeleton
-                width={80}
-                height={16}
-                type='gray'
-                mt={7}
-                br={4}
-                isLoading={estimated === null}
-              >
-                <Styles.Estimated>{`$ ${getFormatEstimated(
-                  estimated,
-                  numberFriendly(estimated)
-                )}`}</Styles.Estimated>
-              </Skeleton>
-            </Styles.Balances>
-          ) : null}
-        </Styles.Row>
+        <Styles.Card>
+          <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />
+          <Styles.Row gridColumns={isNotActivated ? 'auto' : 'repeat(2,1fr)'}>
+            <Styles.AddressInfo>
+              <Styles.CurrencyInfo>
+                {hardware ? (
+                  <Styles.HardwareIconRow className='hardware-icon'>
+                    <SVG
+                      src={hardware.type === 'ledger' ? ledgerLogo : trezorLogo}
+                      width={12}
+                      height={12}
+                    />
+                  </Styles.HardwareIconRow>
+                ) : null}
+                <Styles.WalletName className='wallet-name'>{walletName}</Styles.WalletName>
+              </Styles.CurrencyInfo>
+              {isNotActivated ? (
+                <Styles.ActivateBlock>
+                  <Styles.ActivateLabel>Activation is required</Styles.ActivateLabel>
+                </Styles.ActivateBlock>
+              ) : (
+                <Styles.AddressRow>
+                  <Styles.Address>{address}</Styles.Address>
+                </Styles.AddressRow>
+              )}
+            </Styles.AddressInfo>
+            {!isNotActivated ? (
+              <Styles.Balances>
+                <Skeleton width={110} height={16} type='gray' br={4} isLoading={balance === null}>
+                  <Styles.BalanceRow>
+                    <Styles.Balance>
+                      {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
+                    </Styles.Balance>
+                    {pendingBalance !== 0 ? (
+                      <Styles.PendingIcon>
+                        <SVG src={clockIcon} width={16} height={16} />
+                      </Styles.PendingIcon>
+                    ) : null}
+                  </Styles.BalanceRow>
+                </Skeleton>
+                <Skeleton
+                  width={80}
+                  height={16}
+                  type='gray'
+                  mt={7}
+                  br={4}
+                  isLoading={estimated === null}
+                >
+                  <Styles.Estimated>{`$ ${getFormatEstimated(
+                    estimated,
+                    numberFriendly(estimated),
+                  )}`}</Styles.Estimated>
+                </Skeleton>
+              </Styles.Balances>
+            ) : null}
+          </Styles.Row>
+        </Styles.Card>
       </Styles.Container>
     </Styles.Wrapper>
   )

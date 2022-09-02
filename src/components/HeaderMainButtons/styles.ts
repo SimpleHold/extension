@@ -6,7 +6,9 @@ type TProps = {
 
 const Animations = styled.div`
   width: 100%;
-  position: relative;
+  position: absolute;
+  left: 29px;
+  top: 150px;
 
   .buttons-enter {
     opacity: 0;

@@ -476,16 +476,17 @@ const SendConfirmation: React.FC = () => {
           const isInternalTx = checkIsInternalTx(symbol)
 
           if (isInternalTx) {
-            const createTx = await createInternalTx(
+            const createTx = await createInternalTx({
               symbol,
               addressFrom,
               addressTo,
-              getAmount(),
-              findWallet.privateKey,
-              parseNetworkFee,
+              amount: getAmount(),
+              privateKey: findWallet.privateKey,
+              networkFee: parseNetworkFee,
               outputs,
-              extraId
-            )
+              extraId,
+              tokenChain
+            })
 
             if (createTx) {
               return updateState({

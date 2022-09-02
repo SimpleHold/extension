@@ -2,6 +2,7 @@ import amplitudeSDK from 'amplitude-js'
 
 // Config
 import config from "@config/index"
+import { ERROR_CREATE_TX, ERROR_GENERATE_ADDRESS, ERROR_IMPORT_PRIVATE_KEY } from '@config/events'
 
 // Utils
 import { getItem } from '@utils/storage'
@@ -13,7 +14,7 @@ interface IEvent {
   properties?: { [key: string]: string | number }
 }
 
-const isDisabled = (getItem('analytics') !== 'agreed') || config.isDevMode
+const isDisabled = config.isDevMode
 
 export const init = (apiKey: string, clientId: string) => {
   if (isDisabled) return;
@@ -48,4 +49,60 @@ export const setUserAddressesProperties = () => {
     const walletsData = parseWalletsData(wallets)
     setUserProperties(walletsData)
   }
+}
+
+
+// Log errors
+export const logErrorCreateTx = (
+  error: string,
+  symbol: string,
+  tokenChain?: string,
+) => {
+
+  const properties = {
+    error,
+    symbol,
+    ...(tokenChain && {tokenChain})
+  }
+
+  logEvent({
+    name: ERROR_CREATE_TX,
+    properties
+  })
+}
+
+export const logErrorGenerateAddress = (
+  error: string,
+  symbol: string,
+  chain?: string,
+) => {
+
+  const properties = {
+    error,
+    symbol,
+    ...(chain && {chain})
+  }
+
+  logEvent({
+    name: ERROR_GENERATE_ADDRESS,
+    properties
+  })
+}
+
+export const logErrorImportPrivateKey = (
+  error: string,
+  symbol: string,
+  chain?: string,
+) => {
+
+  const properties = {
+    error,
+    symbol,
+    ...(chain && {chain})
+  }
+
+  logEvent({
+    name: ERROR_IMPORT_PRIVATE_KEY,
+    properties
+  })
 }
