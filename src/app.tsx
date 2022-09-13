@@ -15,7 +15,7 @@ import { GENERAL_FIRST_ENTER, GENERAL_START_SESSION } from '@config/events'
 import { validateWallet } from '@utils/validate'
 import { init, logEvent } from '@utils/amplitude'
 import { getItem, removeItem, setItem } from '@utils/storage'
-import { getFullHistory, getStats, updateStats } from '@utils/txs'
+import { getFullHistory, getStats, updateStats } from 'utils/history'
 import { setUserId } from '@utils/api'
 
 import { ToastContextProvider } from '@contexts/Toast/Toast'
@@ -121,8 +121,8 @@ const App: React.FC = () => {
 
   React.useEffect(() => {
     if (initialPage === '/wallets') {
-      const savedHistory = getFullHistory()
-      if (!savedHistory.length) {
+      const savedHistory = getItem("full_history")
+      if (!savedHistory) {
         updateTxsHistory()
       }
     }

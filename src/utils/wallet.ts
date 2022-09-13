@@ -88,6 +88,12 @@ type TBalanceUpdate = TBalanceData & {
   symbol: string,
 }
 
+const precisions: TBalancePrecisions = {
+  vtho: 3,
+}
+
+export const getBalancePrecision = (symbol: string): number | undefined => precisions[symbol]
+
 const sortByBalance = (a: IWallet, b: IWallet, isAscending: boolean) => {
   return isAscending
     ? Number(a.balance_btc || 0) - Number(b.balance_btc || 0)
@@ -207,13 +213,6 @@ export const getSingleWallet = (address: string, symbol: string, wallets?: IWall
   )
 }
 
-export const getBalancePrecision = (symbol: string): number | undefined => {
-  const precisions: TBalancePrecisions = {
-    vtho: 3,
-  }
-  return precisions[symbol]
-}
-
 export const getBalanceDiff = (latestBalance: number | null, balance: number, precisionDigits: number = 7) => {
   const formatLatest = toFixedWithoutRound(latestBalance || 0, precisionDigits)
   const formatNew = toFixedWithoutRound(balance, precisionDigits)
@@ -223,7 +222,7 @@ export const getBalanceDiff = (latestBalance: number | null, balance: number, pr
   return formatNew - formatLatest
 }
 
-export const updateBalance = (data: TBalanceUpdate, precision?: number): void => {
+export const saveBalanceData = (data: TBalanceUpdate, precision?: number): void => {
   const { address, symbol, balance, balance_btc, balance_usd, pending, pending_btc } = data
   const wallets = getWallets()
   const findWallet = getSingleWallet(address, symbol, wallets)

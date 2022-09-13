@@ -41,7 +41,7 @@ import {
   createBtcTx,
   getFirstAddress,
 } from '@utils/ledger'
-import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
+import { getStats, updateStats, isShowSatismeter } from 'utils/history'
 import { minus } from '@utils/format'
 import { logEvent } from '@utils/amplitude'
 

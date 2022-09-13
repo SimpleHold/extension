@@ -19,6 +19,12 @@ export type TCurrency = {
   chain?: string
 }
 
+export type TFindWalletHistory = {
+  symbol: string
+  address: string
+  chain?: string
+}
+
 export interface IState {
   status: null | TStatuses
   currencies: TCurrency[]

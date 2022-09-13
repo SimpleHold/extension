@@ -19,9 +19,7 @@ import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import {
-  getTxsInfo,
   getWarning,
-  getTransactionHistory
 } from '@utils/api'
 import {
   renameWallet,
@@ -34,19 +32,18 @@ import { activateWallet, getBalance } from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
 import { getExplorerLink, getTransactionLink, checkWithPhrase } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
-import { getItem } from '@utils/storage'
+import { getItem, getJSON } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { toLower, toUpper } from '@utils/format'
 import {
   save as saveTxs,
   group as groupTxs,
   compare as compareTxs,
-  getExist as getExistTxs
-} from '@utils/txs'
+  getExist as getExistTxs, findWalletTxHistory,
+} from 'utils/history'
 import { logEvent } from '@utils/amplitude'
-import { getTxHistory as getTonCoinTxHistory } from '@utils/currencies/toncoin'
-import { checkIfTimePassed, toMs } from '@utils/dates'
-import { removeTempTxs, updateTxsHistory } from '@utils/history'
+import { toMs } from '@utils/dates'
+import { updateTxsHistory } from '@utils/history'
 import { receiveAllPendingTxs } from '@utils/currencies/nano'
 
 // Config
@@ -63,6 +60,7 @@ import { IWallet } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
+import { TTxWallet } from 'utils/api/types'
 
 const initialState: IState = {
   balance: null,
@@ -96,31 +94,30 @@ const WalletPage: React.FC = () => {
       hardware,
       isHidden = false,
       name,
-      decimals = 0
-    }
+      decimals = 0,
+    },
   } = useLocation<ILocationState>()
   const history = useHistory()
   const { state, updateState } = useState<IState>({
     ...initialState,
     isHiddenWallet: isHidden,
-    address: locationState.address
+    address: locationState.address,
   })
 
   const [walletPendingStatus, setWalletPendingStatus] = React.useState<null | boolean>(null)
   const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
   const [hasPendingTxs, setHasPendingTxs] = React.useState<null | boolean>(null)
-  const [lastRefreshHistoryTimestamp, setRefreshHistoryTimestamp] = React.useState(0)
   const [isIdle, setIsIdle] = React.useState(false)
 
   useIdleTimer({
     timeout: toMs({ minutes: 1 }),
     onActive: () => setIsIdle(false),
-    onIdle: () => setIsIdle(true)
+    onIdle: () => setIsIdle(true),
   })
 
   React.useEffect(() => {
     loadBalance()
-    getTxHistory()
+    getWalletTxHistory()
     getName()
     getWalletWarning()
     getWalletData()
@@ -135,19 +132,6 @@ const WalletPage: React.FC = () => {
   React.useEffect(() => {
     setWalletPendingStatus(Boolean(hasPendingTxs || pendingBalance))
   }, [pendingBalance, hasPendingTxs])
-
-  React.useEffect(() => {
-    let id: number
-    if (walletPendingStatus) {
-      const isReady = checkIfTimePassed(lastRefreshHistoryTimestamp, { seconds: 15 })
-      id = +setInterval(() => {
-        if (isReady) {
-          getTxHistory().then(loadBalance)
-        }
-      }, toMs({ seconds: isIdle ? 60 : 15 }))
-    }
-    return () => clearInterval(id)
-  }, [isIdle, walletPendingStatus])
 
   const getWalletData = (): void => {
     const currentWallet = getCurrentWallet()
@@ -190,7 +174,7 @@ const WalletPage: React.FC = () => {
 
     if (walletsList) {
       const findWallet = walletsList.find(
-        (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+        (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid),
       )
 
       if (findWallet) {
@@ -202,10 +186,10 @@ const WalletPage: React.FC = () => {
     }
   }
 
-  const openPage = (url: string, stateData: {[key: string]: any} = {}) => () => {
+  const openPage = (url: string, stateData: { [key: string]: any } = {}) => () => {
 
     const sharedToken = getSharedToken(symbol, chain)
-    const walletName = getWalletName({uuid, symbol, hardware, chain, name, address: state.address})
+    const walletName = getWalletName({ uuid, symbol, hardware, chain, name, address: state.address })
 
     history.push(url, {
       ...locationState,
@@ -216,7 +200,7 @@ const WalletPage: React.FC = () => {
       address: state.address,
       decimals: sharedToken ? sharedToken.decimals : decimals,
       isRedirect: !!isRedirect,
-      ...stateData
+      ...stateData,
     })
   }
 
@@ -228,17 +212,11 @@ const WalletPage: React.FC = () => {
 
     const { balance, balance_usd, pending } = await getBalance(
       { symbol, address: state.address, chain: currency?.chain || chain, tokenSymbol, contractAddress },
-      { force: true }
+      { force: true },
     )
 
     setPendingBalance(pending)
     updateState({ balance, estimated: balance_usd })
-  }
-
-  const getTonTxHistory = async (): Promise<void> => {
-    const txHistory = await getTonCoinTxHistory(state.address)
-
-    updateState({ txHistory })
   }
 
   const getCurrencyChain = (): string | null => {
@@ -259,58 +237,21 @@ const WalletPage: React.FC = () => {
     return null
   }
 
-  const getTxHistory = async (): Promise<void> => {
+  const getWalletTxHistory = async (): Promise<void> => {
 
     if (state.isNotActivated) {
       return updateState({ txHistory: [] })
     }
+    const wallet: TTxWallet = { address: state.address, chain: getWalletChain(symbol, chain), symbol }
+    await updateTxsHistory({pickSingleWallet: wallet})
+    const history = findWalletTxHistory(wallet)
 
-    if (currency?.symbol === 'toncoin' && !chain) {
-      return await getTonTxHistory()
-    }
+    const txHistory = groupTxs(history)
 
-    const currencyChain = getCurrencyChain()
+    const pendingTxs = history.find(tx => tx.isPending)
+    setHasPendingTxs(!!pendingTxs)
 
-    if (currencyChain) {
-      const walletData = {
-        chain: getWalletChain(symbol, chain),
-        address: state.address,
-        symbol,
-        tokenSymbol,
-        contractAddress
-      }
-
-      removeTempTxs(walletData)
-
-      const data = await getTransactionHistory(
-        currencyChain,
-        state.address,
-        tokenSymbol,
-        contractAddress
-      )
-
-      if (data.length) {
-        const compare = compareTxs(state.address, currencyChain, data, tokenSymbol, contractAddress)
-        if (compare.length) {
-          const getFullTxHistoryInfo = await getTxsInfo(currencyChain, state.address, compare)
-
-          saveTxs(state.address, currencyChain, getFullTxHistoryInfo, tokenSymbol, contractAddress)
-          updateTxsHistory({ updateSingleWallet: walletData })
-        }
-      }
-      const history = getExistTxs(state.address, currencyChain, tokenSymbol, contractAddress)
-
-      const txHistory = groupTxs(history)
-
-      const pendingTxs = history.find(tx => tx.isPending)
-      setHasPendingTxs(!!pendingTxs)
-
-      setRefreshHistoryTimestamp(Date.now())
-
-      updateState({ txHistory })
-    } else {
-      updateState({ txHistory: [] })
-    }
+    updateState({ txHistory })
   }
 
   const onSelectDropdown = (key: string) => {
@@ -320,7 +261,7 @@ const WalletPage: React.FC = () => {
         confirmDrawerTitle: `Please enter your password to see the ${
           withPhrase ? 'recovery phrase' : 'private key'
         }`,
-        confirmDrawerType: withPhrase ? 'showPhrase' : 'showPrivateKey'
+        confirmDrawerType: withPhrase ? 'showPhrase' : 'showPrivateKey',
       })
     } else if (key === 'explorer') {
       const currencyChain = getCurrencyChain()
@@ -334,7 +275,7 @@ const WalletPage: React.FC = () => {
     } else if (key === 'addToken') {
       history.push('/select-token', {
         currency,
-        address: state.address
+        address: state.address,
       })
     }
   }
@@ -344,11 +285,6 @@ const WalletPage: React.FC = () => {
     if (state.balance !== null && state.estimated !== null) {
       updateState({ balance: null, estimated: null, isBalanceRefreshing: true })
       setTimeout(loadBalance, 1000)
-
-      if (walletPendingStatus) {
-        const isReady = checkIfTimePassed(lastRefreshHistoryTimestamp, { seconds: 15 })
-        isReady && getTxHistory()
-      }
 
       logEvent({
         name: REFRESH_BALANCE,
@@ -369,7 +305,7 @@ const WalletPage: React.FC = () => {
           const parseBackup = JSON.parse(decryptBackup)
 
           const findWallet: IWallet | undefined = parseBackup?.wallets?.find(
-            (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+            (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid),
           )
 
           if (findWallet) {
@@ -379,12 +315,12 @@ const WalletPage: React.FC = () => {
               if (symbol.toLowerCase() === 'xno') {
                 const res = await receiveAllPendingTxs(state.address, privateKey)
                 if (res) {
-                  await getTxHistory()
+                  await getWalletTxHistory()
                   setWalletPendingStatus(false)
                   return updateState({
                     isDrawerButtonLoading: false,
                     activeDrawer: 'txsReceivedSuccess',
-                    password: ''
+                    password: '',
                   })
                 }
               }
@@ -395,7 +331,7 @@ const WalletPage: React.FC = () => {
 
       return updateState({
         passwordErrorLabel: 'Error occurred',
-        isDrawerButtonLoading: false
+        isDrawerButtonLoading: false,
       })
     }
     updateState({ passwordErrorLabel: 'Password is not valid', isDrawerButtonLoading: false })
@@ -415,7 +351,7 @@ const WalletPage: React.FC = () => {
           const parseBackup = JSON.parse(decryptBackup)
 
           const findWallet: IWallet | undefined = parseBackup?.wallets?.find(
-            (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
+            (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid),
           )
 
           if (findWallet) {
@@ -439,7 +375,7 @@ const WalletPage: React.FC = () => {
                   isNotActivated: false,
                   activeDrawer: 'success',
                   password: '',
-                  address: getAddress
+                  address: getAddress,
                 })
               }
             }
@@ -447,7 +383,7 @@ const WalletPage: React.FC = () => {
 
           return updateState({
             passwordErrorLabel: 'Activation failed',
-            isDrawerButtonLoading: false
+            isDrawerButtonLoading: false,
           })
         }
       }
@@ -476,7 +412,7 @@ const WalletPage: React.FC = () => {
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
           const findWallet: IWallet | undefined = parseBackup?.wallets?.find(
-            (wallet: IWallet) => toLower(wallet.address) === toLower(state.address)
+            (wallet: IWallet) => toLower(wallet.address) === toLower(state.address),
           )
 
           if (findWallet) {
@@ -499,7 +435,7 @@ const WalletPage: React.FC = () => {
       activeDrawer: null,
       isDrawerButtonLoading: false,
       password: '',
-      passwordErrorLabel: null
+      passwordErrorLabel: null,
     })
   }
 
@@ -515,7 +451,7 @@ const WalletPage: React.FC = () => {
   const onDownloadBackup = (): void => {
     return history.replace('/download-backup', {
       password: state.password,
-      from: 'newWallet'
+      from: 'newWallet',
     })
   }
 
@@ -543,7 +479,7 @@ const WalletPage: React.FC = () => {
     updateState({
       activeDrawer: 'confirm',
       confirmDrawerTitle: 'Please enter your password to activate your account',
-      confirmDrawerType: 'activateWallet'
+      confirmDrawerType: 'activateWallet',
     })
   }
 
@@ -551,7 +487,7 @@ const WalletPage: React.FC = () => {
     updateState({
       activeDrawer: 'confirm',
       confirmDrawerTitle: 'Please enter your password to receive incoming transactions',
-      confirmDrawerType: 'receivePendingTxs'
+      confirmDrawerType: 'receivePendingTxs',
     })
   }
 

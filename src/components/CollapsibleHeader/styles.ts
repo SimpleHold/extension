@@ -1,4 +1,5 @@
 import styled from 'styled-components'
+import { isDevMode } from 'config'
 
 import background from '@assets/backgrounds/main.png'
 
@@ -8,7 +9,8 @@ type TLinkProps = {
 
 const Container = styled.div`
   width: 100%;
-  background-image: url(${background});
+  background-image: ${() => isDevMode ? "none" : `url(${background})`};
+  ${() => isDevMode && "background-color: #3fbb7d;"};
   background-repeat: no-repeat;
   position: fixed;
   z-index: 2;
