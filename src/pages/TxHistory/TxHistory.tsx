@@ -16,19 +16,17 @@ import HistoryFilterDrawer from '@drawers/HistoryFilter'
 
 // Utils
 import { generateWalletName, getWallets, IWallet } from '@utils/wallet'
-import { getFullHistory, groupHistory, THistoryTxGroup } from '@utils/txs'
+import { getFullHistory, groupHistory, THistoryTxGroup } from 'utils/history'
 import { toLower } from '@utils/format'
 import { checkOneOfExist, getItem } from '@utils/storage'
 import { updateTxsHistory } from '@utils/history'
-import { checkIfTimePassed } from '@utils/dates'
 
 // Hooks
 import useState from '@hooks/useState'
 
 // Types
-import { TFullTxInfo } from '@utils/api/types'
 import { IState, TTxData } from './types'
-import { TCurrency } from '@drawers/HistoryFilter/types'
+import { TTxFullInfo } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -47,18 +45,12 @@ const TxHistory: React.FC = () => {
 
   React.useEffect(() => {
     getWalletList()
-    const handler = () => getSavedHistory()
-    window.addEventListener('historyFetchComplete', handler)
-    return () => window.removeEventListener('historyFetchComplete', handler)
   }, [])
 
   React.useEffect(() => {
     if (state.wallets.length && state.txGroups === null) {
-      const lastHistoryUpdate = getItem('lastFullHistoryUpdate')
-      const fetchRequired = lastHistoryUpdate
-        ? checkIfTimePassed(+lastHistoryUpdate, {seconds: 30})
-        : true
-      if (fetchRequired) {
+      const savedHistory = getItem("full_history")
+      if (!savedHistory?.length) {
         onGetTxHistory()
       } else {
         getSavedHistory()
@@ -102,7 +94,7 @@ const TxHistory: React.FC = () => {
     updateState({ activeDrawer: 'filters' })
   }
 
-  const openTx = (data: TTxData) => (): void => {
+  const openTx = (data: TTxFullInfo) => (): void => {
     history.push('/tx', data)
   }
 
@@ -180,18 +172,17 @@ const TxHistory: React.FC = () => {
                   <Styles.GroupDate>{dayjs(date).format('MMM D')}</Styles.GroupDate>
                 </Styles.GroupDateRow>
 
-                {data.map((tx: TFullTxInfo, index: number) => {
+                {data.map((tx: TTxFullInfo, index: number) => {
                   const {
                     hash,
                     amount,
                     estimated,
                     chain,
+                    address,
+                    date,
                     isPending,
                     symbol,
-                    address,
-                    tokenSymbol,
-                    contractAddress,
-                    date
+                    tokenSymbol
                   } = tx
                   const walletName = getNameWallet(symbol, address)
                   const tokenChain = tokenSymbol ? chain : undefined
@@ -207,15 +198,7 @@ const TxHistory: React.FC = () => {
                         isPending,
                         tokenChain
                       }}
-                      onClick={openTx({
-                        symbol,
-                        address,
-                        chain,
-                        hash,
-                        tokenChain,
-                        tokenSymbol,
-                        contractAddress
-                      })}
+                      onClick={openTx(tx)}
                     />
                   )
                 })}

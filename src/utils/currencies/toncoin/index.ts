@@ -4,7 +4,7 @@ import axios from 'axios'
 
 // Utils
 import { getTonAddressState, getEstimated } from '@utils/api'
-import { TAddressTxGroup, group as groupTxs } from '@utils/txs'
+import { TAddressTxGroup, group as groupTxs } from 'utils/history'
 import { getAbsoluteValue } from '@utils/format'
 
 // Types

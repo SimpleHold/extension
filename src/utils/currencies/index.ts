@@ -2,13 +2,14 @@
 import addressValidate from '@config/addressValidate'
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
 import { getToken } from '@config/tokens'
+import { GENERAL_BALANCE_CHANGE } from '@config/events'
 
 // Utils
 import {
   getEtherNetworkFee,
   getThetaNetworkFee,
   getNetworkFee as getNetworkFeeRequest,
-  getCustomFee, requestBalance,
+  getCustomFee, fetchBalance,
 } from '@utils/api'
 import { toLower } from '@utils/format'
 import {
@@ -17,10 +18,11 @@ import {
   getLatestBalance,
   getSingleWallet,
   getWalletChain,
-  updateBalance,
+  saveBalanceData,
 } from '@utils/wallet'
 import { checkIfTimePassed } from '@utils/dates'
 import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey, logEvent } from '@utils/amplitude'
+import { updateTxsHistory } from '@utils/history'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData, TCreateInternalTxProps } from './types'
@@ -47,8 +49,6 @@ import * as toncoin from '@utils/currencies/toncoin'
 import * as digibyte from '@utils/currencies/digibyte'
 import * as ravencoin from '@utils/currencies/ravencoin'
 import * as nano from '@utils/currencies/nano'
-import { GENERAL_BALANCE_CHANGE } from 'config/events'
-import updateTxsHistory from 'utils/history'
 
 const emptyData = {
   balance: 0,
@@ -82,7 +82,7 @@ export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBa
   let timer = null
 
   try {
-    const request = requestBalance(address, getChain, tokenSymbol, contractAddress, isFullBalance) // todo add axios timeout
+    const request = fetchBalance(address, getChain, tokenSymbol, contractAddress, isFullBalance)
       .then(data => {
         fetchedData = data
         const precision = getBalancePrecision(symbol)
@@ -92,7 +92,6 @@ export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBa
         if (balanceDiff || isPendingStatusChanged) {
           if (balanceDiff) {
             const wallet = getSingleWallet(address, symbol)
-
             if (wallet?.lastBalanceCheck) {
               logEvent({
                 name: GENERAL_BALANCE_CHANGE,
@@ -105,7 +104,7 @@ export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBa
           }
 
           updateTxsHistory({
-            updateSingleWallet: {
+            pickSingleWallet: {
               chain: getWalletChain(symbol, chain),
               address,
               symbol,
@@ -114,7 +113,7 @@ export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBa
             },
           })
         }
-        updateBalance({ address, symbol, ...data })
+        saveBalanceData({ address, symbol, ...data })
       })
 
     const isTimer = !(force || !responseTimeLimit)

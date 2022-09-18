@@ -30,7 +30,7 @@ import {
 } from '@utils/currencies'
 import { convertDecimals } from '@utils/currencies/ethereumLike'
 import { getItem } from '@utils/storage'
-import { getStats, updateStats, isShowSatismeter } from '@utils/txs'
+import { getStats, updateStats, isShowSatismeter } from 'utils/history'
 import { minus } from '@utils/format'
 
 // Config

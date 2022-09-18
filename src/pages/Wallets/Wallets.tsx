@@ -344,9 +344,7 @@ const Wallets: React.FC = () => {
         isActive={state.activeDrawer === 'select_currency'}
         onClose={onCloseDrawer}
         isRedirect={`/${listType}`}
-      >
-        <div>drawer content</div>
-      </SelectCurrencyDrawer>
+      />
       <BottomMenuBar onViewTxHistory={onViewTxHistory}
                      onOpenSettings={() => openPage('/settings')}
                      onClickWallets={() => openPage('/wallets')}

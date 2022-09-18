@@ -1,12 +1,29 @@
 import { TTime } from 'utils/dates'
 
-export interface IGetBalance {
+export interface IGetBalance { // TODO: remove deprecated
   balance: number
   balance_usd: number
   balance_btc: number
   pending: number
   pending_btc: number
   isBalanceError?: boolean
+}
+
+export interface IGetBalances {
+  address: string
+  chain: string
+  tokenSymbol?: string
+  contractAddress?: string
+  balanceInfo: TBalanceInfo
+}
+
+export type TBalanceInfo = {
+  balance: number
+  balance_usd: number
+  balance_btc: number
+  pending: number
+  pending_btc: number
+  balance_string: string
 }
 
 export interface IGetContractInfo {
@@ -96,38 +113,44 @@ export type TTxHistoryAddress = {
   estimated: number
 }
 
-export type TTxAddressItem = {
-  chain: string
-  address: string
-  symbol: string
-  txs: string[]
-  tokenSymbol?: string
-  contractAddress?: string
-}
-
 export type TFullTxHistoryResponse = {
   error: boolean
-  data?: TTxAddressItem[]
+  data?: TFullTxWallet[]
 }
 
 export type TFullTxWallet = {
   chain: string
   address: string
   symbol: string
-  txs: string[]
+  txs: TTxFullInfo[]
   tokenSymbol?: string
   contractAddress?: string
 }
 
-export type TFullTxInfo = {
+export type TTxFullInfo = {
+  type: "received" | "spend"
   hash: string
   amount: number
   estimated: number
+  fee: number
+  feeEstimated: number
   chain: string
   address: string
-  isPending: boolean
   date: string
+  isPending: boolean
   symbol: string
+  addressFrom?: string
+  addressTo?: string
+  addressesFrom?: [{
+    address: string
+    amount: number
+    estimated: number
+  }]
+  addressesTo?: [{
+    address: string
+    amount: number
+    estimated: number
+  }]
   tokenSymbol?: string
   contractAddress?: string
 }
@@ -157,8 +180,16 @@ export type TVetTxParams = {
 
 export type TTonAddressState = 'uninitialized' | 'active' | 'frozen'
 
-export type TGetBalanceWalletProps = {
+export type TGetBalanceWalletProps = { // TODO remove deprecated
   symbol: string
+  address: string
+  chain?: string
+  tokenSymbol?: string
+  contractAddress?: string
+  isFullBalance?: boolean
+}
+
+export type TGetBalancesWalletProps = {
   address: string
   chain?: string
   tokenSymbol?: string
@@ -171,5 +202,3 @@ export type TGetBalanceOptions = {
   responseTimeLimit?: number
   requestDebounceTime?: TTime
 }
-
-export type TGetBalance = (props: TGetBalanceWalletProps, options?: TGetBalanceOptions) => Promise<IGetBalance>

@@ -55,10 +55,10 @@ const Wallet: React.FC<Props> = (props) => {
   const [pendingBalance, setPendingBalance] = React.useState<number>(0)
 
   React.useEffect(() => {
-    fetchBalance()
+    loadBalance()
   }, [])
 
-  const fetchBalance = async (): Promise<void> => {
+  const loadBalance = async (): Promise<void> => {
     const { balance, balance_usd, pending } = await getBalance(
       {
         symbol,

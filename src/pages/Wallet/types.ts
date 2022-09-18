@@ -1,5 +1,5 @@
 // Types
-import { TAddressTxGroup } from '@utils/txs'
+import { TAddressTxGroup } from 'utils/history'
 import { THardware } from '@utils/wallet'
 
 export interface ILocationState {
