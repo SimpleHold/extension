@@ -15,6 +15,10 @@ import socket from '@utils/socket'
 // Styles
 import Styles from './styles'
 
+type TSocketShareBackup = {
+  mobileDeviceId: string
+}
+
 const ScanBackup: React.FC = () => {
   const history = useHistory()
 
@@ -29,21 +33,19 @@ const ScanBackup: React.FC = () => {
   }, [])
 
   React.useEffect(() => {
-    socket.auth = { username: backupHash }
+    if (backupHash.length) {
+      socket.connect()
 
-    socket.connect()
-
-    socket.on('share-backup', ({ content, from }) => {
-      if (content === backupHash) {
-        socket.emit('share-backup', {
-          content: getItem('backup'),
-          to: from,
+      socket.on(backupHash, ({ mobileDeviceId }: TSocketShareBackup) => {
+        socket.emit('set-backup', {
+          mobileDeviceId,
+          backup: getItem('backup'),
         })
-      }
-    })
+      })
 
-    return () => {
-      socket.disconnect()
+      return () => {
+        socket.off(backupHash)
+      }
     }
   }, [backupHash])
 
