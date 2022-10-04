@@ -21,7 +21,6 @@ import {
   getFilteredSum,
   getFilteredWallets,
   IWallet,
-  updateWalletsBalances,
 } from '@utils/wallet'
 import { logEvent } from '@utils/amplitude'
 import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
@@ -41,6 +40,7 @@ import { ILocationState, IState, TWalletAmountData } from './types'
 
 // Styles
 import Styles from './styles'
+import { getBalances } from 'utils/currencies'
 
 const initialState: IState = {
   wallets: null,
@@ -170,7 +170,7 @@ const Wallets: React.FC = () => {
 
     if (wallets.length) {
       updateState({ wallets })
-      await updateWalletsBalances(wallets)
+      await getBalances(wallets)
       wallets = getFilteredWallets()
       setInitialBalance(wallets)
     } else {

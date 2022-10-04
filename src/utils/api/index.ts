@@ -10,10 +10,10 @@ import {
   IGetContractInfo,
   IGetNetworkFeeResponse,
   ITokensBalance,
-  TAddressTx,
   TCustomFee,
   TFullTxHistoryResponse,
-  TFullTxWallet, TGetBalancesWalletProps, TGetBalanceWalletProps,
+  TFullTxWallet,
+  TGetBalancesWalletProps,
   THistoryTx,
   TNft,
   TNFtWallets,
@@ -24,37 +24,6 @@ import {
   Web3TxParams,
 } from './types'
 import { IToken } from '@config/tokens'
-
-export const fetchBalance = async (
-  address: string,
-  chain?: string,
-  tokenSymbol?: string,
-  contractAddress?: string,
-  isFullBalance?: boolean,
-): Promise<IGetBalance> => {
-  try {
-    const { data }: AxiosResponse = await axios(
-      `${config.serverUrl}/wallet/balance/${chain}/${address}`,
-      {
-        params: {
-          tokenSymbol,
-          contractAddress,
-          isFullBalance,
-        },
-      },
-    )
-    return data.data
-  } catch {
-    return {
-      balance: 0,
-      balance_usd: 0,
-      balance_btc: 0,
-      pending: 0,
-      pending_btc: 0,
-      isBalanceError: true,
-    }
-  }
-}
 
 export const fetchBalances = async (wallets: TGetBalancesWalletProps[],
 ): Promise<IGetBalances[]> => {
@@ -350,55 +319,6 @@ export const getNerveTxParams = async (from: string) => {
   }
 }
 
-// export const getTransactionHistory = async (
-//   chain: string,
-//   address: string,
-//   tokenSymbol?: string,
-//   contractAddress?: string
-// ): Promise<string[]> => {
-//   try {
-//     const { data } = await axios.get(`${config.serverUrl}/transaction/${chain}/history`, {
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       params: {
-//         address,
-//         tokenSymbol,
-//         contractAddress,
-//       },
-//     })
-//
-//     return data.data
-//   } catch {
-//     return []
-//   }
-// }
-
-// export const getTxsInfo = async (
-//   chain: string,
-//   address: string,
-//   txs: string[]
-// ): Promise<TAddressTx[]> => {
-//   try {
-//     const { data } = await axios.post(
-//       `${config.serverUrl}/transaction/${chain}/info`,
-//       {
-//         txs,
-//         address,
-//       },
-//       {
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//       }
-//     )
-//
-//     return data.data
-//   } catch {
-//     return []
-//   }
-// }
-
 export const getCustomFee = async (chain: string): Promise<TCustomFee | null> => {
   try {
     const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/fee/${chain}`)
@@ -451,25 +371,6 @@ export const getWarning = async (symbol: string, chain?: string): Promise<string
   }
 }
 
-// export const fetchFullTxHistoryOld = async (wallets: TTxWallet[]): Promise<TTxAddressItem[]> => { // TODO: remove
-//   try {
-//     const { data }: AxiosResponse<TFullTxHistoryResponse> = await axios.post(
-//       `${config.serverUrl}/transaction/full-history`,
-//       {
-//         wallets,
-//       },
-//       {
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//       }
-//     )
-//     return data?.data || []
-//   } catch {
-//     return []
-//   }
-// }
-
 export const fetchFullTxHistory = async (wallets: TTxWallet[]): Promise<TFullTxWallet[]> => {
   try {
     const { data }: AxiosResponse<TFullTxHistoryResponse> = await axios.post(
@@ -487,56 +388,6 @@ export const fetchFullTxHistory = async (wallets: TTxWallet[]): Promise<TFullTxW
     return data?.data || []
   } catch {
     return []
-  }
-}
-
-export type TGetFullTxHistoryOptions = {
-  delay?: number
-}
-
-// export const getFullTxHistoryInfo = async ( wallets: TFullTxWallet[], options: TGetFullTxHistoryOptions = {} ): Promise<TFullTxInfo[]> => {
-//   try {
-//     const { data }: AxiosResponse = await axios.post(
-//       `${config.serverUrl}/transaction/full-history-info`,
-//       {
-//         wallets,
-//         options
-//       },
-//       {
-//         headers: {
-//           'Content-Type': 'application/json',
-//         },
-//       }
-//     )
-//     return data?.data || []
-//   } catch {
-//     return []
-//   }
-// }
-
-export const getHistoryTxInfo = async (
-  hash: string,
-  chain: string,
-  address: string,
-  tokenSymbol?: string,
-  contractAddress?: string,
-): Promise<THistoryTx | null> => {
-  try {
-    const { data }: AxiosResponse = await axios.get(
-      `${config.serverUrl}/transaction/hash/${hash}`,
-      {
-        params: {
-          chain,
-          address,
-          tokenSymbol,
-          contractAddress,
-        },
-      },
-    )
-
-    return data?.data || null
-  } catch {
-    return null
   }
 }
 

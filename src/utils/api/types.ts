@@ -10,6 +10,7 @@ export interface IGetBalance { // TODO: remove deprecated
 }
 
 export interface IGetBalances {
+  symbol: string
   address: string
   chain: string
   tokenSymbol?: string

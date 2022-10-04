@@ -11,7 +11,6 @@ import { toLower } from '@utils/format'
 import { TAddressTx, TFullTxWallet, TTxFullInfo, TTxWallet } from '@utils/api/types'
 import { IWallet, TGetWalletsOptions } from '@utils/wallet'
 import { TCurrency, TFindWalletHistory } from '@drawers/HistoryFilter/types'
-import { TGetFullTxHistoryOptions } from '@utils/api'
 
 export type TAddressTxGroup = {
   date: string
@@ -33,68 +32,54 @@ export const updateTxsHistory = async (
     getWalletsOptions,
     pickSingleWallet,
   }: THistoryUpdateOptions = {}) => {
-  const { applyFilters, latest } = getWalletsOptions || {}
+  const { applyFilters } = getWalletsOptions || {}
 
-  if (sessionStorage.getItem('fetchInProgress')) {
-    return
-  }
-
-  if (!pickSingleWallet) {
-    sessionStorage.setItem('fetchInProgress', 'true')
-  }
-
-  let payload: TTxWallet[]
-  if (pickSingleWallet) {
-    payload = [pickSingleWallet]
-  } else {
-    let wallets = getWallets({}) || []
-    if (!wallets.length) return false
-    if (applyFilters) {
-      wallets = wallets.filter(filterWallets)
+  try {
+    if (sessionStorage.getItem('history_fetch_pending')) {
+      return
     }
-    payload = wallets
-      .map((wallet: IWallet) => {
-        const { address, chain, symbol, contractAddress } = wallet
-        return {
-          address,
-          chain: getWalletChain(symbol, chain),
-          symbol,
-          tokenSymbol: chain ? symbol : undefined,
-          contractAddress,
-        }
-      })
-      .filter(wallet => wallet.address)
+
+    if (!pickSingleWallet) {
+      sessionStorage.setItem('history_fetch_pending', 'true')
+    }
+
+    let payload: TTxWallet[]
+    if (pickSingleWallet) {
+      payload = [pickSingleWallet]
+    } else {
+      let wallets = getWallets({}) || []
+      if (!wallets.length) return false
+      if (applyFilters) {
+        wallets = wallets.filter(filterWallets)
+      }
+      payload = wallets
+        .map((wallet: IWallet) => {
+          const { address, chain, symbol, contractAddress } = wallet
+          return {
+            address,
+            chain: getWalletChain(symbol, chain),
+            symbol,
+            tokenSymbol: chain ? symbol : undefined,
+            contractAddress,
+          }
+        })
+        .filter(wallet => wallet.address)
+    }
+    const data = await fetchFullTxHistory(payload)
+
+    if (!data.length) return
+
+    const compare = compareFullHistory(data)
+
+    if (compare.length) {
+      const mapData = compare.flatMap(data => data.txs)
+      saveFullHistory(mapData)
+    }
+  } catch {
+
+  } finally {
+    sessionStorage.removeItem('history_fetch_pending')
   }
-  const data = await fetchFullTxHistory(payload)
-
-  if (!data.length) return
-
-  const compare = compareFullHistory(data)
-
-  if (compare.length) {
-    const mapData = compare.flatMap(data => data.txs)
-    saveFullHistory(mapData)
-  }
-  sessionStorage.removeItem('fetchInProgress')
-}
-
-export const getWalletKey = (
-  address: string,
-  chain: string,
-  tokenSymbol?: string,
-  contractAddress?: string,
-) => {
-  let key = `${address}_${chain}`
-
-  if (tokenSymbol) {
-    key += `_${tokenSymbol}`
-  }
-
-  if (contractAddress) {
-    key += `_${contractAddress}`
-  }
-
-  return key
 }
 
 export const group = (txs: TAddressTx[]): TAddressTxGroup[] => {
@@ -139,84 +124,6 @@ export const groupHistory = (txs: TTxFullInfo[]): THistoryTxGroup[] => {
   }
 
   return data
-}
-
-export const compare = (
-  address: string,
-  chain: string,
-  txs: string[],
-  tokenSymbol?: string,
-  contractAddress?: string,
-): string[] => {
-  const getTxs = getJSON(getWalletKey(address, chain, tokenSymbol, contractAddress))
-  if (getTxs?.length) {
-    return txs.filter(
-      (hash: string) => {
-        const txExists = getTxs.find((tx: TAddressTx) => (toLower(tx.hash) === toLower(hash)) && !tx.isPending)
-        return !txExists
-      },
-    )
-  }
-
-  return txs
-}
-
-export const getExist = (
-  address: string,
-  chain: string,
-  tokenSymbol?: string,
-  contractAddress?: string,
-): TAddressTx[] => {
-  try {
-    const getTxs = getJSON(getWalletKey(address, chain, tokenSymbol, contractAddress))
-
-    if (getTxs?.length) {
-      return getTxs
-    }
-    return []
-  } catch {
-    return []
-  }
-}
-
-export const save = (
-  address: string,
-  chain: string,
-  txs: TAddressTx[],
-  tokenSymbol?: string,
-  contractAddress?: string,
-) => {
-  const walletKey = getWalletKey(address, chain, tokenSymbol, contractAddress)
-
-  const findWalletStorage = getItem(walletKey)
-  if (findWalletStorage) {
-    const getTxs = getJSON(walletKey)
-    if (getTxs) {
-      const getNewTxs = txs.filter((newTx: TAddressTx) => {
-        return !getTxs.find((tx: TAddressTx) => toLower(tx.hash) === toLower(newTx.hash))
-      })
-      let pendingUpdated = false
-      const getUpdatedPendingTxs = getTxs.map((tx: TAddressTx) => {
-        const match = txs.find((newTx: TAddressTx) => {
-          const hashMatch = toLower(newTx.hash) === toLower(tx.hash)
-          const pendingStatusUpdated = tx.isPending && !newTx.isPending
-          const isUpdated = hashMatch && pendingStatusUpdated
-          if (isUpdated) {
-            pendingUpdated = true
-          }
-          return isUpdated
-        })
-        return match ? { ...tx, isPending: false } : tx
-      })
-      if (getNewTxs.length || pendingUpdated) {
-        setItem(walletKey, JSON.stringify([...getUpdatedPendingTxs, ...getNewTxs]))
-      }
-    } else {
-      setItem(walletKey, JSON.stringify(txs))
-    }
-  } else {
-    setItem(walletKey, JSON.stringify(txs))
-  }
 }
 
 export const getStats = (): string | null => {

@@ -7,7 +7,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import Skeleton from '@components/Skeleton'
 
 // Utils
-import { getBalance } from '@utils/currencies'
+import { getSingleBalance } from '@utils/currencies'
 import { toUpper, numberFriendly, short, getFormatEstimated } from '@utils/format'
 
 // Config
@@ -59,19 +59,19 @@ const Wallet: React.FC<Props> = (props) => {
   }, [])
 
   const loadBalance = async (): Promise<void> => {
-    const { balance, balance_usd, pending } = await getBalance(
-      {
-        symbol,
-        address,
-        chain: currency?.chain || chain,
-        tokenSymbol: chain ? symbol : undefined,
-        contractAddress
-      }, { responseTimeLimit: undefined }
-    )
+    const walletData = {
+      symbol,
+      address,
+      chain: currency?.chain || chain,
+      tokenSymbol: chain ? symbol : undefined,
+      contractAddress
+    }
+
+    const { balance, pending, balance_usd } = await getSingleBalance(walletData)
 
     setBalance(balance)
-    setPendingBalance(pending)
     setEstimated(balance_usd)
+    setPendingBalance(pending || 0)
   }
 
   return (
