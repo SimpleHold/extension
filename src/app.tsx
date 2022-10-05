@@ -26,7 +26,7 @@ const App: React.FC = () => {
     initAmplitude()
     preloadPages()
     getPlatformInfo()
-    browser.runtime.setUninstallURL(`https://simplehold.io/survey?id=${getItem('clientId')}`)
+    browser.runtime.setUninstallURL(`https://simplehold.typeform.com/nps-score`)
 
     let id: null | number = null
 
