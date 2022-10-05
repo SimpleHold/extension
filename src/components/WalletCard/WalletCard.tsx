@@ -8,7 +8,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { toUpper, numberFriendly, getFormatEstimated, getFormatBalance } from '@utils/format'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from '@utils/metrics'
 import { getLatestBalance, THardware } from '@utils/wallet'
 
 // Config

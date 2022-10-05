@@ -21,7 +21,7 @@ import {
   getWallets,
 } from '@utils/wallet'
 import { decrypt } from '@utils/crypto'
-import { setUserProperties } from '@utils/amplitude'
+import { setUserProperties } from 'utils/metrics'
 import { toLower, toUpper } from '@utils/format'
 import { importPrivateKey, getTokenStandard } from '@utils/currencies'
 import { getTokensBalance } from '@utils/api'

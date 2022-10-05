@@ -24,7 +24,7 @@ import { ILocationState, IState } from './types'
 // Styles
 import Styles from './styles'
 import { RECEIVE_COPY_ADDRESS } from 'config/events'
-import { logEvent } from 'utils/amplitude'
+import { logEvent } from 'utils/metrics'
 
 const initialState: IState = {
   isCopied: false,

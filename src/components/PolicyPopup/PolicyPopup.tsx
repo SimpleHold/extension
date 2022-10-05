@@ -15,7 +15,7 @@ import Button from '@components/Button'
 // Utils
 import { openWebPage } from '@utils/extension'
 import { setItem } from '@utils/storage'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 
 // Styles
 import Styles from './styles'

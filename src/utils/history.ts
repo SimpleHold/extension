@@ -293,15 +293,3 @@ export const findWalletTxHistory = ({ symbol, chain, address }: TFindWalletHisto
   return mapHistory
 }
 
-export const isShowSatismeter = (prevValue: number, value: number): boolean => { // TODO: move to sep file
-  const getStats = getJSON('txs_stats')
-
-  if (getStats) {
-    const { lastUpdate } = getStats
-    const monthDiff = dayjs().diff(lastUpdate, 'month')
-
-    return (prevValue < 1 && value > 0) || monthDiff >= 3
-  }
-
-  return false
-}

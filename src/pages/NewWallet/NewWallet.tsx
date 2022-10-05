@@ -12,7 +12,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 
 // Utils
-import { logEvent, setUserProperties } from '@utils/amplitude'
+import { logEvent, setUserProperties } from 'utils/metrics'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'

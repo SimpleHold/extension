@@ -18,7 +18,7 @@ import illustrate from '@assets/illustrate/onboardingIllustrate.png'
 import swapSpaceIllustrate from '@assets/theme/swapspace/1.svg'
 
 // Utils
-import { init, logEvent } from '@utils/amplitude'
+import { init, logEvent } from 'utils/metrics'
 import { getItem, removeItem, setItem } from '@utils/storage'
 import { Cookie, getAllCookies, getUrl, openWebPage } from '@utils/extension'
 import { toLower } from '@utils/format'

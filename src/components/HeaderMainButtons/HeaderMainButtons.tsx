@@ -11,7 +11,7 @@ import swapIcon from '@assets/icons/swapIconMainNew.svg'
 
 // Utils
 import { openWebPage } from '@utils/extension'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 
 // Styles
 import Styles from './styles'

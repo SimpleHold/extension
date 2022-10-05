@@ -13,7 +13,7 @@ import LogoutDrawer from '@drawers/Logout'
 import { decrypt } from '@utils/crypto'
 import { download as downloadBackup } from '@utils/backup'
 import { validatePassword } from '@utils/validate'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { openWebPage } from '@utils/extension'
 import { getItem, removeCache, removeItem } from '@utils/storage'
 

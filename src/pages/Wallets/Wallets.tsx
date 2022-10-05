@@ -23,7 +23,7 @@ import {
   getFilteredWallets,
   IWallet,
 } from '@utils/wallet'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from '@utils/metrics'
 import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
 import { checkOneOfExist, clear, getItem, setItem } from '@utils/storage'
 import { getBalances } from '@utils/currencies'

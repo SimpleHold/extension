@@ -73,7 +73,7 @@ export type TBalanceData = {
   balance: number
   balance_usd: number
   balance_btc: number
-  balance_string?: string // todo
+  balance_string?: string
   pending?: number
   pending_btc?: number
   lastBalanceCheck?: number

@@ -41,7 +41,7 @@ import { getItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { toLower, toUpper } from '@utils/format'
 import { findWalletTxHistory, group as groupTxs } from 'utils/history'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { updateTxsHistory } from '@utils/history'
 import { receiveAllPendingTxs } from '@utils/currencies/nano'
 

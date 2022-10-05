@@ -17,7 +17,7 @@ import tokens, { IToken } from '@config/tokens'
 // Utils
 import { toUpper, toLower } from '@utils/format'
 import { addNew as addNewWallet, getWallets, IWallet } from '@utils/wallet'
-import { setUserProperties } from '@utils/amplitude'
+import { setUserProperties } from 'utils/metrics'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'

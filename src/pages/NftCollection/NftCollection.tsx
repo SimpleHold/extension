@@ -17,7 +17,7 @@ import { getNft } from '@utils/api'
 import { IWallet, getWallets } from '@utils/wallet'
 import { checkOneOfExist, getItem, getNFTImage } from '@utils/storage'
 import { toLower } from '@utils/format'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { openWebPage } from '@utils/extension'
 
 // Types

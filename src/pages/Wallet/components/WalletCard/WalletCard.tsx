@@ -7,7 +7,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { toUpper, price, getFormatEstimated, getFormatBalance } from '@utils/format'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { openWebPage } from '@utils/extension'
 
 // Assets

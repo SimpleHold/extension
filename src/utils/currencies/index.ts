@@ -20,7 +20,7 @@ import {
   getWalletChain,
   saveBalanceData, TBalanceData,
 } from '@utils/wallet'
-import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey, logEvent } from '@utils/amplitude'
+import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey, logEvent } from 'utils/metrics'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData, TCreateInternalTxProps } from './types'

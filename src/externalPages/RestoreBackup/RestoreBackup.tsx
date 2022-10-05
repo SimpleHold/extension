@@ -17,7 +17,7 @@ import FailDrawer from '@drawers/Fail'
 import SuccessDrawer from '@drawers/Success'
 
 // Utils
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from '@utils/metrics'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { validate as validateBackup } from '@utils/backup'

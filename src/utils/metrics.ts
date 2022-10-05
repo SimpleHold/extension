@@ -5,9 +5,10 @@ import config from "@config/index"
 import { ERROR_CREATE_TX, ERROR_GENERATE_ADDRESS, ERROR_IMPORT_PRIVATE_KEY } from '@config/events'
 
 // Utils
-import { getItem } from '@utils/storage'
+import { getItem, getJSON } from '@utils/storage'
 import { validateWallet } from '@utils/validate'
 import { parseWalletsData } from '@utils/wallet'
+import dayjs from 'dayjs'
 
 interface IEvent {
   name: string
@@ -105,4 +106,19 @@ export const logErrorImportPrivateKey = (
     name: ERROR_IMPORT_PRIVATE_KEY,
     properties
   })
+}
+
+// Satismeter
+
+export const isShowSatismeter = (prevValue: number, value: number): boolean => {
+  const getStats = getJSON('txs_stats')
+
+  if (getStats) {
+    const { lastUpdate } = getStats
+    const monthDiff = dayjs().diff(lastUpdate, 'month')
+
+    return (prevValue < 1 && value > 0) || monthDiff >= 3
+  }
+
+  return false
 }

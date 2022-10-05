@@ -10,7 +10,7 @@ import ForgotPasscodeDrawer from '@drawers/ForgotPasscode'
 
 // Utils
 import { sha256hash } from '@utils/crypto'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { getItem, removeItem } from '@utils/storage'
 
 // Config

@@ -27,7 +27,7 @@ import {
   TTrezorCurrency,
   getFeatures,
 } from '@utils/trezor'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 
 // Assets
 import connectTrezorImage from '@assets/illustrate/connectTrezor.svg'

@@ -19,7 +19,7 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
-import { logEvent } from '@utils/amplitude'
+import { isShowSatismeter, logEvent } from 'utils/metrics'
 import {
   formatUnit,
   createTransaction,
@@ -30,7 +30,7 @@ import {
 } from '@utils/currencies'
 import { convertDecimals } from '@utils/currencies/ethereumLike'
 import { getItem } from '@utils/storage'
-import { getStats, updateStats, isShowSatismeter } from 'utils/history'
+import { getStats, updateStats } from 'utils/history'
 import { minus } from '@utils/format'
 
 // Config

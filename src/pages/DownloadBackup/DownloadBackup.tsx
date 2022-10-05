@@ -8,7 +8,7 @@ import Button from '@components/Button'
 
 // Utils
 import { download as downloadBackup } from '@utils/backup'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getItem, removeItem, setItem } from '@utils/storage'

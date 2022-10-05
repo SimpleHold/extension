@@ -40,7 +40,7 @@ import {
 } from '@utils/currencies'
 import { getItem, setItem, removeItem } from '@utils/storage'
 import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { getUtxos as getVergeUtxos } from '@utils/currencies/verge'
 
 // Config

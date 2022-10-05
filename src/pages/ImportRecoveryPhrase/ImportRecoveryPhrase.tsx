@@ -18,7 +18,7 @@ import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { getItem, setItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
-import { setUserProperties } from '@utils/amplitude'
+import { setUserProperties } from 'utils/metrics'
 import { toUpper } from '@utils/format'
 
 // Styles
