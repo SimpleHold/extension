@@ -93,6 +93,7 @@ const RestoreWallet: React.FC = () => {
           setItem('backup', state.backupData)
           setItem('wallets', getWalletsList)
           history.replace('/wallets')
+          setItem("initial_balances_request", "required")
         } else {
           updateState({ activeDrawer: 'fail' })
         }

@@ -52,36 +52,47 @@ import * as toncoin from '@utils/currencies/toncoin'
 import * as digibyte from '@utils/currencies/digibyte'
 import * as ravencoin from '@utils/currencies/ravencoin'
 import * as nano from '@utils/currencies/nano'
-
-const emptyData = {
-  balance: 0,
-  balance_usd: 0,
-  balance_btc: 0,
-  pending: 0,
-  pending_btc: 0,
-}
+import { getItem, removeItem, setItem } from 'utils/storage'
 
 const defaultOptions = {
   responseTimeLimit: 8000,
   requestDebounceTime: { seconds: 20 },
 }
 
+type TWalletBalanceRequestPayload = {
+  address: string
+  symbol: string
+  chain?: string
+  contractAddress?: string
+  tokenSymbol?: string
+  isFullBalance?: boolean
+}
+
 export const getBalances = async (wallets: TGetBalanceWalletProps[], options: TGetBalanceOptions = {}): Promise<IGetBalances[] | null> => {
+
+  if (wallets.length > 1) {
+    setItem("enable_skeletons", "true")
+  }
 
   try {
     const mapWallets = wallets.map(wallet => {
       const tokenSymbol = wallet.chain ? wallet.symbol : undefined
       const sharedToken = getSharedToken(wallet.symbol, wallet.chain)
-      const contractAddress = wallet.contractAddress // todo make util
+      const contractAddress = wallet.contractAddress
         || sharedToken?.address
         || (wallet.chain ? getToken(wallet.symbol, wallet.chain)?.address : undefined)
 
-      return {
-        ...wallet,
+      const requestPayload: TWalletBalanceRequestPayload = {
+        symbol: wallet.symbol,
+        address: wallet.address,
         contractAddress,
-        tokenSymbol,
         chain: getWalletChain(wallet.symbol, wallet.chain) || wallet.chain,
+        isFullBalance: wallet.isFullBalance
       }
+
+      requestPayload.tokenSymbol = contractAddress ? tokenSymbol : undefined
+
+      return requestPayload
     })
 
     const data = await fetchBalances(mapWallets)
@@ -114,14 +125,16 @@ export const getBalances = async (wallets: TGetBalanceWalletProps[], options: TG
           }
         }
       }
-      if (sessionStorage.getItem("initial_balances_request") === "true" && wallets.length > 1) {
-        sessionStorage.removeItem("initial_balances_request")
+      if (getItem("initial_balances_request") && wallets.length > 1) {
+        removeItem("initial_balances_request")
       }
       saveBalanceData({ address, symbol, ...balanceInfo })
     }
     return data
   } catch {
     return []
+  } finally {
+    removeItem("enable_skeletons")
   }
 }
 

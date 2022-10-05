@@ -76,11 +76,9 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   const sharedToken = getSharedToken(symbol, chain)
   const contractAddress = props.contractAddress || sharedToken?.address || (chain ? getToken(symbol, chain)?.address : undefined)
 
-  const enableSkeletons = sessionStorage.getItem("initial_balances_request") === "true"
+  const enableSkeletons = false
 
-  console.log("enableSkeletons", enableSkeletons)
   const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
-  const tokenSymbol = chain ? symbol : undefined
 
   const history = useHistory()
 
@@ -169,7 +167,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
             </Styles.AddressInfo>
             {!isNotActivated ? (
               <Styles.Balances>
-                <Skeleton width={110} height={16} type='gray' br={4} isLoading={enableSkeletons && (balance === null)}>
+                <Skeleton width={110} height={16} type='gray' br={4} isLoading={enableSkeletons}>
                   <Styles.BalanceRow>
                     <Styles.Balance>
                       {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
@@ -187,7 +185,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
                   type='gray'
                   mt={7}
                   br={4}
-                  isLoading={enableSkeletons && (estimated === null)}
+                  isLoading={enableSkeletons}
                 >
                   <Styles.Estimated>{`$ ${getFormatEstimated(
                     estimated,

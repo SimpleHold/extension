@@ -88,7 +88,7 @@ const App: React.FC = () => {
     })
 
     if (getItem("initialBackup") === "downloaded") {
-      sessionStorage.setItem("initial_balances_request", "true")
+      setItem("initial_balances_request", "required")
       removeItem("initialBackup")
     }
 

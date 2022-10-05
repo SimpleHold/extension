@@ -115,6 +115,7 @@ const RestoreBackup: React.FC = () => {
           setBadgeText('1')
 
           updateState({ activeDrawer: 'success' })
+          setItem("initial_balances_request", "required")
         } else {
           updateState({ activeDrawer: 'fail' })
         }

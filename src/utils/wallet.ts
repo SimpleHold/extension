@@ -198,7 +198,6 @@ export const getWallets = (options: TGetWalletsOptions = {}): IWallet[] | null =
     }
     return null
   } catch {
-    console.error("FINDWALLETS CATCH")
     return null
   }
 }
@@ -225,17 +224,10 @@ export const getBalanceDiff = (latestBalance: number | null, balance: number, pr
 
 export const saveBalanceData = (data: TBalanceUpdate, precision?: number): void => {
   const { address, symbol, balance, balance_btc, balance_usd, pending, pending_btc } = data
-  console.log("saveBalanceData", data)
-  console.log(1)
   const wallets = getWallets()
-  console.log("wallets:", wallets)
-  console.log(2)
-  console.log({address, symbol})
   const findWallet = getSingleWallet(address, symbol, wallets)
-  console.log(3)
-  console.log("findWallet", findWallet)
+
   if (findWallet) {
-    console.log(">>>>>>> in findwallet")
     findWallet.walletPendingStatus = !!pending
     findWallet.balance = toFixedWithoutRound(balance || 0, precision || 7)
     findWallet.pending = pending
@@ -245,12 +237,11 @@ export const saveBalanceData = (data: TBalanceUpdate, precision?: number): void 
     findWallet.lastBalanceCheck = Date.now()
     setItem('wallets', JSON.stringify(wallets))
     updateLast('lastBalanceCheck', address, symbol)
-    return
   }
-  console.log("WALLET NOT FOUND")
 }
 
-export const getLatestBalance = (address: string, chain: string): TBalanceData => {
+
+export const getLatestBalance = (address: string, symbol: string): TBalanceData => {
   const wallets = getWallets()
 
   let data: TBalanceData = {
@@ -263,7 +254,7 @@ export const getLatestBalance = (address: string, chain: string): TBalanceData =
   }
 
   if (wallets) {
-    const findWallet = getSingleWallet(address, chain, wallets)
+    const findWallet = getSingleWallet(address, symbol, wallets)
 
     if (findWallet) {
       if (findWallet.balance !== undefined) data.balance = findWallet.balance

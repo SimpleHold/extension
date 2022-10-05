@@ -1,7 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { PrivateKey } from '@hashgraph/sdk'
-import { useIdleTimer } from 'react-idle-timer'
 
 // Components
 import Cover from '@components/Cover'
@@ -43,7 +42,6 @@ import { decrypt } from '@utils/crypto'
 import { toLower, toUpper } from '@utils/format'
 import { findWalletTxHistory, group as groupTxs } from 'utils/history'
 import { logEvent } from '@utils/amplitude'
-import { toMs } from '@utils/dates'
 import { updateTxsHistory } from '@utils/history'
 import { receiveAllPendingTxs } from '@utils/currencies/nano'
 
@@ -107,13 +105,6 @@ const WalletPage: React.FC = () => {
   const [walletPendingStatus, setWalletPendingStatus] = React.useState<null | boolean>(null)
   const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
   const [hasPendingTxs, setHasPendingTxs] = React.useState<null | boolean>(null)
-  const [isIdle, setIsIdle] = React.useState(false)
-
-  useIdleTimer({
-    timeout: toMs({ minutes: 1 }),
-    onActive: () => setIsIdle(false),
-    onIdle: () => setIsIdle(true),
-  })
 
   React.useEffect(() => {
     loadBalance()

@@ -335,4 +335,5 @@ export const getCurrencyByChain = (chain: string): ICurrency | undefined => {
   return currencies.find((currency: ICurrency) => toLower(currency.chain) === toLower(chain))
 }
 
+
 export default currencies
