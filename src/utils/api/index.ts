@@ -6,7 +6,7 @@ import config from '@config/index'
 // Types
 import {
   IAdaTrParams,
-  IGetBalance, IGetBalances,
+  IGetBalances,
   IGetContractInfo,
   IGetNetworkFeeResponse,
   ITokensBalance,
@@ -14,7 +14,6 @@ import {
   TFullTxHistoryResponse,
   TFullTxWallet,
   TGetBalancesWalletProps,
-  THistoryTx,
   TNft,
   TNFtWallets,
   TPhishingSite,
@@ -29,10 +28,13 @@ export const fetchBalances = async (wallets: TGetBalancesWalletProps[],
 ): Promise<IGetBalances[]> => {
   try {
     const { data }: AxiosResponse = await axios.post(
-      `${config.serverUrl}/wallet/balances`,
+      `${config.serverUrl}/wallet/balances-extension`,
       {
         wallets,
       },
+      {
+        timeout: 120000,
+      }
     )
     return data.data
   } catch {
@@ -374,12 +376,12 @@ export const getWarning = async (symbol: string, chain?: string): Promise<string
 export const fetchFullTxHistory = async (wallets: TTxWallet[]): Promise<TFullTxWallet[]> => {
   try {
     const { data }: AxiosResponse<TFullTxHistoryResponse> = await axios.post(
-      `${config.serverUrl}/transaction/transactions-full-info`,
+      `${config.serverUrl}/transaction/transactions-full-info-extension`,
       {
         wallets,
       },
       {
-        timeout: 600000,
+        timeout: 120000,
         headers: {
           'Content-Type': 'application/json',
         },

@@ -8,7 +8,7 @@ import Button from '@components/Button'
 
 // Utils
 import { download as downloadBackup } from '@utils/backup'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getItem, removeItem, setItem } from '@utils/storage'
@@ -30,7 +30,7 @@ interface LocationState {
 }
 
 const DownloadBackup: React.FC = () => {
-  const [isDownloadManually, setDownloadManually] = React.useState<boolean>(false)
+  const [isDownloadManually, setDownloadManually] = React.useState<boolean | undefined>(undefined)
 
   const { state } = useLocation<LocationState>()
   const history = useHistory()
@@ -42,13 +42,11 @@ const DownloadBackup: React.FC = () => {
   const checkBrowserAndOS = () => {
     const os = detectOS()
     const browser = detectBrowser()
-
-    if (os === 'macos' && browser === 'chrome') {
-      setDownloadManually(true)
-    }
+    setDownloadManually((os === 'macos' && browser === 'chrome'))
   }
 
-  const downloadFile = () => {
+  const downloadFile = async () => {
+
     if (state?.from) {
       logEvent({
         name:
@@ -58,6 +56,7 @@ const DownloadBackup: React.FC = () => {
 
     if (isDownloadManually) {
       setTimeout(() => openWebPage(getUrl('download-backup.html')), 1000)
+      return
     }
 
     const backup = getItem('backup')
