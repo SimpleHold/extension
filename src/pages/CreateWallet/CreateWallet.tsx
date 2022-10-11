@@ -9,7 +9,7 @@ import Link from '@components/Link'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { generate as generateBackup } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
 import { generate as generateAddress } from '@utils/currencies'

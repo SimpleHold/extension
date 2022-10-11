@@ -1,7 +1,7 @@
 // Config
 import addressValidate from '@config/addressValidate'
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getSharedToken, getToken } from '@config/tokens'
 import { GENERAL_BALANCE_CHANGE } from '@config/events'
 
 // Utils
@@ -9,7 +9,7 @@ import {
   getEtherNetworkFee,
   getThetaNetworkFee,
   getNetworkFee as getNetworkFeeRequest,
-  getCustomFee, fetchBalance,
+  getCustomFee, fetchBalances,
 } from '@utils/api'
 import { toLower } from '@utils/format'
 import {
@@ -18,15 +18,18 @@ import {
   getLatestBalance,
   getSingleWallet,
   getWalletChain,
-  saveBalanceData,
+  saveBalanceData, TBalanceData,
 } from '@utils/wallet'
-import { checkIfTimePassed } from '@utils/dates'
-import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey, logEvent } from '@utils/amplitude'
-import { updateTxsHistory } from '@utils/history'
+import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey, logEvent } from 'utils/metrics'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData, TCreateInternalTxProps } from './types'
-import { TCustomFee, TGetBalanceOptions, TGetBalanceWalletProps } from '@utils/api/types'
+import {
+  IGetBalances,
+  TCustomFee,
+  TGetBalanceOptions,
+  TGetBalanceWalletProps,
+} from '@utils/api/types'
 
 // Currencies
 import * as ethereumLike from '@utils/currencies/ethereumLike'
@@ -49,89 +52,97 @@ import * as toncoin from '@utils/currencies/toncoin'
 import * as digibyte from '@utils/currencies/digibyte'
 import * as ravencoin from '@utils/currencies/ravencoin'
 import * as nano from '@utils/currencies/nano'
-
-const emptyData = {
-  balance: 0,
-  balance_usd: 0,
-  balance_btc: 0,
-  pending: 0,
-  pending_btc: 0,
-}
+import { getItem, removeItem, setItem } from 'utils/storage'
 
 const defaultOptions = {
   responseTimeLimit: 8000,
   requestDebounceTime: { seconds: 20 },
 }
 
-export const getBalance = async (wallet: TGetBalanceWalletProps, options: TGetBalanceOptions = {}) => {
-  const { symbol, address, chain, tokenSymbol, contractAddress, isFullBalance } = wallet
+type TWalletBalanceRequestPayload = {
+  address: string
+  symbol: string
+  chain?: string
+  contractAddress?: string
+  tokenSymbol?: string
+  isFullBalance?: boolean
+}
 
-  if (!address) return { ...emptyData, isBalanceError: true }
+export const getBalances = async (wallets: TGetBalanceWalletProps[], options: TGetBalanceOptions = {}): Promise<IGetBalances[] | null> => {
 
-  const { force, responseTimeLimit, requestDebounceTime } = { ...defaultOptions, ...options }
-
-  const getChain = getWalletChain(symbol, chain) || chain
-  const savedData = getLatestBalance(address, symbol)
-  const localData = { ...emptyData, ...savedData }
-  const isFetchReady = force || checkIfTimePassed(savedData.lastBalanceCheck || 0, requestDebounceTime)
-
-  if (!isFetchReady) return localData
-
-  let fetchedData = {}
-  let timerId: number | undefined
-  let timer = null
+  if (wallets.length > 1) {
+    setItem("enable_skeletons", "true")
+  }
 
   try {
-    const request = fetchBalance(address, getChain, tokenSymbol, contractAddress, isFullBalance)
-      .then(data => {
-        fetchedData = data
-        const precision = getBalancePrecision(symbol)
-        const balanceDiff = getBalanceDiff(savedData.balance, data.balance || 0, precision)
-        const isPendingStatusChanged = !!savedData.pending !== !!data.pending
+    const mapWallets = wallets.map(wallet => {
+      const tokenSymbol = wallet.chain ? wallet.symbol : undefined
+      const sharedToken = getSharedToken(wallet.symbol, wallet.chain)
+      const contractAddress = wallet.contractAddress
+        || sharedToken?.address
+        || (wallet.chain ? getToken(wallet.symbol, wallet.chain)?.address : undefined)
 
-        if (balanceDiff || isPendingStatusChanged) {
-          if (balanceDiff) {
-            const wallet = getSingleWallet(address, symbol)
-            if (wallet?.lastBalanceCheck) {
-              logEvent({
-                name: GENERAL_BALANCE_CHANGE,
-                properties: {
-                  symbol,
-                  dynamics: balanceDiff > 0 ? 'pos' : 'neg',
-                },
-              })
-            }
-          }
+      const requestPayload: TWalletBalanceRequestPayload = {
+        symbol: wallet.symbol,
+        address: wallet.address,
+        contractAddress,
+        chain: getWalletChain(wallet.symbol, wallet.chain) || wallet.chain,
+        isFullBalance: wallet.isFullBalance
+      }
 
-          updateTxsHistory({
-            pickSingleWallet: {
-              chain: getWalletChain(symbol, chain),
-              address,
-              symbol,
-              tokenSymbol,
-              contractAddress,
-            },
-          })
-        }
-        saveBalanceData({ address, symbol, ...data })
-      })
+      requestPayload.tokenSymbol = contractAddress ? tokenSymbol : undefined
 
-    const isTimer = !(force || !responseTimeLimit)
+      return requestPayload
+    })
 
-    if (isTimer) {
-      timer = new Promise(resolve => {
-        timerId = +setTimeout(resolve, responseTimeLimit)
-      })
+    const data = await fetchBalances(mapWallets)
+
+    if (!data?.length) {
+      return data
     }
 
-    await Promise.race(timer ? [request, timer] : [request])
-    return { ...localData, ...fetchedData }
+    for (const wallet of data) {
+
+      const { balanceInfo, symbol, address } = wallet
+
+      const savedData = getLatestBalance(address, symbol)
+
+      const precision = getBalancePrecision(symbol)
+      const balanceDiff = getBalanceDiff(savedData.balance, balanceInfo.balance || 0, precision)
+      const isPendingStatusChanged = !!savedData.pending !== !!balanceInfo.pending
+
+      if (balanceDiff || isPendingStatusChanged) {
+        if (balanceDiff) {
+          const wallet = getSingleWallet(address, symbol)
+          if (wallet?.lastBalanceCheck) {
+            logEvent({
+              name: GENERAL_BALANCE_CHANGE,
+              properties: {
+                symbol,
+                dynamics: balanceDiff > 0 ? 'pos' : 'neg',
+              },
+            })
+          }
+        }
+      }
+      if (getItem("initial_balances_request") && wallets.length > 1) {
+        removeItem("initial_balances_request")
+      }
+      saveBalanceData({ address, symbol, ...balanceInfo })
+    }
+    return data
   } catch {
-    return localData
+    return []
   } finally {
-    timerId && clearTimeout(timerId)
+    removeItem("enable_skeletons")
   }
 }
+
+export const getSingleBalance = async (wallet: TGetBalanceWalletProps): Promise<TBalanceData> => {
+  await getBalances([wallet])
+  return getLatestBalance(wallet.address, wallet.symbol)
+}
+
 
 export const isEthereumLike = (symbol: string, chain?: string): boolean => {
   return ethereumLike.coins.indexOf(symbol) !== -1 || typeof chain !== 'undefined'

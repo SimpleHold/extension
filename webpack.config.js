@@ -65,28 +65,28 @@ const externalPages = [
     chunks: ['phishing'],
   },
   {
-    chunks: ['selectAddress'],
     filename: 'select-address.html',
+    chunks: ['selectAddress'],
   },
   {
-    chunks: ['send'],
     filename: 'send.html',
+    chunks: ['send'],
   },
   {
-    chunks: ['sendConfirmation'],
     filename: 'send-confirmation.html',
+    chunks: ['sendConfirmation'],
   },
   {
-    chunks: ['connectTrezor'],
     filename: 'connect-trezor.html',
+    chunks: ['connectTrezor'],
   },
   {
-    chunks: ['connectLedger'],
     filename: 'connect-ledger.html',
+    chunks: ['connectLedger'],
   },
   {
-    chunks: [],
     filename: 'trezor-usb-permissions.html',
+    chunks: [],
   },
 ]
 
@@ -233,7 +233,7 @@ const config = {
           maxSize: 3500 * 1000,
           chunks(chunk) {
             return (
-              !(chunk.name === 'background' && targetBrowser !== 'firefox') &&
+              chunk.name !== 'background' &&
               chunk.name !== 'contentScript' &&
               chunk.name !== 'trezor' &&
               chunk.name !== 'inpage' &&

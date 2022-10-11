@@ -21,6 +21,7 @@ export interface IWalletsList {
   sumPendingCallback?: (wallet: TWalletAmountData) => void
   handleClick?: () => void
   isRedirect?: string
+  showSkeletons?: boolean
 }
 
 const WalletsList: React.FC<IWalletsList> = (props) => {

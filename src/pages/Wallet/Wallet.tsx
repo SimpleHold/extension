@@ -1,7 +1,6 @@
 import * as React from 'react'
-import { useLocation, useHistory } from 'react-router-dom'
+import { useHistory, useLocation } from 'react-router-dom'
 import { PrivateKey } from '@hashgraph/sdk'
-import { useIdleTimer } from 'react-idle-timer'
 
 // Components
 import Cover from '@components/Cover'
@@ -18,31 +17,31 @@ import RenameWalletDrawer from '@drawers/RenameWallet'
 import SuccessDrawer from '@drawers/Success'
 
 // Utils
+import { getWarning } from '@utils/api'
 import {
-  getWarning,
-} from '@utils/api'
-import {
+  activateAddress,
+  generateWalletName,
+  getWalletChain,
+  getWalletName,
+  getWallets,
+  IWallet,
   renameWallet,
   toggleVisibleWallet,
-  generateWalletName,
-  getWallets,
-  activateAddress, getWalletChain, getWalletName,
 } from '@utils/wallet'
-import { activateWallet, getBalance } from '@utils/currencies'
+import {
+  activateWallet,
+  checkWithPhrase,
+  getExplorerLink,
+  getSingleBalance,
+  getTransactionLink,
+} from '@utils/currencies'
 import { openWebPage } from '@utils/extension'
-import { getExplorerLink, getTransactionLink, checkWithPhrase } from '@utils/currencies'
 import { validatePassword } from '@utils/validate'
-import { getItem, getJSON } from '@utils/storage'
+import { getItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { toLower, toUpper } from '@utils/format'
-import {
-  save as saveTxs,
-  group as groupTxs,
-  compare as compareTxs,
-  getExist as getExistTxs, findWalletTxHistory,
-} from 'utils/history'
-import { logEvent } from '@utils/amplitude'
-import { toMs } from '@utils/dates'
+import { findWalletTxHistory, group as groupTxs } from 'utils/history'
+import { logEvent } from 'utils/metrics'
 import { updateTxsHistory } from '@utils/history'
 import { receiveAllPendingTxs } from '@utils/currencies/nano'
 
@@ -56,7 +55,6 @@ import useState from '@hooks/useState'
 
 // Types
 import { ILocationState, IState } from './types'
-import { IWallet } from '@utils/wallet'
 
 // Styles
 import Styles from './styles'
@@ -107,13 +105,6 @@ const WalletPage: React.FC = () => {
   const [walletPendingStatus, setWalletPendingStatus] = React.useState<null | boolean>(null)
   const [pendingBalance, setPendingBalance] = React.useState<null | number>(null)
   const [hasPendingTxs, setHasPendingTxs] = React.useState<null | boolean>(null)
-  const [isIdle, setIsIdle] = React.useState(false)
-
-  useIdleTimer({
-    timeout: toMs({ minutes: 1 }),
-    onActive: () => setIsIdle(false),
-    onIdle: () => setIsIdle(true),
-  })
 
   React.useEffect(() => {
     loadBalance()
@@ -210,12 +201,11 @@ const WalletPage: React.FC = () => {
       return
     }
 
-    const { balance, balance_usd, pending } = await getBalance(
-      { symbol, address: state.address, chain: currency?.chain || chain, tokenSymbol, contractAddress },
-      { force: true },
+    const { balance, balance_usd, pending } = await getSingleBalance(
+      { symbol, address: state.address, chain: currency?.chain || chain, tokenSymbol, contractAddress }
     )
 
-    setPendingBalance(pending)
+    setPendingBalance(pending || 0)
     updateState({ balance, estimated: balance_usd })
   }
 
@@ -243,7 +233,7 @@ const WalletPage: React.FC = () => {
       return updateState({ txHistory: [] })
     }
     const wallet: TTxWallet = { address: state.address, chain: getWalletChain(symbol, chain), symbol }
-    await updateTxsHistory({pickSingleWallet: wallet})
+    await updateTxsHistory({ pickSingleWallet: wallet })
     const history = findWalletTxHistory(wallet)
 
     const txHistory = groupTxs(history)

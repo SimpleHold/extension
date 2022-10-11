@@ -13,9 +13,9 @@ import { GENERAL_FIRST_ENTER, GENERAL_START_SESSION } from '@config/events'
 
 // Utils
 import { validateWallet } from '@utils/validate'
-import { init, logEvent } from '@utils/amplitude'
+import { init, logEvent } from '@utils/metrics'
 import { getItem, removeItem, setItem } from '@utils/storage'
-import { getFullHistory, getStats, updateStats } from 'utils/history'
+import { getStats, updateStats } from '@utils/history'
 import { setUserId } from '@utils/api'
 
 import { ToastContextProvider } from '@contexts/Toast/Toast'
@@ -26,7 +26,7 @@ const App: React.FC = () => {
     initAmplitude()
     preloadPages()
     getPlatformInfo()
-    browser.runtime.setUninstallURL(`https://simplehold.io/survey?id=${getItem('clientId')}`)
+    browser.runtime.setUninstallURL(`https://simplehold.typeform.com/nps-score`)
 
     let id: null | number = null
 
@@ -88,6 +88,7 @@ const App: React.FC = () => {
     })
 
     if (getItem("initialBackup") === "downloaded") {
+      setItem("initial_balances_request", "required")
       removeItem("initialBackup")
     }
 

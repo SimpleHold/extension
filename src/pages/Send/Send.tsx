@@ -19,7 +19,7 @@ import AboutFeeDrawer from '@drawers/AboutFee'
 // Utils
 import { toLower, toUpper, plus } from '@utils/format'
 import { validateMany } from '@utils/validate'
-import { getBalance } from '@utils/currencies'
+import { getSingleBalance } from '@utils/currencies'
 import { getUnspentOutputs } from '@utils/api'
 import { getWallets } from '@utils/wallet'
 import {
@@ -35,7 +35,7 @@ import {
   isEthereumLike,
   checkWithZeroFee,
 } from '@utils/currencies'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { setItem } from '@utils/storage'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
@@ -341,7 +341,7 @@ const SendPage: React.FC = () => {
       estimated: null,
     })
 
-    const { balance, balance_usd } = await getBalance(
+    const { balance, balance_usd } = await getSingleBalance(
       {
         symbol,
         address: state.selectedAddress,
@@ -349,9 +349,7 @@ const SendPage: React.FC = () => {
         tokenSymbol: tokenChain ? symbol : undefined,
         contractAddress,
         isFullBalance: true,
-      }, {
-        force: true,
-      },
+      }
     )
 
     updateState({

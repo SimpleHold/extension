@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { ScrollParams } from 'react-virtualized'
+import { useIdleTimer } from 'react-idle-timer'
 
 // Components
 import CollapsibleHeader from '@components/CollapsibleHeader'
@@ -21,11 +22,12 @@ import {
   getFilteredSum,
   getFilteredWallets,
   IWallet,
-  updateWalletsBalances,
 } from '@utils/wallet'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from '@utils/metrics'
 import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
-import { checkOneOfExist, clear } from '@utils/storage'
+import { checkOneOfExist, clear, getItem, setItem } from '@utils/storage'
+import { getBalances } from '@utils/currencies'
+import { checkIfTimePassed, toMs } from '@utils/dates'
 
 // Config
 import {
@@ -65,7 +67,18 @@ const Wallets: React.FC = () => {
   const [isListScrollable, setIsListScrollable] = React.useState(false)
 
   const [listType, setListType] = React.useState<'send' | 'receive' | null>(null)
-  const [isShowNft, setIsShowFfts] = React.useState(false)
+  const [isShowNft, setIsShowNfts] = React.useState(false)
+
+  const [isIdle, setIsIdle] = React.useState(false)
+
+  let refreshBalancesTimerId: number
+  const balanceRefreshTime = { minutes: 2 }
+
+  useIdleTimer({
+    timeout: toMs({ minutes: 5 }),
+    onActive: () => setIsIdle(false),
+    onIdle: () => setIsIdle(true),
+  })
 
   const addToast = useToastContext()
   const walletsTop = isHeaderCollapsed ? 120 : 278
@@ -76,6 +89,7 @@ const Wallets: React.FC = () => {
     logEvent({
       name: MAIN_HOME
     })
+    return () => clearTimeout(refreshBalancesTimerId)
   }, [])
 
   React.useEffect(() => {
@@ -170,7 +184,7 @@ const Wallets: React.FC = () => {
 
     if (wallets.length) {
       updateState({ wallets })
-      await updateWalletsBalances(wallets)
+      await loadBalances()
       wallets = getFilteredWallets()
       setInitialBalance(wallets)
     } else {
@@ -184,6 +198,18 @@ const Wallets: React.FC = () => {
       name: ADD_ADDRESS,
     })
     history.push('/select-currency')
+  }
+
+  const loadBalances = async () => {
+    refreshBalancesTimerId = +setTimeout(loadBalances, toMs(balanceRefreshTime))
+    let wallets = getFilteredWallets()
+    const lastUpdate = getItem("last_balances_request")
+    const isTimePassed = !lastUpdate || checkIfTimePassed(+lastUpdate, balanceRefreshTime)
+    const isFetchReady = getItem("initial_balances_request") || !isIdle && isTimePassed
+    if (isFetchReady) {
+      setItem("last_balances_request", String(Date.now()))
+      await getBalances(wallets)
+    }
   }
 
   const setInitialBalance = (wallets: IWallet[]) => {
@@ -304,7 +330,7 @@ const Wallets: React.FC = () => {
 
   const listControlsProps = {
     onSwitch: () => {
-      setIsShowFfts(true)
+      setIsShowNfts(true)
       onViewNFT()
     },
     isFiltersActive: isFiltersActive(),
@@ -330,7 +356,8 @@ const Wallets: React.FC = () => {
                        onScroll={onScroll}
                        sumBalanceCallback={sumBalanceCallback}
                        sumEstimatedCallback={sumEstimatedCallback}
-                       sumPendingCallback={sumPendingCallback}/>
+                       sumPendingCallback={sumPendingCallback}
+          />
         </Styles.WalletsListContainer>
 
       </Styles.Wrapper>

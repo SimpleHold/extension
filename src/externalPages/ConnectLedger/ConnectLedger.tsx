@@ -20,7 +20,7 @@ import { getItem, getJSON, setItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { addHardwareWallet, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 
 // Hooks
 import useState from '@hooks/useState'

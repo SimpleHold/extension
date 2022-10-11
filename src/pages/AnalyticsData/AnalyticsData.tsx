@@ -7,7 +7,7 @@ import Header from '@components/Header'
 import Button from '@components/Button'
 
 // Utils
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { setItem } from '@utils/storage'
 
 // Config

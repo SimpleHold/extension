@@ -6,11 +6,10 @@ import { toFixedWithoutRound, toLower } from '@utils/format'
 import { encrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
 import { toMs } from '@utils/dates'
-import { getBalance } from '@utils/currencies'
 
 // Config
 import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken, getTokenContractAddress } from '@config/tokens'
+import { getToken } from '@config/tokens'
 
 // Types
 import { TBackup } from '@utils/backup'
@@ -70,10 +69,11 @@ type THardwareFirstAddress = {
   address: string
 }
 
-type TBalanceData = {
+export type TBalanceData = {
   balance: number
   balance_usd: number
   balance_btc: number
+  balance_string?: string
   pending?: number
   pending_btc?: number
   lastBalanceCheck?: number
@@ -240,22 +240,6 @@ export const saveBalanceData = (data: TBalanceUpdate, precision?: number): void 
   }
 }
 
-export const updateWalletsBalances = async (wallets: IWallet[]) => {
-  const queue = []
-  for (const wallet of wallets) {
-    let { symbol, address, chain } = wallet
-    const walletData = {
-      symbol,
-      address,
-      chain,
-      contractAddress: chain ? wallet.contractAddress || getTokenContractAddress(symbol, chain) : undefined,
-      tokenSymbol: chain ? symbol : undefined,
-    }
-    const request = getBalance(walletData)
-    queue.push(request)
-  }
-  return await Promise.all(queue)
-}
 
 export const getLatestBalance = (address: string, symbol: string): TBalanceData => {
   const wallets = getWallets()

@@ -18,8 +18,7 @@ interface Props {
   symbol: string
 }
 
-const PendingBalance: React.FC<Props> = (props) => {
-  const { pending, type, symbol } = props
+const PendingBalance: React.FC<Props> = ({ pending, type, symbol }) => {
 
   const [USDValue, setUSDValue] = React.useState<number>(0)
 

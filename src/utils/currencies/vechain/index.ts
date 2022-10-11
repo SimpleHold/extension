@@ -5,7 +5,7 @@ import Web3 from 'web3'
 import { thorify } from 'thorify'
 
 // Utils
-import { fetchBalance, getVechainParams, getVechainFee } from '@utils/api'
+import { getVechainParams, getVechainFee, fetchBalances } from '@utils/api'
 import { toLower, toUnit } from '@utils/format'
 
 // Config
@@ -68,7 +68,8 @@ export const getNetworkFee = async (
   chain: string
 ): Promise<TGetFeeData> => {
   try {
-    const { balance: currencyBalance } = await fetchBalance(from, 'vethor')
+    const data = await fetchBalances([{address: from, chain: 'vethor'}])
+    const { balance: currencyBalance } = data[0].balanceInfo
 
     if (chain === 'vechain') {
       const fee = Devkit.Transaction.intrinsicGas([

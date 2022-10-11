@@ -13,7 +13,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 import FailDrawer from '@drawers/Fail'
 
 // Utils
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { validate as validateBackup } from '@utils/backup'
@@ -93,6 +93,7 @@ const RestoreWallet: React.FC = () => {
           setItem('backup', state.backupData)
           setItem('wallets', getWalletsList)
           history.replace('/wallets')
+          setItem("initial_balances_request", "required")
         } else {
           updateState({ activeDrawer: 'fail' })
         }

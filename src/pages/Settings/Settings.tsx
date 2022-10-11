@@ -14,7 +14,7 @@ import LogoutDrawer from '@drawers/Logout'
 
 // Utils
 import { download as downloadBackup } from '@utils/backup'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { sha256hash } from '@utils/crypto'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openAppInNewWindow, openWebPage } from '@utils/extension'

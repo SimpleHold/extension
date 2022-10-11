@@ -8,7 +8,7 @@ import Header from '@components/Header'
 import Link from '@components/Link'
 
 // Utils
-import { init, logEvent } from '@utils/amplitude'
+import { init, logEvent } from 'utils/metrics'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getItem, setItem, removeItem } from '@utils/storage'

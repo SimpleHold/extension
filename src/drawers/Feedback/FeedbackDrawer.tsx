@@ -8,7 +8,7 @@ import Button from '@components/Button'
 // Utils
 import { sendFeedback } from '@utils/api'
 import { getItem } from '@utils/storage'
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 
 // Hooks
 import useState from '@hooks/useState'

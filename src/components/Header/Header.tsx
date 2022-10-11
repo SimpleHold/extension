@@ -3,7 +3,7 @@ import SVG from 'react-inlinesvg'
 import { useHistory } from 'react-router-dom'
 
 // Utils
-import { logEvent } from '@utils/amplitude'
+import { logEvent } from 'utils/metrics'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
