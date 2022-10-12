@@ -108,7 +108,7 @@ const WalletPage: React.FC = () => {
 
   React.useEffect(() => {
     loadBalance()
-    getWalletTxHistory()
+    // getWalletTxHistory()
     getName()
     getWalletWarning()
     getWalletData()
@@ -227,22 +227,26 @@ const WalletPage: React.FC = () => {
     return null
   }
 
-  const getWalletTxHistory = async (): Promise<void> => {
-
-    if (state.isNotActivated) {
-      return updateState({ txHistory: [] })
-    }
-    const wallet: TTxWallet = { address: state.address, chain: getWalletChain(symbol, chain), symbol }
-    await updateTxsHistory({ pickSingleWallet: wallet })
-    const history = findWalletTxHistory(wallet)
-
-    const txHistory = groupTxs(history)
-
-    const pendingTxs = history.find(tx => tx.isPending)
-    setHasPendingTxs(!!pendingTxs)
-
-    updateState({ txHistory })
-  }
+  // const getWalletTxHistory = async (): Promise<void> => { // TODO temp
+  //
+  //   if (state.isNotActivated) {
+  //     return updateState({ txHistory: [] })
+  //   }
+  //
+  //   const wallet: TTxWallet = { address: state.address, chain: getWalletChain(symbol, chain), symbol }
+  //
+  //
+  //
+  //   await updateTxsHistory({ pickSingleWallet: wallet })
+  //   const history = findWalletTxHistory(wallet)
+  //
+  //   const txHistory = groupTxs(history)
+  //
+  //   const pendingTxs = history.find(tx => tx.isPending)
+  //   setHasPendingTxs(!!pendingTxs)
+  //
+  //   updateState({ txHistory })
+  // }
 
   const onSelectDropdown = (key: string) => {
     if (key === 'recoveryPhrase' || key === 'privateKey') {
@@ -305,7 +309,7 @@ const WalletPage: React.FC = () => {
               if (symbol.toLowerCase() === 'xno') {
                 const res = await receiveAllPendingTxs(state.address, privateKey)
                 if (res) {
-                  await getWalletTxHistory()
+                  // await getWalletTxHistory()
                   setWalletPendingStatus(false)
                   return updateState({
                     isDrawerButtonLoading: false,
@@ -548,7 +552,8 @@ const WalletPage: React.FC = () => {
               />
             ) : null}
           </Styles.Row>
-          <TransactionHistory data={state.txHistory} symbol={symbol} openTx={openTx} />
+          {/*<TransactionHistory data={state.txHistory} symbol={symbol} openTx={openTx} />*/}
+          <TransactionHistory data={[]} symbol={symbol} openTx={openTx} />
         </Styles.Container>
       </Styles.Wrapper>
       <ConfirmDrawer
