@@ -13,8 +13,8 @@ import { getToken } from '@config/tokens'
 
 // Types
 import { TBackup } from '@utils/backup'
-import { TWalletAmountData } from 'pages/Wallets/types'
-import { TCurrency } from 'drawers/FilterWallets/types'
+import { TWalletAmountData } from '@pages/Wallets/types'
+import { TCurrency } from '@drawers/FilterWallets/types'
 
 export type THardware = {
   path: string
@@ -46,6 +46,7 @@ export interface IWallet {
   isNotActivated?: boolean
   lastActive?: number
   lastBalanceCheck?: number
+  txHistoryUpdateRequired?: boolean
 }
 
 export type TUpdateLast = {
@@ -77,6 +78,7 @@ export type TBalanceData = {
   pending?: number
   pending_btc?: number
   lastBalanceCheck?: number
+  txHistoryUpdateRequired?: boolean
 }
 
 type TBalancePrecisions = {
@@ -223,7 +225,7 @@ export const getBalanceDiff = (latestBalance: number | null, balance: number, pr
 }
 
 export const saveBalanceData = (data: TBalanceUpdate, precision?: number): void => {
-  const { address, symbol, balance, balance_btc, balance_usd, pending, pending_btc } = data
+  const { address, symbol, balance, balance_btc, balance_usd, pending, pending_btc, txHistoryUpdateRequired } = data
   const wallets = getWallets()
   const findWallet = getSingleWallet(address, symbol, wallets)
 
@@ -235,6 +237,7 @@ export const saveBalanceData = (data: TBalanceUpdate, precision?: number): void 
     findWallet.balance_btc = balance_btc
     findWallet.balance_usd = balance_usd
     findWallet.lastBalanceCheck = Date.now()
+    findWallet.txHistoryUpdateRequired = txHistoryUpdateRequired
     setItem('wallets', JSON.stringify(wallets))
     updateLast('lastBalanceCheck', address, symbol)
   }

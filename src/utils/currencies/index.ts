@@ -20,7 +20,9 @@ import {
   getWalletChain,
   saveBalanceData, TBalanceData,
 } from '@utils/wallet'
-import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey, logEvent } from 'utils/metrics'
+import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey, logEvent } from '@utils/metrics'
+import { getItem, removeItem, setItem } from '@utils/storage'
+import { checkIfTimePassed } from '@utils/dates'
 
 // Types
 import { TProvider, TCreateTransactionProps, IGetFeeParams, TGetFeeData, TCreateInternalTxProps } from './types'
@@ -52,7 +54,6 @@ import * as toncoin from '@utils/currencies/toncoin'
 import * as digibyte from '@utils/currencies/digibyte'
 import * as ravencoin from '@utils/currencies/ravencoin'
 import * as nano from '@utils/currencies/nano'
-import { getItem, removeItem, setItem } from 'utils/storage'
 
 const defaultOptions = {
   responseTimeLimit: 8000,
@@ -110,8 +111,10 @@ export const getBalances = async (wallets: TGetBalanceWalletProps[], options: TG
       const precision = getBalancePrecision(symbol)
       const balanceDiff = getBalanceDiff(savedData.balance, balanceInfo.balance || 0, precision)
       const isPendingStatusChanged = !!savedData.pending !== !!balanceInfo.pending
+      const isBalanceChanged = balanceDiff || isPendingStatusChanged
 
-      if (balanceDiff || isPendingStatusChanged) {
+      if (isBalanceChanged) {
+
         if (balanceDiff) {
           const wallet = getSingleWallet(address, symbol)
           if (wallet?.lastBalanceCheck) {
@@ -128,7 +131,7 @@ export const getBalances = async (wallets: TGetBalanceWalletProps[], options: TG
       if (getItem("initial_balances_request") && wallets.length > 1) {
         removeItem("initial_balances_request")
       }
-      saveBalanceData({ address, symbol, ...balanceInfo })
+      saveBalanceData({ address, symbol, txHistoryUpdateRequired: Boolean(isBalanceChanged), ...balanceInfo })
     }
     return data
   } catch {
@@ -139,7 +142,10 @@ export const getBalances = async (wallets: TGetBalanceWalletProps[], options: TG
 }
 
 export const getSingleBalance = async (wallet: TGetBalanceWalletProps): Promise<TBalanceData> => {
-  await getBalances([wallet])
+  const latestBalance = getLatestBalance(wallet.address, wallet.symbol)
+  if (checkIfTimePassed(latestBalance.lastBalanceCheck || 0, { seconds: 30 })) {
+    await getBalances([wallet])
+  }
   return getLatestBalance(wallet.address, wallet.symbol)
 }
 

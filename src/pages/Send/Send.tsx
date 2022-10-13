@@ -35,7 +35,7 @@ import {
   isEthereumLike,
   checkWithZeroFee,
 } from '@utils/currencies'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { setItem } from '@utils/storage'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
