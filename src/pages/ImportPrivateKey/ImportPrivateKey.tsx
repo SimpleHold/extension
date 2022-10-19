@@ -23,7 +23,7 @@ import {
 import { decrypt } from '@utils/crypto'
 import { setUserProperties } from 'utils/metrics'
 import { toLower, toUpper } from '@utils/format'
-import { importPrivateKey, getTokenStandard } from '@utils/currencies'
+import { importPrivateKey, getTokenStandard, getSingleBalance } from '@utils/currencies'
 import { getTokensBalance } from '@utils/api'
 import { getItem, setItem } from '@utils/storage'
 import * as theta from '@utils/currencies/theta'
@@ -49,6 +49,7 @@ const initialState: IState = {
   errorLabel: null,
   password: '',
   isImportButtonLoading: false,
+  isConfirmButtonLoading: false
 }
 
 const ImportPrivateKey: React.FC = () => {
@@ -194,6 +195,14 @@ const ImportPrivateKey: React.FC = () => {
             ).length
             setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
 
+            updateState({ isConfirmButtonLoading: true })
+
+            await getSingleBalance(
+              { symbol, address, chain, tokenSymbol: chain ? symbol : undefined, contractAddress }
+            )
+
+            updateState({ isConfirmButtonLoading: false })
+
             return updateState({ activeDrawer: 'success' })
           }
         }
@@ -269,6 +278,7 @@ const ImportPrivateKey: React.FC = () => {
         inputLabel="Enter password"
         textInputValue={state.password}
         isButtonDisabled={!validatePassword(state.password)}
+        isButtonLoading={state.isConfirmButtonLoading}
         onConfirm={onConfirmDrawer}
         onChangeText={setPassword}
         textInputType="password"

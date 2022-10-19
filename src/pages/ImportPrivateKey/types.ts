@@ -12,4 +12,5 @@ export interface IState {
   errorLabel: null | string
   password: string
   isImportButtonLoading: boolean
+  isConfirmButtonLoading: boolean
 }
