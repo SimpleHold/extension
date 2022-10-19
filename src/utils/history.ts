@@ -3,7 +3,7 @@ import { groupBy, pick } from 'lodash'
 
 // Utils
 import { getItem, getJSON, setItem } from '@utils/storage'
-import { filterWallets, getWalletChain, getWallets } from '@utils/wallet'
+import { filterWallets, getWalletChain, getWallets, updateWalletHistoryFetchStatus } from '@utils/wallet'
 import { fetchFullTxHistory } from '@utils/api'
 import { toLower } from '@utils/format'
 
@@ -209,6 +209,11 @@ export const saveFullHistory = (txs: TTxFullInfo[]): void => {
       })
       return match ? { ...tx, isPending: false } : tx
     })
+
+    for (const tx of getNewTxs) {
+      updateWalletHistoryFetchStatus(tx.address, tx.symbol, false)
+    }
+
     setItem('full_history', JSON.stringify([...getUpdatedPendingTxs, ...getNewTxs]))
   } else {
     setItem('full_history', JSON.stringify(txs))

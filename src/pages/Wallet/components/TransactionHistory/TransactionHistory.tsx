@@ -22,7 +22,6 @@ type TSort = { date: string }
 
 const TransactionHistory: React.FC<Props> = (props) => {
   const { data, symbol, openTx } = props
-
   const sortByDate = (a: TSort, b: TSort) => new Date(b.date).getTime() - new Date(a.date).getTime()
 
   return (

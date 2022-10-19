@@ -20,7 +20,7 @@ import SuccessDrawer from '@drawers/Success'
 import { getWarning } from '@utils/api'
 import {
   activateAddress,
-  generateWalletName,
+  generateWalletName, getSingleWallet,
   getWalletChain,
   getWalletName,
   getWallets,
@@ -44,6 +44,7 @@ import { findWalletTxHistory, group as groupTxs } from 'utils/history'
 import { logEvent } from 'utils/metrics'
 import { updateTxsHistory } from '@utils/history'
 import { receiveAllPendingTxs } from '@utils/currencies/nano'
+import { TTxWallet } from '@utils/api/types'
 
 // Config
 import { getCurrency } from '@config/currencies'
@@ -58,7 +59,6 @@ import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
-import { TTxWallet } from 'utils/api/types'
 
 const initialState: IState = {
   balance: null,
@@ -108,7 +108,6 @@ const WalletPage: React.FC = () => {
 
   React.useEffect(() => {
     loadBalance()
-    // getWalletTxHistory()
     getName()
     getWalletWarning()
     getWalletData()
@@ -119,6 +118,12 @@ const WalletPage: React.FC = () => {
       updateState({ isBalanceRefreshing: false })
     }
   }, [state.balance, state.estimated, state.isBalanceRefreshing])
+
+  React.useEffect(() => {
+    if (typeof state.balance === "number") {
+      getWalletTxHistory()
+    }
+  }, [state.balance])
 
   React.useEffect(() => {
     setWalletPendingStatus(Boolean(hasPendingTxs || pendingBalance))
@@ -227,26 +232,31 @@ const WalletPage: React.FC = () => {
     return null
   }
 
-  // const getWalletTxHistory = async (): Promise<void> => { // TODO temp
-  //
-  //   if (state.isNotActivated) {
-  //     return updateState({ txHistory: [] })
-  //   }
-  //
-  //   const wallet: TTxWallet = { address: state.address, chain: getWalletChain(symbol, chain), symbol }
-  //
-  //
-  //
-  //   await updateTxsHistory({ pickSingleWallet: wallet })
-  //   const history = findWalletTxHistory(wallet)
-  //
-  //   const txHistory = groupTxs(history)
-  //
-  //   const pendingTxs = history.find(tx => tx.isPending)
-  //   setHasPendingTxs(!!pendingTxs)
-  //
-  //   updateState({ txHistory })
-  // }
+  const getWalletTxHistory = async (): Promise<void> => {
+
+    if (state.isNotActivated) {
+      return updateState({ txHistory: [] })
+    }
+
+    const wallet: TTxWallet = { address: state.address, chain: getWalletChain(symbol, chain), symbol }
+    let history = findWalletTxHistory(wallet)
+
+    const walletData = getSingleWallet(state.address, symbol)
+    const isNonEmptyBalance = typeof state.balance === "number" && state.balance > 0
+    const isFetchRequired = walletData?.txHistoryUpdateRequired
+      || isNonEmptyBalance && !history.length
+    if (isFetchRequired) {
+      await updateTxsHistory({ pickSingleWallet: wallet })
+      history = findWalletTxHistory(wallet)
+    }
+
+    const txHistory = groupTxs(history)
+
+    const pendingTxs = history.find(tx => tx.isPending)
+    setHasPendingTxs(!!pendingTxs)
+
+    updateState({ txHistory })
+  }
 
   const onSelectDropdown = (key: string) => {
     if (key === 'recoveryPhrase' || key === 'privateKey') {
@@ -309,7 +319,7 @@ const WalletPage: React.FC = () => {
               if (symbol.toLowerCase() === 'xno') {
                 const res = await receiveAllPendingTxs(state.address, privateKey)
                 if (res) {
-                  // await getWalletTxHistory()
+                  await getWalletTxHistory()
                   setWalletPendingStatus(false)
                   return updateState({
                     isDrawerButtonLoading: false,
@@ -552,8 +562,7 @@ const WalletPage: React.FC = () => {
               />
             ) : null}
           </Styles.Row>
-          {/*<TransactionHistory data={state.txHistory} symbol={symbol} openTx={openTx} />*/}
-          <TransactionHistory data={[]} symbol={symbol} openTx={openTx} />
+          <TransactionHistory data={state.txHistory} symbol={symbol} openTx={openTx} />
         </Styles.Container>
       </Styles.Wrapper>
       <ConfirmDrawer

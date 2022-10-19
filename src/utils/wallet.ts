@@ -243,6 +243,16 @@ export const saveBalanceData = (data: TBalanceUpdate, precision?: number): void 
   }
 }
 
+export const updateWalletHistoryFetchStatus = (address: string, symbol: string, value: boolean): void => {
+  const wallets = getWallets()
+  const findWallet = getSingleWallet(address, symbol, wallets)
+
+  if (findWallet) {
+    findWallet.txHistoryUpdateRequired = value
+    setItem('wallets', JSON.stringify(wallets))
+  }
+}
+
 
 export const getLatestBalance = (address: string, symbol: string): TBalanceData => {
   const wallets = getWallets()
