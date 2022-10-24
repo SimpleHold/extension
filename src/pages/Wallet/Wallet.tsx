@@ -237,8 +237,7 @@ const WalletPage: React.FC = () => {
     if (state.isNotActivated) {
       return updateState({ txHistory: [] })
     }
-
-    const wallet: TTxWallet = { address: state.address, chain: getWalletChain(symbol, chain), symbol }
+    const wallet: TTxWallet = { address: state.address, chain: chain || getWalletChain(symbol, chain), symbol }
     let history = findWalletTxHistory(wallet)
 
     const walletData = getSingleWallet(state.address, symbol)
@@ -246,7 +245,7 @@ const WalletPage: React.FC = () => {
     const isFetchRequired = walletData?.txHistoryUpdateRequired
       || isNonEmptyBalance && !history.length
     if (isFetchRequired) {
-      await updateTxsHistory({ pickSingleWallet: wallet })
+      await updateTxsHistory({ pickSingleWallet: {...wallet, tokenSymbol, contractAddress}})
       history = findWalletTxHistory(wallet)
     }
 

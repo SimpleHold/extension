@@ -7,7 +7,7 @@ import Skeleton from '@components/Skeleton'
 
 // Types
 import { TAddressTx } from '@utils/api/types'
-import { TAddressTxGroup } from 'utils/history'
+import { TAddressTxGroup } from '@utils/history'
 
 // Styles
 import Styles from './styles'

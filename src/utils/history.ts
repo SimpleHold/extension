@@ -57,7 +57,7 @@ export const updateTxsHistory = async (
           const { address, chain, symbol, contractAddress } = wallet
           return {
             address,
-            chain: getWalletChain(symbol, chain),
+            chain: chain || getWalletChain(symbol, chain),
             symbol,
             tokenSymbol: chain ? symbol : undefined,
             contractAddress,
@@ -66,7 +66,6 @@ export const updateTxsHistory = async (
         .filter(wallet => wallet.address)
     }
     const data = await fetchFullTxHistory(payload)
-
     if (!data.length) return
 
     const compare = compareFullHistory(data)
@@ -196,7 +195,9 @@ export const saveFullHistory = (txs: TTxFullInfo[]): void => {
         const hashMatch = toLower(tx.hash) === toLower(newTx.hash)
         const amountMatch = tx.amount === newTx.amount
         const addressMatch = tx.address === newTx.address
-        return hashMatch && amountMatch && addressMatch
+        const symbolMatch = tx.symbol === newTx.symbol
+        const chainMatch = tx.chain === newTx.chain
+        return hashMatch && amountMatch && addressMatch && symbolMatch && chainMatch
       })
     })
 
@@ -204,8 +205,10 @@ export const saveFullHistory = (txs: TTxFullInfo[]): void => {
       const match = txs.find((newTx: TTxFullInfo) => {
         const hashMatch = toLower(newTx.hash) === toLower(tx.hash)
         const addressMatch = toLower(newTx.address) === toLower(tx.address)
+        const symbolMatch = tx.symbol === newTx.symbol
+        const chainMatch = tx.chain === newTx.chain
         const pendingStatusUpdated = tx.isPending !== newTx.isPending
-        return hashMatch && addressMatch && pendingStatusUpdated
+        return hashMatch && addressMatch && symbolMatch && chainMatch && pendingStatusUpdated
       })
       return match ? { ...tx, isPending: false } : tx
     })
@@ -213,7 +216,6 @@ export const saveFullHistory = (txs: TTxFullInfo[]): void => {
     for (const tx of getNewTxs) {
       updateWalletHistoryFetchStatus(tx.address, tx.symbol, false)
     }
-
     setItem('full_history', JSON.stringify([...getUpdatedPendingTxs, ...getNewTxs]))
   } else {
     setItem('full_history', JSON.stringify(txs))
