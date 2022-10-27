@@ -6,6 +6,7 @@ import { validateWallet } from '@utils/validate'
 // Types
 import { IWallet } from '@utils/wallet'
 import { padTo2Digits } from 'utils/format'
+import { removeItem, setItem } from 'utils/storage'
 
 const pjson = require('../../package.json')
 
@@ -74,6 +75,13 @@ export const download = (backup: string): void => {
   document.body.appendChild(element)
   element.click()
   document.body.removeChild(element)
+}
+
+export const downloadBackupFile = async (backup: string) => {
+  download(backup)
+  removeItem('backupStatus')
+  removeItem('initialBackup')
+  setItem('backup_download_successful', 'true')
 }
 
 export const validate = (backup: string): string | null => {

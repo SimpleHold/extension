@@ -13,7 +13,7 @@ import PasscodeDrawer from '@drawers/Passcode'
 import LogoutDrawer from '@drawers/Logout'
 
 // Utils
-import { download as downloadBackup } from '@utils/backup'
+import { downloadBackupFile as downloadBackup } from '@utils/backup'
 import { logEvent } from 'utils/metrics'
 import { sha256hash } from '@utils/crypto'
 import { detectBrowser, detectOS } from '@utils/detect'
@@ -83,18 +83,16 @@ const Settings: React.FC = () => {
     }
   }
 
-  const onDownloadBackup = async () => {
-    if (state.isDownloadManually) {
-      openWebPage(getUrl('download-backup.html'))
-    } else {
-      const backup = getItem('backup')
+  const onDownloadBackup = async () => { // Manual download for mac/chrome is currently removed
+    const backup = getItem('backup')
 
-      if (backup) {
-        logEvent({
-          name: SETTINGS_BACKUP,
-        })
-        downloadBackup(backup)
-      }
+    if (backup) {
+      logEvent({
+        name: SETTINGS_BACKUP,
+      })
+
+      await downloadBackup(backup)
+      removeCache()
     }
   }
 
@@ -145,8 +143,8 @@ const Settings: React.FC = () => {
         logEvent({
           name: SUPPORT_SELECT,
           properties: {
-            page: "settings"
-          }
+            page: 'settings',
+          },
         })
         openWebPage('https://simplehold.io/about')
       },
@@ -185,8 +183,8 @@ const Settings: React.FC = () => {
     updateState({ activeDrawer: 'logout' })
   }
 
-  const onConfirmLogout = (): void => {
-    removeCache()
+  const onConfirmLogout = async () => {
+    await onDownloadBackup()
     history.push('/welcome')
   }
 
@@ -199,8 +197,8 @@ const Settings: React.FC = () => {
         logEvent({
           name: SETTINGS_TOGGLE_PASSCODE,
           properties: {
-            is_enable: "no"
-          }
+            is_enable: 'no',
+          },
         })
       } else {
         updateState({ isPasscodeError: true })
@@ -213,8 +211,8 @@ const Settings: React.FC = () => {
       logEvent({
         name: SETTINGS_TOGGLE_PASSCODE,
         properties: {
-          is_enable: "yes"
-        }
+          is_enable: 'yes',
+        },
       })
     }
   }
@@ -231,7 +229,7 @@ const Settings: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle="Back" onBack={history.goBack} activePage="settings" whiteLogo />
+        <Header withBack backTitle='Back' onBack={history.goBack} activePage='settings' whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Settings</Styles.Title>
@@ -272,7 +270,7 @@ const Settings: React.FC = () => {
                           src={icon.source}
                           width={icon.width}
                           height={icon.height}
-                          title="icon"
+                          title='icon'
                         />
                       </Styles.IconRow>
                     ) : null}
@@ -287,7 +285,7 @@ const Settings: React.FC = () => {
             </Styles.ExtensionInfo>
           </Styles.Row>
           <Styles.Actions>
-            <Button label="Log out & clear cache" onClick={onLogout} isDanger />
+            <Button label='Log out & clear cache' onClick={onLogout} isDanger />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>

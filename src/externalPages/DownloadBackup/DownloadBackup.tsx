@@ -7,8 +7,8 @@ import { browser } from 'webextension-polyfill-ts'
 import ExternalPageContainer from '@containers/ExternalPage'
 
 // Utils
-import { download } from '@utils/backup'
-import { getItem, removeItem } from '@utils/storage'
+import { downloadBackupFile } from '@utils/backup'
+import { getItem, removeItem, setItem } from '@utils/storage'
 import { getUrl } from '@utils/extension'
 
 // Styles
@@ -47,8 +47,7 @@ const DownloadBackup: React.FC = () => {
     const backup = getItem('backup')
 
     if (backup) {
-      download(backup)
-      removeItem('backupStatus')
+      downloadBackupFile(backup)
     }
   }
 
@@ -61,9 +60,9 @@ const DownloadBackup: React.FC = () => {
   }
 
   return (
-    <ExternalPageContainer onClose={onClose} height="100%" headerStyle="white">
+    <ExternalPageContainer onClose={onClose} height='100%' headerStyle='white'>
       <Styles.Body>
-        <Styles.Image src="../../assets/illustrate/downloadbackup.svg" />
+        <Styles.Image src='../../assets/illustrate/downloadbackup.svg' />
         <Styles.Title>Download backup</Styles.Title>
         <Styles.Description>Your download will start in few seconds.</Styles.Description>
         <Styles.DownloadLink onClick={onDownload}>If not, click here</Styles.DownloadLink>
@@ -71,7 +70,7 @@ const DownloadBackup: React.FC = () => {
         <Styles.DividerLine />
 
         <Styles.QuestionBlock>
-          <SVG src="../../assets/icons/ask.svg" width={15} height={15} title="ask" />
+          <SVG src='../../assets/icons/ask.svg' width={15} height={15} title='ask' />
           <Styles.Question>Why I see this page?</Styles.Question>
         </Styles.QuestionBlock>
 

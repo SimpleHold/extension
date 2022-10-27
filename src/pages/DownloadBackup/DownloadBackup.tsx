@@ -7,7 +7,7 @@ import Link from '@components/Link'
 import Button from '@components/Button'
 
 // Utils
-import { download as downloadBackup } from '@utils/backup'
+import { downloadBackupFile as downloadBackup } from '@utils/backup'
 import { logEvent } from '@utils/metrics'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
