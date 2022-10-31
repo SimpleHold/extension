@@ -10,10 +10,11 @@ import useVisible from '@hooks/useVisible'
 
 // Utils
 import { toUpper } from '@utils/format'
-import { checkWithZeroFee } from '@utils/currencies'
+import { checkIsZeroFee } from '@coins/index'
 
 // Types
 import { TFeeValue } from '../types'
+import { TFeeTypes } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -72,7 +73,7 @@ const FeeButtonShared: React.FC<Props> = (props) => {
         ) : (
           <Styles.Body>
             <Styles.Fee isError={isError}>
-              {fee === 0 && !checkWithZeroFee(symbol) ? '-' : `${fee} ${toUpper(symbol)}`}
+              {fee === 0 && !checkIsZeroFee(symbol) ? '-' : `${fee} ${toUpper(symbol)}`}
             </Styles.Fee>
             {isError ? (
               <Styles.IconRow>

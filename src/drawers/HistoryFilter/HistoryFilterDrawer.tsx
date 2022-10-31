@@ -16,7 +16,7 @@ import { getItem, checkOneOfExist, removeItem, setItem, removeMany } from '@util
 import { toLower } from '@utils/format'
 
 // Config
-import { getCurrency } from '@config/currencies'
+import { getCurrency } from 'config/currencies/currencies'
 import { getToken } from '@config/tokens'
 
 // Hooks

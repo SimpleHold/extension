@@ -19,8 +19,10 @@ import { getWallets, IWallet, getUnique, sortAlphabetically } from '@utils/walle
 import useState from '@hooks/useState'
 
 // Config
-import { getCurrency } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyInfo } from '@config/currencies/utils'
+
+// Tokens
+import { getToken } from '@tokens/index'
 
 // Types
 import { Props, TSortButton, IState, TCurrency } from './types'
@@ -83,7 +85,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
       const currenciesList = uniqueWallets.sort(sortAlphabetically).map((wallet: IWallet) => {
         const { chain, symbol, name } = wallet
 
-        const getWalletInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+        const getWalletInfo = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 
         return {
           symbol: getWalletInfo?.symbol || symbol,

@@ -16,7 +16,7 @@ import { toLower, toUpper } from '@utils/format'
 import { getItem, removeItem } from '@utils/storage'
 
 // Config
-import { getCurrency } from '@config/currencies'
+import { getCurrency } from 'config/currencies/currencies'
 import { getToken } from '@config/tokens'
 
 // Hooks

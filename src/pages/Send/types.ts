@@ -1,8 +1,9 @@
 // Types
 import { THardware, IWallet } from '@utils/wallet'
-import { ICurrency } from '@config/currencies'
-import { IToken } from '@config/tokens'
-import { TCustomFee } from '@utils/api/types'
+import { TCurrency } from '@config/currencies/types'
+import { TToken } from '@tokens/types'
+import { TCustomFee, TFeeTypes } from '@utils/api/types'
+import { TUnspentOutput } from '@coins/types'
 
 export interface ILocationState {
   symbol: string
@@ -14,12 +15,12 @@ export interface ILocationState {
   tokenName?: string
   decimals?: number
   hardware: THardware
-  currency: ICurrency | IToken
+  currency: TCurrency | TToken
   isRedirect?: boolean
 }
 
 export type TFeeValue = {
-  utxos?: UnspentOutput[]
+  utxos?: TUnspentOutput[]
   type: TFeeTypes
   value: number
 }
@@ -36,7 +37,7 @@ export interface IState {
   amount: string
   extraIdName: string | null
   extraId: string
-  outputs: UnspentOutput[]
+  outputs: TUnspentOutput[]
   isFeeLoading: boolean
   fee: number
   feeSymbol: string
@@ -44,7 +45,7 @@ export interface IState {
   addressErrorLabel: null | string
   amountErrorLabel: null | string
   currencyBalance: null | number
-  utxosList: UnspentOutput[] | CardanoUnspentTxOutput[]
+  utxosList: TUnspentOutput[]
   backTitle: string
   customFee: TCustomFee
   isIncludeFee: boolean

@@ -2,16 +2,15 @@ import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 import type Transport from '@ledgerhq/hw-transport-webusb'
 import { Transaction } from '@ethereumjs/tx'
 import { encode } from 'ripple-binary-codec'
-
 import BTCApp from '@ledgerhq/hw-app-btc'
 import ETHApp from '@ledgerhq/hw-app-eth'
 import XRPApp from '@ledgerhq/hw-app-xrp'
+import Web3 from 'web3'
+import { Xrp } from 'sh-coins'
 
 // Utils
-import { toHex } from '@utils/currencies/ethereumLike'
 import { toUpper } from '@utils/format'
 import { getXrpTxParams, getTxHex } from '@utils/api'
-import { formatValue as formatXrpValue } from '@utils/currencies/ripple'
 
 export type TCurrency = {
   symbol: string
@@ -50,6 +49,10 @@ export const currencies: TCurrency[] = [
     path: "44'/144'/0'/0/",
   },
 ]
+
+export const toHex = (value: number): string => {
+  return new Web3().utils.toHex(value)
+}
 
 export const requestTransport = async (): Promise<Transport | null> => {
   try {
@@ -216,7 +219,7 @@ export const createXrpTx = async (
           Account: addressFrom,
           Destination: addressTo,
           Amount: `${amount}`,
-          Fee: `${formatXrpValue(fee, 'to')}`,
+          Fee: `${Xrp.formatValue(fee, 'to')}`,
           Sequence: sequence,
           SigningPubKey: toUpper(publicKey),
         }

@@ -13,7 +13,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 
 // Utils
-import { importRecoveryPhrase } from '@utils/currencies'
+import { importRecoveryPhrase } from '@coins/index'
 import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { getItem, setItem } from '@utils/storage'
@@ -113,7 +113,7 @@ const ImportRecoveryPhrase: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Add address" whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle="Add address" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Import recovery phrase</Styles.Title>

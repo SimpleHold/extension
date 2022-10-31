@@ -23,7 +23,7 @@ import clockIcon from '@assets/icons/clock.svg'
 
 // Utils
 import { short, toUpper, getFormatEstimated, price } from '@utils/format'
-import { getTransactionLink, getNetworkFeeSymbol } from '@utils/currencies'
+import { getTransactionLink, getNetworkFeeSymbol } from '@coins/index'
 import { openWebPage } from '@utils/extension'
 
 // Hooks
@@ -47,7 +47,6 @@ type TTxProps = {
 }
 
 const TxHistory: React.FC<TTxProps> = () => {
-
   const history = useHistory()
 
   const {
@@ -83,7 +82,11 @@ const TxHistory: React.FC<TTxProps> = () => {
   }, [state.isCopied])
 
   const onViewTx = (): void => {
-    openWebPage(getTransactionLink(hash, symbol, chain, tokenChain))
+    const txLink = getTransactionLink(hash, chain, symbol, tokenChain)
+
+    if (txLink) {
+      openWebPage(txLink)
+    }
   }
 
   const onCopyHash = (): void => {
@@ -103,30 +106,28 @@ const TxHistory: React.FC<TTxProps> = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle='History' onBack={history.goBack} whiteLogo />
+        <Header withBack backTitle="History" onBack={history.goBack} whiteLogo />
         <Styles.Container>
           <Styles.Body>
             <Styles.Heading>
-                <CurrencyLogo size={50} symbol={symbol} chain={tokenChain} />
+              <CurrencyLogo size={50} symbol={symbol} chain={tokenChain} />
               <Styles.HeadingInfo>
-                  <Styles.AmountRow>
-                    <Styles.Amount amount={amount}>{`${
-                      amount > 0 ? '+' : ''
-                    } ${numeral(amount).format('0.[000000]')} ${toUpper(
-                      symbol,
-                    )}`}</Styles.Amount>
-                    {isPending ? (
-                      <Styles.PendingIcon>
-                        <SVG src={clockIcon} width={16} height={16} />
-                      </Styles.PendingIcon>
-                    ) : null}
-                  </Styles.AmountRow>
-                  <Styles.Estimated>
-                    {`$ ${estimated > 0 ? '+' : ''} ${getFormatEstimated(
-                      estimated,
-                      price(estimated),
-                    )}`}
-                  </Styles.Estimated>
+                <Styles.AmountRow>
+                  <Styles.Amount amount={amount}>{`${amount > 0 ? '+' : ''} ${numeral(
+                    amount
+                  ).format('0.[000000]')} ${toUpper(symbol)}`}</Styles.Amount>
+                  {isPending ? (
+                    <Styles.PendingIcon>
+                      <SVG src={clockIcon} width={16} height={16} />
+                    </Styles.PendingIcon>
+                  ) : null}
+                </Styles.AmountRow>
+                <Styles.Estimated>
+                  {`$ ${estimated > 0 ? '+' : ''} ${getFormatEstimated(
+                    estimated,
+                    price(estimated)
+                  )}`}
+                </Styles.Estimated>
               </Styles.HeadingInfo>
             </Styles.Heading>
 
@@ -135,15 +136,12 @@ const TxHistory: React.FC<TTxProps> = () => {
                 <Styles.InfoColumnRow>
                   <Styles.InfoLabel>Fee</Styles.InfoLabel>
                   <Styles.InfoContent>
-                      <Styles.InfoBold>
-                        {fee} {toUpper(feeSymbol)}
-                      </Styles.InfoBold>
-                      <Styles.InfoText>
-                        {`$ ${getFormatEstimated(
-                          feeEstimated,
-                          price(feeEstimated),
-                        )}`}
-                      </Styles.InfoText>
+                    <Styles.InfoBold>
+                      {fee} {toUpper(feeSymbol)}
+                    </Styles.InfoBold>
+                    <Styles.InfoText>
+                      {`$ ${getFormatEstimated(feeEstimated, price(feeEstimated))}`}
+                    </Styles.InfoText>
                   </Styles.InfoContent>
                 </Styles.InfoColumnRow>
               </Styles.InfoColumn>
@@ -151,53 +149,37 @@ const TxHistory: React.FC<TTxProps> = () => {
                 <Styles.InfoColumnRow pb={7}>
                   <Styles.InfoLabel>From</Styles.InfoLabel>
                   <Styles.InfoContent>
-                      <>
-                          {addressFrom ? (
-                            <CopyToClipboard value={addressFrom} zIndex={3}>
-                              <Styles.InfoBold>
-                                {short(addressFrom, 20)}
-                              </Styles.InfoBold>
-                            </CopyToClipboard>
-                          ) : null}
-                          {addressesFrom ? (
-                            <Styles.AddressesRow onClick={onViewAddresses('senders')}>
-                              <Styles.Addresses>
-                                Senders {addressesFrom.length}
-                              </Styles.Addresses>
-                              <SVG
-                                src='../../../assets/icons/dropdownArrow.svg'
-                                width={8}
-                                height={6}
-                              />
-                            </Styles.AddressesRow>
-                          ) : null}
-                        </>
+                    <>
+                      {addressFrom ? (
+                        <CopyToClipboard value={addressFrom} zIndex={3}>
+                          <Styles.InfoBold>{short(addressFrom, 20)}</Styles.InfoBold>
+                        </CopyToClipboard>
+                      ) : null}
+                      {addressesFrom ? (
+                        <Styles.AddressesRow onClick={onViewAddresses('senders')}>
+                          <Styles.Addresses>Senders {addressesFrom.length}</Styles.Addresses>
+                          <SVG src="../../../assets/icons/dropdownArrow.svg" width={8} height={6} />
+                        </Styles.AddressesRow>
+                      ) : null}
+                    </>
                   </Styles.InfoContent>
                 </Styles.InfoColumnRow>
                 <Styles.InfoColumnRow pt={7}>
                   <Styles.InfoLabel>To</Styles.InfoLabel>
                   <Styles.InfoContent>
-                      <>
-                        {addressTo ? (
-                          <CopyToClipboard value={addressTo}>
-                            <Styles.InfoBold>
-                              {short(addressTo, 20)}
-                            </Styles.InfoBold>
-                          </CopyToClipboard>
-                        ) : null}
-                        {addressesTo ? (
-                          <Styles.AddressesRow onClick={onViewAddresses('recipients')}>
-                            <Styles.Addresses>
-                              Recipients {addressesTo.length}
-                            </Styles.Addresses>
-                            <SVG
-                              src='../../../assets/icons/dropdownArrow.svg'
-                              width={8}
-                              height={6}
-                            />
-                          </Styles.AddressesRow>
-                        ) : null}
-                      </>
+                    <>
+                      {addressTo ? (
+                        <CopyToClipboard value={addressTo}>
+                          <Styles.InfoBold>{short(addressTo, 20)}</Styles.InfoBold>
+                        </CopyToClipboard>
+                      ) : null}
+                      {addressesTo ? (
+                        <Styles.AddressesRow onClick={onViewAddresses('recipients')}>
+                          <Styles.Addresses>Recipients {addressesTo.length}</Styles.Addresses>
+                          <SVG src="../../../assets/icons/dropdownArrow.svg" width={8} height={6} />
+                        </Styles.AddressesRow>
+                      ) : null}
+                    </>
                   </Styles.InfoContent>
                 </Styles.InfoColumnRow>
               </Styles.InfoColumn>
@@ -205,9 +187,7 @@ const TxHistory: React.FC<TTxProps> = () => {
                 <Styles.InfoColumnRow>
                   <Styles.InfoLabel>Created</Styles.InfoLabel>
                   <Styles.InfoContent>
-                      <Styles.Date>
-                        {dayjs(date).format('MMM D, HH:mm:ss')}
-                      </Styles.Date>
+                    <Styles.Date>{dayjs(date).format('MMM D, HH:mm:ss')}</Styles.Date>
                   </Styles.InfoContent>
                 </Styles.InfoColumnRow>
               </Styles.InfoColumn>
@@ -226,11 +206,7 @@ const TxHistory: React.FC<TTxProps> = () => {
               </Styles.CopyButton>
             </Styles.HashBlock>
           </Styles.Body>
-            <Button
-              label={'View on explorer'}
-              onClick={onViewTx}
-              icon={linkIcon}
-            />
+          <Button label={'View on explorer'} onClick={onViewTx} icon={linkIcon} />
         </Styles.Container>
       </Styles.Wrapper>
       {addressesFrom && addressesTo ? (

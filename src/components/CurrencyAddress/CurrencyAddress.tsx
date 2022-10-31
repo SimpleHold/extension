@@ -7,8 +7,8 @@ import CheckBox from '@components/CheckBox'
 
 // Utils
 import { short, toUpper } from '@utils/format'
-import { getSingleBalance } from '@utils/currencies'
-import { getCurrency } from '@config/currencies'
+import { getSingleBalance } from '@coins/index'
+import { getCurrencyInfo } from '@config/currencies/utils'
 
 // Styles
 import Styles from './styles'
@@ -30,10 +30,10 @@ const CurrencyAddress: React.FC<Props> = (props) => {
     onGetBalance()
   }, [])
 
-  const currency = getCurrency(symbol)
+  const currency = getCurrencyInfo(symbol)
 
   const onGetBalance = async (): Promise<void> => {
-    const request = await getSingleBalance({symbol, address, chain: currency?.chain})
+    const request = await getSingleBalance({ symbol, address, chain: currency?.chain })
     setBalance(request.balance)
   }
 

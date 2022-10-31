@@ -19,7 +19,7 @@ import AboutFeeDrawer from '@drawers/AboutFee'
 // Utils
 import { toLower, toUpper, plus } from '@utils/format'
 import { validateMany } from '@utils/validate'
-import { getSingleBalance } from '@utils/currencies'
+import { getSingleBalance } from '@coins/index'
 import { getUnspentOutputs } from '@utils/api'
 import { getWallets } from '@utils/wallet'
 import {
@@ -34,12 +34,12 @@ import {
   getStandingFee,
   isEthereumLike,
   checkWithZeroFee,
-} from '@utils/currencies'
+} from '@coins/index'
 import { logEvent } from '@utils/metrics'
 import { setItem } from '@utils/storage'
 import { getUrl, openWebPage } from '@utils/extension'
-import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
-import { getUtxos as getVergeUtxos } from '@utils/currencies/verge'
+import { getDogeUtxos } from '@coins/index/bitcoinLike'
+import { getUtxos as getVergeUtxos } from '@coins/index/verge'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -49,7 +49,10 @@ import useState from '@hooks/useState'
 import { getToken } from '@config/tokens'
 import {
   SEND_SELECT,
-  SEND_CANCEL, SEND_RECIPIENT_ADDRESS, SEND_ENTERED_AMOUNT, SEND_CHOOSE_FEE,
+  SEND_CANCEL,
+  SEND_RECIPIENT_ADDRESS,
+  SEND_ENTERED_AMOUNT,
+  SEND_CHOOSE_FEE,
 } from '@config/events'
 
 // Types
@@ -170,7 +173,7 @@ const SendPage: React.FC = () => {
     }
 
     logEvent({
-      name: SEND_ENTERED_AMOUNT
+      name: SEND_ENTERED_AMOUNT,
     })
 
     return () => {
@@ -341,16 +344,14 @@ const SendPage: React.FC = () => {
       estimated: null,
     })
 
-    const { balance, balance_usd } = await getSingleBalance(
-      {
-        symbol,
-        address: state.selectedAddress,
-        chain: currency?.chain || tokenChain,
-        tokenSymbol: tokenChain ? symbol : undefined,
-        contractAddress,
-        isFullBalance: true,
-      }
-    )
+    const { balance, balance_usd } = await getSingleBalance({
+      symbol,
+      address: state.selectedAddress,
+      chain: currency?.chain || tokenChain,
+      tokenSymbol: tokenChain ? symbol : undefined,
+      contractAddress,
+      isFullBalance: true,
+    })
 
     updateState({
       balance,
@@ -380,7 +381,7 @@ const SendPage: React.FC = () => {
 
   const onGoBack = () => {
     if (isRedirect) {
-      history.push("/wallets")
+      history.push('/wallets')
     } else {
       history.goBack()
     }
@@ -455,7 +456,7 @@ const SendPage: React.FC = () => {
           chain,
           hardware,
           extraId: state.extraId,
-        }),
+        })
       )
     }
 
@@ -521,7 +522,7 @@ const SendPage: React.FC = () => {
     }
 
     logEvent({
-      name: SEND_RECIPIENT_ADDRESS
+      name: SEND_RECIPIENT_ADDRESS,
     })
   }
 
@@ -638,7 +639,7 @@ const SendPage: React.FC = () => {
     }
 
     logEvent({
-      name: SEND_CHOOSE_FEE
+      name: SEND_CHOOSE_FEE,
     })
   }
 
@@ -658,9 +659,7 @@ const SendPage: React.FC = () => {
     state.fee > state.currencyBalance
 
   const onBack = () => {
-    isRedirect
-      ? history.push('/wallets')
-      : history.goBack()
+    isRedirect ? history.push('/wallets') : history.goBack()
   }
 
   const backTitle = isRedirect ? 'Home' : state.backTitle
@@ -719,8 +718,8 @@ const SendPage: React.FC = () => {
             />
           </Styles.Row>
           <Styles.Actions>
-            <Button label='Cancel' isLight onClick={onCancel} mr={7.5} />
-            <Button label='Send' onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
+            <Button label="Cancel" isLight onClick={onCancel} mr={7.5} />
+            <Button label="Send" onClick={onConfirm} disabled={isButtonDisabled()} ml={7.5} />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>

@@ -1,8 +1,8 @@
 import * as React from 'react'
 
 // Config
-import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyInfo, getCurrencyByChain } from '@config/currencies/utils'
+import { getToken } from '@tokens/index'
 
 // Utils
 import { toUpper } from '@utils/format'
@@ -26,7 +26,7 @@ const CurrencyLogo: React.FC<Props> = (props) => {
   const [logo, setLogo] = React.useState<string | null>(null)
 
   const getChainLogo = chain ? getCurrencyByChain(chain) : null
-  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+  const currency = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 
   React.useEffect(() => {
     checkLocalLogo()

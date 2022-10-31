@@ -21,7 +21,7 @@ import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { convertDecimals } from '@utils/currencies/ethereumLike'
+import { convertDecimals } from '@coins/index/ethereumLike'
 import {
   formatUnit,
   createTransaction,
@@ -29,7 +29,7 @@ import {
   getTransactionLink,
   checkIsInternalTx,
   createInternalTx,
-} from '@utils/currencies'
+} from '@coins/index'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import { getItem, getJSON, removeItem } from '@utils/storage'
 import { ethereumSignTransaction, signTransaction, getFeatures } from '@utils/trezor'
@@ -53,12 +53,7 @@ import useDebounce from '@hooks/useDebounce'
 import errorHardwareConnectIcon from '@assets/drawer/errorHardwareConnect.svg'
 
 // Config
-import {
-  SEND_CANCEL,
-  SEND_CONFIRMED,
-  SEND_SUCCESS,
-  SEND_PASS,
-} from '@config/events'
+import { SEND_CANCEL, SEND_CONFIRMED, SEND_SUCCESS, SEND_PASS } from '@config/events'
 
 // Types
 import { IState, TLedgerTxParams } from './types'
@@ -78,7 +73,7 @@ const initialState: IState = {
   ledgerTransport: null,
   ledgerDrawerState: null,
   isDraggable: false,
-  logCaptured: false
+  logCaptured: false,
 }
 
 const SendConfirmation: React.FC = () => {
@@ -106,7 +101,7 @@ const SendConfirmation: React.FC = () => {
   React.useEffect(() => {
     if (debouncedPassword) {
       logEvent({
-        name: SEND_PASS
+        name: SEND_PASS,
       })
     }
   }, [])
@@ -255,7 +250,7 @@ const SendConfirmation: React.FC = () => {
 
     if (!state.logCaptured) {
       logEvent({
-        name: SEND_PASS
+        name: SEND_PASS,
       })
     }
 
@@ -359,9 +354,8 @@ const SendConfirmation: React.FC = () => {
       }
 
       if (getTxId) {
-
         logEvent({
-          name: SEND_SUCCESS
+          name: SEND_SUCCESS,
         })
 
         return updateState({
@@ -432,7 +426,6 @@ const SendConfirmation: React.FC = () => {
         extraId,
       } = state.props
 
-
       const decryptBackup = decrypt(backup, state.password)
 
       if (decryptBackup) {
@@ -485,7 +478,7 @@ const SendConfirmation: React.FC = () => {
               networkFee: parseNetworkFee,
               outputs,
               extraId,
-              tokenChain
+              tokenChain,
             })
 
             if (createTx) {
@@ -578,7 +571,7 @@ const SendConfirmation: React.FC = () => {
     if (state.props) {
       const { amount, networkFee, isIncludeFee } = state.props
 
-      if (isIncludeFee === 'true' && (state.props.symbol === state.props.networkFeeSymbol)) {
+      if (isIncludeFee === 'true' && state.props.symbol === state.props.networkFeeSymbol) {
         return minus(amount, networkFee)
       }
       return amount

@@ -19,7 +19,7 @@ import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getUnusedAddressesForToken } from '@config/tokens'
-import { getCurrencyByChain } from '@config/currencies'
+import { getCurrencyByChain } from 'config/currencies/currencies'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -164,7 +164,7 @@ const AddTokenToAddress: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Select currency" whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle="Select currency" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Add to {toUpper(chain)} address</Styles.Title>

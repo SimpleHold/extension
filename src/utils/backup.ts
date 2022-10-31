@@ -5,7 +5,8 @@ import { validateWallet } from '@utils/validate'
 
 // Types
 import { IWallet } from '@utils/wallet'
-import { padTo2Digits } from 'utils/format'
+import { padTo2Digits } from '@utils/format'
+import { TGenerateAddress } from '@coins/types'
 
 const pjson = require('../../package.json')
 
@@ -69,7 +70,7 @@ const createBackupFileName = (fileExtension: string) => {
 export const download = (backup: string): void => {
   const element = document.createElement('a')
   element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(backup))
-  element.setAttribute('download', createBackupFileName("txt"))
+  element.setAttribute('download', createBackupFileName('txt'))
   element.style.display = 'none'
   document.body.appendChild(element)
   element.click()

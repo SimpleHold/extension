@@ -20,7 +20,8 @@ import SuccessDrawer from '@drawers/Success'
 import { getWarning } from '@utils/api'
 import {
   activateAddress,
-  generateWalletName, getSingleWallet,
+  generateWalletName,
+  getSingleWallet,
   getWalletChain,
   getWalletName,
   getWallets,
@@ -34,7 +35,7 @@ import {
   getExplorerLink,
   getSingleBalance,
   getTransactionLink,
-} from '@utils/currencies'
+} from '@coins/index'
 import { openWebPage } from '@utils/extension'
 import { validatePassword } from '@utils/validate'
 import { getItem } from '@utils/storage'
@@ -43,12 +44,12 @@ import { toLower, toUpper } from '@utils/format'
 import { findWalletTxHistory, group as groupTxs } from 'utils/history'
 import { logEvent } from 'utils/metrics'
 import { updateTxsHistory } from '@utils/history'
-import { receiveAllPendingTxs } from '@utils/currencies/nano'
+import { receiveAllPendingTxs } from '@coins/nano'
 import { TTxWallet } from '@utils/api/types'
 
 // Config
-import { getCurrency } from '@config/currencies'
-import { getSharedToken, getToken } from '@config/tokens'
+import { getCurrencyInfo } from '@config/currencies/utils'
+import { getSharedToken, getToken } from '@tokens/index'
 import { REFRESH_BALANCE } from '@config/events'
 
 // Hooks
@@ -120,7 +121,7 @@ const WalletPage: React.FC = () => {
   }, [state.balance, state.estimated, state.isBalanceRefreshing])
 
   React.useEffect(() => {
-    if (typeof state.balance === "number") {
+    if (typeof state.balance === 'number') {
       getWalletTxHistory()
     }
   }, [state.balance])
@@ -149,7 +150,7 @@ const WalletPage: React.FC = () => {
     }
   }
 
-  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+  const currency = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
   const withPhrase = checkWithPhrase(symbol)
   const tokenSymbol = chain ? symbol : undefined
   const isCustomToken =
@@ -170,12 +171,13 @@ const WalletPage: React.FC = () => {
 
     if (walletsList) {
       const findWallet = walletsList.find(
-        (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid),
+        (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
       )
 
       if (findWallet) {
         const walletName =
-          findWallet.walletName || generateWalletName(walletsList, symbol, uuid, hardware, chain, name)
+          findWallet.walletName ||
+          generateWalletName(walletsList, symbol, uuid, hardware, chain, name)
 
         updateState({ walletName })
       }
@@ -183,9 +185,15 @@ const WalletPage: React.FC = () => {
   }
 
   const openPage = (url: string, stateData: { [key: string]: any } = {}) => () => {
-
     const sharedToken = getSharedToken(symbol, chain)
-    const walletName = getWalletName({ uuid, symbol, hardware, chain, name, address: state.address })
+    const walletName = getWalletName({
+      uuid,
+      symbol,
+      hardware,
+      chain,
+      name,
+      address: state.address,
+    })
 
     history.push(url, {
       ...locationState,
@@ -206,9 +214,13 @@ const WalletPage: React.FC = () => {
       return
     }
 
-    const { balance, balance_usd, pending } = await getSingleBalance(
-      { symbol, address: state.address, chain: currency?.chain || chain, tokenSymbol, contractAddress }
-    )
+    const { balance, balance_usd, pending } = await getSingleBalance({
+      symbol,
+      address: state.address,
+      chain: currency?.chain || chain,
+      tokenSymbol,
+      contractAddress,
+    })
 
     setPendingBalance(pending || 0)
     updateState({ balance, estimated: balance_usd })
@@ -233,25 +245,28 @@ const WalletPage: React.FC = () => {
   }
 
   const getWalletTxHistory = async (): Promise<void> => {
-
     if (state.isNotActivated) {
       return updateState({ txHistory: [] })
     }
-    const wallet: TTxWallet = { address: state.address, chain: chain || getWalletChain(symbol, chain), symbol }
+    const wallet: TTxWallet = {
+      address: state.address,
+      chain: chain || getWalletChain(symbol, chain),
+      symbol,
+    }
     let history = findWalletTxHistory(wallet)
 
     const walletData = getSingleWallet(state.address, symbol)
-    const isNonEmptyBalance = typeof state.balance === "number" && state.balance > 0
-    const isFetchRequired = walletData?.txHistoryUpdateRequired
-      || isNonEmptyBalance && !history.length
+    const isNonEmptyBalance = typeof state.balance === 'number' && state.balance > 0
+    const isFetchRequired =
+      walletData?.txHistoryUpdateRequired || (isNonEmptyBalance && !history.length)
     if (isFetchRequired) {
-      await updateTxsHistory({ pickSingleWallet: {...wallet, tokenSymbol, contractAddress}})
+      await updateTxsHistory({ pickSingleWallet: { ...wallet, tokenSymbol, contractAddress } })
       history = findWalletTxHistory(wallet)
     }
 
     const txHistory = groupTxs(history)
 
-    const pendingTxs = history.find(tx => tx.isPending)
+    const pendingTxs = history.find((tx) => tx.isPending)
     setHasPendingTxs(!!pendingTxs)
 
     updateState({ txHistory })
@@ -270,7 +285,17 @@ const WalletPage: React.FC = () => {
       const currencyChain = getCurrencyChain()
 
       if (currencyChain) {
-        openWebPage(getExplorerLink(state.address, symbol, currencyChain, chain, contractAddress))
+        const explorerLink = getExplorerLink(
+          state.address,
+          currencyChain,
+          symbol,
+          chain,
+          contractAddress
+        )
+
+        if (explorerLink) {
+          openWebPage(explorerLink)
+        }
       }
     } else if (key === 'availability') {
       toggleVisibleWallet(state.address, symbol, !state.isHiddenWallet)
@@ -308,7 +333,7 @@ const WalletPage: React.FC = () => {
           const parseBackup = JSON.parse(decryptBackup)
 
           const findWallet: IWallet | undefined = parseBackup?.wallets?.find(
-            (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid),
+            (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
           )
 
           if (findWallet) {
@@ -340,7 +365,6 @@ const WalletPage: React.FC = () => {
     updateState({ passwordErrorLabel: 'Password is not valid', isDrawerButtonLoading: false })
   }
 
-
   const onActivateWallet = async (): Promise<void> => {
     updateState({ isDrawerButtonLoading: true })
 
@@ -354,7 +378,7 @@ const WalletPage: React.FC = () => {
           const parseBackup = JSON.parse(decryptBackup)
 
           const findWallet: IWallet | undefined = parseBackup?.wallets?.find(
-            (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid),
+            (wallet: IWallet) => toLower(wallet.uuid) === toLower(uuid)
           )
 
           if (findWallet) {
@@ -415,7 +439,7 @@ const WalletPage: React.FC = () => {
         if (decryptBackup) {
           const parseBackup = JSON.parse(decryptBackup)
           const findWallet: IWallet | undefined = parseBackup?.wallets?.find(
-            (wallet: IWallet) => toLower(wallet.address) === toLower(state.address),
+            (wallet: IWallet) => toLower(wallet.address) === toLower(state.address)
           )
 
           if (findWallet) {
@@ -466,7 +490,11 @@ const WalletPage: React.FC = () => {
     const currencyChain = getCurrencyChain()
 
     if (currencyChain) {
-      await openWebPage(getTransactionLink(hash, symbol, currencyChain, chain))
+      const txLink = getTransactionLink(hash, currencyChain, symbol, chain)
+
+      if (txLink) {
+        await openWebPage(txLink)
+      }
     }
   }
 
@@ -501,7 +529,7 @@ const WalletPage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle='Home' whiteLogo />
+        <Header withBack onBack={history.goBack} backTitle="Home" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Heading
@@ -532,32 +560,32 @@ const WalletPage: React.FC = () => {
             />
             {state.balance !== null && state.balance < 20 && toLower(symbol) === 'xrp' ? (
               <Warning
-                text='You need at least 20 XRP to activate your XRP address. This amount is reserved according to the network’s requirement, it can not be sent to another address'
-                color='#7D7E8D'
+                text="You need at least 20 XRP to activate your XRP address. This amount is reserved according to the network’s requirement, it can not be sent to another address"
+                color="#7D7E8D"
                 br={8}
                 mt={10}
-                padding='8px 10px'
-                background='rgba(189, 196, 212, 0.2)'
+                padding="8px 10px"
+                background="rgba(189, 196, 212, 0.2)"
               />
             ) : null}
             {state.warning ? (
               <Warning
                 text={state.warning}
-                color='#EB5757'
+                color="#EB5757"
                 br={8}
                 mt={10}
-                padding='8px 10px'
-                background='#FCE6E6'
+                padding="8px 10px"
+                background="#FCE6E6"
               />
             ) : null}
             {state.isNotActivated ? (
               <Warning
                 text={`You need to activate your ${toUpper(symbol)} address.`}
-                color='#7D7E8D'
+                color="#7D7E8D"
                 br={8}
                 mt={10}
-                padding='8px 10px'
-                background='rgba(189, 196, 212, 0.2)'
+                padding="8px 10px"
+                background="rgba(189, 196, 212, 0.2)"
               />
             ) : null}
           </Styles.Row>
@@ -573,19 +601,19 @@ const WalletPage: React.FC = () => {
         onConfirm={onConfirmDrawer}
         textInputValue={state.password}
         onChangeText={setPassword}
-        inputLabel='Enter password'
-        textInputType='password'
+        inputLabel="Enter password"
+        textInputType="password"
         inputErrorLabel={state.passwordErrorLabel}
       />
       <SuccessDrawer
         isActive={state.activeDrawer === 'success'}
         onClose={onDownloadBackup}
-        text='The new address has been successfully activated!'
+        text="The new address has been successfully activated!"
       />
       <SuccessDrawer
         isActive={state.activeDrawer === 'txsReceivedSuccess'}
         onClose={onCloseDrawer}
-        text='All incoming transactions have been received!'
+        text="All incoming transactions have been received!"
       />
       <PrivateKeyDrawer
         isMnemonic={withPhrase}

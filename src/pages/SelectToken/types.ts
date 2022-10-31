@@ -1,10 +1,10 @@
 // Types
-import { ICurrency } from '@config/currencies'
+import { TCurrency } from '@config/currencies/types'
 import { IToken } from '@config/tokens'
 
 export interface ILocationState {
   address: string
-  currency: ICurrency
+  currency: TCurrency
 }
 
 export interface IState {

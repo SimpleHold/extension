@@ -1,7 +1,8 @@
 // Types
 import { IWallet } from '@utils/wallet'
-import { ICurrency } from '@config/currencies'
-import { TCustomFee } from '@utils/api/types'
+import { TCurrency } from '@config/currencies/types'
+import { TCustomFee, TFeeTypes } from '@utils/api/types'
+import { TUnspentOutput } from '@coins/types'
 
 export type TTabInfo = {
   favIconUrl: string
@@ -18,7 +19,7 @@ export interface Props {
 }
 
 export type TFeeValue = {
-  utxos?: UnspentOutput[]
+  utxos?: TUnspentOutput[]
   type: TFeeTypes
   value: number
 }
@@ -28,7 +29,7 @@ export interface IState {
   amount: string
   walletsList: IWallet[]
   selectedWallet: null | IWallet
-  currencyInfo: null | ICurrency
+  currencyInfo: null | TCurrency
   balance: null | number
   estimated: null | number
   addressErrorLabel: null | string
@@ -38,8 +39,8 @@ export interface IState {
   feeSymbol: string
   isFeeLoading: boolean
   amountErrorLabel: null | string
-  outputs: UnspentOutput[]
-  utxosList: UnspentOutput[] | CardanoUnspentTxOutput[]
+  outputs: TUnspentOutput[]
+  utxosList: TUnspentOutput[]
   currencyBalance: number
   extraId: string
   extraIdName: string

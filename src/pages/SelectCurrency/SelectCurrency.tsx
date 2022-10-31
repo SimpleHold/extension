@@ -16,10 +16,10 @@ import HardwareTab from './tabs/hardwareTab'
 import { toLower } from '@utils/format'
 import { getWallets } from '@utils/wallet'
 import { getUrl, openWebPage } from '@utils/extension'
-import { getTokenStandard } from '@utils/currencies'
+import { getTokenStandard } from '@coins/index'
 import { getTokens } from '@utils/localTokens'
-import * as theta from '@utils/currencies/theta'
-import * as vechain from '@utils/currencies/vechain'
+import * as theta from '@coins/index/theta'
+import * as vechain from '@coins/index/vechain'
 
 // Config
 import { checkExistWallet } from '@config/tokens'

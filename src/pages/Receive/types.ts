@@ -1,12 +1,12 @@
 // Types
-import { ICurrency } from '@config/currencies'
-import { IToken } from '@config/tokens'
+import { TCurrency } from '@config/currencies/types'
+import { TToken } from '@tokens/types'
 
 export interface ILocationState {
   address: string
   symbol: string
   walletName: string
-  currency: ICurrency | IToken
+  currency: TCurrency | TToken
   isRedirect?: boolean
 }
 

@@ -1,106 +1,8 @@
 declare module '*.png'
 declare module '*.svg'
-declare module '@thetalabs/theta-js'
-declare module 'neblio-lib'
-declare module 'tronweb'
 declare module 'tonweb'
 declare module 'tonweb-mnemonic'
 declare module 'digibyte-lib'
-
-declare module 'nuls-sdk-js' {
-  function newAddress(
-    chainId: number,
-    passWord: string,
-    prefix: string
-  ): {
-    address: string
-    pri: string
-  }
-  function importByKey(
-    chainId: number,
-    pri: string,
-    passWord: string,
-    prefix: string
-  ): {
-    address: string
-    pub: string
-    pri: string
-  }
-  function verifyAddress(
-    address: string
-  ): {
-    chainId: number
-    right: boolean
-  }
-  function transactionAssemble(inputs: any, outputs: any, remark: string, type: number): any
-  function transactionSerialize(pri: string, pub: string, assembleTx: any): string
-}
-
-declare module 'nerve-sdk-js' {
-  function newAddress(
-    chainId: number,
-    passWord: string,
-    prefix: string
-  ): {
-    address: string
-    pri: string
-  }
-  function importByKey(
-    chainId: number,
-    pri: string,
-    passWord: string,
-    prefix: string
-  ): {
-    address: string
-    pub: string
-    pri: string
-  }
-  function verifyAddress(
-    address: string
-  ): {
-    chainId: number
-    right: boolean
-  }
-  function transactionAssemble(inputs: any, outputs: any, remark: string, type: number): any
-  function transactionSerialize(pri: string, pub: string, assembleTx: any): string
-}
-
-type TGenerateAddress = {
-  address: string
-  privateKey: string
-  mnemonic?: string
-  isNotActivated?: boolean
-}
-
-type TCreatedTransaction = {
-  raw: string
-  hash: string
-}
-
-interface Window {
-  dashcore: {
-    generateWallet: () => TGenerateAddress
-  }
-}
-
-type TFeeTypes = 'slow' | 'average' | 'fast'
-
-interface UnspentOutput {
-  txId: string
-  outputIndex: number
-  script: string
-  satoshis: number
-  address: string
-}
-
-interface CardanoUnspentTxOutput {
-  ctaAddress: string
-  ctaAmount: {
-    getCoin: string
-  }
-  ctaTxHash: string
-  ctaTxIndex: number
-}
 
 interface BitcoinLikeProvider {
   generateWallet: () => TGenerateAddress
@@ -132,13 +34,5 @@ interface BitcoinLikeProvider {
   ) => string
 }
 
-declare const bitcoin: BitcoinLikeProvider
-declare const bitcoincash: BitcoinLikeProvider
-declare const dash: BitcoinLikeProvider
-declare const litecoin: BitcoinLikeProvider
-declare const dogecoin: BitcoinLikeProvider
-declare const bitcoinsv: BitcoinLikeProvider
 declare const ravencoin: BitcoinLikeProvider
-declare const Zilliqa: any
-declare const bitcore: any
 declare const ravencore: any

@@ -22,24 +22,18 @@ import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import { isShowSatismeter, logEvent } from 'utils/metrics'
 import {
   formatUnit,
-  createTransaction,
-  isEthereumLike,
+  createTx,
   getTransactionLink,
   checkIsInternalTx,
   createInternalTx,
-} from '@utils/currencies'
-import { convertDecimals } from '@utils/currencies/ethereumLike'
+} from '@coins/index'
+import { convertDecimals } from '@coins/ethereumLike'
 import { getItem } from '@utils/storage'
 import { getStats, updateStats } from 'utils/history'
 import { minus } from '@utils/format'
 
 // Config
-import {
-  SEND_CANCEL,
-  SEND_CONFIRMED,
-  SEND_SUCCESS,
-  SEND_PASS,
-} from '@config/events'
+import { SEND_CANCEL, SEND_CONFIRMED, SEND_SUCCESS, SEND_PASS } from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -116,80 +110,80 @@ const SendConfirmation: React.FC = () => {
       const decryptBackup = decrypt(backup, state.password)
       if (decryptBackup) {
         const findWallet: IWallet | null = JSON.parse(decryptBackup).wallets.find(
-          (wallet: IWallet) => wallet.address === addressFrom,
+          (wallet: IWallet) => wallet.address === addressFrom
         )
 
         if (findWallet?.privateKey) {
           updateState({ isButtonLoading: true })
 
-          const parseAmount =
-            tokenChain && decimals
-              ? convertDecimals(getAmount(), decimals)
-              : formatUnit(symbol, getAmount(), 'to', chain, 'ether')
-          const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
+          // const parseAmount =
+          //   tokenChain && decimals
+          //     ? convertDecimals(getAmount(), decimals)
+          //     : formatUnit(symbol, getAmount(), 'to', chain, 'ether')
+          // const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
-          const ethTxData = isEthereumLike(symbol, tokenChain)
-            ? await getWeb3TxParams(
-              addressFrom,
-              addressTo,
-              `${parseAmount}`,
-              chain || tokenChain,
-              contractAddress,
-            )
-            : {}
+          // const ethTxData = isEthereumLike(symbol, tokenChain)
+          //   ? await getWeb3TxParams(
+          //       addressFrom,
+          //       addressTo,
+          //       `${parseAmount}`,
+          //       chain || tokenChain,
+          //       contractAddress
+          //     )
+          //   : {}
 
-          const xrpTxData = symbol === 'xrp' ? await getXrpTxParams(addressFrom) : {}
-          const transactionData = {
-            from: addressFrom,
-            to: addressTo,
-            amount: `${parseAmount}`,
-            privateKey: findWallet.privateKey,
-            symbol,
-            tokenChain,
-            outputs,
-            networkFee: parseNetworkFee,
-            contractAddress,
-          }
+          // const xrpTxData = symbol === 'xrp' ? await getXrpTxParams(addressFrom) : {}
+          // const transactionData = {
+          //   from: addressFrom,
+          //   to: addressTo,
+          //   amount: `${parseAmount}`,
+          //   privateKey: findWallet.privateKey,
+          //   symbol,
+          //   tokenChain,
+          //   outputs,
+          //   networkFee: parseNetworkFee,
+          //   contractAddress,
+          // }
 
           const isInternalTx = checkIsInternalTx(symbol)
 
           if (isInternalTx) {
-            const createTx = await createInternalTx({
-                symbol,
-                addressFrom,
-                addressTo,
-                amount: getAmount(),
-                privateKey: findWallet.privateKey,
-                networkFee: parseNetworkFee,
-                outputs,
-                extraId,
-                tokenChain,
-              },
-            )
+            // const createTx = await createInternalTx({
+            //   symbol,
+            //   addressFrom,
+            //   addressTo,
+            //   amount: getAmount(),
+            //   privateKey: findWallet.privateKey,
+            //   networkFee: parseNetworkFee,
+            //   outputs,
+            //   extraId,
+            //   tokenChain,
+            // })
 
-            if (createTx) {
-              logEvent({
-                name: SEND_SUCCESS,
-              })
+            // if (createTx) {
+            //   logEvent({
+            //     name: SEND_SUCCESS,
+            //   })
 
-              return updateState({
-                activeDrawer: 'success',
-                transactionLink: getTransactionLink(createTx, symbol, chain, tokenChain),
-                isButtonLoading: false,
-              })
-            }
+            //   return updateState({
+            //     activeDrawer: 'success',
+            //     transactionLink: getTransactionLink(createTx, symbol, chain, tokenChain),
+            //     isButtonLoading: false,
+            //   })
+            // }
 
             return updateState({
               inputErrorLabel: 'Error while creating transaction',
               isButtonLoading: false,
             })
           }
-          const transaction = await createTransaction({
-            ...transactionData,
-            ...ethTxData,
-            xrpTxData,
-            extraId,
-          })
+          const transaction = null
+          // const transaction = await createTransaction({
+          //   ...transactionData,
+          //   ...ethTxData,
+          //   xrpTxData,
+          //   extraId,
+          // })
 
           if (transaction) {
             if (symbol === 'xno') {
@@ -237,7 +231,7 @@ const SendConfirmation: React.FC = () => {
 
     return updateState({
       activeDrawer: 'success',
-      transactionLink: getTransactionLink(txHash, symbol, chain, tokenChain),
+      transactionLink: getTransactionLink(txHash, chain, symbol, tokenChain) || '',
       isButtonLoading: false,
     })
   }
@@ -312,7 +306,7 @@ const SendConfirmation: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle='Send' onBack={history.goBack} whiteLogo />
+        <Header withBack backTitle="Send" onBack={history.goBack} whiteLogo />
         <Styles.Body>
           <SendConfirmShared
             amount={getAmount()}
@@ -331,9 +325,9 @@ const SendConfirmation: React.FC = () => {
       <ConfirmDrawer
         isActive={state.activeDrawer === 'confirm'}
         onClose={onCloseConfirmDrawer}
-        title='Confirm the sending'
-        inputLabel='Enter password'
-        textInputType='password'
+        title="Confirm the sending"
+        inputLabel="Enter password"
+        textInputType="password"
         textInputValue={state.password}
         inputErrorLabel={state.inputErrorLabel}
         onChangeText={setPassword}

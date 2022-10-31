@@ -9,10 +9,11 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import { toUpper, toLower } from '@utils/format'
 
 // Config
-import currencies, { ICurrency } from '@config/currencies'
+import currencies from '@config/currencies'
 
 // Types
-import { IToken } from '@config/tokens'
+import { TCurrency } from '@config/currencies/types'
+import { TToken } from '@tokens/types'
 
 // Styles
 import Styles from '../styles'
@@ -21,7 +22,7 @@ interface Props {
   onAddCustomToken: () => void
   onAddToken: (symbol: string, chain: string, tokenName: string) => () => void
   onAddAddress: (symbol: string) => () => void
-  tokens: IToken[]
+  tokens: TToken[]
 }
 
 const AllTab: React.FC<Props> = (props) => {
@@ -29,7 +30,7 @@ const AllTab: React.FC<Props> = (props) => {
 
   const [searchValue, setSearchValue] = React.useState<string>('')
 
-  const filterTokensList = tokens.filter((token: IToken) => {
+  const filterTokensList = tokens.filter((token: TToken) => {
     if (searchValue.length) {
       const findByName = toLower(token.name)?.indexOf(toLower(searchValue) || '') !== -1
       const findBySymbol = toLower(token.symbol)?.indexOf(toLower(searchValue) || '') !== -1
@@ -39,7 +40,7 @@ const AllTab: React.FC<Props> = (props) => {
     return token
   })
 
-  const filterCurrenciesList = currencies.filter((currency: ICurrency) => {
+  const filterCurrenciesList = currencies.filter((currency: TCurrency) => {
     if (searchValue.length) {
       const findByName = toLower(currency.name)?.indexOf(toLower(searchValue) || '') !== -1
       const findBySymbol = toLower(currency.symbol)?.indexOf(toLower(searchValue) || '') !== -1
@@ -65,7 +66,7 @@ const AllTab: React.FC<Props> = (props) => {
       ) : null}
 
       <Styles.CurrenciesList>
-        {filterCurrenciesList.map((currency: ICurrency, index) => {
+        {filterCurrenciesList.map((currency: TCurrency, index) => {
           const { name, symbol } = currency
 
           return (
@@ -76,7 +77,7 @@ const AllTab: React.FC<Props> = (props) => {
             </Styles.CurrencyBlock>
           )
         })}
-        {filterTokensList.map((token: IToken, index) => {
+        {filterTokensList.map((token: TToken, index) => {
           const { name, symbol, chain } = token
 
           return (

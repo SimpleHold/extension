@@ -18,15 +18,11 @@ import useToastContext from '@hooks/useToastContext'
 import useState from '@hooks/useState'
 
 // Utils
-import {
-  getFilteredSum,
-  getFilteredWallets,
-  IWallet,
-} from '@utils/wallet'
+import { getFilteredSum, getFilteredWallets, IWallet } from '@utils/wallet'
 import { logEvent } from '@utils/metrics'
 import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
 import { checkOneOfExist, clear, getItem, setItem } from '@utils/storage'
-import { getBalances } from '@utils/currencies'
+import { getBalances } from '@coins/index'
 import { checkIfTimePassed, toMs } from '@utils/dates'
 
 // Config
@@ -34,7 +30,8 @@ import {
   ADD_ADDRESS,
   FILTERS_SELECT,
   HISTORY_SELECT,
-  MAIN_HOME, RECEIVE_SELECT,
+  MAIN_HOME,
+  RECEIVE_SELECT,
   EXCHANGE_SELECT,
 } from '@config/events'
 
@@ -54,7 +51,6 @@ const initialState: IState = {
 }
 
 const Wallets: React.FC = () => {
-
   const history = useHistory()
   const { state: locationState } = useLocation<ILocationState>()
   const { state, updateState } = useState<IState>(initialState)
@@ -87,7 +83,7 @@ const Wallets: React.FC = () => {
     getWalletsList()
     checkBadgeText()
     logEvent({
-      name: MAIN_HOME
+      name: MAIN_HOME,
     })
     return () => clearTimeout(refreshBalancesTimerId)
   }, [])
@@ -113,7 +109,7 @@ const Wallets: React.FC = () => {
 
   const updateBalance = (
     arr: TWalletAmountData[],
-    type: 'totalBalance' | 'totalEstimated' | 'pendingBalance',
+    type: 'totalBalance' | 'totalEstimated' | 'pendingBalance'
   ) => {
     if (arr.length === state.wallets?.length && state[type] === null) {
       updateState({ [type]: arr.reduce((acc, walletData) => acc + walletData.amount, 0) })
@@ -203,11 +199,11 @@ const Wallets: React.FC = () => {
   const loadBalances = async () => {
     refreshBalancesTimerId = +setTimeout(loadBalances, toMs(balanceRefreshTime))
     let wallets = getFilteredWallets()
-    const lastUpdate = getItem("last_balances_request")
+    const lastUpdate = getItem('last_balances_request')
     const isTimePassed = !lastUpdate || checkIfTimePassed(+lastUpdate, balanceRefreshTime)
-    const isFetchReady = getItem("initial_balances_request") || !isIdle && isTimePassed
+    const isFetchReady = getItem('initial_balances_request') || (!isIdle && isTimePassed)
     if (isFetchReady) {
-      setItem("last_balances_request", String(Date.now()))
+      setItem('last_balances_request', String(Date.now()))
       await getBalances(wallets)
     }
   }
@@ -227,9 +223,9 @@ const Wallets: React.FC = () => {
     setWalletsEstimated(walletsEstimated)
   }
 
-  const sumWalletBalance = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (
-    wallet: TWalletAmountData,
-  ) => {
+  const sumWalletBalance = (
+    setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>
+  ) => (wallet: TWalletAmountData) => {
     setStateCallback((prevArray: TWalletAmountData[]) => {
       return prevArray.find((existingWallet) => existingWallet.uuid === wallet.uuid)
         ? prevArray
@@ -270,9 +266,9 @@ const Wallets: React.FC = () => {
   }
 
   const setListOnClickHandler = (type: 'send' | 'receive') => () => {
-    if (type === "receive") {
+    if (type === 'receive') {
       logEvent({
-        name: RECEIVE_SELECT
+        name: RECEIVE_SELECT,
       })
     }
     setListType(type)
@@ -285,8 +281,8 @@ const Wallets: React.FC = () => {
     logEvent({
       name: FILTERS_SELECT,
       properties: {
-        type: "wallets"
-      }
+        type: 'wallets',
+      },
     })
   }, [])
 
@@ -309,13 +305,13 @@ const Wallets: React.FC = () => {
     }
   }
 
-  const scrollHandler = React.useCallback(e => e.preventDefault(), [])
+  const scrollHandler = React.useCallback((e) => e.preventDefault(), [])
 
   const toggleScroll = (toggle: 'on' | 'off') => {
     const list = document.getElementsByClassName('ReactVirtualized__List')[0]
     const events = ['mousewheel', 'touchmove']
     const method = toggle === 'off' ? 'addEventListener' : 'removeEventListener'
-    events.forEach(event => list?.[method](event, scrollHandler, false))
+    events.forEach((event) => list?.[method](event, scrollHandler, false))
   }
 
   const isFiltersActive = (): boolean => {
@@ -336,7 +332,7 @@ const Wallets: React.FC = () => {
     isFiltersActive: isFiltersActive(),
     openFilters,
     showNft: isShowNft,
-    onAddNewAddress
+    onAddNewAddress,
   }
 
   return (
@@ -350,16 +346,20 @@ const Wallets: React.FC = () => {
           onClickReceive={setListOnClickHandler('receive')}
           onClickSend={setListOnClickHandler('send')}
         />
-        <Styles.WalletsListContainer style={{ top: walletsTop, zIndex: 2}} isUnfolded={isHeaderCollapsed} onWheel={onWheel}>
-          <MainListControls controlsProps={listControlsProps} isListUnfolded={isHeaderCollapsed}/>
-          <WalletsList wallets={state.wallets}
-                       onScroll={onScroll}
-                       sumBalanceCallback={sumBalanceCallback}
-                       sumEstimatedCallback={sumEstimatedCallback}
-                       sumPendingCallback={sumPendingCallback}
+        <Styles.WalletsListContainer
+          style={{ top: walletsTop, zIndex: 2 }}
+          isUnfolded={isHeaderCollapsed}
+          onWheel={onWheel}
+        >
+          <MainListControls controlsProps={listControlsProps} isListUnfolded={isHeaderCollapsed} />
+          <WalletsList
+            wallets={state.wallets}
+            onScroll={onScroll}
+            sumBalanceCallback={sumBalanceCallback}
+            sumEstimatedCallback={sumEstimatedCallback}
+            sumPendingCallback={sumPendingCallback}
           />
         </Styles.WalletsListContainer>
-
       </Styles.Wrapper>
       <FilterWalletsDrawer
         isActive={state.activeDrawer === 'filters'}
@@ -372,10 +372,11 @@ const Wallets: React.FC = () => {
         onClose={onCloseDrawer}
         isRedirect={`/${listType}`}
       />
-      <BottomMenuBar onViewTxHistory={onViewTxHistory}
-                     onOpenSettings={() => openPage('/settings')}
-                     onClickWallets={() => openPage('/wallets')}
-                     onClickSwap={onClickSwap}
+      <BottomMenuBar
+        onViewTxHistory={onViewTxHistory}
+        onOpenSettings={() => openPage('/settings')}
+        onClickWallets={() => openPage('/wallets')}
+        onClickSwap={onClickSwap}
       />
     </>
   )

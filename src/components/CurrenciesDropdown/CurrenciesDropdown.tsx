@@ -9,7 +9,7 @@ import RadioButton from '@components/RadioButton'
 import { toLower } from '@utils/format'
 
 // Config
-import { getCurrencyByChain } from '@config/currencies'
+import { getCurrencyByChain } from 'config/currencies/currencies'
 
 // Hooks
 import useVisible from '@hooks/useVisible'

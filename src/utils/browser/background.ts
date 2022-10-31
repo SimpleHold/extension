@@ -1,4 +1,5 @@
 import { browser, Tabs } from 'webextension-polyfill-ts'
+import { Xrp } from 'sh-coins'
 
 // Utils
 import { IRequest } from '@utils/browser/types'
@@ -6,7 +7,6 @@ import { getWallets, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
 import { getManifest, getUrl, openWebPage } from '@utils/extension'
 import { setItem, getJSON } from '@utils/storage'
-import { generateExtraId } from '@utils/currencies/ripple'
 import { getPhishingSites, getTokens } from '@utils/api'
 import { TPhishingSite } from '@utils/api/types'
 import { msToMin } from '@utils/dates'
@@ -17,7 +17,7 @@ import { addNew } from '@utils/localTokens'
 import { TPopupPosition } from './types'
 
 // Config
-import { getCurrency } from '@config/currencies'
+import { getCurrencyInfo } from '@config/currencies/utils'
 
 let activeRequest: string | undefined
 let currentWindowId: number
@@ -228,11 +228,11 @@ const generateContextMenu = async () => {
       )
 
       if (getSymbolWallets.length) {
-        const getCurrencyInfo = getCurrency(item)
+        const currencyInfo = getCurrencyInfo(item)
 
-        if (getCurrencyInfo) {
+        if (currencyInfo) {
           const currencyMenu = browser.contextMenus.create({
-            title: getCurrencyInfo.name,
+            title: currencyInfo.name,
             parentId: parent,
             id: item,
             contexts: ['editable'],
@@ -320,7 +320,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
     if (info.menuItemId !== 'sh-other-wallets') {
       const menuItemId = `${info.menuItemId}`.split('_')[1]
 
-      const data = menuItemId === 'extraId' ? generateExtraId() : menuItemId
+      const data = menuItemId === 'extraId' ? Xrp.generateExtraId() : menuItemId
 
       await browser.tabs.sendMessage(tabs[0].id, {
         type: 'context-menu-address',

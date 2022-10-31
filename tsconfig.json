@@ -26,7 +26,9 @@
       "@drawers/*": ["src/drawers/*"],
       "@contexts/*": ["src/contexts/*"],
       "@containers/*": ["src/containers/*"],
-      "@shared/*": ["src/shared/*"]
+      "@shared/*": ["src/shared/*"],
+      "@coins/*": ["src/coins/*"],
+      "@tokens/*": ["src/tokens/*"]
     }
   },
   "include": ["src", "@types", "webpack.config.js"]

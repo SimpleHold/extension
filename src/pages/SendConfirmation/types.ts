@@ -1,10 +1,13 @@
+// Types
+import { TUnspentOutput } from '@coins/types'
+
 export interface ILocationState {
   amount: number
   symbol: string
   networkFee: number
   addressFrom: string
   addressTo: string
-  outputs: UnspentOutput[]
+  outputs: TUnspentOutput[]
   chain: string
   networkFeeSymbol: string
   isIncludeFee: boolean

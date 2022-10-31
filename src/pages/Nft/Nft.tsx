@@ -11,7 +11,7 @@ import Button from '@components/Button'
 import AddImageDrawer from '@drawers/AddImage'
 
 // Utils
-import { getContractUrl } from '@utils/currencies'
+import { getContractUrl } from '@coins/index'
 import { openWebPage } from '@utils/extension'
 import { short } from '@utils/format'
 import { addNFTImage } from '@utils/storage'
@@ -72,7 +72,7 @@ const NftPage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Wallet" whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle="Wallet" whiteLogo />
         <Styles.Container>
           <Styles.Title>
             {name} {short(`${tokenId}`, 15)}

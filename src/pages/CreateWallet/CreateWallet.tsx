@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
+import { Theta } from 'sh-coins'
 
 // Components
 import Header from '@components/Header'
@@ -12,14 +13,13 @@ import { validatePassword } from '@utils/validate'
 import { logEvent } from 'utils/metrics'
 import { generate as generateBackup } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
-import { generate as generateAddress } from '@utils/currencies'
+import { generateAddress } from '@coins/index'
 import { setItem } from '@utils/storage'
 import { getAllCookies, Cookie } from '@utils/extension'
-import * as theta from '@utils/currencies/theta'
 
 // Config
-import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyInfo, getCurrencyByChain } from '@config/currencies/utils'
+import { getToken } from '@tokens/index'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -84,12 +84,12 @@ const Wallets: React.FC = () => {
           })
         }
       } else {
-        const findCurrency = getCurrency(value)
+        const findCurrency = getCurrencyInfo(value)
 
         if (findCurrency) {
           const { symbol } = findCurrency
 
-          if (theta.coins.indexOf(symbol) !== -1) {
+          if (Theta.config.coins.indexOf(symbol) !== -1) {
             updateState({ initialCurrencies: [{ symbol: 'theta' }, { symbol: 'tfuel' }] })
           } else {
             updateState({
@@ -109,7 +109,6 @@ const Wallets: React.FC = () => {
     state.password.length < 7 || state.password !== state.confirmPassword || !state.isAgreed
 
   const onConfirm = async (): Promise<void> => {
-
     logEvent({
       name: ONBOARDING_CREATE_NEW_WALLET_PASSES,
     })
@@ -118,7 +117,7 @@ const Wallets: React.FC = () => {
 
     for (const currency of state.initialCurrencies) {
       const { symbol, chain } = currency
-      const generate = await generateAddress(symbol, chain)
+      const generate = await generateAddress(symbol, chain) // Fix me
 
       if (generate) {
         data.push({

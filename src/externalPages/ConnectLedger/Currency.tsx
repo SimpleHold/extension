@@ -8,7 +8,7 @@ import CurrencyAddress from '@components/CurrencyAddress'
 import Alert from './Alert'
 
 // Config
-import { getCurrency } from '@config/currencies'
+import { getCurrency } from 'config/currencies/currencies'
 
 // Utils
 import { getBTCAddress, getETHAddress, getXRPAddress, requestTransport } from '@utils/ledger'

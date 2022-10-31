@@ -3,13 +3,13 @@ import { getItem, setItem } from '@utils/storage'
 import { toLower } from '@utils/format'
 
 // Types
-import { IToken } from '@config/tokens'
+import { TToken } from '@tokens/types'
 
-export const addNew = (tokens: IToken[]): void => {
+export const addNew = (tokens: TToken[]): void => {
   setItem('tokens', JSON.stringify(tokens))
 }
 
-export const getTokens = (): IToken[] => {
+export const getTokens = (): TToken[] => {
   try {
     const getTokens = getItem('tokens')
 
@@ -27,11 +27,11 @@ export const getTokens = (): IToken[] => {
   }
 }
 
-export const getToken = (chain: string, symbol: string): IToken | undefined => {
+export const getToken = (chain: string, symbol: string): TToken | undefined => {
   const tokens = getTokens()
 
   return tokens.find(
-    (token: IToken) =>
+    (token: TToken) =>
       toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain)
   )
 }

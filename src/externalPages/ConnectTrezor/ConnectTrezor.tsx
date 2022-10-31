@@ -34,7 +34,7 @@ import connectTrezorImage from '@assets/illustrate/connectTrezor.svg'
 import errorConnectTrezorImage from '@assets/illustrate/errorConnectTrezor.svg'
 
 // Config
-import { getCurrency } from '@config/currencies'
+import { getCurrency } from 'config/currencies/currencies'
 import { CONNECT_HARDWARE_WALLET } from '@config/events'
 
 // Hooks

@@ -11,7 +11,7 @@ import ErrorCurrencyIcon from '@assets/drawer/errorCurrency.svg'
 import LedgerTxReviewIcon from '@assets/drawer/ledgerTxReview.svg'
 
 // Config
-import { getCurrency } from '@config/currencies'
+import { getCurrency } from 'config/currencies/currencies'
 
 // Styles
 import Styles from './styles'

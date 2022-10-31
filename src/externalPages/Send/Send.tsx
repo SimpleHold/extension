@@ -23,7 +23,7 @@ import NetworkFeeShared from '@shared/NetworkFee'
 import { toLower, toUpper, plus } from '@utils/format'
 import { getWallets, IWallet, generateWalletName } from '@utils/wallet'
 import { getUnspentOutputs } from '@utils/api'
-import { getSingleBalance } from '@utils/currencies'
+import { getSingleBalance } from '@coins/index'
 import { getCurrentTab, updateTab, getUrl } from '@utils/extension'
 import {
   getExtraIdName,
@@ -37,20 +37,21 @@ import {
   getStandingFee,
   isEthereumLike,
   checkWithZeroFee,
-} from '@utils/currencies'
+} from '@coins/index'
 import { getItem, setItem, removeItem } from '@utils/storage'
-import { getDogeUtxos } from '@utils/currencies/bitcoinLike'
+import { getDogeUtxos } from '@coins/index/bitcoinLike'
 import { logEvent } from 'utils/metrics'
-import { getUtxos as getVergeUtxos } from '@utils/currencies/verge'
+import { getUtxos as getVergeUtxos } from '@coins/index/verge'
 
 // Config
-import { getCurrency, ICurrency } from '@config/currencies'
+import { getCurrency, ICurrency } from 'config/currencies/currencies'
 import { getToken } from '@config/tokens'
 import {
   SEND_SELECT,
   SEND_CANCEL,
   SEND_RECIPIENT_ADDRESS,
-  SEND_ENTERED_AMOUNT, SEND_CHOOSE_FEE,
+  SEND_ENTERED_AMOUNT,
+  SEND_CHOOSE_FEE,
 } from '@config/events'
 
 // Hooks
@@ -155,9 +156,8 @@ const Send: React.FC = () => {
     }
 
     logEvent({
-      name: SEND_ENTERED_AMOUNT
+      name: SEND_ENTERED_AMOUNT,
     })
-
   }, [debounced])
 
   React.useEffect(() => {
@@ -446,16 +446,14 @@ const Send: React.FC = () => {
       const getCurrencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
 
       if (getCurrencyInfo) {
-        const { balance, balance_usd } = await getSingleBalance(
-          {
-            symbol,
-            address,
-            chain: getCurrencyInfo?.chain,
-            tokenSymbol: chain ? symbol : undefined,
-            contractAddress,
-            isFullBalance: true
-          }
-        )
+        const { balance, balance_usd } = await getSingleBalance({
+          symbol,
+          address,
+          chain: getCurrencyInfo?.chain,
+          tokenSymbol: chain ? symbol : undefined,
+          contractAddress,
+          isFullBalance: true,
+        })
 
         updateState({ balance, estimated: balance_usd })
       }
@@ -514,7 +512,6 @@ const Send: React.FC = () => {
   }
 
   const onConfirm = async (): Promise<void> => {
-
     let amount = Number(state.amount)
 
     // _vtho
@@ -524,7 +521,7 @@ const Send: React.FC = () => {
       const isInsufficientBalance = balance - safeGap <= 0.001
       if (isInsufficientBalance) {
         const minValue = (balance + safeGap).toString().slice(0, 6)
-        updateState({ amountErrorLabel: `Min amount for this transfer is ${minValue}`})
+        updateState({ amountErrorLabel: `Min amount for this transfer is ${minValue}` })
         return
       }
       if (amount + safeGap >= balance) {
@@ -606,7 +603,7 @@ const Send: React.FC = () => {
     }
 
     logEvent({
-      name: SEND_RECIPIENT_ADDRESS
+      name: SEND_RECIPIENT_ADDRESS,
     })
   }
 
@@ -629,14 +626,18 @@ const Send: React.FC = () => {
 
     const fee = state.isIncludeFee ? 0 : state.fee
 
-    if (state.amount.length && Number(state.amount) + (state.selectedWallet?.symbol === state.feeSymbol ? Number(fee) : 0) > availableBalance) {
+    if (
+      state.amount.length &&
+      Number(state.amount) + (state.selectedWallet?.symbol === state.feeSymbol ? Number(fee) : 0) >
+        availableBalance
+    ) {
       return setInsufficientError()
     }
 
     const getAmount = (): number => {
       let parseAmount = Number(state.amount)
 
-      if (state.isIncludeFee && (state.selectedWallet?.symbol === state.feeSymbol)) {
+      if (state.isIncludeFee && state.selectedWallet?.symbol === state.feeSymbol) {
         parseAmount = parseAmount - state.fee
       }
 
@@ -646,7 +647,8 @@ const Send: React.FC = () => {
     if (state.currencyInfo && state.selectedWallet) {
       let amount = getAmount()
       let minAmount: number = 0
-      const getMinAmountWithFee = state.isIncludeFee && state.selectedWallet?.symbol === state.feeSymbol ? state.fee : 0
+      const getMinAmountWithFee =
+        state.isIncludeFee && state.selectedWallet?.symbol === state.feeSymbol ? state.fee : 0
 
       if (state.selectedWallet?.chain) {
         minAmount = state.currencyInfo.minSendAmount || 0.001
@@ -690,7 +692,10 @@ const Send: React.FC = () => {
 
   const isButtonDisabled = (): boolean => {
     if (state.selectedWallet && state.currencyInfo) {
-      const getAmount = state.isIncludeFee && (state.selectedWallet.symbol === state.feeSymbol) ? Number(state.amount) - state.fee : Number(state.amount)
+      const getAmount =
+        state.isIncludeFee && state.selectedWallet.symbol === state.feeSymbol
+          ? Number(state.amount) - state.fee
+          : Number(state.amount)
 
       if (
         validateAddress(state.selectedWallet.symbol, state.address, state.selectedWallet?.chain) &&
@@ -777,7 +782,7 @@ const Send: React.FC = () => {
     }
 
     logEvent({
-      name: SEND_CHOOSE_FEE
+      name: SEND_CHOOSE_FEE,
     })
   }
 

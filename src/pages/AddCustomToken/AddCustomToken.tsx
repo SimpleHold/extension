@@ -16,7 +16,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 // Config
 import { validateContractAddress, checkExistWallet, getToken } from '@config/tokens'
 import networks, { getEthNetwork, IEthNetwork } from '@config/ethLikeNetworks'
-import { getCurrency } from '@config/currencies'
+import { getCurrency } from 'config/currencies/currencies'
 
 // Utils
 import { getContractInfo } from '@utils/api'
@@ -25,7 +25,7 @@ import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
-import { getTokenStandard } from '@utils/currencies'
+import { getTokenStandard } from '@coins/index'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -282,7 +282,7 @@ const AddCustomToken: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Select currency" whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle="Select currency" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Add custom token</Styles.Title>

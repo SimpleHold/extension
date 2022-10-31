@@ -21,10 +21,48 @@ import {
   TTxWallet,
   TVetTxParams,
   Web3TxParams,
+  TRequestParams,
+  TResponse,
 } from './types'
-import { IToken } from '@config/tokens'
+import { TToken } from '@tokens/types'
 
-export const fetchBalances = async (wallets: TGetBalancesWalletProps[],
+// Fix me TODO: add sendRequest to every method
+
+export const sendRequest = async <T, D = {}>({
+  url,
+  method = 'GET',
+  data,
+  params,
+  skipNestedData,
+  timeout = 0,
+}: TRequestParams<D>): Promise<T | null> => {
+  try {
+    const { data: responseData }: AxiosResponse<TResponse<T>> = await axios({
+      method,
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        from: 'mobile-app',
+      },
+      data,
+      params,
+      timeout: timeout,
+    })
+
+    if (skipNestedData) {
+      // @ts-ignore
+      return responseData
+    }
+
+    return responseData.data
+  } catch {
+    return null
+  }
+}
+
+export const fetchBalances = async (
+  wallets: TGetBalancesWalletProps[]
 ): Promise<IGetBalances[]> => {
   try {
     const { data }: AxiosResponse = await axios.post(
@@ -45,7 +83,7 @@ export const fetchBalances = async (wallets: TGetBalancesWalletProps[],
 export const getEstimated = async (
   value: number,
   currencyFrom: string,
-  currencyTo: string,
+  currencyTo: string
 ): Promise<number> => {
   try {
     const { data }: AxiosResponse = await axios({
@@ -76,7 +114,7 @@ export const getUnspentOutputs = async (address: string, chain: string): Promise
 
 export const sendRawTransaction = async (
   transaction: string,
-  currency?: string,
+  currency?: string
 ): Promise<string | null> => {
   try {
     if (currency) {
@@ -90,7 +128,7 @@ export const sendRawTransaction = async (
           headers: {
             'Content-Type': 'application/json',
           },
-        },
+        }
       )
 
       return data?.data || null
@@ -103,7 +141,7 @@ export const sendRawTransaction = async (
 
 export const getContractInfo = async (
   address: string,
-  chain: string,
+  chain: string
 ): Promise<IGetContractInfo | null> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/contract/${chain}/${address}`)
@@ -116,7 +154,7 @@ export const getContractInfo = async (
 
 export const getTokensBalance = async (
   address: string,
-  chain: string,
+  chain: string
 ): Promise<ITokensBalance[] | null> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/contract/balances`, {
@@ -140,7 +178,7 @@ export const getWeb3TxParams = async (
   to: string,
   value: string,
   chain?: string,
-  contractAddress?: string,
+  contractAddress?: string
 ): Promise<Web3TxParams | null> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/params`, {
@@ -169,7 +207,7 @@ export const getEtherNetworkFee = async (
   chain: string,
   tokenSymbol?: string,
   contractAddress?: string,
-  decimals?: number,
+  decimals?: number
 ): Promise<IGetNetworkFeeResponse> => {
   try {
     const { data } = await axios.get(`${config.serverUrl}/transaction/eth-like/smart-network-fee`, {
@@ -335,14 +373,13 @@ export const setUserId = async (userid: string): Promise<void> => {
     await axios.post(`${config.serverUrl}/satismeter/users/new`, {
       userid,
     })
-  } catch {
-  }
+  } catch {}
 }
 
 export const sendFeedback = async (
   userId: string,
   feedback: string,
-  rating: number,
+  rating: number
 ): Promise<void> => {
   try {
     await axios.post(`${config.serverUrl}/satismeter/feedback`, {
@@ -350,8 +387,7 @@ export const sendFeedback = async (
       feedback,
       rating,
     })
-  } catch {
-  }
+  } catch {}
 }
 
 export const getWarning = async (symbol: string, chain?: string): Promise<string | null> => {
@@ -385,7 +421,7 @@ export const fetchFullTxHistory = async (wallets: TTxWallet[]): Promise<TFullTxW
         headers: {
           'Content-Type': 'application/json',
         },
-      },
+      }
     )
     return data?.data || []
   } catch {
@@ -405,7 +441,7 @@ export const activateAccount = async <T>(chain: string, publicKey: string): Prom
         headers: {
           'Content-Type': 'application/json',
         },
-      },
+      }
     )
 
     return data.data
@@ -442,7 +478,7 @@ export const getNft = async (wallets: TNFtWallets[]): Promise<TNft[]> => {
         headers: {
           'Content-Type': 'application/json',
         },
-      },
+      }
     )
     return data.data
   } catch {
@@ -497,9 +533,11 @@ export const getTonAddressState = async (address: string): Promise<TTonAddressSt
   }
 }
 
-export const getTokens = async (): Promise<IToken[] | null> => {
+export const getTokens = async (): Promise<TToken[] | null> => {
   try {
     const { data }: AxiosResponse = await axios.get(`${config.serverUrl}/tokens`)
+
+    // Fix me add new tokens
 
     return data.data
   } catch {
@@ -516,7 +554,7 @@ export const sendNanoRpcRequest = async <T>(input: any): Promise<T | null> => {
         headers: {
           'Content-Type': 'application/json',
         },
-      },
+      }
     )
     return data.data
   } catch {
@@ -534,10 +572,31 @@ export const getNanoPow = async (hash: string, type: string): Promise<string | n
         headers: {
           'Content-Type': 'application/json',
         },
-      },
+      }
     )
     return data.data
   } catch {
     return null
   }
+}
+
+export const getTxParams = async (
+  type: string,
+  from?: string,
+  to?: string,
+  value?: string,
+  chain?: string,
+  contractAddress?: string
+): Promise<any> => {
+  return await sendRequest({
+    url: `${config.serverUrl}/transaction/${type}/params`,
+    params: {
+      from,
+      to,
+      chain,
+      value,
+      contractAddress,
+    },
+    skipNestedData: type !== 'eth-like',
+  })
 }

@@ -1,5 +1,5 @@
 // Types
-import { ICurrency } from '@config/currencies'
+import { ICurrency } from 'config/currencies/currencies'
 import { IEthNetwork } from '@config/ethLikeNetworks'
 
 export interface IToken {
