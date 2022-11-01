@@ -1,0 +1,10 @@
+import { TGenerateAddress, TInternalTxProps, TCurrencyConfig } from '../types';
+export declare const config: TCurrencyConfig;
+export declare const formatValue: (value: string | number, type: 'from' | 'to') => number;
+export declare const generateAddress: () => Promise<TGenerateAddress | null>;
+export declare const importPrivateKey: (privateKey: string) => Promise<string | null>;
+export declare const getExplorerLink: (address: string) => string;
+export declare const getTransactionLink: (hash: string) => string;
+export declare const getStandingFee: (symbol: string, chain: string, tokenChain?: string) => number;
+export declare const createInternalTx: ({ addressFrom, addressTo, amount, privateKey, tokenChain, contractAddress, }: TInternalTxProps) => Promise<string | null>;
+export declare const validateAddress: (address: string) => boolean;

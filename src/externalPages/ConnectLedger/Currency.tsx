@@ -8,7 +8,7 @@ import CurrencyAddress from '@components/CurrencyAddress'
 import Alert from './Alert'
 
 // Config
-import { getCurrency } from 'config/currencies/currencies'
+import { getCurrencyInfo } from '@config/currencies/utils'
 
 // Utils
 import { getBTCAddress, getETHAddress, getXRPAddress, requestTransport } from '@utils/ledger'
@@ -58,7 +58,7 @@ const Currency: React.FC<Props> = (props) => {
 
   const isActive = addresses.length > 0 || isTransportError || isDisconnectError
 
-  const currencyInfo = getCurrency(symbol)
+  const currencyInfo = getCurrencyInfo(symbol)
 
   const getAddress = async (transport: Transport): Promise<void> => {
     if (!ledgerTransport) {

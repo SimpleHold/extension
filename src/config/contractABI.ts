@@ -1,5 +1,5 @@
 // Types
-import { AbiItem } from '@coins/index/ethereumLike/types'
+import { AbiItem } from '@coins/ethereumLike/types'
 
 const contract: AbiItem[] = [
   {

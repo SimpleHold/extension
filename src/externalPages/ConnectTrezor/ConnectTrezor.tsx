@@ -34,7 +34,7 @@ import connectTrezorImage from '@assets/illustrate/connectTrezor.svg'
 import errorConnectTrezorImage from '@assets/illustrate/errorConnectTrezor.svg'
 
 // Config
-import { getCurrency } from 'config/currencies/currencies'
+import { getCurrencyInfo } from '@config/currencies/utils'
 import { CONNECT_HARDWARE_WALLET } from '@config/events'
 
 // Hooks
@@ -373,7 +373,7 @@ const ConnectTrezor: React.FC = () => {
               <Styles.CurrenciesList>
                 {state.currencies.map((currency: TCurrency) => {
                   const { symbol, addresses } = currency
-                  const currencyInfo = getCurrency(symbol)
+                  const currencyInfo = getCurrencyInfo(symbol)
 
                   return (
                     <Currency

@@ -36,7 +36,7 @@ export const generateAddress = async (): Promise<TGenerateAddress | null> => {
   }
 }
 
-export const importPrivateKey = (privateKey: string): string | null => {
+export const importPrivateKey = async (privateKey: string): Promise<string | null> => {
   return web3.eth.accounts.privateKeyToAccount(privateKey).address
 }
 

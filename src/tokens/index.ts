@@ -1,6 +1,6 @@
 // Utils
 import { toLower } from '@utils/format'
-import { getItem } from '@utils/storage'
+import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { getCurrencyByChain } from '@config/currencies/utils'
@@ -39,6 +39,10 @@ const tokens: TToken[] = [
 
 export default tokens
 
+export const addNewSharedTokens = (tokens: TToken[]): void => {
+  setItem('tokens', JSON.stringify(tokens))
+}
+
 export const getSharedTokens = (): TToken[] => {
   try {
     const getTokens = getItem('tokens')
@@ -55,12 +59,10 @@ export const getSharedTokens = (): TToken[] => {
 
 export const getSharedToken = (symbol: string, chain?: string): TToken | undefined => {
   try {
-    const getTokens = getItem('tokens')
+    const getTokens = getSharedTokens()
 
-    if (getTokens) {
-      const parse: TToken[] = JSON.parse(getTokens)
-
-      return parse.find(
+    if (getTokens.length) {
+      return getTokens.find(
         (token: TToken) =>
           toLower(token.symbol) === toLower(symbol) && toLower(token.chain) === toLower(chain)
       )

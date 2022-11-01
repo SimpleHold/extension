@@ -1,6 +1,8 @@
+import type Transport from '@ledgerhq/hw-transport-webusb'
+
 // Types
 import { THardware } from '@utils/wallet'
-import type Transport from '@ledgerhq/hw-transport-webusb'
+import { TUnspentOutput } from '@coins/types'
 
 export type TTabInfo = {
   favIconUrl: string
@@ -13,7 +15,7 @@ export interface Props {
   networkFee: number
   addressFrom: string
   addressTo: string
-  outputs: UnspentOutput[]
+  outputs: TUnspentOutput[]
   chain: string
   networkFeeSymbol: string
   contractAddress?: string
@@ -50,6 +52,6 @@ export type TLedgerTxParams = {
   amount: number
   chain: string
   fee: number
-  outputs?: UnspentOutput[]
+  outputs?: TUnspentOutput[]
   extraId?: string
 }

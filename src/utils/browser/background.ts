@@ -1,5 +1,5 @@
 import { browser, Tabs } from 'webextension-polyfill-ts'
-import { Xrp } from 'sh-coins'
+import { Xrp } from '@coins/dist' // Fix me
 
 // Utils
 import { IRequest } from '@utils/browser/types'
@@ -11,7 +11,9 @@ import { getPhishingSites, getTokens } from '@utils/api'
 import { TPhishingSite } from '@utils/api/types'
 import { msToMin } from '@utils/dates'
 import { validateUrl } from '@utils/validate'
-import { addNew } from '@utils/localTokens'
+
+// Tokens
+import { addNewSharedTokens } from '@tokens/index'
 
 // Types
 import { TPopupPosition } from './types'
@@ -294,7 +296,7 @@ const onGetTokens = async (): Promise<void> => {
   }, 600000)
 
   if (tokens?.length) {
-    addNew(tokens)
+    addNewSharedTokens(tokens)
   }
 }
 

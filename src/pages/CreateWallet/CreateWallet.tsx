@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
-import { Theta } from 'sh-coins'
+import { Theta } from '@coins/dist' // Fix me
 
 // Components
 import Header from '@components/Header'
@@ -19,6 +19,7 @@ import { getAllCookies, Cookie } from '@utils/extension'
 
 // Config
 import { getCurrencyInfo, getCurrencyByChain } from '@config/currencies/utils'
+import { ONBOARDING_CREATE_NEW_WALLET_PASSES } from '@config/events'
 import { getToken } from '@tokens/index'
 
 // Hooks
@@ -29,7 +30,6 @@ import { IState } from './types'
 
 // Styles
 import Styles from './styles'
-import { ONBOARDING_CREATE_NEW_WALLET_PASSES } from 'config/events'
 
 const initialState: IState = {
   password: '',
@@ -117,7 +117,7 @@ const Wallets: React.FC = () => {
 
     for (const currency of state.initialCurrencies) {
       const { symbol, chain } = currency
-      const generate = await generateAddress(symbol, chain) // Fix me
+      const generate = null // await generateAddress(symbol, chain) // Fix me
 
       if (generate) {
         data.push({

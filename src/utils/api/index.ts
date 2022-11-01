@@ -43,7 +43,6 @@ export const sendRequest = async <T, D = {}>({
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
-        from: 'mobile-app',
       },
       data,
       params,

@@ -6,7 +6,9 @@ import { getToken } from '@tokens/index'
 
 // Utils
 import { toUpper } from '@utils/format'
-import { getToken as getLocalToken } from '@utils/localTokens'
+
+// Tokens
+import { getSharedToken } from '@tokens/index'
 
 // Styles
 import Styles from './styles'
@@ -34,7 +36,7 @@ const CurrencyLogo: React.FC<Props> = (props) => {
 
   const checkLocalLogo = (): void => {
     if (chain) {
-      const find = getLocalToken(chain, symbol)
+      const find = getSharedToken(chain, symbol)
 
       if (find) {
         setLogo(find.logo)

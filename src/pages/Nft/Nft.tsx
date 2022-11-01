@@ -50,7 +50,11 @@ const NftPage: React.FC = () => {
   }
 
   const onViewContract = (): void => {
-    openWebPage(getContractUrl(contractAddress, chain))
+    const url = getContractUrl(contractAddress, chain)
+
+    if (url) {
+      openWebPage(url)
+    }
   }
 
   const onCloseDrawer = (): void => {

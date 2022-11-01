@@ -9,7 +9,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import { toUpper, toLower } from '@utils/format'
 
 // Types
-import { IToken } from '@config/tokens'
+import { TToken } from '@tokens/types'
 
 // Styles
 import Styles from '../styles'
@@ -17,7 +17,7 @@ import Styles from '../styles'
 interface Props {
   onAddCustomToken: () => void
   onAddToken: (symbol: string, chain: string, tokenName: string) => () => void
-  tokens: IToken[]
+  tokens: TToken[]
 }
 
 const TokensTab: React.FC<Props> = (props) => {
@@ -25,7 +25,7 @@ const TokensTab: React.FC<Props> = (props) => {
 
   const [searchValue, setSearchValue] = React.useState<string>('')
 
-  const filterTokensList = tokens.filter((token: IToken) => {
+  const filterTokensList = tokens.filter((token: TToken) => {
     if (searchValue.length) {
       const findByName = toLower(token.name)?.indexOf(toLower(searchValue) || '') !== -1
       const findBySymbol = toLower(token.symbol)?.indexOf(toLower(searchValue) || '') !== -1
@@ -57,7 +57,7 @@ const TokensTab: React.FC<Props> = (props) => {
           </Styles.CustomTokenLogo>
           <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
         </Styles.CustomTokenBlock>
-        {filterTokensList.map((token: IToken, index) => {
+        {filterTokensList.map((token: TToken, index) => {
           const { name, symbol, chain } = token
 
           return (

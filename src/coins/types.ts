@@ -7,7 +7,7 @@ export type TProvider = {
     chain: string,
     tokenChain?: string
   ) => Promise<TGenerateAddress | null>
-  importPrivateKey?: (privateKey: string, symbol: string) => string | null
+  importPrivateKey?: (privateKey: string, symbol: string) => Promise<string | null>
   getExplorerLink: (
     address: string,
     chain: string,

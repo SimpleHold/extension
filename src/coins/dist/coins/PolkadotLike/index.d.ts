@@ -1,0 +1,11 @@
+import { TFeeResponse } from '../../utils/api/types';
+import { TGenerateAddress, TCurrencyConfig, TFeeProps, TInternalTxProps } from '../types';
+export declare const config: TCurrencyConfig;
+export declare const formatValue: (value: string | number, type: 'from' | 'to', symbol: string) => number;
+export declare const generateAddress: (symbol: string, chain: string) => Promise<TGenerateAddress | null>;
+export declare const importRecoveryPhrase: (recoveryPhrase: string, symbol: string, chain: string) => Promise<TGenerateAddress | null>;
+export declare const getTransactionLink: (hash: string, chain: string) => string;
+export declare const getExplorerLink: (address: string, chain: string) => string;
+export declare const validateAddress: (address: string) => boolean;
+export declare const getNetworkFee: (props: TFeeProps) => Promise<TFeeResponse | null>;
+export declare const createInternalTx: (props: TInternalTxProps) => Promise<string | null>;

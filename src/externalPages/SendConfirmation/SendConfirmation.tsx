@@ -21,15 +21,15 @@ import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { IWallet } from '@utils/wallet'
-import { convertDecimals } from '@coins/index/ethereumLike'
-import {
-  formatUnit,
-  createTransaction,
-  isEthereumLike,
-  getTransactionLink,
-  checkIsInternalTx,
-  createInternalTx,
-} from '@coins/index'
+// import { convertDecimals } from '@coins/index/ethereumLike'
+// import {
+//   formatUnit,
+//   createTransaction,
+//   isEthereumLike,
+//   getTransactionLink,
+//   checkIsInternalTx,
+//   createInternalTx,
+// } from '@coins/index'
 import { sendRawTransaction, getWeb3TxParams, getXrpTxParams } from '@utils/api'
 import { getItem, getJSON, removeItem } from '@utils/storage'
 import { ethereumSignTransaction, signTransaction, getFeatures } from '@utils/trezor'
@@ -121,42 +121,42 @@ const SendConfirmation: React.FC = () => {
           extraId,
         } = state.props
 
-        const parseAmount = +formatUnit(symbol, amount, 'to', chain, 'ether')
-        const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
+        // const parseAmount = +formatUnit(symbol, amount, 'to', chain, 'ether')
+        // const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
         updateState({ ledgerDrawerState: 'reviewTx' })
 
-        const request = await signLedgerTx({
-          transport: state.ledgerTransport,
-          symbol,
-          path,
-          addressFrom,
-          addressTo,
-          amount: parseAmount,
-          chain,
-          fee: parseNetworkFee,
-          outputs,
-          extraId,
-        })
+        // const request = await signLedgerTx({
+        //   transport: state.ledgerTransport,
+        //   symbol,
+        //   path,
+        //   addressFrom,
+        //   addressTo,
+        //   amount: parseAmount,
+        //   chain,
+        //   fee: parseNetworkFee,
+        //   outputs,
+        //   extraId,
+        // })
 
-        if (typeof request === 'object' && request !== null) {
-          const { name } = request
+        // if (typeof request === 'object' && request !== null) {
+        //   const { name } = request
 
-          if (name === 'TransportStatusError') {
-            updateState({ ledgerDrawerState: 'wrongApp' })
-          } else if (name === 'DisconnectedDeviceDuringOperation') {
-            updateState({ ledgerDrawerState: 'connectionFailed' })
-          }
-          return
-        }
+        //   if (name === 'TransportStatusError') {
+        //     updateState({ ledgerDrawerState: 'wrongApp' })
+        //   } else if (name === 'DisconnectedDeviceDuringOperation') {
+        //     updateState({ ledgerDrawerState: 'connectionFailed' })
+        //   }
+        //   return
+        // }
 
-        if (request) {
-          const txHash = await sendRawTransaction(request, chain)
+        // if (request) {
+        //   const txHash = await sendRawTransaction(request, chain)
 
-          if (txHash) {
-            return checkTransaction(txHash)
-          }
-        }
+        //   if (txHash) {
+        //     return checkTransaction(txHash)
+        //   }
+        // }
       }
 
       updateState({ activeDrawer: 'fail' })
@@ -321,37 +321,37 @@ const SendConfirmation: React.FC = () => {
         return updateState({ activeDrawer: 'wrongDevice' })
       }
 
-      const parseAmount = +formatUnit(symbol, amount, 'to', chain, 'ether')
-      const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
+      // const parseAmount = +formatUnit(symbol, amount, 'to', chain, 'ether')
+      // const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
       let getTxId
 
-      if (toLower(symbol) === 'eth') {
-        const ethParams = await getWeb3TxParams(addressFrom, addressTo, `${parseAmount}`, chain)
+      // if (toLower(symbol) === 'eth') {
+      //   const ethParams = await getWeb3TxParams(addressFrom, addressTo, `${parseAmount}`, chain)
 
-        if (ethParams) {
-          const { chainId, nonce, gas, gasPrice } = ethParams
+      //   if (ethParams) {
+      //     const { chainId, nonce, gas, gasPrice } = ethParams
 
-          getTxId = await ethereumSignTransaction(
-            path,
-            addressTo,
-            parseAmount,
-            chainId,
-            nonce,
-            gas,
-            +gasPrice
-          )
-        }
-      } else if (outputs?.length) {
-        getTxId = await signTransaction(
-          `${parseAmount}`,
-          addressTo,
-          symbol,
-          outputs,
-          hardware.path,
-          parseNetworkFee
-        )
-      }
+      //     getTxId = await ethereumSignTransaction(
+      //       path,
+      //       addressTo,
+      //       parseAmount,
+      //       chainId,
+      //       nonce,
+      //       gas,
+      //       +gasPrice
+      //     )
+      //   }
+      // } else if (outputs?.length) {
+      //   getTxId = await signTransaction(
+      //     `${parseAmount}`,
+      //     addressTo,
+      //     symbol,
+      //     outputs,
+      //     hardware.path,
+      //     parseNetworkFee
+      //   )
+      // }
 
       if (getTxId) {
         logEvent({
@@ -360,7 +360,7 @@ const SendConfirmation: React.FC = () => {
 
         return updateState({
           activeDrawer: 'success',
-          transactionLink: getTransactionLink(getTxId, symbol, chain),
+          // transactionLink: getTransactionLink(getTxId, symbol, chain),
           isButtonLoading: false,
         })
       }
@@ -436,81 +436,81 @@ const SendConfirmation: React.FC = () => {
         if (findWallet?.privateKey) {
           updateState({ isDrawerButtonLoading: true })
 
-          const parseAmount =
-            tokenChain && decimals
-              ? +convertDecimals(getAmount(), decimals)
-              : +formatUnit(symbol, getAmount(), 'to', chain, 'ether')
-          const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
+          // const parseAmount =
+          //   tokenChain && decimals
+          //     ? +convertDecimals(getAmount(), decimals)
+          //     : +formatUnit(symbol, getAmount(), 'to', chain, 'ether')
+          // const parseNetworkFee = +formatUnit(symbol, networkFee, 'to', chain, 'ether')
 
-          const ethTxData = isEthereumLike(symbol, tokenChain)
-            ? await getWeb3TxParams(
-                addressFrom,
-                addressTo,
-                `${parseAmount}`,
-                chain || tokenChain,
-                contractAddress
-              )
-            : {}
+          // const ethTxData = isEthereumLike(symbol, tokenChain)
+          //   ? await getWeb3TxParams(
+          //       addressFrom,
+          //       addressTo,
+          //       `${parseAmount}`,
+          //       chain || tokenChain,
+          //       contractAddress
+          //     )
+          //   : {}
 
-          const xrpTxData = symbol === 'xrp' ? await getXrpTxParams(addressFrom) : {}
+          // const xrpTxData = symbol === 'xrp' ? await getXrpTxParams(addressFrom) : {}
 
-          const transactionData = {
-            from: addressFrom,
-            to: addressTo,
-            amount: `${parseAmount}`,
-            privateKey: findWallet.privateKey,
-            symbol,
-            tokenChain,
-            outputs,
-            networkFee: parseNetworkFee,
-            contractAddress,
-          }
+          // const transactionData = {
+          //   from: addressFrom,
+          //   to: addressTo,
+          //   amount: `${parseAmount}`,
+          //   privateKey: findWallet.privateKey,
+          //   symbol,
+          //   tokenChain,
+          //   outputs,
+          //   networkFee: parseNetworkFee,
+          //   contractAddress,
+          // }
 
-          const isInternalTx = checkIsInternalTx(symbol)
+          // const isInternalTx = checkIsInternalTx(symbol)
 
-          if (isInternalTx) {
-            const createTx = await createInternalTx({
-              symbol,
-              addressFrom,
-              addressTo,
-              amount: getAmount(),
-              privateKey: findWallet.privateKey,
-              networkFee: parseNetworkFee,
-              outputs,
-              extraId,
-              tokenChain,
-            })
+          // if (isInternalTx) {
+          //   const createTx = await createInternalTx({
+          //     symbol,
+          //     addressFrom,
+          //     addressTo,
+          //     amount: getAmount(),
+          //     privateKey: findWallet.privateKey,
+          //     networkFee: parseNetworkFee,
+          //     outputs,
+          //     extraId,
+          //     tokenChain,
+          //   })
 
-            if (createTx) {
-              return updateState({
-                activeDrawer: 'success',
-                transactionLink: getTransactionLink(createTx, symbol, chain, tokenChain),
-                isButtonLoading: false,
-              })
-            }
+          //   if (createTx) {
+          //     return updateState({
+          //       activeDrawer: 'success',
+          //       transactionLink: '', // Fix me getTransactionLink(createTx, symbol, chain, tokenChain),
+          //       isButtonLoading: false,
+          //     })
+          //   }
 
-            return updateState({
-              inputErrorLabel: 'Error while creating transaction',
-              isButtonLoading: false,
-            })
-          }
+          //   return updateState({
+          //     inputErrorLabel: 'Error while creating transaction',
+          //     isButtonLoading: false,
+          //   })
+          // }
 
-          const transaction = await createTransaction({
-            ...transactionData,
-            ...ethTxData,
-            xrpTxData,
-            extraId,
-          })
+          // const transaction = await createTransaction({
+          //   ...transactionData,
+          //   ...ethTxData,
+          //   xrpTxData,
+          //   extraId,
+          // })
 
           updateState({ isDrawerButtonLoading: false })
 
-          if (transaction) {
-            const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
+          // if (transaction) {
+          //   const sendTransaction = await sendRawTransaction(transaction, chain || tokenChain)
 
-            if (sendTransaction) {
-              return checkTransaction(sendTransaction)
-            }
-          }
+          //   if (sendTransaction) {
+          //     return checkTransaction(sendTransaction)
+          //   }
+          // }
 
           return updateState({
             inputErrorLabel: 'Error while creating transaction',
@@ -558,7 +558,7 @@ const SendConfirmation: React.FC = () => {
 
       updateState({
         activeDrawer: 'success',
-        transactionLink: getTransactionLink(txHash, symbol, chain, tokenChain),
+        transactionLink: '', // Fix me getTransactionLink(txHash, symbol, chain, tokenChain),
       })
     }
   }

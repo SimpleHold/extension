@@ -6,11 +6,14 @@ import BTCApp from '@ledgerhq/hw-app-btc'
 import ETHApp from '@ledgerhq/hw-app-eth'
 import XRPApp from '@ledgerhq/hw-app-xrp'
 import Web3 from 'web3'
-import { Xrp } from 'sh-coins'
+import { Xrp } from '@coins/dist' // Fix me
 
 // Utils
 import { toUpper } from '@utils/format'
 import { getXrpTxParams, getTxHex } from '@utils/api'
+
+// Types
+import { TUnspentOutput } from '@coins/types'
 
 export type TCurrency = {
   symbol: string
@@ -150,7 +153,7 @@ export const ethLedgerSignTx = async (
 export const createBtcTx = async (
   transport: Transport,
   path: string,
-  outputs: UnspentOutput[],
+  outputs: TUnspentOutput[],
   addressFrom: string,
   addressTo: string,
   amount: number,
@@ -177,7 +180,7 @@ export const createBtcTx = async (
       return null
     }
 
-    const newTx = bitcoin.createUnsignedTx(outputs, addressTo, amount, fee, addressFrom)
+    const newTx = '' // bitcoin.createUnsignedTx(outputs, addressTo, amount, fee, addressFrom) Fix me
 
     const splitNewTx = btc.splitTransaction(newTx)
     const outputScriptHex = btc.serializeTransactionOutputs(splitNewTx).toString('hex')

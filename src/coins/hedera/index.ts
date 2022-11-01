@@ -35,23 +35,13 @@ export const generateAddress = async (): Promise<TGenerateAddress | null> => {
   }
 }
 
-export const importPrivateKey = (privateKey: string): string | null => {
+export const importPrivateKey = async (privateKey: string): Promise<string | null> => {
   try {
-    return null
+    return await getHederaAccountId(PrivateKey.fromString(privateKey).publicKey.toString())
   } catch {
     return null
   }
 }
-
-// Fix me
-
-// export const importPrivateKey = async (privateKey: string): Promise<string | null> => {
-//   try {
-//     return await getHederaAccountId(PrivateKey.fromString(privateKey).publicKey.toString())
-//   } catch {
-//     return null
-//   }
-// }
 
 export const getExplorerLink = (address: string): string => {
   return `https://app.dragonglass.me/hedera/accounts/${address}`

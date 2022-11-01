@@ -42,7 +42,7 @@ export const generateAddress = async (): Promise<TGenerateAddress | null> => {
   }
 }
 
-export const importPrivateKey = (privateKey: string): string | null => {
+export const importPrivateKey = async (privateKey: string): Promise<string | null> => {
   try {
     return new digibyteLib.PrivateKey(privateKey).toAddress().toString()
   } catch {

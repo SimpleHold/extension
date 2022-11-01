@@ -14,9 +14,8 @@ import Skeleton from '@components/Skeleton'
 import ConfirmDrawer from '@drawers/Confirm'
 
 // Config
-import { validateContractAddress, checkExistWallet, getToken } from '@config/tokens'
 import networks, { getEthNetwork, IEthNetwork } from '@config/ethLikeNetworks'
-import { getCurrency } from 'config/currencies/currencies'
+import { getCurrencyInfo } from '@config/currencies/utils'
 
 // Utils
 import { getContractInfo } from '@utils/api'
@@ -25,7 +24,7 @@ import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
-import { getTokenStandard } from '@coins/index'
+import { getStandart, validateContractAddress, checkExistWallet, getToken } from '@tokens/index'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -95,7 +94,7 @@ const AddCustomToken: React.FC = () => {
       if (getNetworkInfo) {
         updateState({ selectedNetwork: getNetworkInfo })
 
-        const findCurrency = getCurrency(getNetworkInfo.symbol)
+        const findCurrency = getCurrencyInfo(getNetworkInfo.symbol)
 
         if (findCurrency) {
           updateState({ logoBackground: findCurrency.background })
@@ -162,7 +161,7 @@ const AddCustomToken: React.FC = () => {
         tokenName,
         contractAddress: state.contractAddress,
         decimals,
-        tokenStandart: getTokenStandard(toLower(chain)),
+        tokenStandart: getStandart(toLower(chain)),
       }
 
       if (checkTokenWallets) {
@@ -180,7 +179,7 @@ const AddCustomToken: React.FC = () => {
     if (getNetworkInfo) {
       updateState({ selectedNetwork: getNetworkInfo })
 
-      const findCurrency = getCurrency(getNetworkInfo.symbol)
+      const findCurrency = getCurrencyInfo(getNetworkInfo.symbol)
 
       if (findCurrency) {
         updateState({ logoBackground: findCurrency.background })

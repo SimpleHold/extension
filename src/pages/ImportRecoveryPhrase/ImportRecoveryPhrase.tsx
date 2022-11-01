@@ -47,10 +47,10 @@ const ImportRecoveryPhrase: React.FC = () => {
   }, [])
 
   const onImport = async (): Promise<void> => {
-    const data = await importRecoveryPhrase(symbol, recoveryPhrase)
+    const data = null // Fix me await importRecoveryPhrase(symbol, recoveryPhrase)
 
     if (data) {
-      const checkExist = checkExistWallet(data.address, symbol)
+      const checkExist = false // checkExistWallet(data.address, symbol)
 
       if (checkExist) {
         return setErrorLabel('This address has already been added')
@@ -66,7 +66,7 @@ const ImportRecoveryPhrase: React.FC = () => {
 
     if (backup) {
       const decryptBackup = decrypt(backup, password)
-      const recoveryData = await importRecoveryPhrase(symbol, recoveryPhrase)
+      const recoveryData = null // Fix me await importRecoveryPhrase(symbol, recoveryPhrase)
 
       if (decryptBackup && recoveryData) {
         const { address, privateKey } = recoveryData

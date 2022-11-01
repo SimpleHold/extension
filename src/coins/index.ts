@@ -27,7 +27,7 @@ import {
   Elrond,
   Casper,
   Aptos,
-} from 'sh-coins'
+} from './dist'
 import find from 'lodash/find'
 
 // Coins
@@ -169,16 +169,16 @@ export const generateAddress = async (
   }
 }
 
-export const importPrivateKey = (
+export const importPrivateKey = async (
   symbol: string,
   privateKey: string,
   tokenChain?: string
-): string | null => {
+): Promise<string | null> => {
   try {
     const provider = getProvider(symbol, tokenChain)
 
     if (provider?.importPrivateKey) {
-      return provider.importPrivateKey(privateKey, symbol)
+      return await provider.importPrivateKey(privateKey, symbol)
     }
 
     return null
@@ -394,6 +394,12 @@ export const checkWithOutputs = (symbol: string, tokenChain?: string): boolean =
 }
 
 export const getList = (symbol: string, tokenChain?: string): string[] => {
+  if (vechain.config.coins.indexOf(symbol) !== -1) {
+    return vechain.config.coins.sort(
+      (a: string, b: string) => b.indexOf(symbol) - a.indexOf(symbol)
+    )
+  }
+
   if (Theta.config.coins.indexOf(symbol) !== -1) {
     return Theta.config.coins.sort(
       (a: string, b: string) => Number(b.indexOf(symbol) !== -1) - Number(a.indexOf(symbol) !== -1)

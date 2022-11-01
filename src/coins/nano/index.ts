@@ -53,7 +53,7 @@ export const formatValue = (value: string | number, type: 'from' | 'to'): number
   })
 }
 
-export const importPrivateKey = (privateKey: string): string | null => {
+export const importPrivateKey = async (privateKey: string): Promise<string | null> => {
   try {
     const publicKey = nano.derivePublicKey(privateKey)
     const address = nano.deriveAddress(publicKey)

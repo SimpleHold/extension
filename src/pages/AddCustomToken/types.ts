@@ -1,5 +1,5 @@
 // Types
-import { ICurrency } from 'config/currencies/currencies'
+import { TCurrency } from '@config/currencies/types'
 import { IEthNetwork } from '@config/ethLikeNetworks'
 
 export interface IToken {
@@ -10,7 +10,7 @@ export interface IToken {
 
 export interface ILocationState {
   activeNetwork?: string
-  currency?: ICurrency
+  currency?: TCurrency
   address?: string
 }
 

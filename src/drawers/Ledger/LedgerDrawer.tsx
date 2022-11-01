@@ -11,7 +11,7 @@ import ErrorCurrencyIcon from '@assets/drawer/errorCurrency.svg'
 import LedgerTxReviewIcon from '@assets/drawer/ledgerTxReview.svg'
 
 // Config
-import { getCurrency } from 'config/currencies/currencies'
+import { getCurrencyInfo } from '@config/currencies/utils'
 
 // Styles
 import Styles from './styles'
@@ -32,7 +32,7 @@ const LedgerDrawer: React.FC<Props> = (props) => {
     return null
   }
 
-  const getCurrencyInfo = getCurrency(symbol || 'btc')
+  const currencyInfo = getCurrencyInfo(symbol || 'btc')
 
   const drawerStates = {
     wrongDevice: {
@@ -44,7 +44,7 @@ const LedgerDrawer: React.FC<Props> = (props) => {
     wrongApp: {
       title: 'Wrong Ledger app',
       icon: ErrorCurrencyIcon,
-      text: `Please use ${getCurrencyInfo?.name || 'Bitcoin'} app in your Ledger device`,
+      text: `Please use ${currencyInfo?.name || 'Bitcoin'} app in your Ledger device`,
     },
     connectionFailed: {
       title: 'Connection failed',

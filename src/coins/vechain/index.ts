@@ -39,7 +39,7 @@ export const generateAddress = async (): Promise<TGenerateAddress | null> => {
   }
 }
 
-export const importPrivateKey = (privateKey: string): string | null => {
+export const importPrivateKey = async (privateKey: string): Promise<string | null> => {
   try {
     const pubKey = Devkit.secp256k1.derivePublicKey(Buffer.from(privateKey, 'hex'))
 

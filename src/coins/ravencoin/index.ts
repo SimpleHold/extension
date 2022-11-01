@@ -28,7 +28,7 @@ export const generateAddress = async (): Promise<TGenerateAddress> => {
   }
 }
 
-export const importPrivateKey = (privateKey: string): string => {
+export const importPrivateKey = async (privateKey: string): Promise<string> => {
   return new ravencore.PrivateKey(privateKey).toAddress().toString()
 }
 

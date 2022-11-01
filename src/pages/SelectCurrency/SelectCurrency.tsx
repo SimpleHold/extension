@@ -16,15 +16,15 @@ import HardwareTab from './tabs/hardwareTab'
 import { toLower } from '@utils/format'
 import { getWallets } from '@utils/wallet'
 import { getUrl, openWebPage } from '@utils/extension'
-import { getTokenStandard } from '@coins/index'
-import { getTokens } from '@utils/localTokens'
-import * as theta from '@coins/index/theta'
-import * as vechain from '@coins/index/vechain'
+import { getStandart } from '@tokens/index'
+
+// Tokens
+import { getSharedTokens } from '@tokens/index'
 
 // Config
-import { checkExistWallet } from '@config/tokens'
+import tokens, { checkExistWallet } from '@tokens/index'
 import networks, { IEthNetwork } from '@config/ethLikeNetworks'
-import tokens, { IToken } from '@config/tokens'
+import { TToken } from '@tokens/types'
 
 // Styles
 import Styles from './styles'
@@ -33,34 +33,34 @@ const SelectCurrency: React.FC = () => {
   const history = useHistory()
 
   const [activeTabKey, setActiveTabKey] = React.useState<string>('all')
-  const [tokensList, setTokensList] = React.useState<IToken[]>(tokens)
+  const [tokensList, setTokensList] = React.useState<TToken[]>(tokens)
 
   React.useEffect(() => {
     checkLocalTokens()
   }, [])
 
   const checkLocalTokens = (): void => {
-    const localTokens = getTokens()
+    const localTokens = getSharedTokens()
 
     if (localTokens.length) {
-      setTokensList((prev: IToken[]) => [...prev, ...localTokens])
+      setTokensList((prev: TToken[]) => [...prev, ...localTokens])
     }
   }
 
   const getWarning = (symbol: string): string | undefined => {
-    if (theta.coins.indexOf(symbol) !== -1) {
-      return `You are trying to add a new ${
-        toLower(symbol) === 'theta' ? 'Theta' : 'TFuel'
-      } address. The same address for ${
-        toLower(symbol) === 'theta' ? 'TFuel' : 'Theta'
-      } will also be added to your wallet.`
-    } else if (vechain.coins.indexOf(symbol) !== -1) {
-      return `You are trying to add a new ${
-        toLower(symbol) === 'vet' ? 'VeChain' : 'VeThor'
-      } address. The same address for ${
-        toLower(symbol) === 'vet' ? 'VeThor' : 'VeChain'
-      } will also be added to your wallet.`
-    }
+    // if (theta.coins.indexOf(symbol) !== -1) {
+    //   return `You are trying to add a new ${
+    //     toLower(symbol) === 'theta' ? 'Theta' : 'TFuel'
+    //   } address. The same address for ${
+    //     toLower(symbol) === 'theta' ? 'TFuel' : 'Theta'
+    //   } will also be added to your wallet.`
+    // } else if (vechain.coins.indexOf(symbol) !== -1) {
+    //   return `You are trying to add a new ${
+    //     toLower(symbol) === 'vet' ? 'VeChain' : 'VeThor'
+    //   } address. The same address for ${
+    //     toLower(symbol) === 'vet' ? 'VeThor' : 'VeChain'
+    //   } will also be added to your wallet.`
+    // } Fix me
     return undefined
   }
 
@@ -89,7 +89,7 @@ const SelectCurrency: React.FC = () => {
           chain,
           chainName: getNetwork.name,
           tokenName,
-          tokenStandart: getTokenStandard(toLower(getNetwork.chain)),
+          tokenStandart: getStandart(toLower(getNetwork.chain)),
         })
       }
 

@@ -17,20 +17,19 @@ import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
-import { generate, checkWithPhrase } from '@coins/index'
+import { generateAddress, checkWithPhrase, getList } from '@coins/index'
 import { getItem, setItem } from '@utils/storage'
-import * as theta from '@coins/index/theta'
-import * as vechain from '@coins/index/vechain'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
-import { getCurrencyByChain, ICurrency } from 'config/currencies/currencies'
+import { getCurrencyByChain } from '@config/currencies/utils'
 
 // Hooks
 import useState from '@hooks/useState'
 
 // Types
 import { ILocationState, IState } from './types'
+import { TCurrency } from '@config/currencies/types'
 
 // Styles
 import Styles from './styles'
@@ -80,16 +79,11 @@ const NewWallet: React.FC = () => {
     })
   }
 
-  const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
-    if (vechain.coins.indexOf(symbol) !== -1) {
-      return vechain.coins.sort((a: string, b: string) => b.indexOf(symbol) - a.indexOf(symbol))
+  const getCurrenciesList = (getCurrencyInfo?: TCurrency | undefined | null): string[] => {
+    if (getCurrencyInfo) {
+      return getList(getCurrencyInfo.symbol, chain)
     }
-    if (theta.coins.indexOf(symbol) !== -1) {
-      return theta.coins.sort((a: string, b: string) => a.indexOf(symbol) - b.indexOf(symbol))
-    }
-    if (chain && getCurrencyInfo) {
-      return [symbol, getCurrencyInfo.symbol]
-    }
+
     return [symbol]
   }
 
@@ -97,7 +91,7 @@ const NewWallet: React.FC = () => {
     if (validatePassword(state.password)) {
       updateState({ isButtonLoading: true })
 
-      const generateAddress = await generate(symbol, chain)
+      const generateAddress = null // Fix me await generate(symbol, chain)
       if (generateAddress) {
         const { privateKey, mnemonic, isNotActivated, address } = generateAddress
 

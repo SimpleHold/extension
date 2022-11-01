@@ -16,8 +16,8 @@ import { getItem, checkOneOfExist, removeItem, setItem, removeMany } from '@util
 import { toLower } from '@utils/format'
 
 // Config
-import { getCurrency } from 'config/currencies/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyInfo } from '@config/currencies/utils'
+import { getToken } from '@tokens/index'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -83,7 +83,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
       const currencies = uniqueWallets.sort(sortAlphabetically).map((wallet: IWallet) => {
         const { chain, symbol, name } = wallet
 
-        const getWalletInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+        const getWalletInfo = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 
         return {
           symbol: getWalletInfo?.symbol || symbol,

@@ -111,6 +111,9 @@ const config = {
     hash: true,
   },
   mode: nodeEnv,
+  node: {
+    fs: 'empty',
+  },
   entry: {
     manifest: path.join(sourcePath, 'manifest.json'),
     background: path.join(sourcePath, 'utils', 'browser', 'background.ts'),
@@ -140,9 +143,28 @@ const config = {
       ),
     },
   },
-
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        loader: require.resolve('@open-wc/webpack-import-meta-loader'),
+      },
+      {
+        test: /\.mjs$/,
+        include: /@polkadot/i,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+            plugins: ['@babel/plugin-proposal-class-properties'],
+          },
+        },
+      },
+      {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto',
+      },
       {
         type: 'javascript/auto',
         test: /manifest\.json$/,
@@ -228,7 +250,7 @@ const config = {
     splitChunks: {
       cacheGroups: {
         vendor: {
-          test: /[\\/]node_modules[\\/]((?!(@emurgo)).*)[\\/]/,
+          test: /[\\/]node_modules[\\/]/,
           name: 'vendor',
           maxSize: 3500 * 1000,
           chunks(chunk) {

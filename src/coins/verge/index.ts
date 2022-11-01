@@ -42,7 +42,7 @@ export const generateAddress = async (): Promise<TGenerateAddress | null> => {
   return null
 }
 
-export const importPrivateKey = (privateKey: string): string | null => {
+export const importPrivateKey = async (privateKey: string): Promise<string | null> => {
   const keyPair = vergeLib.ECPair.fromWIF(privateKey, network)
 
   const { address } = vergeLib.payments.p2pkh({

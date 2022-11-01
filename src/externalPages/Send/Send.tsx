@@ -33,19 +33,19 @@ import {
   formatUnit,
   getNetworkFee,
   generateExtraId,
-  getFee,
-  getStandingFee,
-  isEthereumLike,
-  checkWithZeroFee,
+  // getFee,
+  // getStandingFee,
+  // isEthereumLike,
+  // checkWithZeroFee,
 } from '@coins/index'
 import { getItem, setItem, removeItem } from '@utils/storage'
-import { getDogeUtxos } from '@coins/index/bitcoinLike'
+// import { getDogeUtxos } from '@coins/index/bitcoinLike'
 import { logEvent } from 'utils/metrics'
-import { getUtxos as getVergeUtxos } from '@coins/index/verge'
+// import { getUtxos as getVergeUtxos } from '@coins/index/verge'
 
 // Config
-import { getCurrency, ICurrency } from 'config/currencies/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyInfo } from '@config/currencies/utils'
+import { getToken } from '@tokens/index'
 import {
   SEND_SELECT,
   SEND_CANCEL,
@@ -61,6 +61,8 @@ import useState from '@hooks/useState'
 // Types
 import { IState } from './types'
 import { TFeeValue } from '@shared/types'
+import { TCurrency } from '@config/currencies/types'
+import { TFeeTypes } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -114,7 +116,7 @@ const Send: React.FC = () => {
 
   React.useEffect(() => {
     if (state.selectedWallet) {
-      getCurrencyInfo()
+      getCurrency()
       getCurrencyBalance()
       checkAddress()
       onGetNetworkFeeSymbol()
@@ -197,11 +199,11 @@ const Send: React.FC = () => {
     if (state.selectedWallet) {
       const { symbol } = state.selectedWallet
 
-      const data = getStandingFee(symbol)
+      // const data = getStandingFee(symbol)
 
-      if (data) {
-        updateState({ fee: data, isStandingFee: true })
-      }
+      // if (data) {
+      //   updateState({ fee: data, isStandingFee: true })
+      // } Fix me
     }
   }
 
@@ -225,7 +227,7 @@ const Send: React.FC = () => {
     }
   }
 
-  const getOutputs = async (info: ICurrency): Promise<void> => {
+  const getOutputs = async (info: TCurrency): Promise<void> => {
     if (state.selectedWallet) {
       const { symbol, address } = state.selectedWallet
       const { chain } = info
@@ -254,28 +256,25 @@ const Send: React.FC = () => {
     if (state.selectedWallet) {
       const { symbol, chain } = state.selectedWallet
 
-      const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+      const currencyInfo = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 
       if (currencyInfo) {
-        const customFee = await getFee(symbol, currencyInfo.chain)
-
-        if (customFee) {
-          updateState({ customFee })
-        }
+        // const customFee = await getFee(symbol, currencyInfo.chain)
+        // if (customFee) {
+        //   updateState({ customFee })
+        // }
       }
     }
   }
 
   const onGetDogeUtxos = (): void => {
-    const utxosList = getDogeUtxos(state.outputs, state.address, state.amount)
-
-    updateState({ utxosList })
+    // const utxosList = getDogeUtxos(state.outputs, state.address, state.amount)
+    // updateState({ utxosList })
   }
 
   const onGetVergeUtxos = (): void => {
-    const utxosList = getVergeUtxos(state.outputs, state.address, state.amount)
-
-    updateState({ utxosList })
+    // const utxosList = getVergeUtxos(state.outputs, state.address, state.amount)
+    // updateState({ utxosList })
   }
 
   const onGetNetworkFee = async (): Promise<void> => {
@@ -301,7 +300,7 @@ const Send: React.FC = () => {
       return
     }
 
-    const currencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+    const currencyInfo = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 
     if (currencyInfo) {
       updateState({ isFeeLoading: true })
@@ -313,67 +312,67 @@ const Send: React.FC = () => {
 
       let amount = Number(state.amount)
 
-      const data = await getNetworkFee({
-        symbol,
-        addressFrom: address,
-        addressTo: state.address,
-        chain: currencyInfo.chain,
-        amount: `${amount}`,
-        tokenChain: chain,
-        btcLikeParams: {
-          outputs: state.outputs,
-          customFee: state.customFee,
-        },
-        ethLikeParams: {
-          contractAddress,
-          decimals,
-          fees: state.customFee,
-        },
-      })
+      // const data = await getNetworkFee({
+      //   symbol,
+      //   addressFrom: address,
+      //   addressTo: state.address,
+      //   chain: currencyInfo.chain,
+      //   amount: `${amount}`,
+      //   tokenChain: chain,
+      //   btcLikeParams: {
+      //     outputs: state.outputs,
+      //     customFee: state.customFee,
+      //   },
+      //   ethLikeParams: {
+      //     contractAddress,
+      //     decimals,
+      //     fees: state.customFee,
+      //   },
+      // })
 
       updateState({ isFeeLoading: false })
 
-      if (data) {
-        if (data?.utxos && withOutputs) {
-          updateState({ utxosList: data.utxos })
-        }
+      // if (data) {
+      //   if (data?.utxos && withOutputs) {
+      //     updateState({ utxosList: data.utxos })
+      //   }
 
-        if (data.networkFee || data.fees?.length) {
-          if (data.networkFee) {
-            updateState({ fee: data.networkFee })
-          }
+      //   if (data.networkFee || data.fees?.length) {
+      //     if (data.networkFee) {
+      //       updateState({ fee: data.networkFee })
+      //     }
 
-          if (data.fees?.length) {
-            const getFee = data.fees.find((value: TFeeValue) => value.type === state.feeType)
+      //     if (data.fees?.length) {
+      //       const getFee = data.fees.find((value: TFeeValue) => value.type === state.feeType)
 
-            updateState({ feeValues: data.fees })
+      //       updateState({ feeValues: data.fees })
 
-            if (getFee) {
-              updateState({
-                feeValues: data.fees,
-                utxosList: getFee.utxos || [],
-                fee: getFee.value,
-              })
-            }
-          }
-        } else {
-          if (Number(state.amount) > 0 && Number(state.balance) > 0) {
-            setInsufficientError()
-          }
-        }
+      //       if (getFee) {
+      //         updateState({
+      //           feeValues: data.fees,
+      //           utxosList: getFee.utxos || [],
+      //           fee: getFee.value,
+      //         })
+      //       }
+      //     }
+      //   } else {
+      //     if (Number(state.amount) > 0 && Number(state.balance) > 0) {
+      //       setInsufficientError()
+      //     }
+      //   }
 
-        if (!isNaN(Number(data.currencyBalance))) {
-          updateState({ currencyBalance: data.currencyBalance })
-        }
+      //   if (!isNaN(Number(data.currencyBalance))) {
+      //     updateState({ currencyBalance: data.currencyBalance })
+      //   }
 
-        if (isEthereumLike(symbol, chain)) {
-          const timer = setTimeout(() => {
-            onGetNetworkFee()
-          }, 5000)
+      //   if (isEthereumLike(symbol, chain)) {
+      //     const timer = setTimeout(() => {
+      //       onGetNetworkFee()
+      //     }, 5000)
 
-          updateState({ timer })
-        }
-      }
+      //     updateState({ timer })
+      //   }
+      // }
     }
   }
 
@@ -424,11 +423,11 @@ const Send: React.FC = () => {
     }
   }
 
-  const getCurrencyInfo = (): void => {
+  const getCurrency = (): void => {
     if (state.selectedWallet) {
       const info = state.selectedWallet?.chain
         ? getToken(state.selectedWallet?.symbol, state.selectedWallet.chain)
-        : getCurrency(state.selectedWallet?.symbol)
+        : getCurrencyInfo(state.selectedWallet?.symbol)
 
       if (info) {
         updateState({ currencyInfo: info })
@@ -443,13 +442,13 @@ const Send: React.FC = () => {
     if (state.selectedWallet) {
       const { address, symbol, chain, contractAddress } = state.selectedWallet
 
-      const getCurrencyInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+      const getCurrency = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 
-      if (getCurrencyInfo) {
+      if (getCurrency) {
         const { balance, balance_usd } = await getSingleBalance({
           symbol,
           address,
-          chain: getCurrencyInfo?.chain,
+          chain: getCurrency?.chain,
           tokenSymbol: chain ? symbol : undefined,
           contractAddress,
           isFullBalance: true,
@@ -536,7 +535,7 @@ const Send: React.FC = () => {
     if (currentTab?.id && state.selectedWallet) {
       const currency = state.selectedWallet?.chain
         ? getToken(state.selectedWallet.symbol, state.selectedWallet.chain)
-        : getCurrency(state.selectedWallet.symbol)
+        : getCurrencyInfo(state.selectedWallet.symbol)
 
       const data = {
         amount,
@@ -556,13 +555,13 @@ const Send: React.FC = () => {
         isIncludeFee: state.isIncludeFee,
       }
 
-      logEvent({
-        name: SEND_SELECT,
-        properties: {
-          fee: state.isIncludeFee ? 'incl' : 'excl',
-          speed: currency?.isCustomFee ? 'fixed' : state.feeType,
-        },
-      })
+      // logEvent({
+      //   name: SEND_SELECT,
+      //   properties: {
+      //     fee: state.isIncludeFee ? 'incl' : 'excl',
+      //     speed: currency?.isCustomFee ? 'fixed' : state.feeType,
+      //   },
+      // })
 
       if (state.timer) {
         clearTimeout(state.timer)
@@ -585,18 +584,18 @@ const Send: React.FC = () => {
       updateState({ addressErrorLabel: null })
     }
 
-    if (state.selectedWallet && state.currencyInfo) {
-      if (
-        state.address.length &&
-        !validateAddress(state.selectedWallet.symbol, state.address, state.selectedWallet?.chain)
-      ) {
-        return updateState({ addressErrorLabel: 'Address is not valid' })
-      }
+    // if (state.selectedWallet && state.currencyInfo) {
+    //   if (
+    //     state.address.length &&
+    //     !validateAddress(state.selectedWallet.symbol, state.address, state.selectedWallet?.chain)
+    //   ) {
+    //     return updateState({ addressErrorLabel: 'Address is not valid' })
+    //   }
 
-      if (state.address === state.selectedWallet.address) {
-        return updateState({ addressErrorLabel: 'Address same as sender' })
-      }
-    }
+    //   if (state.address === state.selectedWallet.address) {
+    //     return updateState({ addressErrorLabel: 'Address same as sender' })
+    //   }
+    // }
 
     if (!state.fee && Number(state.amount) > 0 && !state.amountErrorLabel) {
       onGetNetworkFee()
@@ -650,34 +649,34 @@ const Send: React.FC = () => {
       const getMinAmountWithFee =
         state.isIncludeFee && state.selectedWallet?.symbol === state.feeSymbol ? state.fee : 0
 
-      if (state.selectedWallet?.chain) {
-        minAmount = state.currencyInfo.minSendAmount || 0.001
-      } else {
-        amount = +formatUnit(
-          state.selectedWallet.symbol,
-          getAmount(),
-          'to',
-          state.currencyInfo.chain,
-          'ether'
-        )
-        minAmount = +formatUnit(
-          state.selectedWallet.symbol,
-          state.currencyInfo.minSendAmount,
-          'from',
-          state.currencyInfo.chain,
-          'ether'
-        )
-      }
+      // if (state.selectedWallet?.chain) {
+      //   minAmount = state.currencyInfo.minSendAmount || 0.001
+      // } else {
+      //   amount = +formatUnit(
+      //     state.selectedWallet.symbol,
+      //     getAmount(),
+      //     'to',
+      //     state.currencyInfo.chain,
+      //     'ether'
+      //   )
+      //   minAmount = +formatUnit(
+      //     state.selectedWallet.symbol,
+      //     state.currencyInfo.minSendAmount,
+      //     'from',
+      //     state.currencyInfo.chain,
+      //     'ether'
+      //   )
+      // }
 
       const minAmountWithFee = plus(minAmount, getMinAmountWithFee)
 
-      if (amount < state.currencyInfo.minSendAmount) {
-        return updateState({
-          amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(
-            state.selectedWallet.symbol
-          )}`,
-        })
-      }
+      // if (amount < state.currencyInfo.minSendAmount) {
+      //   return updateState({
+      //     amountErrorLabel: `Min amount is ${minAmountWithFee} ${toUpper(
+      //       state.selectedWallet.symbol
+      //     )}`,
+      //   })
+      // }
     }
   }
 
@@ -697,27 +696,27 @@ const Send: React.FC = () => {
           ? Number(state.amount) - state.fee
           : Number(state.amount)
 
-      if (
-        validateAddress(state.selectedWallet.symbol, state.address, state.selectedWallet?.chain) &&
-        state.amount.length &&
-        getAmount > 0 &&
-        state.addressErrorLabel === null &&
-        state.amountErrorLabel === null &&
-        Number(state.balance) > 0 &&
-        !state.isFeeLoading &&
-        !isCurrencyBalanceError
-      ) {
-        if (!state?.utxosList?.length) {
-          const withOutputs = checkWithOutputs(state.currencyInfo.symbol)
-          return withOutputs
-        }
+      // if (
+      //   validateAddress(state.selectedWallet.symbol, state.address, state.selectedWallet?.chain) &&
+      //   state.amount.length &&
+      //   getAmount > 0 &&
+      //   state.addressErrorLabel === null &&
+      //   state.amountErrorLabel === null &&
+      //   Number(state.balance) > 0 &&
+      //   !state.isFeeLoading &&
+      //   !isCurrencyBalanceError
+      // ) {
+      //   if (!state?.utxosList?.length) {
+      //     const withOutputs = checkWithOutputs(state.currencyInfo.symbol)
+      //     return withOutputs
+      //   }
 
-        if (state.fee === 0) {
-          return !checkWithZeroFee(state.currencyInfo.symbol)
-        }
+      //   // if (state.fee === 0) {
+      //   //   return !checkWithZeroFee(state.currencyInfo.symbol)
+      //   // }
 
-        return false
-      }
+      //   return false
+      // }
     }
     return true
   }
@@ -773,7 +772,7 @@ const Send: React.FC = () => {
       updateState({ amountErrorLabel: null })
     }
 
-    updateState({ feeType, selectedFee: state.customFee[feeType] })
+    // updateState({ feeType, selectedFee: state.customFee[feeType] })
 
     const getFee = state.feeValues.find((value: TFeeValue) => value.type === feeType)
 
@@ -819,7 +818,7 @@ const Send: React.FC = () => {
     if (state.props?.currency) {
       const { currency } = state.props
 
-      const getInfo = getCurrency(currency)
+      const getInfo = getCurrencyInfo(currency)
 
       if (getInfo) {
         return getInfo.name
@@ -882,7 +881,8 @@ const Send: React.FC = () => {
                   type={state.feeType}
                   setType={setFeeType}
                   isBalanceError={isCurrencyBalanceError && state.currencyBalance !== null}
-                  withButton={state?.currencyInfo?.isCustomFee}
+                  // withButton={state?.currencyInfo?.isCustomFee}
+                  withButton
                   isIncludeFee={state.isIncludeFee}
                   toggleIncludeFee={toggleIncludeFee}
                   showFeeDrawer={showFeeDrawer}

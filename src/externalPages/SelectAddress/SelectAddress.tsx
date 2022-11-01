@@ -16,8 +16,8 @@ import { toLower, toUpper } from '@utils/format'
 import { getItem, removeItem } from '@utils/storage'
 
 // Config
-import { getCurrency } from 'config/currencies/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyInfo } from '@config/currencies/utils'
+import { getToken } from '@tokens/index'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -92,12 +92,12 @@ const SelectAddress: React.FC = () => {
     const parseChain = queryChain !== 'null' && queryChain !== null ? queryChain : null
 
     if (queryCurrency !== 'null' && queryCurrency !== null) {
-      const getCurrencyInfo = parseChain
+      const currencyInfo = parseChain
         ? getToken(queryCurrency, parseChain)
-        : getCurrency(queryCurrency)
+        : getCurrencyInfo(queryCurrency)
 
-      if (getCurrencyInfo) {
-        const { symbol, name, background } = getCurrencyInfo
+      if (currencyInfo) {
+        const { symbol, name, background } = currencyInfo
 
         updateState({
           selectedCurrency: {
@@ -147,12 +147,12 @@ const SelectAddress: React.FC = () => {
 
   const onSelectCurrency = (index: number): void => {
     const currency = getDropdownList()[index]
-    const getCurrencyInfo = currency.logo?.chain
+    const currencyInfo = currency.logo?.chain
       ? getToken(currency.logo.symbol, currency.logo.chain)
-      : getCurrency(currency.logo.symbol)
+      : getCurrencyInfo(currency.logo.symbol)
 
-    if (getCurrencyInfo) {
-      const { symbol, name, background } = getCurrencyInfo
+    if (currencyInfo) {
+      const { symbol, name, background } = currencyInfo
 
       updateState({
         selectedCurrency: {
@@ -183,9 +183,9 @@ const SelectAddress: React.FC = () => {
         )
 
       return mapWallets.map((wallet: IWallet) => {
-        const getCurrencyInfo = wallet?.chain
+        const currencyInfo = wallet?.chain
           ? getToken(wallet.symbol, wallet.chain)
-          : getCurrency(wallet.symbol)
+          : getCurrencyInfo(wallet.symbol)
 
         return {
           logo: {
@@ -193,10 +193,10 @@ const SelectAddress: React.FC = () => {
             width: 40,
             height: 40,
             br: 13,
-            background: getCurrencyInfo?.background || '',
+            background: currencyInfo?.background || '',
             chain: wallet.chain,
           },
-          value: getCurrencyInfo?.name || '',
+          value: currencyInfo?.name || '',
         }
       })
     }
