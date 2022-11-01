@@ -11,7 +11,7 @@ import LogoutDrawer from '@drawers/Logout'
 
 // Utils
 import { decrypt } from '@utils/crypto'
-import { download as downloadBackup } from '@utils/backup'
+import { downloadBackupFile as downloadBackup } from '@utils/backup'
 import { validatePassword } from '@utils/validate'
 import { logEvent } from 'utils/metrics'
 import { openWebPage } from '@utils/extension'

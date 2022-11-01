@@ -28,9 +28,11 @@ import useState from '@hooks/useState'
 // Types
 import { ILocationState, IState } from './types'
 
+// Utils
+import { getTokens } from '@utils/localTokens'
+
 // Styles
 import Styles from './styles'
-import { getTokens } from 'utils/localTokens'
 
 const initialState: IState = {
   searchValue: '',
