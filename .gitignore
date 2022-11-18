@@ -1,6 +1,4 @@
-dist/js/*
-dist/*.html
-dist/static/
+dist/
 
 /node_modules
 npm-debug.log

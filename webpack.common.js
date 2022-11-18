@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const Dotenv = require('dotenv-webpack')
 const TerserPlugin = require('terser-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const externalPages = [
   {
@@ -82,7 +83,7 @@ module.exports = {
     trezor: path.join(__dirname, 'src/utils/trezor/trezor-content-script.ts'),
   },
   output: {
-    path: path.join(__dirname, 'dist/js'),
+    path: path.join(__dirname, 'dist'),
     filename: '[name].js',
   },
   module: {
@@ -96,12 +97,19 @@ module.exports = {
         test: /\.(png|jpg|gif|svg)$/i,
         type: 'asset/resource',
         generator: {
-          filename: '../static/[hash][ext][query]',
+          filename: 'static/[hash][ext][query]',
         },
       },
     ],
   },
   plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/assets/favicon', to: '' },
+        { from: 'scripts', to: 'scripts' },
+        { from: 'src/manifest.json', to: '' },
+      ],
+    }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
       assert: ['assert', 'Assert'],
@@ -164,15 +172,13 @@ module.exports = {
           name: 'vendor',
           maxSize: 3500 * 1000,
           chunks(chunk) {
-            const chunkNames = [
-              'background',
-              'contentScript',
-              'trezor',
-              'inpage',
-              'trezorUsbPermissions',
-            ]
-
-            return chunkNames.indexOf(chunk.name) === -1
+            return (
+              chunk.name !== 'background' &&
+              chunk.name !== 'contentScript' &&
+              chunk.name !== 'trezor' &&
+              chunk.name !== 'inpage' &&
+              chunk.name !== 'trezorUsbPermissions'
+            )
           },
         },
       },

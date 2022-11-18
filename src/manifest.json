@@ -28,11 +28,11 @@
       "48": "favicon-48.png",
       "128": "favicon-128.png"
     },
-    "default_popup": "js/popup.html",
+    "default_popup": "popup.html",
     "default_title": "SimpleHold"
   },
   "background": {
-    "service_worker": "js/background.js"
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -42,17 +42,17 @@
         "https://swapspace.co/*",
         "http://localhost/*"
       ],
-      "js": ["js/contentScript.js"]
+      "js": ["contentScript.js"]
     }
   ],
   "web_accessible_resources": [
     {
       "resources": [
-        "js/inpage.js",
-        "js/selectAddress.js",
+        "inpage.js",
+        "selectAddress.js",
         "select-address.html",
-        "js/contentScript.js",
-        "js/send.js",
+        "contentScript.js",
+        "send.js",
         "send.html"
       ],
       "matches": [
