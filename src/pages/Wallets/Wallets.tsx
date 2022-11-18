@@ -206,8 +206,11 @@ const Wallets: React.FC = () => {
       wallets = getFilteredWallets()
       setInitialBalance(wallets)
     } else {
-      clear()
-      history.push('/welcome')
+      updateState({
+        totalBalance: 0,
+        totalEstimated: 0,
+        pendingBalance: 0,
+      })
     }
   }
 
