@@ -148,6 +148,6 @@ const App: React.FC = () => {
   )
 }
 
-browser.tabs.query({ active: true, currentWindow: true }).then(() => {
-  render(<App />, document.getElementById('popup'))
-})
+// browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+render(<App />, document.getElementById('popup'))
+// })

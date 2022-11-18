@@ -30,8 +30,8 @@ const externalPages = [
     chunks: ['send'],
   },
   {
-    filename: 'send-confirmation.html',
-    chunks: ['sendConfirmation'],
+    filename: 'send-confirm.html',
+    chunks: ['sendConfirm'],
   },
   {
     filename: 'connect-trezor.html',
@@ -51,7 +51,7 @@ const multipleHtmlPlugins = externalPages.map((page) => {
   const { filename, chunks } = page
 
   return new HtmlWebpackPlugin({
-    template: path.join('dist', filename),
+    template: path.join('views', filename),
     inject: 'body',
     chunks,
     hash: true,
@@ -96,7 +96,7 @@ module.exports = {
         test: /\.(png|jpg|gif|svg)$/i,
         type: 'asset/resource',
         generator: {
-          filename: 'static/[hash][ext][query]',
+          filename: '../static/[hash][ext][query]',
         },
       },
     ],
@@ -108,10 +108,9 @@ module.exports = {
       process: 'process/browser',
     }),
     new Dotenv(),
-  ],
-  // .concat(multipleHtmlPlugins)
+  ].concat(multipleHtmlPlugins),
   resolve: {
-    extensions: ['.ts', '.tsx', '.js'],
+    extensions: ['.ts', '.tsx', '.js', '.json'],
     alias: {
       '@src': path.resolve(__dirname, 'src/'),
       '@components': path.resolve(__dirname, 'src/components'),
@@ -145,38 +144,38 @@ module.exports = {
       querystring: false,
     },
   },
-  // optimization: {
-  //   minimize: true,
-  //   minimizer: [
-  //     new TerserPlugin({
-  //       parallel: true,
-  //       terserOptions: {
-  //         format: {
-  //           comments: false,
-  //         },
-  //       },
-  //       extractComments: false,
-  //     }),
-  //   ],
-  //   splitChunks: {
-  //     cacheGroups: {
-  //       vendor: {
-  //         test: /[\\/]node_modules[\\/]((?!(@emurgo)).*)[\\/]/,
-  //         name: 'vendor',
-  //         maxSize: 3500 * 1000,
-  //         chunks(chunk) {
-  //           const chunkNames = [
-  //             'background',
-  //             'contentScript',
-  //             'trezor',
-  //             'inpage',
-  //             'trezorUsbPermissions',
-  //           ]
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        parallel: true,
+        terserOptions: {
+          format: {
+            comments: false,
+          },
+        },
+        extractComments: false,
+      }),
+    ],
+    splitChunks: {
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          maxSize: 3500 * 1000,
+          chunks(chunk) {
+            const chunkNames = [
+              'background',
+              'contentScript',
+              'trezor',
+              'inpage',
+              'trezorUsbPermissions',
+            ]
 
-  //           return chunkNames.indexOf(chunk.name) === -1
-  //         },
-  //       },
-  //     },
-  //   },
-  // },
+            return chunkNames.indexOf(chunk.name) === -1
+          },
+        },
+      },
+    },
+  },
 }

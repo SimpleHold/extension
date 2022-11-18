@@ -28,7 +28,7 @@
       "48": "favicon-48.png",
       "128": "favicon-128.png"
     },
-    "default_popup": "popup.html",
+    "default_popup": "js/popup.html",
     "default_title": "SimpleHold"
   },
   "background": {

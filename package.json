@@ -5,7 +5,7 @@
   "private": false,
   "repository": "https://github.com/SimpleHold/extension.git",
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
+    "build": "webpack --config webpack.prod.js && node postbuild.js",
     "dev": "webpack -w --config webpack.dev.js",
     "test": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ./.eslintrc.js \"src/**/*.ts*\"",
@@ -146,7 +146,8 @@
     "eslint-config-prettier": "^6.12.0",
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-react": "^7.21.4",
-    "html-webpack-plugin": "4.5.0",
+    "fs-extra": "^10.1.0",
+    "html-webpack-plugin": "^5.5.0",
     "http-browserify": "^1.7.0",
     "jest": "^26.5.3",
     "prettier": "^2.1.2",
