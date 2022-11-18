@@ -26,22 +26,9 @@ const App: React.FC = () => {
     initAmplitude()
     preloadPages()
     getPlatformInfo()
-
+    setWindowResize()
+    disableBrowserTranslation()
     browser.runtime.setUninstallURL('https://simpleproducts.typeform.com/nps-score')
-
-    let id: null | number = null
-
-    if (window.name) {
-      window.onresize = () => {
-        if (id) {
-          clearTimeout(id)
-        }
-        const height = window.outerHeight
-        const width = window.outerWidth
-        if (width === 375 && height === 630) return
-        id = +setTimeout(() => window.resizeTo(375, 630), 1000)
-      }
-    }
   }, [])
 
   const getPlatformInfo = async (): Promise<void> => {
@@ -66,6 +53,31 @@ const App: React.FC = () => {
       `)
       // @ts-ignore
       document.adoptedStyleSheets = [...document.adoptedStyleSheets, fontFaceSheet]
+    }
+  }
+
+  const disableBrowserTranslation = () => {
+    if (window) {
+      const meta = document.createElement('meta')
+      meta.name = 'google'
+      meta.content = 'notranslate'
+      document.head.appendChild(meta)
+      document.documentElement.translate = false
+    }
+  }
+
+  const setWindowResize = () => {
+    let id: null | number = null
+    if (window.name) {
+      window.onresize = () => {
+        if (id) {
+          clearTimeout(id)
+        }
+        const height = window.outerHeight
+        const width = window.outerWidth
+        if (width === 375 && height === 630) return
+        id = +setTimeout(() => window.resizeTo(375, 630), 1000)
+      }
     }
   }
 
