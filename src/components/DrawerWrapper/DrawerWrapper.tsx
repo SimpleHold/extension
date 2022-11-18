@@ -1,6 +1,9 @@
 import * as React from 'react'
-import { Transition } from 'react-transition-group'
+import { Transition, TransitionStatus } from 'react-transition-group'
 import SVG from 'react-inlinesvg'
+
+// Assets
+import timesIcon from '@assets/icons/times.svg'
 
 // Styles
 import Styles from './styles'
@@ -16,6 +19,8 @@ interface Props {
   padding?: string
   height?: number
   withoutDimScreen?: boolean
+  isFullScreen?: boolean
+  hideStrandgeDiv?: boolean
 }
 
 const BackgroundStyles = {
@@ -23,6 +28,7 @@ const BackgroundStyles = {
   entered: { opacity: '1' },
   exiting: { opacity: '0' },
   exited: { display: 'none' },
+  unmounted: { display: 'none' },
 }
 
 const DrawerWrapper: React.FC<Props> = (props) => {
@@ -37,6 +43,8 @@ const DrawerWrapper: React.FC<Props> = (props) => {
     padding,
     height,
     withoutDimScreen,
+    isFullScreen,
+    hideStrandgeDiv,
   } = props
 
   const nodeRef = React.useRef(null)
@@ -50,6 +58,7 @@ const DrawerWrapper: React.FC<Props> = (props) => {
     entered: { transform: 'none' },
     exiting: { transform: 'translate3d(0, 100%, 0)' },
     exited: { display: 'none' },
+    unmounted: { display: 'none' },
   }
 
   return (
@@ -61,9 +70,10 @@ const DrawerWrapper: React.FC<Props> = (props) => {
       mountOnEnter
       nodeRef={nodeRef}
     >
-      {(state: 'entering' | 'entered' | 'exiting' | 'exited') => (
+      {(state: TransitionStatus) => (
         <Styles.Wrapper ref={nodeRef}>
           <Styles.Background
+            isFullScreen={isFullScreen}
             onClick={onClose}
             style={{
               ...BackgroundStyles[state],
@@ -73,6 +83,7 @@ const DrawerWrapper: React.FC<Props> = (props) => {
             withoutDimScreen={withoutDimScreen}
           />
           <Styles.Drawer
+            isFullScreen={isFullScreen}
             isWindowedMode={isWindowedMode}
             openFrom={openFrom}
             padding={padding}
@@ -81,20 +92,19 @@ const DrawerWrapper: React.FC<Props> = (props) => {
               ...drawerStyle[state],
             }}
           >
-            {title && title.length > 30 || icon ? <div style={{width: "100%", height: '25px'}}/> : null}
-            {icon
-              ? (<Styles.IconRow>
-                <Styles.Icon src={icon} alt='icon' />
-              </Styles.IconRow>)
-              : null
-            }
-            {title
-              ? <Styles.Title>{title}</Styles.Title>
-              : null}
+            {((title && title.length > 30) || icon) && !hideStrandgeDiv ? (
+              <div style={{ width: '100%', height: '25px' }} />
+            ) : null}
+            {icon ? (
+              <Styles.IconRow>
+                <Styles.Icon src={icon} alt="icon" />
+              </Styles.IconRow>
+            ) : null}
+            {title ? <Styles.Title>{title}</Styles.Title> : null}
 
             {withCloseIcon ? (
               <Styles.CloseIconRow onClick={onClose}>
-                <SVG src='../../assets/icons/times.svg' width={16} height={16} />
+                <SVG src={timesIcon} width={16} height={16} />
               </Styles.CloseIconRow>
             ) : null}
             {children}

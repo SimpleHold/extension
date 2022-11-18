@@ -1,6 +1,9 @@
 import styled from 'styled-components'
-import { isDevMode } from 'config'
 
+// Config
+import { isDevMode } from '@config/index'
+
+// Assets
 import background from '@assets/backgrounds/main.png'
 
 type TLinkProps = {
@@ -9,13 +12,14 @@ type TLinkProps = {
 
 const Container = styled.div`
   width: 100%;
-  background-image: ${() => isDevMode ? "none" : `url(${background})`};
-  ${() => isDevMode && "background-color: #3fbb7d;"};
+  background-image: ${() => (isDevMode ? 'none' : `url(${background})`)};
+  ${() => isDevMode && 'background-color: #3fbb7d;'};
   background-repeat: no-repeat;
   position: fixed;
   z-index: 2;
-  
-  &,* {
+
+  &,
+  * {
     transition: 0.5s ease;
   }
 `
@@ -63,13 +67,12 @@ const Estimated = styled.p`
     font-size: 19px;
     line-height: 25px;
     text-align: center;
-    color: #C5EBD8;
+    color: #c5ebd8;
     &.usdSign {
       font-family: Roboto, sans-serif;
       margin-right: 4px;
     }
   }
-  
 `
 
 const TotalBalanceLabel = styled.p`

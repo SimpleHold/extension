@@ -17,8 +17,8 @@ import { TFeeResponse } from '@utils/api/types'
 
 const ten18 = new BigNumber(10).pow(18)
 const VTHO_CA = '0x0000000000000000000000000000456E65726779'
-const providerUrl = 'https://mainnet.veblocks.net/'
-const web3Instance = thorify(new Web3(), providerUrl)
+
+const web3Instance = thorify(new Web3(), 'https://mainnet.veblocks.net/')
 
 export const config: TCurrencyConfig = {
   coins: ['vet', 'vtho'],
@@ -72,7 +72,13 @@ export const getNetworkFee = async (props: TFeeProps): Promise<TFeeResponse> => 
   try {
     const { from, chain, amount } = props
 
-    const to = '' // Fix me
+    const to = (await generateAddress())?.address
+
+    if (!to) {
+      return {
+        networkFee: 0,
+      }
+    }
 
     const data = await fetchBalances([{ address: from, chain: 'vethor' }])
     const { balance: currencyBalance } = data[0].balanceInfo
@@ -91,6 +97,7 @@ export const getNetworkFee = async (props: TFeeProps): Promise<TFeeResponse> => 
         currencyBalance,
       }
     }
+
     const safeRequestAmount = amount.length > 17 ? Number(amount.slice(0, 17)) : amount
     const networkFee = await getVechainFee(from, to, `${formatValue(safeRequestAmount, 'to')}`)
 

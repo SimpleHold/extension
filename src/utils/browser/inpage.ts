@@ -1,6 +1,8 @@
 // Config
 import currencies from '@config/currencies'
 import { TCurrency } from '@config/currencies/types'
+
+// Tokens
 import tokens from '@tokens/index'
 import { TToken } from '@tokens/types'
 

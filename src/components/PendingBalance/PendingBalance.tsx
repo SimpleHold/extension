@@ -9,6 +9,9 @@ import Skeleton from '@components/Skeleton'
 import { toUpper } from '@utils/format'
 import { getEstimated } from '@utils/api'
 
+// Assets
+import clockIconPending from '@assets/icons/clockIconPending.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -19,7 +22,6 @@ interface Props {
 }
 
 const PendingBalance: React.FC<Props> = ({ pending, type, symbol }) => {
-
   const [USDValue, setUSDValue] = React.useState<number>(0)
 
   React.useEffect(() => {
@@ -40,7 +42,7 @@ const PendingBalance: React.FC<Props> = ({ pending, type, symbol }) => {
     return (
       <Styles.Container type={type}>
         <Styles.IconRow>
-          <SVG src="../../assets/icons/clockIconPending.svg" width={16} height={16} />
+          <SVG src={clockIconPending} width={16} height={16} />
         </Styles.IconRow>
         <Styles.Row>
           <Styles.Pending>
@@ -51,7 +53,9 @@ const PendingBalance: React.FC<Props> = ({ pending, type, symbol }) => {
           </Styles.Pending>
           <Skeleton width={56} height={14} isLoading={USDValue === null} type={type}>
             {USDValue ? (
-              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${isValidFormatUsd ? formatUsdValue : '< 0.000001'}`}</Styles.USDValue>
+              <Styles.USDValue>{`$ ${USDValue > 0 ? '+' : ''}${
+                isValidFormatUsd ? formatUsdValue : '< 0.000001'
+              }`}</Styles.USDValue>
             ) : null}
           </Skeleton>
         </Styles.Row>

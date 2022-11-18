@@ -101,8 +101,8 @@ export const getAbsoluteValue = (value: string | number, isPositive: boolean): n
 }
 
 export const getFormatBalance = (balance: string | number | null) => {
-  if (balance === null) return null;
-  if (balance === 0) return '0';
+  if (balance === null) return null
+  if (balance === 0) return '0'
   if (Math.abs(+balance) < 0.000001) {
     return '< 0.000001'
   }
@@ -110,11 +110,23 @@ export const getFormatBalance = (balance: string | number | null) => {
 }
 
 export const toFixedWithoutRound = (n: number, digits: number): number => {
-  const regEx = new RegExp('^-?\\d+(?:\.\\d{0,' + (digits || -1) + '})?');
+  const regEx = new RegExp('^-?\\d+(?:.\\d{0,' + (digits || -1) + '})?')
   const match = n.toString().match(regEx)
   return match ? +match[0] : n
 }
 
 export const padTo2Digits = (n: number) => {
-  return n.toString().padStart(2, '0');
+  return n.toString().padStart(2, '0')
+}
+
+export const formatFee = (fee: number): string => {
+  if (`${fee}` === '0') {
+    return '0'
+  }
+
+  if (fee < 0.000001) {
+    return Number(fee).toFixed(10)
+  }
+
+  return `${fee}`
 }

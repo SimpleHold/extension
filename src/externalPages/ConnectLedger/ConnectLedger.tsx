@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-dom'
+import browser from 'webextension-polyfill'
 
 // Components
 import Button from '@components/Button'
@@ -20,7 +21,7 @@ import { getItem, getJSON, setItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { addHardwareWallet, IWallet } from '@utils/wallet'
 import { toLower } from '@utils/format'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -150,44 +151,40 @@ const ConnectLedger: React.FC = () => {
     openWebPage(getUrl('download-backup.html'))
   }
 
-  const onToggleSelectAddress = (
-    isSelected: boolean,
-    symbol: string,
-    address: string,
-    index: number,
-    isDisabled: boolean
-  ) => () => {
-    if (isDisabled) {
-      return
-    }
+  const onToggleSelectAddress =
+    (isSelected: boolean, symbol: string, address: string, index: number, isDisabled: boolean) =>
+    () => {
+      if (isDisabled) {
+        return
+      }
 
-    const getCurrency = currencies.find(
-      (currency: TCurrency) => toLower(currency.symbol) === toLower(symbol)
-    )
+      const getCurrency = currencies.find(
+        (currency: TCurrency) => toLower(currency.symbol) === toLower(symbol)
+      )
 
-    if (getCurrency) {
-      const { path } = getCurrency
+      if (getCurrency) {
+        const { path } = getCurrency
 
-      if (!isSelected) {
-        const newAddress = {
-          address,
-          symbol,
-          path: `${path}${index}`,
+        if (!isSelected) {
+          const newAddress = {
+            address,
+            symbol,
+            path: `${path}${index}`,
+          }
+
+          updateState({ selectedAddresses: [...state.selectedAddresses, newAddress] })
+        } else {
+          const removeExist = state.selectedAddresses.filter(
+            (currency: TSelectedAddress) =>
+              toLower(currency.address) !== toLower(address) ||
+              toLower(currency.symbol) !== toLower(symbol) ||
+              toLower(currency.path) !== toLower(`${path}${index}`)
+          )
+
+          updateState({ selectedAddresses: removeExist })
         }
-
-        updateState({ selectedAddresses: [...state.selectedAddresses, newAddress] })
-      } else {
-        const removeExist = state.selectedAddresses.filter(
-          (currency: TSelectedAddress) =>
-            toLower(currency.address) !== toLower(address) ||
-            toLower(currency.symbol) !== toLower(symbol) ||
-            toLower(currency.path) !== toLower(`${path}${index}`)
-        )
-
-        updateState({ selectedAddresses: removeExist })
       }
     }
-  }
 
   const saveFirstAddress = (symbol: string, address: string) => {
     updateState({ firstAddresses: [...state.firstAddresses, { symbol, address }] })
@@ -283,4 +280,6 @@ const ConnectLedger: React.FC = () => {
   )
 }
 
-render(<ConnectLedger />, document.getElementById('connect-ledger'))
+browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+  render(<ConnectLedger />, document.getElementById('connect-ledger'))
+})

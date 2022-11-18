@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-dom'
+import browser from 'webextension-polyfill'
 
 // Components
 import Button from '@components/Button'
@@ -27,7 +28,7 @@ import {
   TTrezorCurrency,
   getFeatures,
 } from '@utils/trezor'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 
 // Assets
 import connectTrezorImage from '@assets/illustrate/connectTrezor.svg'
@@ -258,44 +259,40 @@ const ConnectTrezor: React.FC = () => {
     }
   }
 
-  const onToggleSelectAddress = (
-    isSelected: boolean,
-    symbol: string,
-    address: string,
-    index: number,
-    isDisabled: boolean
-  ) => () => {
-    if (isDisabled) {
-      return
-    }
+  const onToggleSelectAddress =
+    (isSelected: boolean, symbol: string, address: string, index: number, isDisabled: boolean) =>
+    () => {
+      if (isDisabled) {
+        return
+      }
 
-    const getCurrency = state.currencyIndexes.find(
-      (currency: TTrezorCurrency) => toLower(currency.symbol) === toLower(symbol)
-    )
+      const getCurrency = state.currencyIndexes.find(
+        (currency: TTrezorCurrency) => toLower(currency.symbol) === toLower(symbol)
+      )
 
-    if (getCurrency) {
-      const { path } = getCurrency
+      if (getCurrency) {
+        const { path } = getCurrency
 
-      if (!isSelected) {
-        const newAddress = {
-          address,
-          symbol,
-          path: `${path}${index}`,
+        if (!isSelected) {
+          const newAddress = {
+            address,
+            symbol,
+            path: `${path}${index}`,
+          }
+
+          updateState({ selectedAddresses: [...state.selectedAddresses, newAddress] })
+        } else {
+          const removeExist = state.selectedAddresses.filter(
+            (currency: TSelectedAddress) =>
+              toLower(currency.address) !== toLower(address) ||
+              toLower(currency.symbol) !== toLower(symbol) ||
+              toLower(currency.path) !== toLower(`${path}${index}`)
+          )
+
+          updateState({ selectedAddresses: removeExist })
         }
-
-        updateState({ selectedAddresses: [...state.selectedAddresses, newAddress] })
-      } else {
-        const removeExist = state.selectedAddresses.filter(
-          (currency: TSelectedAddress) =>
-            toLower(currency.address) !== toLower(address) ||
-            toLower(currency.symbol) !== toLower(symbol) ||
-            toLower(currency.path) !== toLower(`${path}${index}`)
-        )
-
-        updateState({ selectedAddresses: removeExist })
       }
     }
-  }
 
   const onDownloadBackup = (): void => {
     openWebPage(getUrl('download-backup.html'))
@@ -427,4 +424,6 @@ const ConnectTrezor: React.FC = () => {
   )
 }
 
-render(<ConnectTrezor />, document.getElementById('connect-trezor'))
+browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+  render(<ConnectTrezor />, document.getElementById('connect-trezor'))
+})

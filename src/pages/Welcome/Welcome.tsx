@@ -8,7 +8,7 @@ import Header from '@components/Header'
 import Link from '@components/Link'
 
 // Utils
-import { init, logEvent } from 'utils/metrics'
+import { init, logEvent } from '@utils/metrics'
 import { detectBrowser, detectOS } from '@utils/detect'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getItem, setItem, removeItem } from '@utils/storage'
@@ -18,12 +18,17 @@ import { getPhishingSites } from '@utils/api'
 import config from '@config/index'
 import { ONBOARDING_CREATE_NEW_WALLET, START_RESTORE, GENERAL_FIRST_ENTER } from '@config/events'
 
+// Assets
+import plusCircleIcon from '@assets/icons/plusCircle.svg'
+import restoreIcon from '@assets/icons/restore.svg'
+
 // Styles
 import Styles from './styles'
 
 const Welcome: React.FC = () => {
   const [isManualRestore, setManualRestore] = React.useState<boolean>(false)
   const history = useHistory()
+  const logo = React.useRef<SVGElement>(null)
 
   const os = detectOS()
   const browser = detectBrowser()
@@ -62,7 +67,7 @@ const Welcome: React.FC = () => {
     }
   }
 
-  const onCreateWallet = (): void => {
+  const onCreateWallet = async (): Promise<void> => {
     logEvent({
       name: ONBOARDING_CREATE_NEW_WALLET,
     })
@@ -100,23 +105,13 @@ const Welcome: React.FC = () => {
           <Styles.WalletActions>
             <Styles.Action onClick={onCreateWallet}>
               <Styles.ActionIcon>
-                <SVG
-                  src="../../assets/icons/plusCircle.svg"
-                  width={20}
-                  height={20}
-                  title="Create new wallet"
-                />
+                <SVG src={plusCircleIcon} width={20} height={20} title="Create new wallet" />
               </Styles.ActionIcon>
               <Styles.ActionName>Create a new wallet</Styles.ActionName>
             </Styles.Action>
             <Styles.Action onClick={onRestoreWallet}>
               <Styles.ActionIcon>
-                <SVG
-                  src="../../assets/icons/restore.svg"
-                  width={20}
-                  height={20}
-                  title="Restore wallet"
-                />
+                <SVG src={restoreIcon} width={20} height={20} title="Restore wallet" />
               </Styles.ActionIcon>
               <Styles.ActionName>Restore your wallet</Styles.ActionName>
               {isManualRestore ? (

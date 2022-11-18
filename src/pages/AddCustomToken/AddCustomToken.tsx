@@ -14,7 +14,7 @@ import Skeleton from '@components/Skeleton'
 import ConfirmDrawer from '@drawers/Confirm'
 
 // Config
-import networks, { getEthNetwork, IEthNetwork } from '@config/ethLikeNetworks'
+import networks, { TNetwork, NOT_ETH_NETWORKS } from '@config/networks'
 import { getCurrencyInfo } from '@config/currencies/utils'
 
 // Utils
@@ -65,6 +65,7 @@ const AddCustomToken: React.FC = () => {
 
   const activeNetwork = locationState?.activeNetwork || undefined
   const currency = locationState?.currency || undefined
+  const networksList = [...networks, ...NOT_ETH_NETWORKS]
 
   React.useEffect(() => {
     if (
@@ -89,7 +90,7 @@ const AddCustomToken: React.FC = () => {
       typeof activeNetwork !== 'undefined' &&
       toLower(state.selectedNetwork.chain) !== toLower(activeNetwork)
     ) {
-      const getNetworkInfo = getEthNetwork(activeNetwork)
+      const getNetworkInfo = getNetwork(activeNetwork)
 
       if (getNetworkInfo) {
         updateState({ selectedNetwork: getNetworkInfo })
@@ -102,6 +103,10 @@ const AddCustomToken: React.FC = () => {
       }
     }
   }, [activeNetwork])
+
+  const getNetwork = (chain: string): TNetwork | undefined => {
+    return networksList.find((i) => i.chain === chain)
+  }
 
   const getContractAddressInfo = async (): Promise<void> => {
     updateState({ isLoading: true })
@@ -173,8 +178,7 @@ const AddCustomToken: React.FC = () => {
   }
 
   const onSelectDropdown = (index: number): void => {
-    const getNetwork = mapList[index]
-    const getNetworkInfo = getEthNetwork(getNetwork.chain)
+    const getNetworkInfo = getNetwork(mapList[index].chain)
 
     if (getNetworkInfo) {
       updateState({ selectedNetwork: getNetworkInfo })
@@ -251,11 +255,11 @@ const AddCustomToken: React.FC = () => {
     updateState({ password })
   }
 
-  const dropDownList = networks.filter(
-    (network: IEthNetwork) => network.symbol !== state.selectedNetwork.symbol
+  const dropDownList = networksList.filter(
+    (network: TNetwork) => network.symbol !== state.selectedNetwork.symbol
   )
 
-  const mapList = dropDownList.map((network: IEthNetwork) => {
+  const mapList = dropDownList.map((network: TNetwork) => {
     return {
       logo: {
         symbol: network.symbol,
@@ -322,6 +326,7 @@ const AddCustomToken: React.FC = () => {
               onSelect={onSelectDropdown}
               currencyBr={20}
               disabled={typeof activeNetwork !== 'undefined'}
+              maxHeight={180}
             />
             <TextInput
               label="Token Contract Address"

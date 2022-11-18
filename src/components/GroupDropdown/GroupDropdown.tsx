@@ -4,6 +4,9 @@ import SVG from 'react-inlinesvg'
 // Hooks
 import useVisible from '@hooks/useVisible'
 
+// Assets
+import arrowIcon from '@assets/icons/arrow.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -38,7 +41,7 @@ const Dropdown: React.FC<Props> = (props) => {
         {renderRow || <Styles.HeadingTitle>{title}</Styles.HeadingTitle>}
         {renderRow && hideArrowOnRender ? null : (
           <Styles.ArrowIcon className="arrow">
-            <SVG src="../../assets/icons/arrow.svg" width={8} height={14} />
+            <SVG src={arrowIcon} width={8} height={14} />
           </Styles.ArrowIcon>
         )}
       </Styles.Heading>

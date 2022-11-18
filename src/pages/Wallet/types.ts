@@ -1,6 +1,6 @@
 // Types
-import { TAddressTxGroup } from 'utils/history'
-import { THardware } from '@utils/wallet'
+import { TAddressTxGroup } from '@utils/history'
+import { IWallet, THardware } from '@utils/wallet'
 
 export interface ILocationState {
   name?: string
@@ -14,6 +14,7 @@ export interface ILocationState {
   isHidden?: boolean
   isRedirect?: string
   hardware: THardware
+  wallet: IWallet
 }
 
 export interface IState {

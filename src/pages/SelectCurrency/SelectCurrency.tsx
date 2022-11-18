@@ -18,12 +18,16 @@ import { getWallets } from '@utils/wallet'
 import { getUrl, openWebPage } from '@utils/extension'
 import { getStandart } from '@tokens/index'
 
+// Coins
+import { config as thetaConfig } from '@coins/theta'
+import { config as vechainConfig } from '@coins/vechain'
+
 // Tokens
 import { getSharedTokens } from '@tokens/index'
 
 // Config
 import tokens, { checkExistWallet } from '@tokens/index'
-import networks, { IEthNetwork } from '@config/ethLikeNetworks'
+import networks, { TNetwork } from '@config/networks'
 import { TToken } from '@tokens/types'
 
 // Styles
@@ -48,19 +52,20 @@ const SelectCurrency: React.FC = () => {
   }
 
   const getWarning = (symbol: string): string | undefined => {
-    // if (theta.coins.indexOf(symbol) !== -1) {
-    //   return `You are trying to add a new ${
-    //     toLower(symbol) === 'theta' ? 'Theta' : 'TFuel'
-    //   } address. The same address for ${
-    //     toLower(symbol) === 'theta' ? 'TFuel' : 'Theta'
-    //   } will also be added to your wallet.`
-    // } else if (vechain.coins.indexOf(symbol) !== -1) {
-    //   return `You are trying to add a new ${
-    //     toLower(symbol) === 'vet' ? 'VeChain' : 'VeThor'
-    //   } address. The same address for ${
-    //     toLower(symbol) === 'vet' ? 'VeThor' : 'VeChain'
-    //   } will also be added to your wallet.`
-    // } Fix me
+    if (thetaConfig.coins.indexOf(symbol) !== -1) {
+      return `You are trying to add a new ${
+        toLower(symbol) === 'theta' ? 'Theta' : 'TFuel'
+      } address. The same address for ${
+        toLower(symbol) === 'theta' ? 'TFuel' : 'Theta'
+      } will also be added to your wallet.`
+    } else if (vechainConfig.coins.indexOf(symbol) !== -1) {
+      return `You are trying to add a new ${
+        toLower(symbol) === 'vet' ? 'VeChain' : 'VeThor'
+      } address. The same address for ${
+        toLower(symbol) === 'vet' ? 'VeThor' : 'VeChain'
+      } will also be added to your wallet.`
+    }
+
     return undefined
   }
 
@@ -80,7 +85,7 @@ const SelectCurrency: React.FC = () => {
       const checkTokenWallets = checkExistWallet(walletsList, symbol, chain)
 
       const getNetwork = networks.find(
-        (network: IEthNetwork) => toLower(network.chain) === toLower(chain)
+        (network: TNetwork) => toLower(network.chain) === toLower(chain)
       )
 
       if (getNetwork && checkTokenWallets) {
@@ -155,12 +160,14 @@ const SelectCurrency: React.FC = () => {
 
   return (
     <Styles.Wrapper>
-      <Cover />
-      {CurrenciesTab}
-      <Header withBack onBack={history.goBack} backTitle="Wallets" whiteLogo />
-      <Styles.Container>
-        <Tabs tabs={tabs} activeTabKey={activeTabKey} onSelectTab={onSelectTab} />
-      </Styles.Container>
+      <>
+        <Cover />
+        {CurrenciesTab}
+        <Header withBack onBack={history.goBack} backTitle="Wallets" whiteLogo />
+        <Styles.Container>
+          <Tabs tabs={tabs} activeTabKey={activeTabKey} onSelectTab={onSelectTab} />
+        </Styles.Container>
+      </>
     </Styles.Wrapper>
   )
 }

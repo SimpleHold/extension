@@ -13,11 +13,11 @@ import PasscodeDrawer from '@drawers/Passcode'
 import LogoutDrawer from '@drawers/Logout'
 
 // Utils
-import { download as downloadBackup } from '@utils/backup'
-import { logEvent } from 'utils/metrics'
+import { downloadBackupFile as downloadBackup } from '@utils/backup'
+import { logEvent } from '@utils/metrics'
 import { sha256hash } from '@utils/crypto'
 import { detectBrowser, detectOS } from '@utils/detect'
-import { getUrl, openAppInNewWindow, openWebPage } from '@utils/extension'
+import { openAppInNewWindow, openWebPage } from '@utils/extension'
 import { getManifest } from '@utils/extension'
 import { getItem, setItem, removeItem, removeCache } from '@utils/storage'
 
@@ -27,7 +27,8 @@ import {
   SETTINGS_SIGN_IN_MOBILE,
   SETTINGS_OPEN_WINDOW,
   SUPPORT_SELECT,
-  SETTINGS_SELECT, SETTINGS_TOGGLE_PASSCODE,
+  SETTINGS_SELECT,
+  SETTINGS_TOGGLE_PASSCODE,
 } from '@config/events'
 
 // Hooks
@@ -84,17 +85,15 @@ const Settings: React.FC = () => {
   }
 
   const onDownloadBackup = async () => {
-    if (state.isDownloadManually) {
-      openWebPage(getUrl('download-backup.html'))
-    } else {
-      const backup = getItem('backup')
+    // Manual download for mac/chrome is currently removed
+    const backup = getItem('backup')
 
-      if (backup) {
-        logEvent({
-          name: SETTINGS_BACKUP,
-        })
-        downloadBackup(backup)
-      }
+    if (backup) {
+      logEvent({
+        name: SETTINGS_BACKUP,
+      })
+
+      await downloadBackup(backup)
     }
   }
 
@@ -145,8 +144,8 @@ const Settings: React.FC = () => {
         logEvent({
           name: SUPPORT_SELECT,
           properties: {
-            page: "settings"
-          }
+            page: 'settings',
+          },
         })
         openWebPage('https://simplehold.io/about')
       },
@@ -185,8 +184,10 @@ const Settings: React.FC = () => {
     updateState({ activeDrawer: 'logout' })
   }
 
-  const onConfirmLogout = (): void => {
+  const onConfirmLogout = async () => {
+    await onDownloadBackup()
     removeCache()
+
     history.push('/welcome')
   }
 
@@ -199,8 +200,8 @@ const Settings: React.FC = () => {
         logEvent({
           name: SETTINGS_TOGGLE_PASSCODE,
           properties: {
-            is_enable: "no"
-          }
+            is_enable: 'no',
+          },
         })
       } else {
         updateState({ isPasscodeError: true })
@@ -213,8 +214,8 @@ const Settings: React.FC = () => {
       logEvent({
         name: SETTINGS_TOGGLE_PASSCODE,
         properties: {
-          is_enable: "yes"
-        }
+          is_enable: 'yes',
+        },
       })
     }
   }

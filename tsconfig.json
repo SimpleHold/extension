@@ -1,19 +1,19 @@
 {
   "compilerOptions": {
-    "target": "esnext",
+    "target": "es5",
     "module": "commonjs",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "jsx": "react",
-    "declaration": false,
-    "isolatedModules": true,
-    "useDefineForClassFields": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "esModuleInterop": true,
     "moduleResolution": "node",
+    "rootDir": "./src",
+    "outDir": "dist/js",
+    "strict": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "jsx": "react",
+    "esModuleInterop": true,
+    "lib": ["ESNext", "dom"],
+    "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
-    "resolveJsonModule": true,
     "baseUrl": ".",
     "paths": {
       "*": ["src/*"],
@@ -28,8 +28,8 @@
       "@containers/*": ["src/containers/*"],
       "@shared/*": ["src/shared/*"],
       "@coins/*": ["src/coins/*"],
-      "@tokens/*": ["src/tokens/*"]
+      "@tokens/*": ["src/tokens/*"],
+      "@store/*": ["src/store/*"]
     }
-  },
-  "include": ["src", "@types", "webpack.config.js"]
+  }
 }

@@ -18,6 +18,9 @@ import ethLogo from '@assets/currencies/eth.svg'
 import bscLogo from '@assets/currencies/bnb.svg'
 import maticLogo from '@assets/currencies/matic.svg'
 import solLogo from '@assets/currencies/sol.svg'
+import avaxLogo from '@assets/currencies/avax.svg'
+import ftmLogo from '@assets/currencies/ftm.svg'
+import timesIcon from '@assets/icons/times.svg'
 
 // Styles
 import Styles from './styles'
@@ -32,6 +35,7 @@ type TNetwork = {
   title: string
   key: string
   icon?: string
+  symbol?: string
 }
 
 const networks: TNetwork[] = [
@@ -43,21 +47,37 @@ const networks: TNetwork[] = [
     title: 'Ethereum',
     key: 'eth',
     icon: ethLogo,
+    symbol: 'eth',
   },
   {
     title: 'BSC',
     key: 'bsc',
     icon: bscLogo,
+    symbol: 'bnb',
   },
   {
     title: 'Polygon',
     key: 'matic',
     icon: maticLogo,
+    symbol: 'matic',
   },
   {
     title: 'Solana',
     key: 'sol',
     icon: solLogo,
+    symbol: 'sol',
+  },
+  {
+    title: 'Fantom Opera',
+    key: 'ftm',
+    icon: ftmLogo,
+    symbol: 'ftm',
+  },
+  {
+    title: 'Avalanche C-Chain',
+    key: 'avax',
+    icon: avaxLogo,
+    symbol: 'avax',
   },
 ]
 
@@ -104,10 +124,9 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     const walletsList = getWallets()
 
     if (walletsList) {
+      const mapNetworks = networks.map((i) => i.symbol)
       const filterWallet = walletsList.filter(
-        (wallet: IWallet) =>
-          !wallet.chain &&
-          (wallet.symbol === 'eth' || wallet.symbol === 'bnb' || wallet.symbol === 'matic' || wallet.symbol === 'sol')
+        (wallet: IWallet) => !wallet.chain && mapNetworks.indexOf(wallet.symbol) !== -1
       )
 
       setWallets(filterWallet)
@@ -237,7 +256,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
                   <Styles.ResetGroup>
                     <Styles.ResetTitle>{selectedWallets.length} selected</Styles.ResetTitle>
                     <Styles.ResetIcon onClick={onResetWallets}>
-                      <SVG src="../../assets/icons/times.svg" width={8.33} height={8.33} />
+                      <SVG src={timesIcon} width={8.33} height={8.33} />
                     </Styles.ResetIcon>
                   </Styles.ResetGroup>
                 ) : null}

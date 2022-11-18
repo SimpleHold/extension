@@ -18,7 +18,7 @@ import { TToken } from '@tokens/types'
 // Utils
 import { toUpper, toLower } from '@utils/format'
 import { addNew as addNewWallet, getWallets, IWallet } from '@utils/wallet'
-import { setUserProperties } from 'utils/metrics'
+import { setUserProperties } from '@utils/metrics'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
@@ -28,6 +28,9 @@ import { getSharedTokens } from '@tokens/index'
 
 // Hooks
 import useState from '@hooks/useState'
+
+// Assets
+import plusCircleIcon from '@assets/icons/plusCircle.svg'
 
 // Types
 import { ILocationState, IState } from './types'
@@ -207,12 +210,7 @@ const SelectToken: React.FC = () => {
 
               <Styles.TokenBlock onClick={onAddCustomToken}>
                 <Styles.CustomTokenLogo>
-                  <SVG
-                    src="../../assets/icons/plusCircle.svg"
-                    width={20}
-                    height={20}
-                    title="Create new wallet"
-                  />
+                  <SVG src={plusCircleIcon} width={20} height={20} title="Create new wallet" />
                 </Styles.CustomTokenLogo>
                 <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
               </Styles.TokenBlock>

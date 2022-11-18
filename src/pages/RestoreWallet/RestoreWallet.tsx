@@ -13,7 +13,7 @@ import ConfirmDrawer from '@drawers/Confirm'
 import FailDrawer from '@drawers/Fail'
 
 // Utils
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { validate as validateBackup } from '@utils/backup'
@@ -46,12 +46,12 @@ const RestoreWallet: React.FC = () => {
 
   const { state, updateState } = useState<IState>(initialState)
 
-  const onDrop = React.useCallback(async (acceptedFiles) => {
+  const onDrop = React.useCallback(async (acceptedFiles: File[]) => {
     updateState({ isInvalidFile: false, backupData: '' })
 
     const text = await acceptedFiles[0]?.text()
-    const fileExt = acceptedFiles[0].name.split(".").pop()
-    const isAcceptedExt = ["txt", "dat"].indexOf(toLower(fileExt) as string) !== -1
+    const fileExt = acceptedFiles[0].name.split('.').pop()
+    const isAcceptedExt = ['txt', 'dat'].indexOf(toLower(fileExt) as string) !== -1
 
     if (text?.length > 0 && isAcceptedExt) {
       updateState({ backupData: text })
@@ -93,7 +93,7 @@ const RestoreWallet: React.FC = () => {
           setItem('backup', state.backupData)
           setItem('wallets', getWalletsList)
           history.replace('/wallets')
-          setItem("initial_balances_request", "required")
+          setItem('initial_balances_request', 'required')
         } else {
           updateState({ activeDrawer: 'fail' })
         }
@@ -123,7 +123,6 @@ const RestoreWallet: React.FC = () => {
               isFileUploaded={state.backupData.length > 0}
               onDrop={onDrop}
             />
-
           </Styles.Row>
           <Styles.Actions>
             <Button label="Cancel" onClick={history.goBack} isLight mr={7.5} />

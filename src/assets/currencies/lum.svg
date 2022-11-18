@@ -1,11 +1,11 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="11.9998" cy="2.58228" r="2.58228" fill="#1D1D22"/>
-<circle cx="21.4177" cy="12" r="2.58228" fill="#1D1D22"/>
-<circle cx="2.58228" cy="12" r="2.58228" fill="#1D1D22"/>
-<circle cx="5.6201" cy="5.31652" r="1.67089" fill="#1D1D22"/>
-<circle cx="5.6201" cy="18.0759" r="1.67089" fill="#1D1D22"/>
-<circle cx="18.3799" cy="5.31652" r="1.67089" fill="#1D1D22"/>
-<circle cx="18.3799" cy="18.0759" r="1.67089" fill="#1D1D22"/>
-<circle cx="11.9998" cy="11.8481" r="2.58228" fill="#1D1D22"/>
-<circle cx="11.9998" cy="21.1139" r="2.58228" fill="#1D1D22"/>
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="9.99956" cy="2.1519" r="2.1519" fill="white"/>
+<ellipse cx="17.8482" cy="9.99956" rx="2.1519" ry="2.1519" fill="white"/>
+<circle cx="2.1519" cy="9.99956" r="2.1519" fill="white"/>
+<ellipse cx="4.68342" cy="4.43049" rx="1.39241" ry="1.39241" fill="white"/>
+<circle cx="4.68342" cy="15.0633" r="1.39241" fill="white"/>
+<ellipse cx="15.3162" cy="4.43049" rx="1.39241" ry="1.39241" fill="white"/>
+<circle cx="15.3162" cy="15.0633" r="1.39241" fill="white"/>
+<circle cx="9.99956" cy="9.87358" r="2.1519" fill="white"/>
+<ellipse cx="9.99956" cy="17.5953" rx="2.1519" ry="2.1519" fill="white"/>
 </svg>

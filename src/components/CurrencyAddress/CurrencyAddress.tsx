@@ -7,8 +7,8 @@ import CheckBox from '@components/CheckBox'
 
 // Utils
 import { short, toUpper } from '@utils/format'
-import { getSingleBalance } from '@coins/index'
 import { getCurrencyInfo } from '@config/currencies/utils'
+import { getSingleBalance } from '@coins/utils'
 
 // Styles
 import Styles from './styles'

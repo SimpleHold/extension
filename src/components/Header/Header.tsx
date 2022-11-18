@@ -3,11 +3,17 @@ import SVG from 'react-inlinesvg'
 import { useHistory } from 'react-router-dom'
 
 // Utils
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
 import { LOGOUT_SELECT } from '@config/events'
+
+// Assets
+import logo from '@assets/logoNew.svg'
+import navigationHomeIconNew from '@assets/icons/navigationHomeIconNew.svg'
+import arrowIcon from '@assets/icons/arrow.svg'
+import lockIconNew from '@assets/icons/lockIconNew.svg'
 
 // Styles
 import Styles from './styles'
@@ -60,17 +66,18 @@ const Header: React.FC<Props> = (props) => {
     <Styles.Container withBorder={withBorder} borderColor={borderColor} isAbsolute={isAbsolute}>
       <Styles.LogoRow>
         <Styles.Logo whiteLogo={whiteLogo}>
-          <SVG src="../../assets/logoNew.svg" width={30} height={30} title="SimpleHold" />
+          <SVG src={logo} width={30} height={30} title="SimpleHold" />
         </Styles.Logo>
       </Styles.LogoRow>
       <Styles.Row>
         {isHomePage || (withBack && onBack && backTitle) ? (
           <Styles.Navigate onClick={onBack}>
             <Styles.BackIconRow>
-              {isHomePage
-                ? <SVG src="../../assets/icons/navigationHomeIconNew.svg" width={10} height={10} title={'Home'} />
-                : <SVG src="../../assets/icons/arrow.svg" width={6} height={10} title={'Back'} />
-              }
+              {isHomePage ? (
+                <SVG src={navigationHomeIconNew} width={10} height={10} title={'Home'} />
+              ) : (
+                <SVG src={arrowIcon} width={6} height={10} title={'Back'} />
+              )}
             </Styles.BackIconRow>
             <Styles.NavigateTitle>{isHomePage ? 'Home' : backTitle}</Styles.NavigateTitle>
           </Styles.Navigate>
@@ -78,7 +85,7 @@ const Header: React.FC<Props> = (props) => {
         {!noActions ? (
           <Styles.Nav>
             <Styles.NavItem onClick={lockWallet}>
-              <SVG src="../../assets/icons/lockIconNew.svg" width={14} height={15} title="Lock wallet" />
+              <SVG src={lockIconNew} width={14} height={15} title="Lock wallet" />
             </Styles.NavItem>
             {/*<Styles.NavItem*/}
             {/*  onClick={() => (activePage === 'settings' ? null : openPage('/settings'))}*/}

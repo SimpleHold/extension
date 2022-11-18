@@ -11,6 +11,10 @@ import { toLower } from '@utils/format'
 // Types
 import { TSelectedAddress } from './types'
 
+// Assets
+import plusCircleIcon from '@assets/icons/plusCircle.svg'
+import bottomArrowIcon from '@assets/icons/bottomArrow.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -33,15 +37,8 @@ interface Props {
 const MAX_ADDRESSES_NUMBER = 100
 
 const Currency: React.FC<Props> = (props) => {
-  const {
-    symbol,
-    addresses,
-    name,
-    onConnect,
-    selectedAddresses,
-    onToggleSelect,
-    existWallets,
-  } = props
+  const { symbol, addresses, name, onConnect, selectedAddresses, onToggleSelect, existWallets } =
+    props
 
   const onClickHeading = (): void => {
     if (!addresses.length) {
@@ -61,7 +58,7 @@ const Currency: React.FC<Props> = (props) => {
           <Styles.CurrencyName>{name}</Styles.CurrencyName>
           {!addresses.length ? (
             <Styles.AddAddressButton>
-              <SVG src="../../assets/icons/plusCircle.svg" width={20} height={20} />
+              <SVG src={plusCircleIcon} width={20} height={20} />
             </Styles.AddAddressButton>
           ) : null}
         </Styles.CurrencyHeadingRow>
@@ -99,7 +96,7 @@ const Currency: React.FC<Props> = (props) => {
           {addresses.length < MAX_ADDRESSES_NUMBER ? (
             <Styles.NextAddressRow onClick={onGetNextAddress}>
               <Styles.NextAddressLabel>Next addresses</Styles.NextAddressLabel>
-              <SVG src="../../assets/icons/bottomArrow.svg" width={7} height={4} />
+              <SVG src={bottomArrowIcon} width={7} height={4} />
             </Styles.NextAddressRow>
           ) : null}
         </Styles.CurrencyBody>

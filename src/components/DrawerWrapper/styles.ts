@@ -5,18 +5,20 @@ type TDrawerProps = {
   padding?: string
   height?: number
   isWindowedMode?: boolean
+  isFullScreen?: boolean
 }
 
 type TBackgroundProps = {
   openFrom?: string
   withoutDimScreen?: boolean
+  isFullScreen?: boolean
 }
 
-const Wrapper = styled.div`
-`
+const Wrapper = styled.div``
 
 const Background = styled.div`
-  position: ${({ openFrom, isWindowedMode }: TBackgroundProps & TDrawerProps) => (openFrom === 'browser' || isWindowedMode ? 'absolute' : 'fixed')};
+  position: ${({ openFrom, isWindowedMode }: TBackgroundProps & TDrawerProps) =>
+    openFrom === 'browser' || isWindowedMode ? 'absolute' : 'fixed'};
   backdrop-filter: blur(2px);
   z-index: 100;
   background-color: rgba(29, 29, 34, 0.2);
@@ -26,7 +28,8 @@ const Background = styled.div`
   height: 100%;
   transition: opacity 250ms;
   border-radius: ${({ openFrom }: TBackgroundProps) => (openFrom === 'browser' ? '16px' : '0')};
-  display: ${({ withoutDimScreen }: TBackgroundProps) => withoutDimScreen ? 'none' : 'initial'};;
+  display: ${({ withoutDimScreen }: TBackgroundProps) => (withoutDimScreen ? 'none' : 'initial')};
+  margin-top: ${({ isFullScreen }: TBackgroundProps) => (isFullScreen ? '60px' : '0')}; ;
 `
 
 const Drawer = styled.div`
@@ -34,8 +37,10 @@ const Drawer = styled.div`
   border-radius: 16px 16px 0 0;
   padding: ${({ padding }: TDrawerProps) => padding || '30px'};
   word-break: break-word;
-  position: ${({ openFrom, isWindowedMode }: TDrawerProps) => (openFrom === 'browser' || isWindowedMode ? 'absolute' : 'fixed')};
-  height: ${({ height }: TDrawerProps) => (height ? `${height}px` : 'auto')};
+  position: ${({ openFrom, isWindowedMode }: TDrawerProps) =>
+    openFrom === 'browser' || isWindowedMode ? 'absolute' : 'fixed'};
+  height: ${({ height, isFullScreen }: TDrawerProps) =>
+    height ? `${height}px` : isFullScreen ? 'calc(100% - 60px)' : 'auto'};
   z-index: 101;
   left: 0;
   bottom: 0;

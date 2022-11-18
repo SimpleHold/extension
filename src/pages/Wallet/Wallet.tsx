@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
-import { PrivateKey } from '@hashgraph/sdk'
+import { PrivateKey } from '@hashgraph/cryptography'
 
 // Components
 import Cover from '@components/Cover'
@@ -29,21 +29,15 @@ import {
   renameWallet,
   toggleVisibleWallet,
 } from '@utils/wallet'
-import {
-  activateWallet,
-  checkWithPhrase,
-  getExplorerLink,
-  getSingleBalance,
-  getTransactionLink,
-} from '@coins/index'
+import { activateWallet, checkWithPhrase, getExplorerLink, getTransactionLink } from '@coins/index'
+import { getSingleBalance } from '@coins/utils'
 import { openWebPage } from '@utils/extension'
 import { validatePassword } from '@utils/validate'
 import { getItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
 import { toLower, toUpper } from '@utils/format'
-import { findWalletTxHistory, group as groupTxs } from 'utils/history'
-import { logEvent } from 'utils/metrics'
-import { updateTxsHistory } from '@utils/history'
+import { findWalletTxHistory, group as groupTxs, updateTxsHistory } from '@utils/history'
+import { logEvent } from '@utils/metrics'
 import { receiveAllPendingTxs } from '@coins/nano'
 import { TTxWallet } from '@utils/api/types'
 
@@ -94,6 +88,7 @@ const WalletPage: React.FC = () => {
       isHidden = false,
       name,
       decimals = 0,
+      wallet,
     },
   } = useLocation<ILocationState>()
   const history = useHistory()
@@ -184,29 +179,32 @@ const WalletPage: React.FC = () => {
     }
   }
 
-  const openPage = (url: string, stateData: { [key: string]: any } = {}) => () => {
-    const sharedToken = getSharedToken(symbol, chain)
-    const walletName = getWalletName({
-      uuid,
-      symbol,
-      hardware,
-      chain,
-      name,
-      address: state.address,
-    })
+  const openPage =
+    (url: string, stateData: { [key: string]: any } = {}) =>
+    () => {
+      const sharedToken = getSharedToken(symbol, chain)
+      const walletName = getWalletName({
+        uuid,
+        symbol,
+        hardware,
+        chain,
+        name,
+        address: state.address,
+      })
 
-    history.push(url, {
-      ...locationState,
-      walletName: state.walletName || walletName,
-      tokenChain: chain,
-      chain: sharedToken ? chain : currency?.chain,
-      currency,
-      address: state.address,
-      decimals: sharedToken ? sharedToken.decimals : decimals,
-      isRedirect: !!isRedirect,
-      ...stateData,
-    })
-  }
+      history.push(url, {
+        ...locationState,
+        walletName: state.walletName || walletName,
+        tokenChain: chain,
+        chain: sharedToken ? chain : currency?.chain,
+        currency,
+        address: state.address,
+        decimals: sharedToken ? sharedToken.decimals : decimals,
+        isRedirect: !!isRedirect,
+        wallet,
+        ...stateData,
+      })
+    }
 
   const loadBalance = async (): Promise<void> => {
     if (state.isNotActivated) {
@@ -342,9 +340,12 @@ const WalletPage: React.FC = () => {
             if (privateKey) {
               if (symbol.toLowerCase() === 'xno') {
                 const res = await receiveAllPendingTxs(state.address, privateKey)
+
                 if (res) {
                   await getWalletTxHistory()
+
                   setWalletPendingStatus(false)
+
                   return updateState({
                     isDrawerButtonLoading: false,
                     activeDrawer: 'txsReceivedSuccess',

@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { ScrollParams } from 'react-virtualized'
 import { useIdleTimer } from 'react-idle-timer'
+import browser from 'webextension-polyfill'
 
 // Components
 import CollapsibleHeader from '@components/CollapsibleHeader'
@@ -18,11 +19,11 @@ import useToastContext from '@hooks/useToastContext'
 import useState from '@hooks/useState'
 
 // Utils
-import { getFilteredSum, getFilteredWallets, IWallet } from '@utils/wallet'
+import { getFilteredSum, getFilteredWallets, getWallets, IWallet } from '@utils/wallet'
 import { logEvent } from '@utils/metrics'
 import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
 import { checkOneOfExist, clear, getItem, setItem } from '@utils/storage'
-import { getBalances } from '@coins/index'
+import { getBalances } from '@coins/utils'
 import { checkIfTimePassed, toMs } from '@utils/dates'
 
 // Config
@@ -48,6 +49,10 @@ const initialState: IState = {
   pendingBalance: null,
   activeDrawer: null,
   scrollPosition: 0,
+}
+
+const LS = {
+  getItem: async (key: string) => (await browser.storage.local.get(key))[key],
 }
 
 const Wallets: React.FC = () => {
@@ -85,6 +90,8 @@ const Wallets: React.FC = () => {
     logEvent({
       name: MAIN_HOME,
     })
+    setWalletsToBackground()
+    checkWindowStorageTokens()
     return () => clearTimeout(refreshBalancesTimerId)
   }, [])
 
@@ -106,6 +113,14 @@ const Wallets: React.FC = () => {
       addToast('Your passcode is disabled now. You can turn it on in settings.')
     }
   }, [locationState])
+
+  const checkWindowStorageTokens = async (): Promise<void> => {
+    const getTokens = await LS.getItem('tokens')
+
+    if (getTokens) {
+      setItem('tokens', JSON.stringify(getTokens))
+    }
+  }
 
   const updateBalance = (
     arr: TWalletAmountData[],
@@ -150,6 +165,13 @@ const Wallets: React.FC = () => {
   React.useEffect(() => {
     toggleScroll('off')
   }, [])
+
+  const setWalletsToBackground = (): void => {
+    browser.runtime.sendMessage({
+      type: 'wallets',
+      data: getWallets(),
+    })
+  }
 
   const showSelectCurrencyDrawer = () => updateState({ activeDrawer: 'select_currency' })
 
@@ -223,15 +245,15 @@ const Wallets: React.FC = () => {
     setWalletsEstimated(walletsEstimated)
   }
 
-  const sumWalletBalance = (
-    setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>
-  ) => (wallet: TWalletAmountData) => {
-    setStateCallback((prevArray: TWalletAmountData[]) => {
-      return prevArray.find((existingWallet) => existingWallet.uuid === wallet.uuid)
-        ? prevArray
-        : [...prevArray, wallet]
-    })
-  }
+  const sumWalletBalance =
+    (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) =>
+    (wallet: TWalletAmountData) => {
+      setStateCallback((prevArray: TWalletAmountData[]) => {
+        return prevArray.find((existingWallet) => existingWallet.uuid === wallet.uuid)
+          ? prevArray
+          : [...prevArray, wallet]
+      })
+    }
 
   const sumBalanceCallback = React.useCallback(sumWalletBalance(setWalletsBalance), [])
   const sumEstimatedCallback = React.useCallback(sumWalletBalance(setWalletsEstimated), [])
@@ -305,7 +327,7 @@ const Wallets: React.FC = () => {
     }
   }
 
-  const scrollHandler = React.useCallback((e) => e.preventDefault(), [])
+  const scrollHandler = React.useCallback((e: any) => e.preventDefault(), [])
 
   const toggleScroll = (toggle: 'on' | 'off') => {
     const list = document.getElementsByClassName('ReactVirtualized__List')[0]

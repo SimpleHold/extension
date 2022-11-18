@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import SVG from 'react-inlinesvg'
+import browser from 'webextension-polyfill'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -34,8 +35,9 @@ import useState from '@hooks/useState'
 // Types
 import { IState } from './types'
 
-// Icons
-import puzzleIcon from '../../assets/modalIcons/puzzle.svg'
+// Assets
+import puzzleIcon from '@assets/modalIcons/puzzle.svg'
+import askIcon from '@assets/icons/ask.svg'
 
 // Styles
 import Styles from './styles'
@@ -47,7 +49,7 @@ const initialState: IState = {
   activeDrawer: null,
   password: '',
   passwordErrorLabel: null,
-  isPageActive: false
+  isPageActive: false,
 }
 
 const RestoreBackup: React.FC = () => {
@@ -59,12 +61,12 @@ const RestoreBackup: React.FC = () => {
     }
   }, [])
 
-  const onDrop = React.useCallback(async (acceptedFiles) => {
+  const onDrop = React.useCallback(async (acceptedFiles: File[]) => {
     updateState({ isFileBroken: false, backupData: '' })
 
     const text = await acceptedFiles[0]?.text()
-    const fileExt = acceptedFiles[0].name.split(".").pop()
-    const isAcceptedExt = ["txt", "dat"].indexOf(toLower(fileExt) as string) !== -1
+    const fileExt = acceptedFiles[0].name.split('.').pop()
+    const isAcceptedExt = ['txt', 'dat'].indexOf(toLower(fileExt) as string) !== -1
 
     if (text?.length > 0 && isAcceptedExt) {
       updateState({ backupData: text })
@@ -79,15 +81,15 @@ const RestoreBackup: React.FC = () => {
 
   const onConfirm = (): void => {
     logEvent({
-      name: START_RESTORE_CONFIRM
+      name: START_RESTORE_CONFIRM,
     })
 
     updateState({ activeDrawer: 'confirm' })
   }
 
-  const onConfirmRestore = (): void => {
+  const onConfirmRestore = async (): Promise<void> => {
     logEvent({
-      name: START_RESTORE_PASSWORD
+      name: START_RESTORE_PASSWORD,
     })
 
     if (state.passwordErrorLabel) {
@@ -112,10 +114,10 @@ const RestoreBackup: React.FC = () => {
           removeItem('manualRestoreBackup')
 
           setBadgeBackgroundColor('#EB5757')
-          setBadgeText('1')
+          await setBadgeText('1')
 
           updateState({ activeDrawer: 'success' })
-          setItem("initial_balances_request", "required")
+          setItem('initial_balances_request', 'required')
         } else {
           updateState({ activeDrawer: 'fail' })
         }
@@ -136,7 +138,7 @@ const RestoreBackup: React.FC = () => {
   }
 
   return (
-    <ExternalPageContainer onClose={onClose} headerStyle='white'>
+    <ExternalPageContainer onClose={onClose} headerStyle="white">
       <>
         <Styles.Body>
           <Styles.Title>Restore</Styles.Title>
@@ -148,9 +150,9 @@ const RestoreBackup: React.FC = () => {
           />
 
           <Styles.Actions>
-            <Button label='Cancel' onClick={onClose} isLight mr={7.5} />
+            <Button label="Cancel" onClick={onClose} isLight mr={7.5} />
             <Button
-              label='Confirm'
+              label="Confirm"
               onClick={onConfirm}
               disabled={!state.backupData.length || !state.isAgreed}
               ml={7.5}
@@ -160,7 +162,7 @@ const RestoreBackup: React.FC = () => {
           <Styles.DividerLine />
 
           <Styles.QuestionBlock>
-            <SVG src='../../assets/icons/ask.svg' width={15} height={15} title='ask' />
+            <SVG src={askIcon} width={15} height={15} title="ask" />
             <Styles.Question>Why I see this page?</Styles.Question>
           </Styles.QuestionBlock>
 
@@ -173,28 +175,28 @@ const RestoreBackup: React.FC = () => {
         <ConfirmDrawer
           isActive={state.activeDrawer === 'confirm'}
           onClose={onCloseDrawer}
-          title='Enter the password to restore your wallet'
+          title="Enter the password to restore your wallet"
           textInputValue={state.password}
           onChangeText={setPassword}
           onConfirm={onConfirmRestore}
-          textInputType='password'
-          inputLabel='Enter password'
+          textInputType="password"
+          inputLabel="Enter password"
           isButtonDisabled={!validatePassword(state.password)}
           inputErrorLabel={state.passwordErrorLabel}
-          openFrom='browser'
+          openFrom="browser"
         />
         <FailDrawer
           isActive={state.activeDrawer === 'fail'}
           onClose={onCloseDrawer}
-          text='The backup file is broken. We cannot restore your wallet. Check your backup file and try again.'
-          openFrom='browser'
+          text="The backup file is broken. We cannot restore your wallet. Check your backup file and try again."
+          openFrom="browser"
         />
         <SuccessDrawer
           isActive={state.activeDrawer === 'success'}
           onClose={() => null}
           icon={puzzleIcon}
-          text='We successfully restored your wallet. Go to the extension by clicking on the SimpleHold icon in the extensions menu and enjoy your crypto!'
-          openFrom='browser'
+          text="We successfully restored your wallet. Go to the extension by clicking on the SimpleHold icon in the extensions menu and enjoy your crypto!"
+          openFrom="browser"
           disableClose
         />
       </>
@@ -202,4 +204,6 @@ const RestoreBackup: React.FC = () => {
   )
 }
 
-render(<RestoreBackup />, document.getElementById('restore-backup'))
+browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+  render(<RestoreBackup />, document.getElementById('restore-backup'))
+})

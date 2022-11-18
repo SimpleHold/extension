@@ -9,7 +9,7 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { toUpper, numberFriendly, getFormatEstimated, getFormatBalance } from '@utils/format'
 import { logEvent } from '@utils/metrics'
-import { getLatestBalance, THardware } from '@utils/wallet'
+import { getLatestBalance, IWallet, THardware } from '@utils/wallet'
 
 // Config
 import { getSharedToken, getToken } from '@tokens/index'
@@ -44,6 +44,7 @@ interface Props {
   hardware?: THardware
   isNotActivated?: boolean
   isRedirect?: string
+  wallet: IWallet
 }
 
 const emptyData = {
@@ -71,6 +72,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     hardware,
     isNotActivated,
     isRedirect,
+    wallet,
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
@@ -135,6 +137,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
       uuid,
       hardware,
       isRedirect,
+      wallet,
     })
   }
 

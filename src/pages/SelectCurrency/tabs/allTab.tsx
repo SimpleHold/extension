@@ -15,6 +15,9 @@ import currencies from '@config/currencies'
 import { TCurrency } from '@config/currencies/types'
 import { TToken } from '@tokens/types'
 
+// Assets
+import plusCircleIcon from '@assets/icons/plusCircle.svg'
+
 // Styles
 import Styles from '../styles'
 
@@ -93,7 +96,7 @@ const AllTab: React.FC<Props> = (props) => {
         })}
         <Styles.CustomTokenBlock onClick={onAddCustomToken}>
           <Styles.CustomTokenLogo>
-            <SVG src="../../../assets/icons/plusCircle.svg" width={20} height={20} />
+            <SVG src={plusCircleIcon} width={20} height={20} />
           </Styles.CustomTokenLogo>
           <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
         </Styles.CustomTokenBlock>

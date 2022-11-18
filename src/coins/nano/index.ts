@@ -1,5 +1,4 @@
 import * as nano from 'nanocurrency'
-import { BlockRepresentation, ConvertParams } from 'nanocurrency'
 
 // Utils
 import { activateAccount, getNanoPow, sendNanoRpcRequest } from '@utils/api'
@@ -26,6 +25,7 @@ export const generateAddress = async (): Promise<TGenerateAddress | null> => {
     const publicKey = nano.derivePublicKey(privateKey)
     const address = nano.deriveAddress(publicKey)
     const formatAddress = getFormatAddress(address)
+
     if (address) {
       return {
         address: formatAddress,
@@ -47,7 +47,7 @@ const getFormatAddress = (address: string) => {
 }
 
 export const formatValue = (value: string | number, type: 'from' | 'to'): number => {
-  return +nano.convert(`${value}`, <ConvertParams>{
+  return +nano.convert(`${value}`, <nano.ConvertParams>{
     from: type === 'from' ? 'raw' : 'Nano',
     to: type === 'from' ? 'Nano' : 'raw',
   })
@@ -103,7 +103,8 @@ export const receiveAllPendingTxs = async (address: string, privKey: string): Pr
     const receivableBlocks = response.blocks
 
     for (const link of receivableBlocks) {
-      let response = await receiveBlock({ address, pubKey, privKey, blockHash: link })
+      const response = await receiveBlock({ address, pubKey, privKey, blockHash: link })
+
       if (response && response.hash !== undefined) {
         isReceived = true
       }
@@ -119,7 +120,7 @@ export const getStandingFee = (): number => {
 }
 
 const processBlock = async (
-  block: BlockRepresentation,
+  block: nano.BlockRepresentation,
   subtype: string
 ): Promise<TProcessBlock | null> => {
   const input = {
@@ -132,24 +133,22 @@ const processBlock = async (
 }
 
 const getBlockInfo = async (hash: string): Promise<TBlockInfo | null> => {
-  const input = {
+  return await sendNanoRpcRequest<TBlockInfo>({
     action: 'block_info',
     json_block: true,
     hash,
-  }
-  return await sendNanoRpcRequest<TBlockInfo>(input)
+  })
 }
 
 const getAccountInfo = async (
   address: string,
   representative = true
 ): Promise<TAccountInfo | null> => {
-  const input = {
+  return await sendNanoRpcRequest<TAccountInfo>({
     action: 'account_info',
     account: address,
     representative,
-  }
-  return await sendNanoRpcRequest<TAccountInfo>(input)
+  })
 }
 
 const getReceivableBlocks = async (
@@ -200,9 +199,11 @@ export const activateWallet = async (
 export const getActivationStatus = async (address: string): Promise<boolean> => {
   try {
     const account = await getAccountInfo(address)
+
     if (account) {
       return account.balance !== undefined
     }
+
     return false
   } catch {
     return false
@@ -291,10 +292,11 @@ export const createTransaction = async (
     })
 
     const response = await processBlock(block.block, subtype)
+
     if (response) {
-      const { hash } = response
-      return hash
+      return response.hash
     }
+
     return null
   } catch {
     return null

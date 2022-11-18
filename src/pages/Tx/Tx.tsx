@@ -20,6 +20,7 @@ import linkIcon from '@assets/icons/link.svg'
 import copyIcon from '@assets/icons/copy.svg'
 import checkCopyIcon from '@assets/icons/checkCopy.svg'
 import clockIcon from '@assets/icons/clock.svg'
+import dropdownArrowIcon from '@assets/icons/dropdownArrow.svg'
 
 // Utils
 import { short, toUpper, getFormatEstimated, price } from '@utils/format'
@@ -158,7 +159,7 @@ const TxHistory: React.FC<TTxProps> = () => {
                       {addressesFrom ? (
                         <Styles.AddressesRow onClick={onViewAddresses('senders')}>
                           <Styles.Addresses>Senders {addressesFrom.length}</Styles.Addresses>
-                          <SVG src="../../../assets/icons/dropdownArrow.svg" width={8} height={6} />
+                          <SVG src={dropdownArrowIcon} width={8} height={6} />
                         </Styles.AddressesRow>
                       ) : null}
                     </>
@@ -176,7 +177,7 @@ const TxHistory: React.FC<TTxProps> = () => {
                       {addressesTo ? (
                         <Styles.AddressesRow onClick={onViewAddresses('recipients')}>
                           <Styles.Addresses>Recipients {addressesTo.length}</Styles.Addresses>
-                          <SVG src="../../../assets/icons/dropdownArrow.svg" width={8} height={6} />
+                          <SVG src={dropdownArrowIcon} width={8} height={6} />
                         </Styles.AddressesRow>
                       ) : null}
                     </>

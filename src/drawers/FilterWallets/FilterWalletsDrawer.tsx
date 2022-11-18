@@ -24,6 +24,9 @@ import { getCurrencyInfo } from '@config/currencies/utils'
 // Tokens
 import { getToken } from '@tokens/index'
 
+// Assets
+import timesIcon from '@assets/icons/times.svg'
+
 // Types
 import { Props, TSortButton, IState, TCurrency } from './types'
 import { initialState, sortButtons } from './data'
@@ -347,7 +350,7 @@ const FilterWalletsDrawer: React.FC<Props> = (props) => {
                 <Styles.GroupClear>
                   <Styles.ClearTitle>{state.selectedCurrencies.length} selected</Styles.ClearTitle>
                   <Styles.ClearButton onClick={onRemoveCurrencies}>
-                    <SVG src="../../assets/icons/times.svg" width={7.3} height={7.3} />
+                    <SVG src={timesIcon} width={7.3} height={7.3} />
                   </Styles.ClearButton>
                 </Styles.GroupClear>
               ) : null}

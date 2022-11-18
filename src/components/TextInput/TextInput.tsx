@@ -4,6 +4,10 @@ import SVG from 'react-inlinesvg'
 // Components
 import Tooltip from '@components/Tooltip'
 
+// Assets
+import warningIcon from '@assets/icons/warning.svg'
+import timesIcon from '@assets/icons/times.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -141,7 +145,7 @@ const TextInput: React.FC<Props> = (props) => {
           </Styles.Label>
           {labelTooltip?.length && errorLabel && value.length && !isFocused ? (
             <Tooltip text={labelTooltip} maxWidth={195} textSpace="pre-wrap" mt={5}>
-              <SVG src="../../assets/icons/warning.svg" width={12} height={12} />
+              <SVG src={warningIcon} width={12} height={12} />
             </Tooltip>
           ) : null}
         </Styles.LabelRow>
@@ -176,7 +180,7 @@ const TextInput: React.FC<Props> = (props) => {
 
       {value.length && type !== 'password' && isClearButtonVisible ? (
         <Styles.ClearButton onClick={onClear}>
-          <SVG src="../../assets/icons/times.svg" width={10} height={10} />
+          <SVG src={timesIcon} width={10} height={10} />
         </Styles.ClearButton>
       ) : null}
 

@@ -97,10 +97,6 @@ export interface IGetNetworkFeeResponse {
   }[]
 }
 
-export interface IAdaTrParams {
-  ttl: number
-}
-
 export type TPhishingSite = {
   url: string
   rightUrl: string
@@ -149,11 +145,6 @@ export type TTxHistoryAddress = {
   address: string
   amount: number
   estimated: number
-}
-
-export type TFullTxHistoryResponse = {
-  error: boolean
-  data?: TFullTxWallet[]
 }
 
 export type TFullTxWallet = {
@@ -244,4 +235,29 @@ export type TGetBalanceOptions = {
   force?: boolean
   responseTimeLimit?: number
   requestDebounceTime?: TTime
+}
+
+export type TFeeRate = {
+  slow: number
+  average: number
+  fast: number
+}
+
+export type TCardanoAsset = {
+  asset: string
+  policy_id: string
+  asset_name: string
+  fingerprint: string
+  quantity: string
+  initial_mint_tx_hash: string
+  mint_or_burn_count: number
+  onchain_metadata: null | string
+  metadata: {
+    name: string
+    description: string
+    ticker: string
+    url: string
+    logo: string
+    decimals: number
+  }
 }

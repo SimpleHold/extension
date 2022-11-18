@@ -18,12 +18,7 @@ const Skeleton: React.FC<Props> = (props) => {
   const { type, width, height, mt, br = 5, isLoading, children, mb } = props
 
   if (isLoading) {
-    return <Styles.Container type={type}
-                             width={width}
-                             height={height}
-                             mt={mt}
-                             br={br}
-                             mb={mb}/>
+    return <Styles.Container type={type} width={width} height={height} mt={mt} br={br} mb={mb} />
   }
 
   return children || null

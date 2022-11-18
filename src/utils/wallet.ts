@@ -531,8 +531,10 @@ export const getWalletName = (wallet: IWallet): string => {
 
   if (walletsList) {
     const { symbol, uuid, hardware, chain, name } = wallet
+
     return generateWalletName(walletsList, symbol, uuid, hardware, chain, name)
   }
+
   return ''
 }
 

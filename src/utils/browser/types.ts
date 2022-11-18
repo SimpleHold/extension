@@ -8,3 +8,8 @@ export type TPopupPosition = {
   top: number
   left: number
 }
+
+export type TResponse<D> = {
+  error: boolean
+  data: D
+}

@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
-import { Theta } from '@coins/dist' // Fix me
 
 // Components
 import Header from '@components/Header'
@@ -10,10 +9,10 @@ import Link from '@components/Link'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { generate as generateBackup } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
-import { generateAddress } from '@coins/index'
+import { generateAddress, getList } from '@coins/index'
 import { setItem } from '@utils/storage'
 import { getAllCookies, Cookie } from '@utils/extension'
 
@@ -89,17 +88,13 @@ const Wallets: React.FC = () => {
         if (findCurrency) {
           const { symbol } = findCurrency
 
-          if (Theta.config.coins.indexOf(symbol) !== -1) {
-            updateState({ initialCurrencies: [{ symbol: 'theta' }, { symbol: 'tfuel' }] })
-          } else {
-            updateState({
-              initialCurrencies: [
-                {
-                  symbol,
-                },
-              ],
-            })
-          }
+          const list = getList(symbol).map((i) => {
+            return {
+              symbol: i,
+            }
+          })
+
+          updateState({ initialCurrencies: list })
         }
       }
     }
@@ -117,14 +112,18 @@ const Wallets: React.FC = () => {
 
     for (const currency of state.initialCurrencies) {
       const { symbol, chain } = currency
-      const generate = null // await generateAddress(symbol, chain) // Fix me
+      const currencyInfo = getCurrencyInfo(symbol)
 
-      if (generate) {
-        data.push({
-          symbol,
-          chain,
-          data: generate,
-        })
+      if (currencyInfo) {
+        const generate = await generateAddress(symbol, currencyInfo.chain, chain)
+
+        if (generate) {
+          data.push({
+            symbol,
+            chain,
+            data: generate,
+          })
+        }
       }
     }
 

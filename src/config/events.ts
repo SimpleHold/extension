@@ -57,3 +57,7 @@ export const START_RESTORE_PASSWORD = 'start_restore_password'
 export const ERROR_CREATE_TX = 'error_create_tx'
 export const ERROR_GENERATE_ADDRESS = 'error_generate_address'
 export const ERROR_IMPORT_PRIVATE_KEY = 'error_import_private_key'
+
+// New send page
+export const SEND_SELECT_WALLET = 'send_select_wallet'
+export const SEND_SELECT_FEE = 'send_select_fee'

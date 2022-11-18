@@ -16,9 +16,10 @@ import SuccessDrawer from '@drawers/Success'
 import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets } from '@utils/wallet'
 import { decrypt } from '@utils/crypto'
-import { setUserProperties } from 'utils/metrics'
+import { setUserProperties } from '@utils/metrics'
 import { toLower, toUpper } from '@utils/format'
-import { importPrivateKey, getSingleBalance, getList } from '@coins/index'
+import { importPrivateKey, getList } from '@coins/index'
+import { getSingleBalance } from '@coins/utils'
 import { getTokensBalance } from '@utils/api'
 import { getItem, setItem } from '@utils/storage'
 
@@ -67,20 +68,22 @@ const ImportPrivateKey: React.FC = () => {
     textInputRef.current?.focus()
   }, [])
 
+  React.useEffect(() => {
+    if (state.errorLabel && state.isImportButtonLoading) {
+      updateState({ isImportButtonLoading: false })
+    }
+  }, [state.errorLabel, state.isImportButtonLoading])
+
   const onConfirm = async (isSkipFindTokens?: boolean): Promise<void> => {
     if (state.errorLabel) {
       updateState({ errorLabel: null })
     }
 
-    if (symbol === 'hbar') {
-      updateState({ isImportButtonLoading: true })
-    }
+    updateState({ isImportButtonLoading: true })
 
     const getAddress = await importPrivateKey(symbol, state.privateKey, chain)
 
-    if (symbol === 'hbar') {
-      updateState({ isImportButtonLoading: false })
-    }
+    updateState({ isImportButtonLoading: false })
 
     if (getAddress) {
       const checkExist = checkExistWallet(getAddress, symbol, chain)
@@ -93,7 +96,7 @@ const ImportPrivateKey: React.FC = () => {
         return await findAddressTokens(getAddress, state.privateKey)
       }
 
-      return updateState({ activeDrawer: 'confirm' })
+      return updateState({ activeDrawer: 'confirm', isImportButtonLoading: false })
     }
 
     return updateState({ errorLabel: 'Invalid private key' })

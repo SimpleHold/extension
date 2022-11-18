@@ -17,6 +17,7 @@ import { generateWalletName, IWallet, THardware } from '@utils/wallet'
 // Assets
 import ledgerLogo from '@assets/icons/ledger.svg'
 import trezorLogo from '@assets/icons/trezor.svg'
+import dropdownArrowIcon from '@assets/icons/dropdownArrow.svg'
 
 // Styles
 import Styles from './styles'
@@ -107,7 +108,7 @@ const WalletCard: React.FC<Props> = (props) => {
               <Styles.WalletName>{walletName}</Styles.WalletName>
               {wallets.length > 1 ? (
                 <Styles.DropdownArrow className="arrow">
-                  <SVG src="../../../assets/icons/dropdownArrow.svg" width={8} height={6} />
+                  <SVG src={dropdownArrowIcon} width={8} height={6} />
                 </Styles.DropdownArrow>
               ) : null}
             </Styles.WalletNameRow>

@@ -1,4 +1,4 @@
-import { browser, Runtime } from 'webextension-polyfill-ts'
+import browser, { Runtime } from 'webextension-polyfill'
 
 let port: Runtime.Port | null = browser.runtime.connect(undefined, { name: 'trezor-connect' })
 

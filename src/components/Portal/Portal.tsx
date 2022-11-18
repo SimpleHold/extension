@@ -1,25 +1,27 @@
-import * as React from "react";
-import {useEffect, useRef, useState} from "react";
-import {createPortal} from 'react-dom'
+import * as React from 'react'
+import { createPortal } from 'react-dom'
 
-const Portal: React.FC = ({ children }) => {
+interface Props {
+  children: React.ReactNode
+}
 
-    const [mounted, setMounted] = useState(false)
-    const ref: any = useRef<HTMLDivElement>(null)
+const Portal: React.FC<Props> = ({ children }) => {
+  const [mounted, setMounted] = React.useState(false)
+  const ref: any = React.useRef<HTMLDivElement>(null)
 
-    useEffect(() => {
-        ref.current = document.createElement('div');
-        ref.current.setAttribute("id", 'popup');
-        document.body.appendChild(ref.current);
-        setMounted(true);
-        return () => {
-            document.body.removeChild(ref.current)
-        };
-    }, [])
+  React.useEffect(() => {
+    ref.current = document.createElement('div')
+    ref.current.setAttribute('id', 'popup')
+    document.body.appendChild(ref.current)
 
-    return mounted ? createPortal(children, ref.current) : null
-};
+    setMounted(true)
 
-export default Portal;
+    return () => {
+      document.body.removeChild(ref.current)
+    }
+  }, [])
 
+  return mounted ? createPortal(children, ref.current) : null
+}
 
+export default Portal

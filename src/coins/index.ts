@@ -1,37 +1,31 @@
-import {
-  BitcoinLike,
-  Cardano,
-  Tron,
-  Theta,
-  Neo,
-  Nuls,
-  Nerve,
-  Xrp,
-  Stellar,
-  Harmony,
-  Zilliqa,
-  Tezos,
-  Xinfin,
-  Terra,
-  Waves,
-  Qtum,
-  Near,
-  Icon,
-  Sxp,
-  Iota,
-  Neblio,
-  Solana,
-  PolkadotLike,
-  Iotex,
-  FioProtocol,
-  Elrond,
-  Casper,
-  Aptos,
-} from './dist'
 import find from 'lodash/find'
 
 // Coins
+import * as bitcoinLike from '@coins/bitcoinLike'
 import * as ethereumLike from '@coins/ethereumLike'
+import * as cardano from '@coins/cardano'
+import * as tron from '@coins/tron'
+import * as theta from '@coins/theta'
+import * as neo from '@coins/neo'
+import * as nuls from '@coins/nuls'
+import * as nerve from '@coins/nerve'
+import * as xrp from '@coins/xrp'
+import * as stellar from '@coins/stellar'
+import * as harmony from '@coins/harmony'
+import * as zilliqa from '@coins/zilliqa'
+import * as tezos from '@coins/tezos'
+import * as terra from '@coins/terra'
+import * as waves from '@coins/waves'
+import * as qtum from '@coins/qtum'
+import * as near from '@coins/near'
+import * as iota from '@coins/iota'
+import * as neblio from '@coins/neblio'
+import * as solana from '@coins/solana'
+import * as polkadotLike from '@coins/polkadotLike'
+import * as fioProtocol from '@coins/fioProtocol'
+import * as elrond from '@coins/elrond'
+import * as casper from '@coins/casper'
+import * as aptos from '@coins/aptos'
 import * as verge from '@coins/verge'
 import * as toncoin from '@coins/toncoin'
 import * as cosmosLike from '@coins/cosmosLike'
@@ -40,35 +34,19 @@ import * as vechain from '@coins/vechain'
 import * as digibyte from '@coins/digibyte'
 import * as ravencoin from '@coins/ravencoin'
 import * as nano from '@coins/nano'
+import * as xinfin from '@coins/xinfin'
+// import * as iotex from '@coins/iotex'
+// import * as sxp from '@coins/sxp'
+import * as icon from '@coins/icon'
 
 // Utils
-import {
-  getBalanceDiff,
-  getBalancePrecision,
-  getLatestBalance,
-  getSingleWallet,
-  getWalletChain,
-  saveBalanceData,
-  TBalanceData,
-} from '@utils/wallet'
-import { checkIfTimePassed } from '@utils/dates'
-import { getItem, removeItem, setItem } from '@utils/storage'
-import { getEtherNetworkFee, fetchBalances } from '@utils/api'
-import {
-  logErrorCreateTx,
-  logErrorGenerateAddress,
-  logErrorImportPrivateKey,
-  logEvent,
-} from '@utils/metrics'
+import { logErrorCreateTx, logErrorGenerateAddress, logErrorImportPrivateKey } from '@utils/metrics'
+import { getEtherNetworkFee } from '@utils/api'
 import { getCurrencyBalance } from './utils'
-
-// Tokens
-import { getSharedToken, getToken } from '@tokens/index'
 
 // Config
 import { getCurrencyByChain } from '@config/currencies/utils'
 import { NOT_ETH_NETWORKS, TNetwork } from '@config/networks'
-import { GENERAL_BALANCE_CHANGE } from '@config/events'
 
 // Types
 import {
@@ -80,68 +58,67 @@ import {
   TInternalTxProps,
 } from './types'
 import { TFeeResponse } from '@utils/api/types'
-import { IGetBalances, TGetBalanceOptions, TGetBalanceWalletProps } from '@utils/api/types'
 
 const providers: TProvider[] = [
+  bitcoinLike,
   ethereumLike,
-  BitcoinLike,
-  Tron,
-  Theta,
-  Nuls,
-  Nerve,
-  Cardano,
-  Xrp,
-  Neblio,
+  cardano,
+  tron,
+  theta,
+  neo,
+  nuls,
+  nerve,
+  xrp,
+  stellar,
+  harmony,
+  zilliqa,
+  tezos,
+  terra,
+  waves,
+  qtum,
+  near,
+  iota,
+  neblio,
+  solana,
+  polkadotLike,
+  fioProtocol,
+  elrond,
+  casper,
+  aptos,
   verge,
-  Xinfin,
-  Solana,
-  Harmony,
-  Zilliqa,
-  Terra,
-  PolkadotLike,
   toncoin,
-  Iotex,
-  Stellar,
   cosmosLike,
-  Neo,
-  Tezos,
-  FioProtocol,
-  Waves,
-  Qtum,
-  Near,
-  Icon,
-  Sxp,
-  Iota,
-  Elrond,
-  Casper,
-  Aptos,
   hedera,
   vechain,
   digibyte,
-  ravencoin,
   nano,
+  ravencoin,
+  xinfin,
+  icon,
+  // iotex,
+  // sxp,
 ]
 
 const getProvider = (symbol: string, tokenChain?: string): TProvider | null => {
   if (tokenChain) {
     if (tokenChain === 'terra-classic') {
-      return Terra
+      return terra
     }
 
     if (tokenChain === 'tron') {
-      return Tron
+      return tron
     }
 
     if (tokenChain === 'solana') {
-      return Solana
+      return solana
     }
 
     if (tokenChain === 'cardano') {
-      return Cardano
+      return cardano
     }
 
     if (tokenChain === 'neo') {
-      return Neo
+      return neo
     }
 
     return ethereumLike
@@ -165,6 +142,7 @@ export const generateAddress = async (
     return null
   } catch (err) {
     logErrorGenerateAddress(`${err}`, symbol, chain)
+
     return null
   }
 }
@@ -231,7 +209,7 @@ export const getNetworkFee = async (props: TFeeProps): Promise<TFeeResponse | nu
         let utxos: TUnspentOutput[] = []
 
         if (symbol === 'doge') {
-          utxos = BitcoinLike.getUtxos('doge', outputs, amount)
+          utxos = bitcoinLike.getUtxos('doge', outputs, amount)
         }
 
         const currencyBalance = await getCurrencyBalance(from, tokenChain)
@@ -250,20 +228,22 @@ export const getNetworkFee = async (props: TFeeProps): Promise<TFeeResponse | nu
         ethereumLike.config.coins.indexOf(symbol) !== -1 ||
         (tokenChain && mapNotEthNetworks.indexOf(tokenChain) === -1)
       ) {
-        const to = (await ethereumLike.generateAddress())?.address || ''
+        const to = (await ethereumLike.generateAddress())?.address
         const value = decimals
           ? ethereumLike.convertDecimals(amount, decimals)
           : ethereumLike.toEther(amount)
 
-        return await getEtherNetworkFee(
-          from,
-          to,
-          value,
-          tokenChain || chain,
-          tokenChain ? symbol : undefined,
-          contractAddress,
-          decimals
-        )
+        if (to) {
+          return await getEtherNetworkFee(
+            from,
+            to,
+            value,
+            tokenChain || chain,
+            tokenChain ? symbol : undefined,
+            contractAddress,
+            decimals
+          )
+        }
       }
 
       if (provider?.getNetworkFee) {
@@ -332,7 +312,7 @@ export const validateAddress = (
 }
 
 export const checkIsCustomFee = (symbol: string, tokenChain?: string): boolean => {
-  if (BitcoinLike.config.coins.indexOf(symbol) !== -1) {
+  if (bitcoinLike.config.coins.indexOf(symbol) !== -1) {
     return symbol !== 'doge'
   }
 
@@ -394,18 +374,6 @@ export const checkWithOutputs = (symbol: string, tokenChain?: string): boolean =
 }
 
 export const getList = (symbol: string, tokenChain?: string): string[] => {
-  if (vechain.config.coins.indexOf(symbol) !== -1) {
-    return vechain.config.coins.sort(
-      (a: string, b: string) => b.indexOf(symbol) - a.indexOf(symbol)
-    )
-  }
-
-  if (Theta.config.coins.indexOf(symbol) !== -1) {
-    return Theta.config.coins.sort(
-      (a: string, b: string) => Number(b.indexOf(symbol) !== -1) - Number(a.indexOf(symbol) !== -1)
-    )
-  }
-
   if (tokenChain) {
     const currencyInfo = getCurrencyByChain(tokenChain)
 
@@ -414,12 +382,24 @@ export const getList = (symbol: string, tokenChain?: string): string[] => {
     }
   }
 
+  if (theta.config.coins.indexOf(symbol) !== -1) {
+    return theta.config.coins.sort(
+      (a: string, b: string) => Number(b.indexOf(symbol) !== -1) - Number(a.indexOf(symbol) !== -1)
+    )
+  }
+
+  if (vechain.config.coins.indexOf(symbol) !== -1) {
+    return vechain.config.coins.sort(
+      (a: string, b: string) => b.indexOf(symbol) - a.indexOf(symbol)
+    )
+  }
+
   return [symbol]
 }
 
 export const getNetworkFeeSymbol = (symbol: string, tokenChain?: string): string => {
   try {
-    if (Theta.config.coins.indexOf(symbol) !== -1) {
+    if (theta.config.coins.indexOf(symbol) !== -1) {
       return 'tfuel'
     }
 
@@ -558,106 +538,11 @@ export const checkIsFeeApproximate = (symbol: string, tokenChain?: string): bool
   return provider?.config?.isFeeApproximate || false
 }
 
-type TWalletBalanceRequestPayload = {
-  address: string
-  symbol: string
-  chain?: string
-  contractAddress?: string
-  tokenSymbol?: string
-  isFullBalance?: boolean
-}
-
-export const getBalances = async (
-  wallets: TGetBalanceWalletProps[],
-  options: TGetBalanceOptions = {}
-): Promise<IGetBalances[] | null> => {
-  if (wallets.length > 1) {
-    setItem('enable_skeletons', 'true')
-  }
-
-  try {
-    const mapWallets = wallets.map((wallet) => {
-      const tokenSymbol = wallet.chain ? wallet.symbol : undefined
-      const sharedToken = getSharedToken(wallet.symbol, wallet.chain)
-      const contractAddress =
-        wallet.contractAddress ||
-        sharedToken?.address ||
-        (wallet.chain ? getToken(wallet.symbol, wallet.chain)?.address : undefined)
-
-      const requestPayload: TWalletBalanceRequestPayload = {
-        symbol: wallet.symbol,
-        address: wallet.address,
-        contractAddress,
-        chain: getWalletChain(wallet.symbol, wallet.chain) || wallet.chain,
-        isFullBalance: wallet.isFullBalance,
-      }
-
-      requestPayload.tokenSymbol = contractAddress ? tokenSymbol : undefined
-
-      return requestPayload
-    })
-
-    const data = await fetchBalances(mapWallets)
-
-    if (!data?.length) {
-      return data
-    }
-
-    for (const wallet of data) {
-      const { balanceInfo, symbol, address } = wallet
-
-      const savedData = getLatestBalance(address, symbol)
-
-      const precision = getBalancePrecision(symbol)
-      const balanceDiff = getBalanceDiff(savedData.balance, balanceInfo.balance || 0, precision)
-      const isPendingStatusChanged = !!savedData.pending !== !!balanceInfo.pending
-      const isBalanceChanged = balanceDiff || isPendingStatusChanged
-
-      if (isBalanceChanged) {
-        if (balanceDiff) {
-          const wallet = getSingleWallet(address, symbol)
-          if (wallet?.lastBalanceCheck) {
-            logEvent({
-              name: GENERAL_BALANCE_CHANGE,
-              properties: {
-                symbol,
-                dynamics: balanceDiff > 0 ? 'pos' : 'neg',
-              },
-            })
-          }
-        }
-      }
-      if (getItem('initial_balances_request') && wallets.length > 1) {
-        removeItem('initial_balances_request')
-      }
-      saveBalanceData({
-        address,
-        symbol,
-        txHistoryUpdateRequired: Boolean(isBalanceChanged),
-        ...balanceInfo,
-      })
-    }
-    return data
-  } catch {
-    return []
-  } finally {
-    removeItem('enable_skeletons')
-  }
-}
-
-export const getSingleBalance = async (wallet: TGetBalanceWalletProps): Promise<TBalanceData> => {
-  const latestBalance = getLatestBalance(wallet.address, wallet.symbol)
-  if (checkIfTimePassed(latestBalance.lastBalanceCheck || 0, { seconds: 30 })) {
-    await getBalances([wallet])
-  }
-  return getLatestBalance(wallet.address, wallet.symbol)
-}
-
 export const activateWallet = async (
   chain: string,
   publicKey: string,
   privateKey?: string
-): Promise<any | null> => {
+): Promise<string | null> => {
   if (chain === 'xno') {
     if (!privateKey) {
       return null
@@ -669,4 +554,6 @@ export const activateWallet = async (
   if (chain === 'hedera') {
     return await hedera.activateWallet(chain, publicKey)
   }
+
+  return null
 }

@@ -7,7 +7,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { toUpper, price, getFormatEstimated, getFormatBalance } from '@utils/format'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { openWebPage } from '@utils/extension'
 
 // Assets
@@ -20,7 +20,7 @@ import { EXCHANGE_SELECT } from '@config/events'
 import Styles from './styles'
 
 interface Props {
-  getOpenPage: (url: string, stateData?: {[key: string]: any}) => () => void
+  getOpenPage: (url: string, stateData?: { [key: string]: any }) => () => void
   symbol: string
   chain?: string
   balance: null | number
@@ -51,9 +51,8 @@ const WalletCard: React.FC<Props> = (props) => {
     onConfirmActivate,
     hasUnreceivedTxs,
     onConfirmReceivePending,
-    isRedirect
+    isRedirect,
   } = props
-
 
   const [initialized, setInitialized] = React.useState(false)
   const [balanceWidth, setBalanceWidth] = React.useState(undefined)
@@ -76,7 +75,7 @@ const WalletCard: React.FC<Props> = (props) => {
   }, [balance])
 
   React.useEffect(() => {
-    isRedirect && getOpenPage(isRedirect, {isRedirect: !!isRedirect})()
+    isRedirect && getOpenPage(isRedirect, { isRedirect: !!isRedirect })()
   }, [isRedirect])
 
   const onExchange = (): void => {
@@ -99,7 +98,12 @@ const WalletCard: React.FC<Props> = (props) => {
         <CurrencyLogo size={60} br={18} symbol={symbol} chain={chain} name={tokenName} />
         <Styles.WalletInfo>
           <Styles.BalanceRow>
-            <Skeleton width={balanceWidth || 173} height={balanceHeight} type='gray' isLoading={balance === null}>
+            <Skeleton
+              width={balanceWidth || 173}
+              height={balanceHeight}
+              type="gray"
+              isLoading={balance === null}
+            >
               <Styles.Balance ref={balanceWidthRef} height={balanceHeight}>
                 {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
               </Styles.Balance>
@@ -114,7 +118,7 @@ const WalletCard: React.FC<Props> = (props) => {
             width={estimatedWidth || 75}
             height={19}
             mt={estimatedMT}
-            type='gray'
+            type="gray"
             isLoading={estimated === null}
           >
             <Styles.Estimated ref={estimatedWidthRef} mt={estimatedMT}>{`$ ${getFormatEstimated(
@@ -125,29 +129,31 @@ const WalletCard: React.FC<Props> = (props) => {
         </Styles.WalletInfo>
       </Styles.Body>
       <Styles.Actions>
-
-        {isNotActivated &&
-        <Styles.ActionButton onClick={onConfirmActivate}>
-          <Styles.ActionName>Activate</Styles.ActionName>
-        </Styles.ActionButton>}
-
-        {hasUnreceivedTxs && !isNotActivated &&
-        <Styles.ActionButton onClick={onConfirmReceivePending}>
-          <Styles.ActionName>Receive assets</Styles.ActionName>
-        </Styles.ActionButton>}
-
-        {!isNotActivated && !hasUnreceivedTxs &&
-        <>
-          <Styles.ActionButton onClick={getOpenPage('/send')}>
-            <Styles.ActionName>Send</Styles.ActionName>
+        {isNotActivated && (
+          <Styles.ActionButton onClick={onConfirmActivate}>
+            <Styles.ActionName>Activate</Styles.ActionName>
           </Styles.ActionButton>
-          <Styles.ActionButton onClick={onReceive}>
-            <Styles.ActionName>Receive</Styles.ActionName>
+        )}
+
+        {hasUnreceivedTxs && !isNotActivated && (
+          <Styles.ActionButton onClick={onConfirmReceivePending}>
+            <Styles.ActionName>Receive assets</Styles.ActionName>
           </Styles.ActionButton>
-          <Styles.ActionButton onClick={onExchange}>
-            <Styles.ActionName>Exchange</Styles.ActionName>
-          </Styles.ActionButton>
-        </>}
+        )}
+
+        {!isNotActivated && !hasUnreceivedTxs && (
+          <>
+            <Styles.ActionButton onClick={getOpenPage('/send')}>
+              <Styles.ActionName>Send</Styles.ActionName>
+            </Styles.ActionButton>
+            <Styles.ActionButton onClick={onReceive}>
+              <Styles.ActionName>Receive</Styles.ActionName>
+            </Styles.ActionButton>
+            <Styles.ActionButton onClick={onExchange}>
+              <Styles.ActionName>Exchange</Styles.ActionName>
+            </Styles.ActionButton>
+          </>
+        )}
       </Styles.Actions>
     </Styles.Container>
   )

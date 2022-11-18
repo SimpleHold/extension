@@ -1,9 +1,12 @@
 import * as React from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 // Components
 import DrawerWrapper from '@components/DrawerWrapper'
 import Button from '@components/Button'
+
+// Assets
+import successIcon from '@assets/drawer/success.svg'
 
 // Styles
 import Styles from './styles'
@@ -37,7 +40,7 @@ const SuccessDrawer: React.FC<Props> = (props) => {
       title="Success!"
       isActive={isActive}
       onClose={onClose}
-      icon={icon || '../../assets/drawer/success.svg'}
+      icon={icon || successIcon}
       openFrom={openFrom}
     >
       <Styles.Row>

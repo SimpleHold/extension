@@ -1,11 +1,11 @@
-import { PrivateKey, Hbar, HbarUnit, Client, TransferTransaction } from '@hashgraph/sdk'
-import { Buffer } from 'buffer'
+import { PrivateKey } from '@hashgraph/cryptography'
+import BigNumber from 'bignumber.js'
 
 // Utils
 import { activateAccount, getHederaAccountId } from '@utils/api'
 
 // Types
-import { TGenerateAddress, TInternalTxProps, TCurrencyConfig } from '@coins/types'
+import { TInternalTxProps, TGenerateAddress, TCurrencyConfig } from '@coins/types'
 
 export const config: TCurrencyConfig = {
   coins: ['hbar'],
@@ -13,25 +13,23 @@ export const config: TCurrencyConfig = {
   extraIdName: 'Memo',
 }
 
+const ten6 = new BigNumber(10).pow(6)
+
 export const formatValue = (value: string | number, type: 'from' | 'to'): number => {
   if (type === 'from') {
-    return Hbar.from(Number(value), HbarUnit.Tinybar).to(HbarUnit.Hbar).toNumber()
+    return Number(new BigNumber(value).div(ten6))
   }
 
-  return new Hbar(value).toTinybars().toNumber()
+  return Number(new BigNumber(value).multipliedBy(ten6))
 }
 
 export const generateAddress = async (): Promise<TGenerateAddress | null> => {
-  try {
-    const newKey = PrivateKey.generate()
+  const newKey = PrivateKey.generateED25519()
 
-    return {
-      address: '',
-      privateKey: `${newKey}`,
-      isNotActivated: true,
-    }
-  } catch {
-    return null
+  return {
+    address: '',
+    privateKey: `${newKey}`,
+    isNotActivated: true,
   }
 }
 
@@ -51,35 +49,8 @@ export const getTransactionLink = (hash: string): string => {
   return `https://app.dragonglass.me/hedera/search?q=${hash}`
 }
 
-export const createInternalTx = async ({
-  addressFrom,
-  addressTo,
-  amount,
-  privateKey,
-  extraId,
-}: TInternalTxProps): Promise<string | null> => {
-  try {
-    if (!privateKey) {
-      return null
-    }
-
-    const client = Client.forMainnet().setOperator(addressFrom, PrivateKey.fromString(privateKey))
-
-    const transferTransactionResponse = await new TransferTransaction()
-      .addHbarTransfer(addressFrom, Hbar.from(-Math.abs(Number(amount)), HbarUnit.Hbar))
-      .addHbarTransfer(addressTo, Hbar.from(Number(amount), HbarUnit.Hbar))
-      .setTransactionMemo(extraId || '')
-      .execute(client)
-
-    return Buffer.from(transferTransactionResponse.transactionHash).toString('hex')
-  } catch {
-    return null
-  }
-}
-
-export const activateWallet = async (chain: string, publicKey: string) => {
-  const res = await activateAccount<string>(chain, publicKey)
-  return res
+export const activateWallet = async (chain: string, publicKey: string): Promise<string | null> => {
+  return await activateAccount<string>(chain, publicKey)
 }
 
 export const validateAddress = (address: string): boolean => {
@@ -92,4 +63,8 @@ export const validateAddress = (address: string): boolean => {
 
 export const getStandingFee = (): number => {
   return 0.005
+}
+
+export const createInternalTx = async (props: TInternalTxProps): Promise<string | null> => {
+  return null
 }

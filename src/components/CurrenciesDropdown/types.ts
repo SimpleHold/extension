@@ -36,4 +36,5 @@ export interface Props {
   withActions?: boolean
   onResetDropdown?: () => void
   onClose?: () => void
+  maxHeight?: number
 }

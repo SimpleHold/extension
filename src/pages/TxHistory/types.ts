@@ -1,5 +1,5 @@
 // Types
-import { THistoryTxGroup } from 'utils/history'
+import { THistoryTxGroup } from '@utils/history'
 import { IWallet } from '@utils/wallet'
 
 export interface IState {

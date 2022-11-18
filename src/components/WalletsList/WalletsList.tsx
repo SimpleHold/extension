@@ -1,5 +1,11 @@
 import * as React from 'react'
-import { List, ListRowProps, WindowScroller } from 'react-virtualized'
+import {
+  List as _List,
+  ListProps,
+  ListRowProps,
+  WindowScroller as _WindowScroller,
+  WindowScrollerProps,
+} from 'react-virtualized'
 
 // Components
 import WalletCard from '@components/WalletCard'
@@ -24,9 +30,19 @@ export interface IWalletsList {
   showSkeletons?: boolean
 }
 
-const WalletsList: React.FC<IWalletsList> = (props) => {
+const WindowScroller = _WindowScroller as unknown as React.FC<WindowScrollerProps>
+const List = _List as unknown as React.FC<ListProps>
 
-  const {wallets, sumBalanceCallback, sumEstimatedCallback, sumPendingCallback, onScroll, handleClick, isRedirect} = props
+const WalletsList: React.FC<IWalletsList> = (props) => {
+  const {
+    wallets,
+    sumBalanceCallback,
+    sumEstimatedCallback,
+    sumPendingCallback,
+    onScroll,
+    handleClick,
+    isRedirect,
+  } = props
 
   const renderWallet = ({ index, style, key }: ListRowProps): React.ReactNode => {
     const wallet = wallets?.[index]
@@ -73,6 +89,7 @@ const WalletsList: React.FC<IWalletsList> = (props) => {
             isNotActivated={isNotActivated}
             handleClick={handleClick}
             isRedirect={isRedirect}
+            wallet={wallet}
           />
         </div>
       )
@@ -91,6 +108,7 @@ const WalletsList: React.FC<IWalletsList> = (props) => {
     <WindowScroller>
       {({ registerChild }) => {
         return (
+          // @ts-ignore
           <div ref={registerChild}>
             <List
               className={'wallets-list'}
@@ -103,9 +121,7 @@ const WalletsList: React.FC<IWalletsList> = (props) => {
               width={375}
               overscanRowCount={0}
               noRowsRenderer={() => (
-                <Styles.NotFound>
-                  Nothing was found for the specified parameters
-                </Styles.NotFound>
+                <Styles.NotFound>Nothing was found for the specified parameters</Styles.NotFound>
               )}
             />
           </div>

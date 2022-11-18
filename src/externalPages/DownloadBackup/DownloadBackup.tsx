@@ -1,15 +1,19 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import SVG from 'react-inlinesvg'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
 
 // Utils
-import { download } from '@utils/backup'
+import { downloadBackupFile } from '@utils/backup'
 import { getItem, removeItem } from '@utils/storage'
 import { getUrl } from '@utils/extension'
+
+// Assets
+import downloadbackup from '@assets/illustrate/downloadbackup.svg'
+import askIcon from '@assets/icons/ask.svg'
 
 // Styles
 import Styles from './styles'
@@ -47,7 +51,7 @@ const DownloadBackup: React.FC = () => {
     const backup = getItem('backup')
 
     if (backup) {
-      download(backup)
+      downloadBackupFile(backup)
       removeItem('backupStatus')
     }
   }
@@ -63,7 +67,7 @@ const DownloadBackup: React.FC = () => {
   return (
     <ExternalPageContainer onClose={onClose} height="100%" headerStyle="white">
       <Styles.Body>
-        <Styles.Image src="../../assets/illustrate/downloadbackup.svg" />
+        <Styles.Image src={downloadbackup} />
         <Styles.Title>Download backup</Styles.Title>
         <Styles.Description>Your download will start in few seconds.</Styles.Description>
         <Styles.DownloadLink onClick={onDownload}>If not, click here</Styles.DownloadLink>
@@ -71,7 +75,7 @@ const DownloadBackup: React.FC = () => {
         <Styles.DividerLine />
 
         <Styles.QuestionBlock>
-          <SVG src="../../assets/icons/ask.svg" width={15} height={15} title="ask" />
+          <SVG src={askIcon} width={15} height={15} title="ask" />
           <Styles.Question>Why I see this page?</Styles.Question>
         </Styles.QuestionBlock>
 
@@ -85,4 +89,6 @@ const DownloadBackup: React.FC = () => {
   )
 }
 
-render(<DownloadBackup />, document.getElementById('download-backup'))
+browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+  render(<DownloadBackup />, document.getElementById('download-backup'))
+})

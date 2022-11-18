@@ -8,9 +8,7 @@ import Skeleton from '@components/Skeleton'
 
 // Utils
 import { toUpper, numberFriendly, short, getFormatEstimated } from '@utils/format'
-
-// Coins
-import { getSingleBalance } from '@coins/index'
+import { getSingleBalance } from '@coins/utils'
 
 // Config
 import { getCurrencyInfo } from '@config/currencies/utils'
@@ -41,16 +39,8 @@ interface Props {
 }
 
 const Wallet: React.FC<Props> = (props) => {
-  const {
-    symbol,
-    address,
-    walletName,
-    chain,
-    name,
-    hardware,
-    contractAddress,
-    onClickWallet,
-  } = props
+  const { symbol, address, walletName, chain, name, hardware, contractAddress, onClickWallet } =
+    props
 
   const currency = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 

@@ -6,7 +6,10 @@ import BTCApp from '@ledgerhq/hw-app-btc'
 import ETHApp from '@ledgerhq/hw-app-eth'
 import XRPApp from '@ledgerhq/hw-app-xrp'
 import Web3 from 'web3'
-import { Xrp } from '@coins/dist' // Fix me
+
+// Coins
+import { formatValue } from '@coins/xrp'
+import { createUnsignedTx } from '@coins/bitcoinLike'
 
 // Utils
 import { toUpper } from '@utils/format'
@@ -76,6 +79,7 @@ export const getBTCAddress = async (
 
     return bitcoinAddress
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -89,6 +93,7 @@ export const getETHAddress = async (
 
     return address
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -102,6 +107,7 @@ export const getXRPAddress = async (
 
     return address
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -146,6 +152,7 @@ export const ethLedgerSignTx = async (
 
     return null
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -180,7 +187,11 @@ export const createBtcTx = async (
       return null
     }
 
-    const newTx = '' // bitcoin.createUnsignedTx(outputs, addressTo, amount, fee, addressFrom) Fix me
+    const newTx = await createUnsignedTx(addressFrom, addressTo, amount, fee, outputs)
+
+    if (!newTx) {
+      return null
+    }
 
     const splitNewTx = btc.splitTransaction(newTx)
     const outputScriptHex = btc.serializeTransactionOutputs(splitNewTx).toString('hex')
@@ -192,6 +203,7 @@ export const createBtcTx = async (
       additionals: [],
     })
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -222,7 +234,7 @@ export const createXrpTx = async (
           Account: addressFrom,
           Destination: addressTo,
           Amount: `${amount}`,
-          Fee: `${Xrp.formatValue(fee, 'to')}`,
+          Fee: `${formatValue(fee, 'to')}`,
           Sequence: sequence,
           SigningPubKey: toUpper(publicKey),
         }
@@ -246,6 +258,7 @@ export const createXrpTx = async (
 
     return null
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -263,6 +276,7 @@ export const getFirstAddress = async (
       return await getXRPAddress(0, transport)
     }
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }

@@ -13,6 +13,9 @@ import { checkIsZeroFee } from '@coins/index'
 import { TFeeValue } from '../types'
 import { TFeeTypes } from '@utils/api/types'
 
+// Assets
+import askIcon from '@assets/icons/ask.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -74,7 +77,7 @@ const NetworkFee: React.FC<Props> = (props) => {
       </Styles.Row>
 
       <Styles.AboutFee onClick={showFeeDrawer}>
-        <SVG src="../../assets/icons/ask.svg" width={15} height={15} />
+        <SVG src={askIcon} width={15} height={15} />
         <Styles.AboutFeeLabel>What is Network Fee</Styles.AboutFeeLabel>
       </Styles.AboutFee>
     </Styles.Container>
