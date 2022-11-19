@@ -3,6 +3,7 @@ import { v4 } from 'uuid'
 // Utils
 import { validateWallet } from '@utils/validate'
 import { removeItem, setItem } from '@utils/storage'
+import { getProvider } from '@coins/index'
 
 // Types
 import { IWallet } from '@utils/wallet'
@@ -94,8 +95,10 @@ export const validate = (backup: string): string | null => {
 
       if (validateWalletsList && parseBackup.version && parseBackup.uuid) {
         parseBackup?.wallets.forEach((wallet: IWallet) => delete wallet.privateKey)
-
-        return JSON.stringify(parseBackup.wallets)
+        const wallets = parseBackup?.wallets
+          .map((wallet: IWallet) => (!wallet.chain && getProvider(wallet.symbol) ? wallet : null))
+          .filter((w: IWallet | null) => w)
+        return JSON.stringify(wallets)
       }
     }
   }
