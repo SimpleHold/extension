@@ -102,7 +102,7 @@ export const getBalances = async (
       const isPendingStatusChanged = !!savedData.pending !== !!balanceInfo.pending
       const isBalanceChanged = balanceDiff || isPendingStatusChanged
 
-      if (isBalanceChanged) {
+      if (isBalanceChanged && !getItem('initial_balances_request')) {
         if (balanceDiff) {
           const wallet = getSingleWallet(address, symbol)
           if (wallet?.lastBalanceCheck) {
