@@ -207,10 +207,7 @@ export type TxPlanResult =
       minimalLovelaceAmount: number
     }
 
-export type CborizedVotingRegistrationMetadata = [
-  Map<number, Map<number, Buffer | BigInt>>,
-  [],
-]
+export type CborizedVotingRegistrationMetadata = [Map<number, Map<number, Buffer | BigInt>>, []]
 
 export const enum TxCertificateKey {
   STAKING_KEY_REGISTRATION = 0,
@@ -227,13 +224,13 @@ export type CborizedTxStakeCredential = [TxStakeCredentialType, Buffer]
 
 export type CborizedTxStakingKeyRegistrationCert = [
   TxCertificateKey.STAKING_KEY_REGISTRATION,
-  CborizedTxStakeCredential,
+  CborizedTxStakeCredential
 ]
 
 export type CborizedTxDelegationCert = [
   TxCertificateKey.DELEGATION,
   CborizedTxStakeCredential,
-  Buffer,
+  Buffer
 ]
 
 export type CborizedTxStakepoolRegistrationCert = [
@@ -251,12 +248,12 @@ export type CborizedTxStakepoolRegistrationCert = [
   Buffer,
   Array<Buffer>,
   any,
-  [string, Buffer] | null,
+  [string, Buffer] | null
 ]
 
 export type CborizedTxStakingKeyDeregistrationCert = [
   TxCertificateKey.STAKING_KEY_DEREGISTRATION,
-  CborizedTxStakeCredential,
+  CborizedTxStakeCredential
 ]
 
 export type CborizedTxCertificate =
@@ -325,10 +322,7 @@ export type MyAddressesParams = {
   gapLimit: number
 }
 
-export type CborizedCliWitness = [
-  TxWitnessKey,
-  CborizedTxWitnessShelley | CborizedTxWitnessByron,
-]
+export type CborizedCliWitness = [TxWitnessKey, CborizedTxWitnessShelley | CborizedTxWitnessByron]
 
 export enum CryptoProviderType {
   BITBOX02 = 'BITBOX02',
@@ -355,13 +349,10 @@ export enum CryptoProviderFeature {
 
 export interface CryptoProvider {
   network: Network
-  signTx: (
-    unsignedTx: TxAux,
-    addressToPathMapper: AddressToPathMapper,
-  ) => Promise<TxSigned>
+  signTx: (unsignedTx: TxAux, addressToPathMapper: AddressToPathMapper) => Promise<TxSigned>
   witnessPoolRegTx: (
     unsignedTx: TxAux,
-    addressToPathMapper: AddressToPathMapper,
+    addressToPathMapper: AddressToPathMapper
   ) => Promise<CborizedCliWitness>
   getWalletSecret: () => Buffer | void
   getType: () => CryptoProviderType
@@ -371,10 +362,7 @@ export interface CryptoProvider {
   _sign: (message: string, absDerivationPath: BIP32Path) => void
   ensureFeatureIsSupported: (feature: CryptoProviderFeature) => void
   isFeatureSupported: (feature: CryptoProviderFeature) => boolean
-  displayAddressForPath: (
-    absDerivationPath: BIP32Path,
-    stakingPath: BIP32Path,
-  ) => void
+  displayAddressForPath: (absDerivationPath: BIP32Path, stakingPath: BIP32Path) => void
   getVersion: () => string | null
 }
 

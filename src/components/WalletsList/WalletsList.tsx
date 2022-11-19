@@ -42,6 +42,7 @@ const WalletsList: React.FC<IWalletsList> = (props) => {
     onScroll,
     handleClick,
     isRedirect,
+    showSkeletons
   } = props
 
   const renderWallet = ({ index, style, key }: ListRowProps): React.ReactNode => {
@@ -90,6 +91,7 @@ const WalletsList: React.FC<IWalletsList> = (props) => {
             handleClick={handleClick}
             isRedirect={isRedirect}
             wallet={wallet}
+            enableSkeleton={showSkeletons}
           />
         </div>
       )

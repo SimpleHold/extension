@@ -27,7 +27,7 @@ const getBackground = (type: 'light' | 'gray'): string => {
 }
 
 const Container = styled.div`
-  width: ${({ width }: TContainerProps) => width ? `${width}px` : 'auto'};
+  width: ${({ width }: TContainerProps) => (width ? `${width}px` : 'auto')};
   height: ${({ height }: TContainerProps) => `${height}px`};
   margin-top: ${({ mt }: TContainerProps) => (mt ? `${mt}px` : '0')};
   margin-bottom: ${({ mb }: TContainerProps) => (mb ? `${mb}px` : '0')};
@@ -37,7 +37,7 @@ const Container = styled.div`
 `
 
 const Styles = {
-  Container
+  Container,
 }
 
 export default Styles

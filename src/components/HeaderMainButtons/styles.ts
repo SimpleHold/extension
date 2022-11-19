@@ -24,7 +24,6 @@ const Animations = styled.div`
   }
 
   .buttons-exit-active {
-
     opacity: 0;
     transition: all 200ms;
   }
@@ -47,9 +46,7 @@ const Container = styled.div`
   border-radius: 16px;
 `
 
-const ControlsLeft = styled.div`
-
-`
+const ControlsLeft = styled.div``
 
 const ControlsRight = styled.div`
   display: flex;
@@ -70,9 +67,7 @@ const Button = styled.div`
   }
 `
 
-const Icon = styled.img`
-  
-`
+const Icon = styled.img``
 
 const Label = styled.span`
   font-family: Inter, sans-serif;
@@ -80,7 +75,7 @@ const Label = styled.span`
   font-weight: 500;
   font-size: 13px;
   line-height: 16px;
-  color: #FFFFFF;
+  color: #ffffff;
 `
 
 const Styles = {

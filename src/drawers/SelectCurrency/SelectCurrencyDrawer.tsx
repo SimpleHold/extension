@@ -21,7 +21,6 @@ interface Props {
 }
 
 const SelectCurrencyDrawer: React.FC<Props> = ({ isActive, onClose, wallets, isRedirect }) => {
-
   const [searchValue, setSearchValue] = React.useState<string>('')
 
   const getFilterWalletsList = wallets?.filter((wallet: IWallet) => {
@@ -35,8 +34,15 @@ const SelectCurrencyDrawer: React.FC<Props> = ({ isActive, onClose, wallets, isR
   })
 
   return (
-    <DrawerWrapper title='Select Currency' isActive={isActive} onClose={onClose} height={544} padding={'30px 0'}
-                   withoutDimScreen withCloseIcon>
+    <DrawerWrapper
+      title="Select Currency"
+      isActive={isActive}
+      onClose={onClose}
+      height={544}
+      padding={'30px 0'}
+      withoutDimScreen
+      withCloseIcon
+    >
       <Styles.Wrapper>
         <Styles.SearchContainer>
           <SearchBar
@@ -45,9 +51,7 @@ const SelectCurrencyDrawer: React.FC<Props> = ({ isActive, onClose, wallets, isR
             placeholder={'Enter wallet name'}
           />
         </Styles.SearchContainer>
-        <WalletsList wallets={getFilterWalletsList || []}
-                     isRedirect={isRedirect}
-        />
+        <WalletsList wallets={getFilterWalletsList || []} isRedirect={isRedirect} />
       </Styles.Wrapper>
     </DrawerWrapper>
   )

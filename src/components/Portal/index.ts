@@ -1,3 +1,3 @@
-import Portal from "./Portal";
+import Portal from './Portal'
 
-export default Portal;
+export default Portal

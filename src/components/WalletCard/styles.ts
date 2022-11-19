@@ -37,7 +37,7 @@ const Card = styled.div`
   align-items: center;
   user-select: none;
   padding-bottom: 10px;
-  border-bottom: 1px solid #F3F3F3;
+  border-bottom: 1px solid #f3f3f3;
 `
 
 const Row = styled.div`
@@ -87,7 +87,7 @@ const Address = styled.p`
   font-weight: 500;
   font-size: 13px;
   line-height: 20px;
-  color: #B0B0BD;
+  color: #b0b0bd;
 `
 
 const Balances = styled.div`
@@ -131,7 +131,7 @@ const Estimated = styled.p`
   font-size: 13px;
   line-height: 20px;
   text-align: right;
-  color: #B0B0BD;
+  color: #b0b0bd;
 `
 
 const ActivateBlock = styled.div`

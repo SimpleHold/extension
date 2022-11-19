@@ -61,7 +61,7 @@ const Wrapper = styled.div`
 
   .container {
     padding: ${({ theme }: TThemeProps) =>
-            theme === 'swapspace' ? '240px 30px 0 30px' : '20px 30px 0 30px'};
+      theme === 'swapspace' ? '240px 30px 0 30px' : '20px 30px 0 30px'};
   }
 
   .slide {
@@ -99,7 +99,7 @@ const Title = styled.p`
   font-size: 22px;
   line-height: 27px;
   text-align: center;
-  color: #1D1D22;
+  color: #1d1d22;
 `
 
 const Description = styled.p`
@@ -110,7 +110,7 @@ const Description = styled.p`
   font-size: 16px;
   line-height: 25px;
   text-align: center;
-  color: #74758C;
+  color: #74758c;
 `
 
 const Footer = styled.div`
@@ -183,10 +183,10 @@ const Buttons = styled.div`
   }
 
   > div .button {
-    background-color: #F2F4F8;
+    background-color: #f2f4f8;
 
     .label {
-      color: #3FBB7D;
+      color: #3fbb7d;
     }
   }
 `
@@ -251,7 +251,7 @@ const Styles = {
   RestoreButtonContainer,
   HoverActionText,
   Text,
-  TermsLink
+  TermsLink,
 }
 
 export default Styles

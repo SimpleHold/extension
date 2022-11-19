@@ -1,3 +1,3 @@
-import PolicyPopup from "./PolicyPopup";
+import PolicyPopup from './PolicyPopup'
 
-export default PolicyPopup;
+export default PolicyPopup

@@ -33,7 +33,6 @@ export type TAccountInfo = {
   representative_block: string
 }
 
-
 export type TReceiveBlock = {
   address: string
   pubKey: string

@@ -64,10 +64,6 @@ export const getBalances = async (
   wallets: TGetBalanceWalletProps[],
   options: TGetBalanceOptions = {}
 ): Promise<IGetBalances[] | null> => {
-  if (wallets.length > 1) {
-    setItem('enable_skeletons', 'true')
-  }
-
   try {
     const mapWallets = wallets.map((wallet) => {
       const tokenSymbol = wallet.chain ? wallet.symbol : undefined

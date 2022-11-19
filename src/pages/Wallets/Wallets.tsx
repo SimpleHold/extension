@@ -68,6 +68,7 @@ const Wallets: React.FC = () => {
   const [isListScrollable, setIsListScrollable] = React.useState(false)
 
   const [listType, setListType] = React.useState<'send' | 'receive' | null>(null)
+  const [showSkeletons, setShowSkeletons] = React.useState(false)
   const [isShowNft, setIsShowNfts] = React.useState(false)
 
   const [isIdle, setIsIdle] = React.useState(false)
@@ -223,11 +224,16 @@ const Wallets: React.FC = () => {
     let wallets = getFilteredWallets()
     const lastUpdate = getItem('last_balances_request')
     const isTimePassed = !lastUpdate || checkIfTimePassed(+lastUpdate, balanceRefreshTime)
-    const isFetchReady = getItem('initial_balances_request') || (!isIdle && isTimePassed)
+    const isInitialRequest = getItem('initial_balances_request')
+    const isFetchReady = isInitialRequest || (!isIdle && isTimePassed)
+    if (isInitialRequest) {
+      setShowSkeletons(true)
+    }
     if (isFetchReady) {
       setItem('last_balances_request', String(Date.now()))
       await getBalances(wallets)
     }
+    setShowSkeletons(false)
   }
 
   const setInitialBalance = (wallets: IWallet[]) => {
@@ -380,6 +386,7 @@ const Wallets: React.FC = () => {
             sumBalanceCallback={sumBalanceCallback}
             sumEstimatedCallback={sumEstimatedCallback}
             sumPendingCallback={sumPendingCallback}
+            showSkeletons={showSkeletons}
           />
         </Styles.WalletsListContainer>
       </Styles.Wrapper>

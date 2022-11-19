@@ -37,15 +37,8 @@ interface Props {
 }
 
 const WalletHeading: React.FC<Props> = (props) => {
-  const {
-    symbol,
-    onSelectDropdown,
-    withPhrase,
-    walletName,
-    onRenameWallet,
-    isHidden,
-    hardware,
-  } = props
+  const { symbol, onSelectDropdown, withPhrase, walletName, onRenameWallet, isHidden, hardware } =
+    props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
 

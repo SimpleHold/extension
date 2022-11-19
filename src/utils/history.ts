@@ -3,7 +3,12 @@ import { groupBy, pick } from 'lodash'
 
 // Utils
 import { getItem, getJSON, setItem } from '@utils/storage'
-import { filterWallets, getWalletChain, getWallets, updateWalletHistoryFetchStatus } from '@utils/wallet'
+import {
+  filterWallets,
+  getWalletChain,
+  getWallets,
+  updateWalletHistoryFetchStatus,
+} from '@utils/wallet'
 import { fetchFullTxHistory } from '@utils/api'
 import { toLower } from '@utils/format'
 
@@ -27,11 +32,10 @@ export type THistoryUpdateOptions = {
   pickSingleWallet?: TTxWallet
 }
 
-export const updateTxsHistory = async (
-  {
-    getWalletsOptions,
-    pickSingleWallet,
-  }: THistoryUpdateOptions = {}) => {
+export const updateTxsHistory = async ({
+  getWalletsOptions,
+  pickSingleWallet,
+}: THistoryUpdateOptions = {}) => {
   const { applyFilters } = getWalletsOptions || {}
 
   try {
@@ -63,7 +67,7 @@ export const updateTxsHistory = async (
             contractAddress,
           }
         })
-        .filter(wallet => wallet.address)
+        .filter((wallet) => wallet.address)
     }
     const data = await fetchFullTxHistory(payload)
     if (!data.length) return
@@ -71,11 +75,10 @@ export const updateTxsHistory = async (
     const compare = compareFullHistory(data)
 
     if (compare.length) {
-      const mapData = compare.flatMap(data => data.txs)
+      const mapData = compare.flatMap((data) => data.txs)
       saveFullHistory(mapData)
     }
   } catch {
-
   } finally {
     sessionStorage.removeItem('history_fetch_pending')
   }
@@ -108,11 +111,11 @@ export const groupHistory = (txs: TTxFullInfo[]): THistoryTxGroup[] => {
   const data: THistoryTxGroup[] = []
 
   const sortTxs = txs.sort(
-    (a: TTxFullInfo, b: TTxFullInfo) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    (a: TTxFullInfo, b: TTxFullInfo) => new Date(b.date).getTime() - new Date(a.date).getTime()
   )
 
   const result = groupBy(sortTxs, (item: TTxFullInfo) =>
-    dayjs(item.date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+    dayjs(item.date, 'YYYY-MM-DD').format('YYYY-MM-DD')
   )
 
   for (const i in result) {
@@ -144,7 +147,7 @@ export const updateStats = (): void => {
     JSON.stringify({
       amount: newAmount,
       lastUpdate: new Date().getTime(),
-    }),
+    })
   )
 }
 
@@ -158,16 +161,14 @@ export const compareFullHistory = (items: TFullTxWallet[]): TFullTxWallet[] => {
       const { address, chain, symbol, tokenSymbol, contractAddress } = item
 
       const findTxs = item.txs.filter((i) =>
-        getHistory.find(
-          (ii: TTxFullInfo) => {
-            const hashMatch = ii.hash === i.hash
-            const symbolMatch = ii.symbol === symbol
-            const chainMatch = ii.chain === chain
-            const isPending = ii.isPending
-            const fullMatch = hashMatch && symbolMatch && chainMatch && isPending
-            return !fullMatch
-          },
-        ),
+        getHistory.find((ii: TTxFullInfo) => {
+          const hashMatch = ii.hash === i.hash
+          const symbolMatch = ii.symbol === symbol
+          const chainMatch = ii.chain === chain
+          const isPending = ii.isPending
+          const fullMatch = hashMatch && symbolMatch && chainMatch && isPending
+          return !fullMatch
+        })
       )
       if (findTxs.length) {
         data.push({
@@ -234,7 +235,7 @@ const filterHistoryByStatus = (item: TTxFullInfo, status: string): boolean => {
 const filterHistoryByCurrencies = (
   currencies: string | null,
   addresses: string | null,
-  item: TTxFullInfo,
+  item: TTxFullInfo
 ) => {
   if (!currencies && !addresses) {
     return item
@@ -242,7 +243,7 @@ const filterHistoryByCurrencies = (
 
   if (currencies?.length && !addresses) {
     return JSON.parse(currencies).find(
-      (currency: TCurrency) => toLower(currency.symbol) === toLower(item.symbol),
+      (currency: TCurrency) => toLower(currency.symbol) === toLower(item.symbol)
     )
   }
 
@@ -250,7 +251,7 @@ const filterHistoryByCurrencies = (
     return JSON.parse(addresses).find(
       (wallet: IWallet) =>
         toLower(wallet.symbol) === toLower(item.symbol) &&
-        toLower(wallet.address) === toLower(item.address),
+        toLower(wallet.address) === toLower(item.address)
     )
   }
 }
@@ -280,23 +281,22 @@ export const getFullHistory = (): TTxFullInfo[] => {
   return []
 }
 
-export const findWalletTxHistory = ({ symbol, chain, address }: TFindWalletHistory): TAddressTx[] => {
+export const findWalletTxHistory = ({
+  symbol,
+  chain,
+  address,
+}: TFindWalletHistory): TAddressTx[] => {
   const fullHistory: TTxFullInfo[] | undefined = getJSON('full_history')
   if (!fullHistory) {
     return []
   }
   const filteredHistory = fullHistory.filter((tx) => {
-    return (
-      tx.symbol === symbol
-      && tx.address === address
-      && tx.chain === chain
-    )
+    return tx.symbol === symbol && tx.address === address && tx.chain === chain
   })
 
-  const mapHistory: TAddressTx[] = filteredHistory.map(tx => {
+  const mapHistory: TAddressTx[] = filteredHistory.map((tx) => {
     return pick(tx, ['type', 'hash', 'amount', 'date', 'isPending', 'estimated'])
   })
 
   return mapHistory
 }
-
