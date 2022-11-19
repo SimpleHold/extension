@@ -24,10 +24,11 @@ interface Props {
   pendingBalance: null | number
   onClickReceive: () => void
   onClickSend: () => void
+  showSkeletons: boolean
 }
 
 const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
-  const { isCollapsed, balance, estimated, pendingBalance, onClickReceive, onClickSend } = props
+  const { isCollapsed, balance, estimated, pendingBalance, onClickReceive, onClickSend, showSkeletons } = props
 
   const containerHeight = isCollapsed ? 123 : 276
 
@@ -58,7 +59,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
         <Skeleton
           width={balanceSkeletonWidth}
           height={balanceFontSize}
-          isLoading={balance === null}
+          isLoading={showSkeletons || balance === null}
           type="light"
           mt={balanceRowMarginTop}
         >
@@ -88,7 +89,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
         <Skeleton
           width={120}
           height={estimatedLineHeight}
-          isLoading={estimated === null}
+          isLoading={showSkeletons || estimated === null}
           mt={estimatedMarginTop}
           type="light"
         >
@@ -106,7 +107,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
           ) : null}
         </Skeleton>
 
-        {pendingBalance !== null && Number(pendingBalance) > 0 ? (
+        {!showSkeletons && pendingBalance !== null && Number(pendingBalance) > 0 ? (
           <Styles.PendingBalanceRow
             style={{
               height: pendingBalanceRowHeight,

@@ -376,6 +376,7 @@ const Wallets: React.FC = () => {
           pendingBalance={state.pendingBalance}
           onClickReceive={setListOnClickHandler('receive')}
           onClickSend={setListOnClickHandler('send')}
+          showSkeletons={showSkeletons}
         />
         <Styles.WalletsListContainer
           style={{ top: walletsTop, zIndex: 2 }}
