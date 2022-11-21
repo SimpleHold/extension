@@ -176,7 +176,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
                 <Skeleton width={110} height={16} type="gray" br={4} isLoading={!!enableSkeleton}>
                   <Styles.BalanceRow>
                     <Styles.Balance>
-                      {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
+                      {`${getFormatBalance(balance) || 0} ${toUpper(symbol)}`}
                     </Styles.Balance>
                     {pendingBalance !== 0 ? (
                       <Styles.PendingIcon>
