@@ -10,6 +10,7 @@ import Skeleton from '@components/Skeleton'
 import { toUpper, numberFriendly, getFormatEstimated, getFormatBalance } from '@utils/format'
 import { logEvent } from '@utils/metrics'
 import { getLatestBalance, IWallet, THardware } from '@utils/wallet'
+import { getItem } from '@utils/storage'
 
 // Config
 import { getSharedToken, getToken } from '@tokens/index'
@@ -44,6 +45,7 @@ interface Props {
   hardware?: THardware
   isNotActivated?: boolean
   isRedirect?: string
+  enableSkeleton?: boolean
   wallet: IWallet
 }
 
@@ -72,6 +74,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     hardware,
     isNotActivated,
     isRedirect,
+    enableSkeleton,
     wallet,
   } = props
 
@@ -80,8 +83,6 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     props.contractAddress ||
     sharedToken?.address ||
     (chain ? getToken(symbol, chain)?.address : undefined)
-
-  const enableSkeletons = false
 
   const currency = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 
@@ -93,7 +94,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
 
   React.useEffect(() => {
     loadBalance()
-  }, [])
+  }, [enableSkeleton])
 
   const loadBalance = async (): Promise<void> => {
     const savedData = getLatestBalance(address, symbol)
@@ -172,7 +173,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
             </Styles.AddressInfo>
             {!isNotActivated ? (
               <Styles.Balances>
-                <Skeleton width={110} height={16} type="gray" br={4} isLoading={enableSkeletons}>
+                <Skeleton width={110} height={16} type="gray" br={4} isLoading={!!enableSkeleton}>
                   <Styles.BalanceRow>
                     <Styles.Balance>
                       {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
@@ -190,7 +191,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
                   type="gray"
                   mt={7}
                   br={4}
-                  isLoading={enableSkeletons}
+                  isLoading={!!enableSkeleton}
                 >
                   <Styles.Estimated>{`$ ${getFormatEstimated(
                     estimated,

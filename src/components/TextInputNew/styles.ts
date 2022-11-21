@@ -23,7 +23,7 @@ type TEyeIconPRops = {
 const Container = styled.div`
   margin: 14px 16px;
   height: 32px;
-  background: #F5F5F7;
+  background: #f5f5f7;
   border: ${({ isFocused, isError }: TContainerProps) =>
     isFocused || isError ? `1px solid ${isFocused ? '#3FBB7D' : '#EB5757'}` : '1px solid #F5F5F7'};
   border-radius: 8px;
@@ -92,9 +92,9 @@ const Input = styled.input`
   //line-height: 22px;
 
   ::placeholder {
-    color: #B0B0BD;
+    color: #b0b0bd;
   }
-  
+
   &:disabled {
     background-color: #ffffff !important;
     color: #1d1d22;

@@ -1,13 +1,13 @@
-import styled from "styled-components";
+import styled from 'styled-components'
 
 type TContainerProps = {
-  isFocused: boolean;
-};
+  isFocused: boolean
+}
 
 const Container = styled.div`
   padding: 8px;
-  background-color: #F5F5F7;
-  border: 1px solid #F5F5F7;
+  background-color: #f5f5f7;
+  border: 1px solid #f5f5f7;
   border-radius: 10px;
   display: flex;
   flex-direction: row;
@@ -16,13 +16,12 @@ const Container = styled.div`
   transition: all 0.2s ease-in-out;
 
   input {
-    background-color: #F5F5F7;
+    background-color: #f5f5f7;
   }
 
   .search-icon {
     path {
-      stroke: ${({ isFocused }: TContainerProps) =>
-        isFocused ? "#3fbb7d" : "#BDC4D4"};
+      stroke: ${({ isFocused }: TContainerProps) => (isFocused ? '#3fbb7d' : '#BDC4D4')};
     }
   }
 
@@ -34,12 +33,12 @@ const Container = styled.div`
         stroke: #3fbb7d;
       }
     }
-    
+
     .search-button {
-      background-color: #F7F8FA;
+      background-color: #f7f8fa;
     }
   }
-`;
+`
 
 const Input = styled.input`
   margin: 0 0 0 10px;
@@ -53,26 +52,25 @@ const Input = styled.input`
   width: 100%;
 
   ::placeholder {
-    color: #B0B0BD;
+    color: #b0b0bd;
   }
-  
+
   &:hover {
     cursor: pointer;
   }
-`;
+`
 
 const Row = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
   flex: 1;
-`;
-
+`
 
 const Styles = {
   Container,
   Input,
   Row,
-};
+}
 
-export default Styles;
+export default Styles

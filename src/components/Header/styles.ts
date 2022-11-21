@@ -21,7 +21,7 @@ const Container = styled.div`
   align-items: center;
   width: 100%;
   border-bottom: ${({ withBorder, borderColor }: TContainerProps) =>
-          withBorder ? `0.5px solid ${borderColor || '#EAEAEA'}` : 'none'};
+    withBorder ? `0.5px solid ${borderColor || '#EAEAEA'}` : 'none'};
   z-index: 100;
   position: ${({ isAbsolute }: TContainerProps) => (isAbsolute ? 'absolute' : 'relative')};
 `
@@ -42,19 +42,14 @@ const Logo = styled.div`
     fill: ${({ whiteLogo }: TLogoProps) => whiteLogo && '#fff'};
 
     &:nth-child(2) {
-      opacity: ${({ whiteLogo }: TLogoProps) => whiteLogo ? 0.38 : 1};
+      opacity: ${({ whiteLogo }: TLogoProps) => (whiteLogo ? 0.38 : 1)};
     }
-  ;
-
     &:nth-child(3) {
-      opacity: ${({ whiteLogo }: TLogoProps) => whiteLogo ? 0.68 : 1};
+      opacity: ${({ whiteLogo }: TLogoProps) => (whiteLogo ? 0.68 : 1)};
     }
-  ;
-
     &:nth-child(4) {
-      opacity: ${({ whiteLogo }: TLogoProps) => whiteLogo ? 0.49 : 1};
+      opacity: ${({ whiteLogo }: TLogoProps) => (whiteLogo ? 0.49 : 1)};
     }
-  ;
   }
 `
 

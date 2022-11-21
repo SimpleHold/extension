@@ -9,17 +9,15 @@ const Container = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  padding: ${({ isCollapsed }: TProps) => isCollapsed ? '0 10px' : '16px 16px'};
-  position: ${({ isCollapsed }: TProps) => isCollapsed ? 'absolute' : 'absolute'};
-  top: ${({ isCollapsed }: TProps) => isCollapsed ? '-55px' : 0};
+  padding: ${({ isCollapsed }: TProps) => (isCollapsed ? '0 10px' : '16px 16px')};
+  position: ${({ isCollapsed }: TProps) => (isCollapsed ? 'absolute' : 'absolute')};
+  top: ${({ isCollapsed }: TProps) => (isCollapsed ? '-55px' : 0)};
   border-radius: 24px 24px 0 0;
   z-index: 9;
   overflow: hidden;
 `
 
-const ControlsLeft = styled.div`
-
-`
+const ControlsLeft = styled.div``
 
 const ControlsRight = styled.div`
   display: flex;
@@ -28,7 +26,7 @@ const ControlsRight = styled.div`
 const Styles = {
   Container,
   ControlsLeft,
-  ControlsRight
+  ControlsRight,
 }
 
 export default Styles

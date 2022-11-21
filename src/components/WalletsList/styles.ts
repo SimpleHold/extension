@@ -3,7 +3,7 @@ import styled from 'styled-components'
 const Wrapper = styled.div`
   height: 600px;
   transition: 0.5s ease;
-  background-color: #3FBB7D;
+  background-color: #3fbb7d;
 `
 
 const WalletsList = styled.div`
@@ -16,9 +16,9 @@ const WalletsList = styled.div`
       padding: 12px 0;
       background-color: initial;
       border-radius: 16px 16px 0 0;
-      border-bottom: 1px solid #F3F3F3;
+      border-bottom: 1px solid #f3f3f3;
     }
-  } 
+  }
 
   .ReactVirtualized__List {
     transition: 0.4s ease-in;
@@ -58,9 +58,7 @@ const List = {
   backgroundColor: '#fff',
 }
 
-const ListItem = {
-
-}
+const ListItem = {}
 
 const Styles = {
   Wrapper,

@@ -99,7 +99,7 @@ const providers: TProvider[] = [
   // sxp,
 ]
 
-const getProvider = (symbol: string, tokenChain?: string): TProvider | null => {
+export const getProvider = (symbol: string, tokenChain?: string): TProvider | null => {
   if (tokenChain) {
     if (tokenChain === 'terra-classic') {
       return terra

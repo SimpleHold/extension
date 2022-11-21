@@ -1,23 +1,23 @@
 type TInput = {
-  [type: string]: number;
-};
+  [type: string]: number
+}
 
 type TInputValue = {
-  inputs: TInput;
-  outputs: TInput;
-};
+  inputs: TInput
+  outputs: TInput
+}
 
 const checkUInt53 = (n: number) => {
   if (n < 0 || n > Number.MAX_SAFE_INTEGER || n % 1 !== 0) {
-    throw new RangeError('value out of range');
+    throw new RangeError('value out of range')
   }
-};
+}
 
 const varIntLength = (number: number): number => {
-  checkUInt53(number);
+  checkUInt53(number)
 
-  return number < 0xfd ? 1 : number <= 0xffff ? 3 : number <= 0xffffffff ? 5 : 9;
-};
+  return number < 0xfd ? 1 : number <= 0xffff ? 3 : number <= 0xffffffff ? 5 : 9
+}
 
 const types: TInputValue = {
   inputs: {
@@ -34,53 +34,53 @@ const types: TInputValue = {
     P2WPKH: 31 * 4,
     P2WSH: 43 * 4,
   },
-};
+}
 
 const getByteCount = (inputs: TInput, outputs: TInput): number => {
-  let totalWeight = 0;
-  let hasWitness = false;
-  let inputCount = 0;
-  let outputCount = 0;
+  let totalWeight = 0
+  let hasWitness = false
+  let inputCount = 0
+  let outputCount = 0
 
   Object.keys(inputs).forEach((key) => {
-    checkUInt53(inputs[key]);
+    checkUInt53(inputs[key])
     if (key.slice(0, 8) === 'MULTISIG') {
-      const keyParts = key.split(':');
+      const keyParts = key.split(':')
       if (keyParts.length !== 2) {
-        throw new Error('invalid input: ' + key);
+        throw new Error('invalid input: ' + key)
       }
-      const newKey = keyParts[0];
+      const newKey = keyParts[0]
       const mAndN = keyParts[1].split('-').map(function (item) {
-        return parseInt(item);
-      });
+        return parseInt(item)
+      })
 
-      totalWeight += types.inputs[newKey] * inputs[key];
-      const multiplyer = newKey === 'MULTISIG-P2SH' ? 4 : 1;
-      totalWeight += (73 * mAndN[0] + 34 * mAndN[1]) * multiplyer * inputs[key];
+      totalWeight += types.inputs[newKey] * inputs[key]
+      const multiplyer = newKey === 'MULTISIG-P2SH' ? 4 : 1
+      totalWeight += (73 * mAndN[0] + 34 * mAndN[1]) * multiplyer * inputs[key]
     } else {
-      totalWeight += types.inputs[key] * inputs[key];
+      totalWeight += types.inputs[key] * inputs[key]
     }
-    inputCount += inputs[key];
+    inputCount += inputs[key]
     if (key.indexOf('W') >= 0) {
-      hasWitness = true;
+      hasWitness = true
     }
-  });
+  })
 
   Object.keys(outputs).forEach((key) => {
-    checkUInt53(outputs[key]);
-    totalWeight += types.outputs[key] * outputs[key];
-    outputCount += outputs[key];
-  });
+    checkUInt53(outputs[key])
+    totalWeight += types.outputs[key] * outputs[key]
+    outputCount += outputs[key]
+  })
 
   if (hasWitness) {
-    totalWeight += 2;
+    totalWeight += 2
   }
 
-  totalWeight += 8 * 4;
-  totalWeight += varIntLength(inputCount) * 4;
-  totalWeight += varIntLength(outputCount) * 4;
+  totalWeight += 8 * 4
+  totalWeight += varIntLength(inputCount) * 4
+  totalWeight += varIntLength(outputCount) * 4
 
-  return Math.ceil(totalWeight / 4);
-};
+  return Math.ceil(totalWeight / 4)
+}
 
-export default getByteCount;
+export default getByteCount

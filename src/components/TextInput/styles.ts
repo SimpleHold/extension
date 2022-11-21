@@ -20,11 +20,11 @@ type TEyeIconPRops = {
   isVisible: boolean
 }
 
-const Container = styled.div`
+const Container = styled.div<TContainerProps>`
   height: 60px;
   background: #ffffff;
-  border: ${({ isFocused, isError }: TContainerProps) =>
-    isFocused || isError ? `1px solid ${isFocused ? '#3FBB7D' : '#EB5757'}` : '1px solid #DEE1E9'};
+  border: ${({ isFocused, isError }) =>
+    isFocused || isError ? `1px solid ${isError ? '#EB5757' : '#3FBB7D'}` : '1px solid #DEE1E9'};
   border-radius: 8px;
   display: flex;
   flex-direction: row;
@@ -32,17 +32,16 @@ const Container = styled.div`
   justify-content: space-between;
   margin: 0 0 10px 0;
   padding: 0 16px;
-  padding-right: ${({ pr }: TContainerProps) => `${pr}px`};
+  padding-right: ${({ pr }) => `${pr}px`};
   position: relative;
   user-select: none;
 
   label {
-    color: ${({ isFocused, isError }: TContainerProps) =>
-      isError && !isFocused ? '#EB5757' : '#7D7E8D'};
+    color: ${({ isError }) => (isError ? '#EB5757' : '#7D7E8D')};
   }
 
   &:hover {
-    cursor: ${({ disabled }: TContainerProps) => (disabled ? 'default' : 'pointer')};
+    cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
   }
 `
 

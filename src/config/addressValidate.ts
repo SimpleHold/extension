@@ -10,8 +10,7 @@ const currencies: TCurrency[] = [
   },
   {
     coins: ['bch'],
-    mask:
-      '^([13][a-km-zA-HJ-NP-Z1-9]{25,34})$|^((bitcoincash:)?(q|p)[a-z0-9]{41})$|^((BITCOINCASH:)?(Q|P)[A-Z0-9]{41})$',
+    mask: '^([13][a-km-zA-HJ-NP-Z1-9]{25,34})$|^((bitcoincash:)?(q|p)[a-z0-9]{41})$|^((BITCOINCASH:)?(Q|P)[A-Z0-9]{41})$',
   },
   {
     coins: ['bsv'],

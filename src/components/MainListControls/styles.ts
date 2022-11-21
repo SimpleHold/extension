@@ -10,16 +10,16 @@ const Animations = styled.div`
   .folded-enter {
     opacity: 0;
   }
-  
+
   .folded-enter-active {
     opacity: 1;
     transition: all 400ms;
   }
-  
+
   .folded-exit {
     opacity: 1;
   }
-  
+
   .folded-exit-active {
     opacity: 0;
     top: -10px;
@@ -31,7 +31,7 @@ const Animations = styled.div`
     opacity: 0;
     transform: scale(1.2);
   }
-  
+
   .unfolded-enter-active {
     opacity: 1;
     transform: scale(1);
@@ -41,7 +41,7 @@ const Animations = styled.div`
   .unfolded-exit {
     opacity: 1;
   }
-  
+
   .unfolded-exit-active {
     opacity: 0;
     transition: all 180ms;

@@ -7,7 +7,8 @@ type TProps = {
 
 const Container = styled.div`
   border-radius: 22px;
-  background: ${({ invertColors }: TProps) => invertColors ? 'rgba(255, 255, 255, 0.2)' : '#F5F5F7'};
+  background: ${({ invertColors }: TProps) =>
+    invertColors ? 'rgba(255, 255, 255, 0.2)' : '#F5F5F7'};
   transition: all 0.3s;
   width: 36px;
   height: 36px;
@@ -46,7 +47,7 @@ const FiltersActiveDot = styled.div`
 
 const Styles = {
   Container,
-  FiltersActiveDot
+  FiltersActiveDot,
 }
 
 export default Styles

@@ -218,7 +218,7 @@ export const getSingleWallet = (address: string, symbol: string, wallets?: IWall
 export const getBalanceDiff = (
   latestBalance: number | null,
   balance: number,
-  precisionDigits: number = 7
+  precisionDigits = 7
 ) => {
   const formatLatest = toFixedWithoutRound(latestBalance || 0, precisionDigits)
   const formatNew = toFixedWithoutRound(balance, precisionDigits)
@@ -273,7 +273,7 @@ export const updateWalletHistoryFetchStatus = (
 export const getLatestBalance = (address: string, symbol: string): TBalanceData => {
   const wallets = getWallets()
 
-  let data: TBalanceData = {
+  const data: TBalanceData = {
     balance: 0,
     balance_usd: 0,
     balance_btc: 0,

@@ -64,10 +64,6 @@ export const getBalances = async (
   wallets: TGetBalanceWalletProps[],
   options: TGetBalanceOptions = {}
 ): Promise<IGetBalances[] | null> => {
-  if (wallets.length > 1) {
-    setItem('enable_skeletons', 'true')
-  }
-
   try {
     const mapWallets = wallets.map((wallet) => {
       const tokenSymbol = wallet.chain ? wallet.symbol : undefined
@@ -106,7 +102,7 @@ export const getBalances = async (
       const isPendingStatusChanged = !!savedData.pending !== !!balanceInfo.pending
       const isBalanceChanged = balanceDiff || isPendingStatusChanged
 
-      if (isBalanceChanged) {
+      if (isBalanceChanged && !getItem('initial_balances_request')) {
         if (balanceDiff) {
           const wallet = getSingleWallet(address, symbol)
           if (wallet?.lastBalanceCheck) {

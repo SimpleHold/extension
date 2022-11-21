@@ -25,11 +25,11 @@ export const validateWallet = (wallets: string | null) => {
 export const validateUrl = (url: string): boolean => {
   const pattern = new RegExp(
     '^(https?:\\/\\/)?' +
-    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
-    '((\\d{1,3}\\.){3}\\d{1,3}))' +
-    '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
-    '(\\?[;&a-z\\d%_.~+=-]*)?' +
-    '(\\#[-a-z\\d_]*)?$',
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' +
+      '((\\d{1,3}\\.){3}\\d{1,3}))' +
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' +
+      '(\\?[;&a-z\\d%_.~+=-]*)?' +
+      '(\\#[-a-z\\d_]*)?$',
     'i'
   )
   return !!pattern.test(url)
@@ -38,7 +38,7 @@ export const validateUrl = (url: string): boolean => {
 export const validateMany = (checks: { [key: string]: number | boolean }) => {
   const values = Object.values(checks)
   for (const value of values) {
-    if (!value) return false;
+    if (!value) return false
   }
   return true
 }

@@ -1,7 +1,7 @@
 import amplitudeSDK from 'amplitude-js'
 
 // Config
-import config from "@config/index"
+import config from '@config/index'
 import { ERROR_CREATE_TX, ERROR_GENERATE_ADDRESS, ERROR_IMPORT_PRIVATE_KEY } from '@config/events'
 
 // Utils
@@ -18,12 +18,12 @@ interface IEvent {
 const isDisabled = config.isDevMode
 
 export const init = (apiKey: string, clientId: string) => {
-  if (isDisabled) return;
+  if (isDisabled) return
   amplitudeSDK.getInstance().init(apiKey, clientId)
 }
 
 export const logEvent = ({ name, properties = {} }: IEvent) => {
-  if (isDisabled) return;
+  if (isDisabled) return
   properties = {
     ...properties,
     ...{
@@ -52,59 +52,43 @@ export const setUserAddressesProperties = () => {
   }
 }
 
-
 // Log errors
-export const logErrorCreateTx = (
-  error: string,
-  symbol: string,
-  tokenChain?: string,
-) => {
-
+export const logErrorCreateTx = (error: string, symbol: string, tokenChain?: string) => {
   const properties = {
     error,
     symbol,
-    ...(tokenChain && {tokenChain})
+    ...(tokenChain && { tokenChain }),
   }
 
   logEvent({
     name: ERROR_CREATE_TX,
-    properties
+    properties,
   })
 }
 
-export const logErrorGenerateAddress = (
-  error: string,
-  symbol: string,
-  chain?: string,
-) => {
-
+export const logErrorGenerateAddress = (error: string, symbol: string, chain?: string) => {
   const properties = {
     error,
     symbol,
-    ...(chain && {chain})
+    ...(chain && { chain }),
   }
 
   logEvent({
     name: ERROR_GENERATE_ADDRESS,
-    properties
+    properties,
   })
 }
 
-export const logErrorImportPrivateKey = (
-  error: string,
-  symbol: string,
-  chain?: string,
-) => {
-
+export const logErrorImportPrivateKey = (error: string, symbol: string, chain?: string) => {
   const properties = {
     error,
     symbol,
-    ...(chain && {chain})
+    ...(chain && { chain }),
   }
 
   logEvent({
     name: ERROR_IMPORT_PRIVATE_KEY,
-    properties
+    properties,
   })
 }
 

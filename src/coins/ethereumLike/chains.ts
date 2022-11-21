@@ -10,8 +10,7 @@ const chains: TChain[] = [
   },
   {
     chain: 'etc',
-    explorerLink:
-      'https://blockscout.com/etc/mainnet/address/ADDR/transactions',
+    explorerLink: 'https://blockscout.com/etc/mainnet/address/ADDR/transactions',
     tokenExplorerLink: '',
     txLink: 'https://blockscout.com/etc/mainnet/tx/HASH/internal-transactions',
   },

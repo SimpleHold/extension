@@ -26,15 +26,9 @@ type TTab = {
 }
 
 const BottomMenuBar: React.FC<Props> = (props) => {
-
   const [activeTab, setActiveTab] = React.useState<TTabTitle>('wallets')
 
-  const {
-    onClickWallets,
-    onClickSwap,
-    onViewTxHistory,
-    onOpenSettings,
-  } = props
+  const { onClickWallets, onClickSwap, onViewTxHistory, onOpenSettings } = props
 
   const onWallets = () => {
     setActiveTab('wallets')
@@ -60,35 +54,37 @@ const BottomMenuBar: React.FC<Props> = (props) => {
     {
       title: 'wallets',
       icon: walletsIcon,
-      onClick: onWallets
+      onClick: onWallets,
     },
     {
       title: 'swap',
       icon: swapIcon,
-      onClick: onSwap
+      onClick: onSwap,
     },
     {
       title: 'history',
       icon: historyIcon,
-      onClick: onHistory
+      onClick: onHistory,
     },
     {
       title: 'settings',
       icon: settingsIcon,
-      onClick: onSettings
-    }
+      onClick: onSettings,
+    },
   ]
 
   return (
     <Styles.Container>
       {tabs.map((tab) => {
-        const {title, icon, onClick} = tab
+        const { title, icon, onClick } = tab
         const isActive = activeTab === title
 
-        return <Styles.Button key={`${title}`} onClick={onClick} isActive={isActive}>
-          <SVG src={icon} width={24} height={24} />
-          <Styles.Label isActive={isActive}>{title}</Styles.Label>
-        </Styles.Button>
+        return (
+          <Styles.Button key={`${title}`} onClick={onClick} isActive={isActive}>
+            <SVG src={icon} width={24} height={24} />
+            <Styles.Label isActive={isActive}>{title}</Styles.Label>
+          </Styles.Button>
+        )
       })}
     </Styles.Container>
   )

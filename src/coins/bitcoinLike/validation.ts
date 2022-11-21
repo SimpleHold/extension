@@ -1,7 +1,7 @@
 export type TValidateItem = {
-  symbol: string;
-  pattern: string;
-};
+  symbol: string
+  pattern: string
+}
 
 const validation: TValidateItem[] = [
   {
@@ -29,6 +29,6 @@ const validation: TValidateItem[] = [
     symbol: 'bsv',
     pattern: '^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$',
   },
-];
+]
 
-export default validation;
+export default validation

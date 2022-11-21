@@ -1,5 +1,5 @@
 // Types
-import { TChain } from './types';
+import { TChain } from './types'
 
 const chains: TChain[] = [
   {
@@ -42,6 +42,6 @@ const chains: TChain[] = [
     decimals: 12,
     symbol: 'aca',
   },
-];
+]
 
-export default chains;
+export default chains
