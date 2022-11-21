@@ -23,13 +23,13 @@ import { getCurrencyInfo } from '@config/currencies/utils'
 import Styles from './styles'
 
 const WalletCard: React.FC = () => {
+  const [walletBalance, setWalletBalance] = React.useState<string>('')
   const [walletEstimated, setWalletEstimated] = React.useState<number | null>(null)
 
   const {
     wallet,
     setActiveDrawer,
     drawerWallets,
-    balance,
     setBalance,
     setBalanceLoading,
     isBalanceLoading,
@@ -58,13 +58,14 @@ const WalletCard: React.FC = () => {
         isFullBalance: true,
       })
 
+      checkWalletBalance(`${data.balance}`)
       setWalletBalance(`${data.balance}`)
       setWalletEstimated(data.balance_usd)
       setBalanceLoading(false)
     }
   }
 
-  const setWalletBalance = (value: string): void => {
+  const checkWalletBalance = (value: string): void => {
     if (!wallet) {
       return
     }
@@ -107,7 +108,7 @@ const WalletCard: React.FC = () => {
           <Styles.Right>
             <Skeleton width={120} height={19} type="gray" br={4} isLoading={isBalanceLoading}>
               <Styles.BalanceRow>
-                <Styles.Balance>{numeral(balance).format('0.[000000]')}</Styles.Balance>
+                <Styles.Balance>{numeral(walletBalance).format('0.[000000]')}</Styles.Balance>
                 <Styles.Symbol>{wallet.symbol}</Styles.Symbol>
               </Styles.BalanceRow>
             </Skeleton>

@@ -179,12 +179,14 @@ const SendForm: React.FC<Props> = (props) => {
   }
 
   const onValueChange = ({ value }: NumberFormatValues): void => {
+    const formatValue = value[0] === '.' ? `0${value}` : value
+
     if (inputType === 'amount') {
-      setAmount(value)
-      setUsdAmount(coinPrice === 0 ? '0' : `${multiplied(coinPrice, value)}`)
+      setAmount(formatValue)
+      setUsdAmount(coinPrice === 0 ? '0' : `${multiplied(coinPrice, formatValue)}`)
     } else {
-      setAmount(coinPrice === 0 ? '0' : div(value, coinPrice))
-      setUsdAmount(value)
+      setAmount(coinPrice === 0 ? '0' : div(formatValue, coinPrice))
+      setUsdAmount(formatValue)
     }
   }
 
@@ -208,6 +210,14 @@ const SendForm: React.FC<Props> = (props) => {
     return inputType === 'amount' ? formatEstimated : formatAmount
   }
 
+  const isAllowed = ({ value }: NumberFormatValues) => {
+    if (Number(value) === 0 && Number(amount) === 0) {
+      return false
+    }
+
+    return true
+  }
+
   return (
     <Styles.Container>
       <Styles.Row>
@@ -216,6 +226,7 @@ const SendForm: React.FC<Props> = (props) => {
         </Styles.Button>
         <Styles.AmountRow>
           <Styles.Input
+            isAllowed={isAllowed}
             placeholder={`0 ${toUpper(wallet?.symbol)}`}
             value={inputType === 'amount' ? amount : usdAmount}
             onValueChange={onValueChange}
