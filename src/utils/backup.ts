@@ -3,12 +3,17 @@ import { v4 } from 'uuid'
 // Utils
 import { validateWallet } from '@utils/validate'
 import { removeItem, setItem } from '@utils/storage'
-import { getProvider } from '@coins/index'
+import { padTo2Digits, toLower } from '@utils/format'
+
+// Config
+import tokens, { getSharedTokens } from '@tokens/index'
+import currencies from '@config/currencies'
 
 // Types
 import { IWallet } from '@utils/wallet'
-import { padTo2Digits } from '@utils/format'
 import { TGenerateAddress } from '@coins/types'
+import { TCurrency } from '@config/currencies/types'
+import { TToken } from '@tokens/types'
 
 const pjson = require('../../package.json')
 
@@ -94,13 +99,29 @@ export const validate = (backup: string): string | null => {
       const validateWalletsList = validateWallet(JSON.stringify(parseBackup?.wallets))
 
       if (validateWalletsList && parseBackup.version && parseBackup.uuid) {
-        parseBackup?.wallets.forEach((wallet: IWallet) => delete wallet.privateKey)
-        const wallets = parseBackup?.wallets
-          .map((wallet: IWallet) => (!wallet.chain && getProvider(wallet.symbol) ? wallet : null))
-          .filter((w: IWallet | null) => w)
-        return JSON.stringify(wallets)
+        parseBackup.wallets.forEach((wallet: IWallet) => delete wallet.privateKey)
+        const supportedWallets = getSupportedWallets(parseBackup.wallets)
+        return JSON.stringify(supportedWallets)
       }
     }
   }
   return null
+}
+
+export const getSupportedWallets = (wallets: IWallet[]): IWallet[] => {
+  const sharedTokens = getSharedTokens()
+  const tokensList = [...tokens, ...sharedTokens]
+
+  return wallets.filter((wallet: IWallet) => {
+    const filterCurrencies =
+      currencies.find(
+        (currency: TCurrency) => toLower(currency.symbol) === toLower(wallet.symbol)
+      ) !== undefined && wallet.chain === undefined
+    const filterTokens = tokensList.find(
+      (token: TToken) =>
+        toLower(token.symbol) === toLower(wallet.symbol) &&
+        toLower(token.chain) === toLower(wallet.chain)
+    )
+    return filterCurrencies || filterTokens
+  })
 }
