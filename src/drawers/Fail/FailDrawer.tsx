@@ -4,6 +4,9 @@ import * as React from 'react'
 import DrawerWrapper from '@components/DrawerWrapper'
 import Button from '@components/Button'
 
+// Assets
+import failIcon from '@assets/drawer/fail.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -22,7 +25,7 @@ const FailDrawer: React.FC<Props> = (props) => {
       title="Fail!"
       isActive={isActive}
       onClose={onClose}
-      icon="../../assets/drawer/fail.svg"
+      icon={failIcon}
       openFrom={openFrom}
     >
       <Styles.Row>

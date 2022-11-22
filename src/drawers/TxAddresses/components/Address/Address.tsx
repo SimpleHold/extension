@@ -42,7 +42,10 @@ const Address: React.FC<Props> = (props) => {
       <Styles.Address className="address">{short(address, 28)}</Styles.Address>
       <Styles.Info>
         <Styles.Amount>{`${amount} ${symbol}`}</Styles.Amount>
-        <Styles.Estimated>{`$ ${getFormatEstimated(estimated, price(estimated))}`}</Styles.Estimated>
+        <Styles.Estimated>{`$ ${getFormatEstimated(
+          estimated,
+          price(estimated)
+        )}`}</Styles.Estimated>
       </Styles.Info>
 
       <Styles.Button className="button">

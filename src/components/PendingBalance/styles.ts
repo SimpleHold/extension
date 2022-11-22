@@ -42,7 +42,7 @@ const Pending = styled.p`
   font-style: normal;
   font-weight: 500;
   font-size: 12px;
-  color: #FFFFFF;
+  color: #ffffff;
   text-transform: capitalize;
 `
 
@@ -51,7 +51,7 @@ const USDValue = styled.p`
   font-family: Roboto, sans-serif;
   font-style: normal;
   font-size: 12px;
-  color: #FFFFFF;
+  color: #ffffff;
 `
 
 const Styles = {

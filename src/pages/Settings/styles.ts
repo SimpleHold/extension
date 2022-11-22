@@ -80,7 +80,7 @@ const IconRow = styled.div`
   justify-content: center;
 `
 
-  const Text = styled.p`
+const Text = styled.p`
   padding-right: 40px;
   margin: 5px 0 0 0;
   font-size: 14px;
@@ -126,7 +126,7 @@ const Styles = {
   Text,
   ExtensionInfo,
   CopyRight,
-  Version
+  Version,
 }
 
 export default Styles

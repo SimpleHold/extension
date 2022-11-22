@@ -18,8 +18,8 @@ import { decrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
-import { getUnusedAddressesForToken } from '@config/tokens'
-import { getCurrencyByChain } from '@config/currencies'
+import { getUnusedAddresses } from '@tokens/index'
+import { getCurrencyByChain } from '@config/currencies/utils'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -85,8 +85,7 @@ const AddTokenToAddress: React.FC = () => {
     const walletsList = getWallets()
 
     if (walletsList) {
-      const chainAddresses = getUnusedAddressesForToken(walletsList, symbol, chain)
-      updateState({ chainAddresses })
+      updateState({ chainAddresses: getUnusedAddresses(walletsList, symbol, chain) })
     }
   }
 
@@ -164,7 +163,7 @@ const AddTokenToAddress: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Select currency" whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle="Select currency" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Add to {toUpper(chain)} address</Styles.Title>

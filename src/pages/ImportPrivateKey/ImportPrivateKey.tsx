@@ -14,31 +14,27 @@ import SuccessDrawer from '@drawers/Success'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import {
-  checkExistWallet,
-  addNew as addNewWallet,
-  IWallet,
-  getWallets,
-} from '@utils/wallet'
+import { checkExistWallet, addNew as addNewWallet, IWallet, getWallets } from '@utils/wallet'
 import { decrypt } from '@utils/crypto'
-import { setUserProperties } from 'utils/metrics'
+import { setUserProperties } from '@utils/metrics'
 import { toLower, toUpper } from '@utils/format'
-import { importPrivateKey, getTokenStandard, getSingleBalance } from '@utils/currencies'
+import { importPrivateKey, getList } from '@coins/index'
+import { getSingleBalance } from '@coins/utils'
 import { getTokensBalance } from '@utils/api'
 import { getItem, setItem } from '@utils/storage'
-import * as theta from '@utils/currencies/theta'
-import * as vechain from '@utils/currencies/vechain'
 
 // Hooks
 import useState from '@hooks/useState'
 
 // Config
-import tokens, { IToken } from '@config/tokens'
-import { getCurrencyByChain, ICurrency } from '@config/currencies'
+import tokens, { getStandart } from '@tokens/index'
+import { getCurrencyByChain } from '@config/currencies/utils'
 
 // Types
 import { IState, LocationState } from './types'
 import { ITokensBalance } from '@utils/api/types'
+import { TToken } from '@tokens/types'
+import { TCurrency } from '@config/currencies/types'
 
 // Styles
 import Styles from './styles'
@@ -49,7 +45,7 @@ const initialState: IState = {
   errorLabel: null,
   password: '',
   isImportButtonLoading: false,
-  isConfirmButtonLoading: false
+  isConfirmButtonLoading: false,
 }
 
 const ImportPrivateKey: React.FC = () => {
@@ -72,20 +68,22 @@ const ImportPrivateKey: React.FC = () => {
     textInputRef.current?.focus()
   }, [])
 
+  React.useEffect(() => {
+    if (state.errorLabel && state.isImportButtonLoading) {
+      updateState({ isImportButtonLoading: false })
+    }
+  }, [state.errorLabel, state.isImportButtonLoading])
+
   const onConfirm = async (isSkipFindTokens?: boolean): Promise<void> => {
     if (state.errorLabel) {
       updateState({ errorLabel: null })
     }
 
-    if (symbol === 'hbar') {
-      updateState({ isImportButtonLoading: true })
-    }
+    updateState({ isImportButtonLoading: true })
 
     const getAddress = await importPrivateKey(symbol, state.privateKey, chain)
 
-    if (symbol === 'hbar') {
-      updateState({ isImportButtonLoading: false })
-    }
+    updateState({ isImportButtonLoading: false })
 
     if (getAddress) {
       const checkExist = checkExistWallet(getAddress, symbol, chain)
@@ -98,7 +96,7 @@ const ImportPrivateKey: React.FC = () => {
         return await findAddressTokens(getAddress, state.privateKey)
       }
 
-      return updateState({ activeDrawer: 'confirm' })
+      return updateState({ activeDrawer: 'confirm', isImportButtonLoading: false })
     }
 
     return updateState({ errorLabel: 'Invalid private key' })
@@ -116,7 +114,7 @@ const ImportPrivateKey: React.FC = () => {
 
       if (filterData?.length && wallets) {
         const mapTokens = filterData.map((token: ITokensBalance) => token.symbol)
-        const mapExistTokens = tokens.map((token: IToken) => token.symbol)
+        const mapExistTokens = tokens.map((token: TToken) => token.symbol)
         const filterByExistTokens = mapTokens.filter((token: string) =>
           mapExistTokens.includes(token)
         )
@@ -140,7 +138,7 @@ const ImportPrivateKey: React.FC = () => {
             tokenName,
             contractAddress,
             decimals,
-            tokenStandart: getTokenStandard(toLower(chain)),
+            tokenStandart: getStandart(toLower(chain)),
           })
         }
       }
@@ -149,16 +147,11 @@ const ImportPrivateKey: React.FC = () => {
     }
   }
 
-  const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
-    if (vechain.coins.indexOf(symbol) !== -1) {
-      return vechain.coins.sort((a: string, b: string) => b.indexOf(symbol) - a.indexOf(symbol))
+  const getCurrenciesList = (getCurrencyInfo?: TCurrency | undefined | null): string[] => {
+    if (getCurrencyInfo) {
+      return getList(getCurrencyInfo.symbol, chain)
     }
-    if (theta.coins.indexOf(symbol) !== -1) {
-      return theta.coins.sort((a: string, b: string) => a.indexOf(symbol) - b.indexOf(symbol))
-    }
-    if (chain && getCurrencyInfo) {
-      return [symbol, getCurrencyInfo.symbol]
-    }
+
     return [symbol]
   }
 
@@ -184,7 +177,7 @@ const ImportPrivateKey: React.FC = () => {
             chain,
             tokenName,
             contractAddress,
-            decimals,
+            decimals
           )
 
           if (walletsList) {
@@ -197,9 +190,13 @@ const ImportPrivateKey: React.FC = () => {
 
             updateState({ isConfirmButtonLoading: true })
 
-            await getSingleBalance(
-              { symbol, address, chain, tokenSymbol: chain ? symbol : undefined, contractAddress }
-            )
+            await getSingleBalance({
+              symbol,
+              address,
+              chain,
+              tokenSymbol: chain ? symbol : undefined,
+              contractAddress,
+            })
 
             updateState({ isConfirmButtonLoading: false })
 
@@ -235,7 +232,7 @@ const ImportPrivateKey: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Add address" whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle="Add address" whiteLogo />
         <Styles.Container>
           <Styles.Heading>
             <Styles.Title>Import a private key</Styles.Title>

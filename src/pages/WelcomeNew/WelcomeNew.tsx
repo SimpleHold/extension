@@ -1,15 +1,19 @@
 import * as React from 'react'
 import { useHistory } from 'react-router-dom'
 import { v4 } from 'uuid'
-import { browser, Tabs } from 'webextension-polyfill-ts'
+import browser, { Tabs } from 'webextension-polyfill'
 
 // Components
 import Header from '@components/Header'
 import Button from '@components/Button'
 
 // Config
-import { GENERAL_FIRST_ENTER, ONBOARDING_BACKUP, ONBOARDING_CREATE_NEW_WALLET } from '@config/events'
-import config from 'config'
+import {
+  GENERAL_FIRST_ENTER,
+  ONBOARDING_BACKUP,
+  ONBOARDING_CREATE_NEW_WALLET,
+} from '@config/events'
+import config from '@config/index'
 
 // Assets
 import illustrate from '@assets/illustrate/onboardingIllustrate.png'
@@ -18,7 +22,7 @@ import illustrate from '@assets/illustrate/onboardingIllustrate.png'
 import swapSpaceIllustrate from '@assets/theme/swapspace/1.svg'
 
 // Utils
-import { init, logEvent } from 'utils/metrics'
+import { init, logEvent } from '@utils/metrics'
 import { getItem, removeItem, setItem } from '@utils/storage'
 import { Cookie, getAllCookies, getUrl, openWebPage } from '@utils/extension'
 import { toLower } from '@utils/format'
@@ -41,8 +45,7 @@ const themes: TTheme = {
     {
       image: illustrate,
       title: 'Welcome to SimpleHold Wallet!',
-      description:
-        'Store, send, receive and exchange safely and easily with SimpleHold!',
+      description: 'Store, send, receive and exchange safely and easily with SimpleHold!',
     },
   ],
   swapspace: [
@@ -79,7 +82,10 @@ const WelcomeNew: React.FC = () => {
   }
 
   const checkManualRestore = () => {
-    if (((os === 'macos' && browserName === 'chrome') || browserName === 'firefox') && !isManualRestore) {
+    if (
+      ((os === 'macos' && browserName === 'chrome') || browserName === 'firefox') &&
+      !isManualRestore
+    ) {
       setManualRestore(true)
     }
   }
@@ -157,14 +163,11 @@ const WelcomeNew: React.FC = () => {
         borderColor={theme === 'swapspace' ? 'rgba(234, 234, 234, 0.2)' : undefined}
         isAbsolute
       />
-      <Styles.Container className='container'>
+      <Styles.Container className="container">
         <Styles.Row>
-          <Styles.Illustrate
-            src={themes[theme][0].image}
-            alt='illustrate'
-          />
-          <Styles.Title className='title'>{themes[theme][0].title}</Styles.Title>
-          <Styles.Description className='description'>
+          <Styles.Illustrate src={themes[theme][0].image} alt="illustrate" />
+          <Styles.Title className="title">{themes[theme][0].title}</Styles.Title>
+          <Styles.Description className="description">
             {themes[theme][0].description}
           </Styles.Description>
         </Styles.Row>
@@ -174,11 +177,14 @@ const WelcomeNew: React.FC = () => {
             <Styles.RestoreButtonContainer>
               <Button label={'Restore'} onClick={onRestoreWallet} />
               {isManualRestore ? (
-                <Styles.HoverActionText className={'action-text'}>The link will open in a new tab</Styles.HoverActionText>
+                <Styles.HoverActionText className={'action-text'}>
+                  The link will open in a new tab
+                </Styles.HoverActionText>
               ) : null}
             </Styles.RestoreButtonContainer>
             <Styles.Text>
-              By proceeding, you agree to the<br/>
+              By proceeding, you agree to the
+              <br />
               <Styles.TermsLink onClick={openTerms}>Terms of Use</Styles.TermsLink>
               {' and '}
               <Styles.TermsLink onClick={openPrivacy}>Privacy policy</Styles.TermsLink>

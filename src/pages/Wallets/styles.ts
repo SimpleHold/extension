@@ -7,7 +7,7 @@ type TProps = {
 const Wrapper = styled.div`
   height: 600px;
   transition: 0.5s ease;
-  background-color: #3FBB7D;
+  background-color: #3fbb7d;
   position: relative;
 `
 
@@ -17,7 +17,7 @@ const WalletsListContainer = styled.div`
 
   .ReactVirtualized__List {
     transition: 0.4s ease-in;
-    padding-top: ${({ isUnfolded }: TProps) => isUnfolded ? '0 !important;' : '56px !important;'};
+    padding-top: ${({ isUnfolded }: TProps) => (isUnfolded ? '0 !important;' : '56px !important;')};
   }
 `
 

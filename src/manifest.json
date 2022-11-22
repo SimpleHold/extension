@@ -1,12 +1,12 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "SimpleHold",
-  "version": "1.25.5",
+  "version": "1.26.0",
   "icons": {
-    "16": "assets/logo/favicon-16.png",
-    "32": "assets/logo/favicon-32.png",
-    "48": "assets/logo/favicon-48.png",
-    "128": "assets/logo/favicon-128.png"
+    "16": "favicon-16.png",
+    "32": "favicon-32.png",
+    "48": "favicon-48.png",
+    "128": "favicon-128.png"
   },
   "description": "Light wallet for Bitcoin and other cryptocurrencies.",
   "homepage_url": "https://simplehold.io",
@@ -17,30 +17,22 @@
     "clipboardWrite",
     "clipboardRead",
     "cookies",
-    "*://*.simplehold.io/*"
+    "scripting",
+    "storage",
+    "alarms"
   ],
-  "content_security_policy": "script-src 'self' 'wasm-eval'; object-src 'self'",
-  "__chrome|firefox__author": "SimpleHold",
-  "__opera__developer": {
-    "name": "SimpleHold"
-  },
-  "__chrome__minimum_chrome_version": "49",
-  "__opera__minimum_opera_version": "36",
-  "browser_action": {
-    "default_popup": "popup.html",
+  "action": {
     "default_icon": {
-      "16": "assets/logo/favicon-16.png",
-      "32": "assets/logo/favicon-32.png",
-      "48": "assets/logo/favicon-48.png",
-      "128": "assets/logo/favicon-128.png"
+      "16": "favicon-16.png",
+      "32": "favicon-32.png",
+      "48": "favicon-48.png",
+      "128": "favicon-128.png"
     },
-    "default_title": "SimpleHold",
-    "__chrome|opera__chrome_style": false,
-    "__firefox__browser_style": false
+    "default_popup": "popup.html",
+    "default_title": "SimpleHold"
   },
   "background": {
-    "scripts": ["js/background.bundle.js"],
-    "__chrome|opera__persistent": false
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -50,18 +42,29 @@
         "https://swapspace.co/*",
         "http://localhost/*"
       ],
-      "js": ["js/contentScript.bundle.js"]
-    },
-    {
-      "matches": ["*://connect.trezor.io/*/popup.html"],
-      "js": ["js/trezor.bundle.js"]
+      "js": ["contentScript.js"]
     }
   ],
   "web_accessible_resources": [
-    "js/inpage.bundle.js",
-    "js/selectAddress.bundle.js",
-    "select-address.html",
-    "js/send.bundle.js",
-    "send.html"
-  ]
+    {
+      "resources": [
+        "inpage.js",
+        "selectAddress.js",
+        "select-address.html",
+        "contentScript.js",
+        "send.js",
+        "send.html"
+      ],
+      "matches": [
+        "https://simpleswap.io/*",
+        "https://simplehold.io/*",
+        "https://swapspace.co/*",
+        "http://localhost/*"
+      ]
+    }
+  ],
+  "host_permissions": ["*://*.simplehold.io/*", "*://*.simpleswap.io/*"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
 }

@@ -7,7 +7,7 @@ import CopyToClipboard from '@components/CopyToClipboard'
 import Button from '@components/Button'
 
 // Utils
-import { generateExtraId } from '@utils/currencies'
+import { generateExtraId } from '@coins/index'
 
 // Styles
 import Styles from './styles'

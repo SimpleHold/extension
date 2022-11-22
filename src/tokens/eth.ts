@@ -1,0 +1,273 @@
+import usdtLogo from '@assets/tokens/usdt.svg'
+import usdcLogo from '@assets/tokens/usdc.svg'
+import daiLogo from '@assets/tokens/dai.svg'
+import paxLogo from '@assets/tokens/pax.svg'
+import busdLogo from '@assets/tokens/busd.svg'
+import ustLogo from '@assets/tokens/ust.svg'
+import enjLogo from '@assets/tokens/enj.svg'
+import sandLogo from '@assets/tokens/sand.svg'
+import litLogo from '@assets/tokens/lit.svg'
+import exdrLogo from '@assets/tokens/exdr.svg'
+import julLogo from '@assets/tokens/jul.svg'
+import truLogo from '@assets/tokens/tru.svg'
+import markLogo from '@assets/tokens/mark.svg'
+import astaLogo from '@assets/tokens/asta.svg'
+import bnbLogo from '@assets/tokens/bnb.svg'
+import shibLogo from '@assets/tokens/shib.svg'
+import ctsiLogo from '@assets/tokens/ctsi.svg'
+import sxpLogo from '@assets/tokens/sxp.svg'
+import linkLogo from '@assets/tokens/link.svg'
+import toncoinLogo from '@assets/tokens/toncoin.svg'
+import bntLogo from '@assets/tokens/bnt.svg'
+import audioLogo from '@assets/tokens/audio.svg'
+
+// Tokens
+import CONFIG, { CHAINS } from '@tokens/config'
+import { TToken } from '@tokens/types'
+
+const ETH_TOKENS: TToken[] = [
+  {
+    address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
+    name: 'Tether',
+    symbol: 'usdt',
+    decimals: 6,
+    logo: usdtLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+    name: 'USD Coin',
+    symbol: 'usdc',
+    decimals: 6,
+    logo: usdcLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+    name: 'Dai Stablecoin',
+    symbol: 'dai',
+    decimals: 18,
+    logo: daiLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x8e870d67f660d95d5be530380d0ec0bd388289e1',
+    name: 'Paxos Standard',
+    symbol: 'pax',
+    decimals: 18,
+    logo: paxLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x4Fabb145d64652a948d72533023f6E7A623C7C53',
+    name: 'Binance USD',
+    symbol: 'busd',
+    decimals: 18,
+    logo: busdLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0xa47c8bf37f92aBed4A126BDA807A7b7498661acD',
+    name: 'Wrapped UST Token',
+    symbol: 'ust',
+    decimals: 18,
+    logo: ustLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0xf629cbd94d3791c9250152bd8dfbdf380e2a3b9c',
+    name: 'Enjin Coin',
+    symbol: 'enj',
+    decimals: 18,
+    logo: enjLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x3845badAde8e6dFF049820680d1F14bD3903a5d0',
+    name: 'The Sandbox',
+    symbol: 'sand',
+    decimals: 18,
+    logo: sandLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0xb59490ab09a0f526cc7305822ac65f2ab12f9723',
+    name: 'Litentry',
+    symbol: 'lit',
+    decimals: 18,
+    logo: litLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x6468e79A80C0eaB0F9A2B574c8d5bC374Af59414',
+    name: 'e-Darix',
+    symbol: 'exdr',
+    decimals: 18,
+    logo: exdrLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x5580ab97F226C324c671746a1787524AEF42E415',
+    name: 'JustLiquidity',
+    symbol: 'jul',
+    decimals: 18,
+    logo: julLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x4c19596f5aaff459fa38b0f7ed92f11ae6543784',
+    name: 'TrueFi',
+    symbol: 'tru',
+    decimals: 8,
+    logo: truLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x67c597624b17b16fb77959217360b7cd18284253',
+    name: 'Benchmark',
+    symbol: 'mark',
+    decimals: 9,
+    logo: markLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0xf2ddae89449b7d26309a5d54614b1fc99c608af5',
+    name: 'Asta',
+    symbol: 'asta',
+    decimals: 18,
+    logo: astaLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0xB8c77482e45F1F44dE1745F52C74426C631bDD52',
+    name: 'Binance Coin',
+    symbol: 'bnb',
+    decimals: 18,
+    logo: bnbLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce',
+    name: 'SHIBA INU',
+    symbol: 'shib',
+    decimals: 18,
+    logo: shibLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x491604c0fdf08347dd1fa4ee062a822a5dd06b5d',
+    name: 'Cartesi Token',
+    symbol: 'ctsi',
+    decimals: 18,
+    logo: ctsiLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x8ce9137d39326ad0cd6491fb5cc0cba0e089b6a9',
+    name: 'Swipe',
+    symbol: 'sxp',
+    decimals: 18,
+    logo: sxpLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x514910771af9ca656af840dff83e8264ecf986ca',
+    name: 'ChainLink Token',
+    symbol: 'link',
+    decimals: 18,
+    logo: linkLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x582d872a1b094fc48f5de31d3b73f2d9be47def1',
+    name: 'Wrapped TON Coin',
+    symbol: 'toncoin',
+    decimals: 9,
+    logo: toncoinLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x1f573d6fb3f13d689ff844b4ce37794d79a7ff1c',
+    name: 'Bancor',
+    symbol: 'bnt',
+    decimals: 18,
+    logo: bntLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+  {
+    address: '0x18aaa7115705e8be94bffebde57af9bfc265b998',
+    name: 'Audius',
+    symbol: 'audio',
+    decimals: 18,
+    logo: audioLogo,
+    background: CHAINS.ETH.background,
+    chain: CHAINS.ETH.name,
+    minSendAmount: CONFIG.MIN_SEND_AMOUNT,
+    isCustomFee: CONFIG.IS_CUSTOM_FEE,
+  },
+]
+
+export default ETH_TOKENS

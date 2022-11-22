@@ -8,7 +8,8 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import { toUpper, toLower } from '@utils/format'
 
 // Config
-import currencies, { ICurrency } from '@config/currencies'
+import currencies from '@config/currencies'
+import { TCurrency } from '@config/currencies/types'
 
 // Styles
 import Styles from '../styles'
@@ -22,7 +23,7 @@ const CurrenciesTab: React.FC<Props> = (props) => {
 
   const [searchValue, setSearchValue] = React.useState<string>('')
 
-  const filterCurrenciesList = currencies.filter((currency: ICurrency) => {
+  const filterCurrenciesList = currencies.filter((currency: TCurrency) => {
     if (searchValue.length) {
       const findByName = toLower(currency.name)?.indexOf(toLower(searchValue) || '') !== -1
       const findBySymbol = toLower(currency.symbol)?.indexOf(toLower(searchValue) || '') !== -1
@@ -46,7 +47,7 @@ const CurrenciesTab: React.FC<Props> = (props) => {
       ) : null}
 
       <Styles.CurrenciesList>
-        {filterCurrenciesList.map((currency: ICurrency, index) => {
+        {filterCurrenciesList.map((currency: TCurrency, index) => {
           const { name, symbol } = currency
 
           return (

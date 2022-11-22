@@ -13,19 +13,26 @@ import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 
 // Utils
-import { importRecoveryPhrase } from '@utils/currencies'
+import { importRecoveryPhrase } from '@coins/index'
 import { validatePassword } from '@utils/validate'
 import { checkExistWallet, addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { getItem, setItem } from '@utils/storage'
 import { decrypt } from '@utils/crypto'
-import { setUserProperties } from 'utils/metrics'
+import { setUserProperties } from '@utils/metrics'
 import { toUpper } from '@utils/format'
+
+// Config
+import { getCurrencyInfo } from '@config/currencies/utils'
+
+// Tokens
+import { getToken } from '@tokens/index'
 
 // Styles
 import Styles from './styles'
 
 interface LocationState {
   symbol: string
+  tokenChain?: string
 }
 
 const ImportRecoveryPhrase: React.FC = () => {
@@ -37,7 +44,7 @@ const ImportRecoveryPhrase: React.FC = () => {
 
   const history = useHistory()
   const {
-    state: { symbol },
+    state: { symbol, tokenChain },
   } = useLocation<LocationState>()
 
   const textareaInputRef = React.useRef<HTMLTextAreaElement>(null)
@@ -47,10 +54,16 @@ const ImportRecoveryPhrase: React.FC = () => {
   }, [])
 
   const onImport = async (): Promise<void> => {
-    const data = await importRecoveryPhrase(symbol, recoveryPhrase)
+    const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrencyInfo(symbol)
+
+    if (!currency) {
+      return
+    }
+
+    const data = await importRecoveryPhrase(symbol, recoveryPhrase, currency.chain, tokenChain)
 
     if (data) {
-      const checkExist = checkExistWallet(data.address, symbol)
+      const checkExist = checkExistWallet(data.address, symbol, tokenChain)
 
       if (checkExist) {
         return setErrorLabel('This address has already been added')
@@ -66,7 +79,19 @@ const ImportRecoveryPhrase: React.FC = () => {
 
     if (backup) {
       const decryptBackup = decrypt(backup, password)
-      const recoveryData = await importRecoveryPhrase(symbol, recoveryPhrase)
+
+      const currency = tokenChain ? getToken(symbol, tokenChain) : getCurrencyInfo(symbol)
+
+      if (!currency) {
+        return
+      }
+
+      const recoveryData = await importRecoveryPhrase(
+        symbol,
+        recoveryPhrase,
+        currency.chain,
+        tokenChain
+      )
 
       if (decryptBackup && recoveryData) {
         const { address, privateKey } = recoveryData
@@ -113,7 +138,7 @@ const ImportRecoveryPhrase: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Add address" whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle="Add address" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Import recovery phrase</Styles.Title>

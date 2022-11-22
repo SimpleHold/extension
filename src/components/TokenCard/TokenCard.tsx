@@ -5,7 +5,7 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import RadioButton from '@components/RadioButton'
 
 // Config
-import { getToken } from '@config/tokens'
+import { getToken } from '@tokens/index'
 
 // Utils
 import { toUpper } from '@utils/format'

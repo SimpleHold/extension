@@ -14,9 +14,8 @@ import Skeleton from '@components/Skeleton'
 import ConfirmDrawer from '@drawers/Confirm'
 
 // Config
-import { validateContractAddress, checkExistWallet, getToken } from '@config/tokens'
-import networks, { getEthNetwork, IEthNetwork } from '@config/ethLikeNetworks'
-import { getCurrency } from '@config/currencies'
+import networks, { TNetwork, NOT_ETH_NETWORKS } from '@config/networks'
+import { getCurrencyInfo } from '@config/currencies/utils'
 
 // Utils
 import { getContractInfo } from '@utils/api'
@@ -25,7 +24,7 @@ import { toLower } from '@utils/format'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
-import { getTokenStandard } from '@utils/currencies'
+import { getStandart, validateContractAddress, checkExistWallet, getToken } from '@tokens/index'
 
 // Hooks
 import useDebounce from '@hooks/useDebounce'
@@ -66,6 +65,7 @@ const AddCustomToken: React.FC = () => {
 
   const activeNetwork = locationState?.activeNetwork || undefined
   const currency = locationState?.currency || undefined
+  const networksList = [...networks, ...NOT_ETH_NETWORKS]
 
   React.useEffect(() => {
     if (
@@ -90,12 +90,12 @@ const AddCustomToken: React.FC = () => {
       typeof activeNetwork !== 'undefined' &&
       toLower(state.selectedNetwork.chain) !== toLower(activeNetwork)
     ) {
-      const getNetworkInfo = getEthNetwork(activeNetwork)
+      const getNetworkInfo = getNetwork(activeNetwork)
 
       if (getNetworkInfo) {
         updateState({ selectedNetwork: getNetworkInfo })
 
-        const findCurrency = getCurrency(getNetworkInfo.symbol)
+        const findCurrency = getCurrencyInfo(getNetworkInfo.symbol)
 
         if (findCurrency) {
           updateState({ logoBackground: findCurrency.background })
@@ -103,6 +103,10 @@ const AddCustomToken: React.FC = () => {
       }
     }
   }, [activeNetwork])
+
+  const getNetwork = (chain: string): TNetwork | undefined => {
+    return networksList.find((i) => i.chain === chain)
+  }
 
   const getContractAddressInfo = async (): Promise<void> => {
     updateState({ isLoading: true })
@@ -162,7 +166,7 @@ const AddCustomToken: React.FC = () => {
         tokenName,
         contractAddress: state.contractAddress,
         decimals,
-        tokenStandart: getTokenStandard(toLower(chain)),
+        tokenStandart: getStandart(toLower(chain)),
       }
 
       if (checkTokenWallets) {
@@ -174,13 +178,12 @@ const AddCustomToken: React.FC = () => {
   }
 
   const onSelectDropdown = (index: number): void => {
-    const getNetwork = mapList[index]
-    const getNetworkInfo = getEthNetwork(getNetwork.chain)
+    const getNetworkInfo = getNetwork(mapList[index].chain)
 
     if (getNetworkInfo) {
       updateState({ selectedNetwork: getNetworkInfo })
 
-      const findCurrency = getCurrency(getNetworkInfo.symbol)
+      const findCurrency = getCurrencyInfo(getNetworkInfo.symbol)
 
       if (findCurrency) {
         updateState({ logoBackground: findCurrency.background })
@@ -252,11 +255,11 @@ const AddCustomToken: React.FC = () => {
     updateState({ password })
   }
 
-  const dropDownList = networks.filter(
-    (network: IEthNetwork) => network.symbol !== state.selectedNetwork.symbol
+  const dropDownList = networksList.filter(
+    (network: TNetwork) => network.symbol !== state.selectedNetwork.symbol
   )
 
-  const mapList = dropDownList.map((network: IEthNetwork) => {
+  const mapList = dropDownList.map((network: TNetwork) => {
     return {
       logo: {
         symbol: network.symbol,
@@ -282,7 +285,7 @@ const AddCustomToken: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Select currency" whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle="Select currency" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Add custom token</Styles.Title>
@@ -323,6 +326,7 @@ const AddCustomToken: React.FC = () => {
               onSelect={onSelectDropdown}
               currencyBr={20}
               disabled={typeof activeNetwork !== 'undefined'}
+              maxHeight={180}
             />
             <TextInput
               label="Token Contract Address"

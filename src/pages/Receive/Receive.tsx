@@ -13,7 +13,11 @@ import CopyToClipboard from '@components/CopyToClipboard'
 import ExtraIdDrawer from '@drawers/ExtraId'
 
 // Utils
-import { getExtraIdName } from '@utils/currencies'
+import { getExtraIdName } from '@coins/index'
+import { logEvent } from '@utils/metrics'
+
+// Config
+import { RECEIVE_COPY_ADDRESS } from '@config/events'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -23,8 +27,6 @@ import { ILocationState, IState } from './types'
 
 // Styles
 import Styles from './styles'
-import { RECEIVE_COPY_ADDRESS } from 'config/events'
-import { logEvent } from 'utils/metrics'
 
 const initialState: IState = {
   isCopied: false,
@@ -60,7 +62,7 @@ const ReceivePage: React.FC = () => {
     copy(address)
     updateState({ isCopied: true })
     logEvent({
-      name: RECEIVE_COPY_ADDRESS
+      name: RECEIVE_COPY_ADDRESS,
     })
   }
 
@@ -77,9 +79,7 @@ const ReceivePage: React.FC = () => {
   }
 
   const onBack = () => {
-    isRedirect
-      ? history.push('/wallets')
-      : history.goBack()
+    isRedirect ? history.push('/wallets') : history.goBack()
   }
 
   const backTitle = isRedirect ? 'Home' : walletName
@@ -88,7 +88,7 @@ const ReceivePage: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={onBack} backTitle={backTitle} whiteLogo/>
+        <Header withBack onBack={onBack} backTitle={backTitle} whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Receive>

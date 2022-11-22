@@ -1,6 +1,10 @@
 // Config
-import currencies, { ICurrency } from '@config/currencies'
-import tokens, { IToken } from '@config/tokens'
+import currencies from '@config/currencies'
+import { TCurrency } from '@config/currencies/types'
+
+// Tokens
+import tokens from '@tokens/index'
+import { TToken } from '@tokens/types'
 
 // Utils
 import { isFullScreen } from '@utils/window'
@@ -63,7 +67,7 @@ addCustomEventListener('#sh-send-button', 'click', () => {
   }
 })
 
-const mapCurrencies = currencies.map((currency: ICurrency) => {
+const mapCurrencies = currencies.map((currency: TCurrency) => {
   const { symbol, background } = currency
 
   return {
@@ -74,7 +78,7 @@ const mapCurrencies = currencies.map((currency: ICurrency) => {
   }
 })
 
-const mapTokens = tokens.map((token: IToken) => {
+const mapTokens = tokens.map((token: TToken) => {
   const { symbol, background, chain } = token
 
   return {

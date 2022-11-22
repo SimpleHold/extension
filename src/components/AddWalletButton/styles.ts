@@ -5,14 +5,13 @@ type TProps = {
   withBadge?: boolean
 }
 
-const Container = styled.div`
-`
-
+const Container = styled.div``
 
 const Wrapper = styled.div`
-  opacity: ${({ isCollapsed }: TProps) => isCollapsed ? 1 : 0};
+  opacity: ${({ isCollapsed }: TProps) => (isCollapsed ? 1 : 0)};
 
-  &, * {
+  &,
+  * {
     transition: 0.4s ease;
   }
 
@@ -40,7 +39,7 @@ const Wrapper = styled.div`
 `
 
 const Badge = styled.div`
-  background-color: #3FBB7D;
+  background-color: #3fbb7d;
   border-radius: 24px;
   display: flex;
   justify-content: space-between;

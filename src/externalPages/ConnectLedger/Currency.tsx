@@ -8,11 +8,15 @@ import CurrencyAddress from '@components/CurrencyAddress'
 import Alert from './Alert'
 
 // Config
-import { getCurrency } from '@config/currencies'
+import { getCurrencyInfo } from '@config/currencies/utils'
 
 // Utils
 import { getBTCAddress, getETHAddress, getXRPAddress, requestTransport } from '@utils/ledger'
 import { toLower } from '@utils/format'
+
+// Assets
+import plusCircleIcon from '@assets/icons/plusCircle.svg'
+import bottomArrowIcon from '@assets/icons/bottomArrow.svg'
 
 // Types
 import { TSelectedAddress } from './types'
@@ -36,14 +40,8 @@ interface Props {
 }
 
 const Currency: React.FC<Props> = (props) => {
-  const {
-    symbol,
-    transport,
-    selectedAddresses,
-    existWallets,
-    onToggleSelect,
-    saveFirstAddress,
-  } = props
+  const { symbol, transport, selectedAddresses, existWallets, onToggleSelect, saveFirstAddress } =
+    props
 
   const [ledgerTransport, setLedgerTransport] = React.useState<Transport | null>(null)
 
@@ -58,7 +56,7 @@ const Currency: React.FC<Props> = (props) => {
 
   const isActive = addresses.length > 0 || isTransportError || isDisconnectError
 
-  const currencyInfo = getCurrency(symbol)
+  const currencyInfo = getCurrencyInfo(symbol)
 
   const getAddress = async (transport: Transport): Promise<void> => {
     if (!ledgerTransport) {
@@ -90,7 +88,7 @@ const Currency: React.FC<Props> = (props) => {
       if (index === 0) {
         saveFirstAddress(symbol, request)
       }
-    } else {
+    } else if (request) {
       const { name } = request
 
       if (name === 'TransportStatusError') {
@@ -133,7 +131,7 @@ const Currency: React.FC<Props> = (props) => {
           {currencyInfo ? <Styles.CurrencyName>{currencyInfo.name}</Styles.CurrencyName> : null}
           {!isActive ? (
             <Styles.AddAddressButton>
-              <SVG src="../../assets/icons/plusCircle.svg" width={20} height={20} />
+              <SVG src={plusCircleIcon} width={20} height={20} />
             </Styles.AddAddressButton>
           ) : null}
         </Styles.CurrencyHeadingRow>
@@ -168,7 +166,7 @@ const Currency: React.FC<Props> = (props) => {
           {addresses.length < 100 ? (
             <Styles.NextAddressRow onClick={onGetAddress}>
               <Styles.NextAddressLabel>Next address</Styles.NextAddressLabel>
-              <SVG src="../../assets/icons/bottomArrow.svg" width={7} height={4} />
+              <SVG src={bottomArrowIcon} width={7} height={4} />
             </Styles.NextAddressRow>
           ) : null}
         </Styles.Addresses>

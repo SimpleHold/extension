@@ -1,6 +1,6 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 // Components
 import Cover from '@components/Cover'
@@ -13,6 +13,11 @@ import { validatePassword } from '@utils/validate'
 import { decrypt, sha256hash } from '@utils/crypto'
 import { getCurrentTab, getUrl, updateTab } from '@utils/extension'
 import { getItem, removeItem } from '@utils/storage'
+
+// Assets
+import logoNew from '@assets/logoNew.svg'
+import arrowIcon from '@assets/icons/arrow.svg'
+import timesIcon from '@assets/icons/times.svg'
 
 // Styles
 import Styles from './styles'
@@ -229,19 +234,19 @@ const ExternalPageContainer: React.FC<Props> = (props) => {
         {headerStyle === 'green' ? <Cover /> : null}
         <Styles.Header className="sh-header" isDraggable={isDraggable}>
           <Styles.Logo headerStyle={headerStyle}>
-            <SVG src="../../assets/logoNew.svg" width={30} height={24} />
+            <SVG src={logoNew} width={30} height={24} />
           </Styles.Logo>
           <Styles.HeaderRow withBack={backPageTitle !== undefined && backPageUrl !== undefined}>
             {backPageTitle && backPageUrl ? (
               <Styles.HeaderBackRow onClick={goBack}>
                 <Styles.HeaderBackIconRow>
-                  <SVG src="../../assets/icons/arrow.svg" width={6} height={10} title="Back" />
+                  <SVG src={arrowIcon} width={6} height={10} title="Back" />
                 </Styles.HeaderBackIconRow>
                 <Styles.HeaderBackTitle>{backPageTitle}</Styles.HeaderBackTitle>
               </Styles.HeaderBackRow>
             ) : null}
             <Styles.CloseButton onClick={onClose} headerStyle={headerStyle}>
-              <SVG src="../../assets/icons/times.svg" width={15} height={15} />
+              <SVG src={timesIcon} width={15} height={15} />
             </Styles.CloseButton>
           </Styles.HeaderRow>
         </Styles.Header>

@@ -148,7 +148,7 @@ const Styles = {
   Loading,
   Content,
   ButtonDot,
-  Controls
+  Controls,
 }
 
 export default Styles

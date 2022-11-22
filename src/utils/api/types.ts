@@ -1,6 +1,43 @@
-import { TTime } from 'utils/dates'
+import { Method } from 'axios'
 
-export interface IGetBalance { // TODO: remove deprecated
+// Types
+import { TTime } from '@utils/dates'
+import { TUnspentOutput } from '@coins/types'
+
+export type TFeeResponse = {
+  fees?: TFee[]
+  networkFee?: number
+  utxos?: TUnspentOutput[]
+  currencyBalance?: number
+  isZeroFee?: boolean
+  minCurrencyAmount?: number
+}
+
+export type TFee = {
+  type: TFeeTypes
+  value: number
+  utxos?: TUnspentOutput[]
+}
+
+export type TFeeTypes = 'slow' | 'average' | 'fast'
+
+export type TRequestParams<D> = {
+  url: string
+  method?: Method
+  data?: D
+  params?: any
+  skipNestedData?: boolean
+  errorEventName?: string
+  timeout?: number
+}
+
+export type TResponse<RD> = {
+  error: boolean
+  data: RD
+}
+
+export interface IGetBalance {
+  // TODO: remove deprecated
   balance: number
   balance_usd: number
   balance_btc: number
@@ -48,7 +85,7 @@ export interface Web3TxParams {
 export interface IGetNetworkFeeResponse {
   networkFee?: number
   networkFeeLabel?: string
-  utxos?: UnspentOutput[] | CardanoUnspentTxOutput[]
+  utxos?: TUnspentOutput[]
   chainId?: number
   gas?: number
   gasPrice?: string
@@ -58,10 +95,6 @@ export interface IGetNetworkFeeResponse {
     type: TFeeTypes
     value: number
   }[]
-}
-
-export interface IAdaTrParams {
-  ttl: number
 }
 
 export type TPhishingSite = {
@@ -114,11 +147,6 @@ export type TTxHistoryAddress = {
   estimated: number
 }
 
-export type TFullTxHistoryResponse = {
-  error: boolean
-  data?: TFullTxWallet[]
-}
-
 export type TFullTxWallet = {
   chain: string
   address: string
@@ -129,7 +157,7 @@ export type TFullTxWallet = {
 }
 
 export type TTxFullInfo = {
-  type: "received" | "spend"
+  type: 'received' | 'spend'
   hash: string
   amount: number
   estimated: number
@@ -142,16 +170,20 @@ export type TTxFullInfo = {
   symbol: string
   addressFrom?: string
   addressTo?: string
-  addressesFrom?: [{
-    address: string
-    amount: number
-    estimated: number
-  }]
-  addressesTo?: [{
-    address: string
-    amount: number
-    estimated: number
-  }]
+  addressesFrom?: [
+    {
+      address: string
+      amount: number
+      estimated: number
+    }
+  ]
+  addressesTo?: [
+    {
+      address: string
+      amount: number
+      estimated: number
+    }
+  ]
   tokenSymbol?: string
   contractAddress?: string
 }
@@ -181,7 +213,8 @@ export type TVetTxParams = {
 
 export type TTonAddressState = 'uninitialized' | 'active' | 'frozen'
 
-export type TGetBalanceWalletProps = { // TODO remove deprecated
+export type TGetBalanceWalletProps = {
+  // TODO remove deprecated
   symbol: string
   address: string
   chain?: string
@@ -202,4 +235,29 @@ export type TGetBalanceOptions = {
   force?: boolean
   responseTimeLimit?: number
   requestDebounceTime?: TTime
+}
+
+export type TFeeRate = {
+  slow: number
+  average: number
+  fast: number
+}
+
+export type TCardanoAsset = {
+  asset: string
+  policy_id: string
+  asset_name: string
+  fingerprint: string
+  quantity: string
+  initial_mint_tx_hash: string
+  mint_or_burn_count: number
+  onchain_metadata: null | string
+  metadata: {
+    name: string
+    description: string
+    ticker: string
+    url: string
+    logo: string
+    decimals: number
+  }
 }

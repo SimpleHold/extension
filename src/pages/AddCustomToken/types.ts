@@ -1,6 +1,6 @@
 // Types
-import { ICurrency } from '@config/currencies'
-import { IEthNetwork } from '@config/ethLikeNetworks'
+import { TCurrency } from '@config/currencies/types'
+import { TNetwork } from '@config/networks'
 
 export interface IToken {
   name: string
@@ -10,13 +10,13 @@ export interface IToken {
 
 export interface ILocationState {
   activeNetwork?: string
-  currency?: ICurrency
+  currency?: TCurrency
   address?: string
 }
 
 export interface IState {
   contractAddress: string
-  selectedNetwork: IEthNetwork
+  selectedNetwork: TNetwork
   errorLabel: null | string
   isLoading: boolean
   tokenInfo: IToken

@@ -2,16 +2,21 @@ import TransportWebUSB from '@ledgerhq/hw-transport-webusb'
 import type Transport from '@ledgerhq/hw-transport-webusb'
 import { Transaction } from '@ethereumjs/tx'
 import { encode } from 'ripple-binary-codec'
-
 import BTCApp from '@ledgerhq/hw-app-btc'
 import ETHApp from '@ledgerhq/hw-app-eth'
 import XRPApp from '@ledgerhq/hw-app-xrp'
+import Web3 from 'web3'
+
+// Coins
+import { formatValue } from '@coins/xrp'
+import { createUnsignedTx } from '@coins/bitcoinLike'
 
 // Utils
-import { toHex } from '@utils/currencies/ethereumLike'
 import { toUpper } from '@utils/format'
 import { getXrpTxParams, getTxHex } from '@utils/api'
-import { formatValue as formatXrpValue } from '@utils/currencies/ripple'
+
+// Types
+import { TUnspentOutput } from '@coins/types'
 
 export type TCurrency = {
   symbol: string
@@ -51,6 +56,10 @@ export const currencies: TCurrency[] = [
   },
 ]
 
+export const toHex = (value: number): string => {
+  return new Web3().utils.toHex(value)
+}
+
 export const requestTransport = async (): Promise<Transport | null> => {
   try {
     return await TransportWebUSB.request()
@@ -70,6 +79,7 @@ export const getBTCAddress = async (
 
     return bitcoinAddress
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -83,6 +93,7 @@ export const getETHAddress = async (
 
     return address
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -96,6 +107,7 @@ export const getXRPAddress = async (
 
     return address
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -140,6 +152,7 @@ export const ethLedgerSignTx = async (
 
     return null
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -147,7 +160,7 @@ export const ethLedgerSignTx = async (
 export const createBtcTx = async (
   transport: Transport,
   path: string,
-  outputs: UnspentOutput[],
+  outputs: TUnspentOutput[],
   addressFrom: string,
   addressTo: string,
   amount: number,
@@ -174,7 +187,11 @@ export const createBtcTx = async (
       return null
     }
 
-    const newTx = bitcoin.createUnsignedTx(outputs, addressTo, amount, fee, addressFrom)
+    const newTx = await createUnsignedTx(addressFrom, addressTo, amount, fee, outputs)
+
+    if (!newTx) {
+      return null
+    }
 
     const splitNewTx = btc.splitTransaction(newTx)
     const outputScriptHex = btc.serializeTransactionOutputs(splitNewTx).toString('hex')
@@ -186,6 +203,7 @@ export const createBtcTx = async (
       additionals: [],
     })
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -216,7 +234,7 @@ export const createXrpTx = async (
           Account: addressFrom,
           Destination: addressTo,
           Amount: `${amount}`,
-          Fee: `${formatXrpValue(fee, 'to')}`,
+          Fee: `${formatValue(fee, 'to')}`,
           Sequence: sequence,
           SigningPubKey: toUpper(publicKey),
         }
@@ -240,6 +258,7 @@ export const createXrpTx = async (
 
     return null
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }
@@ -257,6 +276,7 @@ export const getFirstAddress = async (
       return await getXRPAddress(0, transport)
     }
   } catch (err) {
+    // @ts-ignore
     return err
   }
 }

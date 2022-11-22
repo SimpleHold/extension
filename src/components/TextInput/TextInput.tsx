@@ -4,6 +4,10 @@ import SVG from 'react-inlinesvg'
 // Components
 import Tooltip from '@components/Tooltip'
 
+// Assets
+import warningIcon from '@assets/icons/warning.svg'
+import timesIcon from '@assets/icons/times.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -48,6 +52,8 @@ const TextInput: React.FC<Props> = (props) => {
   const [isButtonVisible, setButtonVisible] = React.useState<boolean>(false)
   const [isClearButtonVisible, setClearButtonVisible] = React.useState<boolean>(false)
 
+  const [showErrorLabel, setShowErrorLabel] = React.useState<boolean>(false)
+
   React.useEffect(() => {
     if (!isFocused && isButtonVisible) {
       setTimeout(() => {
@@ -70,6 +76,10 @@ const TextInput: React.FC<Props> = (props) => {
     }
   }, [value, isClearButtonVisible, isFocused])
 
+  React.useEffect(() => {
+    errorLabel && showTemporaryError()
+  }, [errorLabel])
+
   const onClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     if (
       (!disabled &&
@@ -87,6 +97,17 @@ const TextInput: React.FC<Props> = (props) => {
 
   const onChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value)
+  }
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      errorLabel && showTemporaryError()
+    }
+  }
+
+  const showTemporaryError = () => {
+    setShowErrorLabel(true)
+    setTimeout(setShowErrorLabel, 1000, false)
   }
 
   const onClear = (): void => {
@@ -130,18 +151,21 @@ const TextInput: React.FC<Props> = (props) => {
     <Styles.Container
       onClick={onClick}
       isFocused={isFocused}
-      isError={errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0}
+      isError={
+        showErrorLabel ||
+        (errorLabel !== undefined && errorLabel !== null && !isFocused && value.length > 0)
+      }
       disabled={disabled}
       pr={isClearButtonVisible || type === 'password' ? 10 : 16}
     >
       <Styles.Row isActive={isFocused || value?.length > 0} openFrom={openFrom}>
         <Styles.LabelRow>
           <Styles.Label>
-            {errorLabel && !isFocused && value.length > 0 ? errorLabel : label}
+            {showErrorLabel || (errorLabel && !isFocused && value.length > 0) ? errorLabel : label}
           </Styles.Label>
           {labelTooltip?.length && errorLabel && value.length && !isFocused ? (
             <Tooltip text={labelTooltip} maxWidth={195} textSpace="pre-wrap" mt={5}>
-              <SVG src="../../assets/icons/warning.svg" width={12} height={12} />
+              <SVG src={warningIcon} width={12} height={12} />
             </Tooltip>
           ) : null}
         </Styles.LabelRow>
@@ -154,6 +178,7 @@ const TextInput: React.FC<Props> = (props) => {
             onChange={onChangeInput}
             decimalScale={18}
             disabled={disabled}
+            onKeyDown={onKeyDown}
           />
         ) : (
           <Styles.Input
@@ -164,6 +189,7 @@ const TextInput: React.FC<Props> = (props) => {
             onChange={onChangeInput}
             type={type === 'password' && isPasswordVisible ? 'text' : type}
             disabled={disabled}
+            onKeyDown={onKeyDown}
           />
         )}
       </Styles.Row>
@@ -176,7 +202,7 @@ const TextInput: React.FC<Props> = (props) => {
 
       {value.length && type !== 'password' && isClearButtonVisible ? (
         <Styles.ClearButton onClick={onClear}>
-          <SVG src="../../assets/icons/times.svg" width={10} height={10} />
+          <SVG src={timesIcon} width={10} height={10} />
         </Styles.ClearButton>
       ) : null}
 

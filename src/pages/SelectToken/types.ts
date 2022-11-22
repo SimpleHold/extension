@@ -1,10 +1,10 @@
 // Types
-import { ICurrency } from '@config/currencies'
-import { IToken } from '@config/tokens'
+import { TCurrency } from '@config/currencies/types'
+import { TToken } from '@tokens/types'
 
 export interface ILocationState {
   address: string
-  currency: ICurrency
+  currency: TCurrency
 }
 
 export interface IState {
@@ -13,5 +13,5 @@ export interface IState {
   password: string
   errorLabel: null | string
   tokenSymbol: string
-  tokensList: IToken[]
+  tokensList: TToken[]
 }

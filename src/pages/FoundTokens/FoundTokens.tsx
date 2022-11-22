@@ -14,11 +14,11 @@ import ConfirmDrawer from '@drawers/Confirm'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet } from '@utils/wallet'
-import { importPrivateKey } from '@utils/currencies'
+import { importPrivateKey } from '@coins/index'
 import { getItem, setItem } from '@utils/storage'
 
 // Config
-import { getCurrencyByChain } from '@config/currencies'
+import { getCurrencyByChain } from '@config/currencies/utils'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -134,7 +134,7 @@ const FoundTokens: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle="Import private key" whiteLogo/>
+        <Header withBack onBack={history.goBack} backTitle="Import private key" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Found tokens</Styles.Title>

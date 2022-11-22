@@ -1,4 +1,4 @@
-import { browser, Tabs, Cookies } from 'webextension-polyfill-ts'
+import browser, { Tabs, Cookies } from 'webextension-polyfill'
 
 export type Cookie = Cookies.Cookie
 
@@ -7,7 +7,7 @@ export const getId = (): string => {
 }
 
 export const getUrl = (path: string): string => {
-  return browser.extension.getURL(path)
+  return browser.runtime.getURL(path)
 }
 
 export const openWebPage = async (url: string): Promise<void> => {
@@ -16,23 +16,23 @@ export const openWebPage = async (url: string): Promise<void> => {
 
 export const openAppInNewWindow = (): void => {
   window.open(
-    getUrl("popup.html"),
-    "SimpleHold Wallet",
-    "popup=yes,left=500,top=0,width=375,height=630,resizable=no,location=no,status=no,scrollbars=no"
-  );
-  window.close();
+    getUrl('popup.html'),
+    'SimpleHold Wallet',
+    'popup=yes,left=500,top=0,width=375,height=630,resizable=no,location=no,status=no,scrollbars=no'
+  )
+  window.close()
 }
 
 export const setBadgeBackgroundColor = (color: string) => {
-  browser.browserAction.setBadgeBackgroundColor({ color })
+  browser.action.setBadgeBackgroundColor({ color })
 }
 
-export const setBadgeText = (text: string) => {
-  browser.browserAction.setBadgeText({ text })
+export const setBadgeText = async (text: string): Promise<void> => {
+  browser.action.setBadgeText({ text })
 }
 
 export const getBadgeText = async (): Promise<string> => {
-  return await browser.browserAction.getBadgeText({})
+  return await browser.action.getBadgeText({})
 }
 
 export const getManifest = () => {

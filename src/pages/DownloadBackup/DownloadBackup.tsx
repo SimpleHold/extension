@@ -14,13 +14,11 @@ import { getUrl, openWebPage } from '@utils/extension'
 import { getItem, removeItem, setItem } from '@utils/storage'
 
 // Config
-import {
-  ADD_ADDRESS_GENERATE_BACKUP,
-  ADD_ADDRESS_IMPORT_BACKUP,
-} from '@config/events'
+import { ADD_ADDRESS_GENERATE_BACKUP, ADD_ADDRESS_IMPORT_BACKUP } from '@config/events'
 
-// Icons
+// Assets
 import linkIcon from '@assets/icons/link.svg'
+import downloadbackup from '@assets/illustrate/downloadbackup.svg'
 
 // Styles
 import Styles from './styles'
@@ -42,11 +40,10 @@ const DownloadBackup: React.FC = () => {
   const checkBrowserAndOS = () => {
     const os = detectOS()
     const browser = detectBrowser()
-    setDownloadManually((os === 'macos' && browser === 'chrome'))
+    setDownloadManually(os === 'macos' && browser === 'chrome')
   }
 
   const downloadFile = async () => {
-
     if (state?.from) {
       logEvent({
         name:
@@ -63,8 +60,8 @@ const DownloadBackup: React.FC = () => {
 
     if (backup) {
       downloadBackup(backup)
-      if (getItem("initialBackup")) {
-        setItem("initialBackup", "downloaded")
+      if (getItem('initialBackup')) {
+        setItem('initialBackup', 'downloaded')
       }
       removeItem('backupStatus')
       history.replace('/wallets')
@@ -76,7 +73,7 @@ const DownloadBackup: React.FC = () => {
       <Header noActions withBorder />
       <Styles.Container>
         <Styles.Row>
-          <Styles.Image src="../../assets/illustrate/downloadbackup.svg" alt="image" />
+          <Styles.Image src={downloadbackup} alt="image" />
           <Styles.Title>Backup</Styles.Title>
           <Styles.Description>
             Please save your backup file and keep it properly as well as your password. It ensures

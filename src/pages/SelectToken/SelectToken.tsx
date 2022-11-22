@@ -12,18 +12,25 @@ import CurrencyLogo from '@components/CurrencyLogo'
 import ConfirmDrawer from '@drawers/Confirm'
 
 // Config
-import tokens, { IToken } from '@config/tokens'
+import tokens from '@tokens/index'
+import { TToken } from '@tokens/types'
 
 // Utils
 import { toUpper, toLower } from '@utils/format'
 import { addNew as addNewWallet, getWallets, IWallet } from '@utils/wallet'
-import { setUserProperties } from 'utils/metrics'
+import { setUserProperties } from '@utils/metrics'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { getItem, setItem } from '@utils/storage'
 
+// Tokens
+import { getSharedTokens } from '@tokens/index'
+
 // Hooks
 import useState from '@hooks/useState'
+
+// Assets
+import plusCircleIcon from '@assets/icons/plusCircle.svg'
 
 // Types
 import { ILocationState, IState } from './types'
@@ -60,7 +67,7 @@ const SelectToken: React.FC = () => {
   }, [])
 
   const checkLocalTokens = (): void => {
-    const localTokens = getTokens()
+    const localTokens = getSharedTokens()
 
     if (localTokens.length) {
       updateState({ tokensList: [...state.tokensList, ...localTokens] })
@@ -78,8 +85,8 @@ const SelectToken: React.FC = () => {
             toLower(wallet.chain) === toLower(currency.chain)
         )
         .map((wallet: IWallet) => wallet.symbol)
-      const tokensList: IToken[] = tokens.filter(
-        (token: IToken) =>
+      const tokensList: TToken[] = tokens.filter(
+        (token: TToken) =>
           toLower(token.chain) === toLower(currency.chain) && !getExistTokens.includes(token.symbol)
       )
 
@@ -87,7 +94,7 @@ const SelectToken: React.FC = () => {
     }
   }
 
-  const filterTokensList = state.tokensList.filter((token: IToken) => {
+  const filterTokensList = state.tokensList.filter((token: TToken) => {
     if (state.searchValue.length) {
       const findByName = toLower(token.name)?.indexOf(toLower(state.searchValue) || '') !== -1
       const findBySymbol = toLower(token.symbol)?.indexOf(toLower(state.searchValue) || '') !== -1
@@ -189,12 +196,14 @@ const SelectToken: React.FC = () => {
             ) : null}
 
             <Styles.TokensList>
-              {filterTokensList.map((token: IToken, index) => {
+              {filterTokensList.map((token: TToken, index) => {
                 const { name, symbol, chain } = token
 
-
                 return (
-                  <Styles.TokenBlock key={`${symbol}/${chain}/${index}`} onClick={() => onAddToken(symbol)}>
+                  <Styles.TokenBlock
+                    key={`${symbol}/${chain}/${index}`}
+                    onClick={() => onAddToken(symbol)}
+                  >
                     <CurrencyLogo symbol={symbol} size={40} br={10} chain={chain} />
                     <Styles.TokenName>{name}</Styles.TokenName>
                     <Styles.TokenSymbol>{toUpper(symbol)}</Styles.TokenSymbol>
@@ -204,12 +213,7 @@ const SelectToken: React.FC = () => {
 
               <Styles.TokenBlock onClick={onAddCustomToken}>
                 <Styles.CustomTokenLogo>
-                  <SVG
-                    src="../../assets/icons/plusCircle.svg"
-                    width={20}
-                    height={20}
-                    title="Create new wallet"
-                  />
+                  <SVG src={plusCircleIcon} width={20} height={20} title="Create new wallet" />
                 </Styles.CustomTokenLogo>
                 <Styles.CustomTokenLabel>Add Custom Token</Styles.CustomTokenLabel>
               </Styles.TokenBlock>

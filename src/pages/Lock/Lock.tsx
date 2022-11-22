@@ -13,12 +13,15 @@ import LogoutDrawer from '@drawers/Logout'
 import { decrypt } from '@utils/crypto'
 import { downloadBackupFile as downloadBackup } from '@utils/backup'
 import { validatePassword } from '@utils/validate'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { openWebPage } from '@utils/extension'
 import { getItem, removeCache, removeItem } from '@utils/storage'
 
 // Config
 import { SUPPORT_SELECT } from '@config/events'
+
+// Assets
+import lockImage from '@assets/illustrate/lock.svg'
 
 // Styles
 import Styles from './styles'
@@ -78,7 +81,7 @@ const Lock: React.FC = () => {
       removeCache()
 
       history.push('/welcome')
-      removeItem("isLocked")
+      removeItem('isLocked')
     }
   }
 
@@ -98,8 +101,8 @@ const Lock: React.FC = () => {
     logEvent({
       name: SUPPORT_SELECT,
       properties: {
-        page: "lock"
-      }
+        page: 'lock',
+      },
     })
     openWebPage('https://simplehold.io/about')
   }
@@ -109,7 +112,7 @@ const Lock: React.FC = () => {
       <Styles.Wrapper>
         <Header noActions withBorder />
         <Styles.Container>
-          <Styles.Image src="../../assets/illustrate/lock.svg" alt="lock" />
+          <Styles.Image src={lockImage} alt="lock" />
           <Styles.Title>Welcome back!</Styles.Title>
           <Styles.Form onSubmit={onSubmitForm}>
             <TextInput
@@ -127,9 +130,7 @@ const Lock: React.FC = () => {
 
           <Styles.Links>
             <Styles.Link onClick={onLogout}>Download a backup and log out</Styles.Link>
-            <Styles.Link onClick={onContactSupport}>
-              Contact support
-            </Styles.Link>
+            <Styles.Link onClick={onContactSupport}>Contact support</Styles.Link>
           </Styles.Links>
         </Styles.Container>
       </Styles.Wrapper>

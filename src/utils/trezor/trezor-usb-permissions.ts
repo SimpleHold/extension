@@ -1,4 +1,4 @@
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 const switchToPopupTab = async (event?: Event) => {
   window.removeEventListener('beforeunload', switchToPopupTab)
@@ -40,6 +40,7 @@ const switchToPopupTab = async (event?: Event) => {
 window.addEventListener('message', (event) => {
   if (event.data === 'usb-permissions-init') {
     const iframe = document.getElementById('trezor-usb-permissions')
+
     if (iframe) {
       // @ts-ignore
       iframe.contentWindow.postMessage(

@@ -8,13 +8,16 @@ import Button from '@components/Button'
 // Utils
 import { sendFeedback } from '@utils/api'
 import { getItem } from '@utils/storage'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 
 // Hooks
 import useState from '@hooks/useState'
 
 // Config
 import { NPS_CONFIRM, NPS_COMMENT, NPS_SCORE, NPS_OUT } from '@config/events'
+
+// Assets
+import successIcon from '@assets/drawer/success.svg'
 
 // Types
 import { IProps, IState } from './types'
@@ -91,7 +94,7 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
 
     if (!state.isSent) {
       logEvent({
-        name: NPS_OUT
+        name: NPS_OUT,
       })
     }
 
@@ -104,7 +107,7 @@ const FeedbackDrawer: React.FC<IProps> = (props) => {
       isActive={isActive}
       onClose={onClickClose}
       withCloseIcon
-      icon={state.isSent ? '../../assets/drawer/success.svg' : undefined}
+      icon={state.isSent ? successIcon : undefined}
       openFrom={openFrom}
     >
       <Styles.Row>

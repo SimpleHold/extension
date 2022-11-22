@@ -1,9 +1,12 @@
 import TrezorConnect, { TxInputType, TxOutputType, Features } from 'trezor-connect'
 import { Transaction } from '@ethereumjs/tx'
+import Web3 from 'web3'
 
 // Utils
-import { toHex } from '@utils/currencies/ethereumLike'
 import { sendRawTransaction } from '@utils/api'
+
+// Types
+import { TUnspentOutput } from '@coins/types'
 
 export type TTrezorBundle = {
   path: string
@@ -50,6 +53,10 @@ export const currencies: TTrezorCurrency[] = [
     index: 0,
   },
 ]
+
+export const toHex = (value: number): string => {
+  return new Web3().utils.toHex(value)
+}
 
 export const init = async (): Promise<void> => {
   try {
@@ -121,7 +128,7 @@ export const signTransaction = async (
   amount: string,
   addressTo: string,
   coin: string,
-  outputs: UnspentOutput[],
+  outputs: TUnspentOutput[],
   path: string,
   fee: number
 ): Promise<string | null> => {
@@ -130,7 +137,7 @@ export const signTransaction = async (
 
     const addressFromPath = getNumberPath(path)
 
-    const mapInputs: TxInputType[] = outputs.map((output: UnspentOutput) => {
+    const mapInputs: TxInputType[] = outputs.map((output: TUnspentOutput) => {
       return {
         address_n: addressFromPath,
         prev_index: output.outputIndex,
@@ -141,7 +148,7 @@ export const signTransaction = async (
     })
 
     const getTotalOutputsSats = outputs.reduce(
-      (a: number, b: UnspentOutput) => Number(b.satoshis) + a,
+      (a: number, b: TUnspentOutput) => Number(b.satoshis) + a,
       0
     )
 

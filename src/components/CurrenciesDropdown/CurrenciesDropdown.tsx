@@ -9,10 +9,13 @@ import RadioButton from '@components/RadioButton'
 import { toLower } from '@utils/format'
 
 // Config
-import { getCurrencyByChain } from '@config/currencies'
+import { getCurrencyByChain } from '@config/currencies/utils'
 
 // Hooks
 import useVisible from '@hooks/useVisible'
+
+// Assets
+import arrowIcon from '@assets/icons/arrow.svg'
 
 // Types
 import { Props, TList, TSelectedCurrency } from './types'
@@ -39,6 +42,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
     withActions,
     onResetDropdown,
     onClose,
+    maxHeight,
   } = props
 
   const { ref, isVisible, setIsVisible } = useVisible(false)
@@ -108,7 +112,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
             </Styles.Info>
             {!disabled ? (
               <Styles.ArrowIconRow>
-                <SVG src="../../assets/icons/arrow.svg" width={8} height={14} />
+                <SVG src={arrowIcon} width={8} height={14} />
               </Styles.ArrowIconRow>
             ) : null}
           </Styles.Row>
@@ -117,7 +121,7 @@ const CurrenciesDropdown: React.FC<Props> = (props) => {
 
       {!disabled ? (
         <Styles.DropdownRow isVisible={isVisible}>
-          <Styles.List maxHeight={withActions ? 180 : 240}>
+          <Styles.List maxHeight={maxHeight || withActions ? 180 : 240}>
             {list.map((item: TList, index: number) => {
               const { logo, value, label, withRadioButton } = item
 

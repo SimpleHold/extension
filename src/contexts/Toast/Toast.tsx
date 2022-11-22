@@ -1,5 +1,4 @@
 import * as React from 'react'
-import SVG from 'react-inlinesvg'
 
 // Styles
 import Styles from './styles'
@@ -38,9 +37,7 @@ export const ToastContextProvider: React.FC<Props> = (props) => {
         <Styles.Container>
           <Styles.Toast>
             <Styles.ToastText>{toast}</Styles.ToastText>
-            <Styles.CloseIconRow onClick={() => setToast('')}>
-              <SVG src="../../assets/icons/times.svg" width={16} height={16} />
-            </Styles.CloseIconRow>
+            <Styles.CloseIconRow onClick={() => setToast('')} />
           </Styles.Toast>
         </Styles.Container>
       ) : null}

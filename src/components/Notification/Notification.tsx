@@ -1,6 +1,9 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
 
+// Assets
+import timesIcon from '@assets/icons/times.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -26,7 +29,7 @@ const Notification: React.ForwardRefRenderFunction<Handles, {}> = (props, forwar
       <Styles.Wrapper>
         <Styles.Text>{text}</Styles.Text>
         <Styles.CloseIcon onClick={onClose}>
-          <SVG src="../../assets/icons/times.svg" width={10} height={10} title="Close" />
+          <SVG src={timesIcon} width={10} height={10} title="Close" />
         </Styles.CloseIcon>
       </Styles.Wrapper>
     )

@@ -12,25 +12,29 @@ import ConfirmDrawer from '@drawers/Confirm'
 import SuccessDrawer from '@drawers/Success'
 
 // Utils
-import { logEvent, setUserProperties } from 'utils/metrics'
+import { logEvent, setUserProperties } from '@utils/metrics'
 import { validatePassword } from '@utils/validate'
 import { decrypt } from '@utils/crypto'
 import { addNew as addNewWallet, IWallet } from '@utils/wallet'
 import { toUpper } from '@utils/format'
-import { generate, checkWithPhrase } from '@utils/currencies'
+import { generateAddress, checkWithPhrase, getList } from '@coins/index'
 import { getItem, setItem } from '@utils/storage'
-import * as theta from '@utils/currencies/theta'
-import * as vechain from '@utils/currencies/vechain'
 
 // Config
 import { ADD_ADDRESS_GENERATE, ADD_ADDRESS_IMPORT, ADD_ADDRESS_CONFIRM } from '@config/events'
-import { getCurrencyByChain, ICurrency } from '@config/currencies'
+import { getCurrencyByChain, getCurrencyInfo } from '@config/currencies/utils'
 
 // Hooks
 import useState from '@hooks/useState'
 
 // Types
 import { ILocationState, IState } from './types'
+import { TCurrency } from '@config/currencies/types'
+
+// Assets
+import phraseIcon from '@assets/icons/phrase.svg'
+import importIcon from '@assets/icons/import.svg'
+import plusCircleIcon from '@assets/icons/plusCircle.svg'
 
 // Styles
 import Styles from './styles'
@@ -80,16 +84,11 @@ const NewWallet: React.FC = () => {
     })
   }
 
-  const getCurrenciesList = (getCurrencyInfo?: ICurrency | undefined | null): string[] => {
-    if (vechain.coins.indexOf(symbol) !== -1) {
-      return vechain.coins.sort((a: string, b: string) => b.indexOf(symbol) - a.indexOf(symbol))
+  const getCurrenciesList = (getCurrencyInfo?: TCurrency | undefined | null): string[] => {
+    if (getCurrencyInfo) {
+      return getList(getCurrencyInfo.symbol, chain)
     }
-    if (theta.coins.indexOf(symbol) !== -1) {
-      return theta.coins.sort((a: string, b: string) => a.indexOf(symbol) - b.indexOf(symbol))
-    }
-    if (chain && getCurrencyInfo) {
-      return [symbol, getCurrencyInfo.symbol]
-    }
+
     return [symbol]
   }
 
@@ -97,13 +96,20 @@ const NewWallet: React.FC = () => {
     if (validatePassword(state.password)) {
       updateState({ isButtonLoading: true })
 
-      const generateAddress = await generate(symbol, chain)
-      if (generateAddress) {
-        const { privateKey, mnemonic, isNotActivated, address } = generateAddress
+      const currencyInfo = chain ? getCurrencyByChain(chain) : getCurrencyInfo(symbol)
+
+      if (!currencyInfo) {
+        return
+      }
+
+      const generatedAddress = await generateAddress(symbol, currencyInfo.chain, chain)
+
+      if (generatedAddress) {
+        const { privateKey, mnemonic, isNotActivated, address } = generatedAddress
 
         const backup = getItem('backup')
 
-        if (backup && privateKey) {
+        if (backup && (privateKey || mnemonic)) {
           const decryptBackup = decrypt(backup, state.password)
 
           if (decryptBackup) {
@@ -124,12 +130,12 @@ const NewWallet: React.FC = () => {
               contractAddress,
               decimals,
               mnemonic,
-              isNotActivated,
+              isNotActivated
             )
 
             if (walletsList) {
               const walletAmount = JSON.parse(walletsList).filter(
-                (wallet: IWallet) => wallet.symbol === symbol,
+                (wallet: IWallet) => wallet.symbol === symbol
               ).length
 
               setUserProperties({ [`NUMBER_WALLET_${toUpper(symbol)}`]: `${walletAmount}` })
@@ -166,6 +172,7 @@ const NewWallet: React.FC = () => {
   const onImportPhrase = (): void => {
     history.push('/import-recovery-phrase', {
       symbol,
+      tokenChain: chain,
     })
   }
 
@@ -183,7 +190,12 @@ const NewWallet: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack onBack={history.goBack} backTitle={backTitle || 'Select currency'} whiteLogo />
+        <Header
+          withBack
+          onBack={history.goBack}
+          backTitle={backTitle || 'Select currency'}
+          whiteLogo
+        />
         <Styles.Container>
           <Styles.Title>Add address</Styles.Title>
           <Styles.Description>
@@ -198,24 +210,14 @@ const NewWallet: React.FC = () => {
             {isWithPhrase ? (
               <Styles.Action onClick={onImportPhrase}>
                 <Styles.ActionIcon>
-                  <SVG
-                    src='../../assets/icons/phrase.svg'
-                    width={16}
-                    height={16}
-                    title='Import a recovery phrase'
-                  />
+                  <SVG src={phraseIcon} width={16} height={16} title="Import a recovery phrase" />
                 </Styles.ActionIcon>
                 <Styles.ActionName>Import a recovery phrase</Styles.ActionName>
               </Styles.Action>
             ) : (
               <Styles.Action onClick={onImportPrivateKey}>
                 <Styles.ActionIcon>
-                  <SVG
-                    src='../../assets/icons/import.svg'
-                    width={18}
-                    height={18}
-                    title='Import a private key'
-                  />
+                  <SVG src={importIcon} width={18} height={18} title="Import a private key" />
                 </Styles.ActionIcon>
                 <Styles.ActionName>Import a private key</Styles.ActionName>
               </Styles.Action>
@@ -223,12 +225,7 @@ const NewWallet: React.FC = () => {
 
             <Styles.Action onClick={onGenerateAddress}>
               <Styles.ActionIcon>
-                <SVG
-                  src='../../assets/icons/plusCircle.svg'
-                  width={20}
-                  height={20}
-                  title='Generate a new address'
-                />
+                <SVG src={plusCircleIcon} width={20} height={20} title="Generate a new address" />
               </Styles.ActionIcon>
               <Styles.ActionName>Generate a new address</Styles.ActionName>
             </Styles.Action>
@@ -238,20 +235,20 @@ const NewWallet: React.FC = () => {
       <ConfirmDrawer
         isActive={state.activeDrawer === 'confirm'}
         onClose={onCloseDrawer}
-        title='Please enter your password to add a new address'
-        inputLabel='Enter password'
+        title="Please enter your password to add a new address"
+        inputLabel="Enter password"
         textInputValue={state.password}
         isButtonDisabled={!validatePassword(state.password)}
         onConfirm={onConfirm}
         onChangeText={setPassword}
-        textInputType='password'
+        textInputType="password"
         inputErrorLabel={state.errorLabel}
         isButtonLoading={state.isButtonLoading}
       />
       <SuccessDrawer
         isActive={state.activeDrawer === 'success'}
         onClose={onDownloadBackup}
-        text='The new address has been successfully added!'
+        text="The new address has been successfully added!"
       />
     </>
   )

@@ -1,6 +1,10 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
 
+// Assets
+import trezorLogo from '@assets/hardware/trezor.svg'
+import ledgerLogo from '@assets/hardware/ledger.svg'
+
 // Styles
 import Styles from '../styles'
 
@@ -15,10 +19,10 @@ const HardwareTab: React.FC<Props> = (props) => {
     <Styles.Tab>
       <Styles.HardwareWallets>
         <Styles.HardwareWallet onClick={onConnect('trezor')}>
-          <SVG src="../../../assets/hardware/trezor.svg" width={80} height={22} />
+          <SVG src={trezorLogo} width={80} height={22} />
         </Styles.HardwareWallet>
         <Styles.HardwareWallet onClick={onConnect('ledger')}>
-          <SVG src="../../../assets/hardware/ledger.svg" width={80} height={22} />
+          <SVG src={ledgerLogo} width={80} height={22} />
         </Styles.HardwareWallet>
       </Styles.HardwareWallets>
     </Styles.Tab>

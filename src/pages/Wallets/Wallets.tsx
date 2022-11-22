@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useHistory, useLocation } from 'react-router-dom'
 import { ScrollParams } from 'react-virtualized'
 import { useIdleTimer } from 'react-idle-timer'
+import browser from 'webextension-polyfill'
 
 // Components
 import CollapsibleHeader from '@components/CollapsibleHeader'
@@ -18,15 +19,11 @@ import useToastContext from '@hooks/useToastContext'
 import useState from '@hooks/useState'
 
 // Utils
-import {
-  getFilteredSum,
-  getFilteredWallets,
-  IWallet,
-} from '@utils/wallet'
+import { getFilteredSum, getFilteredWallets, getWallets, IWallet } from '@utils/wallet'
 import { logEvent } from '@utils/metrics'
 import { getBadgeText, openWebPage, setBadgeText } from '@utils/extension'
 import { checkOneOfExist, clear, getItem, setItem } from '@utils/storage'
-import { getBalances } from '@utils/currencies'
+import { getBalances } from '@coins/utils'
 import { checkIfTimePassed, toMs } from '@utils/dates'
 
 // Config
@@ -34,7 +31,8 @@ import {
   ADD_ADDRESS,
   FILTERS_SELECT,
   HISTORY_SELECT,
-  MAIN_HOME, RECEIVE_SELECT,
+  MAIN_HOME,
+  RECEIVE_SELECT,
   EXCHANGE_SELECT,
 } from '@config/events'
 
@@ -53,8 +51,11 @@ const initialState: IState = {
   scrollPosition: 0,
 }
 
-const Wallets: React.FC = () => {
+const LS = {
+  getItem: async (key: string) => (await browser.storage.local.get(key))[key],
+}
 
+const Wallets: React.FC = () => {
   const history = useHistory()
   const { state: locationState } = useLocation<ILocationState>()
   const { state, updateState } = useState<IState>(initialState)
@@ -67,6 +68,7 @@ const Wallets: React.FC = () => {
   const [isListScrollable, setIsListScrollable] = React.useState(false)
 
   const [listType, setListType] = React.useState<'send' | 'receive' | null>(null)
+  const [showSkeletons, setShowSkeletons] = React.useState(false)
   const [isShowNft, setIsShowNfts] = React.useState(false)
 
   const [isIdle, setIsIdle] = React.useState(false)
@@ -87,8 +89,10 @@ const Wallets: React.FC = () => {
     getWalletsList()
     checkBadgeText()
     logEvent({
-      name: MAIN_HOME
+      name: MAIN_HOME,
     })
+    setWalletsToBackground()
+    checkWindowStorageTokens()
     return () => clearTimeout(refreshBalancesTimerId)
   }, [])
 
@@ -111,9 +115,17 @@ const Wallets: React.FC = () => {
     }
   }, [locationState])
 
+  const checkWindowStorageTokens = async (): Promise<void> => {
+    const getTokens = await LS.getItem('tokens')
+
+    if (getTokens) {
+      setItem('tokens', JSON.stringify(getTokens))
+    }
+  }
+
   const updateBalance = (
     arr: TWalletAmountData[],
-    type: 'totalBalance' | 'totalEstimated' | 'pendingBalance',
+    type: 'totalBalance' | 'totalEstimated' | 'pendingBalance'
   ) => {
     if (arr.length === state.wallets?.length && state[type] === null) {
       updateState({ [type]: arr.reduce((acc, walletData) => acc + walletData.amount, 0) })
@@ -155,6 +167,13 @@ const Wallets: React.FC = () => {
     toggleScroll('off')
   }, [])
 
+  const setWalletsToBackground = (): void => {
+    browser.runtime.sendMessage({
+      type: 'wallets',
+      data: getWallets(),
+    })
+  }
+
   const showSelectCurrencyDrawer = () => updateState({ activeDrawer: 'select_currency' })
 
   const calculateBalances = () => {
@@ -188,8 +207,11 @@ const Wallets: React.FC = () => {
       wallets = getFilteredWallets()
       setInitialBalance(wallets)
     } else {
-      clear()
-      history.push('/welcome')
+      updateState({
+        totalBalance: 0,
+        totalEstimated: 0,
+        pendingBalance: 0,
+      })
     }
   }
 
@@ -203,13 +225,18 @@ const Wallets: React.FC = () => {
   const loadBalances = async () => {
     refreshBalancesTimerId = +setTimeout(loadBalances, toMs(balanceRefreshTime))
     let wallets = getFilteredWallets()
-    const lastUpdate = getItem("last_balances_request")
+    const lastUpdate = getItem('last_balances_request')
     const isTimePassed = !lastUpdate || checkIfTimePassed(+lastUpdate, balanceRefreshTime)
-    const isFetchReady = getItem("initial_balances_request") || !isIdle && isTimePassed
+    const isInitialRequest = getItem('initial_balances_request')
+    const isFetchReady = isInitialRequest || (!isIdle && isTimePassed)
+    if (isInitialRequest) {
+      setShowSkeletons(true)
+    }
     if (isFetchReady) {
-      setItem("last_balances_request", String(Date.now()))
+      setItem('last_balances_request', String(Date.now()))
       await getBalances(wallets)
     }
+    setShowSkeletons(false)
   }
 
   const setInitialBalance = (wallets: IWallet[]) => {
@@ -227,15 +254,15 @@ const Wallets: React.FC = () => {
     setWalletsEstimated(walletsEstimated)
   }
 
-  const sumWalletBalance = (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) => (
-    wallet: TWalletAmountData,
-  ) => {
-    setStateCallback((prevArray: TWalletAmountData[]) => {
-      return prevArray.find((existingWallet) => existingWallet.uuid === wallet.uuid)
-        ? prevArray
-        : [...prevArray, wallet]
-    })
-  }
+  const sumWalletBalance =
+    (setStateCallback: React.Dispatch<React.SetStateAction<TWalletAmountData[]>>) =>
+    (wallet: TWalletAmountData) => {
+      setStateCallback((prevArray: TWalletAmountData[]) => {
+        return prevArray.find((existingWallet) => existingWallet.uuid === wallet.uuid)
+          ? prevArray
+          : [...prevArray, wallet]
+      })
+    }
 
   const sumBalanceCallback = React.useCallback(sumWalletBalance(setWalletsBalance), [])
   const sumEstimatedCallback = React.useCallback(sumWalletBalance(setWalletsEstimated), [])
@@ -270,9 +297,9 @@ const Wallets: React.FC = () => {
   }
 
   const setListOnClickHandler = (type: 'send' | 'receive') => () => {
-    if (type === "receive") {
+    if (type === 'receive') {
       logEvent({
-        name: RECEIVE_SELECT
+        name: RECEIVE_SELECT,
       })
     }
     setListType(type)
@@ -285,8 +312,8 @@ const Wallets: React.FC = () => {
     logEvent({
       name: FILTERS_SELECT,
       properties: {
-        type: "wallets"
-      }
+        type: 'wallets',
+      },
     })
   }, [])
 
@@ -309,13 +336,13 @@ const Wallets: React.FC = () => {
     }
   }
 
-  const scrollHandler = React.useCallback(e => e.preventDefault(), [])
+  const scrollHandler = React.useCallback((e: any) => e.preventDefault(), [])
 
   const toggleScroll = (toggle: 'on' | 'off') => {
     const list = document.getElementsByClassName('ReactVirtualized__List')[0]
     const events = ['mousewheel', 'touchmove']
     const method = toggle === 'off' ? 'addEventListener' : 'removeEventListener'
-    events.forEach(event => list?.[method](event, scrollHandler, false))
+    events.forEach((event) => list?.[method](event, scrollHandler, false))
   }
 
   const isFiltersActive = (): boolean => {
@@ -336,7 +363,7 @@ const Wallets: React.FC = () => {
     isFiltersActive: isFiltersActive(),
     openFilters,
     showNft: isShowNft,
-    onAddNewAddress
+    onAddNewAddress,
   }
 
   return (
@@ -349,17 +376,23 @@ const Wallets: React.FC = () => {
           pendingBalance={state.pendingBalance}
           onClickReceive={setListOnClickHandler('receive')}
           onClickSend={setListOnClickHandler('send')}
+          showSkeletons={showSkeletons}
         />
-        <Styles.WalletsListContainer style={{ top: walletsTop, zIndex: 2}} isUnfolded={isHeaderCollapsed} onWheel={onWheel}>
-          <MainListControls controlsProps={listControlsProps} isListUnfolded={isHeaderCollapsed}/>
-          <WalletsList wallets={state.wallets}
-                       onScroll={onScroll}
-                       sumBalanceCallback={sumBalanceCallback}
-                       sumEstimatedCallback={sumEstimatedCallback}
-                       sumPendingCallback={sumPendingCallback}
+        <Styles.WalletsListContainer
+          style={{ top: walletsTop, zIndex: 2 }}
+          isUnfolded={isHeaderCollapsed}
+          onWheel={onWheel}
+        >
+          <MainListControls controlsProps={listControlsProps} isListUnfolded={isHeaderCollapsed} />
+          <WalletsList
+            wallets={state.wallets}
+            onScroll={onScroll}
+            sumBalanceCallback={sumBalanceCallback}
+            sumEstimatedCallback={sumEstimatedCallback}
+            sumPendingCallback={sumPendingCallback}
+            showSkeletons={showSkeletons}
           />
         </Styles.WalletsListContainer>
-
       </Styles.Wrapper>
       <FilterWalletsDrawer
         isActive={state.activeDrawer === 'filters'}
@@ -372,10 +405,11 @@ const Wallets: React.FC = () => {
         onClose={onCloseDrawer}
         isRedirect={`/${listType}`}
       />
-      <BottomMenuBar onViewTxHistory={onViewTxHistory}
-                     onOpenSettings={() => openPage('/settings')}
-                     onClickWallets={() => openPage('/wallets')}
-                     onClickSwap={onClickSwap}
+      <BottomMenuBar
+        onViewTxHistory={onViewTxHistory}
+        onOpenSettings={() => openPage('/settings')}
+        onClickWallets={() => openPage('/wallets')}
+        onClickSwap={onClickSwap}
       />
     </>
   )

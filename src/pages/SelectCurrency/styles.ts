@@ -23,6 +23,10 @@ const CurrenciesList = styled.div`
   overflow-y: scroll;
 `
 
+const TokensList = styled(CurrenciesList)`
+  max-height: 300px;
+`
+
 const CurrencyBlock = styled.div`
   border: 1px solid #dee1e9;
   background-color: #ffffff;
@@ -162,6 +166,7 @@ const Styles = {
   HardwareWallet,
   NotFoundMessage,
   CurrenciesList,
+  TokensList,
   CurrencyBlock,
   CurrencyName,
   CurrencySymbol,

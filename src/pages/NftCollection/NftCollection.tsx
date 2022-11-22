@@ -17,7 +17,7 @@ import { getNft } from '@utils/api'
 import { IWallet, getWallets } from '@utils/wallet'
 import { checkOneOfExist, getItem, getNFTImage } from '@utils/storage'
 import { toLower } from '@utils/format'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { openWebPage } from '@utils/extension'
 
 // Types
@@ -56,10 +56,10 @@ const NftCollectionPage: React.FC = () => {
     if (walletsList?.length) {
       const filterWallet = walletsList.filter(
         (wallet: IWallet) =>
-          wallet.symbol === 'eth'
-          || wallet.symbol === 'bnb'
-          || wallet.symbol === 'matic'
-          || wallet.symbol === 'sol',
+          wallet.symbol === 'eth' ||
+          wallet.symbol === 'bnb' ||
+          wallet.symbol === 'matic' ||
+          wallet.symbol === 'sol'
       )
 
       if (filterWallet.length) {
@@ -83,7 +83,7 @@ const NftCollectionPage: React.FC = () => {
       return JSON.parse(getAddresses).find(
         (item: IWallet) =>
           toLower(item.symbol) === toLower(wallet.symbol) &&
-          toLower(item.address) === toLower(wallet.address),
+          toLower(item.address) === toLower(wallet.address)
       )
     }
 
@@ -135,8 +135,8 @@ const NftCollectionPage: React.FC = () => {
     logEvent({
       name: FILTERS_SELECT,
       properties: {
-        type: "nfts"
-      }
+        type: 'nfts',
+      },
     })
     setActiveDrawer('filters')
   }
@@ -159,7 +159,6 @@ const NftCollectionPage: React.FC = () => {
 
     openWebPage('https://simpleswap.io/?ref=2a7607295184')
   }
-
 
   const renderNotFound = () => (
     <Styles.NotFound>
@@ -242,10 +241,11 @@ const NftCollectionPage: React.FC = () => {
         onClose={onCloseDrawer}
         onApply={onApplyDrawer}
       />
-      <BottomMenuBar onViewTxHistory={onViewTxHistory}
-                     onOpenSettings={() => openPage('/settings')}
-                     onClickWallets={() => openPage('/wallets')}
-                     onClickSwap={onClickSwap}
+      <BottomMenuBar
+        onViewTxHistory={onViewTxHistory}
+        onOpenSettings={() => openPage('/settings')}
+        onClickWallets={() => openPage('/wallets')}
+        onClickSwap={onClickSwap}
       />
     </>
   )

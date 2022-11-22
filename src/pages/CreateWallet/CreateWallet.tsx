@@ -9,17 +9,17 @@ import Link from '@components/Link'
 
 // Utils
 import { validatePassword } from '@utils/validate'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { generate as generateBackup } from '@utils/backup'
 import { encrypt } from '@utils/crypto'
-import { generate as generateAddress } from '@utils/currencies'
+import { generateAddress, getList } from '@coins/index'
 import { setItem } from '@utils/storage'
 import { getAllCookies, Cookie } from '@utils/extension'
-import * as theta from '@utils/currencies/theta'
 
 // Config
-import { getCurrency, getCurrencyByChain } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyInfo, getCurrencyByChain } from '@config/currencies/utils'
+import { ONBOARDING_CREATE_NEW_WALLET_PASSES } from '@config/events'
+import { getToken } from '@tokens/index'
 
 // Hooks
 import useState from '@hooks/useState'
@@ -29,7 +29,6 @@ import { IState } from './types'
 
 // Styles
 import Styles from './styles'
-import { ONBOARDING_CREATE_NEW_WALLET_PASSES } from 'config/events'
 
 const initialState: IState = {
   password: '',
@@ -84,22 +83,18 @@ const Wallets: React.FC = () => {
           })
         }
       } else {
-        const findCurrency = getCurrency(value)
+        const findCurrency = getCurrencyInfo(value)
 
         if (findCurrency) {
           const { symbol } = findCurrency
 
-          if (theta.coins.indexOf(symbol) !== -1) {
-            updateState({ initialCurrencies: [{ symbol: 'theta' }, { symbol: 'tfuel' }] })
-          } else {
-            updateState({
-              initialCurrencies: [
-                {
-                  symbol,
-                },
-              ],
-            })
-          }
+          const list = getList(symbol).map((i) => {
+            return {
+              symbol: i,
+            }
+          })
+
+          updateState({ initialCurrencies: list })
         }
       }
     }
@@ -109,7 +104,6 @@ const Wallets: React.FC = () => {
     state.password.length < 7 || state.password !== state.confirmPassword || !state.isAgreed
 
   const onConfirm = async (): Promise<void> => {
-
     logEvent({
       name: ONBOARDING_CREATE_NEW_WALLET_PASSES,
     })
@@ -118,14 +112,18 @@ const Wallets: React.FC = () => {
 
     for (const currency of state.initialCurrencies) {
       const { symbol, chain } = currency
-      const generate = await generateAddress(symbol, chain)
+      const currencyInfo = getCurrencyInfo(symbol)
 
-      if (generate) {
-        data.push({
-          symbol,
-          chain,
-          data: generate,
-        })
+      if (currencyInfo) {
+        const generate = await generateAddress(symbol, currencyInfo.chain, chain)
+
+        if (generate) {
+          data.push({
+            symbol,
+            chain,
+            data: generate,
+          })
+        }
       }
     }
 

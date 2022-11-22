@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { render } from 'react-dom'
+import browser from 'webextension-polyfill'
 
 // Components
 import CheckBox from '@components/CheckBox'
@@ -13,13 +14,17 @@ import { TPhishingSite } from '@utils/api/types'
 // Styles
 import Styles from './styles'
 
+const LS = {
+  getItem: async (key: string) => (await browser.storage.local.get(key))[key],
+}
+
 const Phishing: React.FC = () => {
   const [isAgreedVisible, setAgreedVisible] = React.useState<boolean>(false)
   const [isAgreed, setIsAgreed] = React.useState<boolean>(false)
   const [phishingSite, setPhishingSite] = React.useState<TPhishingSite | null>(null)
 
   React.useEffect(() => {
-    getInfo()
+    getBrowserStorage()
   }, [])
 
   React.useEffect(() => {
@@ -27,6 +32,26 @@ const Phishing: React.FC = () => {
       closePhishingSite()
     }
   }, [phishingSite])
+
+  const getBrowserStorage = async () => {
+    const phishingSite = await LS.getItem('phishingSite')
+    const phishingSites = await LS.getItem('phishingSites')
+    const phishingSiteUrl = await LS.getItem('phishingSiteUrl')
+
+    if (phishingSite) {
+      setItem('phishingSite', phishingSite)
+    }
+
+    if (phishingSites) {
+      setItem('phishingSites', phishingSites)
+    }
+
+    if (phishingSiteUrl) {
+      setItem('phishingSiteUrl', phishingSiteUrl)
+    }
+
+    getInfo()
+  }
 
   const getInfo = (): void => {
     const data = getJSON('phishingSite')
@@ -179,4 +204,6 @@ const Phishing: React.FC = () => {
   )
 }
 
-render(<Phishing />, document.getElementById('phishing'))
+browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+  render(<Phishing />, document.getElementById('phishing'))
+})

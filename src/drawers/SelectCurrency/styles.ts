@@ -4,11 +4,11 @@ const Wrapper = styled.div`
   margin-top: 22px;
   height: 600px;
   overflow: hidden;
-  
+
   .wallets-list {
     padding: 0 0 75px !important;
   }
-  
+
   .tabs-container {
   }
 `
@@ -24,7 +24,7 @@ const Container = styled.div`
 
 const SearchContainer = styled.div`
   padding: 14px 16px;
-  border-top: 1px solid #EBEBEE;
+  border-top: 1px solid #ebebee;
 `
 
 const Row = styled.div`
@@ -41,9 +41,9 @@ const WalletsList = styled.div`
       padding: 12px 0;
       background-color: initial;
       border-radius: 16px 16px 0 0;
-      border-bottom: 1px solid #F3F3F3;
+      border-bottom: 1px solid #f3f3f3;
     }
-  } 
+  }
 
   .ReactVirtualized__List {
     transition: 0.4s ease-in;
@@ -83,9 +83,7 @@ const List = {
   backgroundColor: '#fff',
 }
 
-const ListItem = {
-
-}
+const ListItem = {}
 
 const CurrenciesList = styled.div`
   margin: 20px 0 0 0;
@@ -171,8 +169,7 @@ const NotFoundMessage = styled.p`
   color: #7d7e8d;
 `
 
-const Tab = styled.div`
-`
+const Tab = styled.div``
 
 const CustomTokenBlock = styled(CurrencyBlock)`
   border: 1px solid #ffffff;

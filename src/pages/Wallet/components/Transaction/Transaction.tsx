@@ -9,6 +9,11 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { toUpper, price, short } from '@utils/format'
 
+// Assets
+import txArrowIcon from '@assets/icons/txArrow.svg'
+import clockIcon from '@assets/icons/clock.svg'
+import txLinkIcon from '@assets/icons/txLink.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -59,11 +64,11 @@ const Transaction: React.FC<Props> = (props) => {
           <Styles.Info>
             <Styles.TypeRow>
               <Styles.DestinationType isPending={isPending} type={type}>
-                <SVG src="../../../assets/icons/txArrow.svg" width={12} height={16} />
+                <SVG src={txArrowIcon} width={12} height={16} />
               </Styles.DestinationType>
               {isPending ? (
                 <Styles.PendingIcon>
-                  <SVG src="../../../assets/icons/clock.svg" width={8} height={9.5} />
+                  <SVG src={clockIcon} width={8} height={9.5} />
                 </Styles.PendingIcon>
               ) : null}
             </Styles.TypeRow>
@@ -71,7 +76,7 @@ const Transaction: React.FC<Props> = (props) => {
               <Styles.HashRow>
                 <Styles.Hash className="tx-hash">{short(hash, 12)}</Styles.Hash>
                 <Styles.LinkIcon className="link-icon">
-                  <SVG src="../../../assets/icons/txLink.svg" width={12} height={12} />
+                  <SVG src={txLinkIcon} width={12} height={12} />
                 </Styles.LinkIcon>
               </Styles.HashRow>
               <Styles.Date>{dayjs(date).format('MMM D')}</Styles.Date>

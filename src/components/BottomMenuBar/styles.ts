@@ -30,14 +30,13 @@ const Button = styled.div`
     margin-bottom: 2px;
     transition: 0.2s ease;
     path {
-      fill: ${({ isActive }: TProps) => isActive ? '#3FBB7D' : '#BDC4D4'};
+      fill: ${({ isActive }: TProps) => (isActive ? '#3FBB7D' : '#BDC4D4')};
     }
   }
-  
 
   :hover {
     svg {
-      transform: ${({ isActive }: TProps) => isActive ? 'none' : 'translateY(-2px)'};
+      transform: ${({ isActive }: TProps) => (isActive ? 'none' : 'translateY(-2px)')};
     }
   }
 `
@@ -52,13 +51,13 @@ const Label = styled.p`
   line-height: 14px;
   letter-spacing: 0.38px;
   text-transform: capitalize;
-  color: ${({ isActive }: TProps) => isActive ? '#3FBB7D' : '#9C9CAC'};
+  color: ${({ isActive }: TProps) => (isActive ? '#3FBB7D' : '#9C9CAC')};
 `
 
 const Styles = {
   Container,
   Button,
-  Label
+  Label,
 }
 
 export default Styles

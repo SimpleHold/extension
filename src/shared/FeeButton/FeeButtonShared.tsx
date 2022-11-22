@@ -10,10 +10,17 @@ import useVisible from '@hooks/useVisible'
 
 // Utils
 import { toUpper } from '@utils/format'
-import { checkWithZeroFee } from '@utils/currencies'
+
+// Coins
+import { checkIsZeroFee } from '@coins/index'
+
+// Assets
+import dropdownArrowIcon from '@assets/icons/dropdownArrow.svg'
+import warningIcon from '@assets/icons/warning.svg'
 
 // Types
 import { TFeeValue } from '../types'
+import { TFeeTypes } from '@utils/api/types'
 
 // Styles
 import Styles from './styles'
@@ -59,12 +66,7 @@ const FeeButtonShared: React.FC<Props> = (props) => {
         <Styles.Heading>
           <Styles.Label className="label">{withButton ? type : 'Network Fee'}</Styles.Label>
           {withButton ? (
-            <SVG
-              src="../../../assets/icons/dropdownArrow.svg"
-              width={8}
-              height={5}
-              className="arrow"
-            />
+            <SVG src={dropdownArrowIcon} width={8} height={5} className="arrow" />
           ) : null}
         </Styles.Heading>
         {isLoading ? (
@@ -72,12 +74,12 @@ const FeeButtonShared: React.FC<Props> = (props) => {
         ) : (
           <Styles.Body>
             <Styles.Fee isError={isError}>
-              {fee === 0 && !checkWithZeroFee(symbol) ? '-' : `${fee} ${toUpper(symbol)}`}
+              {fee === 0 && !checkIsZeroFee(symbol) ? '-' : `${fee} ${toUpper(symbol)}`}
             </Styles.Fee>
             {isError ? (
               <Styles.IconRow>
                 <Tooltip text="Insufficient funds" mt={5}>
-                  <SVG src="../../assets/icons/warning.svg" width={12} height={12} />
+                  <SVG src={warningIcon} width={12} height={12} />
                 </Tooltip>
               </Styles.IconRow>
             ) : null}

@@ -11,6 +11,9 @@ import HeaderMainButtons from '@components/HeaderMainButtons'
 // Utils
 import { getFormatEstimated, price } from '@utils/format'
 
+// Assets
+import clockIconPending from '@assets/icons/clockIconPending.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -21,17 +24,11 @@ interface Props {
   pendingBalance: null | number
   onClickReceive: () => void
   onClickSend: () => void
+  showSkeletons: boolean
 }
 
 const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
-  const {
-    isCollapsed,
-    balance,
-    estimated,
-    pendingBalance,
-    onClickReceive,
-    onClickSend,
-  } = props
+  const { isCollapsed, balance, estimated, pendingBalance, onClickReceive, onClickSend, showSkeletons } = props
 
   const containerHeight = isCollapsed ? 123 : 276
 
@@ -62,7 +59,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
         <Skeleton
           width={balanceSkeletonWidth}
           height={balanceFontSize}
-          isLoading={balance === null}
+          isLoading={showSkeletons || balance === null}
           type="light"
           mt={balanceRowMarginTop}
         >
@@ -75,7 +72,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
             >
               {numeral(balance).format('0.[000000]')} BTC
             </Styles.Balance>
-            {isCollapsed && (pendingBalance !== null) && (Number(pendingBalance) > 0) ? (
+            {isCollapsed && pendingBalance !== null && Number(pendingBalance) > 0 ? (
               <Styles.ClockIcon
                 style={{
                   width: clockIconSize,
@@ -83,11 +80,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
                   marginLeft: clockIconMarginLeft,
                 }}
               >
-                <SVG
-                  src='../../assets/icons/clockIconPending.svg'
-                  width={clockIconSize}
-                  height={clockIconSize}
-                />
+                <SVG src={clockIconPending} width={clockIconSize} height={clockIconSize} />
               </Styles.ClockIcon>
             ) : null}
           </Styles.BalanceRow>
@@ -96,9 +89,9 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
         <Skeleton
           width={120}
           height={estimatedLineHeight}
-          isLoading={estimated === null}
+          isLoading={showSkeletons || estimated === null}
           mt={estimatedMarginTop}
-          type='light'
+          type="light"
         >
           {estimated !== null ? (
             <Styles.Estimated
@@ -114,7 +107,7 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
           ) : null}
         </Skeleton>
 
-        {pendingBalance !== null && (Number(pendingBalance) > 0) ? (
+        {!showSkeletons && pendingBalance !== null && Number(pendingBalance) > 0 ? (
           <Styles.PendingBalanceRow
             style={{
               height: pendingBalanceRowHeight,
@@ -122,13 +115,14 @@ const CollapsibleHeader: React.FC<Props> = React.memo((props) => {
               marginTop: pendingBalanceRowMarginTop,
             }}
           >
-            <PendingBalance pending={pendingBalance} type='light' symbol='btc' />
+            <PendingBalance pending={pendingBalance} type="light" symbol="btc" />
           </Styles.PendingBalanceRow>
         ) : null}
 
-        <HeaderMainButtons isCollapsed={!isCollapsed}
-                           onClickReceive={onClickReceive}
-                           onClickSend={onClickSend}
+        <HeaderMainButtons
+          isCollapsed={!isCollapsed}
+          onClickReceive={onClickReceive}
+          onClickSend={onClickSend}
         />
       </Styles.Row>
     </Styles.Container>

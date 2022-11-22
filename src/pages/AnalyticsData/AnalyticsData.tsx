@@ -7,11 +7,15 @@ import Header from '@components/Header'
 import Button from '@components/Button'
 
 // Utils
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { setItem } from '@utils/storage'
 
 // Config
 import { ANALYTICS_OK } from '@config/events'
+
+// Assets
+import checkIcon from '@assets/icons/check.svg'
+import timesIcon from '@assets/icons/times.svg'
 
 // Styles
 import Styles from './styles'
@@ -46,7 +50,7 @@ const AnalyticsData: React.FC = () => {
           <Styles.ListRow color="#3FBB7D">
             <Styles.ListDivider>
               <Styles.ListIconRow color="#3FBB7D">
-                <SVG src="../../assets/icons/check.svg" width={9} height={9} title="check" />
+                <SVG src={checkIcon} width={9} height={9} title="check" />
               </Styles.ListIconRow>
             </Styles.ListDivider>
             <Styles.List>
@@ -58,7 +62,7 @@ const AnalyticsData: React.FC = () => {
           <Styles.ListRow color="#EB5757">
             <Styles.ListDivider>
               <Styles.ListIconRow color="#EB5757">
-                <SVG src="../../assets/icons/times.svg" width={9} height={9} title="times" />
+                <SVG src={timesIcon} width={9} height={9} title="times" />
               </Styles.ListIconRow>
             </Styles.ListDivider>
             <Styles.List>

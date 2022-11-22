@@ -9,11 +9,12 @@ import Skeleton from '@components/Skeleton'
 // Utils
 import { toUpper, numberFriendly, getFormatEstimated, getFormatBalance } from '@utils/format'
 import { logEvent } from '@utils/metrics'
-import { getLatestBalance, THardware } from '@utils/wallet'
+import { getLatestBalance, IWallet, THardware } from '@utils/wallet'
+import { getItem } from '@utils/storage'
 
 // Config
-import { getSharedToken, getToken } from '@config/tokens'
-import { getCurrency } from '@config/currencies'
+import { getSharedToken, getToken } from '@tokens/index'
+import { getCurrencyInfo } from '@config/currencies/utils'
 import { MAIN_SELECT_WALLET } from '@config/events'
 
 // Assets
@@ -44,6 +45,8 @@ interface Props {
   hardware?: THardware
   isNotActivated?: boolean
   isRedirect?: string
+  enableSkeleton?: boolean
+  wallet: IWallet
 }
 
 const emptyData = {
@@ -71,14 +74,17 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     hardware,
     isNotActivated,
     isRedirect,
+    enableSkeleton,
+    wallet,
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
-  const contractAddress = props.contractAddress || sharedToken?.address || (chain ? getToken(symbol, chain)?.address : undefined)
+  const contractAddress =
+    props.contractAddress ||
+    sharedToken?.address ||
+    (chain ? getToken(symbol, chain)?.address : undefined)
 
-  const enableSkeletons = false
-
-  const currency = chain ? getToken(symbol, chain) : getCurrency(symbol)
+  const currency = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 
   const history = useHistory()
 
@@ -88,10 +94,9 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
 
   React.useEffect(() => {
     loadBalance()
-  }, [])
+  }, [enableSkeleton])
 
   const loadBalance = async (): Promise<void> => {
-
     const savedData = getLatestBalance(address, symbol)
 
     const data = isNotActivated ? emptyData : savedData
@@ -133,6 +138,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
       uuid,
       hardware,
       isRedirect,
+      wallet,
     })
   }
 
@@ -145,7 +151,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
             <Styles.AddressInfo>
               <Styles.CurrencyInfo>
                 {hardware ? (
-                  <Styles.HardwareIconRow className='hardware-icon'>
+                  <Styles.HardwareIconRow className="hardware-icon">
                     <SVG
                       src={hardware.type === 'ledger' ? ledgerLogo : trezorLogo}
                       width={12}
@@ -153,7 +159,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
                     />
                   </Styles.HardwareIconRow>
                 ) : null}
-                <Styles.WalletName className='wallet-name'>{walletName}</Styles.WalletName>
+                <Styles.WalletName className="wallet-name">{walletName}</Styles.WalletName>
               </Styles.CurrencyInfo>
               {isNotActivated ? (
                 <Styles.ActivateBlock>
@@ -167,10 +173,10 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
             </Styles.AddressInfo>
             {!isNotActivated ? (
               <Styles.Balances>
-                <Skeleton width={110} height={16} type='gray' br={4} isLoading={enableSkeletons}>
+                <Skeleton width={110} height={16} type="gray" br={4} isLoading={!!enableSkeleton}>
                   <Styles.BalanceRow>
                     <Styles.Balance>
-                      {`${getFormatBalance(balance)} ${toUpper(symbol)}`}
+                      {`${getFormatBalance(balance) || 0} ${toUpper(symbol)}`}
                     </Styles.Balance>
                     {pendingBalance !== 0 ? (
                       <Styles.PendingIcon>
@@ -182,14 +188,14 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
                 <Skeleton
                   width={80}
                   height={16}
-                  type='gray'
+                  type="gray"
                   mt={7}
                   br={4}
-                  isLoading={enableSkeletons}
+                  isLoading={!!enableSkeleton}
                 >
                   <Styles.Estimated>{`$ ${getFormatEstimated(
                     estimated,
-                    numberFriendly(estimated),
+                    numberFriendly(estimated)
                   )}`}</Styles.Estimated>
                 </Skeleton>
               </Styles.Balances>

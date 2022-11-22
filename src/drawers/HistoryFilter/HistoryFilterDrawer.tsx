@@ -16,11 +16,14 @@ import { getItem, checkOneOfExist, removeItem, setItem, removeMany } from '@util
 import { toLower } from '@utils/format'
 
 // Config
-import { getCurrency } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyInfo } from '@config/currencies/utils'
+import { getToken } from '@tokens/index'
 
 // Hooks
 import useState from '@hooks/useState'
+
+// Assets
+import timesIcon from '@assets/icons/times.svg'
 
 // Types
 import { Props, TStatuses, TStatusItem, TCurrency, IState } from './types'
@@ -83,7 +86,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
       const currencies = uniqueWallets.sort(sortAlphabetically).map((wallet: IWallet) => {
         const { chain, symbol, name } = wallet
 
-        const getWalletInfo = chain ? getToken(symbol, chain) : getCurrency(symbol)
+        const getWalletInfo = chain ? getToken(symbol, chain) : getCurrencyInfo(symbol)
 
         return {
           symbol: getWalletInfo?.symbol || symbol,
@@ -122,29 +125,26 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
     updateState({ status })
   }
 
-  const onToggleCurrency = (
-    symbol: string,
-    name: string,
-    isActive: boolean,
-    chain?: string
-  ) => (): void => {
-    let selectedCurrencies = [...state.selectedCurrencies]
+  const onToggleCurrency =
+    (symbol: string, name: string, isActive: boolean, chain?: string) => (): void => {
+      let selectedCurrencies = [...state.selectedCurrencies]
 
-    if (isActive) {
-      selectedCurrencies = selectedCurrencies.filter(
-        (currency: TCurrency) =>
-          toLower(currency.symbol) !== toLower(symbol) || toLower(currency.chain) !== toLower(chain)
-      )
-    } else {
-      selectedCurrencies.push({
-        symbol,
-        chain,
-        name,
-      })
+      if (isActive) {
+        selectedCurrencies = selectedCurrencies.filter(
+          (currency: TCurrency) =>
+            toLower(currency.symbol) !== toLower(symbol) ||
+            toLower(currency.chain) !== toLower(chain)
+        )
+      } else {
+        selectedCurrencies.push({
+          symbol,
+          chain,
+          name,
+        })
+      }
+
+      updateState({ selectedCurrencies })
     }
-
-    updateState({ selectedCurrencies })
-  }
 
   const renderCurrencies = (
     <>
@@ -298,7 +298,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
                 <Styles.ResetGroup>
                   <Styles.ResetTitle>{state.selectedCurrencies.length} selected</Styles.ResetTitle>
                   <Styles.ResetIcon onClick={onResetCurrencies}>
-                    <SVG src="../../assets/icons/times.svg" width={8.33} height={8.33} />
+                    <SVG src={timesIcon} width={8.33} height={8.33} />
                   </Styles.ResetIcon>
                 </Styles.ResetGroup>
               ) : null}
@@ -318,7 +318,7 @@ const HistoryFilterDrawer: React.FC<Props> = (props) => {
                 <Styles.ResetGroup>
                   <Styles.ResetTitle>{state.selectedWallets.length} selected</Styles.ResetTitle>
                   <Styles.ResetIcon onClick={onResetWallets}>
-                    <SVG src="../../assets/icons/times.svg" width={8.33} height={8.33} />
+                    <SVG src={timesIcon} width={8.33} height={8.33} />
                   </Styles.ResetIcon>
                 </Styles.ResetGroup>
               ) : null}

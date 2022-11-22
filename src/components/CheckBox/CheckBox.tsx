@@ -1,6 +1,9 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
 
+// Assets
+import checkIcon from '@assets/icons/check.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -35,13 +38,7 @@ const CheckBox: React.FC<Props> = (props) => {
       size={size}
       borderSize={borderSize}
     >
-      {value ? (
-        <SVG
-          src="../../assets/icons/check.svg"
-          width={iconWidth || 9.5}
-          height={iconHeight || 7.5}
-        />
-      ) : null}
+      {value ? <SVG src={checkIcon} width={iconWidth || 9.5} height={iconHeight || 7.5} /> : null}
     </Styles.Container>
   )
 }

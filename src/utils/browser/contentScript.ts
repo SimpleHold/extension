@@ -1,4 +1,4 @@
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import copy from 'copy-to-clipboard'
 import qs from 'query-string'
 
@@ -12,12 +12,24 @@ let initialScreenY: number = 0
 let initialLeft: number = 0
 let initialTop: number = 0
 let isDraggableActive: boolean = false
+let activeRequest: string | null
 
 const setSHAttribute = async () => {
   if (!browser.extension.inIncognitoContext) {
     document.documentElement.setAttribute('sh-ex-status', 'installed')
   }
 }
+
+const executeScripts = async (): Promise<void> => {
+  const container = document.head || document.documentElement
+  const s = document.createElement('script')
+  s.src = browser.runtime.getURL('js/inpage.js')
+
+  container.appendChild(s)
+}
+
+setSHAttribute()
+executeScripts()
 
 const addCustomEventListener = (selector: string, event: any, handler: Function) => {
   const rootElement = document.querySelector<HTMLBodyElement>('body')
@@ -80,7 +92,7 @@ const createIframe = async (src: string) => {
   iframe.style.filter = 'drop-shadow(0px 5px 15px rgba(125, 126, 141, 0.5))'
   iframe.style.border = 'none'
 
-  iframe.src = browser.extension.getURL(src)
+  iframe.src = browser.runtime.getURL(src)
 
   document.body.insertBefore(iframe, document.body.firstChild)
 }
@@ -131,19 +143,6 @@ addCustomEventListener('#sh-send-button', 'click', async () => {
   }
 })
 
-const injectScript = () => {
-  const container = document.head || document.documentElement
-  const s = document.createElement('script')
-  s.src = browser.runtime.getURL('js/inpage.bundle.js')
-
-  container.appendChild(s)
-}
-
-injectScript()
-setSHAttribute()
-
-let activeRequest: string | null
-
 browser.runtime.onMessage.addListener(async (request: IRequest) => {
   if (request.type === 'set_address') {
     const { data } = request
@@ -173,8 +172,6 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
 
     copy(data.address)
     document.execCommand('paste')
-  } else if (request.type === 'close_select_address_window') {
-    removeIframe()
   } else if (request.type === 'initial_drag_positions') {
     const { screenX, screenY } = request.data
     const findIframe = document.getElementById('sh-iframe')

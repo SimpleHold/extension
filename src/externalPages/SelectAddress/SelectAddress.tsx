@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import SVG from 'react-inlinesvg'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 // Container
 import ExternalPageContainer from '@containers/ExternalPage'
@@ -13,14 +13,17 @@ import CurrenciesDropdown from '@components/CurrenciesDropdown'
 // Utils
 import { generateWalletName, getWallets, IWallet } from '@utils/wallet'
 import { toLower, toUpper } from '@utils/format'
-import { getItem, removeItem } from '@utils/storage'
+import { getItem, removeItem, setItem } from '@utils/storage'
 
 // Config
-import { getCurrency } from '@config/currencies'
-import { getToken } from '@config/tokens'
+import { getCurrencyInfo } from '@config/currencies/utils'
+import { getToken } from '@tokens/index'
 
 // Hooks
 import useState from '@hooks/useState'
+
+// Assets
+import filterIcon from '@assets/icons/filter.svg'
 
 // Types
 import { IState } from './types'
@@ -34,6 +37,10 @@ const initialState: IState = {
   selectedCurrency: null,
   tabInfo: null,
   isDraggable: false,
+}
+
+const LS = {
+  getItem: async (key: string) => (await browser.storage.local.get(key))[key],
 }
 
 const SelectAddress: React.FC = () => {
@@ -63,7 +70,13 @@ const SelectAddress: React.FC = () => {
     }
   }, [])
 
-  const checkActiveTab = () => {
+  const checkActiveTab = async () => {
+    const browserTabInfo = await LS.getItem('tab')
+
+    if (browserTabInfo) {
+      setItem('tab', browserTabInfo)
+    }
+
     const tabInfo: string | null = getItem('tab')
 
     if (tabInfo) {
@@ -92,12 +105,12 @@ const SelectAddress: React.FC = () => {
     const parseChain = queryChain !== 'null' && queryChain !== null ? queryChain : null
 
     if (queryCurrency !== 'null' && queryCurrency !== null) {
-      const getCurrencyInfo = parseChain
+      const currencyInfo = parseChain
         ? getToken(queryCurrency, parseChain)
-        : getCurrency(queryCurrency)
+        : getCurrencyInfo(queryCurrency)
 
-      if (getCurrencyInfo) {
-        const { symbol, name, background } = getCurrencyInfo
+      if (currencyInfo) {
+        const { symbol, name, background } = currencyInfo
 
         updateState({
           selectedCurrency: {
@@ -124,8 +137,6 @@ const SelectAddress: React.FC = () => {
   }
 
   const onClose = (): void => {
-    window.close()
-
     browser.runtime.sendMessage({
       type: 'close_select_address_window',
     })
@@ -142,17 +153,18 @@ const SelectAddress: React.FC = () => {
     if (getItem('tab')) {
       removeItem('tab')
     }
+
     onClose()
   }
 
   const onSelectCurrency = (index: number): void => {
     const currency = getDropdownList()[index]
-    const getCurrencyInfo = currency.logo?.chain
+    const currencyInfo = currency.logo?.chain
       ? getToken(currency.logo.symbol, currency.logo.chain)
-      : getCurrency(currency.logo.symbol)
+      : getCurrencyInfo(currency.logo.symbol)
 
-    if (getCurrencyInfo) {
-      const { symbol, name, background } = getCurrencyInfo
+    if (currencyInfo) {
+      const { symbol, name, background } = currencyInfo
 
       updateState({
         selectedCurrency: {
@@ -183,9 +195,9 @@ const SelectAddress: React.FC = () => {
         )
 
       return mapWallets.map((wallet: IWallet) => {
-        const getCurrencyInfo = wallet?.chain
+        const currencyInfo = wallet?.chain
           ? getToken(wallet.symbol, wallet.chain)
-          : getCurrency(wallet.symbol)
+          : getCurrencyInfo(wallet.symbol)
 
         return {
           logo: {
@@ -193,10 +205,10 @@ const SelectAddress: React.FC = () => {
             width: 40,
             height: 40,
             br: 13,
-            background: getCurrencyInfo?.background || '',
+            background: currencyInfo?.background || '',
             chain: wallet.chain,
           },
-          value: getCurrencyInfo?.name || '',
+          value: currencyInfo?.name || '',
         }
       })
     }
@@ -242,7 +254,7 @@ const SelectAddress: React.FC = () => {
                 : 'My addresses'}
             </Styles.AddressesLabel>
             <Styles.FiltersButton onClick={toggleFilters} isActive={state.isFiltersActive}>
-              <SVG src="../../assets/icons/filter.svg" width={20} height={16} />
+              <SVG src={filterIcon} width={20} height={16} />
             </Styles.FiltersButton>
           </Styles.AddressesRow>
 
@@ -263,16 +275,8 @@ const SelectAddress: React.FC = () => {
           {filterWallets?.length ? (
             <Styles.AddressesList>
               {filterWallets.map((wallet: IWallet, index: number) => {
-                const {
-                  address,
-                  symbol,
-                  chain,
-                  name,
-                  contractAddress,
-                  decimals,
-                  uuid,
-                  hardware,
-                } = wallet
+                const { address, symbol, chain, name, contractAddress, decimals, uuid, hardware } =
+                  wallet
 
                 const walletName =
                   wallet.walletName ||
@@ -291,6 +295,7 @@ const SelectAddress: React.FC = () => {
                     walletName={walletName}
                     uuid={uuid}
                     hardware={hardware}
+                    wallet={wallet}
                   />
                 )
               })}
@@ -304,4 +309,6 @@ const SelectAddress: React.FC = () => {
   )
 }
 
-render(<SelectAddress />, document.getElementById('select-address'))
+browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+  render(<SelectAddress />, document.getElementById('select-address'))
+})

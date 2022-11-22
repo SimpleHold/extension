@@ -1,11 +1,11 @@
-import * as React from "react";
-import SVG from "react-inlinesvg";
+import * as React from 'react'
+import SVG from 'react-inlinesvg'
 
 // Assets
-import searchIcon from "@assets/icons/searchIcon.svg";
+import searchIcon from '@assets/icons/searchIcon.svg'
 
 // Styles
-import Styles from "./styles";
+import Styles from './styles'
 
 interface Props {
   value: string
@@ -14,34 +14,34 @@ interface Props {
 }
 
 const SearchBar: React.FC<Props> = (props) => {
-  const { value, onChange, placeholder = '' } = props;
+  const { value, onChange, placeholder = '' } = props
 
-  const [isFocused, setIsFocused] = React.useState<boolean>(false);
+  const [isFocused, setIsFocused] = React.useState<boolean>(false)
 
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null)
 
   const onChangeInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    onChange(e.target.value);
-  };
+    onChange(e.target.value)
+  }
 
   const onFocus = (): void => {
-    setIsFocused(true);
-  };
+    setIsFocused(true)
+  }
 
   const onBlur = () => {
-    setIsFocused(false);
-  };
+    setIsFocused(false)
+  }
 
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') {
-      onChange("")
+      onChange('')
     }
   }
 
   return (
-    <Styles.Container isFocused={isFocused} className={"search"}>
+    <Styles.Container isFocused={isFocused} className={'search'}>
       <Styles.Row>
-        <SVG src={searchIcon} width={16} height={16} className="search-icon"/>
+        <SVG src={searchIcon} width={16} height={16} className="search-icon" />
         <Styles.Input
           placeholder={placeholder}
           value={value}
@@ -53,7 +53,7 @@ const SearchBar: React.FC<Props> = (props) => {
         />
       </Styles.Row>
     </Styles.Container>
-  );
-};
+  )
+}
 
-export default SearchBar;
+export default SearchBar

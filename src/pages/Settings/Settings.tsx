@@ -14,10 +14,10 @@ import LogoutDrawer from '@drawers/Logout'
 
 // Utils
 import { downloadBackupFile as downloadBackup } from '@utils/backup'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 import { sha256hash } from '@utils/crypto'
 import { detectBrowser, detectOS } from '@utils/detect'
-import { getUrl, openAppInNewWindow, openWebPage } from '@utils/extension'
+import { openAppInNewWindow, openWebPage } from '@utils/extension'
 import { getManifest } from '@utils/extension'
 import { getItem, setItem, removeItem, removeCache } from '@utils/storage'
 
@@ -27,7 +27,8 @@ import {
   SETTINGS_SIGN_IN_MOBILE,
   SETTINGS_OPEN_WINDOW,
   SUPPORT_SELECT,
-  SETTINGS_SELECT, SETTINGS_TOGGLE_PASSCODE,
+  SETTINGS_SELECT,
+  SETTINGS_TOGGLE_PASSCODE,
 } from '@config/events'
 
 // Hooks
@@ -83,7 +84,8 @@ const Settings: React.FC = () => {
     }
   }
 
-  const onDownloadBackup = async () => { // Manual download for mac/chrome is currently removed
+  const onDownloadBackup = async () => {
+    // Manual download for mac/chrome is currently removed
     const backup = getItem('backup')
 
     if (backup) {
@@ -92,7 +94,6 @@ const Settings: React.FC = () => {
       })
 
       await downloadBackup(backup)
-      removeCache()
     }
   }
 
@@ -185,6 +186,8 @@ const Settings: React.FC = () => {
 
   const onConfirmLogout = async () => {
     await onDownloadBackup()
+    removeCache()
+
     history.push('/welcome')
   }
 
@@ -229,7 +232,7 @@ const Settings: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle='Back' onBack={history.goBack} activePage='settings' whiteLogo />
+        <Header withBack backTitle="Back" onBack={history.goBack} activePage="settings" whiteLogo />
         <Styles.Container>
           <Styles.Row>
             <Styles.Title>Settings</Styles.Title>
@@ -270,7 +273,7 @@ const Settings: React.FC = () => {
                           src={icon.source}
                           width={icon.width}
                           height={icon.height}
-                          title='icon'
+                          title="icon"
                         />
                       </Styles.IconRow>
                     ) : null}
@@ -285,7 +288,7 @@ const Settings: React.FC = () => {
             </Styles.ExtensionInfo>
           </Styles.Row>
           <Styles.Actions>
-            <Button label='Log out & clear cache' onClick={onLogout} isDanger />
+            <Button label="Log out & clear cache" onClick={onLogout} isDanger />
           </Styles.Actions>
         </Styles.Container>
       </Styles.Wrapper>

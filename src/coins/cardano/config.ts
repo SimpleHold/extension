@@ -1,0 +1,17 @@
+export const HARDENED_THRESHOLD = 0x80000000
+
+export const shelleyPath = [
+  HARDENED_THRESHOLD + 1852,
+  HARDENED_THRESHOLD + 1815,
+  HARDENED_THRESHOLD,
+  0,
+  0,
+]
+
+export const shelleyStakeAccountPath = [
+  HARDENED_THRESHOLD + 1852,
+  HARDENED_THRESHOLD + 1815,
+  HARDENED_THRESHOLD,
+  2,
+  0,
+]

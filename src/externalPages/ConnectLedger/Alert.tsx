@@ -1,6 +1,9 @@
 import * as React from 'react'
 import SVG from 'react-inlinesvg'
 
+// Assets
+import warningIcon from '@assets/icons/warning.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -18,7 +21,7 @@ const Alert: React.FC<Props> = (props) => {
     <Styles.Alert type={type} onClick={onClick}>
       <Styles.AlertRow>
         <Styles.AlertIcon>
-          <SVG src="../../assets/icons/warning.svg" width={16} height={16} />
+          <SVG src={warningIcon} width={16} height={16} />
         </Styles.AlertIcon>
         <Styles.AlertText>{text}</Styles.AlertText>
       </Styles.AlertRow>

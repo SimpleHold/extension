@@ -16,7 +16,7 @@ import HistoryFilterDrawer from '@drawers/HistoryFilter'
 
 // Utils
 import { generateWalletName, getWallets, IWallet } from '@utils/wallet'
-import { getFullHistory, groupHistory, THistoryTxGroup } from 'utils/history'
+import { getFullHistory, groupHistory, THistoryTxGroup } from '@utils/history'
 import { toLower } from '@utils/format'
 import { checkOneOfExist, getItem } from '@utils/storage'
 import { updateTxsHistory } from '@utils/history'
@@ -28,6 +28,9 @@ import useState from '@hooks/useState'
 import { IState, TTxData } from './types'
 import { TTxFullInfo } from '@utils/api/types'
 
+// Assets
+import sortIcon from '@assets/icons/sort.svg'
+
 // Styles
 import Styles from './styles'
 
@@ -35,7 +38,7 @@ const initialState: IState = {
   activeDrawer: null,
   txGroups: null,
   wallets: [],
-  isNotFound: false
+  isNotFound: false,
 }
 
 const TxHistory: React.FC = () => {
@@ -49,7 +52,7 @@ const TxHistory: React.FC = () => {
 
   React.useEffect(() => {
     if (state.wallets.length && state.txGroups === null) {
-      const savedHistory = getItem("full_history")
+      const savedHistory = getItem('full_history')
       if (!savedHistory?.length) {
         onGetTxHistory()
       } else {
@@ -136,7 +139,7 @@ const TxHistory: React.FC = () => {
     <Styles.Loading>
       <Styles.Group>
         <Styles.GroupDateRow>
-          <Skeleton width={50} height={16} br={5} type='gray' isLoading />
+          <Skeleton width={50} height={16} br={5} type="gray" isLoading />
         </Styles.GroupDateRow>
         {Array(7)
           .fill('loading')
@@ -182,7 +185,7 @@ const TxHistory: React.FC = () => {
                     date,
                     isPending,
                     symbol,
-                    tokenSymbol
+                    tokenSymbol,
                   } = tx
                   const walletName = getNameWallet(symbol, address)
                   const tokenChain = tokenSymbol ? chain : undefined
@@ -196,7 +199,7 @@ const TxHistory: React.FC = () => {
                         amount,
                         estimated,
                         isPending,
-                        tokenChain
+                        tokenChain,
                       }}
                       onClick={openTx(tx)}
                     />
@@ -228,12 +231,12 @@ const TxHistory: React.FC = () => {
     <>
       <Styles.Wrapper>
         <Cover />
-        <Header withBack backTitle='Home' onBack={history.goBack} whiteLogo />
+        <Header withBack backTitle="Home" onBack={history.goBack} whiteLogo />
         <Styles.Container>
           <Styles.Heading>
             <Styles.Title>History</Styles.Title>
             <Styles.Button onClick={openFilters}>
-              <SVG src='../../assets/icons/sort.svg' width={18} height={14} />
+              <SVG src={sortIcon} width={18} height={14} />
               {isFiltersActive() ? <Styles.ButtonDot /> : null}
             </Styles.Button>
           </Styles.Heading>

@@ -15,18 +15,17 @@ import Button from '@components/Button'
 // Utils
 import { openWebPage } from '@utils/extension'
 import { setItem } from '@utils/storage'
-import { logEvent } from 'utils/metrics'
+import { logEvent } from '@utils/metrics'
 
 // Styles
 import Styles from './styles'
 
 interface Props {
-  onBlur?:() => void
-  onClose:() => void
+  onBlur?: () => void
+  onClose: () => void
 }
 
 const PolicyPopup: React.FC<Props> = ({ onBlur, onClose }) => {
-
   const onBlurHandler = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.stopPropagation()
     onBlur && onBlur()
@@ -38,8 +37,8 @@ const PolicyPopup: React.FC<Props> = ({ onBlur, onClose }) => {
     logEvent({
       name: ANALYTICS_OK,
       properties: {
-        option: "ok"
-      }
+        option: 'ok',
+      },
     })
     onClose()
   }
@@ -48,8 +47,8 @@ const PolicyPopup: React.FC<Props> = ({ onBlur, onClose }) => {
     logEvent({
       name: ANALYTICS_OK,
       properties: {
-        option: "skip"
-      }
+        option: 'skip',
+      },
     })
     onClose()
   }
@@ -57,13 +56,11 @@ const PolicyPopup: React.FC<Props> = ({ onBlur, onClose }) => {
   return (
     <Popup>
       <Styles.Wrapper onClick={onBlurHandler}>
-        <Styles.Title>
-          Help Us to Improve Our App
-        </Styles.Title>
+        <Styles.Title>Help Us to Improve Our App</Styles.Title>
         <Styles.Description>
-          SimpleHold would like to gather usage data to understand better how users interact with the wallet. This data
-          will be used only for improving the usability and user experience
-          of our product.
+          SimpleHold would like to gather usage data to understand better how users interact with
+          the wallet. This data will be used only for improving the usability and user experience of
+          our product.
         </Styles.Description>
         <Styles.Links>
           <Styles.LinkItem onClick={() => openWebPage('https://simplehold.io/privacy')}>
@@ -71,14 +68,14 @@ const PolicyPopup: React.FC<Props> = ({ onBlur, onClose }) => {
               <SVG src={documentsIcon} width={16} height={16} />
             </Styles.DocumentsIcon>
             <span>Privacy Policy</span>
-            <SVG src={arrowIcon} width={6} height={14} className={'arrow'}/>
+            <SVG src={arrowIcon} width={6} height={14} className={'arrow'} />
           </Styles.LinkItem>
           <Styles.LinkItem onClick={() => openWebPage('https://simplehold.io/terms')}>
             <Styles.DocumentsIcon>
               <SVG src={documentsIcon} width={16} height={16} />
             </Styles.DocumentsIcon>
             <span>Terms of Use</span>
-            <SVG src={arrowIcon} width={6} height={14} className={'arrow'}/>
+            <SVG src={arrowIcon} width={6} height={14} className={'arrow'} />
           </Styles.LinkItem>
         </Styles.Links>
         <Styles.Buttons>
@@ -91,5 +88,3 @@ const PolicyPopup: React.FC<Props> = ({ onBlur, onClose }) => {
 }
 
 export default PolicyPopup
-
-
