@@ -35,6 +35,9 @@ import plusCircleIcon from '@assets/icons/plusCircle.svg'
 // Types
 import { ILocationState, IState } from './types'
 
+// Utils
+import { getTokens } from '@utils/localTokens'
+
 // Styles
 import Styles from './styles'
 
