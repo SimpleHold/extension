@@ -63,6 +63,12 @@
       ]
     }
   ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{46af0774-2e97-4f10-802c-5e25d6541bff}",
+      "strict_min_version": "42.0"
+    }
+  },
   "host_permissions": ["*://*.simplehold.io/*", "*://*.simpleswap.io/*"],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"

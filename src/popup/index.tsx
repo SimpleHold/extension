@@ -28,7 +28,7 @@ const App: React.FC = () => {
     getPlatformInfo()
     setWindowResize()
     disableBrowserTranslation()
-    browser.runtime.setUninstallURL('https://simpleproducts.typeform.com/nps-score')
+    browser.runtime.setUninstallURL(`https://simplehold.io/survey?id=${getItem('clientId')}`)
   }, [])
 
   const getPlatformInfo = async (): Promise<void> => {
