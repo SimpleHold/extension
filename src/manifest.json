@@ -17,7 +17,6 @@
     "clipboardWrite",
     "clipboardRead",
     "cookies",
-    "scripting",
     "storage",
     "alarms"
   ],
