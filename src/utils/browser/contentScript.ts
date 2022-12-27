@@ -23,7 +23,7 @@ const setSHAttribute = async () => {
 const executeScripts = async (): Promise<void> => {
   const container = document.head || document.documentElement
   const s = document.createElement('script')
-  s.src = browser.runtime.getURL('js/inpage.js')
+  s.src = browser.runtime.getURL('inpage.js')
 
   container.appendChild(s)
 }
