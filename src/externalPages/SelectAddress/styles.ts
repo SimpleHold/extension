@@ -128,6 +128,11 @@ const NotFound = styled.p`
   color: #7d7e8d;
 `
 
+const WalletCard = {
+  backgroundColor: '#FFFFFF',
+  borderRadius: 10,
+}
+
 const Styles = {
   Body,
   Row,
@@ -144,6 +149,7 @@ const Styles = {
   AddressesList,
   FiltersRow,
   NotFound,
+  WalletCard,
 }
 
 export default Styles

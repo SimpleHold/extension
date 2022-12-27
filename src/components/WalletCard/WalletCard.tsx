@@ -47,6 +47,7 @@ interface Props {
   isRedirect?: string
   enableSkeleton?: boolean
   wallet: IWallet
+  containerStyle?: Object
 }
 
 const emptyData = {
@@ -76,6 +77,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
     isRedirect,
     enableSkeleton,
     wallet,
+    containerStyle,
   } = props
 
   const sharedToken = getSharedToken(symbol, chain)
@@ -143,7 +145,7 @@ const WalletCard: React.FC<Props> = React.memo((props) => {
   }
 
   return (
-    <Styles.Wrapper onClick={openWallet} className={'walletCard'}>
+    <Styles.Wrapper onClick={openWallet} className={'walletCard'} style={containerStyle}>
       <Styles.Container className={'container'}>
         <Styles.Card>
           <CurrencyLogo size={40} symbol={symbol} chain={chain} name={name} />

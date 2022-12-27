@@ -70,9 +70,12 @@ browser.runtime.onMessage.addListener(async (request: IRequest) => {
   const { type, data } = request
 
   if (type === 'close_select_address_window') {
-    const [{ id: tabId }] = await browser.tabs.query({ active: true, currentWindow: true })
+    const [{ id: tabId, url: tabUrl }] = await browser.tabs.query({
+      active: true,
+      currentWindow: true,
+    })
 
-    if (tabId) {
+    if (tabId && tabUrl?.indexOf('chrome-extension') !== -1) {
       await browser.tabs.remove(tabId)
     }
 

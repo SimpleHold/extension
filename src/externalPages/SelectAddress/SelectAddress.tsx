@@ -296,6 +296,7 @@ const SelectAddress: React.FC = () => {
                     uuid={uuid}
                     hardware={hardware}
                     wallet={wallet}
+                    containerStyle={Styles.WalletCard}
                   />
                 )
               })}
