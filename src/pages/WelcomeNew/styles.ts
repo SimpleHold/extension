@@ -60,8 +60,7 @@ const Wrapper = styled.div`
   }
 
   .container {
-    padding: ${({ theme }: TThemeProps) =>
-      theme === 'swapspace' ? '240px 30px 0 30px' : '20px 30px 0 30px'};
+    padding: 20px 30px 0 30px;
   }
 
   .slide {
@@ -83,11 +82,14 @@ const Row = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: ${({ theme }: TThemeProps) => (theme === 'swapspace' ? '200px' : '0')};
 `
 
 const Illustrate = styled.img`
-  width: 230px;
-  height: 200px;
+  width: ${({ theme }: TThemeProps) => (theme === 'swapspace' ? '375px' : '230px')};
+  height: ${({ theme }: TThemeProps) => (theme === 'swapspace' ? '315px' : '200px')};
+  position: ${({ theme }: TThemeProps) => (theme === 'swapspace' ? 'absolute' : 'relative')};
+  top: ${({ theme }: TThemeProps) => (theme === 'swapspace' ? '0' : 'initial')};
 `
 
 const Title = styled.p`

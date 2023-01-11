@@ -164,8 +164,8 @@ const WelcomeNew: React.FC = () => {
         isAbsolute
       />
       <Styles.Container className="container">
-        <Styles.Row>
-          <Styles.Illustrate src={themes[theme][0].image} alt="illustrate" />
+        <Styles.Row theme={theme}>
+          <Styles.Illustrate src={themes[theme][0].image} theme={theme} alt="illustrate" />
           <Styles.Title className="title">{themes[theme][0].title}</Styles.Title>
           <Styles.Description className="description">
             {themes[theme][0].description}
