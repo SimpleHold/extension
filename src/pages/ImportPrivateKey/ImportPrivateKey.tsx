@@ -149,7 +149,7 @@ const ImportPrivateKey: React.FC = () => {
 
   const getCurrenciesList = (getCurrencyInfo?: TCurrency | undefined | null): string[] => {
     if (getCurrencyInfo) {
-      return getList(getCurrencyInfo.symbol, chain)
+      return getList(symbol, chain)
     }
 
     return [symbol]
