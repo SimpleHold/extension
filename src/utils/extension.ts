@@ -14,9 +14,9 @@ export const openWebPage = async (url: string): Promise<void> => {
   await browser.tabs.create({ url })
 }
 
-export const openAppInNewWindow = (): void => {
+export const openAppInNewWindow = (src?: string): void => {
   window.open(
-    getUrl('popup.html'),
+    getUrl(`${src ?? 'popup.html'}`),
     'SimpleHold Wallet',
     'popup=yes,left=500,top=0,width=375,height=630,resizable=no,location=no,status=no,scrollbars=no'
   )
