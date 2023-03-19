@@ -6,6 +6,7 @@ import qs from 'query-string'
 import { IRequest } from '@utils/browser/types'
 import { detectBrowser } from '@utils/detect'
 import { isFullScreen } from '@utils/window'
+import { openAppInNewWindow } from '@utils/extension';
 
 let initialScreenX: number = 0
 let initialScreenY: number = 0
@@ -112,7 +113,7 @@ addCustomEventListener('#sh-button', 'click', async () => {
       isDraggable: true,
     })
 
-    await createIframe(`select-address.html?${params}`)
+    await openAppInNewWindow(`select-address.html?${params}`)
   }
 })
 
@@ -139,7 +140,7 @@ addCustomEventListener('#sh-send-button', 'click', async () => {
       },
     })
 
-    await createIframe(`send.html?isDraggable=true`)
+    await openAppInNewWindow(`send.html?isDraggable=true`)
   }
 })
 
