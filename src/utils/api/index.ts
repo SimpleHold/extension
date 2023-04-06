@@ -68,13 +68,13 @@ export const fetchBalances = async (
   wallets: TGetBalancesWalletProps[]
 ): Promise<IGetBalances[]> => {
   const request = await sendRequest<IGetBalances[]>({
-    url: `${config.serverUrl}/wallet/balances-extension`,
+    url: `${config.serverUrl}/wallet/balances`,
     method: 'POST',
     data: {
       wallets,
-      hash: await getHash(),
+      // hash: await getHash(),
     },
-    timeout: 120000,
+    timeout: 180000,
   })
 
   return request || []
@@ -259,13 +259,13 @@ export const getWarning = async (symbol: string, chain?: string): Promise<string
 
 export const fetchFullTxHistory = async (wallets: TTxWallet[]): Promise<TFullTxWallet[]> => {
   const request = await sendRequest<TFullTxWallet[]>({
-    url: `${config.serverUrl}/transaction/transactions-full-info-extension`,
+    url: `${config.serverUrl}/transaction/transactions-full-info`,
     method: 'POST',
     data: {
       wallets,
-      hash: await getHash(),
+      // hash: await getHash(),
     },
-    timeout: 120000,
+    timeout: 240000,
   })
 
   return request || []
